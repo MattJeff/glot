@@ -1,6 +1,6 @@
 # Runtime fallback
 
-You ship a handful of locales with `glot translate`. Visitors whose language is not one of them usually get English. `@glot/runtime` covers that long tail at zero cost: the UI is translated **on the device** with the browser's Translator API (Chrome), with the same guarantees as the CLI.
+You ship a handful of locales with `glot translate`. Visitors whose language is not one of them usually get English. `@glot-i18n/runtime` covers that long tail at zero cost: the UI is translated **on the device** with the browser's Translator API (Chrome), with the same guarantees as the CLI.
 
 - Placeholders, rich-text tags and glossary terms are masked before translation and restored after.
 - Plural structure is kept.
@@ -8,15 +8,15 @@ You ship a handful of locales with `glot translate`. Visitors whose language is 
 - Shipped locales are never touched.
 
 ```sh
-npm i @glot/runtime
+npm i @glot-i18n/runtime
 ```
 
-Serve `node_modules/@glot/runtime/dist/glot.wasm` (for example as `public/glot.wasm`) and pass `wasm="/glot.wasm"`, or let your bundler resolve it next to the module.
+Serve `node_modules/@glot-i18n/runtime/dist/glot.wasm` (for example as `public/glot.wasm`) and pass `wasm="/glot.wasm"`, or let your bundler resolve it next to the module.
 
 ## Plain JS
 
 ```ts
-import { fallbackWithBadge } from "@glot/runtime";
+import { fallbackWithBadge } from "@glot-i18n/runtime";
 
 await fallbackWithBadge({ source: en, glossary, locale: "de", onMessages: (m) => render(m) });
 ```
@@ -29,7 +29,7 @@ await fallbackWithBadge({ source: en, glossary, locale: "de", onMessages: (m) =>
 // app/layout.tsx (Server Component)
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { GlotFallbackProvider } from "@glot/runtime/next-intl";
+import { GlotFallbackProvider } from "@glot-i18n/runtime/next-intl";
 
 <NextIntlClientProvider>
   <GlotFallbackProvider shipped={["en", "fr"]} source={await getMessages()} glossary={glossary} wasm="/glot.wasm">
@@ -42,7 +42,7 @@ import { GlotFallbackProvider } from "@glot/runtime/next-intl";
 - **Server Components**: replace `getTranslations` with `getGlotTranslations`:
 
 ```tsx
-import { getGlotTranslations } from "@glot/runtime/next-intl/server";
+import { getGlotTranslations } from "@glot-i18n/runtime/next-intl/server";
 
 const t = await getGlotTranslations("home");
 return <h1>{t("title", { name })}</h1>;
@@ -55,7 +55,7 @@ Limits: `t()` from `getGlotTranslations` returns elements, so keep next-intl's `
 ## i18next
 
 ```ts
-import { GlotFallbackBackend } from "@glot/runtime/i18next";
+import { GlotFallbackBackend } from "@glot-i18n/runtime/i18next";
 // chain it after your normal backend; use `react: { bindI18nStore: "added" }` to re-render once the model is downloaded
 ```
 

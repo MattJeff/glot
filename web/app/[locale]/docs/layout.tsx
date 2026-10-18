@@ -21,12 +21,17 @@ export default async function DocsLayout({ children, params }: LayoutProps<"/[lo
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
+      <a href="#main" className="sr-only z-50 rounded-md bg-background px-3 py-2 focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:shadow-lg">
+        {t("skip")}
+      </a>
+      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
+        {/* Reading progress: a CSS scroll timeline, no JS (hidden where unsupported). */}
+        <div aria-hidden className="reading-progress" />
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
           <Link href="/" aria-label={t("home")}>
             <Logo />
           </Link>
-          <Link href="/docs" className="hidden text-sm font-medium sm:inline">
+          <Link href="/docs" className="hidden rounded-md px-2 py-1 text-sm font-medium transition-colors hover:bg-muted sm:inline">
             {t("title")}
           </Link>
           <div className="ms-auto flex flex-1 items-center justify-end gap-1">
@@ -53,7 +58,7 @@ export default async function DocsLayout({ children, params }: LayoutProps<"/[lo
             <SidebarNav nav={nav} />
           </div>
         </details>
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto py-8 lg:block">
+        <aside aria-label={t("menu")} className="sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto py-8 pe-2 lg:block">
           <SidebarNav nav={nav} />
         </aside>
         <main id="main" className="min-w-0 py-8">

@@ -196,6 +196,12 @@ GET    /api/projects/{slug}/sync/pull  -> {catalogs, lock (notes = descriptions 
 GET    /cdn/{slug}/{locale}.json       (OTA, public si public_cdn, ETag + Cache-Control) -> JSON imbriqué
        ?ondemand=1 : locale non livrée → 202 + job (voir « On-demand locales »), puis 200
 GET|PUT /api/projects/{slug}/ondemand  {locales:["de"]|["*"], monthly_budget_usd?, per_day}
+GET    /api/projects/{slug}/onboarding  -> {server_url,slug,source_locale,keys,first_push_at,locales:[{locale,translated,reviewed,missing,errors}],
+         path,hidden,steps:[{id,done}],achievements:[{id,unlocked_at}]}   (onboarding.rs ; étapes dérivées de l'état réel,
+         jalons first_push|first_locale_100|zero_errors|five_languages|glossary_set persistés dans `achievements`, jamais retirés)
+PATCH  /api/projects/{slug}/onboarding  {path?: "agent"|"terminal"|"github", hidden?}
+POST   /api/projects/{slug}/onboarding/token -> {token}   (token API perso nommé "<slug> (onboarding)", montré une fois)
+GET    /badge/{slug}.json              (public si public_cdn ; endpoint shields.io ; 1er fetch => étape « badge README » cochée)
 GET    /api/openapi.json
 GET    /healthz
 ```
@@ -446,6 +452,22 @@ auto-init ; `labels` à passer traduits. Dashboard : `/app/{slug}/feedback`.
   `<Html dir>` absent pour une locale RTL (warning), largeur réellement rendue par resvg (bbox usvg) > budget, OG plus
   haut que l'image. Exit 1 si erreur.
 
+## Emails transactionnels (`crates/server/src/email.rs`, migration `0070_email.sql`, catalogue `crates/server/emails/`)
+API HTTP Resend (reqwest), off si `RESEND_API_KEY` absent (`AppState.mailer = None`). Outbox Postgres `email_outbox` : rendu
+(HTML + texte, `{locale}.json` traduit par glot, repli en) à l'enqueue, `idem_key` UNIQUE (doublons ignorés), budget
+`GLOT_EMAIL_RATE_PER_HOUR` par destinataire ; worker `SKIP LOCKED`, `Idempotency-Key` = id de la ligne, 429/409/5xx/réseau →
+retry 30 s × 2^n (6 essais), autre 4xx → `failed` ; corps effacés après envoi/échec (liens à usage unique).
+```
+POST /api/auth/verify-email {token} -> 204        (48 h, usage unique ; change users.email si changement d'adresse, notifie l'ancienne)
+POST /api/auth/verify-email/resend -> 204          (session ; 503 email_disabled)
+POST /api/auth/forgot-password {email} -> 204      (toujours 204 ; 503 si email off)
+POST /api/auth/reset-password {token,password}     (1 h, usage unique, adresse inchangée ; supprime toutes les sessions)
+PUT  /api/me/password {current_password,password}  (garde la session courante) · PUT /api/me/email {email,password} -> {pending}
+GET  /api/me -> User + {email_verified, email_enabled, locale, notify_job_done} · PATCH /api/me {locale?, notify_job_done?}
+```
+Tokens : sha256 dans `email_tokens`. `jobs.created_by` (POST …/jobs) reçoit `job_done`/`job_failed` si `notify_job_done`.
+Web : `/verify-email`, `/forgot-password`, `/reset-password`, bannière (`VerifyEmailBanner`), `/app/settings/account`.
+
 ## MCP distant (`crates/server/src/mcp_remote.rs` + `mcp_remote/oauth.rs`, migration `0060_mcp_remote.sql`, doc `web/content/docs/mcp-remote.md`)
 - `POST /mcp` : rmcp Streamable HTTP **stateless** (`NeverSessionManager`, réponses JSON), 1 projet par connexion. Outils =
   appels directs des handlers REST (`keys::*`, `jobs::*`, `review::*`, `sync::pull`…) → mêmes rôles/validation/historique.
@@ -462,3 +484,49 @@ auto-init ; `labels` à passer traduits. Dashboard : `/app/{slug}/feedback`.
   stockés en sha256 (`oauth_codes`, `oauth_grants`).
 - Sécurité : Origin validé par rmcp (`GLOT_WEB_ORIGIN` + `GLOT_MCP_ALLOWED_ORIGINS`), Host = `GLOT_PUBLIC_URL` si défini ;
   rate limit `mcp_rate` par token (`GLOT_MCP_RATE_PER_MIN`, défaut 120) ; audit `mcp_audit` (outil, ok, ms, client ; jamais les arguments).
+
+## Billing (`crates/server/src/billing.rs`, migration `0080_billing.sql`, doc `docs/billing.md`)
+Off unless `STRIPE_SECRET_KEY` is set (self-hosted = no limit; CLI / local MCP never reach it). One account per user, covering
+the projects it owns. Monthly counters `billing_usage` + plan limits (`GLOT_PLAN_LIMITS` override) → 402 `quota_exceeded` /
+`plan_required` / `plan_limit` with an upgrade link, enforced in `projects::create`, `cdn::serve`, `insights::ingest`,
+`mcp_remote::guard`, `ondemand::gate`, `jobs::create` (glot's LLM key only; BYOK never counted; overage → Billing Meter
+`glot_llm_strings` when the subscription is metered). Stripe: Checkout / Portal / invoices / `POST /api/billing/webhook`
+(signature, idempotent `stripe_events`, out-of-order guard), API version `2026-09-30.endive`, prices by lookup key
+(`deploy/stripe-setup.sh`). `past_due` keeps the plan until `grace_until` (first failed invoice + 7 days).
+Web: `/pricing`, `/app/settings/billing`.
+
+## Connect GitHub (`crates/server/src/github_app.rs`, migration `0101_github_app.sql`, doc `web/content/docs/github.md`)
+Une GitHub App par déploiement, créée par le flux manifest (`/admin/github-app`, admins = `GLOT_ADMIN_EMAILS`) ; app_id,
+clé privée, webhook secret, client secret chiffrés (GLOT_SECRET_KEY) dans `github_app`. Permissions : contents:write,
+pull_requests:write, metadata:read ; webhooks push, pull_request (+ installation, implicite).
+```
+GET  /api/github/app                      -> {configured, can_admin, slug, app_id, html_url, webhook_url}
+POST /api/github/app/manifest {name?,org?} -> {action, manifest}   (admin ; la page POSTe le formulaire vers github.com)
+GET  /api/github/app/callback?code&state  (public : state usage unique 1 h → POST /app-manifests/{code}/conversions)
+GET  /api/projects/{slug}/github          -> {app|null, installations:[{id,account}], link|null, job|null}
+POST /api/projects/{slug}/github/connect  -> {install_url, authorize_url}   (admin du projet)
+GET  /api/github/callback?code&state      (public : code OAuth → GET /user/installations = preuve d'accès, jamais l'installation_id de l'URL)
+GET  /api/projects/{slug}/github/repos?installation_id -> [{full_name, default_branch, private}]
+PUT  /api/projects/{slug}/github/link {installation_id, repo, branch?} -> {link, job}  (job github_localize)
+POST /api/projects/{slug}/github/run -> Job ; DELETE …/link
+POST /api/github/webhook                  (X-Hub-Signature-256 ; push sur la branche liée → job github_update ;
+                                           pull_request closed → oublie la PR ; installation deleted → supprime les liens)
+```
+Jobs (`jobs` existants, SSE inchangé, `kind` = `github_localize` | `github_update`, `progress` = étapes /6 : token, clone,
+localize, sync, push, pr ; pas de facturation `llm_strings` ni d'email) : token d'installation limité au repo (jamais en argv/log :
+`http.extraHeader` via `GIT_CONFIG_*`), `git clone --depth 1 -c core.symlinks=false` dans `$TMPDIR/glot-gh-{job}` (supprimé au
+Drop), taille max `GLOT_GITHUB_MAX_REPO_MB`, `glot.toml` refusé si `files`/`[extract].include` sortent du clone, `glot init` +
+`glot localize --yes --no-install` (`GLOT_BIN`, env vidé sauf PATH/HOME/clé LLM du projet, `ulimit -v/-t`, groupe de processus tué
+au timeout), `sync::apply_push` (règles de `glot push`), commit `{slug}[bot]` hors `.github/workflows`, push `--force` sur
+`glot/localize` (ou la branche de la PR ouverte, sinon `glot/update`), une seule PR ouverte (PATCH + commentaire de statut).
+Rate limit : `GLOT_GITHUB_JOBS_PER_HOUR` (20) par installation, un seul job en attente par projet (verrou advisory).
+UI : `<ConnectGitHubCard slug />` (`web/components/github/`), page `/app/{slug}/github`, admin `/admin/github-app`.
+
+## Live review (`crates/server/src/review_live/`, migration `0120_review.sql`, contrat `docs/design/live-review-contract.md`)
+Annotations ancrées sur le site du client (widget, jeton `glr_`) ou depuis la page Review du SaaS (membre) : fils, réactions,
+captures (≤ 1 Mio en base), filtres, assignation, historique `review_events` poussé en SSE (`pg_notify('glot_review')`, un
+LISTEN par process, replay `Last-Event-ID`), « appliquer » = `keys::write_translation`, édition manuelle du texte (multi-langues
+atomique, revert, suppression, création de clé), conversion d'un groupe feedback. Préfixes `/api/projects/{slug}/review/…`
+(session/API token) et `/api/review/w/…` (liens `read|comment|edit` expirables/révocables, sessions membre 12 h). CORS widget
+strict (`review_settings.origins` + `GLOT_WEB_ORIGIN`, puis origine liée au projet du jeton), rate limit partagé `review_rate`
+(`GLOT_REVIEW_RATE_PER_MIN`, 120), quota billing `review_annotations`, markdown rendu côté serveur en HTML sûr (`body_html`).

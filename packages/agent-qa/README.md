@@ -1,11 +1,11 @@
-# @glot/agent-qa
+# @glot-i18n/agent-qa
 
 Task parity QA: the same tasks (`glot.tasks.yaml`) run in every locale of your app, by a Claude vision
 agent or a scripted mock, and each failure is blamed on a translation key with a fix. Engine behind
 `glot parity`.
 
 ```sh
-npm i -g @glot/agent-qa           # Node >= 20
+npm i -g @glot-i18n/agent-qa           # Node >= 20
 npx playwright install chromium   # once
 glot-agent-qa --tasks glot.tasks.yaml --base-url http://localhost:3000 --locales en,fr,de \
   --catalogs "messages/{locale}.json" --provider mock
@@ -27,6 +27,6 @@ glot-agent-qa --tasks glot.tasks.yaml --base-url http://localhost:3000 --locales
 - `--provider anthropic` needs `ANTHROPIC_API_KEY`. Exit 1 when a locale is below `--min-parity`.
 
 `glot` finds it in this order: `$GLOT_AGENT_QA`, `glot-agent-qa` on `PATH`, else
-`npx -y @glot/agent-qa@<glot major.minor>`.
+`npx -y @glot-i18n/agent-qa@<glot major.minor>`.
 
 MIT — part of [glot](https://github.com/MattJeff/glot).

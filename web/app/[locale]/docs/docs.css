@@ -1,19 +1,58 @@
-/* Typography for the rendered Markdown in /docs (no typography plugin installed). */
-.docs-prose { max-width: 48rem; line-height: 1.7; font-size: 0.95rem; }
-.docs-prose > * + * { margin-top: 1rem; }
-.docs-prose h1 { font-size: 2rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
-.docs-prose h2 { font-size: 1.4rem; font-weight: 600; margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); scroll-margin-top: 4.5rem; }
-.docs-prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 2rem; scroll-margin-top: 4.5rem; }
+/* Typography for the rendered Markdown in /docs (no typography plugin installed).
+   ~70 characters per line, 16px body, 1.75 line height. */
+.docs-prose { max-width: 46rem; line-height: 1.75; font-size: 1rem; }
+.docs-prose > * + * { margin-top: 1.1rem; }
+.docs-prose h1, .docs-prose h2, .docs-prose h3 { color: var(--foreground); letter-spacing: -0.015em; line-height: 1.25; scroll-margin-top: 5rem; }
+.docs-prose h1 { font-size: 2.25rem; font-weight: 650; letter-spacing: -0.025em; margin-bottom: 1.25rem; }
+.docs-prose h1 + p { font-size: 1.125rem; color: var(--muted-foreground); }
+.docs-prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.docs-prose h3 { font-size: 1.15rem; font-weight: 600; margin-top: 2.25rem; }
 .docs-prose h1 a, .docs-prose h2 a, .docs-prose h3 a { color: inherit; text-decoration: none; }
-.docs-prose a { color: var(--brand); text-decoration: underline; text-underline-offset: 2px; }
+.docs-prose h2 a:hover::after, .docs-prose h3 a:hover::after { content: " #"; color: var(--muted-foreground); }
+.docs-prose a { color: var(--foreground); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--brand) 60%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.docs-prose a:hover { text-decoration-color: var(--brand); }
+.docs-prose strong { color: var(--foreground); font-weight: 600; }
 .docs-prose ul { list-style: disc; padding-inline-start: 1.5rem; }
 .docs-prose ol { list-style: decimal; padding-inline-start: 1.5rem; }
-.docs-prose li + li { margin-top: 0.25rem; }
-.docs-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--muted); padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
-.docs-prose pre { background: var(--muted); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.9rem 1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; }
-.docs-prose pre code { background: none; padding: 0; font-size: inherit; }
-.docs-prose table { width: 100%; border-collapse: collapse; font-size: 0.875rem; display: block; overflow-x: auto; }
-.docs-prose th, .docs-prose td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: start; vertical-align: top; }
-.docs-prose th { background: var(--muted); font-weight: 600; }
-.docs-prose blockquote { border-inline-start: 3px solid var(--brand); padding-inline-start: 1rem; color: var(--muted-foreground); }
-.docs-prose img { max-width: 100%; border-radius: 0.5rem; border: 1px solid var(--border); }
+.docs-prose li::marker { color: var(--muted-foreground); }
+.docs-prose li + li { margin-top: 0.4rem; }
+.docs-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--muted); border: 1px solid var(--border); padding: 0.1rem 0.35rem; border-radius: 0.3rem; }
+.docs-prose .code-wrap { position: relative; }
+.docs-prose pre { background: var(--muted); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.84rem; line-height: 1.65; }
+.dark .docs-prose pre { background: oklch(0.18 0 0); }
+.docs-prose pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.docs-prose .copy-btn {
+  position: absolute; top: 0.5rem; inset-inline-end: 0.5rem;
+  min-height: 1.75rem; padding: 0 0.6rem; border-radius: 0.4rem; border: 1px solid var(--border);
+  background: var(--background); color: var(--muted-foreground); font-size: 0.75rem; font-family: var(--font-sans);
+  opacity: 0; transition: opacity 150ms ease-out, color 150ms;
+}
+.docs-prose .code-wrap:hover .copy-btn, .docs-prose .copy-btn:focus-visible, .docs-prose .copy-btn[data-done] { opacity: 1; }
+.docs-prose .copy-btn:hover { color: var(--foreground); }
+.docs-prose .copy-btn[data-done] { color: var(--success-foreground); }
+@media (hover: none) { .docs-prose .copy-btn { opacity: 1; } }
+.docs-prose table { width: 100%; border-collapse: collapse; font-size: 0.875rem; display: block; overflow-x: auto; border-radius: 0.5rem; }
+.docs-prose th, .docs-prose td { border-bottom: 1px solid var(--border); padding: 0.55rem 0.75rem; text-align: start; vertical-align: top; }
+.docs-prose th { font-weight: 600; color: var(--foreground); border-bottom-width: 2px; }
+.docs-prose tbody tr:hover { background: color-mix(in srgb, var(--muted) 60%, transparent); }
+.docs-prose blockquote { border-inline-start: 3px solid var(--border); padding-inline-start: 1rem; color: var(--muted-foreground); }
+.docs-prose .callout { border: 1px solid var(--border); border-inline-start-width: 3px; border-radius: 0.6rem; padding: 0.85rem 1rem; font-size: 0.95rem; }
+.docs-prose .callout > * + * { margin-top: 0.5rem; }
+.docs-prose .callout-note { border-inline-start-color: var(--info); background: color-mix(in srgb, var(--info) 7%, transparent); }
+.docs-prose .callout-warn { border-inline-start-color: var(--warning); background: color-mix(in srgb, var(--warning) 9%, transparent); }
+.docs-prose img { max-width: 100%; border-radius: 0.75rem; border: 1px solid var(--border); }
+.docs-prose hr { border-color: var(--border); margin-block: 2.5rem; }
+
+/* Reading progress under the sticky header. */
+.reading-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .reading-progress {
+    display: block; position: absolute; inset-inline: 0; bottom: -1px; height: 2px;
+    background: var(--brand); transform-origin: left; transform: scaleX(0);
+    animation: docs-progress linear both; animation-timeline: scroll(root);
+  }
+  [dir="rtl"] .reading-progress { transform-origin: right; }
+}
+@keyframes docs-progress { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .reading-progress { animation-duration: auto !important; } }
+.docs-prose code { -webkit-box-decoration-break: clone; box-decoration-break: clone; }

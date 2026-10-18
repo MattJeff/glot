@@ -1,4 +1,4 @@
-# @glot/runtime
+# @glot-i18n/runtime
 
 Long-tail locales at zero cost: when the visitor's language isn't shipped, the UI is translated **on the
 device** (Chrome Translator API) with glot's guarantees — placeholders/tags/glossary masked, plural
@@ -6,16 +6,16 @@ structure kept, every string validated by glot-core (WASM). Anything that fails 
 language; nothing unvalidated is ever shown.
 
 ```sh
-npm i @glot/runtime
+npm i @glot-i18n/runtime
 ```
 
-Serve `node_modules/@glot/runtime/dist/glot.wasm` somewhere (e.g. `public/glot.wasm`) and pass `wasm="/glot.wasm"`,
+Serve `node_modules/@glot-i18n/runtime/dist/glot.wasm` somewhere (e.g. `public/glot.wasm`) and pass `wasm="/glot.wasm"`,
 or let your bundler resolve it next to the module.
 
 ## Plain JS
 
 ```ts
-import { fallbackWithBadge } from "@glot/runtime";
+import { fallbackWithBadge } from "@glot-i18n/runtime";
 
 await fallbackWithBadge({ source: en, glossary, locale: "de", onMessages: (m) => render(m) });
 ```
@@ -29,7 +29,7 @@ await fallbackWithBadge({ source: en, glossary, locale: "de", onMessages: (m) =>
 // app/layout.tsx (Server Component)
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { GlotFallbackProvider } from "@glot/runtime/next-intl";
+import { GlotFallbackProvider } from "@glot-i18n/runtime/next-intl";
 
 <NextIntlClientProvider>
   <GlotFallbackProvider shipped={["en", "fr"]} source={await getMessages()} glossary={glossary} wasm="/glot.wasm">
@@ -42,7 +42,7 @@ import { GlotFallbackProvider } from "@glot/runtime/next-intl";
 - **Server Components**: replace `getTranslations` with `getGlotTranslations`:
 
   ```tsx
-  import { getGlotTranslations } from "@glot/runtime/next-intl/server";
+  import { getGlotTranslations } from "@glot-i18n/runtime/next-intl/server";
 
   const t = await getGlotTranslations("home");
   return <h1>{t("title", { name })}</h1>;
@@ -69,7 +69,7 @@ let the glot server translate it the first time someone asks:
 // i18n/request.ts
 import { getRequestConfig } from "next-intl/server";
 import { headers } from "next/headers";
-import { createOnDemandLoader, acceptedLanguages } from "@glot/runtime/ondemand";
+import { createOnDemandLoader, acceptedLanguages } from "@glot-i18n/runtime/ondemand";
 import en from "../messages/en.json";
 
 const ondemand = createOnDemandLoader({ server: "https://glot.example.com", project: "my-app", source: en });
@@ -97,10 +97,54 @@ serves needs no on-device pass) and `<html lang={await getLocale()}>`.
 
 End-to-end test (real glot-server with the mock LLM on :8797 + Next): `examples/runtime-next/test/ondemand.test.ts`.
 
+## Copy experiments (segmented, no flicker)
+
+The edge (`@glot-i18n/edge`, Next `proxy.ts` or a Worker) draws each visitor's arm from the published config and
+forwards `x-glot-xp`. Apply it **in the server catalog**, so Server and Client Components render the variant in the
+HTML — nothing swaps after hydration, every `t()` is covered without code change:
+
+```ts
+// i18n/request.ts
+import { withExperiments } from "@glot-i18n/runtime/experiments";
+
+export default getRequestConfig(async () => {
+  const h = await headers();
+  const locale = /* … */, catalog = /* shipped or on-demand messages */;
+  return { locale, messages: withExperiments(catalog, { header: h.get("x-glot-xp"), locale }) };
+});
+```
+
+```tsx
+// app/layout.tsx, inside NextIntlClientProvider: hands the assignment to `track()` (sessionStorage `glot_xp`)
+import { GlotExperiments } from "@glot-i18n/runtime/next-intl";
+<GlotExperiments header={(await headers()).get("x-glot-xp")}>{children}</GlotExperiments>
+```
+
+Then `track("purchase", { value: 49, currency: "EUR" })` (`@glot-i18n/insights`) credits the experiment / cell / arm.
+
+- **"Seen" exposure**: mark the tested blocks `data-glot-key="home.hero.title"` (`<GlotCopy>` does it; the Worker's
+  `data-glot` works too). With the edge's key map (`x-glot-xp.k`), `<GlotExperiments>` reports an experiment as seen
+  once a block stayed ≥ 50 % visible for ≥ 1 s, with its visible time in coarse buckets, when the tab is hidden or
+  left; `@glot-i18n/insights` posts it (once per session, never under GPC/DNT). Set the experiment's
+  `exposure: "seen"` to use those real views as the stats denominator (default `"render"`).
+- `locale` ≠ the edge's locale (e.g. on-demand catalog still translating) → official text, and the assignment is
+  neither stored nor credited. `config` (the
+  `experiments.json`) rebuilds the overlay if the edge only sent assignments. Missing or unreadable header → official.
+- **Order**: catalog (shipped, or `createOnDemandLoader`) → `withExperiments` overlay (server) → in the browser,
+  `GlotFallbackProvider` translates on device whatever the server rendered (variant included) when the visitor's
+  language isn't served. Legacy client experiments (`GlotVariants`) apply last.
+- **No edge (client-only fallback)**: `<GlotCopy k="home.hero.title" />` (or `useGlotCopy(key, values)`) takes the
+  variant `@glot-i18n/insights` assigned client side. Only that block is `visibility: hidden` until the assignment is
+  known, capped by `budget` (default 300 ms, enforced in CSS so it also holds without JS): keep it to the tested block
+  and under your LCP budget (the hidden block can't be the LCP element until it shows). After the budget the official
+  text shows; a late assignment still swaps in (rare). Under the edge, `<GlotCopy>` never masks.
+
+End-to-end test (real Next 16 build, `x-glot-xp` as the edge would set it): `examples/runtime-next/test/experiments.test.ts`.
+
 ## i18next
 
 ```ts
-import { GlotFallbackBackend } from "@glot/runtime/i18next";
+import { GlotFallbackBackend } from "@glot-i18n/runtime/i18next";
 // chain after your normal backend; use `react: { bindI18nStore: "added" }` to re-render after a click-to-download
 ```
 
@@ -108,7 +152,7 @@ import { GlotFallbackBackend } from "@glot/runtime/i18next";
 
 ```ts
 // i18n/request.ts — then run the app with GLOT_DEV_KEYS=1 and `glot measure`
-import { getGlotMessages } from "@glot/runtime/dev";
+import { getGlotMessages } from "@glot-i18n/runtime/dev";
 return { locale, messages: getGlotMessages((await import(`../messages/${locale}.json`)).default) };
 ```
 

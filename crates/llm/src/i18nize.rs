@@ -27,6 +27,9 @@ pub struct NewKey {
     /// Existing key reused (same text and role): nothing to write.
     pub reused: bool,
     pub line: u32,
+    /// Translations found in the code (`lang === 'fr' ? …`): written as `imported`, not retranslated.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub translations: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -312,6 +315,7 @@ pub async fn plan(ws: &Workspace, files: &[String], lib: Lib) -> Result<Plan> {
         ));
     }
     let mut warnings = vec![];
+    ex::set_locales(&ws.config.source_locale, &ws.config.target_locales);
     let mut analyses: Vec<(String, FileAnalysis)> = vec![];
     for f in files {
         let src = std::fs::read_to_string(ws.root.join(f))
@@ -460,6 +464,7 @@ pub async fn plan(ws: &Workspace, files: &[String], lib: Lib) -> Result<Plan> {
                     note: None,
                     reused: true,
                     line: c.line,
+                    translations: BTreeMap::new(),
                 });
                 keys.insert(c.id, k);
                 continue;
@@ -492,6 +497,11 @@ pub async fn plan(ws: &Workspace, files: &[String], lib: Lib) -> Result<Plan> {
             assigned.insert(ident, key.clone());
             for (suf, v) in entries {
                 new_keys.push(NewKey {
+                    translations: if suf.is_empty() {
+                        c.translations.clone()
+                    } else {
+                        BTreeMap::new()
+                    },
                     key: format!("{key}{suf}"),
                     value: v,
                     note: Some(note.clone()),
@@ -554,6 +564,22 @@ pub fn apply(ws: &mut Workspace, plan: &Plan) -> Result<()> {
         for k in f.keys.iter().filter(|k| !k.reused) {
             if written.insert(k.key.clone()) {
                 ws.add_source(&k.key, &k.value, k.note.as_deref())?;
+                for (loc, v) in &k.translations {
+                    if ws.config.target_locales.contains(loc) {
+                        ws.write_entries(loc, &[(k.key.clone(), Some(v.clone()))])?;
+                        ws.lock.record(
+                            loc,
+                            &k.key,
+                            &k.value,
+                            v,
+                            glot_core::lock::Origin::Imported,
+                            None,
+                        );
+                    }
+                }
+                if !k.translations.is_empty() {
+                    ws.lock.save(&ws.root)?;
+                }
             }
         }
     }

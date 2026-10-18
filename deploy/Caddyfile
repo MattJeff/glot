@@ -32,7 +32,16 @@
 # Dashboard: same Next app; Next proxies /api and /cdn to glot-server (same origin => cookie just works).
 app.{$GLOT_DOMAIN} {
 	import common
+	# The dashboard is never a search result; the marketing site lives on the apex only.
+	header X-Robots-Tag "noindex, nofollow"
 	redir / /app
+	# Everything that is not dashboard, auth, API or a build/static asset moves to the apex (no duplicate site).
+	@marketing {
+		not path /
+		not path_regexp ^(/(en|fr|es|de|ja|ar))?/(app|login|signup|oauth|forgot-password|reset-password|verify-email|admin|api|cdn|_next)(/|$)
+		not path_regexp \.[A-Za-z0-9]+$
+	}
+	redir @marketing https://{$GLOT_DOMAIN}{uri} 308
 	reverse_proxy web:3100
 }
 

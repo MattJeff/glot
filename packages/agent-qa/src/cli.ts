@@ -3,6 +3,16 @@ import { parseArgs } from "node:util";
 import { join } from "node:path";
 import { run } from "./parity.ts";
 import { MODEL } from "./agent.ts";
+import { main as panel } from "./panel.ts";
+
+// `glot labs panel`: capture only (screenshots, text, CTAs); the personas run in glot.
+if (process.argv[2] === "panel") {
+  await panel(process.argv.slice(3)).catch((e: Error) => {
+    console.error(`agent-qa panel: ${e.message}`);
+    process.exit(2);
+  });
+  process.exit(0);
+}
 
 const { values: v } = parseArgs({
   options: {
@@ -28,7 +38,8 @@ if (v.help) {
   console.log(`glot-agent-qa [--tasks glot.tasks.yaml] [--base-url URL] [--locales en,fr,de] [--source-locale en]
   [--url-pattern "/{locale}{route}"] [--locale-cookie NEXT_LOCALE,glot-locale] [--catalogs "messages/{locale}.json"]
   [--provider anthropic|mock] [--model ${MODEL}] [--max-steps 15] [--viewport 1280x800]
-  [--out .glot/parity] [--min-parity 90]      (anthropic: ANTHROPIC_API_KEY or an \`ant auth login\` profile)`);
+  [--out .glot/parity] [--min-parity 90]      (anthropic: ANTHROPIC_API_KEY or an \`ant auth login\` profile)
+glot-agent-qa panel [--config glot.panel.yaml] [--routes /,/pricing] [--base-url URL] [--locales en,fr] [--out .glot/panel]   (capture for \`glot labs panel\`)`);
   process.exit(0);
 }
 

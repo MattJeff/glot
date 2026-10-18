@@ -33,6 +33,10 @@ pub fn public_routes() -> Router<AppState> {
     Router::new()
         .route("/api/insights/{key}", post(ingest))
         .layer(DefaultBodyLimit::max(4096))
+        .route(
+            "/api/insights/{key}/batch",
+            post(crate::experiments::ingest::batch).layer(DefaultBodyLimit::max(64 * 1024)),
+        )
         .layer(
             CorsLayer::new()
                 .allow_origin(Any)
@@ -72,6 +76,12 @@ pub struct Hit {
     // ponytail: `route` is accepted for forward compat but never stored.
     #[allow(dead_code)]
     route: Option<String>,
+    /// Segmented experiments (contract §6): assignments of this document/session, revenue, retry id.
+    #[serde(default)]
+    exposures: Vec<crate::experiments::Exposure>,
+    value: Option<f64>,
+    currency: Option<String>,
+    dedup: Option<String>,
 }
 
 #[derive(Serialize, Debug, PartialEq)]
@@ -128,6 +138,16 @@ pub fn country(body: Option<&str>, headers: &HeaderMap) -> String {
     }
 }
 
+pub(crate) fn check_event(e: &str) -> ApiResult<()> {
+    if valid_event(e) {
+        Ok(())
+    } else {
+        Err(AppError::bad_request(
+            "event must be 1-40 chars of a-z0-9_-.:",
+        ))
+    }
+}
+
 fn valid_event(e: &str) -> bool {
     (1..=40).contains(&e.len())
         && e.bytes()
@@ -181,30 +201,17 @@ fn rate_limited(retry_after: u64) -> axum::response::Response {
         .into_response()
 }
 
-pub async fn ingest(
-    State(state): State<AppState>,
-    AppPath(key): AppPath<String>,
-    headers: HeaderMap,
-    body: Bytes,
-) -> ApiResult<axum::response::Response> {
-    use axum::response::IntoResponse;
+/// Public key lookup + shared per-minute budget, `weight` hits at once (a batch counts each element).
+/// `Ok(Err(429))` when the budget is spent.
+pub(crate) async fn admit(
+    state: &AppState,
+    key: &str,
+    weight: i32,
+) -> ApiResult<Result<Uuid, axum::response::Response>> {
     let lock = || BLOCKED.lock().unwrap_or_else(|e| e.into_inner());
-    if let Some(s) = blocked_for(&lock(), &key, unix_now()) {
-        return Ok(rate_limited(s));
+    if let Some(s) = blocked_for(&lock(), key, unix_now()) {
+        return Ok(Err(rate_limited(s)));
     }
-    // Any content type: the snippet posts text/plain to avoid a CORS preflight.
-    let hit: Hit = serde_json::from_slice(&body)
-        .map_err(|e| AppError::bad_request(format!("invalid body: {e}")))?;
-    validate_locale(&hit.served)?;
-    let event = match hit.event.as_deref() {
-        None => VIEW,
-        Some(e) if valid_event(e) => e,
-        Some(_) => {
-            return Err(AppError::bad_request(
-                "event must be 1-40 chars of a-z0-9_-.:",
-            ));
-        }
-    };
     // Key lookup + shared fixed-window counter in one atomic statement (no extra round trip per hit).
     // Window = the DB clock's minute, so replicas with skewed clocks still agree; a newer minute resets the row.
     // ponytail: one DB increment per accepted hit (the hit already costs 2 more queries); batch increments
@@ -214,23 +221,50 @@ pub async fn ingest(
            SELECT k.project_id, p.insights_rate_per_min AS budget
            FROM insight_keys k JOIN projects p ON p.id = k.project_id WHERE k.public_key = $1)
          INSERT INTO insight_rate AS r (project_id, window_start, hits)
-         SELECT project_id, date_trunc('minute', now()), 1 FROM k
+         SELECT project_id, date_trunc('minute', now()), $2 FROM k
          ON CONFLICT (project_id) DO UPDATE SET
-           hits = CASE WHEN excluded.window_start > r.window_start THEN 1 ELSE r.hits + 1 END,
+           hits = CASE WHEN excluded.window_start > r.window_start THEN excluded.hits ELSE r.hits + excluded.hits END,
            window_start = greatest(r.window_start, excluded.window_start)
          RETURNING r.project_id, r.hits, (SELECT budget FROM k),
            extract(epoch FROM r.window_start + interval '1 minute')::int8",
     )
-    .bind(&key)
+    .bind(key)
+    .bind(weight)
     .fetch_optional(&state.db)
     .await?
     .ok_or_else(|| AppError::not_found("unknown insights key"))?;
     if hits > budget.unwrap_or(*DEFAULT_RATE) {
         let now = unix_now();
         let until = window_end.max(0) as u64;
-        block(&mut lock(), &key, until, now);
-        return Ok(rate_limited(until.saturating_sub(now)));
+        block(&mut lock(), key, until, now);
+        return Ok(Err(rate_limited(until.saturating_sub(now))));
     }
+    Ok(Ok(project_id))
+}
+
+pub async fn ingest(
+    State(state): State<AppState>,
+    AppPath(key): AppPath<String>,
+    headers: HeaderMap,
+    body: Bytes,
+) -> ApiResult<axum::response::Response> {
+    use axum::response::IntoResponse;
+    // Any content type: the snippet posts text/plain to avoid a CORS preflight.
+    let hit: Hit = serde_json::from_slice(&body)
+        .map_err(|e| AppError::bad_request(format!("invalid body: {e}")))?;
+    validate_locale(&hit.served)?;
+    let event = match hit.event.as_deref() {
+        None => VIEW,
+        Some(e) => {
+            check_event(e)?;
+            e
+        }
+    };
+    let project_id = match admit(&state, &key, 1).await? {
+        Ok(p) => p,
+        Err(limited) => return Ok(limited),
+    };
+    crate::billing::consume(&state, project_id, crate::billing::INSIGHTS).await?;
     let accept = headers
         .get(header::ACCEPT_LANGUAGE)
         .and_then(|v| v.to_str().ok());
@@ -278,6 +312,17 @@ pub async fn ingest(
     .await?;
     let variants =
         crate::variants::on_hit(&state, project_id, &hit.served, event, &hit.variants).await?;
+    if !hit.exposures.is_empty() && !crate::experiments::ingest::is_bot(&headers) {
+        let xp = crate::experiments::ingest::XpHit {
+            served: hit.served.clone(),
+            event: hit.event.clone(),
+            exposures: hit.exposures,
+            value: hit.value,
+            currency: hit.currency,
+            dedup: hit.dedup,
+        };
+        crate::experiments::ingest::record(&state, project_id, vec![xp]).await?;
+    }
     Ok(Json(HitResponse {
         locale,
         arm: arm.map(String::from),
@@ -479,7 +524,7 @@ pub async fn public_key(state: &AppState, project_id: Uuid) -> ApiResult<String>
 }
 
 /// Same estimate as `glot translate --dry-run` for every key into `locale` (no glossary, no context).
-fn estimate_cost(p: &ProjectRow, keys: &[(String, String)], locale: &str) -> f64 {
+pub(crate) fn estimate_cost(p: &ProjectRow, keys: &[(String, String)], locale: &str) -> f64 {
     let llm = p.llm.0.clone();
     let config = Config {
         source_locale: p.source_locale.clone(),
@@ -501,6 +546,7 @@ fn estimate_cost(p: &ProjectRow, keys: &[(String, String)], locale: &str) -> f64
         qa: Default::default(),
         extract: Default::default(),
         server: None,
+        i18next: Default::default(),
     };
     let req = Request {
         source_locale: p.source_locale.clone(),

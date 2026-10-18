@@ -23,10 +23,14 @@
     "./next": {
       "types": "./dist/next-proxy.d.ts",
       "default": "./dist/next-proxy.js"
+    },
+    "./experiments": {
+      "types": "./dist/experiments.d.ts",
+      "default": "./dist/experiments.js"
     }
   },
   "scripts": {
-    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak",
+    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts src/experiments.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak",
     "prepack": "npm run build",
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc --noEmit"

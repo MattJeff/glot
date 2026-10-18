@@ -240,3 +240,20 @@ async fn rails_yaml() {
         "es has one/many/other"
     );
 }
+
+/// gettext project without a source-language `.po` (field test): the targets' msgids are the source.
+#[tokio::test]
+async fn gettext_without_source_file() {
+    let fr = "msgid \"\"\nmsgstr \"\"\n\"Language: fr\\n\"\n\"Plural-Forms: nplurals=2; plural=n > 1;\\n\"\n\nmsgid \"Save\"\nmsgstr \"Enregistrer\"\n\nmsgid \"At least {:d} items\"\nmsgstr \"\"\n";
+    let dir = project(
+        r#"["po/{locale}.po"]"#,
+        "printf",
+        r#"["fr", "de"]"#,
+        &[("po/fr.po", fr.to_string())],
+    );
+    let ws = Workspace::open(dir.path()).unwrap();
+    assert_eq!(ws.source().entries.len(), 2);
+    translate(dir.path()).await;
+    assert!(read(dir.path(), "po/de.po").contains("msgid \"At least {:d} items\""));
+    assert!(!dir.path().join("po/en.po").exists());
+}

@@ -7,9 +7,10 @@
     "dev": "pnpm prepare-wasm && next dev -p 3240",
     "build": "pnpm prepare-wasm && next build",
     "start": "next start -p 3241",
-    "test": "pnpm build && node --test test/e2e.test.ts test/ondemand.test.ts"
+    "test": "pnpm build && node --test test/e2e.test.ts test/ondemand.test.ts test/experiments.test.ts"
   },
   "dependencies": {
+    "@glot/insights": "file:../../packages/insights",
     "@glot/runtime": "file:../../packages/runtime",
     "next": "16.4.2",
     "next-intl": "^4.14.9",

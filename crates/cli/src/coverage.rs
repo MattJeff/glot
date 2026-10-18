@@ -88,11 +88,7 @@ pub fn run(a: CoverageArgs) -> Result<ExitCode> {
     for loc in &locales {
         let cat = match ws.catalogs.get(loc) {
             Some(c) => c.clone(),
-            None => Catalog::read_all(
-                &ws.config.catalog_paths(&ws.root, loc),
-                loc,
-                ws.config.format,
-            )?,
+            None => Catalog::load(&ws.config, &ws.root, loc)?,
         };
         for (key, msg) in &cat.entries {
             if !a.key.is_empty() && !a.key.contains(key) {

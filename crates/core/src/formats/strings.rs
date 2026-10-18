@@ -115,9 +115,22 @@ fn unescape(s: &str) -> String {
             Some('n') => out.push('\n'),
             Some('t') => out.push('\t'),
             Some('r') => out.push('\r'),
-            Some('U' | 'u') => {
-                let hex: String = it.by_ref().take(4).collect();
-                out.extend(u32::from_str_radix(&hex, 16).ok().and_then(char::from_u32));
+            Some(u @ ('U' | 'u')) => {
+                let hex: String = it.clone().take(4).collect();
+                match u32::from_str_radix(&hex, 16)
+                    .ok()
+                    .filter(|_| hex.len() == 4 && !hex.starts_with('+'))
+                {
+                    Some(n) => {
+                        it.by_ref().take(4).for_each(drop);
+                        out.extend(char::from_u32(n));
+                    }
+                    // Swift's `\u{2019}` is not a .strings escape: kept verbatim so `glot check` reports it.
+                    None => {
+                        out.push('\\');
+                        out.push(u);
+                    }
+                }
             }
             Some(c) => out.push(c),
             None => {}
@@ -154,12 +167,15 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
         return write(None, cat);
     };
     let (mut out, mut pos) = (String::new(), 0);
-    for e in &list {
+    for (i, e) in list.iter().enumerate() {
+        // A duplicated key reads as its last definition (like Foundation): earlier ones stay as written.
+        let shadowed = list[i + 1..].iter().any(|l| l.key == e.key);
         match cat.entries.get(&e.key) {
             None => {
                 out.push_str(&s[pos..e.span.0]);
                 pos = e.span.1;
             }
+            Some(_) if shadowed => {}
             Some(v) if *v == e.value => {}
             Some(v) => {
                 out.push_str(&s[pos..e.val.0]);

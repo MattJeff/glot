@@ -1,0 +1,32 @@
+{
+  "nav": { "home": "Produkt", "pricing": "Preise", "signup": "Registrieren" },
+  "home": {
+    "hero": {
+      "title": "Rechnungen, die Ihre Kunden pünktlich bezahlen",
+      "subtitle": "Relay erstellt, versendet und mahnt Rechnungen in 30 Währungen – Sie werden bezahlt, ohne unangenehme E-Mails.",
+      "cta": "Kostenlos testen"
+    },
+    "features": {
+      "title": "Alles, was nach der Arbeit kommt",
+      "draft": "Rechnungen aus Ihren Zeiteinträgen",
+      "chase": "Höfliche automatische Erinnerungen",
+      "tax": "Umsatzsteuer pro Land erledigt"
+    }
+  },
+  "pricing": {
+    "title": "Einfache Preise",
+    "month": "/ Monat",
+    "starter": "Starter",
+    "starterBody": "Für Freelancer: 20 Rechnungen pro Monat.",
+    "team": "Team",
+    "teamBody": "Für Agenturen: unbegrenzte Rechnungen, 5 Plätze.",
+    "choose": "{plan} wählen"
+  },
+  "signup": {
+    "title": "Konto erstellen",
+    "email": "Geschäftliche E-Mail",
+    "submit": "Konto erstellen",
+    "done": "Willkommen an Bord! Sehen Sie in Ihr Postfach."
+  },
+  "footer": "Relay ist eine Demo-App für glot-Experimente."
+}

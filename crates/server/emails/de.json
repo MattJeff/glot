@@ -1,0 +1,41 @@
+{
+  "emails": {
+    "common": {
+      "fallback": "Falls die Schaltfläche nicht funktioniert, kopieren Sie diesen Link in Ihren Browser:",
+      "footer": "Gesendet an {email} von glot, Open-Source-i18n für SaaS. Dies ist eine Konto-E-Mail, Sie können sich davon nicht abmelden.",
+      "footer_optional": "Gesendet an {email} von glot. Sie erhalten diese E-Mail, weil Auftragsbenachrichtigungen in Ihren Kontoeinstellungen aktiviert sind.",
+      "greeting": "Hallo {name},",
+      "ignore": "Falls Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren."
+    },
+    "email_changed": {
+      "body": "Die E-Mail-Adresse Ihres glot-Kontos wurde zu {new_email} geändert. Falls das nicht von Ihnen stammt, setzen Sie jetzt Ihr Passwort zurück.",
+      "cta": "Passwort zurücksetzen",
+      "subject": "Ihre glot-E-Mail-Adresse wurde geändert"
+    },
+    "job_done": {
+      "body": "Ihr Übersetzungsauftrag in {project} ist abgeschlossen: {done} von {total} Zeichenketten verarbeitet, Kosten {cost} USD.",
+      "cta": "Auftrag öffnen",
+      "subject": "Übersetzung in {project} abgeschlossen"
+    },
+    "job_failed": {
+      "body": "Ihr Übersetzungsauftrag in {project} ist nach {done} von {total} Zeichenketten fehlgeschlagen: {error}",
+      "cta": "Auftrag öffnen",
+      "subject": "Übersetzung in {project} fehlgeschlagen"
+    },
+    "password_changed": {
+      "body": "Das Passwort Ihres glot-Kontos wurde soeben geändert. Falls das nicht von Ihnen stammt, setzen Sie es jetzt zurück und prüfen Sie Ihre API-Tokens.",
+      "cta": "Passwort zurücksetzen",
+      "subject": "Ihr glot-Passwort wurde geändert"
+    },
+    "reset": {
+      "body": "Jemand hat angefragt, das Passwort Ihres glot-Kontos zurückzusetzen. Der Link funktioniert nur einmal und läuft in 1 Stunde ab. Beim Zurücksetzen werden Sie überall abgemeldet.",
+      "cta": "Neues Passwort wählen",
+      "subject": "Ihr glot-Passwort zurücksetzen"
+    },
+    "verify": {
+      "body": "Bestätigen Sie, dass {email} Ihre Adresse ist, um Ihr glot-Konto abzusichern. Der Link läuft in 48 Stunden ab.",
+      "cta": "E-Mail bestätigen",
+      "subject": "Bestätigen Sie Ihre E-Mail-Adresse"
+    }
+  }
+}

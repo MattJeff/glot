@@ -196,7 +196,7 @@ impl Scanner<'_> {
             }
             e => {
                 if let Some(k) = str_of(e) {
-                    self.add_usage(join(prefix, strip_ns(&k)), offset);
+                    self.add_usage(join(prefix, &k), offset);
                     return;
                 }
                 self.report.dynamic.push(self.at(offset));
@@ -209,8 +209,8 @@ impl Scanner<'_> {
                     _ => None,
                 };
                 let dyn_prefix = match quasi {
-                    Some(q) => Some(join(prefix, strip_ns(&q))),
-                    None if !prefix.is_empty() => Some(format!("{prefix}.")),
+                    Some(q) => Some(join(prefix, &q)),
+                    None if !prefix.is_empty() => Some(join(prefix, "")),
                     None => None,
                 };
                 self.report.dynamic_prefixes.extend(dyn_prefix);
@@ -243,10 +243,7 @@ impl Scanner<'_> {
             return;
         }
         let text = raw.split_whitespace().collect::<Vec<_>>().join(" ");
-        // ponytail: one lowercase word (`name: "email"`, `variant: "primary"`) is an identifier, not copy.
-        if !looks_like_text(&text)
-            || !(text.contains(' ') || text.starts_with(|c: char| c.is_uppercase()))
-        {
+        if !crate::i18nize::looks_like_copy(&text) {
             return;
         }
         let role = match prop {
@@ -397,14 +394,34 @@ impl<'a> Visit<'a> for Scanner<'_> {
             "FormattedMessage" => "id",
             _ => "",
         };
-        for attr in &it.attributes {
-            if let JSXAttributeItem::Attribute(a) = attr
-                && !key_attr.is_empty()
-                && matches!(&a.name, JSXAttributeName::Identifier(id) if id.name == key_attr)
-                && let Some((k, _)) = attr_str(a)
-            {
-                self.add_usage(strip_ns(&k).to_string(), a.span.start);
-            }
+        let attr = |name: &str| {
+            it.attributes.iter().find_map(|a| match a {
+                JSXAttributeItem::Attribute(a)
+                    if matches!(&a.name, JSXAttributeName::Identifier(id) if id.name == name) =>
+                {
+                    Some(a)
+                }
+                _ => None,
+            })
+        };
+        if let Some(a) = attr(key_attr).filter(|_| !key_attr.is_empty())
+            && let Some((k, _)) = attr_str(a)
+        {
+            // `<Trans ns="home">`, or `t={t}` from `useTranslation("home")`.
+            let ns = attr("ns")
+                .and_then(|a| attr_str(a))
+                .map(|(ns, _)| format!("{ns}:"));
+            let from_t = || match &attr("t")?.value {
+                Some(JSXAttributeValue::ExpressionContainer(c)) => {
+                    match c.expression.as_expression()? {
+                        Expression::Identifier(id) => self.lookup(&id.name),
+                        _ => None,
+                    }
+                }
+                _ => None,
+            };
+            let prefix = ns.or_else(from_t).unwrap_or_default();
+            self.add_usage(join(&prefix, &k), a.span.start);
         }
         walk::walk_jsx_opening_element(self, it);
     }
@@ -428,7 +445,9 @@ impl<'a> Visit<'a> for Scanner<'_> {
         let raw = &self.src[it.span.start as usize..it.span.end as usize];
         let lead = raw.len() - raw.trim_start().len();
         let role = self.role().unwrap_or("text");
-        self.hardcoded(raw, role, it.span.start + lead as u32);
+        // `l&apos;instant` is `l'instant` on screen (and in the catalog i18nize writes).
+        let text = crate::i18nize::decode_entities(raw, &mut None);
+        self.hardcoded(&text, role, it.span.start + lead as u32);
     }
 
     fn visit_jsx_expression_container(&mut self, it: &JSXExpressionContainer<'a>) {
@@ -490,13 +509,12 @@ fn translator_prefix(init: &Expression) -> Option<String> {
                 .and_then(|a| str_of(a).or_else(|| obj_prop(a, "namespace").and_then(str_of)))
                 .unwrap_or_default(),
         ),
-        // i18next namespaces select a file, not a key prefix (see crate docs).
-        "useTranslation" => Some(
-            arg(1)
-                .and_then(|a| obj_prop(a, "keyPrefix"))
-                .and_then(str_of)
-                .unwrap_or_default(),
-        ),
+        // i18next: `ns:` (first namespace of a list) + `keyPrefix`, see [`join`].
+        "useTranslation" => Some(i18n_prefix(
+            arg(0),
+            arg(1).and_then(|a| obj_prop(a, "keyPrefix")),
+        )),
+        n if n == "getFixedT" || n.ends_with(".getFixedT") => Some(i18n_prefix(arg(1), arg(2))),
         "useI18n" => Some(String::new()),
         _ => None,
     }
@@ -552,27 +570,54 @@ fn is_pascal(name: &str) -> bool {
     name.starts_with(|c: char| c.is_ascii_uppercase())
 }
 
-fn join(prefix: &str, key: &str) -> String {
-    if prefix.is_empty() {
-        key.to_string()
-    } else {
-        format!("{prefix}.{key}")
+/// Translator prefix `ns:keyPrefix` from i18next's `(ns | [ns, …], keyPrefix)` arguments.
+fn i18n_prefix(ns: Option<&Expression>, key_prefix: Option<&Expression>) -> String {
+    let ns = ns.and_then(|a| match a.get_inner_expression() {
+        Expression::ArrayExpression(arr) => arr.elements.first()?.as_expression().and_then(str_of),
+        e => str_of(e),
+    });
+    let kp = key_prefix.and_then(str_of).unwrap_or_default();
+    match ns.filter(|n| !n.is_empty()) {
+        Some(ns) => format!("{ns}:{kp}"),
+        None => kp,
     }
 }
 
-/// i18next `ns:key` -> `key`. glot catalogs are one namespace-less tree per locale.
-pub(crate) fn strip_ns(key: &str) -> &str {
+/// Prefix + key. i18next namespaces stay in front (`home:` + `hero` + `title` =>
+/// `home:hero.title`); an explicit `ns:` in the key wins over the translator's.
+fn join(prefix: &str, key: &str) -> String {
+    let (ns, prefix) = split_ns(prefix);
+    let (key_ns, key) = split_ns(key);
+    let path = if prefix.is_empty() || key_ns.is_some() {
+        key.to_string()
+    } else {
+        format!("{prefix}.{key}")
+    };
+    match key_ns.or(ns) {
+        Some(ns) => format!("{ns}:{path}"),
+        None => path,
+    }
+}
+
+/// i18next `ns:key` => (`ns`, `key`); natural-language keys (`"Note: …"`) have no namespace.
+pub(crate) fn split_ns(key: &str) -> (Option<&str>, &str) {
     match key.split_once(':') {
         Some((ns, rest))
             if !ns.is_empty()
+                && !rest.starts_with(char::is_whitespace)
                 && ns
                     .chars()
                     .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') =>
         {
-            rest
+            (Some(ns), rest)
         }
-        _ => key,
+        _ => (None, key),
     }
+}
+
+/// i18next `ns:key` -> `key`.
+pub(crate) fn strip_ns(key: &str) -> &str {
+    split_ns(key).1
 }
 
 /// Class-name helpers: their string arguments are CSS classes, never copy.

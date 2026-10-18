@@ -21,6 +21,10 @@
     "./server": {
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
+    },
+    "./layout": {
+      "types": "./dist/layout.d.ts",
+      "default": "./dist/layout.js"
     }
   },
   "files": [
@@ -28,7 +32,7 @@
   ],
   "sideEffects": true,
   "scripts": {
-    "build": "rm -rf dist && esbuild src/index.ts src/server.ts --format=esm --minify --target=es2020 --outdir=dist && esbuild src/index.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/insights.global.js && tsc",
+    "build": "rm -rf dist && esbuild src/index.ts src/server.ts src/layout.ts --format=esm --minify --target=es2020 --outdir=dist && esbuild src/index.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/insights.global.js && tsc",
     "test": "node --test 'test/*.test.ts'",
     "prepack": "npm run build"
   },

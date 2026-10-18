@@ -51,6 +51,40 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Motion scale (docs/design/ux-brief.md §3.1): enter with ease-out, exit faster. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-data: 700ms;
+  --animate-pop: pop 320ms var(--ease-out-quint) both;
+  --animate-rise: rise 240ms var(--ease-out-quint) both;
+  --animate-burst: burst 900ms var(--ease-out-quint) both;
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.04), 0 1px 1px oklch(0 0 0 / 0.02);
+  --shadow-raised: 0 8px 24px -8px oklch(0 0 0 / 0.12), 0 2px 6px -2px oklch(0 0 0 / 0.06);
+
+  @keyframes pop {
+    0% { transform: scale(0.9); opacity: 0; }
+    60% { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  @keyframes grow {
+    from { transform: scaleX(0); }
+  }
+  @keyframes rise {
+    from { transform: translateY(6px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+  @keyframes burst {
+    0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+  }
 }
 
 :root {
@@ -65,13 +99,13 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0.52 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.48 0.19 27);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -81,8 +115,12 @@
   --brand: oklch(0.52 0.13 160);
   --brand-foreground: oklch(0.985 0 0);
   --success: oklch(0.55 0.14 155);
-  --warning: oklch(0.62 0.15 65);
+  --warning: oklch(0.7 0.16 70);
   --info: oklch(0.55 0.16 250);
+  /* Text on white or on a 10-15% tint of the same hue: >= 4.5:1. */
+  --success-foreground: oklch(0.45 0.12 155);
+  --warning-foreground: oklch(0.47 0.12 60);
+  --info-foreground: oklch(0.47 0.15 250);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -90,7 +128,7 @@
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: var(--brand);
 }
 
 .dark {
@@ -111,7 +149,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -125,19 +163,38 @@
   --success: oklch(0.74 0.15 155);
   --warning: oklch(0.8 0.14 75);
   --info: oklch(0.72 0.13 250);
+  --success-foreground: var(--success);
+  --warning-foreground: var(--warning);
+  --info-foreground: var(--info);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: var(--brand);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
+  }
+  html {
+    /* 2.4.11 Focus Not Obscured: keep focused rows clear of the sticky header. */
+    scroll-padding-top: 3.5rem;
+  }
+  /* Fallback focus ring for anything that doesn't style its own (links, grid cells…). */
+  :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
   }
   body {
     @apply bg-background text-foreground;
+    /* Notch / home-indicator safe areas (viewport-fit=cover in [locale]/layout.tsx). */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   html {
     @apply font-sans;
@@ -145,6 +202,17 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+  /* Touch: grow small controls' hit area to 44 px without moving the layout (switch/checkbox do it themselves). */
+  @media (pointer: coarse) {
+    :where([data-slot="button"], [data-slot="select-trigger"], [data-slot="tabs-trigger"]) {
+      position: relative;
+    }
+    :where([data-slot="button"], [data-slot="select-trigger"], [data-slot="tabs-trigger"])::after {
+      content: "";
+      position: absolute;
+      inset: min(0px, calc((100% - 44px) / 2));
+    }
   }
 }
 
@@ -157,11 +225,70 @@
   }
 }
 
+@layer utilities {
+  /* List entrance: set --i on each item; only the first 8 are staggered. */
+  .stagger > * {
+    animation: var(--animate-rise);
+    animation-delay: calc(min(var(--i, 0), 8) * 30ms);
+  }
+}
+
+/* Wide tables scroll inside their wrapper, never the page:
+   - position: relative keeps .sr-only (absolute) cells from escaping the clip and widening the page;
+   - edges fade while there is more to scroll (scroll-driven, no JS; inactive when nothing overflows). */
+:where(.overflow-x-auto):has(> table) {
+  position: relative;
+}
+@property --fade-start { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --fade-end { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes scroll-fade {
+  from { --fade-start: 0px; --fade-end: 1.5rem; }
+  8% { --fade-start: 1.5rem; }
+  92% { --fade-end: 1.5rem; }
+  to { --fade-start: 1.5rem; --fade-end: 0px; }
+}
+@supports (animation-timeline: scroll()) {
+  :where(.overflow-x-auto):has(> table) {
+    --fade-dir: to right;
+    mask-image: linear-gradient(var(--fade-dir), transparent, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent);
+    animation: scroll-fade linear both;
+    animation-duration: auto !important;
+    animation-timeline: scroll(self inline);
+  }
+  [dir="rtl"] :where(.overflow-x-auto):has(> table) {
+    --fade-dir: to left;
+  }
+}
+
+/* Page transitions (React <ViewTransition> in AppShell): quick fade + lift, exit faster than enter. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.page) {
+  animation: 120ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.page) {
+  animation: 220ms var(--ease-out-quint) 60ms both vt-fade, 260ms var(--ease-out-quint) both vt-lift;
+}
+@keyframes vt-fade {
+  from { opacity: 0; }
+}
+@keyframes vt-lift {
+  from { translate: 0 6px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

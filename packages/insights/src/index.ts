@@ -25,7 +25,11 @@ const read = (): State | null => {
   }
 };
 
-function send(event?: string): Promise<State> {
+/** Segmented-experiment assignment (contract §6): set by the edge, copied by @glot/runtime into sessionStorage. */
+export type Exposure = { id: string; cell: string; arm: number };
+export type Revenue = { value?: number; currency?: string };
+
+function send(event?: string, rev?: Revenue): Promise<State> {
   if (!opts) return Promise.resolve({});
   const body = {
     langs: [...(navigator.languages || [navigator.language])].slice(0, 5),
@@ -34,6 +38,9 @@ function send(event?: string): Promise<State> {
     event,
     arm: read()?.a,
     variants: event ? arms() : undefined,
+    exposures: event ? exposures(event) : undefined,
+    value: rev?.value,
+    currency: rev?.currency?.toUpperCase(),
   };
   // String body = text/plain: a "simple" CORS request, no preflight.
   return fetch(`${opts.endpoint || ""}/api/insights/${opts.key}`, { method: "POST", body: JSON.stringify(body), keepalive: true })
@@ -55,16 +62,65 @@ export async function init(o: Options): Promise<void> {
     try {
       sessionStorage.setItem(SK, JSON.stringify(s));
     } catch {}
-    // @glot/runtime's useGlotVariant listens for this (no import between the packages).
-    if (s.v && typeof dispatchEvent === "function") dispatchEvent(new Event("glot:variants"));
+    // @glot/runtime's useGlotVariant / <GlotCopy> listen for this (no import between the packages).
+    if (typeof dispatchEvent === "function") dispatchEvent(new Event("glot:variants"));
   }
   if (s.l) o.onLocale?.(s.l);
 }
 
 /** Conversion event: "signup", "purchase" or any name (1-40 chars of a-z0-9_-.:). Credits this session's
- * language-experiment arm and copy-variant arms. */
-export function track(event: string): void {
-  void send(event);
+ * language-experiment arm, copy-variant arms and segmented-experiment exposures (each experiment once per
+ * session and event). `value` (0..1e6) + `currency` (ISO 4217) count as revenue. */
+export function track(event: string, rev?: Revenue): void {
+  void send(event, rev);
+}
+
+const XK = "glot_xp", SENT = "glot_xp_sent";
+const json = (k: string) => {
+  try {
+    return JSON.parse(sessionStorage.getItem(k) || "null");
+  } catch {
+    return null;
+  }
+};
+
+const noTrack = () => {
+  const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
+  return nav.globalPrivacyControl || nav.doNotTrack === "1";
+};
+
+/** Marks `id:event` credited this session; false when it already was. */
+function once(key: string): boolean {
+  const sent: string[] = json(SENT) ?? [];
+  if (sent.includes(key)) return false;
+  try {
+    sessionStorage.setItem(SENT, JSON.stringify([...sent, key]));
+  } catch {}
+  return true;
+}
+
+/** "Seen" exposure from @glot/runtime (`glot:seen`): posted to the experiments batch, once per session/experiment. */
+function seen(e: Event): void {
+  const x = (e as CustomEvent<Exposure & { seen: true; visible_ms: number }>).detail;
+  if (!opts || !x || noTrack() || !once(`${x.id}:$seen`)) return;
+  const body = [{ served: opts.locale || document.documentElement.lang || "en", exposures: [x] }];
+  void fetch(`${opts.endpoint || ""}/api/insights/${opts.key}/batch`, { method: "POST", body: JSON.stringify(body), keepalive: true }).catch(() => {});
+}
+if (typeof addEventListener === "function") addEventListener("glot:seen", seen);
+
+/** Exposures to credit for `event`: cookie `glot_xp` (persistence "session") + sessionStorage (SSR copy), minus
+ * those already credited for this event; none under Global Privacy Control / Do Not Track. */
+function exposures(event: string): Exposure[] | undefined {
+  if (noTrack()) return;
+  const all = new Map<string, Exposure>();
+  const cookie = typeof document !== "undefined" ? /(?:^|;\s*)glot_xp=([^;]*)/.exec(document.cookie || "")?.[1] : undefined;
+  for (const p of cookie?.split("~") ?? []) {
+    const [id, arm, cell] = p.split(".");
+    if (id && cell && arm) all.set(id, { id, cell, arm: Number(arm) });
+  }
+  for (const e of (json(XK) as Exposure[] | null) ?? []) all.set(e.id, e);
+  const out = [...all.values()].slice(0, 20).filter((e) => once(`${e.id}:${event}`));
+  return out.length ? out : undefined;
 }
 
 function arms(): Record<string, number> | undefined {

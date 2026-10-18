@@ -47,6 +47,9 @@ pub struct LocaleStatus {
     pub reviewed: usize,
     pub errors: usize,
     pub warnings: usize,
+    /// Translations identical to their source (`untranslated` warnings).
+    #[serde(default)]
+    pub untranslated: usize,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -55,6 +58,9 @@ pub struct Status {
     pub keys: usize,
     pub locales: BTreeMap<Locale, LocaleStatus>,
     pub plan: Plan,
+    /// Source keys flagged by `validate::lint_source` (code left in the catalog).
+    #[serde(default)]
+    pub suspicious_keys: usize,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -133,7 +139,7 @@ impl Workspace {
         let mut lock = Lockfile::load(&root)?;
         let mut catalogs = BTreeMap::new();
         for loc in config.all_locales() {
-            let cat = Catalog::read_all(&config.catalog_paths(&root, &loc), &loc, config.format)?;
+            let cat = Catalog::load(&config, &root, &loc)?;
             catalogs.insert(loc, cat);
         }
         // Mobile/gettext/YAML catalogs: file notes, fuzzy/needs_review flags, msgid as source.
@@ -252,21 +258,32 @@ impl Workspace {
                         .filter(|f| f.issue.severity == Severity::Error)
                         .count(),
                     warnings: in_loc
+                        .clone()
                         .filter(|f| f.issue.severity == Severity::Warning)
+                        .count(),
+                    untranslated: in_loc
+                        .filter(|f| f.issue.code == glot_core::validate::IssueCode::Untranslated)
                         .count(),
                 };
                 (loc.clone(), s)
             })
             .collect();
+        let suspicious_keys = findings
+            .iter()
+            .filter(|f| f.issue.code == glot_core::validate::IssueCode::SuspiciousSource)
+            .map(|f| &f.key)
+            .collect::<std::collections::BTreeSet<_>>()
+            .len();
         Status {
             source_locale: self.config.source_locale.clone(),
             keys: source.entries.len(),
             locales,
             plan,
+            suspicious_keys,
         }
     }
 
-    fn validate(
+    pub(crate) fn validate(
         &self,
         locale: &str,
         source: &str,
@@ -296,6 +313,16 @@ impl Workspace {
         let source = self.source();
         let mut out = vec![];
         let layout = glot_core::measure::load_layout(&self.root).unwrap_or_default();
+        // Source-only problems (code left in the catalog), once per key rather than per locale.
+        for (key, value) in &source.entries {
+            for issue in glot_core::validate::lint_source(key, value) {
+                out.push(Finding {
+                    locale: self.config.source_locale.clone(),
+                    key: key.clone(),
+                    issue,
+                });
+            }
+        }
         for loc in &self.config.target_locales {
             let Some(target) = self.catalogs.get(loc) else {
                 continue;
@@ -341,8 +368,17 @@ impl Workspace {
                         ),
                     });
                 }
+                // en_GB / fr_CA copying most of their source is expected, not a miss.
+                let lang = |l: &str| {
+                    l.split(['-', '_'])
+                        .next()
+                        .unwrap_or("")
+                        .to_ascii_lowercase()
+                };
+                let same_lang = lang(loc) == lang(&self.config.source_locale);
                 for issue in issues.into_iter().filter(|i| {
-                    !(decided && i.code == glot_core::validate::IssueCode::Untranslated)
+                    !((decided || same_lang)
+                        && i.code == glot_core::validate::IssueCode::Untranslated)
                 }) {
                     out.push(Finding {
                         locale: loc.clone(),
@@ -870,27 +906,34 @@ impl Workspace {
 
     /// Apply sets (Some) / deletions (None) for one locale: update the file already holding the key,
     /// else the first file of the pattern; keep the in-memory catalog in sync.
-    fn write_entries(&mut self, locale: &str, changes: &[(Key, Option<String>)]) -> Result<()> {
+    pub(crate) fn write_entries(
+        &mut self,
+        locale: &str,
+        changes: &[(Key, Option<String>)],
+    ) -> Result<()> {
         if changes.is_empty() {
             return Ok(());
         }
-        let paths = self.config.catalog_paths(&self.root, locale);
+        let paths = self.config.catalog_files(&self.root, locale);
         if paths.is_empty() {
             return Err(Error::Other("glot.toml `files` is empty".into()));
         }
         let mut files = vec![];
-        for p in &paths {
+        for (p, layout) in &paths {
             let fmt = self.file_format(p);
-            files.push((p.clone(), Catalog::read(p, locale, fmt)?, fmt, false));
+            let cat = Catalog::read_with(p, locale, fmt, layout)?;
+            files.push((p.clone(), cat, fmt, false, layout.clone()));
         }
         // A key new to this locale goes to the file holding it in the source locale (same pattern
         // index): `.stringsdict` plurals, i18next namespaces.
         let src = &self.config.source_locale;
         let src_files: Vec<Catalog> = if paths.len() > 1 && locale != src {
             self.config
-                .catalog_paths(&self.root, src)
+                .catalog_files(&self.root, src)
                 .iter()
-                .map(|p| Catalog::read(p, src, self.file_format(p)).unwrap_or_default())
+                .map(|(p, l)| {
+                    Catalog::read_with(p, src, self.file_format(p), l).unwrap_or_default()
+                })
                 .collect()
         } else {
             vec![]
@@ -905,11 +948,30 @@ impl Workspace {
                     let i = files
                         .iter()
                         .position(|f| f.1.entries.contains_key(key))
+                        // i18next `{ns}` files: `home:title` lives in `home.json`.
+                        .or_else(|| {
+                            files
+                                .iter()
+                                .position(|f| !f.4.ns.is_empty() && key.starts_with(&f.4.ns))
+                        })
                         .or_else(|| {
                             src_files
                                 .iter()
                                 .position(|c| c.entries.contains_key(key))
                                 .filter(|&i| i < files.len())
+                        })
+                        // A new key goes to the file already holding its longest dotted prefix
+                        // (`devise.new` => `devise.en.yml`).
+                        .or_else(|| {
+                            key.rmatch_indices('.').find_map(|(d, _)| {
+                                let p = format!("{}.", &key[..d]);
+                                files.iter().position(|f| {
+                                    f.1.entries
+                                        .range(p.clone()..)
+                                        .next()
+                                        .is_some_and(|(k, _)| k.starts_with(&p))
+                                })
+                            })
                         })
                         .unwrap_or(0);
                     files[i].1.entries.insert(key.clone(), v.clone());
@@ -924,7 +986,7 @@ impl Workspace {
                 }
             }
         }
-        for (path, cat, fmt, changed) in files {
+        for (path, cat, fmt, changed, layout) in files {
             if changed {
                 if let Some(dir) = path.parent() {
                     std::fs::create_dir_all(dir).map_err(|e| glot_core::Error::Io {
@@ -932,7 +994,7 @@ impl Workspace {
                         source: e,
                     })?;
                 }
-                cat.write(&path, fmt)?;
+                cat.write_with(&path, fmt, &layout)?;
             }
         }
         Ok(())

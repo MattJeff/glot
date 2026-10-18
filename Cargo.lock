@@ -53,6 +53,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloc-no-stdlib"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc7bb162ec39d46ab1ca8c77bf72e890535becd1751bb45f64c597edb4c8c6b3"
+
+[[package]]
+name = "alloc-stdlib"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e76a019e91224d279006ff972f1e984179a6e9feb050adba6ce8274aef23195"
+dependencies = [
+ "alloc-no-stdlib",
+]
+
+[[package]]
 name = "allocator-api2"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -307,6 +322,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "brotli-decompressor"
+version = "5.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a32acac15fe1967bc3986b2a6347dffc965602354ea6f450ad07e8bfd253583"
+dependencies = [
+ "alloc-no-stdlib",
+ "alloc-stdlib",
 ]
 
 [[package]]
@@ -1074,17 +1099,23 @@ dependencies = [
 name = "glot-core"
 version = "0.4.0"
 dependencies = [
+ "brotli-decompressor",
  "fixed_decimal",
  "glob",
  "icu_locale",
  "icu_locale_core",
  "icu_plurals",
+ "oxc_allocator",
+ "oxc_ast",
+ "oxc_parser",
+ "oxc_span",
  "rustybuzz",
  "serde",
  "serde_json",
  "sha2",
  "thiserror",
  "toml",
+ "unicode-bidi",
 ]
 
 [[package]]
@@ -1132,9 +1163,11 @@ name = "glot-mcp"
 version = "0.4.0"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "glot-core",
  "glot-extract",
  "glot-llm",
+ "reqwest 0.12.28",
  "rmcp",
  "schemars",
  "serde",
@@ -1158,17 +1191,21 @@ dependencies = [
  "glot-core",
  "glot-llm",
  "hex",
+ "hmac",
  "http-body-util",
  "rand 0.9.5",
  "reqwest 0.12.28",
+ "ring",
  "rmcp",
  "schemars",
  "serde",
  "serde_json",
  "sha2",
  "sqlx",
+ "tempfile",
  "tokio",
  "tokio-stream",
+ "toml",
  "tower",
  "tower-http",
  "tracing",

@@ -35,10 +35,10 @@ Each row: `locale, key, origin, ai_generated, model, translated_at, reviewed, re
 glot provenance catalog   # writes messages/fr.provenance.json, messages/de.provenance.json…
 ```
 
-Run it after `glot translate` (or in CI) and ship the files with your catalogs. Then, with `@glot/runtime`:
+Run it after `glot translate` (or in CI) and ship the files with your catalogs. Then, with `@glot-i18n/runtime`:
 
 ```ts
-import { provenanceOf, provenanceLabel, hasMachineTranslations } from "@glot/runtime/provenance";
+import { provenanceOf, provenanceLabel, hasMachineTranslations } from "@glot-i18n/runtime/provenance";
 import prov from "../messages/fr.provenance.json";
 
 // Page-level notice

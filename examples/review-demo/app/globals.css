@@ -1,0 +1,21 @@
+:root { --fg: #14161a; --muted: #4b5260; --accent: #4338ca; --bg: #fff; --card: #f6f7fb; --line: #e5e7eb; }
+@media (prefers-color-scheme: dark) { :root { --fg: #eceef2; --muted: #a8afbd; --accent: #818cf8; --bg: #0f1115; --card: #1a1d24; --line: #2a2e37; } }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.nav nav { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.nav a { color: inherit; }
+.logo { font-weight: 700; font-size: 20px; text-decoration: none; }
+main { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+.hero { text-align: center; padding: 32px 0; }
+.hero h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.1; margin: 0 0 16px; }
+.hero p { color: var(--muted); font-size: 19px; max-width: 640px; margin: 0 auto 28px; }
+/* Trap on purpose: fixed width + nowrap, the German CTA overflows (that's what reviewers annotate). */
+.btn { display: inline-block; background: var(--accent); color: #fff; padding: 12px 20px; border-radius: 8px; border: 0; font: inherit; text-decoration: none; cursor: pointer; }
+.btn-fixed { width: 11rem; white-space: nowrap; text-align: center; }
+.features ul, .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding: 0; list-style: none; }
+.features li, .plan { background: var(--card); border-radius: 12px; padding: 20px; }
+.price { font-size: 30px; font-weight: 700; }
+footer { text-align: center; color: var(--muted); padding: 32px 16px; font-size: 14px; }
+.locales { display: flex; gap: 8px; }
+.locales a[aria-current] { font-weight: 700; }

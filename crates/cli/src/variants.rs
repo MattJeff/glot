@@ -37,11 +37,10 @@ pub async fn translate(
             );
             continue;
         };
-        let paths = ws.config.catalog_paths(&ws.root, &tag);
-        let Some(path) = paths.first().cloned() else {
+        let Some((path, layout)) = ws.config.catalog_files(&ws.root, &tag).first().cloned() else {
             continue;
         };
-        let target = Catalog::read_all(&paths, &tag, ws.config.format)?;
+        let target = Catalog::load(&ws.config, &ws.root, &tag)?;
         let plan = ws.lock.plan(&base_cat, std::slice::from_ref(&target));
         let manual: BTreeSet<_> = plan.manual_edits.iter().map(|(_, k)| k.clone()).collect();
         let todo: Vec<String> = if force {
@@ -129,7 +128,7 @@ pub async fn translate(
         }
         let (results, _usage) = translator.as_ref().unwrap().translate(req).await?;
         // ponytail: new keys land in the variant's first catalog file; split catalogs keep keys where they already are.
-        let mut file = Catalog::read(&path, &tag, ws.config.format)?;
+        let mut file = Catalog::read_with(&path, &tag, ws.config.format, &layout)?;
         let mut written = 0;
         for t in &results {
             if has_errors(&t.issues) {
@@ -154,7 +153,7 @@ pub async fn translate(
             );
             written += 1;
         }
-        file.write(&path, ws.config.format)?;
+        file.write_with(&path, ws.config.format, &layout)?;
         ws.lock.save(&ws.root)?;
         anstream::println!("  {GREEN}✓{GREEN:#} {tag:<6} {written} written");
     }
@@ -169,8 +168,7 @@ pub fn check(ws: &glot_llm::engine::Workspace) -> Vec<glot_llm::engine::Finding>
         let Some(base_cat) = ws.catalogs.get(&base) else {
             continue;
         };
-        let paths = ws.config.catalog_paths(&ws.root, &tag);
-        let Ok(cat) = Catalog::read_all(&paths, &tag, ws.config.format) else {
+        let Ok(cat) = Catalog::load(&ws.config, &ws.root, &tag) else {
             continue;
         };
         for (key, issue) in variants::check(base_cat, &cat, ws.config.syntax) {

@@ -22,15 +22,17 @@ import {
   PanelRight,
   Search,
   SearchX,
+  TableProperties,
 } from "lucide-react";
 import { useFormatter, useNow, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, StatusBadge, useLocaleName } from "@/components/common";
+import { CodeBlock, EmptyState, ErrorState, StatusBadge, useLocaleName } from "@/components/common";
 import { ReviewBlock, seedReviews, useCachedReview, VerdictBadge } from "@/components/review";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -51,6 +53,7 @@ import {
   type Translation,
   type TranslationStatus,
 } from "@/lib/api";
+import { useMediaQuery } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 const PER_PAGE = 100;
@@ -65,16 +68,34 @@ const MISSING: Translation = {
 };
 const tr = (row: KeyRow, locale: string) => row.translations[locale] ?? MISSING;
 
-function patchTranslation(qc: QueryClient, slug: string, key: string, locale: string, next: Translation) {
+type Snapshot = [readonly unknown[], InfiniteData<KeyPage> | undefined][];
+
+/** Writes one translation into every cached key page; returns the previous pages for rollback. */
+function setTranslation(qc: QueryClient, slug: string, key: string, locale: string, next: (prev: Translation) => Translation): Snapshot {
+  const snapshot = qc.getQueriesData<InfiniteData<KeyPage>>({ queryKey: qk.keys(slug) });
   qc.setQueriesData<InfiniteData<KeyPage>>({ queryKey: qk.keys(slug) }, (d) =>
-    d && {
+    d?.pages && {
       ...d,
       pages: d.pages.map((p) => ({
         ...p,
-        items: p.items.map((r) => (r.key === key ? { ...r, translations: { ...r.translations, [locale]: next } } : r)),
+        items: p.items.map((r) =>
+          r.key === key ? { ...r, translations: { ...r.translations, [locale]: next(r.translations[locale] ?? MISSING) } } : r,
+        ),
       })),
     },
   );
+  return snapshot;
+}
+
+/** Optimistic edit/approve: patch the cache now, roll back on error (the global handler toasts the error). */
+function optimistic(qc: QueryClient, slug: string, v: { key: string; locale: string }, next: (prev: Translation) => Translation) {
+  void qc.cancelQueries({ queryKey: qk.keys(slug) });
+  return { snapshot: setTranslation(qc, slug, v.key, v.locale, next) };
+}
+const rollback = (qc: QueryClient, ctx?: { snapshot: Snapshot }) => ctx?.snapshot.forEach(([k, d]) => qc.setQueryData(k, d));
+
+function patchTranslation(qc: QueryClient, slug: string, key: string, locale: string, next: Translation) {
+  setTranslation(qc, slug, key, locale, () => next);
   qc.invalidateQueries({ queryKey: qk.project(slug) });
   qc.invalidateQueries({ queryKey: qk.issues(slug) });
   qc.invalidateQueries({ queryKey: qk.history(slug, key) });
@@ -104,8 +125,16 @@ export function KeysEditor({ project }: { project: Project }) {
   );
   const [withIssues, setWithIssues] = useState(params.get("issues") === "1");
   const [different, setDifferent] = useState(params.get("meaning") === "different");
-  const [visible, setVisible] = useState<string[]>(() =>
+  const [chosen, setVisible] = useState<string[]>(() =>
     locale !== "all" ? [locale] : project.target_locales.slice(0, 3),
+  );
+  // Phones: stacked cards, one locale at a time (picked with the locale select), full-screen editing.
+  const compact = useMediaQuery("(max-width: 767px)");
+  // Touch screens edit on a single tap (double-tap zooms on iOS).
+  const coarse = useMediaQuery("(pointer: coarse)");
+  const visible = useMemo(
+    () => (compact ? [locale !== "all" ? locale : (chosen[0] ?? project.target_locales[0])].filter(Boolean) : chosen),
+    [compact, locale, chosen, project.target_locales],
   );
 
   useEffect(() => {
@@ -164,13 +193,28 @@ export function KeysEditor({ project }: { project: Project }) {
   const activeRow = rows[Math.min(active.row, rows.length - 1)];
   const activeLocale = visible[Math.min(active.col, visible.length - 1)];
 
+  // Screen-reader announcements for saves/approvals (toasts alone may be missed).
+  const [announce, setAnnounce] = useState("");
   const save = useMutation({
     mutationFn: (v: { key: string; locale: string; value: string }) => api.putTranslation(slug, v.key, v.locale, v.value),
+    onMutate: (v) => {
+      setEditing(null);
+      setAnnounce(t("saving"));
+      // A hand edit is stored as human + reviewed; the server's validation result replaces this on success.
+      return optimistic(qc, slug, v, (prev) => ({ ...prev, value: v.value, status: "reviewed", origin: "human", issues: [] }));
+    },
+    onError: (_e, v, ctx) => {
+      rollback(qc, ctx);
+      setEditing({ key: v.key, locale: v.locale });
+      setDraft(v.value);
+      setAnnounce(t("saveFailed"));
+    },
     onSuccess: (next, v) => {
       patchTranslation(qc, slug, v.key, v.locale, next);
-      setEditing(null);
-      if (next.issues.length) toast.warning(t("savedWithIssues", { count: next.issues.length }));
-      else toast.success(t("saved"));
+      const msg = next.issues.length ? t("savedWithIssues", { count: next.issues.length }) : t("saved");
+      setAnnounce(msg);
+      if (next.issues.length) toast.warning(msg);
+      else toast.success(msg);
     },
   });
   const reviewTarget = locale !== "all" ? locale : activeLocale;
@@ -186,8 +230,14 @@ export function KeysEditor({ project }: { project: Project }) {
   });
   const review = useMutation({
     mutationFn: (v: { key: string; locale: string }) => api.review(slug, v.key, v.locale),
+    onMutate: (v) => optimistic(qc, slug, v, (prev) => ({ ...prev, status: "reviewed" })),
+    onError: (_e, _v, ctx) => {
+      rollback(qc, ctx);
+      setAnnounce(t("approveFailed"));
+    },
     onSuccess: (next, v) => {
       patchTranslation(qc, slug, v.key, v.locale, next);
+      setAnnounce(t("approved"));
       toast.success(t("approved"));
     },
   });
@@ -205,7 +255,7 @@ export function KeysEditor({ project }: { project: Project }) {
         header: () => t("key"),
         cell: (c) => (
           <div className="min-w-0">
-            <div className="truncate font-mono text-xs" title={c.getValue()}>{c.getValue()}</div>
+            <div className={cn("font-mono text-xs", compact ? "break-all" : "truncate")} title={c.getValue()}>{c.getValue()}</div>
             {c.row.original.description && (
               <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{c.row.original.description}</div>
             )}
@@ -219,7 +269,7 @@ export function KeysEditor({ project }: { project: Project }) {
           </>
         ),
         cell: (c) => (
-          <p dir="auto" lang={project.source_locale} className="line-clamp-3 text-sm whitespace-pre-wrap">
+          <p dir="auto" lang={project.source_locale} className={cn("line-clamp-3 text-sm whitespace-pre-wrap", compact && "text-muted-foreground")}>
             {c.getValue()}
           </p>
         ),
@@ -235,7 +285,7 @@ export function KeysEditor({ project }: { project: Project }) {
         }),
       ),
     ];
-  }, [project.source_locale, project.target_locales, t, localeName]);
+  }, [project.source_locale, project.target_locales, t, localeName, compact]);
 
   const table = useReactTable({
     data: rows,
@@ -245,14 +295,16 @@ export function KeysEditor({ project }: { project: Project }) {
     state: { columnVisibility: Object.fromEntries(project.target_locales.map((l) => [l, visible.includes(l)])) },
   });
   const tableRows = table.getRowModel().rows;
-  const gridTemplate = `minmax(12rem,16rem) minmax(14rem,1fr) ${visible.map(() => "minmax(15rem,1fr)").join(" ")}`;
+  const gridTemplate = compact
+    ? "minmax(0,1fr)"
+    : `minmax(12rem,16rem) minmax(14rem,1fr) ${visible.map(() => "minmax(15rem,1fr)").join(" ")}`;
 
   // Virtualisation + infinite loading
   const scrollRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: tableRows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 72,
+    estimateSize: () => (compact ? 160 : 72),
     // Cache measured heights per key, not per index: filters reshuffle rows under the same indices.
     getItemKey: (i) => tableRows[i]?.id ?? i,
     overscan: 8,
@@ -310,7 +362,13 @@ export function KeysEditor({ project }: { project: Project }) {
     <div className="-mx-4 -my-6 flex h-[calc(100dvh-3rem)] flex-col sm:-mx-6 lg:-mx-8">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2.5 sm:px-6">
-        <h1 className="me-2 text-base font-semibold">{t("title")}</h1>
+        <div className="me-2 flex items-baseline gap-2">
+          <h1 className="text-base font-semibold">{t("title")}</h1>
+          <p className="hidden text-xs text-muted-foreground 2xl:block">{t("subtitle")}</p>
+        </div>
+        <p role="status" aria-live="polite" className="sr-only">
+          {announce}
+        </p>
         <div className="relative w-full sm:w-64">
           <Search className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -324,13 +382,13 @@ export function KeysEditor({ project }: { project: Project }) {
           />
         </div>
         <Select
-          value={locale}
+          value={compact && locale === "all" ? (visible[0] ?? "all") : locale}
           onValueChange={(v) => {
             setLocale(v);
             if (v !== "all" && !visible.includes(v)) setVisible((cur) => [v, ...cur]);
           }}
         >
-          <SelectTrigger size="sm" className="w-36" aria-label={t("anyLocale")}>
+          <SelectTrigger size="sm" className="w-36" aria-label={compact ? t("columns") : t("anyLocale")}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -369,7 +427,7 @@ export function KeysEditor({ project }: { project: Project }) {
         </div>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="max-md:hidden">
               <Columns3 /> {t("columns")}
               <span className="font-mono text-xs text-muted-foreground">{visible.length}</span>
             </Button>
@@ -424,7 +482,10 @@ export function KeysEditor({ project }: { project: Project }) {
           <div style={{ minWidth: "fit-content" }}>
             <div
               role="row"
-              className="sticky top-0 z-10 grid border-b bg-background/95 text-xs font-medium text-muted-foreground backdrop-blur"
+              className={cn(
+                "sticky top-0 z-10 grid border-b bg-background/95 text-xs font-medium text-muted-foreground backdrop-blur",
+                compact && "sr-only",
+              )}
               style={{ gridTemplateColumns: gridTemplate }}
             >
               {table.getHeaderGroups()[0].headers.map((h) => (
@@ -449,18 +510,26 @@ export function KeysEditor({ project }: { project: Project }) {
                 <ErrorState error={keys.error} onRetry={() => keys.refetch()} />
               </div>
             ) : tableRows.length === 0 ? (
-              <div className="p-6">
-                <EmptyState
-                  icon={SearchX}
-                  title={t("empty")}
-                  action={
-                    hasFilters && (
-                      <Button variant="outline" size="sm" onClick={clearFilters}>
-                        <FilterX /> {t("clearFilters")}
-                      </Button>
-                    )
-                  }
-                />
+              <div className="sticky start-0 max-w-[100vw] p-6 lg:max-w-[calc(100vw-15rem)]">
+                {hasFilters || project.stats.keys > 0 ? (
+                  <EmptyState
+                    icon={SearchX}
+                    title={t("empty")}
+                    body={t("emptyFilteredBody")}
+                    action={
+                      hasFilters && (
+                        <Button variant="outline" size="sm" onClick={clearFilters}>
+                          <FilterX /> {t("clearFilters")}
+                        </Button>
+                      )
+                    }
+                  />
+                ) : (
+                  <EmptyState icon={TableProperties} title={t("noKeys.title")} body={t("noKeys.body")}>
+                    <CodeBlock label={t("noKeys.push")} code={"glot push"} />
+                    <CodeBlock className="mt-3" label={t("noKeys.add")} code={'glot add nav.billing "Billing" --note "sidebar link"'} />
+                  </EmptyState>
+                )}
               </div>
             ) : (
               <div className="relative" style={{ height: virtualizer.getTotalSize() }}>
@@ -477,6 +546,7 @@ export function KeysEditor({ project }: { project: Project }) {
                       aria-selected={isActiveRow}
                       className={cn(
                         "absolute inset-x-0 grid border-b text-sm",
+                        compact && "py-1 [&>[role=gridcell]]:py-1.5",
                         isActiveRow ? "bg-accent/50" : "hover:bg-accent/25",
                       )}
                       style={{ transform: `translateY(${vi.start}px)`, gridTemplateColumns: gridTemplate }}
@@ -501,9 +571,13 @@ export function KeysEditor({ project }: { project: Project }) {
                             locale={loc}
                             translation={tr(row.original, loc)}
                             active={isActiveRow && col === active.col}
-                            editing={isEditing}
+                            editing={isEditing && !compact}
+                            tapToEdit={compact || coarse}
                             draft={draft}
-                            saving={save.isPending}
+                            pending={
+                              (save.isPending && save.variables?.key === row.original.key && save.variables.locale === loc) ||
+                              (review.isPending && review.variables?.key === row.original.key && review.variables.locale === loc)
+                            }
                             onDraft={setDraft}
                             onFocus={() => setActive({ row: vi.index, col })}
                             onEdit={() => {
@@ -526,6 +600,18 @@ export function KeysEditor({ project }: { project: Project }) {
             )}
           </div>
         </div>
+
+        {compact && editing && activeRow?.key === editing.key && (
+          <FullScreenEditor
+            row={activeRow}
+            locale={editing.locale}
+            sourceLocale={project.source_locale}
+            draft={draft}
+            onDraft={setDraft}
+            onCancel={() => setEditing(null)}
+            onSave={() => save.mutate({ key: editing.key, locale: editing.locale, value: draft })}
+          />
+        )}
 
         {detailOpen && (
           <aside className="fixed inset-y-0 end-0 z-40 w-full max-w-sm overflow-y-auto border-s bg-background shadow-xl xl:static xl:z-auto xl:w-96 xl:max-w-none xl:shadow-none">
@@ -550,9 +636,10 @@ function IssuesIcon({ issues }: { issues: Issue[] }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button type="button" className="inline-flex items-center gap-1" aria-label={t("issuesTooltip", { count: issues.length })}>
-          <Icon className={cn("size-3.5", hasError ? "text-destructive" : "text-warning")} />
-          <span className={cn("font-mono text-[11px]", hasError ? "text-destructive" : "text-warning")}>{issues.length}</span>
+        <button type="button" className="inline-flex h-6 min-w-6 items-center justify-center gap-1 rounded-sm">
+          <Icon aria-hidden className={cn("size-3.5", hasError ? "text-destructive" : "text-warning-foreground")} />
+          <span className={cn("font-mono text-[11px]", hasError ? "text-destructive" : "text-warning-foreground")}>{issues.length}</span>
+          <span className="sr-only">{t("issuesTooltip", { count: issues.length })}</span>
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-xs">
@@ -576,7 +663,8 @@ function TranslationCell(props: {
   active: boolean;
   editing: boolean;
   draft: string;
-  saving: boolean;
+  pending: boolean;
+  tapToEdit?: boolean;
   onDraft: (v: string) => void;
   onFocus: () => void;
   onEdit: () => void;
@@ -596,7 +684,6 @@ function TranslationCell(props: {
           dir="auto"
           lang={locale}
           value={props.draft}
-          disabled={props.saving}
           onChange={(e) => props.onDraft(e.target.value)}
           onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
           onKeyDown={(e) => {
@@ -621,11 +708,13 @@ function TranslationCell(props: {
       role="gridcell"
       tabIndex={-1}
       aria-selected={props.active}
-      onClick={props.onFocus}
+      onClick={props.tapToEdit ? props.onEdit : props.onFocus}
       onDoubleClick={props.onEdit}
+      aria-busy={props.pending || undefined}
       className={cn(
-        "group/cell relative min-w-0 cursor-text px-3 py-2.5",
-        props.active && "ring-2 ring-ring/60 ring-inset",
+        "group/cell relative min-w-0 cursor-text px-3 py-2.5 transition-[background-color,opacity] duration-150",
+        props.active && "ring-2 ring-ring ring-inset",
+        props.pending && "opacity-70",
         tr.status === "missing" && "bg-destructive/[0.03]",
         review?.verdict === "different" && "bg-destructive/[0.04]",
       )}
@@ -636,10 +725,11 @@ function TranslationCell(props: {
         <p className="text-muted-foreground italic">{t("emptyValue")}</p>
       )}
       <div className="mt-1.5 flex items-center gap-2">
-        <StatusBadge status={tr.status} />
+        <StatusBadge key={tr.status} status={tr.status} className="motion-safe:animate-pop" />
+        {props.pending && <Loader2 className="size-3 animate-spin text-muted-foreground" aria-hidden />}
         {tr.score !== null && (
           <span
-            className={cn("font-mono text-[11px] tabular-nums", tr.score < 80 ? "text-warning" : "text-muted-foreground")}
+            className={cn("font-mono text-[11px] tabular-nums", tr.score < 80 ? "text-warning-foreground" : "text-muted-foreground")}
             title={t("score", { score: tr.score })}
           >
             {tr.score}
@@ -651,8 +741,12 @@ function TranslationCell(props: {
           <Button
             variant="ghost"
             size="icon-xs"
-            className="ms-auto opacity-0 group-hover/cell:opacity-100 focus-visible:opacity-100"
+            className={cn(
+              "ms-auto opacity-0 transition-opacity group-hover/cell:opacity-100 hover:text-success-foreground focus-visible:opacity-100 pointer-coarse:size-9 pointer-coarse:opacity-100",
+              props.active && "opacity-100",
+            )}
             aria-label={t("approve")}
+            title={`${t("approve")} (⌘↵)`}
             onClick={(e) => {
               e.stopPropagation();
               props.onApprove();
@@ -668,6 +762,54 @@ function TranslationCell(props: {
         </p>
       )}
     </div>
+  );
+}
+
+/** Phone editor: the whole screen for one translation, source on top, actions under the thumb. */
+function FullScreenEditor(props: {
+  row: KeyRow;
+  locale: string;
+  sourceLocale: string;
+  draft: string;
+  onDraft: (v: string) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const t = useTranslations("editor");
+  const tc = useTranslations("common");
+  return (
+    <Dialog open onOpenChange={(o) => !o && props.onCancel()}>
+      <DialogContent className="inset-0 top-0 start-0 flex h-dvh max-h-none max-w-none translate-x-0 translate-y-0 flex-col gap-3 rounded-none p-0 ring-0 rtl:translate-x-0 sm:max-w-none">
+        <div className="border-b px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-3 pe-12">
+          <DialogTitle className="font-mono text-xs font-normal break-all">{props.row.key}</DialogTitle>
+          <DialogDescription dir="auto" lang={props.sourceLocale} className="mt-2 text-sm whitespace-pre-wrap text-foreground">
+            {props.row.source}
+          </DialogDescription>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col px-4">
+          <Label htmlFor="fs-edit" className="mb-1.5 text-xs text-muted-foreground">
+            {t("editPlaceholder", { locale: props.locale })}
+          </Label>
+          <Textarea
+            id="fs-edit"
+            autoFocus
+            dir="auto"
+            lang={props.locale}
+            value={props.draft}
+            onChange={(e) => props.onDraft(e.target.value)}
+            className="min-h-32 flex-1 resize-none"
+          />
+        </div>
+        <div className="flex gap-2 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <Button variant="outline" className="h-11 flex-1" onClick={props.onCancel}>
+            {tc("cancel")}
+          </Button>
+          <Button className="h-11 flex-1" onClick={props.onSave}>
+            <Check /> {tc("save")}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -746,7 +888,7 @@ function DetailPanel({ slug, project, row, onClose }: { slug: string; project: P
                     </div>
                     {x.value && <p dir="auto" lang={l} className="mt-1 whitespace-pre-wrap">{x.value}</p>}
                     {x.issues.map((i, n) => (
-                      <p key={n} className={cn("mt-1 flex gap-1.5 text-xs", i.severity === "error" ? "text-destructive" : "text-warning")}>
+                      <p key={n} className={cn("mt-1 flex gap-1.5 text-xs", i.severity === "error" ? "text-destructive" : "text-warning-foreground")}>
                         {i.severity === "error" ? <CircleX className="mt-0.5 size-3.5 shrink-0" /> : <CircleAlert className="mt-0.5 size-3.5 shrink-0" />}
                         {i.message}
                       </p>

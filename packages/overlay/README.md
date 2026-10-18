@@ -1,4 +1,4 @@
-# @glot/overlay
+# @glot-i18n/overlay
 
 Edit translations **directly in your running app**, with AI. Alt+click any text → a popover shows the key, its value in every locale (editable inline), live validator issues, AI actions, and whether the element overflows its container. Saving writes your catalog files through `glot dev`, so your app's HMR reloads instantly.
 
@@ -23,7 +23,7 @@ Then load the overlay in your app, in dev only. Either:
 **Next.js (App Router), 3 lines** in `app/layout.tsx`:
 
 ```tsx
-import { GlotOverlay } from "@glot/overlay/react";
+import { GlotOverlay } from "@glot-i18n/overlay/react";
 // inside <body>:
 {process.env.NODE_ENV === "development" && <GlotOverlay />}
 ```
@@ -34,7 +34,7 @@ import { GlotOverlay } from "@glot/overlay/react";
 <script src="http://127.0.0.1:4317/overlay.js" defer></script>
 ```
 
-**Bundler**: `if (import.meta.env.DEV) import("@glot/overlay");`
+**Bundler**: `if (import.meta.env.DEV) import("@glot-i18n/overlay");`
 
 The first time, open your app with `?glot_token=<token>` (stored in `localStorage`) or paste the token when the overlay asks. Pin it with `glot dev --token …` / `GLOT_DEV_TOKEN` and pass `<GlotOverlay token={process.env.NEXT_PUBLIC_GLOT_DEV_TOKEN} />` if you prefer.
 

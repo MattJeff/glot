@@ -1,11 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FolderKanban, Plus } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, ProgressBar } from "@/components/common";
 import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { projectHealth } from "@/components/gamification/project-progress";
+import { ProgressRing } from "@/components/gamification/progress-ring";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
@@ -45,11 +47,13 @@ export default function ProjectsPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {projects.data.map((p) => (
-            <ProjectCard key={p.id} project={p} />
+        <ul className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={t("title")}>
+          {projects.data.map((p, i) => (
+            <li key={p.id} style={{ "--i": i } as React.CSSProperties} className="flex">
+              <ProjectCard project={p} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
       <CreateProjectDialog open={open} onOpenChange={setOpen} />
     </div>
@@ -59,19 +63,36 @@ export default function ProjectsPage() {
 function ProjectCard({ project: p }: { project: Project }) {
   const t = useTranslations("projects");
   const format = useFormatter();
+  const tg = useTranslations("gamification");
+  const health = projectHealth(p);
+  const qc = useQueryClient();
+  // Seed the overview with what we already have, then refresh in the background.
+  const prefetch = () => {
+    if (!qc.getQueryData(qk.project(p.slug))) qc.setQueryData(qk.project(p.slug), p);
+  };
   return (
     <Link
       href={`/app/${p.slug}`}
-      className="group flex flex-col rounded-xl border bg-card p-5 transition-colors hover:border-foreground/20 hover:bg-accent/30 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+      onMouseEnter={prefetch}
+      onFocus={prefetch}
+      className="group flex w-full flex-col rounded-xl border bg-card p-5 shadow-(--shadow-card) transition-[border-color,box-shadow,translate] duration-200 ease-out hover:border-foreground/20 hover:shadow-(--shadow-raised) focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="truncate font-medium">{p.name}</h2>
-          <p className="truncate font-mono text-xs text-muted-foreground">{p.slug}</p>
+          <p className="truncate font-mono text-xs text-muted-foreground">
+            {p.slug} · {p.source_locale}
+          </p>
         </div>
-        <span className="shrink-0 rounded-md border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
-          {p.source_locale}
-        </span>
+        {health !== null && (
+          <ProgressRing
+            value={health}
+            size={40}
+            label={tg("healthLabel", { score: Math.round(health) })}
+          >
+            <span className="text-[11px] font-semibold tabular-nums">{Math.round(health)}</span>
+          </ProgressRing>
+        )}
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
         {t("keysCount", { count: p.stats.keys })} · {t("localesCount", { count: p.target_locales.length })}
@@ -83,7 +104,13 @@ function ProjectCard({ project: p }: { project: Project }) {
           return (
             <div key={l} className="flex items-center gap-3">
               <span className="w-10 shrink-0 font-mono text-xs">{l}</span>
-              <ProgressBar total={p.stats.keys} translated={s.translated} reviewed={s.reviewed} stale={s.stale} />
+              <ProgressBar
+                total={p.stats.keys}
+                translated={s.translated}
+                reviewed={s.reviewed}
+                stale={s.stale}
+                label={l}
+              />
               <span className="w-10 shrink-0 text-end font-mono text-xs text-muted-foreground tabular-nums">
                 {format.number(ratio, { style: "percent", maximumFractionDigits: 0 })}
               </span>

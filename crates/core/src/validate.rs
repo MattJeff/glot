@@ -18,6 +18,10 @@ pub enum Syntax {
     Printf,
     /// Rails / Ruby i18n `%{name}`, ICU plural wrapper for `one:`/`other:` mappings.
     Rails,
+    /// vue-i18n: `{name}`, `{0}`, literals `{'@'}`, links `@:key` / `@.lower:key`, plurals `a | b | c`.
+    Vue,
+    /// Laravel: `:name` / `:Name` / `:NAME`, plurals `a|b` and `{0} none|[1,19] some|[20,*] many`.
+    Laravel,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -40,6 +44,14 @@ pub enum IssueCode {
     GlossaryViolation,
     DoNotTranslateViolation,
     LowScore,
+    /// Changed while a live-review annotation is still open on it (`glot check`, needs `[server]`).
+    OpenAnnotation,
+    /// Source entry that cannot work at runtime: code pasted into the catalog (`\(…)`, `L10n.tr(`,
+    /// Swift `\u{…}` escapes), see [`lint_source`].
+    SuspiciousSource,
+    /// Source file with a hand-rolled i18n pattern next to glot's catalogs: `lang === 'fr' ? … : …`
+    /// ternaries or a second `{ en: {...}, fr: {...} }` dictionary (see [`hand_rolled_i18n`]).
+    HandRolledI18n,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -116,6 +128,9 @@ pub fn validate(
             out: &mut out,
         }
         .run();
+        if matches!(syntax, Syntax::Vue | Syntax::Laravel) {
+            out.extend(pipe_forms(source, target, target_locale, syntax));
+        }
     }
     let src_nodes = src.unwrap_or_else(|| vec![Node::Text(source.into())]);
     let (src_len, tgt_len) = (visible_len(&src_nodes), visible_len(&tgt));
@@ -157,6 +172,122 @@ pub fn validate(
         ));
     }
     out
+}
+
+/// `\u{2019}` => `’` (Swift escapes left in a catalog), anything else verbatim.
+pub fn swift_unescape(text: &str) -> std::borrow::Cow<'_, str> {
+    if !text.contains("\\u{") {
+        return text.into();
+    }
+    let mut out = String::new();
+    let mut rest = text;
+    while let Some(at) = rest.find("\\u{") {
+        out.push_str(&rest[..at]);
+        let tail = &rest[at + 3..];
+        match tail.find('}').and_then(|e| {
+            let c = char::from_u32(u32::from_str_radix(&tail[..e], 16).ok()?)?;
+            Some((c, e))
+        }) {
+            Some((c, e)) => {
+                out.push(c);
+                rest = &tail[e + 1..];
+            }
+            None => {
+                out.push_str("\\u{");
+                rest = tail;
+            }
+        }
+    }
+    out.push_str(rest);
+    out.into()
+}
+
+/// Source entries that cannot work at runtime, checked once per key (not per locale): Swift code
+/// left in a catalog by a broken extraction script (`\(name)` interpolation, `L10n.tr(` calls) never
+/// matches a lookup and shows code to users; Swift `\u{…}` escapes are not decoded by `.strings`,
+/// `strings.xml` or gettext.
+pub fn lint_source(key: &str, source: &str) -> Vec<Issue> {
+    let mut out = vec![];
+    let code = ["\\(", "L10n.tr(", "NSLocalizedString(", "String(localized:"];
+    if let Some(c) = code
+        .iter()
+        .find(|c| key.contains(**c) || source.contains(**c))
+    {
+        out.push(warning(
+            IssueCode::SuspiciousSource,
+            format!("Swift code `{c}` in this entry: it was probably extracted from source code by a broken script and never matches at runtime. Delete the key, or rewrite it with a %@ / %lld placeholder."),
+        ));
+    }
+    if let Some(at) = key.find("\\u{").or_else(|| source.find("\\u{")) {
+        let s = if key.contains("\\u{") { key } else { source };
+        let esc: String = s[at..]
+            .chars()
+            .take_while(|c| *c != '}')
+            .chain(['}'])
+            .collect();
+        let shown = swift_unescape(&esc);
+        let hex = esc.trim_start_matches("\\u{").trim_end_matches('}');
+        out.push(warning(
+            IssueCode::SuspiciousSource,
+            format!("Swift escape `{esc}` in a catalog: it is not decoded here, users see it verbatim. Write the character itself ({shown}) or `\\U{hex:0>4}` in a .strings file."),
+        ));
+    }
+    out
+}
+
+/// Hand-rolled i18n in a source file (not a declared catalog): language ternaries
+/// (`language === 'fr' ? 'Bonjour' : 'Hello'`) or a dictionary keyed by locale. CI runs `glot
+/// check` on every PR, so agents that ignore CLAUDE.md still get told.
+/// ponytail: text scan for the ternaries (a comment can count), oxc only for the dictionary.
+pub fn hand_rolled_i18n(src: &str) -> Option<Issue> {
+    let b = src.as_bytes();
+    let ternaries = src
+        .match_indices("==")
+        .filter(|(i, _)| {
+            let (i, mut j) = (*i, *i + 2);
+            if b.get(j) == Some(&b'=') {
+                j += 1;
+            }
+            let rest = src[j..].trim_start();
+            // `lang === 'fr' ? '…'`: a literal branch (not the `(en, fr) => …` pair helper).
+            let code = rest
+                .strip_prefix(['\'', '"'])
+                .and_then(|r| r.split_once(['\'', '"']))
+                .filter(|(_, after)| {
+                    after
+                        .trim_start()
+                        .strip_prefix('?')
+                        .is_some_and(|b| b.trim_start().starts_with(['\'', '"', '`']))
+                })
+                .is_some_and(|(c, _)| {
+                    let (l, r) = c.split_once(['-', '_']).unwrap_or((c, ""));
+                    (2..=3).contains(&l.len())
+                        && l.bytes().all(|x| x.is_ascii_lowercase())
+                        && r.len() <= 4
+                });
+            let left = src[..i].trim_end().trim_end_matches('!').trim_end();
+            let ident = left.len()
+                - left
+                    .trim_end_matches(|c: char| c.is_alphanumeric() || c == '_')
+                    .len();
+            let var = left[left.len() - ident..].to_lowercase();
+            code && (var.contains("lang") || var.contains("locale") || var == "lng")
+        })
+        .count();
+    let dict = (src.contains("en: {") || src.contains("'en': {") || src.contains("\"en\": {"))
+        && crate::formats::js::dictionary_locales(src).len() >= 2;
+    let what = match (ternaries, dict) {
+        (0, false) => return None,
+        (n, false) => format!("{n} language ternaries (`language === 'xx' ? … : …`)"),
+        (0, true) => "a second translations dictionary (`{ en: {...}, fr: {...} }`)".to_string(),
+        (n, true) => format!("a second translations dictionary and {n} language ternaries"),
+    };
+    Some(warning(
+        IssueCode::HandRolledI18n,
+        format!(
+            "hand-rolled i18n: {what}. Move the text to the source catalog and use the app's t() (`glot i18nize` converts ternaries and keeps their translations)."
+        ),
+    ))
 }
 
 /// The message as a user would see it: placeholders replaced by realistic sample values, plurals and
@@ -262,6 +393,8 @@ fn syntax_issue(e: &str, syntax: Syntax) -> Issue {
         Syntax::Mf2 => "MessageFormat 2",
         Syntax::Printf => "printf/ICU",
         Syntax::Rails => "Rails i18n",
+        Syntax::Vue => "vue-i18n",
+        Syntax::Laravel => "Laravel",
     };
     error(
         IssueCode::SyntaxError,
@@ -353,17 +486,61 @@ fn parse(text: &str, syntax: Syntax) -> Result<Vec<Node>, String> {
     };
     let nodes = match syntax {
         Syntax::Icu => p.icu_seq(0, false)?,
-        Syntax::I18next => p.i18n_seq()?,
+        // A `key_one`/`key_other` family, folded by the JSON reader (`catalog::Layout`).
+        Syntax::I18next => {
+            match crate::formats::folded_choice(text).filter(|c| c.kind != "select") {
+                Some(c) => vec![i18next_plural(c)?],
+                None => p.i18n_seq()?,
+            }
+        }
         Syntax::Mf2 => p.mf2()?,
-        Syntax::Printf => printf_args(p.icu_seq(0, false)?, &mut 0),
+        Syntax::Printf => {
+            // Swift `\u{2019}` is text (reported by `lint_source`), not an ICU `{2019}` argument.
+            let (text, py) = printf_braces(&swift_unescape(text));
+            p.s = text.chars().collect();
+            // Native catalogs carry literal `<NONE>`-like text: tags are compared, not required balanced.
+            return Ok(printf_args(
+                p.icu_seq(0, false)?,
+                &mut 0,
+                &mut py.into_iter(),
+            ));
+        }
         Syntax::Rails => {
             // `%{name}` is ICU's `{name}` behind a `%`.
             p.s = text.replace("%{", "{").chars().collect();
             p.icu_seq(0, false)?
         }
+        // HTML in these messages goes through `v-html` / `{!! !!}`: compared, not required balanced.
+        Syntax::Vue => return p.vue_seq(),
+        Syntax::Laravel => return Ok(p.laravel_seq()),
     };
     check_tags(&nodes)?;
     Ok(nodes)
+}
+
+/// `{count, plural, one {…} other {…}}` standing for i18next's `_one`/`_other` keys: each form
+/// is an i18next message; exact values other than `=0` (`_zero`) have no key to live in.
+fn i18next_plural(c: crate::formats::Choice) -> Result<Node, String> {
+    let kind = if c.kind == "plural" {
+        Kind::Plural
+    } else {
+        Kind::Ordinal
+    };
+    let mut options = vec![];
+    for (k, v) in c.forms {
+        if k.starts_with('=') && k != "=0" {
+            return Err(format!(
+                "i18next plurals have no `{k}` form (only `=0` for `_zero` and the CLDR categories); remove it"
+            ));
+        }
+        options.push((k, parse(&v, Syntax::I18next)?));
+    }
+    Ok(Node::Choice(Choice {
+        name: c.var,
+        keyword: c.kind,
+        kind,
+        options,
+    }))
 }
 
 /// Tags must be balanced and properly nested within each message / branch.
@@ -757,6 +934,105 @@ impl Parser {
         Ok(out)
     }
 
+    // ---- vue-i18n
+
+    fn vue_seq(&mut self) -> Result<Vec<Node>, String> {
+        let (mut out, mut text) = (Vec::new(), String::new());
+        while let Some(c) = self.peek() {
+            match c {
+                '{' => {
+                    let start = self.i;
+                    self.i += 1;
+                    let inner = self.take_while(|c| c != '}');
+                    if self.bump().is_none() {
+                        self.i = start;
+                        return self.err(
+                            "unclosed `{`; placeholders look like `{name}`, literals like `{'@'}`",
+                        );
+                    }
+                    let inner = inner.trim();
+                    match inner.strip_prefix('\'').and_then(|l| l.strip_suffix('\'')) {
+                        Some(lit) => text.push_str(lit),
+                        None if inner.is_empty() => return self.err("empty placeholder `{}`"),
+                        None => {
+                            flush(&mut out, &mut text);
+                            out.push(Node::Arg {
+                                name: inner.into(),
+                                format: None,
+                            });
+                        }
+                    }
+                }
+                // `@:key`, `@.lower:key`, `@:(key)`; any other `@` is text.
+                '@' if matches!(self.peek_at(1), Some(':' | '.')) => {
+                    let save = self.i;
+                    self.i += 1;
+                    if self.peek() == Some('.') {
+                        self.i += 1;
+                        self.take_while(|c| c.is_ascii_alphabetic());
+                    }
+                    if self.bump() != Some(':') {
+                        self.i = save + 1;
+                        text.push('@');
+                        continue;
+                    }
+                    let key = if self.peek() == Some('(') {
+                        self.i += 1;
+                        let k = self.take_while(|c| c != ')');
+                        self.expect(')', "unclosed `@:(`; add `)`")?;
+                        k
+                    } else {
+                        let k = self
+                            .take_while(|c| c.is_alphanumeric() || matches!(c, '_' | '-' | '.'));
+                        // `@:hi.` at the end of a sentence: the dot is text.
+                        let key = k.trim_end_matches('.');
+                        self.i -= k.len() - key.len();
+                        key.to_string()
+                    };
+                    if key.is_empty() {
+                        return self.err("empty linked message `@:`; links look like `@:key`");
+                    }
+                    flush(&mut out, &mut text);
+                    out.push(Node::Ref(key));
+                }
+                '<' => self.push_tag_or_text(&mut out, &mut text),
+                _ => {
+                    text.push(c);
+                    self.i += 1;
+                }
+            }
+        }
+        flush(&mut out, &mut text);
+        Ok(out)
+    }
+
+    // ---- Laravel
+
+    /// `:name` after a non-alphanumeric character (`10:30`, `https://` and `Note: x` stay text).
+    /// `:Name` / `:NAME` are the same argument, capitalized by Laravel.
+    fn laravel_seq(&mut self) -> Vec<Node> {
+        let (mut out, mut text) = (Vec::new(), String::new());
+        while let Some(c) = self.peek() {
+            let after_word = self.i > 0 && self.s[self.i - 1].is_alphanumeric();
+            if c == ':' && !after_word && self.peek_at(1).is_some_and(char::is_alphabetic) {
+                self.i += 1;
+                let name = self.take_while(|c| c.is_alphanumeric() || c == '_');
+                flush(&mut out, &mut text);
+                out.push(Node::Arg {
+                    name: name.to_lowercase(),
+                    format: None,
+                });
+            } else if c == '<' {
+                self.push_tag_or_text(&mut out, &mut text);
+            } else {
+                text.push(c);
+                self.i += 1;
+            }
+        }
+        flush(&mut out, &mut text);
+        out
+    }
+
     // ---- MessageFormat 2
 
     fn mf2(&mut self) -> Result<Vec<Node>, String> {
@@ -1115,14 +1391,14 @@ struct Expr {
 /// printf placeholders in text nodes => args named by position (`%@`, `%d` count per message /
 /// per plural branch; `%2$s` explicit) or by name (`%(name)s`); the conversion is the format, so
 /// `%d` vs `%@` is reported as a changed format. `%%` is a literal percent.
-fn printf_args(nodes: Vec<Node>, next: &mut usize) -> Vec<Node> {
+fn printf_args(nodes: Vec<Node>, next: &mut usize, py: &mut PyArgs) -> Vec<Node> {
     let mut out = vec![];
     for n in nodes {
         match n {
-            Node::Text(t) => split_printf(&t, next, &mut out),
+            Node::Text(t) => split_printf(&t, next, py, &mut out),
             Node::Choice(mut c) => {
                 for (_, body) in c.options.iter_mut() {
-                    *body = printf_args(std::mem::take(body), &mut next.clone());
+                    *body = printf_args(std::mem::take(body), &mut next.clone(), py);
                 }
                 out.push(Node::Choice(c));
             }
@@ -1132,11 +1408,100 @@ fn printf_args(nodes: Vec<Node>, next: &mut usize) -> Vec<Node> {
     out
 }
 
-fn split_printf(t: &str, next: &mut usize, out: &mut Vec<Node>) {
+type PyArgs = std::vec::IntoIter<(String, Option<String>)>;
+
+/// Private-use stand-ins between [`printf_braces`] and [`split_printf`].
+const PY_ARG: char = '\u{E000}';
+const L_BRACE: char = '\u{E001}';
+const R_BRACE: char = '\u{E002}';
+
+/// Braces in printf catalogs: `{n, plural, …}` (native plurals) stay for the ICU parser; Python
+/// `str.format` fields (`{}`, `{0}`, `{name!r}`, `{:.2f}`, gettext `python-brace-format`) become
+/// [`PY_ARG`] (name, conversion/spec as the format); any other brace is literal text (iOS/Android).
+fn printf_braces(s: &str) -> (String, Vec<(String, Option<String>)>) {
+    let (mut out, mut py, mut auto) = (String::new(), vec![], 0);
+    let mut i = 0;
+    while let Some(c) = s[i..].chars().next() {
+        let rest = &s[i..];
+        if rest.starts_with("{{") || rest.starts_with("}}") {
+            let b = if c == '{' { L_BRACE } else { R_BRACE };
+            out.extend([b, b]);
+            i += 2;
+            continue;
+        }
+        if c == '{' {
+            let mut depth = 0;
+            let end = rest.char_indices().find_map(|(j, ch)| {
+                depth += (ch == '{') as i32 - (ch == '}') as i32;
+                (depth == 0).then_some(j)
+            });
+            if let Some(end) = end {
+                let inner = &rest[1..end];
+                if let Some(choice) = crate::formats::whole_choice(&rest[..=end]) {
+                    // Branches are printf text too (easy_localization `{}` in plural sub-objects).
+                    let mut forms = vec![];
+                    for (k, body) in choice.forms {
+                        let (b, p) = printf_braces(&body);
+                        py.extend(p);
+                        forms.push((k, b));
+                    }
+                    out.push_str(&crate::formats::icu_choice(
+                        &choice.var,
+                        &choice.kind,
+                        &forms,
+                    ));
+                    i += end + 1;
+                    continue;
+                }
+                let (field, spec) = match inner.find(['!', ':']) {
+                    Some(k) => (&inner[..k], Some(inner[k..].to_string())),
+                    None => (inner, None),
+                };
+                if !inner.contains('{')
+                    && field
+                        .chars()
+                        .all(|c| c.is_alphanumeric() || "_.[]".contains(c))
+                {
+                    let name = if field.is_empty() {
+                        auto += 1;
+                        (auto - 1).to_string()
+                    } else {
+                        field.to_string()
+                    };
+                    py.push((name, spec));
+                    out.push(PY_ARG);
+                    i += end + 1;
+                    continue;
+                }
+            }
+            out.push(L_BRACE);
+        } else if c == '}' {
+            out.push(R_BRACE);
+        } else {
+            out.push(c);
+        }
+        i += c.len_utf8();
+    }
+    (out, py)
+}
+
+fn split_printf(t: &str, next: &mut usize, py: &mut PyArgs, out: &mut Vec<Node>) {
     let c: Vec<char> = t.chars().collect();
     let mut text = String::new();
     let mut i = 0;
     while i < c.len() {
+        if c[i] == PY_ARG {
+            flush(out, &mut text);
+            let (name, format) = py.next().unwrap_or_default();
+            out.push(Node::Arg { name, format });
+            i += 1;
+            continue;
+        }
+        if c[i] == L_BRACE || c[i] == R_BRACE {
+            text.push(if c[i] == L_BRACE { '{' } else { '}' });
+            i += 1;
+            continue;
+        }
         if c[i] != '%' {
             text.push(c[i]);
             i += 1;
@@ -1210,6 +1575,118 @@ fn split_printf(t: &str, next: &mut usize, out: &mut Vec<Node>) {
 fn flush(out: &mut Vec<Node>, text: &mut String) {
     if !text.is_empty() {
         out.push(Node::Text(std::mem::take(text)));
+    }
+}
+
+// ---------------------------------------------------------------- `|` plural forms
+
+/// `a | b | c` split on single `|` outside `{…}` (`{'|'}` and Laravel's `||` are text).
+fn pipe_split(text: &str) -> Vec<&str> {
+    let (b, mut out, mut depth, mut start) = (text.as_bytes(), vec![], 0usize, 0);
+    for (i, &c) in b.iter().enumerate() {
+        match c {
+            b'{' => depth += 1,
+            b'}' => depth = depth.saturating_sub(1),
+            b'|' if depth == 0 && b.get(i + 1) != Some(&b'|') && (i == 0 || b[i - 1] != b'|') => {
+                out.push(&text[start..i]);
+                start = i + 1;
+            }
+            _ => {}
+        }
+    }
+    out.push(&text[start..]);
+    out
+}
+
+/// Laravel range prefix of a form: `{0}`, `[1,19]`, `[20,*]` (spaces dropped).
+fn laravel_range(form: &str) -> Option<String> {
+    let f = form.trim_start();
+    if !f.starts_with(['{', '[']) {
+        return None;
+    }
+    let end = f.find(['}', ']'])?;
+    Some(f[..=end].split_whitespace().collect())
+}
+
+/// Number of `a|b|…` forms Laravel's `MessageSelector::getPluralIndex` picks from.
+// ponytail: Laravel's own table, keyed by language; unknown languages get 2 like English.
+fn laravel_forms(locale: &str) -> usize {
+    match crate::plural::language(locale).as_str() {
+        "az" | "bo" | "dz" | "id" | "ja" | "jv" | "ka" | "km" | "kn" | "ko" | "ms" | "th"
+        | "tr" | "vi" | "zh" => 1,
+        "be" | "bs" | "hr" | "ru" | "sh" | "sr" | "uk" | "cs" | "sk" | "ga" | "lt" | "lv"
+        | "pl" | "ro" => 3,
+        "sl" | "mt" | "cy" => 4,
+        "ar" => 6,
+        _ => 2,
+    }
+}
+
+/// vue-i18n picks a form by position (same count as the source); Laravel by the target's plural
+/// rule (`a|b` needs [`laravel_forms`] forms) or by explicit ranges (kept as in the source).
+fn pipe_forms(source: &str, target: &str, locale: &str, syntax: Syntax) -> Vec<Issue> {
+    let (src, tgt) = (pipe_split(source), pipe_split(target));
+    if src.len() < 2 {
+        return vec![];
+    }
+    let (n, m) = (src.len(), tgt.len());
+    if syntax == Syntax::Vue {
+        if n == m {
+            return vec![];
+        }
+        let code = if m < n {
+            IssueCode::PluralCategoryMissing
+        } else {
+            IssueCode::PluralCategoryExtra
+        };
+        return vec![error(
+            code,
+            format!(
+                "vue-i18n plural: the source has {n} `|`-separated forms but the translation has {m}; keep exactly {n} forms in the same order (vue-i18n picks a form by its position)."
+            ),
+        )];
+    }
+    let ranges = |v: &[&str]| v.iter().map(|f| laravel_range(f)).collect::<Vec<_>>();
+    let (sr, tr) = (ranges(&src), ranges(&tgt));
+    if sr.iter().any(Option::is_some) {
+        if sr == tr {
+            return vec![];
+        }
+        let show = |r: &[Option<String>]| {
+            r.iter()
+                .map(|r| r.as_deref().unwrap_or("(no range)"))
+                .collect::<Vec<_>>()
+                .join(" | ")
+        };
+        return vec![error(
+            IssueCode::PluralCategoryMissing,
+            format!(
+                "Laravel plural: the source forms are `{}` but the translation has `{}`; keep the same ranges in the same order and translate only the text after them.",
+                show(&sr),
+                show(&tr)
+            ),
+        )];
+    }
+    if tr.iter().any(Option::is_some) {
+        return vec![];
+    }
+    let need = laravel_forms(locale);
+    if m < need {
+        vec![error(
+            IssueCode::PluralCategoryMissing,
+            format!(
+                "Laravel plural: {locale} needs {need} `|`-separated forms, the translation has {m}; Laravel falls back to the first form otherwise."
+            ),
+        )]
+    } else if m > need {
+        vec![warning(
+            IssueCode::PluralCategoryExtra,
+            format!(
+                "Laravel plural: {locale} uses {need} `|`-separated forms, the translation has {m}; the extra ones are never shown."
+            ),
+        )]
+    } else {
+        vec![]
     }
 }
 
@@ -1309,6 +1786,8 @@ impl Checker<'_> {
             Syntax::Printf if name.chars().all(|c| c.is_ascii_digit()) => format!("%{name}$…"),
             Syntax::Printf => format!("%({name})…"),
             Syntax::Rails => format!("%{{{name}}}"),
+            Syntax::Vue => format!("{{{name}}}"),
+            Syntax::Laravel => format!(":{name}"),
         }
     }
 
@@ -1361,15 +1840,23 @@ impl Checker<'_> {
         };
         let (src, tgt) = (refs(self.src), refs(self.tgt));
         if src != tgt {
+            let vue = self.syntax == Syntax::Vue;
             let fmt = |v: &[String]| {
                 v.iter()
-                    .map(|k| format!("$t({k})"))
+                    .map(|k| {
+                        if vue {
+                            format!("@:{k}")
+                        } else {
+                            format!("$t({k})")
+                        }
+                    })
                     .collect::<Vec<_>>()
                     .join(", ")
             };
+            let shape = if vue { "@:key" } else { "$t(...)" };
             self.out.push(error(
                 IssueCode::PlaceholderMissing,
-                format!("Nested translations differ: the source uses [{}] but the translation uses [{}]; keep `$t(...)` references unchanged.", fmt(&src), fmt(&tgt)),
+                format!("Nested translations differ: the source uses [{}] but the translation uses [{}]; keep `{shape}` references unchanged.", fmt(&src), fmt(&tgt)),
             ));
         }
     }
@@ -1391,7 +1878,7 @@ impl Checker<'_> {
         }
         let diff = |a: &BTreeMap<String, usize>, b: &BTreeMap<String, usize>| {
             a.iter()
-                .filter(|(t, n)| b.get(*t).unwrap_or(&0) < n)
+                .filter(|(t, n)| b.get(*t).unwrap_or(&0) < *n)
                 .map(|(t, _)| format!("`{t}`"))
                 .collect::<Vec<_>>()
                 .join(", ")
@@ -2032,6 +2519,45 @@ mod tests {
             [TagMismatch]
         );
         assert!(codes("{{- html}} {single}", "{{-html}} {single}", "fr", s).is_empty());
+        // `key_one`/`key_other` families, folded into one plural by the JSON reader.
+        let items = "{count, plural, one {{{count}} item} other {{{count}} items}}";
+        assert_eq!(
+            codes(
+                items,
+                "{count, plural, one {{{count}} rzecz} other {{{count}} rzeczy}}",
+                "pl",
+                s
+            ),
+            [PluralCategoryMissing]
+        );
+        assert!(codes(items, "{count, plural, one {{{count}} rzecz} few {{{count}} rzeczy} many {{{count}} rzeczy} other {{{count}} rzeczy}}", "pl", s).is_empty());
+        assert_eq!(
+            codes(
+                items,
+                "{count, plural, one {{{count}} 個} other {{{count}} 個}}",
+                "ja",
+                s
+            ),
+            [PluralCategoryExtra]
+        );
+        assert_eq!(
+            codes(
+                items,
+                "{count, plural, one {{{n}} Element} other {{{count}} Elemente}}",
+                "de",
+                s
+            ),
+            [PlaceholderExtra]
+        );
+        assert_eq!(
+            codes(
+                items,
+                "{count, plural, =1 {ein} one {{{count}}} other {{{count}}}}",
+                "de",
+                s
+            ),
+            [SyntaxError]
+        );
         assert_eq!(
             placeholders("{{a}} {{ b, uppercase }}", s)
                 .unwrap()
@@ -2136,9 +2662,96 @@ mod tests {
             "\\",
             "{$",
         ] {
-            for syntax in [Syntax::Icu, Syntax::I18next, Syntax::Mf2] {
+            for syntax in [
+                Syntax::Icu,
+                Syntax::I18next,
+                Syntax::Mf2,
+                Syntax::Vue,
+                Syntax::Laravel,
+            ] {
                 let _ = validate("x", t, "fr", syntax, &Constraints::default());
             }
         }
+    }
+
+    #[test]
+    fn vue_i18n() {
+        let vue = |s, t, l| codes(s, t, l, Syntax::Vue);
+        assert!(vue("Hello {name}", "Bonjour {name}", "fr").is_empty());
+        assert!(vue("Item {0} of {1}", "Élément {0} sur {1}", "fr").is_empty());
+        assert_eq!(
+            vue("Hello {name}", "Bonjour {nom}", "fr"),
+            [PlaceholderMissing, PlaceholderExtra]
+        );
+        // Literals are text, not placeholders.
+        assert!(vue("Mail {'@'} us", "Écrivez {'@'} nous", "fr").is_empty());
+        assert_eq!(vue("Hello {name}", "Bonjour {name", "fr"), [SyntaxError]);
+        // Links: `@:key` kept; a bare `@` in an email is text.
+        assert!(vue("@:common.app is great.", "@:common.app est génial.", "fr").is_empty());
+        assert!(!vue("@:common.app rocks", "Super", "fr").is_empty());
+        assert!(vue("Write to a@b.co", "Écrire à a@b.co", "fr").is_empty());
+        // Plurals: same number of forms as the source, by position.
+        assert!(
+            vue(
+                "no apples | one apple | {count} apples",
+                "pas de pommes | une pomme | {count} pommes",
+                "fr"
+            )
+            .is_empty()
+        );
+        assert_eq!(
+            vue(
+                "no apples | one apple | {count} apples",
+                "une pomme | {count} pommes",
+                "fr"
+            ),
+            [PluralCategoryMissing]
+        );
+    }
+
+    #[test]
+    fn laravel() {
+        let lv = |s, t, l| codes(s, t, l, Syntax::Laravel);
+        assert!(lv("Welcome, :name", "Bienvenue, :name", "fr").is_empty());
+        // `:Name` / `:NAME` are the same argument.
+        assert!(lv("Welcome, :Name", "Bienvenue, :NAME", "fr").is_empty());
+        assert_eq!(
+            lv("Welcome, :name", "Bienvenue, :nom", "fr"),
+            [PlaceholderMissing, PlaceholderExtra]
+        );
+        // Times, URLs and `Note:` are text.
+        assert!(
+            lv(
+                "At 10:30, see https://x.io",
+                "À 10:30, voir https://x.io",
+                "fr"
+            )
+            .is_empty()
+        );
+        // Plural forms follow the target language.
+        assert!(lv("one apple|:count apples", "une pomme|:count pommes", "fr").is_empty());
+        assert_eq!(
+            lv("one apple|:count apples", "яблоко|:count яблок", "ru"),
+            [PluralCategoryMissing]
+        );
+        assert!(
+            lv(
+                "one apple|:count apples",
+                "яблоко|:count яблока|:count яблок",
+                "ru"
+            )
+            .is_empty()
+        );
+        assert_eq!(
+            lv("one apple|:count apples", ":count 個|:count 個", "ja"),
+            [PluralCategoryExtra]
+        );
+        // Explicit ranges are kept as in the source.
+        let src = "{0} None|[1,19] Some|[20,*] Many";
+        assert!(lv(src, "{0} Aucun|[1,19] Quelques|[20,*] Beaucoup", "fr").is_empty());
+        assert_eq!(
+            lv(src, "{0} Aucun|[1,*] Quelques", "fr"),
+            [PluralCategoryMissing]
+        );
     }
 }

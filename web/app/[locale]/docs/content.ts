@@ -8,9 +8,9 @@ import { GITHUB_URL } from "@/lib/snippets";
 export const NAV = [
   { section: "start", pages: ["getting-started", "concepts"] },
   { section: "agents", pages: ["mcp", "integrations", "skills"] },
-  { section: "guides", pages: ["frameworks", "runtime", "quality", "provenance"] },
+  { section: "guides", pages: ["github", "frameworks", "runtime", "quality", "review", "provenance"] },
   { section: "reference", pages: ["cli", "faq", "benchmark"] },
-  { section: "labs", pages: ["labs", "insights", "self-hosting", "deploy-hetzner", "mcp-remote"] },
+  { section: "labs", pages: ["labs", "insights", "experiments", "self-hosting", "deploy-hetzner", "mcp-remote"] },
 ] as const;
 
 export type Slug = (typeof NAV)[number]["pages"][number];
@@ -40,6 +40,12 @@ const marked = new Marked({
       const id = slugify(text);
       return `<h${depth} id="${id}"><a href="#${id}">${this.parser.parseInline(tokens)}</a></h${depth}>\n`;
     },
+    // `> **Experimental.** …` / `> **Note:** …` render as callouts, not quotes.
+    blockquote({ tokens }) {
+      const body = this.parser.parse(tokens);
+      const tone = /^<p><strong>(Experimental|Warning|Caution)/i.test(body) ? "warn" : "note";
+      return `<div role="note" class="callout callout-${tone}">${body}</div>\n`;
+    },
   },
 });
 
@@ -47,13 +53,19 @@ const read = (slug: Slug) => readFileSync(path.join(DIR, `${slug}.md`), "utf8");
 
 export function renderDoc(slug: Slug) {
   const src = read(slug);
-  const toc = marked
-    .lexer(src)
+  const tokens = marked.lexer(src);
+  const first = tokens.find((t) => t.type === "paragraph");
+  const description = first ? first.raw.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[`*_>]/g, "").replace(/\s+/g, " ").trim().slice(0, 200) : undefined;
+  const toc = tokens
     .filter((t): t is Token & { type: "heading"; depth: number; text: string } => t.type === "heading" && t.depth === 2)
     .map((t) => ({ id: slugify(t.text), text: t.text.replace(/[`*_]/g, "") }));
   // Links are written `concepts.md#x` so they also work on GitHub; the site serves `/docs/concepts#x`.
-  const html = marked.parse(src, { async: false }).replace(/href="([\w-]+)\.md(#[^"]*)?"/g, 'href="$1$2"');
-  return { html, toc };
+  // Scrollable code blocks and tables must be reachable by keyboard (axe: scrollable-region-focusable).
+  const html = marked
+    .parse(src, { async: false })
+    .replace(/href="([\w-]+)\.md(#[^"]*)?"/g, 'href="$1$2"')
+    .replace(/<(pre|table)>/g, '<$1 tabindex="0">');
+  return { html, toc, description };
 }
 
 export type SearchEntry = { slug: Slug; anchor: string; heading: string; text: string };

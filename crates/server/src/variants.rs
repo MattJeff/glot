@@ -36,14 +36,14 @@ pub fn routes() -> Router<AppState> {
 
 // ---------- Bayesian core ----------
 
-fn normal(rng: &mut impl Rng) -> f64 {
+pub(crate) fn normal(rng: &mut impl Rng) -> f64 {
     // Box-Muller; 1 - u keeps ln away from 0.
     let (u, v): (f64, f64) = (1.0 - rng.random::<f64>(), rng.random());
     (-2.0 * u.ln()).sqrt() * (std::f64::consts::TAU * v).cos()
 }
 
 /// Gamma(shape, 1), Marsaglia-Tsang.
-fn gamma(shape: f64, rng: &mut impl Rng) -> f64 {
+pub(crate) fn gamma(shape: f64, rng: &mut impl Rng) -> f64 {
     if shape < 1.0 {
         return gamma(shape + 1.0, rng) * rng.random::<f64>().powf(1.0 / shape);
     }
@@ -616,6 +616,14 @@ pub async fn create(
     let mut conn = state.db.acquire().await?;
     let k = keys::find_key(&mut conn, p.id, &b.key).await?;
     drop(conn);
+    if crate::experiments::live_key_owner(&state.db, p.id, &k.key)
+        .await?
+        .is_some()
+    {
+        return Err(AppError::conflict(
+            "this key is live in a segmented experiment",
+        ));
+    }
     let current: String = sqlx::query_scalar(
         "SELECT value FROM translations WHERE key_id = $1 AND locale = $2 AND value <> ''",
     )

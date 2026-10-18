@@ -107,7 +107,7 @@ export default function TokensPage() {
 
       <section className="mt-10">
         <h2 className="text-base font-semibold">{t("setup.title")}</h2>
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
             <p className="mb-2 text-sm text-muted-foreground">{t("setup.cliHint")}</p>
             <CodeBlock label={t("setup.cli")} code={cliLogin(origin)} />

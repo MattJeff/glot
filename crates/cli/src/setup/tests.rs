@@ -501,3 +501,75 @@ fn next_cache_components_moves_app_under_locale_segment() {
         paths(&again)
     );
 }
+
+#[test]
+fn create_react_app_entry_and_existing_i18n_module() {
+    // CRA: entry is src/index.js.
+    let cra = fixture(&[
+        (
+            "package.json",
+            r#"{"dependencies":{"react":"19","react-scripts":"5"}}"#,
+        ),
+        (
+            "src/index.js",
+            "import React from 'react';\nimport App from './App';\n",
+        ),
+    ]);
+    let p = detect(cra.path()).unwrap();
+    let plan = super::plan(cra.path(), &p, &opts(Routing::Cookie));
+    assert!(get(&plan, "src/index.js").contains("import \"./i18n\";"));
+
+    // i18next already initialised in src/i18n.js (imported through an alias elsewhere): no i18n.ts,
+    // no second import.
+    let wired = fixture(&[
+        (
+            "package.json",
+            r#"{"dependencies":{"react":"19","i18next":"23","react-i18next":"14"}}"#,
+        ),
+        ("src/index.js", "import App from './App';\n"),
+        ("src/App.js", "import '@/i18n';\n"),
+        (
+            "src/i18n.js",
+            "import i18n from 'i18next';\ni18n.init({ resources: {} });\n",
+        ),
+    ]);
+    let p = detect(wired.path()).unwrap();
+    let plan = super::plan(wired.path(), &p, &opts(Routing::Cookie));
+    let changed = paths(&plan);
+    assert!(
+        !changed.iter().any(|c| c.starts_with("src/i18n")
+            || c.starts_with("src/index")
+            || c.starts_with("src/App")),
+        "{changed:?}"
+    );
+    assert!(
+        plan.notes.iter().any(|n| n.contains("src/i18n.js exists")),
+        "{:?}",
+        plan.notes
+    );
+}
+
+#[test]
+fn next_app_router_with_route_group_root_layouts() {
+    let app = fixture(&[
+        (
+            "package.json",
+            r#"{"dependencies":{"next":"16","react":"19"}}"#,
+        ),
+        ("src/app/(site)/[locale]/layout.tsx", LAYOUT),
+        ("src/app/admin/layout.tsx", LAYOUT),
+    ]);
+    let p = detect(app.path()).unwrap();
+    assert_eq!((p.framework, p.base), (Framework::NextApp, "src/"));
+    let plan = super::plan(app.path(), &p, &opts(Routing::Cookie));
+    assert!(
+        !paths(&plan).iter().any(|c| c.contains("pages/")),
+        "{:?}",
+        paths(&plan)
+    );
+    assert!(
+        plan.notes.iter().any(|n| n.contains("each root layout")),
+        "{:?}",
+        plan.notes
+    );
+}

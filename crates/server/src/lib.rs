@@ -12,17 +12,25 @@ use tokio::sync::{Notify, broadcast};
 use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
 
 pub mod auth;
+pub mod billing;
 pub mod cdn;
+pub mod email;
+pub mod experiments;
 pub mod feedback;
+pub mod github_app;
 pub mod glossary;
 pub mod insights;
 pub mod jobs;
 pub mod keys;
+pub mod layout_rum;
+pub mod markets;
 pub mod mcp_remote;
+pub mod onboarding;
 pub mod ondemand;
 pub mod openapi;
 pub mod projects;
 pub mod review;
+pub mod review_live;
 pub mod sync;
 pub mod variants;
 pub mod visual;
@@ -37,6 +45,10 @@ pub struct AppState {
     pub secure_cookies: bool,
     pub job_events: broadcast::Sender<jobs::Job>,
     pub job_wakeup: Arc<Notify>,
+    /// Transactional email; `None` when RESEND_API_KEY is unset (set by main / tests).
+    pub mailer: Option<email::Mailer>,
+    /// Stripe billing + cloud quotas; `None` (self-hosted, no STRIPE_SECRET_KEY) = nothing is limited.
+    pub billing: Option<Arc<billing::Config>>,
 }
 
 impl AppState {
@@ -49,6 +61,8 @@ impl AppState {
             secure_cookies,
             job_events,
             job_wakeup: Arc::new(Notify::new()),
+            mailer: None,
+            billing: None,
         }
     }
 }
@@ -75,7 +89,8 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/auth/signup", post(auth::signup))
         .route("/api/auth/login", post(auth::login))
         .route("/api/auth/logout", post(auth::logout))
-        .route("/api/me", get(auth::me))
+        .route("/api/me", get(auth::me).patch(auth::update_me))
+        .merge(auth::email_routes())
         .route(
             "/api/tokens",
             get(auth::list_tokens).post(auth::create_token),
@@ -124,16 +139,30 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/openapi.json", get(openapi::spec))
         .merge(visual::routes())
         .merge(insights::routes())
+        .merge(layout_rum::routes())
+        .merge(markets::routes())
         .merge(variants::routes())
+        .merge(experiments::routes())
+        .merge(experiments::generate::routes())
         .merge(feedback::routes())
+        .merge(github_app::routes())
         .merge(ondemand::routes())
+        .merge(onboarding::routes())
+        .merge(billing::routes())
+        .merge(review_live::routes())
         .layer(cors);
 
     Router::new()
         .merge(api)
         .merge(insights::public_routes())
+        .merge(layout_rum::public_routes())
         .merge(feedback::public_routes())
+        .merge(github_app::public_routes())
+        .merge(billing::public_routes())
+        .merge(onboarding::public_routes())
+        .merge(review_live::widget_routes(&state, web_origin))
         .merge(mcp_remote::routes(state.clone(), web_origin))
+        .route("/cdn/{slug}/experiments.json", get(cdn::experiments))
         .route("/cdn/{slug}/{file}", get(cdn::serve))
         .route("/healthz", get(|| async { "ok" }))
         .fallback(|| async { AppError::not_found("route not found") })
@@ -298,15 +327,31 @@ pub fn validate_locale(s: &str) -> ApiResult<()> {
 }
 
 pub fn validate_key(k: &str) -> ApiResult<()> {
-    let ok = !k.is_empty()
-        && k.len() <= 255
-        && !k.starts_with('.')
-        && !k.ends_with('.')
-        && !k.contains("..")
-        && !k.chars().any(|c| c.is_whitespace() || c == '/');
+    // Dotted ids (`home.title`) and natural-language keys from iOS .strings / gettext
+    // (`" countries open"`, `"Loading..."`, `"1/2 done"`) are both valid: only control characters are not.
+    let ok = !k.is_empty() && k.len() <= 1000 && !k.chars().any(|c| c.is_control());
     if ok {
         Ok(())
     } else {
         Err(AppError::bad_request(format!("invalid key '{k}'")))
+    }
+}
+
+#[cfg(test)]
+mod key_validation_tests {
+    #[test]
+    fn natural_language_and_dotted_keys() {
+        for k in [
+            "home.title",
+            " countries open",
+            "Loading...",
+            "1/2 done",
+            "Think your friend\u{2019}s passport?",
+        ] {
+            assert!(super::validate_key(k).is_ok(), "{k:?}");
+        }
+        for k in ["", "bad\u{0}key", "line\nbreak"] {
+            assert!(super::validate_key(k).is_err(), "{k:?}");
+        }
     }
 }

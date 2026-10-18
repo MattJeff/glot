@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Images, Monitor, Smartphone } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { CodeBlock, EmptyState, ErrorState, PageHeader, useLocaleName } from "@/components/common";
+import { CodeBlock, EmptyState, ErrorState, PageHeader, TermTip, useLocaleName } from "@/components/common";
 import { KeySheet, type KeyTarget } from "@/components/key-sheet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -73,7 +73,7 @@ function VisualQa({ project: p }: { project: Project }) {
   if (!reports.length) {
     return (
       <div className="mx-auto max-w-3xl">
-        <PageHeader title={t("title")} subtitle={t("subtitle")} />
+        <PageHeader title={t("title")} subtitle={t.rich("subtitle", { term: (c) => <TermTip tip={t("budgetTip")}>{c}</TermTip> })} />
         <EmptyState icon={Images} title={t("empty.title")} body={t("empty.body")} />
         <CodeBlock
           className="mt-4"
@@ -93,7 +93,7 @@ function VisualQa({ project: p }: { project: Project }) {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader title={t("title")} subtitle={t.rich("subtitle", { term: (c) => <TermTip tip={t("budgetTip")}>{c}</TermTip> })} />
 
       {/* Reports + kind totals (with delta against the compared report) */}
       <div className="mb-4 flex flex-wrap items-end gap-3">
@@ -147,7 +147,7 @@ function VisualQa({ project: p }: { project: Project }) {
               <div className="mt-2 flex items-baseline gap-2">
                 <span className={cn("text-2xl font-semibold tabular-nums", n === 0 && "text-muted-foreground/60")}>{format.number(n)}</span>
                 {delta !== 0 && (
-                  <span className={cn("font-mono text-xs tabular-nums", delta > 0 ? "text-destructive" : "text-success")}>
+                  <span className={cn("font-mono text-xs tabular-nums", delta > 0 ? "text-destructive" : "text-success-foreground")}>
                     {delta > 0 ? "+" : "−"}
                     {format.number(Math.abs(delta))}
                   </span>
@@ -291,7 +291,7 @@ function Thumb({
     <button
       type="button"
       onClick={onOpen}
-      className="group overflow-hidden rounded-xl border text-start transition-shadow hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="group overflow-hidden rounded-xl border text-start transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative h-44 overflow-hidden border-b bg-muted/40">
         {/* eslint-disable-next-line @next/next/no-img-element -- authenticated API image, not optimisable */}
@@ -313,12 +313,12 @@ function Thumb({
         <span className="text-xs text-muted-foreground">{page.viewport}</span>
         <span className="ms-auto text-xs">
           {issues.length === 0 ? (
-            <span className="text-success">{t("clean")}</span>
+            <span className="text-success-foreground">{t("clean")}</span>
           ) : (
             <span className="text-muted-foreground">{t("issues", { count: issues.length })}</span>
           )}
           {delta !== 0 && (
-            <span className={cn("ms-1 font-mono", delta > 0 ? "text-destructive" : "text-success")}>
+            <span className={cn("ms-1 font-mono", delta > 0 ? "text-destructive" : "text-success-foreground")}>
               {delta > 0 ? `+${delta}` : `−${-delta}`}
             </span>
           )}
@@ -404,7 +404,7 @@ function Shot({
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-mono text-xs">{issueLabel(i)}</span>
                   <span dir="auto" className="block truncate text-xs text-muted-foreground">{i.text}</span>
-                  {i.suggestion && <span dir="auto" className="mt-0.5 block text-xs text-success">→ {i.suggestion}</span>}
+                  {i.suggestion && <span dir="auto" className="mt-0.5 block text-xs text-success-foreground">→ {i.suggestion}</span>}
                 </span>
                 {i.crop && (
                   // eslint-disable-next-line @next/next/no-img-element -- authenticated API image

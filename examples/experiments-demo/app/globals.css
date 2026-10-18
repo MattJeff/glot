@@ -1,0 +1,19 @@
+:root { --fg: #14161a; --muted: #5b6270; --accent: #4f46e5; --bg: #fff; --card: #f6f7fb; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #eee; }
+.nav nav { display: flex; gap: 16px; align-items: center; }
+.nav a { color: inherit; text-decoration: none; }
+.logo { font-weight: 700; font-size: 20px; }
+main { max-width: 960px; margin: 0 auto; padding: 48px 24px; }
+.hero { text-align: center; padding: 48px 0; }
+.hero h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.1; margin: 0 0 16px; min-height: 2.2em; }
+.hero p { color: var(--muted); font-size: 20px; max-width: 640px; margin: 0 auto 32px; min-height: 3em; }
+.btn { display: inline-block; background: var(--accent); color: #fff !important; padding: 8px 16px; border-radius: 8px; border: 0; font: inherit; cursor: pointer; }
+.btn-lg { padding: 14px 28px; font-size: 18px; }
+.features ul, .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding: 0; list-style: none; }
+.features li, .plan { background: var(--card); border-radius: 12px; padding: 24px; }
+.price { font-size: 32px; font-weight: 700; }
+form { display: grid; gap: 16px; max-width: 400px; }
+input { display: block; width: 100%; padding: 10px; margin-top: 4px; font: inherit; border: 1px solid #ccd; border-radius: 8px; }
+footer { text-align: center; color: var(--muted); padding: 32px; font-size: 14px; }

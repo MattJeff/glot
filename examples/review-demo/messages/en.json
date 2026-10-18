@@ -1,0 +1,17 @@
+{
+  "nav.home": "Home",
+  "nav.pricing": "Pricing",
+  "hero.title": "Invoices that get you paid on time",
+  "hero.subtitle": "Send polished invoices, chase late payers automatically and see your cash flow at a glance.",
+  "hero.cta": "Start free trial",
+  "features.title": "Everything you need to get paid",
+  "features.draft": "Draft an invoice in under a minute.",
+  "features.chase": "Automatic, polite reminders for late payers.",
+  "features.tax": "Taxes and currencies handled for 40 countries.",
+  "pricing.title": "Simple pricing",
+  "pricing.starter": "Starter",
+  "pricing.pro": "Pro",
+  "pricing.perMonth": "per month",
+  "pricing.choose": "Choose plan",
+  "footer": "© Relay. Made for small businesses."
+}

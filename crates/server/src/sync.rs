@@ -19,23 +19,23 @@ use crate::{
 
 type Catalogs = BTreeMap<String, BTreeMap<String, String>>;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 pub struct PushBody {
     #[serde(default)]
-    catalogs: Catalogs,
+    pub catalogs: Catalogs,
     #[serde(default)]
-    lock: Lockfile,
+    pub lock: Lockfile,
     /// List of terms, same shape as `GET /glossary` (without ids).
     #[serde(default)]
-    glossary: Vec<Term>,
+    pub glossary: Vec<Term>,
     /// Code context from `glot extract`, per source key. Keys absent here keep their stored context.
     #[serde(default)]
-    context: HashMap<String, CodeContext>,
+    pub context: HashMap<String, CodeContext>,
 }
 
 #[derive(Deserialize, Default)]
 #[serde(default)]
-struct CodeContext {
+pub struct CodeContext {
     refs: Vec<SourceRef>,
     ui_role: Option<String>,
     component: Option<String>,
@@ -88,6 +88,16 @@ pub async fn push(
     AppJson(b): AppJson<PushBody>,
 ) -> ApiResult<Json<PushResult>> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    Ok(Json(apply_push(&state, &p, b, &user.name).await?))
+}
+
+/// `push` without the HTTP layer (also used by the GitHub App job), `author` = history author.
+pub async fn apply_push(
+    state: &AppState,
+    p: &projects::ProjectRow,
+    b: PushBody,
+    author: &str,
+) -> ApiResult<PushResult> {
     if let Some(bad) = b
         .catalogs
         .keys()
@@ -223,7 +233,7 @@ pub async fn push(
                     model,
                     score: entry.and_then(|e| e.score),
                     extra_issues: vec![],
-                    author: Some(&user.name),
+                    author: Some(author),
                 },
             )
             .await?;
@@ -236,7 +246,7 @@ pub async fn push(
     }
     tx.commit().await?;
     tracing::info!(project = %p.slug, created = out.created, updated = out.updated, conflicts = out.conflicts.len(), "sync push");
-    Ok(Json(out))
+    Ok(out)
 }
 
 pub async fn pull(
@@ -279,6 +289,9 @@ pub async fn pull(
     .fetch_all(&state.db)
     .await?;
     for (key, locale, value, status, origin, model, score, source_hash) in rows {
+        // Promoted A/B winners (`experiments::api::promote` writes model = "experiment").
+        let reviewed_by =
+            (model.as_deref() == Some("experiment")).then(|| "experiment winner".to_string());
         let origin = match origin.as_str() {
             "machine" => Origin::Machine {
                 model: model.unwrap_or_default(),
@@ -296,7 +309,7 @@ pub async fn pull(
                 reviewed: status == "reviewed",
                 translated_at: None,
                 reviewed_at: None,
-                reviewed_by: None,
+                reviewed_by,
                 needs_review: None,
             },
         );

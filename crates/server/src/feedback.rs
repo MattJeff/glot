@@ -278,7 +278,7 @@ async fn ingest(
 
 // ---------- proposal ----------
 
-fn config(p: &ProjectRow) -> Config {
+pub(crate) fn config(p: &ProjectRow) -> Config {
     // ponytail: same Config as jobs::translate; share a helper if a third caller appears.
     let llm = p.llm.0.clone();
     Config {
@@ -301,10 +301,14 @@ fn config(p: &ProjectRow) -> Config {
         qa: Default::default(),
         extract: Default::default(),
         server: None,
+        i18next: Default::default(),
     }
 }
 
-fn provider(state: &AppState, p: &ProjectRow) -> ApiResult<Box<dyn glot_llm::provider::Provider>> {
+pub(crate) fn provider(
+    state: &AppState,
+    p: &ProjectRow,
+) -> ApiResult<Box<dyn glot_llm::provider::Provider>> {
     let api_key = match &p.api_key_enc {
         Some(enc) => Some(crate::auth::decrypt(&state.secret, enc).ok_or_else(|| {
             AppError::internal("cannot decrypt the project API key (GLOT_SECRET_KEY changed?)")

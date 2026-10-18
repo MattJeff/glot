@@ -1,0 +1,32 @@
+{
+  "nav": { "home": "Product", "pricing": "Pricing", "signup": "Sign up" },
+  "home": {
+    "hero": {
+      "title": "Ship invoices your clients pay on time",
+      "subtitle": "Relay drafts, sends and chases invoices in 30 currencies, so you get paid without the awkward emails.",
+      "cta": "Start free trial"
+    },
+    "features": {
+      "title": "Everything after the work is done",
+      "draft": "Invoices drafted from your time entries",
+      "chase": "Polite automatic reminders",
+      "tax": "VAT and sales tax handled per country"
+    }
+  },
+  "pricing": {
+    "title": "Simple pricing",
+    "month": "/ month",
+    "starter": "Starter",
+    "starterBody": "For freelancers: 20 invoices a month.",
+    "team": "Team",
+    "teamBody": "For agencies: unlimited invoices, 5 seats.",
+    "choose": "Choose {plan}"
+  },
+  "signup": {
+    "title": "Create your account",
+    "email": "Work email",
+    "submit": "Create account",
+    "done": "Welcome aboard! Check your inbox."
+  },
+  "footer": "Relay is a demo app for glot experiments."
+}

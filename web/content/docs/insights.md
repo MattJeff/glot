@@ -11,14 +11,14 @@ No cookie, no visitor id, no IP, user agent or route stored. The server keeps da
 Get the project's public key in the dashboard (**Insights**), then either:
 
 ```html
-<!-- dist/insights.global.js from @glot/insights, served by your app -->
+<!-- dist/insights.global.js from @glot-i18n/insights, served by your app -->
 <script src="/insights.global.js" data-key="PUBLIC_KEY" data-endpoint="https://glot.example.com" defer></script>
 ```
 
 or, with a bundler:
 
 ```ts
-import { init, track } from "@glot/insights";
+import { init, track } from "@glot-i18n/insights";
 
 init({ key: "PUBLIC_KEY", endpoint: "https://glot.example.com", locale: "fr", onLocale: (l) => switchTo(l) });
 track("signup");    // a conversion event
@@ -27,7 +27,7 @@ track("signup");    // a conversion event
 The package is under 2 kB. Server side (Next middleware, Edge), report visits without any client script:
 
 ```ts
-import { reportVisit } from "@glot/insights/server";
+import { reportVisit } from "@glot-i18n/insights/server";
 
 await reportVisit(request, { key: "PUBLIC_KEY", endpoint: "https://glot.example.com", served: "en" });
 ```

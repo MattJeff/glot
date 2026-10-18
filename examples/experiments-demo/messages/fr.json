@@ -1,0 +1,32 @@
+{
+  "nav": { "home": "Produit", "pricing": "Tarifs", "signup": "Inscription" },
+  "home": {
+    "hero": {
+      "title": "Des factures que vos clients paient à temps",
+      "subtitle": "Relay rédige, envoie et relance vos factures en 30 devises : vous êtes payé sans e-mails gênants.",
+      "cta": "Essai gratuit"
+    },
+    "features": {
+      "title": "Tout ce qui vient après le travail",
+      "draft": "Factures rédigées à partir de vos temps",
+      "chase": "Relances automatiques et polies",
+      "tax": "TVA et taxes gérées pays par pays"
+    }
+  },
+  "pricing": {
+    "title": "Des tarifs simples",
+    "month": "/ mois",
+    "starter": "Starter",
+    "starterBody": "Pour les indépendants : 20 factures par mois.",
+    "team": "Équipe",
+    "teamBody": "Pour les agences : factures illimitées, 5 sièges.",
+    "choose": "Choisir {plan}"
+  },
+  "signup": {
+    "title": "Créez votre compte",
+    "email": "E-mail professionnel",
+    "submit": "Créer le compte",
+    "done": "Bienvenue ! Consultez votre boîte de réception."
+  },
+  "footer": "Relay est une application de démonstration des expériences glot."
+}

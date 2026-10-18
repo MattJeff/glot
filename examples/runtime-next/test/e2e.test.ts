@@ -7,7 +7,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { resolve } from "node:path";
 import { chromium, type Browser } from "playwright";
 
-const PORT = 3241, url = `http://localhost:${PORT}/`;
+const PORT = Number(process.env.PORT ?? 3241), url = `http://localhost:${PORT}/`;
 let next: ChildProcess, browser: Browser;
 
 // Word-by-word "German". Glossary terms and placeholders arrive masked as ⟦n⟧ and pass through untouched.

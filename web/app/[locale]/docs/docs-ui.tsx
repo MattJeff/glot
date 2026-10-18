@@ -1,10 +1,10 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { FileText, Hash, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Link, usePathname } from "@/i18n/navigation";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { SearchEntry } from "./content";
 
@@ -16,7 +16,7 @@ export function SidebarNav({ nav }: { nav: Nav }) {
     <nav className="space-y-6 text-sm">
       {nav.map((s) => (
         <div key={s.section}>
-          <p className="mb-2 font-medium">{s.title}</p>
+          <p className="mb-2 text-xs font-semibold tracking-wide text-foreground/80 uppercase">{s.title}</p>
           <ul className="space-y-0.5 border-s">
             {s.pages.map((p) => {
               const href = `/docs/${p.slug}`;
@@ -29,7 +29,7 @@ export function SidebarNav({ nav }: { nav: Nav }) {
                     onClick={(e) => e.currentTarget.closest("details")?.removeAttribute("open")}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "-ms-px block border-s px-3 py-1 text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+                      "-ms-px block border-s px-3 py-1.5 text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground",
                       active && "border-brand font-medium text-foreground",
                     )}
                   >
@@ -45,19 +45,23 @@ export function SidebarNav({ nav }: { nav: Nav }) {
   );
 }
 
-/** Client-side full-text search over a static index: every query term must appear; heading hits rank first. */
+const noop = () => () => {};
+
+/** ⌘K / Ctrl+K / "/" search over a static index: every query term must appear; heading hits rank first. */
 export function DocsSearch({ index, titles }: { index: SearchEntry[]; titles: Record<string, string> }) {
   const t = useTranslations("docs.search");
+  const router = useRouter();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
+  const mac = useSyncExternalStore(noop, () => /Mac|iPhone|iPad/.test(navigator.platform), () => true);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
-      if (e.key === "/" && !/^(INPUT|TEXTAREA)$/.test(el.tagName) && !el.isContentEditable) {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable;
+      if ((e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing)) {
         e.preventDefault();
-        input.current?.focus();
+        setOpen((o) => !o);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -78,50 +82,148 @@ export function DocsSearch({ index, titles }: { index: SearchEntry[]; titles: Re
       })
       .filter((r) => r !== null)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+      .slice(0, 10);
   }, [q, index]);
 
+  const pages = Object.entries(titles);
+  const go = (href: string) => {
+    setOpen(false);
+    setQ("");
+    router.push(href);
+  };
+
   return (
-    <div className="relative w-full max-w-sm">
-      <Search className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        ref={input}
-        type="search"
-        value={q}
-        onChange={(e) => {
-          setQ(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        onKeyDown={(e) => e.key === "Escape" && (setQ(""), input.current?.blur())}
-        placeholder={t("placeholder")}
-        aria-label={t("label")}
-        className="h-8 ps-8"
-      />
-      {open && q.trim() && (
-        <div className="absolute inset-x-0 top-full z-50 mt-1 max-h-[70vh] overflow-auto rounded-md border bg-popover p-1 shadow-lg">
-          {results.length === 0 ? (
-            <p className="p-3 text-sm text-muted-foreground">{t("noResults")}</p>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-keyshortcuts="Meta+K Control+K /"
+        className="flex h-9 w-full max-w-xs items-center gap-2 rounded-md border bg-muted/40 px-3 text-sm text-muted-foreground shadow-xs transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <Search aria-hidden className="size-4" />
+        <span className="flex-1 truncate text-start">{t("placeholder")}</span>
+        <kbd aria-hidden className="hidden rounded border bg-background px-1.5 font-mono text-[11px] sm:inline">
+          {mac ? "⌘K" : "Ctrl K"}
+        </kbd>
+      </button>
+      <CommandDialog open={open} onOpenChange={setOpen} title={t("label")} description={t("hint")}>
+        <Command shouldFilter={false}>
+        <CommandInput value={q} onValueChange={setQ} placeholder={t("input")} />
+        <CommandList className="max-h-[60vh]">
+          {q.trim() ? (
+            <>
+              <CommandEmpty>{t("noResults")}</CommandEmpty>
+              {results.map(({ e, snippet }) => {
+                const href = `/docs/${e.slug}${e.anchor ? `#${e.anchor}` : ""}`;
+                return (
+                  <CommandItem key={href} value={href} onSelect={() => go(href)} className="items-start gap-3 py-2">
+                    <Hash aria-hidden className="mt-0.5 size-4 shrink-0" />
+                    <span className="min-w-0" lang="en">
+                      <span className="block text-xs text-muted-foreground">{titles[e.slug]}</span>
+                      <span className="block font-medium">{e.heading}</span>
+                      <span className="line-clamp-2 block text-xs text-muted-foreground">{snippet}</span>
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </>
           ) : (
-            <ul lang="en">
-              {results.map(({ e, snippet }) => (
-                <li key={`${e.slug}#${e.anchor}`}>
-                  <Link
-                    href={`/docs/${e.slug}${e.anchor ? `#${e.anchor}` : ""}`}
-                    onClick={() => setQ("")}
-                    className="block rounded-sm px-2 py-1.5 hover:bg-accent"
-                  >
-                    <span className="block text-xs text-muted-foreground">{titles[e.slug]}</span>
-                    <span className="block text-sm font-medium">{e.heading}</span>
-                    <span className="line-clamp-2 block text-xs text-muted-foreground">{snippet}</span>
-                  </Link>
-                </li>
+            <CommandGroup heading={t("pages")}>
+              {pages.map(([slug, title]) => (
+                <CommandItem key={slug} value={slug} onSelect={() => go(`/docs/${slug}`)}>
+                  <FileText aria-hidden className="size-4" /> {title}
+                </CommandItem>
               ))}
-            </ul>
+            </CommandGroup>
           )}
-        </div>
-      )}
-    </div>
+        </CommandList>
+        </Command>
+      </CommandDialog>
+    </>
   );
+}
+
+/** "On this page" with the section currently being read highlighted. */
+export function Toc({ items, label }: { items: { id: string; text: string }[]; label: string }) {
+  const [active, setActive] = useState(items[0]?.id);
+  useEffect(() => {
+    // The current section = the last heading that scrolled past the header.
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        let cur = items[0]?.id;
+        for (const i of items) {
+          const el = document.getElementById(i.id);
+          if (el && el.getBoundingClientRect().top < 120) cur = i.id;
+        }
+        setActive(cur);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [items]);
+  return (
+    <nav aria-label={label} className="text-sm">
+      <p className="mb-3 text-xs font-semibold tracking-wide text-foreground/80 uppercase">{label}</p>
+      <ul lang="en" className="space-y-0.5 border-s">
+        {items.map((h) => (
+          <li key={h.id}>
+            <a
+              href={`#${h.id}`}
+              aria-current={active === h.id ? "location" : undefined}
+              className={cn(
+                "-ms-px block border-s py-1 ps-3 text-muted-foreground transition-colors hover:text-foreground",
+                active === h.id && "border-brand text-foreground",
+              )}
+            >
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/** Adds a copy button to every code block of the rendered Markdown. */
+export function CodeCopy({ copy, copied }: { copy: string; copied: string }) {
+  useEffect(() => {
+    const pres = document.querySelectorAll<HTMLPreElement>(".docs-prose pre");
+    const added: HTMLButtonElement[] = [];
+    pres.forEach((pre) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "copy-btn";
+      b.textContent = copy;
+      b.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(pre.querySelector("code")?.innerText ?? pre.innerText);
+          b.textContent = copied;
+          b.dataset.done = "";
+          setTimeout(() => {
+            b.textContent = copy;
+            delete b.dataset.done;
+          }, 1500);
+        } catch {
+          // Clipboard blocked: the code stays selectable.
+        }
+      };
+      // Wrapper so the button stays put while the code scrolls horizontally.
+      if (!pre.parentElement?.classList.contains("code-wrap")) {
+        const w = document.createElement("div");
+        w.className = "code-wrap";
+        pre.before(w);
+        w.append(pre);
+      }
+      pre.parentElement!.append(b);
+      added.push(b);
+    });
+    return () => added.forEach((b) => b.remove());
+  }, [copy, copied]);
+  return null;
 }

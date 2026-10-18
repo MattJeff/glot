@@ -520,6 +520,16 @@ pub struct ConfigPlan {
 pub fn config_hooks(files: &[Source]) -> ConfigPlan {
     let known: BTreeSet<&str> = files.iter().map(|f| f.path.as_str()).collect();
     let mut configs: Vec<Config> = vec![];
+    // Every `use*` identifier in the project, once: a per-config `contains` over all files was
+    // O(configs x project size) (minutes on a repo with large data/dictionary modules).
+    let taken: BTreeSet<&str> = files
+        .iter()
+        .flat_map(|f| {
+            f.src
+                .split(|c: char| !(c.is_alphanumeric() || c == '_' || c == '$'))
+        })
+        .filter(|w| w.starts_with("use"))
+        .collect();
     // Files `glot i18nize` generated (i18n.ts: `LOCALES = ["en", "fr"]`) hold no UI copy.
     for f in files
         .iter()
@@ -534,7 +544,7 @@ pub fn config_hooks(files: &[Source]) -> ConfigPlan {
                 continue;
             };
             let mut hook = hook_name(&id.name);
-            if files.iter().any(|f| f.src.contains(&hook)) {
+            if taken.contains(hook.as_str()) {
                 hook.push_str("Config");
             }
             configs.push(Config {
@@ -880,5 +890,16 @@ mod tests {
             data.starts_with("export function usePlans(): Plan[] {\n  return [{"),
             "{data}"
         );
+    }
+
+    #[test]
+    fn technical_defaults_are_not_config_copy() {
+        // Field test: a connection-defaults object and a WebRTC config held only identifiers.
+        let files = [src(
+            "src/pages/Setup.tsx",
+            "const DEFAULTS = { host: 'postgres', user: 'root', language: 'en' };\nconst RTC = { bundlePolicy: 'max-bundle', rtcpMuxPolicy: 'require' };\nconst TABS = [{ id: 'a', label: 'General' }];\n\nexport default function Setup() {\n  return <p>{DEFAULTS.host}{RTC.bundlePolicy}{TABS[0].label}</p>;\n}\n",
+        )];
+        let plan = config_hooks(&files);
+        assert_eq!(plan.converted, ["src/pages/Setup.tsx: TABS -> useTabs()"]);
     }
 }

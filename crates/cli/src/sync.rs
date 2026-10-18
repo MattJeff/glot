@@ -151,9 +151,9 @@ pub async fn pull() -> Result<ExitCode> {
         .context("pull failed")?;
     let out: PullResponse = parse(res).await?;
     for (locale, entries) in out.catalogs {
-        let paths = ws.config.catalog_paths(&ws.root, &locale);
+        let paths = ws.config.catalog_files(&ws.root, &locale);
         // ponytail: single file per locale; splitting keys back into namespaces needs a key->file map.
-        let [path] = paths.as_slice() else {
+        let [(path, layout)] = paths.as_slice() else {
             bail!(
                 "pull supports exactly one catalog file per locale ({locale}: {})",
                 paths.len()
@@ -163,7 +163,7 @@ pub async fn pull() -> Result<ExitCode> {
             locale: locale.clone(),
             entries,
         }
-        .write(path, ws.config.format)?;
+        .write_with(path, ws.config.format, layout)?;
         anstream::println!(
             "{GREEN}pulled{GREEN:#} {}",
             path.strip_prefix(&ws.root).unwrap_or(path).display()
@@ -175,5 +175,6 @@ pub async fn pull() -> Result<ExitCode> {
     }
     .save(&ws.root.join(glot_core::glossary::GLOSSARY_FILE))?;
     anstream::println!("{BOLD}glot.lock{BOLD:#} and {BOLD}glossary.toml{BOLD:#} updated");
+    crate::experiments::pull_personalizations(&ws).await?;
     Ok(ExitCode::SUCCESS)
 }

@@ -122,7 +122,9 @@ fn agent_prompt_uses_config() {
         .success();
     let p = stdout(glot(r).arg("agent-prompt"));
     assert!(
-        p.contains("useTranslations") && p.contains("--targets ja,es") && p.contains("(ja, es)")
+        p.contains("useTranslations")
+            && p.contains("--targets ja,es")
+            && p.contains("never edit ja, es")
     );
     assert!(p.contains("messages/en.json"));
     let p2 = stdout(glot(r).args(["localize", "--print-agent-prompt"]));

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CircleCheck, CircleX, Languages, Loader2, TriangleAlert } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { useLocaleName } from "@/components/common";
+import { TermTip, useLocaleName } from "@/components/common";
 import { seedReviews } from "@/components/review";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -26,7 +26,7 @@ const ramp = (score: number) =>
 function Status({ score }: { score: number }) {
   const t = useTranslations("health.status");
   const [Icon, cls, label] =
-    score >= 90 ? [CircleCheck, "text-success", t("good")] : score >= 70 ? [TriangleAlert, "text-warning", t("fair")] : [CircleX, "text-destructive", t("poor")];
+    score >= 90 ? [CircleCheck, "text-success-foreground", t("good")] : score >= 70 ? [TriangleAlert, "text-warning-foreground", t("fair")] : [CircleX, "text-destructive", t("poor")];
   return (
     <span className={`inline-flex items-center gap-1 text-xs ${cls}`}>
       <Icon className="size-3.5" aria-hidden /> {label}
@@ -103,7 +103,7 @@ export function HealthScore({ project: p }: { project: Project }) {
   const pct = (n: number) => format.number(Math.round(n));
 
   return (
-    <section className="mt-6 rounded-xl border">
+    <section className="mt-6 rounded-xl border bg-card shadow-(--shadow-card)">
       <div className="flex flex-wrap items-center gap-3 border-b px-4 py-3">
         <h2 className="text-sm font-medium">{t("title")}</h2>
         <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
@@ -123,7 +123,9 @@ export function HealthScore({ project: p }: { project: Project }) {
               <th scope="col" className="px-3 py-2 text-start font-medium">{t("locale")}</th>
               <th scope="col" className="w-44 px-3 py-2 text-start font-medium">{t("overall")}</th>
               {DIMS.map((d) => (
-                <th key={d} scope="col" className="w-[14%] px-3 py-2 text-center font-medium">{t(`dims.${d}`)}</th>
+                <th key={d} scope="col" className="w-[14%] px-3 py-2 text-center font-medium">
+                  <TermTip tip={t(`dimsHelp.${d}`)}>{t(`dims.${d}`)}</TermTip>
+                </th>
               ))}
             </tr>
           </thead>
@@ -180,7 +182,7 @@ export function HealthScore({ project: p }: { project: Project }) {
                           <TooltipTrigger asChild>
                             <Link
                               href={d === "visual" ? `/app/${p.slug}/visual` : d === "meaning" ? `/app/${p.slug}/keys?locale=${r.locale}&meaning=different` : `/app/${p.slug}/keys?locale=${r.locale}${d === "errors" ? "&issues=1" : "&status=missing"}`}
-                              className="flex h-full items-center justify-center rounded-md font-mono text-sm tabular-nums transition-[filter] hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50"
+                              className="flex h-full items-center justify-center rounded-md font-mono text-sm tabular-nums transition-[filter] hover:brightness-110 focus-visible:ring-2 focus-visible:ring-ring"
                               style={{ background: ramp(c.score) }}
                             >
                               {pct(c.score)}

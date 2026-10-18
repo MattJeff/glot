@@ -1,0 +1,17 @@
+{
+  "nav.home": "Accueil",
+  "nav.pricing": "Tarifs",
+  "hero.title": "Des factures qui vous font payer à temps",
+  "hero.subtitle": "Envoyez des factures soignées, relancez automatiquement les retardataires et suivez votre trésorerie d'un coup d'œil.",
+  "hero.cta": "Essai gratuit",
+  "features.title": "Tout pour être payé",
+  "features.draft": "Une facture rédigée en moins d'une minute.",
+  "features.chase": "Des relances automatiques et polies pour les retardataires.",
+  "features.tax": "Taxes et devises gérées dans 40 pays.",
+  "pricing.title": "Des tarifs simples",
+  "pricing.starter": "Starter",
+  "pricing.pro": "Pro",
+  "pricing.perMonth": "par mois",
+  "pricing.choose": "Choisir",
+  "footer": "© Relay. Conçu pour les petites entreprises."
+}

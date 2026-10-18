@@ -1,0 +1,99 @@
+/* Landing-only styles. Motion is CSS only: scroll reveals use view timelines where supported (no JS),
+   everything is static without support or with prefers-reduced-motion. */
+
+/* Terminal surfaces match the hero recording (always dark, in both themes). */
+.term { background: #0b0f17; color: #e6e8ee; }
+.term-dim { color: rgb(230 232 238 / 0.72); }
+.term-faint { color: rgb(230 232 238 / 0.5); }
+.term-err { color: #fca5a5; }
+.term-ok { color: #6ee7b7; }
+.term-warn { color: #fcd34d; }
+.term-rule { border-color: rgb(255 255 255 / 0.1); }
+
+.hero-glow {
+  background:
+    radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 70%),
+    radial-gradient(40% 30% at 85% 10%, color-mix(in srgb, var(--info) 10%, transparent), transparent 70%);
+}
+
+@keyframes l-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes l-grow { from { transform: scaleX(0); } }
+@keyframes l-pop { 0% { opacity: 0; transform: scale(0.85); } 60% { transform: scale(1.06); } 100% { opacity: 1; } }
+@keyframes l-strike { from { transform: scaleX(0); } }
+@keyframes l-fade { from { opacity: 0; } }
+@keyframes l-shrink { from { opacity: 0.4; transform: scale(0.94); } }
+
+/* Strike-through drawn over the "raw" number, then the 0 % pops in. */
+.bench-strike::after {
+  content: "";
+  position: absolute;
+  inset-inline: -2px;
+  top: 52%;
+  height: 2px;
+  background: currentColor;
+  transform-origin: left;
+}
+[dir="rtl"] .bench-strike::after { transform-origin: right; }
+.bench-bar { transform-origin: left; }
+[dir="rtl"] .bench-bar { transform-origin: right; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-in { animation: l-rise 600ms var(--ease-out-quint) both; }
+  .bench-bar { animation: l-grow 900ms var(--ease-out-quint) both; }
+  .bench-strike::after { animation: l-strike 400ms var(--ease-out-quint) 1100ms both; }
+  .bench-zero { animation: l-pop 500ms var(--ease-out-quint) 1300ms both; }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: l-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    .step-line {
+      animation: l-fade linear both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 35%;
+    }
+    .fit-after .fit-btn {
+      animation: l-shrink linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 40%;
+    }
+  }
+
+  /* Guarantee cards: the refusal slides in on hover/focus (pointer devices only; always shown otherwise). */
+  @media (hover: hover) and (pointer: fine) {
+    .guarantee .guarantee-msg { opacity: 0.8; transform: translateY(2px); transition: opacity 200ms ease-out, transform 200ms var(--ease-out-quint); }
+    .guarantee:hover .guarantee-msg,
+    .guarantee:focus-visible .guarantee-msg { opacity: 1; transform: none; }
+  }
+}
+
+.faq[open] > p { animation: l-fade 200ms ease-out; }
+
+/* Home demo (components/home-demo.tsx). Without motion every step renders its final state at once. */
+.demo-status { display: inline-grid; }
+.demo-status > * { grid-area: 1 / 1; }
+.demo-writing { visibility: hidden; }
+.demo-progress { transform-origin: left; }
+[dir="rtl"] .demo-progress { transform-origin: right; }
+@keyframes d-rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes d-type { from { clip-path: inset(0 100% 0 0); } }
+@keyframes d-ring { from { stroke-dashoffset: var(--c); } }
+@keyframes d-show { from { visibility: visible; } to { visibility: visible; } }
+@keyframes d-bar { from { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-stage { animation: l-fade 220ms ease-out; }
+  .demo-in { animation: d-rise 420ms var(--ease-out-quint) both; }
+  .demo-pop { animation: l-pop 380ms var(--ease-out-quint) both; }
+  .demo-type { animation: d-type 650ms steps(28, end) both; }
+  .demo-writing { animation: d-show var(--d) linear; }
+  .demo-ready { animation: l-pop 320ms var(--ease-out-quint) var(--d) both; }
+  .demo-ring { animation: d-ring 1100ms var(--ease-out-quint) both; }
+  .demo-share { transition: width 1200ms var(--ease-out-quint); }
+  .demo-progress { animation: d-bar linear both; }
+  .demo:hover .demo-progress { animation-play-state: paused; }
+}
+/* Each line takes its direction from its own text (English fallback inside an RTL page, or the reverse). */
+.demo :where(p, span, th, td) { unicode-bidi: plaintext; }

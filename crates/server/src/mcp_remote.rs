@@ -39,6 +39,8 @@ use crate::{
     review, sync,
 };
 
+mod annotations;
+mod experiments;
 pub mod oauth;
 
 const MAX_ITEMS: usize = 100;
@@ -57,8 +59,10 @@ pub struct McpAuth {
 /// Scope needed by each tool (unknown tools fall through to rmcp's "tool not found").
 fn scope_of(tool: &str) -> &'static str {
     match tool {
-        "translate" | "review" => "translate",
+        "translate" | "review" | "annotation_rewrite" => "translate",
+        "annotation_reply" | "annotation_resolve" | "annotation_apply_suggestion" => "write",
         "add_string" | "set_translation" | "glossary_upsert" | "translate_repo" => "write",
+        "experiment_create" | "experiment_promote" => "write",
         _ => "read",
     }
 }
@@ -269,6 +273,9 @@ async fn guard(State(state): State<AppState>, req: Request, next: Next) -> Respo
         }
         Err(e) => return e.into_response(),
     }
+    if let Err(e) = crate::billing::consume(&state, auth.project_id, crate::billing::MCP).await {
+        return e.into_response();
+    }
     let (parts, body) = req.into_parts();
     let Ok(bytes) = axum::body::to_bytes(body, 4 << 20).await else {
         return AppError::new(
@@ -427,7 +434,9 @@ impl Remote {
     pub fn new(state: AppState) -> Self {
         Self {
             state,
-            tool_router: Self::tool_router(),
+            tool_router: Self::tool_router()
+                + Self::annotations_router()
+                + Self::experiments_router(),
         }
     }
 

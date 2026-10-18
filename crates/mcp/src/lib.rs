@@ -28,7 +28,11 @@ use glot_llm::engine::{TranslateOptions, Workspace};
 
 const MAX_ITEMS: usize = 100;
 
+pub mod annotations;
+mod experiments;
+mod render;
 mod review;
+pub mod xp_flow;
 
 /// Serve MCP over stdio for the workspace found from `start`. Logs go to stderr only.
 pub async fn serve_stdio(start: PathBuf) -> anyhow::Result<()> {
@@ -78,7 +82,11 @@ impl GlotServer {
         Self {
             ws: Arc::new(Mutex::new(ws)),
             start,
-            tool_router: Self::tool_router() + Self::review_router(),
+            tool_router: Self::tool_router()
+                + Self::review_router()
+                + Self::annotations_router()
+                + Self::experiments_router()
+                + Self::render_router(),
             prompt_router: Self::prompt_router(),
         }
     }

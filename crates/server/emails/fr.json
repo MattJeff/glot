@@ -1,0 +1,41 @@
+{
+  "emails": {
+    "common": {
+      "fallback": "Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :",
+      "footer": "Envoyé à {email} par glot, i18n open source pour SaaS. Il s'agit d'un e-mail de compte : vous ne pouvez pas vous désabonner.",
+      "footer_optional": "Envoyé à {email} par glot. Vous recevez ce message parce que les notifications de tâches sont activées dans les paramètres de votre compte.",
+      "greeting": "Bonjour {name},",
+      "ignore": "Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail."
+    },
+    "email_changed": {
+      "body": "L'adresse e-mail de votre compte glot a été modifiée pour {new_email}. Si ce n'est pas vous, réinitialisez votre mot de passe dès maintenant.",
+      "cta": "Réinitialiser le mot de passe",
+      "subject": "Votre adresse e-mail glot a été modifiée"
+    },
+    "job_done": {
+      "body": "Votre tâche de traduction dans {project} est terminée : {done} sur {total} chaînes traitées, pour un coût de {cost} USD.",
+      "cta": "Ouvrir la tâche",
+      "subject": "Traduction terminée dans {project}"
+    },
+    "job_failed": {
+      "body": "Votre tâche de traduction dans {project} a échoué après {done} chaînes sur {total} : {error}",
+      "cta": "Ouvrir la tâche",
+      "subject": "Échec de la traduction dans {project}"
+    },
+    "password_changed": {
+      "body": "Le mot de passe de votre compte glot vient d'être modifié. Si ce n'est pas vous, réinitialisez-le immédiatement et vérifiez vos jetons API.",
+      "cta": "Réinitialiser le mot de passe",
+      "subject": "Votre mot de passe glot a été modifié"
+    },
+    "reset": {
+      "body": "Quelqu'un a demandé à réinitialiser le mot de passe de votre compte glot. Le lien ne fonctionne qu'une fois et expire dans 1 heure. La réinitialisation vous déconnecte partout.",
+      "cta": "Choisir un nouveau mot de passe",
+      "subject": "Réinitialisez votre mot de passe glot"
+    },
+    "verify": {
+      "body": "Confirmez que {email} est bien votre adresse pour sécuriser votre compte glot. Le lien expire dans 48 heures.",
+      "cta": "Confirmer l'e-mail",
+      "subject": "Confirmez votre adresse e-mail"
+    }
+  }
+}

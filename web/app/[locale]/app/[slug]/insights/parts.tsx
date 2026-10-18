@@ -28,7 +28,7 @@ import { useOrigin } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 // Shell command shown as a code label, not UI copy.
-const NPM_INSTALL = "npm i @glot/insights";
+const NPM_INSTALL = "npm i @glot-i18n/insights";
 
 export function usePct() {
   const format = useFormatter();
@@ -134,7 +134,7 @@ export function DemandTable({
                     <Check className="size-3" /> {t("offered")}
                   </Badge>
                 ) : testing(d.language) ? (
-                  <Badge variant="secondary" className="gap-1 bg-info/12 font-normal text-info">
+                  <Badge variant="secondary" className="gap-1 bg-info/12 font-normal text-info-foreground">
                     <FlaskConical className="size-3" /> {t("testing")}
                   </Badge>
                 ) : (
@@ -271,9 +271,9 @@ export function FunnelPlot({ funnel }: { funnel: InsightFunnel[] }) {
 
 const VERDICT: Record<InsightVerdict, { icon: React.ComponentType<{ className?: string }>; className: string }> = {
   collecting: { icon: CircleDashed, className: "bg-muted text-muted-foreground" },
-  keep: { icon: Check, className: "bg-success/12 text-success" },
+  keep: { icon: Check, className: "bg-success/12 text-success-foreground" },
   remove: { icon: X, className: "bg-destructive/10 text-destructive" },
-  inconclusive: { icon: Minus, className: "bg-warning/15 text-warning" },
+  inconclusive: { icon: Minus, className: "bg-warning/15 text-warning-foreground" },
 };
 
 export function ExperimentCard({
@@ -386,14 +386,25 @@ export function ExperimentCard({
           <Button size="sm" variant={exp.verdict === "keep" ? "default" : "outline"} disabled={busy} onClick={() => onDecide("kept")}>
             {busy ? <Loader2 className="animate-spin" /> : <Check />} {t("keep")}
           </Button>
-          <Button
-            size="sm"
-            variant={exp.verdict === "remove" ? "destructive" : "ghost"}
-            disabled={busy}
-            onClick={() => onDecide("removed")}
-          >
-            <X /> {t("remove")}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant={exp.verdict === "remove" ? "destructive" : "ghost"} disabled={busy}>
+                <X /> {t("remove")}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("removeTitle", { language: name(exp.locale) })}</AlertDialogTitle>
+                <AlertDialogDescription>{t("removeBody", { language: name(exp.locale) })}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={() => onDecide("removed")}>
+                  {t("remove")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           {!decided && <span className="ms-auto self-center text-xs text-muted-foreground">{t("early")}</span>}
         </div>
       )}
@@ -499,11 +510,11 @@ export function Install({ slug, publicKey, open }: { slug: string; publicKey: st
       toast.success(t("rotated"));
     },
   });
-  const script = `<script src="https://unpkg.com/@glot/insights/dist/insights.global.js"
+  const script = `<script src="https://unpkg.com/@glot-i18n/insights/dist/insights.global.js"
   data-key="${publicKey}" data-endpoint="${origin}" defer></script>
 <!-- conversions -->
 <script>glot.track("signup")</script>`;
-  const npm = `import { glot } from "@glot/insights";
+  const npm = `import { glot } from "@glot-i18n/insights";
 
 glot.init({
   key: "${publicKey}",
@@ -514,7 +525,7 @@ glot.init({
 
 glot.track("signup");                 // or "purchase", any name`;
   const middleware = `// middleware.ts (Next.js, Edge) — first visit only, no client JS
-import { reportVisit } from "@glot/insights/server";
+import { reportVisit } from "@glot-i18n/insights/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
@@ -575,7 +586,7 @@ export async function middleware(req: NextRequest) {
           <ul className="space-y-2 text-xs text-muted-foreground">
             {(["noCookie", "noIp", "daily", "size"] as const).map((k) => (
               <li key={k} className="flex gap-2">
-                <ShieldCheck className="mt-px size-3.5 shrink-0 text-success" /> {t(`privacy.${k}`)}
+                <ShieldCheck className="mt-px size-3.5 shrink-0 text-success-foreground" /> {t(`privacy.${k}`)}
               </li>
             ))}
           </ul>

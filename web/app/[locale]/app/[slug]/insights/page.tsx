@@ -6,12 +6,14 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ErrorState, PageHeader, useLocaleName } from "@/components/common";
+import { NextLanguageCard } from "@/components/markets/next-language";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, qk, type InsightDemand } from "@/lib/api";
 import { useSlug } from "@/lib/hooks";
 import { DailyChart, DemandTable, ExperimentCard, ExperimentDialog, FunnelPlot, Install, Section, usePct } from "./parts";
+import { LayoutRum } from "./layout-rum";
 
 const PERIODS = [7, 30, 90];
 
@@ -102,6 +104,7 @@ export default function InsightsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       {header}
+      <NextLanguageCard slug={slug} days={days} />
 
       {d.total_visits === 0 ? (
         <>
@@ -120,14 +123,14 @@ export default function InsightsPage() {
             <div className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-info/10 via-background to-background p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 max-w-2xl">
-                  <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-info">
+                  <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-info-foreground">
                     <Globe2 className="size-3.5" /> {t("hero.kicker")}
                   </div>
                   <p className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">
                     {t.rich("hero.headline", {
                       share: pct(top.share, 0),
                       language: name(top.language),
-                      strong: (c) => <span className="text-info">{c}</span>,
+                      strong: (c) => <span className="text-info-foreground">{c}</span>,
                     })}
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -149,7 +152,7 @@ export default function InsightsPage() {
             </div>
           ) : (
             <div className="flex items-center gap-3 rounded-xl border bg-success/5 p-5 text-sm">
-              <ShieldCheck className="size-5 text-success" /> {t("hero.covered")}
+              <ShieldCheck className="size-5 text-success-foreground" /> {t("hero.covered")}
             </div>
           )}
 
@@ -220,6 +223,8 @@ export default function InsightsPage() {
           <Install slug={slug} publicKey={d.public_key} />
         </>
       )}
+
+      <LayoutRum slug={slug} publicKey={d.public_key} />
 
       <ExperimentDialog
         key={testing === null || testing === "new" ? String(testing) : testing.language}

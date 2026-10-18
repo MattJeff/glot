@@ -1,28 +1,28 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FlaskConical, Loader2, Sparkles, Trophy, Users } from "lucide-react";
+import { ChevronRight, FlaskConical, Trophy, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useState } from "react";
 import { toast } from "sonner";
 import { CodeBlock, ErrorState, PageHeader, useLocaleName } from "@/components/common";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, qk, type VariantExperiment } from "@/lib/api";
-import { useProject, useSlug } from "@/lib/hooks";
+import { cellViews, CellStateBadge, useXpFormat } from "@/components/experiments/results/shared";
+import { useVerdict, XpStatusBadge } from "@/components/experiments/results/summary";
+import { Milestone, MilestoneList } from "@/components/gamification/milestone";
+import { Link } from "@/i18n/navigation";
+import { api, qk, type VariantExperiment, type XpExperiment } from "@/lib/api";
+import { useSlug } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { ExperimentCard } from "./parts";
 
 // Integration snippet shown as code, not UI copy.
 const SNIPPET = `// app/[locale]/layout.tsx — inside NextIntlClientProvider
-import { GlotVariants } from "@glot/runtime/next-intl";
+import { GlotVariants } from "@glot-i18n/runtime/next-intl";
 <GlotVariants>{children}</GlotVariants>
 
 // anywhere: the conversion that decides the winner
-import { track } from "@glot/insights";
+import { track } from "@glot-i18n/insights";
 track("signup");`;
 
 export default function ExperimentsPage() {
@@ -31,9 +31,8 @@ export default function ExperimentsPage() {
   const name = useLocaleName();
   const slug = useSlug();
   const qc = useQueryClient();
-  const project = useProject(slug);
-  const [open, setOpen] = useState(false);
   const q = useQuery({ queryKey: qk.variants(slug), queryFn: () => api.variantExperiments(slug), refetchInterval: 30_000 });
+  const xq = useQuery({ queryKey: qk.xpList(slug), queryFn: () => api.xpList(slug), refetchInterval: 30_000 });
   const act = useMutation({
     mutationFn: ({ id, action }: { id: string; action: "promote" | "stop" }) => api.variantAction(slug, id, action),
     onSuccess: (_, v) => {
@@ -44,14 +43,33 @@ export default function ExperimentsPage() {
   });
 
   if (q.isError) return <ErrorState error={q.error} onRetry={() => q.refetch()} />;
-  const all = q.data;
-  const live = all?.filter((e) => e.status === "running" || e.status === "decided") ?? [];
-  const past = all?.filter((e) => e.status === "promoted" || e.status === "stopped") ?? [];
+  if (xq.isError) return <ErrorState error={xq.error} onRetry={() => xq.refetch()} />;
+  // Segmented experiments (key groups × segments, /xp) get a results page; legacy single-key ones keep their inline card.
+  const all = q.data && xq.data ? [...xq.data, ...q.data] : undefined;
+  const xps = xq.data ?? [];
+  const legacy = q.data ?? [];
+  const xpLive = xps.filter((e) => ["draft", "running", "paused", "personalized"].includes(e.status));
+  const xpPast = xps.filter((e) => !xpLive.includes(e));
+  const live = legacy.filter((e) => e.status === "running" || e.status === "decided");
+  const past = legacy.filter((e) => e.status === "promoted" || e.status === "stopped");
   const byLocale = Object.entries(
     live.reduce<Record<string, VariantExperiment[]>>((m, e) => ((m[e.locale] ??= []).push(e), m), {}),
   ).sort(([a], [b]) => a.localeCompare(b));
-  const toPromote = live.filter((e) => e.status === "decided" && e.winner !== 0).length;
+  const toPromote =
+    live.filter((e) => e.status === "decided" && e.winner !== 0).length +
+    xpLive.reduce((n, e) => n + e.state.filter((c) => c.winner && !c.personalized).length, 0);
+  const liveLocales = new Set([...live.map((e) => e.locale), ...xpLive.flatMap((e) => e.locales)]).size;
   const visitors = live.reduce((n, e) => n + e.arms.reduce((s, a) => s + a.views, 0), 0);
+  const anyWinner =
+    legacy.some((e) => e.winner != null && e.winner !== 0 && e.status !== "running") ||
+    xps.some((e) => e.state.some((c) => c.winner));
+  const newButton = (
+    <Button asChild>
+      <Link href={`/app/${slug}/experiments/new`}>
+        <FlaskConical aria-hidden /> {t("new")}
+      </Link>
+    </Button>
+  );
 
   const card = (e: VariantExperiment) => (
     <ExperimentCard
@@ -67,11 +85,7 @@ export default function ExperimentsPage() {
       <PageHeader
         title={t("title")}
         subtitle={t("subtitle")}
-        actions={
-          <Button onClick={() => setOpen(true)} disabled={!project.data}>
-            <FlaskConical /> {t("new")}
-          </Button>
-        }
+        actions={newButton}
       />
 
       {!all ? (
@@ -87,23 +101,37 @@ export default function ExperimentsPage() {
         <>
           <div className="flex flex-col items-center rounded-xl border border-dashed px-6 py-10 text-center">
             <div className="mb-3 grid size-10 place-items-center rounded-lg border bg-muted/50">
-              <Sparkles className="size-5 text-muted-foreground" />
+              <FlaskConical className="size-5 text-muted-foreground" aria-hidden />
             </div>
             <h2 className="font-medium">{t("empty.title")}</h2>
             <p className="mt-1 max-w-lg text-sm text-muted-foreground">{t("empty.body")}</p>
-            <Button className="mt-4" onClick={() => setOpen(true)} disabled={!project.data}>
-              <FlaskConical /> {t("new")}
-            </Button>
+            <div className="mt-4">{newButton}</div>
           </div>
           <CodeBlock code={SNIPPET} label={t("install")} />
         </>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Stat icon={FlaskConical} label={t("stats.live")} value={format.number(live.length)} hint={t("stats.liveHint", { n: byLocale.length })} />
+          <div className={cn("grid grid-cols-1 gap-3", live.length ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+            <Stat icon={FlaskConical} label={t("stats.live")} value={format.number(live.length + xpLive.length)} hint={t("stats.liveHint", { n: liveLocales })} />
             <Stat icon={Trophy} label={t("stats.toPromote")} value={format.number(toPromote)} hint={t("stats.toPromoteHint")} />
-            <Stat icon={Users} label={t("stats.visitors")} value={format.number(visitors)} hint={t("stats.visitorsHint")} />
+            {/* Per-visitor counts of segmented experiments live on their results page. */}
+            {live.length > 0 && <Stat icon={Users} label={t("stats.visitors")} value={format.number(visitors)} hint={t("stats.visitorsHint")} />}
           </div>
+
+          <ExperimentMilestones started={all.length > 0} won={anyWinner} />
+
+          {xpLive.length > 0 && (
+            <section aria-labelledby="xp-live" className="space-y-3">
+              <h2 id="xp-live" className="font-medium">
+                {t("segmented")}
+              </h2>
+              <ul className="space-y-3">
+                {xpLive.map((e) => (
+                  <XpRow key={e.id} exp={e} slug={slug} />
+                ))}
+              </ul>
+            </section>
+          )}
 
           {byLocale.map(([locale, exps]) => (
             <section key={locale} aria-labelledby={`loc-${locale}`} className="space-y-3">
@@ -114,157 +142,22 @@ export default function ExperimentsPage() {
             </section>
           ))}
 
-          {past.length > 0 && (
+          {past.length + xpPast.length > 0 && (
             <details className="group rounded-xl border p-4 sm:p-5">
-              <summary className="cursor-pointer font-medium">{t("history", { n: past.length })}</summary>
-              <div className="mt-4 space-y-3">{past.map(card)}</div>
+              <summary className="cursor-pointer font-medium">{t("history", { n: past.length + xpPast.length })}</summary>
+              <ul className="mt-4 space-y-3">
+                {xpPast.map((e) => (
+                  <XpRow key={e.id} exp={e} slug={slug} />
+                ))}
+              </ul>
+              {past.length > 0 && <div className="mt-3 space-y-3">{past.map(card)}</div>}
             </details>
           )}
           <CodeBlock code={SNIPPET} label={t("install")} />
         </>
       )}
 
-      {project.data && (
-        <NewExperimentDialog
-          key={String(open)}
-          open={open}
-          slug={slug}
-          locales={project.data.target_locales}
-          onClose={() => setOpen(false)}
-        />
-      )}
     </div>
-  );
-}
-
-function NewExperimentDialog({ open, slug, locales, onClose }: { open: boolean; slug: string; locales: string[]; onClose: () => void }) {
-  const t = useTranslations("experiments.dialog");
-  const name = useLocaleName();
-  const qc = useQueryClient();
-  const [key, setKey] = useState("");
-  const [locale, setLocale] = useState(locales[0] ?? "");
-  const [variants, setVariants] = useState("3");
-  const [explore, setExplore] = useState(100);
-  const [minN, setMinN] = useState(500);
-  const [goal, setGoal] = useState("signup");
-  // Suggestions for the key field (native datalist): the first page of keys matching what was typed.
-  const keys = useQuery({
-    queryKey: [...qk.keys(slug), "suggest", key],
-    queryFn: () => api.keys(slug, { q: key || undefined, per_page: 20 }),
-    enabled: open,
-  });
-  const create = useMutation({
-    mutationFn: () =>
-      api.createVariantExperiment(slug, {
-        key: key.trim(),
-        locale,
-        variants: Number(variants),
-        explore_pct: explore,
-        min_n: minN,
-        goal: goal.trim() || undefined,
-      }),
-    onSuccess: (r) => {
-      qc.invalidateQueries({ queryKey: qk.variants(slug) });
-      toast.success(t("created", { n: r.arms.length - 1, rejected: r.rejected.length }));
-      onClose();
-    },
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>{t("body")}</DialogDescription>
-        </DialogHeader>
-        <form
-          id="variant-form"
-          className="grid gap-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            create.mutate();
-          }}
-        >
-          <div className="grid gap-1.5">
-            <Label htmlFor="v-key">{t("key")}</Label>
-            <Input
-              id="v-key"
-              list="v-keys"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="pricing.cta"
-              translate="no"
-              required
-              className="font-mono"
-              autoComplete="off"
-            />
-            <datalist id="v-keys">
-              {keys.data?.items.map((k) => (
-                <option key={k.key} value={k.key}>
-                  {k.source}
-                </option>
-              ))}
-            </datalist>
-            <p className="text-xs text-muted-foreground">{t("keyHint")}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="v-locale">{t("locale")}</Label>
-              <Select value={locale} onValueChange={setLocale}>
-                <SelectTrigger id="v-locale" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {locales.map((l) => (
-                    <SelectItem key={l} value={l}>
-                      {name(l)} <span className="font-mono text-xs text-muted-foreground">{l}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="v-count">{t("variants")}</Label>
-              <Select value={variants} onValueChange={setVariants}>
-                <SelectTrigger id="v-count" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {["2", "3"].map((n) => (
-                    <SelectItem key={n} value={n}>
-                      {n}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="v-explore">{t("explore")}</Label>
-              <Input id="v-explore" type="number" min={1} max={100} value={explore} onChange={(e) => setExplore(Number(e.target.value))} />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="v-min">{t("minN")}</Label>
-              <Input id="v-min" type="number" min={50} step={50} value={minN} onChange={(e) => setMinN(Number(e.target.value))} />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="v-goal">{t("goal")}</Label>
-              <Input id="v-goal" value={goal} onChange={(e) => setGoal(e.target.value)} className="font-mono" />
-            </div>
-          </div>
-          <p className="rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">{t("guardrails")}</p>
-        </form>
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
-            {t("cancel")}
-          </Button>
-          <Button type="submit" form="variant-form" disabled={create.isPending || !key.trim() || !locale}>
-            {create.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} {t("submit")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -277,5 +170,52 @@ function Stat({ icon: Icon, label, value, hint }: { icon: React.ComponentType<{ 
       <div className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
       {hint && <div className="mt-1 truncate text-xs text-muted-foreground">{hint}</div>}
     </div>
+  );
+}
+
+/** One segmented experiment in the list: status, name, the verdict sentence, each segment's state. */
+function XpRow({ exp, slug }: { exp: XpExperiment; slug: string }) {
+  const t = useTranslations("experimentResults");
+  const { cellName } = useXpFormat();
+  const cells = cellViews(exp, null);
+  const verdict = useVerdict(exp, cells);
+  return (
+    <li>
+      <Link
+        href={`/app/${slug}/experiments/${exp.id}`}
+        className="group flex items-start gap-3 rounded-xl border bg-card p-4 shadow-(--shadow-card) transition-colors hover:bg-accent/40 sm:p-5"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-medium">{exp.name}</h3>
+            <XpStatusBadge status={exp.status} />
+          </div>
+          <p className="mt-1 text-sm text-pretty text-muted-foreground">{verdict}</p>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs" aria-label={t("list.segments")}>
+            {cells.map((c) => (
+              <li key={c.id} className="flex items-center gap-1.5">
+                <span className="text-muted-foreground">{cellName(c, cells.length === 1)}</span>
+                <CellStateBadge state={c.state} />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted-foreground tabular-nums">
+            {t("list.meta", { keys: exp.keys.length, locales: exp.locales.length })}
+          </p>
+        </div>
+        <ChevronRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100" aria-hidden />
+      </Link>
+    </li>
+  );
+}
+
+/** Two real milestones (ux-brief §2): no points, just what the team actually achieved. */
+function ExperimentMilestones({ started, won }: { started: boolean; won: boolean }) {
+  const t = useTranslations("experimentResults.milestones");
+  return (
+    <MilestoneList label={t("label")} className="rounded-xl border p-1">
+      <Milestone icon={FlaskConical} title={t("first")} description={t("firstBody")} achieved={started} />
+      <Milestone icon={Trophy} title={t("winner")} description={t("winnerBody")} achieved={won} />
+    </MilestoneList>
   );
 }

@@ -271,6 +271,7 @@ pub async fn create(
         return Err(AppError::bad_request("name is required (max 100 chars)"));
     }
     let targets = clean_targets(&b.source_locale, b.target_locales)?;
+    crate::billing::check_new_project(&state, user.id).await?;
     let mut tx = state.db.begin().await?;
     let id = Uuid::new_v4();
     sqlx::query("INSERT INTO projects (id, slug, name, source_locale, target_locales, llm) VALUES ($1, $2, $3, $4, $5, $6)")

@@ -49,7 +49,7 @@ test("worker: source while translating, data-glot filled once ready", async () =
         }
         return s;
       });
-      return new Response(new ReadableStream({ async start(c) { c.enqueue(new TextEncoder().encode(await out)); c.close(); } }));
+      return new Response(new ReadableStream({ async start(c) { c.enqueue(new TextEncoder().encode(await out)); c.close(); } }), { headers: res.headers });
     }
   };
   const { default: worker } = await import("../src/worker.ts");
@@ -65,4 +65,28 @@ test("worker: source while translating, data-glot filled once ready", async () =
   assert.match(body, /<html lang="de">/);
   assert.match(body, /<h1 data-glot="home.title">Willkommen &lt;3<\/h1>/);
   assert.match(body, /static/);
+});
+
+test("worker: copy experiment overlay on a source page, forged x-glot-xp dropped, exposure in waitUntil", async () => {
+  const XP = "22222222-0000-0000-0000-000000000002";
+  const config = { v: 1, generated_at: new Date().toISOString(), max_stale: 86400, persistence: "none", holdout: null, segments: [],
+    experiments: [{ id: XP, status: "running", traffic_pct: 100, locales: ["en"], cells: [{ id: "*", weights: [0, 1], count: true }],
+      arms: [{ arm: 0 }, { arm: 1, values: { en: { "home.title": "Join 2,000 teams" } } }] }] };
+  let posted: any, forwarded: string | null = "unset";
+  globalThis.fetch = (async (input: Request | string, init?: RequestInit) => {
+    const u = String(typeof input === "string" ? input : input.url);
+    if (u.endsWith("/experiments.json")) return new Response(JSON.stringify(config));
+    if (u.includes("/api/insights/")) return (posted = JSON.parse(String(init?.body))), new Response("{}");
+    forwarded = (input as Request).headers.get("x-glot-xp");
+    return new Response('<html lang="en"><h1 data-glot="home.title">Welcome</h1></html>', { headers: { "content-type": "text/html" } });
+  }) as typeof fetch;
+  const { default: worker } = await import("../src/worker.ts");
+  const bg: Promise<unknown>[] = [];
+  const res = await worker.fetch(new Request("https://s/", { headers: { ...html, "user-agent": "Mozilla/5.0 Safari", "x-glot-xp": "forged" } }),
+    { GLOT_SERVER: "https://glot", GLOT_PROJECT: "site", LOCALES: "de", GLOT_KEY: "pk"}, { waitUntil: (p) => bg.push(p) });
+  assert.match(await res.text(), /Join 2,000 teams/);
+  assert.equal(res.headers.get("cache-control"), "private, no-store");
+  assert.notEqual(forwarded, "forged");
+  await Promise.all(bg);
+  assert.deepEqual(posted, [{ served: "en", exposures: [{ id: XP, cell: "*", arm: 1 }] }]);
 });

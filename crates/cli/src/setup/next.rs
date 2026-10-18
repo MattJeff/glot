@@ -417,6 +417,11 @@ pub fn app(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
         .iter()
         .map(|n| format!("{app_dir}{n}"))
         .find(|p| root.join(p).is_file() || plan.moved_from(p).is_some());
+    if layout.is_none() {
+        plan.notes.push(format!(
+            "no {app_dir}layout: wrap {{children}} of each root layout in <NextIntlClientProvider> (from next-intl)"
+        ));
+    }
     if let Some(layout) = layout {
         let routing = rel_import(&app_dir, &format!("{i18n}/routing"));
         plan.edit(root, &layout.clone(), |src| {

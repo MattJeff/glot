@@ -1,0 +1,43 @@
+# glot (glotlang)
+
+> glot is an open-source (MIT) localization CLI and MCP server for coding agents, with copy experiments per audience. It moves hardcoded UI strings to keys, translates them with your own LLM key (Anthropic, OpenAI, or any OpenAI-compatible endpoint, including local models), and refuses any translation that breaks a placeholder, misses a CLDR plural form, violates the glossary or is wider than its UI box. Catalogs stay plain files in Git; no runtime dependency is added. glot cloud adds a dashboard, review, GitHub sync and copy experiments: AI-written versions of a headline or button, checked in every locale, served per country, device or traffic source, with the winner promoted back to your catalogs.
+
+Key facts:
+- License: MIT. The CLI, the validator and the local MCP server are free and never limited; you pay only your LLM provider (850 strings cost $0.035 with the default model and `--batch` in our run; `glot translate --dry-run` estimates first).
+- glot cloud: a free plan (1 copy experiment, no audiences) and paid Pro and Team plans (audiences per experiment). Prices: https://glotlang.com/pricing. A self-hosted server has no limits.
+- Install: `npx glot-i18n localize --yes --targets fr,de` (init, i18nize, translate, check; idempotent). Also Homebrew (`brew install mattjeff/glot/glot`) and a shell installer.
+- Libraries: next-intl, react-i18next / i18next, remix-i18next, FormatJS (ICU, i18next and MessageFormat 2 syntax).
+- Catalog formats: JSON (nested or flat), JS/TS dictionaries, Apple String Catalog (.xcstrings) and .strings, Android strings.xml, Flutter ARB, gettext PO, YAML.
+- Automatic i18nize (hardcoded strings to keys): Next.js App Router and Pages Router, React Router, Astro, Vite + React.
+- Agents: MCP server (`npx -y glot-i18n mcp`), Claude Code plugin, Agent Skill, AGENTS.md / Cursor / Windsurf rules.
+- Copy experiments: the edge picks the version from a cached file and the server renders it (no flicker with server rendering; client-only SPAs may flicker). No cookie by default. A winner needs at least 7 days and 500 visitors per version. Experimental API (Labs).
+- Benchmark (October 18, 2026, 320 ICU messages per model and condition, 8 locales): 0.0% broken strings written with glot vs 14.1% (claude-haiku-5-5) and 8.8% (claude-sonnet-5-5) with a plain prompt.
+- Source of truth: Git. `glot.lock` translates only the delta and never overwrites a hand edit without `--force`.
+
+## Pages
+- [Copy experiments in every language](https://glotlang.com/): AI-written copy variants, validated in every locale, served per audience
+- [Open-source AI localization for coding agents](https://glotlang.com/i18n): the localization engine, benchmark and comparison
+- [Pricing](https://glotlang.com/pricing)
+
+## Docs
+- [Install & quickstart](https://glotlang.com/docs/getting-started): install, `init`, `i18nize`, `translate`, try without a key
+- [Concepts](https://glotlang.com/docs/concepts): validator, lockfile, glossary, pixel width
+- [CLI reference](https://glotlang.com/docs/cli): every command and flag
+- [Frameworks](https://glotlang.com/docs/frameworks): what `i18nize` writes per stack
+- [MCP server](https://glotlang.com/docs/mcp): tools exposed to Claude Code, Cursor, Codex
+- [Agent skill](https://glotlang.com/docs/skills): install the glot skill / Claude Code plugin
+- [Integrations & GitHub Action](https://glotlang.com/docs/integrations): CI check, PR comments, AI builders (Lovable, Bolt, v0, Replit)
+- [Quality](https://glotlang.com/docs/quality): checks run on every translation
+- [Copy experiments per segment](https://glotlang.com/docs/experiments): several versions of a headline or call to action per country, device or traffic source, in every locale, server-rendered
+- [FAQ & costs](https://glotlang.com/docs/faq): pricing, providers, privacy, cost control
+
+## Comparisons
+- [Benchmark](https://glotlang.com/docs/benchmark): broken strings with and without glot, protocol and data
+- [Comparison sources](https://github.com/MattJeff/glot/blob/main/docs/comparison-sources.md): glot vs Lokalise, Crowdin, Lingo.dev, Tolgee, each cell sourced and dated
+
+## Optional
+- [Runtime (on-device long-tail locales)](https://glotlang.com/docs/runtime)
+- [Self-hosting](https://glotlang.com/docs/self-hosting)
+- [Labs](https://glotlang.com/docs/labs)
+- [GitHub repository](https://github.com/MattJeff/glot)
+- [npm: glot-i18n](https://www.npmjs.com/package/glot-i18n)

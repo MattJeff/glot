@@ -36,16 +36,16 @@ pub struct JobParams {
 }
 
 #[derive(Debug, Clone, FromRow)]
-struct JobRecord {
-    id: Uuid,
-    project_id: Uuid,
-    kind: String,
-    status: String,
+pub(crate) struct JobRecord {
+    pub(crate) id: Uuid,
+    pub(crate) project_id: Uuid,
+    pub(crate) kind: String,
+    pub(crate) status: String,
     params: DbJson<JobParams>,
-    progress_done: i32,
-    progress_total: i32,
-    cost_usd: f64,
-    error: Option<String>,
+    pub(crate) progress_done: i32,
+    pub(crate) progress_total: i32,
+    pub(crate) cost_usd: f64,
+    pub(crate) error: Option<String>,
     created_at: DateTime<Utc>,
     finished_at: Option<DateTime<Utc>>,
 }
@@ -114,6 +114,7 @@ pub async fn create(
     if b.kind != "translate" {
         return Err(AppError::bad_request("kind must be 'translate'"));
     }
+    crate::billing::check_llm(&state, &p).await?;
     if let Some(locs) = &b.params.locales
         && let Some(bad) = locs.iter().find(|l| !p.target_locales.contains(l))
     {
@@ -122,12 +123,13 @@ pub async fn create(
         )));
     }
     let j: JobRecord = sqlx::query_as(&format!(
-        "INSERT INTO jobs (id, project_id, kind, status, params) VALUES ($1, $2, $3, 'queued', $4) RETURNING {COLS}"
+        "INSERT INTO jobs (id, project_id, kind, status, params, created_by) VALUES ($1, $2, $3, 'queued', $4, $5) RETURNING {COLS}"
     ))
     .bind(Uuid::new_v4())
     .bind(p.id)
     .bind(&b.kind)
     .bind(DbJson(&b.params))
+    .bind(user.id)
     .fetch_one(&state.db)
     .await?;
     state.job_wakeup.notify_one();
@@ -250,7 +252,7 @@ async fn claim(db: sqlx::PgPool) -> sqlx::Result<Option<JobRecord>> {
     sqlx::query_as(&sql).fetch_optional(&db).await
 }
 
-async fn save(state: &AppState, j: &JobRecord) {
+pub(crate) async fn save(state: &AppState, j: &JobRecord) {
     let res = sqlx::query(
         "UPDATE jobs SET status = $2, progress_done = $3, progress_total = $4, cost_usd = $5, error = $6, finished_at = $7 WHERE id = $1",
     )
@@ -273,7 +275,16 @@ async fn run(state: AppState, mut job: JobRecord) {
     let state = &state;
     tracing::info!(job = %job.id, "job started");
     save(state, &job).await;
-    let result = translate(state, &mut job).await;
+    // GitHub jobs: progress counts steps, and the LLM runs in the `glot` subprocess with the project's own key.
+    let github = job.kind.starts_with("github_");
+    let result = if github {
+        crate::github_app::run_job(state, &mut job).await
+    } else {
+        translate(state, &mut job).await
+    };
+    if !github {
+        crate::billing::after_job(state, job.project_id, job.id, job.progress_done as i64).await;
+    }
     job.finished_at = Some(Utc::now());
     match result {
         Ok(()) => job.status = "done".into(),
@@ -285,6 +296,19 @@ async fn run(state: AppState, mut job: JobRecord) {
     }
     save(state, &job).await;
     tracing::info!(job = %job.id, status = %job.status, cost_usd = job.cost_usd, "job finished");
+    if github {
+        return;
+    }
+    crate::email::job_finished(
+        state,
+        job.id,
+        job.status == "done",
+        job.progress_done,
+        job.progress_total,
+        job.cost_usd,
+        job.error.as_deref(),
+    )
+    .await;
 }
 
 async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
@@ -322,6 +346,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
         qa: Default::default(),
         extract: Default::default(),
         server: None,
+        i18next: Default::default(),
     };
     let provider = glot_llm::provider::from_config_with(&config.llm, api_key, &p.llm.0.headers())?;
     let translator = Translator::new(&config, provider);

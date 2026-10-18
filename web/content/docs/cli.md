@@ -28,7 +28,7 @@ Commands:
   mcp        Run the MCP server on stdio
   i18nize    Convert hardcoded UI strings to translation keys and rewrite the code (next-intl / react-i18next)
   assets     Localize emails, SVG and OG images: i18nize, translate, render per locale, check
-  dev        Local server for the in-app editing overlay (@glot/overlay)
+  dev        Local server for the in-app editing overlay (@glot-i18n/overlay)
   parity     Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success
   seo        Multilingual SEO: audit hreflang/canonical/metadata per locale, fix Next.js, localize keywords
   db         Translate database content (catalog, help articles…) into glot_translations (Postgres)
@@ -476,10 +476,10 @@ Options:
 
 ## glot dev
 
-Local server for the in-app editing overlay (@glot/overlay)
+Local server for the in-app editing overlay (@glot-i18n/overlay)
 
 ```text
-Local server for the in-app editing overlay (@glot/overlay)
+Local server for the in-app editing overlay (@glot-i18n/overlay)
 
 Usage: glot dev [OPTIONS]
 

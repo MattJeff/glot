@@ -1,6 +1,6 @@
 use std::env;
 
-use glot_server::{AppState, MIGRATOR, jobs, router};
+use glot_server::{AppState, MIGRATOR, email, jobs, router};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -33,8 +33,13 @@ async fn main() -> anyhow::Result<()> {
     MIGRATOR.run(&db).await?;
     jobs::requeue_orphans(&db).await?;
 
-    let state = AppState::new(db, &secret, web_origin.starts_with("https://"));
+    let mut state = AppState::new(db, &secret, web_origin.starts_with("https://"));
+    state.mailer = email::Mailer::from_env(&web_origin);
+    state.billing = glot_server::billing::Config::from_env(&web_origin)?.map(std::sync::Arc::new);
     jobs::spawn_worker(state.clone());
+    email::spawn_worker(state.clone());
+    glot_server::experiments::rebalance::spawn_worker(state.clone());
+    glot_server::layout_rum::spawn_worker(state.clone());
 
     let listener = tokio::net::TcpListener::bind(&bind).await?;
     tracing::info!("glot-server listening on http://{bind}");

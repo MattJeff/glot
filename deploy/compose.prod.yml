@@ -24,7 +24,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
-    mem_limit: 1g
+    mem_limit: 512m
     logging: *logging
 
   server:
@@ -44,8 +44,21 @@ services:
       GLOT_MCP_RATE_PER_MIN: ${GLOT_MCP_RATE_PER_MIN:-120}
       GLOT_INSIGHTS_RATE_PER_MIN: ${GLOT_INSIGHTS_RATE_PER_MIN:-1200}
       GLOT_FEEDBACK_RATE_PER_MIN: ${GLOT_FEEDBACK_RATE_PER_MIN:-30}
+      # Transactional email (Resend HTTP API); empty key = email disabled.
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-glot <noreply@mail.${GLOT_DOMAIN}>}
+      RESEND_REPLY_TO: ${RESEND_REPLY_TO:-}
+      GLOT_EMAIL_RATE_PER_HOUR: ${GLOT_EMAIL_RATE_PER_HOUR:-10}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PORTAL_CONFIGURATION: ${STRIPE_PORTAL_CONFIGURATION:-}
+      STRIPE_METER_EVENT: ${STRIPE_METER_EVENT:-}
+      STRIPE_AUTOMATIC_TAX: ${STRIPE_AUTOMATIC_TAX:-0}
+      GLOT_BILLING_GRACE_DAYS: ${GLOT_BILLING_GRACE_DAYS:-7}
+      GLOT_PLAN_LIMITS: ${GLOT_PLAN_LIMITS:-}
       RUST_LOG: ${RUST_LOG:-glot_server=info,tower_http=info}
       GLOT_LOG_FORMAT: json
+      GLOT_ADMIN_EMAILS: ${GLOT_ADMIN_EMAILS:-}
     depends_on:
       postgres: { condition: service_healthy }
     # The image has no curl: bash /dev/tcp is enough for a liveness probe.
@@ -55,7 +68,7 @@ services:
       timeout: 5s
       retries: 6
       start_period: 30s
-    mem_limit: 512m
+    mem_limit: 896m
     logging: *logging
 
   web:

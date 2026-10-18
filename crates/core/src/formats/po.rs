@@ -202,18 +202,28 @@ pub fn parse(s: &str, locale: &str) -> Result<Parsed, String> {
     {
         let key = e.key();
         p.entries.insert(key.clone(), value(e, &cats));
-        p.implicit.insert(
-            key.clone(),
-            match &e.id_plural {
-                Some(pl) => icu_choice(
-                    "count",
-                    "plural",
-                    &[("one".into(), e.id.clone()), ("other".into(), pl.clone())],
-                ),
-                None => e.id.clone(),
-            },
-        );
-        let mut note = e.extracted.join("\n");
+        // Lingui: `#. js-lingui-explicit-id` = the msgid is a key, not source text.
+        let lingui = |c: &&String| c.starts_with("js-lingui-");
+        if !e.extracted.iter().any(|c| c == "js-lingui-explicit-id") {
+            p.implicit.insert(
+                key.clone(),
+                match &e.id_plural {
+                    Some(pl) => icu_choice(
+                        "count",
+                        "plural",
+                        &[("one".into(), e.id.clone()), ("other".into(), pl.clone())],
+                    ),
+                    None => e.id.clone(),
+                },
+            );
+        }
+        let mut note = e
+            .extracted
+            .iter()
+            .filter(|c| !lingui(c))
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("\n");
         if !e.refs.is_empty() {
             if !note.is_empty() {
                 note.push('\n');

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -14,10 +14,13 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// viewport-fit=cover: full-bleed on notched phones; globals.css pads with env(safe-area-inset-*).
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale: hasLocale(routing.locales, locale) ? locale : "en", namespace: "landing.meta" });
-  return { title: { default: t("title"), template: "%s · glot" }, description: t("description") };
+  const t = await getTranslations({ locale: hasLocale(routing.locales, locale) ? locale : "en", namespace: "home.meta" });
+  return { metadataBase: new URL("https://glotlang.com"), title: { default: t("title"), template: "%s · glot" }, description: t("description") };
 }
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {

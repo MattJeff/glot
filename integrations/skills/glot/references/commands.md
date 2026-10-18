@@ -14,7 +14,7 @@
 | `glot glossary add <Term> --dnt \| --fr "<t>"` | Glossary term. |
 | `glot fit --base-url <url> --routes /,/x` | Shorten translations overflowing in the running app. |
 | `glot provenance export --format json\|csv\|html` | Per key/locale: machine (model, date) / human / reviewed (by whom, when), score. |
-| `glot provenance catalog` | Write `messages/{locale}.provenance.json` for the runtime badge (`@glot/runtime/provenance`). |
+| `glot provenance catalog` | Write `messages/{locale}.provenance.json` for the runtime badge (`@glot-i18n/runtime/provenance`). |
 | `glot agent-prompt [--for lovable\|bolt\|v0\|agent]` | Print a ready-to-paste i18n prompt for the detected stack. |
 | `glot mcp` | MCP server on stdio (`propose_string`, `add_string`, `translate`, `check`, …). |
 

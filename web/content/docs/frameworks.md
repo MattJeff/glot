@@ -11,6 +11,7 @@ Each setup below is verified end to end on a real app in [`examples/frameworks/`
 | React Router 7/8 (Remix) | remix-i18next | Middleware, `entry.server.tsx` with `I18nextProvider`, dynamic `<html lang>` |
 | Astro (React islands) | react-i18next | Native i18n routing, `src/middleware.ts` |
 | Vite + React | react-i18next | An init module imported from the entry |
+| iOS / macOS (SwiftUI, UIKit) | Foundation (`.xcstrings`, `.strings`) | Only catalog keys; code untouched unless `--rewrite` |
 
 ## Next.js App Router
 
@@ -39,6 +40,15 @@ Native Astro i18n routing with `fallbackType: "rewrite"`: `/fr/...` reuses your 
 ## Vite + React
 
 A react-i18next init module imported from your entry. This is a client-side SPA setup: the locale is resolved in the browser.
+
+## iOS / macOS (Swift)
+
+`glot init` on an Xcode project sets `[extract] include = ["**/*.swift"]` (tests excluded). No Swift toolchain is needed: glot reads Swift literals itself (`"…"`, `"""…"""`, `#"…"#`, `\(…)`).
+
+- `glot extract` lists the keys the code looks up: SwiftUI text APIs (`Text`, `Button`, `Label`, `Toggle`, `Picker`, `TextField`, `Section`, `Menu`, `.navigationTitle`, `.alert`, `.confirmationDialog`, `.help`, `.accessibilityLabel`, `ContentUnavailableView`…), `NSLocalizedString`, `String(localized:)`, `LocalizedStringKey`/`Resource` and SwiftGen-style `L10n.tr`. Plain `String`s shown by UIKit (`label.text = "…"`, `setTitle(_:for:)`, `UIAlertController`) are listed as hardcoded. Logs, image and SF Symbol names, `Text(verbatim:)`, previews and tests are ignored.
+- Keys follow SwiftUI: `Text("\(n) countries")` looks up `%lld countries`. The specifier comes from the interpolated value's type (`Int` → `%lld`, `Double` → `%lf`, `String` and objects → `%@`, `specifier:` wins), found in the project's declarations. An unknown type falls back to `%@` with a warning: check it against Xcode's *Export Localizations*.
+- `glot i18nize` adds the missing keys to the source catalog, in their table (`tableName:`, SwiftGen table, else `Localizable`). SwiftUI code is already localizable, so it is not rewritten. `--rewrite` wraps the UIKit strings in `String(localized: "…")`; the file is re-read before being written.
+- `glot check --fix-suspicious` deletes keys copied from code by a broken script (`— \(L10n.tr(`, `\u{2192}`) when no code looks them up.
 
 ## Other stacks
 

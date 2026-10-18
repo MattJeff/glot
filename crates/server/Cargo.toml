@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+toml.workspace = true
 glot-core.workspace = true
 glot-llm.workspace = true
 serde.workspace = true
@@ -29,8 +30,11 @@ utoipa = { version = "5", features = ["uuid", "chrono"] }
 rmcp = { version = "3.5.1", features = ["server", "macros", "transport-streamable-http-server"] }
 schemars = "1"
 base64 = "0.23"
+hmac = "0.12"
+ring = "0.17"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
 http-body-util = "0.1"
+tempfile = "3"
 rmcp = { version = "3.5.1", features = ["client", "transport-streamable-http-client-reqwest"] }

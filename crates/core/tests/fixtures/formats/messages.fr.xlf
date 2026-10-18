@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="fr" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="greeting" datatype="html">
+        <source>Hello <x id="INTERPOLATION" equiv-text="{{ name }}"/>!</source>
+        <target state="final">Bonjour <x id="INTERPOLATION" equiv-text="{{ name }}"/> !</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">Accueil de l'utilisateur</note>
+        <note priority="1" from="meaning">header</note>
+      </trans-unit>
+      <trans-unit id="bold" datatype="html">
+        <source>Click <x id="START_BOLD_TEXT" ctype="x-b" equiv-text="&lt;b&gt;"/>here<x id="CLOSE_BOLD_TEXT" ctype="x-b" equiv-text="&lt;/b&gt;"/></source>
+        <target state="needs-translation">Cliquez <x id="START_BOLD_TEXT" ctype="x-b" equiv-text="&lt;b&gt;"/>ici<x id="CLOSE_BOLD_TEXT" ctype="x-b" equiv-text="&lt;/b&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="4374883465412154" datatype="html">
+        <source>{VAR_PLURAL, plural, =0 {none} =1 {one item} other {<x id="INTERPOLATION" equiv-text="{{ count }}"/> items}}</source>
+        <target>{VAR_PLURAL, plural, =0 {aucun} =1 {un élément} other {<x id="INTERPOLATION" equiv-text="{{ count }}"/> éléments}}</target>
+      </trans-unit>
+      <trans-unit id="amp" datatype="html">
+        <source>Price &amp; &lt;taxes&gt;</source>
+        <target>Prix &amp; &lt;taxes&gt;</target>
+      </trans-unit>
+      <trans-unit id="untranslated" datatype="html">
+        <source>Not yet</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,25 +1,33 @@
 //! `glot` CLI: thin layer over `glot_llm::engine::Workspace`.
+mod annotations;
 mod assets;
 mod coverage;
+mod culture;
 mod db;
 mod dev;
+mod distill;
+mod experiments;
 mod fit;
 mod i18nize;
 mod init;
 mod localize;
+mod markets;
 mod measure;
+mod panel;
 mod parity;
 mod provenance;
 mod queue;
+mod render;
 mod review;
 mod seo;
 mod setup;
+mod store;
 mod sync;
 mod variants;
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::{BufRead, IsTerminal, Write};
 use std::process::ExitCode;
 
@@ -61,6 +69,13 @@ enum Cmd {
     Check {
         #[arg(long, value_enum, default_value_t = Format::Text)]
         format: Format,
+        /// Delete source keys flagged `suspicious_source` (code copied into the catalog) that no
+        /// code references, from every locale.
+        #[arg(long)]
+        fix_suspicious: bool,
+        /// With --fix-suspicious: do not ask for confirmation.
+        #[arg(short, long)]
+        yes: bool,
     },
     /// Translate missing and stale strings with the configured LLM.
     Translate {
@@ -137,6 +152,11 @@ enum Cmd {
     Push,
     /// (experimental server) Download catalogs, lock and glossary from the glot server.
     Pull,
+    /// Segmented copy experiments: definitions in glot.experiments.toml, state on the server.
+    #[command(subcommand)]
+    Experiments(experiments::Cmd),
+    /// Live-review annotations from the site: list, reply, resolve, apply suggestions, share a review link.
+    Annotations(annotations::AnnotationsArgs),
     /// Run the MCP server on stdio.
     Mcp,
     /// Convert hardcoded UI strings to translation keys and rewrite the code (next-intl / react-i18next).
@@ -158,6 +178,12 @@ enum Cmd {
     /// Experimental commands outside the core loop (the old `glot <cmd>` spelling still works).
     #[command(subcommand)]
     Labs(LabsCmd),
+    #[command(hide = true)]
+    Markets(markets::MarketsArgs),
+    #[command(hide = true)] // spelled `glot labs store`
+    Store(store::StoreArgs),
+    #[command(hide = true)] // spelled `glot labs panel`
+    Panel(panel::PanelArgs),
     /// One step: init (if needed) → i18nize → translate → check → status. Idempotent.
     Localize(localize::LocalizeArgs),
     /// Print a ready-to-paste i18n prompt for a coding agent or app builder (Lovable, Bolt, v0).
@@ -171,6 +197,8 @@ enum Cmd {
     /// Translation memory (.glot/tm.json): exchange it with other projects and tools as TMX.
     #[command(subcommand, hide = true)] // legacy spelling of `glot labs tm`
     Tm(queue::TmCmd),
+    #[command(hide = true)] // legacy spelling of `glot labs distill`
+    Distill(distill::DistillArgs),
 }
 
 /// Experimental: useful, less proven than the core loop. Also callable without `labs` (old spelling).
@@ -200,6 +228,18 @@ enum LabsCmd {
     /// Translation memory (.glot/tm.json): exchange it with other projects and tools as TMX.
     #[command(subcommand)]
     Tm(queue::TmCmd),
+    /// Free local model in the project's voice: dataset export (JSONL), local+RAG translation, eval vs cloud.
+    Distill(distill::DistillArgs),
+    /// Which language to add next: visitor demand, market data, exact cost, technical effort (`--add`).
+    Markets(markets::MarketsArgs),
+    /// App Store / Google Play listings (fastlane): keyword research per country, validated limits, release notes.
+    /// Synthetic native users per market: 5-second test, CTA comprehension, trust, non-native wording (glot.panel.yaml).
+    Panel(panel::PanelArgs),
+    Store(store::StoreArgs),
+    /// Cultural adaptation audit per market: hard-coded formats, US-only forms, idioms, legal wording; transcreation proposals.
+    Culture(culture::CultureArgs),
+    /// Render safety without a browser: webfont glyph coverage, RTL bidi bugs, no-break spaces/quotes/digits (`--fix`).
+    Render(render::RenderArgs),
 }
 
 impl From<LabsCmd> for Cmd {
@@ -214,6 +254,12 @@ impl From<LabsCmd> for Cmd {
             LabsCmd::Unused { prune, json } => Cmd::Unused { prune, json },
             LabsCmd::Queue(a) => Cmd::Queue(a),
             LabsCmd::Tm(c) => Cmd::Tm(c),
+            LabsCmd::Distill(a) => Cmd::Distill(a),
+            LabsCmd::Markets(a) => Cmd::Markets(a),
+            LabsCmd::Store(a) => Cmd::Store(a),
+            LabsCmd::Culture(_) => unreachable!("handled in run"),
+            LabsCmd::Render(_) => unreachable!("handled in run"),
+            LabsCmd::Panel(a) => Cmd::Panel(a),
         }
     }
 }
@@ -267,9 +313,13 @@ Your agent and your app
 
 Server (experimental)
   push, pull  Sync catalogs, lock and glossary with a self-hosted glot server
+  annotations  What reviewers pinned on your site: list, reply, resolve, apply, review links
+                $ glot annotations list --route /pricing --locale de
+  experiments  Segmented copy experiments: push/pull glot.experiments.toml, status, promote
+                $ glot experiments status hero-de --json
 
 Labs
-  labs        coverage, review, parity, seo, db, assets, unused, queue, tm:
+  labs        coverage, review, parity, seo, db, assets, unused, queue, tm, markets, store, distill, culture, panel, render:
               `glot labs --help`
 
 Options:
@@ -349,7 +399,12 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
     match cmd {
         Cmd::Init(args) => init::run(args)?,
         Cmd::Status { json } => status(json)?,
-        Cmd::Check { format } => return check(format),
+        Cmd::Check {
+            fix_suspicious: true,
+            yes,
+            ..
+        } => fix_suspicious(yes)?,
+        Cmd::Check { format, .. } => return check(format),
         Cmd::Translate {
             locale,
             key,
@@ -410,6 +465,8 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Review(a) => return review::run(a).await,
         Cmd::Push => return sync::push().await,
         Cmd::Pull => return sync::pull().await,
+        Cmd::Experiments(c) => return experiments::run(c).await,
+        Cmd::Annotations(a) => return annotations::run(a).await,
         Cmd::Mcp => glot_mcp::serve_stdio(std::env::current_dir()?).await?,
         Cmd::I18nize(args) => i18nize::run(args).await?,
         Cmd::Assets(a) => return assets::run(a).await,
@@ -419,6 +476,12 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Db(args) => return db::run(args).await,
         Cmd::Queue(a) => return queue::run(a),
         Cmd::Tm(c) => return queue::tm(c),
+        Cmd::Distill(a) => return distill::run(a).await,
+        Cmd::Markets(a) => return markets::run(a).await,
+        Cmd::Store(a) => return store::run(a).await,
+        Cmd::Panel(a) => return panel::run(a).await,
+        Cmd::Labs(LabsCmd::Culture(a)) => return culture::run(a).await,
+        Cmd::Labs(LabsCmd::Render(a)) => return render::run(a),
         Cmd::Labs(l) => return Box::pin(run(l.into())).await,
         Cmd::Localize(a) => return localize::run(a),
         Cmd::AgentPrompt(a) => return localize::agent_prompt_cmd(a),
@@ -469,6 +532,27 @@ fn status(json: bool) -> Result<()> {
     let p = &st.plan;
     let todo = p.missing.len() + p.stale.len() + p.invalid.len();
     println!();
+    // ponytail: 50% identical-to-source = "never translated" (an imported English copy), tune if noisy.
+    let copies: Vec<String> = st
+        .locales
+        .iter()
+        .filter(|(_, s)| s.untranslated >= 10 && s.untranslated * 2 > s.translated)
+        .map(|(l, s)| format!("{l} {}/{}", s.untranslated, s.translated))
+        .collect();
+    if !copies.is_empty() {
+        let locs: Vec<&str> = copies.iter().filter_map(|c| c.split(' ').next()).collect();
+        anstream::println!(
+            "{YELLOW}! Probably not translated{YELLOW:#}: most values are identical to the source ({}). Retranslate with {BOLD}glot translate --locale {} --force{BOLD:#} (also replaces hand edits there).",
+            copies.join(", "),
+            locs.join(",")
+        );
+    }
+    if st.suspicious_keys > 0 {
+        anstream::println!(
+            "{YELLOW}! {} suspicious source keys{YELLOW:#} (code such as `\\(` or `L10n.tr(` in the catalog, likely a broken extraction): see {BOLD}glot check{BOLD:#}",
+            st.suspicious_keys
+        );
+    }
     if todo == 0 && p.invalid_human.is_empty() {
         anstream::println!("{GREEN}Up to date.{GREEN:#}");
     } else if todo > 0 {
@@ -581,10 +665,82 @@ fn gh_escape(s: &str, prop: bool) -> String {
     }
 }
 
+/// `glot check --fix-suspicious`: junk keys left by extraction scripts (`— \(L10n.tr(`) that the
+/// code (as `glot extract` reads it) never looks up.
+fn fix_suspicious(yes: bool) -> Result<()> {
+    let mut ws = open()?;
+    let report = ws.extract()?;
+    if report.files_scanned == 0 {
+        anyhow::bail!(
+            "no source file matched [extract] include in glot.toml: cannot tell which keys the code uses"
+        );
+    }
+    let (mut gone, mut kept, mut moves) = (vec![], 0, vec![]);
+    for (k, v) in &ws.source().entries {
+        if glot_core::validate::lint_source(k, v).is_empty() {
+            continue;
+        }
+        if report.usages.contains_key(k) {
+            kept += 1;
+            anstream::println!("  {DIM}kept {k:?} (used in code){DIM:#}");
+            continue;
+        }
+        // `Continue \u{2192}`: the code looks up `Continue →`, keep the translations under it.
+        let fixed = glot_core::validate::swift_unescape(k).into_owned();
+        if fixed != *k && !fixed.contains("\\(") && report.usages.contains_key(&fixed) {
+            anstream::println!("  {YELLOW}~{YELLOW:#} {k:?} -> {fixed:?}");
+            moves.push((k.clone(), fixed));
+        } else {
+            anstream::println!("  {RED}-{RED:#} {k:?}");
+        }
+        gone.push(k.clone());
+    }
+    if gone.is_empty() {
+        anstream::println!("{GREEN}✓ no unused suspicious key{GREEN:#} {DIM}({kept} kept){DIM:#}");
+        return Ok(());
+    }
+    if !yes
+        && !confirm(&format!(
+            "Delete these {} keys from every locale?",
+            gone.len()
+        ))?
+    {
+        anstream::println!("Aborted, nothing written.");
+        return Ok(());
+    }
+    let mut moved = 0;
+    for (old, new) in &moves {
+        if !ws.source().entries.contains_key(new) {
+            ws.add_source(new, new, None)?;
+        }
+        for loc in ws.config.target_locales.clone() {
+            let value = ws.catalogs.get(&loc).and_then(|c| {
+                (!c.entries.contains_key(new)).then(|| c.entries.get(old).cloned())?
+            });
+            if let Some(v) = value {
+                let v = glot_core::validate::swift_unescape(&v).into_owned();
+                if ws.set_translation(&loc, new, &v).is_ok() {
+                    moved += 1;
+                }
+            }
+        }
+    }
+    ws.remove_keys(&gone)?;
+    anstream::println!(
+        "{GREEN}✓ deleted {} suspicious keys{GREEN:#} {DIM}({kept} kept, {} renamed with {moved} translations moved){DIM:#}",
+        gone.len(),
+        moves.len()
+    );
+    Ok(())
+}
+
 fn check(format: Format) -> Result<ExitCode> {
     let ws = open()?;
     let mut findings = ws.check();
     findings.extend(variants::check(&ws));
+    findings.extend(experiments::check(&ws));
+    findings.extend(annotations::check(&ws));
+    findings.extend(hand_rolled_i18n(&ws));
     let errors = findings
         .iter()
         .filter(|f| f.issue.severity == Severity::Error)
@@ -659,6 +815,28 @@ fn check(format: Format) -> Result<ExitCode> {
     } else {
         ExitCode::SUCCESS
     })
+}
+
+/// `glot check` warning per source file with language ternaries or a second dictionary.
+fn hand_rolled_i18n(ws: &glot_llm::engine::Workspace) -> Vec<Finding> {
+    let catalogs: BTreeSet<std::path::PathBuf> = std::iter::once(&ws.config.source_locale)
+        .chain(&ws.config.target_locales)
+        .flat_map(|l| ws.config.catalog_files(&ws.root, l))
+        .map(|(p, _)| p)
+        .collect();
+    glot_extract::i18nize::source_files(&ws.root, &ws.config.extract)
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|f| !catalogs.contains(&ws.root.join(f)))
+        .filter_map(|f| {
+            let src = std::fs::read_to_string(ws.root.join(&f)).ok()?;
+            Some(Finding {
+                locale: "code".into(),
+                issue: glot_core::validate::hand_rolled_i18n(&src)?,
+                key: f,
+            })
+        })
+        .collect()
 }
 
 fn confirm(question: &str) -> Result<bool> {
@@ -855,9 +1033,13 @@ fn extract(json: bool) -> Result<()> {
             "missing": missing,
             "unused": unused,
             "dynamic": report.dynamic,
+            "warnings": report.warnings,
         }));
     }
     anstream::println!("{DIM}{} files scanned{DIM:#}", report.files_scanned);
+    for w in &report.warnings {
+        anstream::eprintln!("{YELLOW}warning:{YELLOW:#} {w}");
+    }
     if !report.hardcoded.is_empty() {
         anstream::println!(
             "\n{BOLD}Hardcoded strings ({}){BOLD:#}",

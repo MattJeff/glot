@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="greeting" datatype="html">
+        <source>Hello <x id="INTERPOLATION" equiv-text="{{ name }}"/>!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">Greets the user</note>
+      </trans-unit>
+      <trans-unit id="bold" datatype="html">
+        <source>Click <x id="START_BOLD_TEXT" ctype="x-b" equiv-text="&lt;b&gt;"/>here<x id="CLOSE_BOLD_TEXT" ctype="x-b" equiv-text="&lt;/b&gt;"/></source>
+      </trans-unit>
+      <trans-unit id="4374883465412154" datatype="html">
+        <source>{VAR_PLURAL, plural, =0 {none} =1 {one item} other {<x id="INTERPOLATION" equiv-text="{{ count }}"/> items}}</source>
+      </trans-unit>
+      <trans-unit id="amp" datatype="html">
+        <source>Price &amp; &lt;taxes&gt;</source>
+      </trans-unit>
+      <trans-unit id="untranslated" datatype="html">
+        <source>Not yet</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

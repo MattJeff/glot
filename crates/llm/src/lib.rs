@@ -1,14 +1,20 @@
 //! glot-llm: LLM providers, guarded translation pipeline, judge, pricing, and the local `engine::Workspace`.
+pub mod copywriting;
+pub mod culture;
+pub mod distill;
 pub mod engine;
 pub mod i18nize;
 pub mod judge;
 pub mod mine;
 pub mod mock;
+pub mod panel;
 pub mod pricing;
 pub mod provider;
 pub mod review;
+pub mod rewrite;
 pub mod routing;
 pub mod seo;
+pub mod store;
 pub mod tm;
 pub mod translate;
 pub mod visual;

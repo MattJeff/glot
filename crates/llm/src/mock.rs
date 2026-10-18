@@ -153,11 +153,26 @@ fn system_glossary(system: &str, locale: Option<&str>) -> Value {
 fn respond(p: &Value) -> Value {
     let locale = p["target_locale"].as_str().unwrap_or("xx");
     let items = p["items"].as_array().cloned().unwrap_or_default();
+    if p["task"] == "culture" {
+        return crate::culture::mock(p);
+    }
+    if p["task"] == "panel" || p["task"] == "panel_judge" {
+        return crate::panel::mock(p);
+    }
     if p["task"] == "keys" {
         return crate::i18nize::mock_keys(p);
     }
+    if p["task"] == "copy_variants" {
+        return crate::copywriting::mock(p);
+    }
+    if p["task"].as_str().is_some_and(|t| t.starts_with("store_")) {
+        return crate::store::mock(p);
+    }
     if p["task"] == "seo_keywords" {
         return crate::seo::mock(p);
+    }
+    if p["task"] == "rewrite" {
+        return crate::rewrite::mock(p);
     }
     if p["task"] == "shorten" {
         return crate::visual::mock_shorten(p);

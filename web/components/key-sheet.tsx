@@ -160,7 +160,7 @@ function KeyForm({ project, row, locale }: { project: Project; row: KeyRow; loca
             aria-label={t("translation")}
           />
           {tr?.issues.map((i, n) => (
-            <p key={n} className={cn("text-xs", i.severity === "error" ? "text-destructive" : "text-warning")}>
+            <p key={n} className={cn("text-xs", i.severity === "error" ? "text-destructive" : "text-warning-foreground")}>
               {i.message}
             </p>
           ))}

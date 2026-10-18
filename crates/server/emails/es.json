@@ -1,0 +1,41 @@
+{
+  "emails": {
+    "common": {
+      "fallback": "Si el botón no funciona, pegue este enlace en su navegador:",
+      "footer": "Enviado a {email} por glot, i18n de código abierto para SaaS. Es un correo de cuenta: no puede darse de baja de él.",
+      "footer_optional": "Enviado a {email} por glot. Lo recibe porque las notificaciones de trabajos están activadas en la configuración de su cuenta.",
+      "greeting": "Hola {name},",
+      "ignore": "Si no lo solicitó, puede ignorar este correo."
+    },
+    "email_changed": {
+      "body": "La dirección de correo de su cuenta de glot se cambió a {new_email}. Si no fue usted, restablezca su contraseña ahora.",
+      "cta": "Restablecer contraseña",
+      "subject": "Se cambió la dirección de correo de su cuenta de glot"
+    },
+    "job_done": {
+      "body": "Su trabajo de traducción en {project} ha terminado: se procesaron {done} de {total} cadenas, con un coste de {cost} USD.",
+      "cta": "Abrir el trabajo",
+      "subject": "Traducción finalizada en {project}"
+    },
+    "job_failed": {
+      "body": "Su trabajo de traducción en {project} falló después de {done} de {total} cadenas: {error}",
+      "cta": "Abrir el trabajo",
+      "subject": "Error en la traducción de {project}"
+    },
+    "password_changed": {
+      "body": "La contraseña de su cuenta de glot acaba de cambiarse. Si no fue usted, restablézcala ahora y revise sus tokens de API.",
+      "cta": "Restablecer contraseña",
+      "subject": "Se cambió su contraseña de glot"
+    },
+    "reset": {
+      "body": "Alguien solicitó restablecer la contraseña de su cuenta de glot. El enlace funciona una sola vez y caduca en 1 hora. Al restablecerla, se cerrará la sesión en todos los dispositivos.",
+      "cta": "Elegir una nueva contraseña",
+      "subject": "Restablezca su contraseña de glot"
+    },
+    "verify": {
+      "body": "Confirme que {email} es su dirección para proteger su cuenta de glot. El enlace caduca en 48 horas.",
+      "cta": "Confirmar correo",
+      "subject": "Confirme su dirección de correo"
+    }
+  }
+}

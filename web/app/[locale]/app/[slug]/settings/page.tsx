@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { cloneElement, useState } from "react";
 import { toast } from "sonner";
 import { CodeBlock, ErrorState, PageHeader, useLocaleName } from "@/components/common";
 import { parseLocales } from "@/components/create-project-dialog";
@@ -49,12 +49,17 @@ function Section({ title, description, children }: { title: string; description?
   );
 }
 
-function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactNode }) {
+/** Label + control + description, wired with aria-describedby so screen readers read the hint. */
+function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactElement<{ "aria-describedby"?: string }> }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      {children}
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {hint ? cloneElement(children, { "aria-describedby": `${id}-hint` }) : children}
+      {hint && (
+        <p id={`${id}-hint`} className="text-xs text-pretty text-muted-foreground">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -149,19 +154,19 @@ function SettingsForm({ project: p }: { project: Project }) {
         save.mutate();
       }}
     >
-      <PageHeader title={t("title")} subtitle={<span className="font-mono">{p.slug}</span>} />
+      <PageHeader title={t("title")} eyebrow={<span className="font-mono">{p.slug}</span>} subtitle={t("subtitle")} />
 
       <Section title={t("general.title")}>
         <Field id="s-name" label={t("general.name")}>
           <Input id="s-name" value={name} onChange={(e) => setName(e.target.value)} required />
         </Field>
-        <Field id="s-slug" label={t("general.slug")}>
+        <Field id="s-slug" label={t("general.slug")} hint={t("general.slugHint")}>
           <Input id="s-slug" value={p.slug} readOnly disabled dir="ltr" className="font-mono" />
         </Field>
       </Section>
 
       <Section title={t("locales.title")} description={t("locales.description")}>
-        <Field id="s-source" label={t("locales.source")}>
+        <Field id="s-source" label={t("locales.source")} hint={t("locales.sourceHint")}>
           <Input id="s-source" value={p.source_locale} readOnly disabled dir="ltr" className="w-32 font-mono" />
         </Field>
         <div className="space-y-1.5">
@@ -221,7 +226,7 @@ function SettingsForm({ project: p }: { project: Project }) {
               </SelectContent>
             </Select>
           </Field>
-          <Field id="s-model" label={t("llm.model")}>
+          <Field id="s-model" label={t("llm.model")} hint={t("llm.modelHint")}>
             <Input id="s-model" value={llm.model} onChange={(e) => set("model", e.target.value)} required dir="ltr" className="font-mono" />
           </Field>
           <Field id="s-fallback" label={t("llm.fallback")} hint={t("llm.fallbackHint")}>
@@ -291,7 +296,7 @@ function SettingsForm({ project: p }: { project: Project }) {
             className="w-40 font-mono"
           />
         </Field>
-        <Field id="s-style" label={t("llm.style")}>
+        <Field id="s-style" label={t("llm.style")} hint={t("llm.styleHint")}>
           <Textarea id="s-style" rows={3} value={style} onChange={(e) => setStyle(e.target.value)} placeholder={t("llm.stylePlaceholder")} />
         </Field>
       </Section>

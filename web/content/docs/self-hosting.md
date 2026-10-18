@@ -28,6 +28,11 @@ Three services: `postgres` (17), `server` (Rust, axum) and `web` (Next.js standa
 | `DATABASE_URL` | set by Compose | Postgres URL (required when running `glot-server` outside Compose) |
 | `GLOT_BIND` | `127.0.0.1:8790` | Listen address of `glot-server` outside Compose |
 | `GLOT_GITHUB_API` | `https://api.github.com` | GitHub API base for feedback PRs (GitHub Enterprise) |
+| `RESEND_API_KEY` | empty (email off) | [Resend](https://resend.com) API key: email verification, password reset, password/email change notices, opt-in "job finished" emails. Unset: no email, no verification banner, `forgot-password` answers 503 |
+| `RESEND_FROM` | `glot <onboarding@resend.dev>` (Compose prod: `glot <noreply@mail.$GLOT_DOMAIN>`) | Sender. Use an address on a domain verified in Resend, ideally a subdomain such as `mail.example.com` so your apex keeps its own reputation |
+| `RESEND_REPLY_TO` | none | Reply-To header |
+| `RESEND_API_URL` | `https://api.resend.com` | Resend API base (tests / proxies) |
+| `GLOT_EMAIL_RATE_PER_HOUR` | 10 | Max emails per recipient per hour (all kinds), counted in Postgres |
 
 Only Postgres needs a volume. Put the web container behind your reverse proxy with TLS; it proxies `/api` and `/cdn` to the server, so one origin is enough and the session cookie just works.
 

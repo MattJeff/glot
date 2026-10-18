@@ -1,11 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CircleAlert, CircleX, Inbox, Languages, Loader2, Sparkles, TableProperties, Wallet } from "lucide-react";
+import { CircleAlert, CircleX, Languages, Loader2, Sparkles, TableProperties, Wallet } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { EmptyState, ErrorState, PageHeader, ProgressBar, useLocaleName } from "@/components/common";
+import { ErrorState, PageHeader, ProgressBar, useLocaleName } from "@/components/common";
+import { AnimatedNumber } from "@/components/gamification/progress-ring";
 import { HealthScore } from "@/components/health-score";
 import { isActive, JobRow } from "@/components/job-row";
+import { OnboardingOverview } from "@/components/onboarding/overview";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
@@ -38,7 +40,9 @@ export default function OverviewPage() {
     <div className="mx-auto max-w-6xl">
       <PageHeader
         title={p.name}
-        subtitle={<span className="font-mono">{p.slug}</span>}
+        // The slug only adds information when it is not just the name, normalized ("test" / "test").
+        eyebrow={p.slug !== slugOf(p.name) ? <span className="font-mono">{p.slug}</span> : undefined}
+        subtitle={t("subtitle")}
         actions={
           <Button onClick={() => translate.mutate()} disabled={busy || p.stats.keys === 0}>
             {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
@@ -47,9 +51,14 @@ export default function OverviewPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={TableProperties} label={t("keys")} value={format.number(p.stats.keys)} />
-        <Stat icon={Languages} label={t("locales")} value={format.number(p.target_locales.length)} hint={p.target_locales.join(" · ")} />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat icon={TableProperties} label={t("keys")} value={<AnimatedNumber value={p.stats.keys} format={(n) => format.number(n)} />} />
+        <Stat
+          icon={Languages}
+          label={t("locales")}
+          value={<AnimatedNumber value={p.target_locales.length} format={(n) => format.number(n)} />}
+          hint={p.target_locales.join(" · ")}
+        />
         <Stat
           icon={Wallet}
           label={t("cost")}
@@ -61,11 +70,9 @@ export default function OverviewPage() {
 
       {p.stats.keys > 0 && p.target_locales.length > 0 && <HealthScore project={p} />}
 
-      {p.stats.keys === 0 ? (
-        <div className="mt-6">
-          <EmptyState icon={Inbox} title={t("noKeys.title")} body={t("noKeys.body")} />
-        </div>
-      ) : (
+      <OnboardingOverview slug={slug} />
+
+      {p.stats.keys === 0 ? null : (
         <div className="mt-6 grid gap-6 lg:grid-cols-5">
           <section className="rounded-xl border lg:col-span-3">
             <h2 className="border-b px-4 py-3 text-sm font-medium">{t("progress")}</h2>
@@ -79,14 +86,14 @@ export default function OverviewPage() {
                         <span className="font-mono text-xs">{l}</span>
                         <span className="text-muted-foreground capitalize">{localeName(l)}</span>
                         <span className="ms-auto flex items-center gap-3 text-xs text-muted-foreground">
-                          {s.stale > 0 && <span className="text-warning">{t("staleCount", { count: s.stale })}</span>}
+                          {s.stale > 0 && <span className="text-warning-foreground">{t("staleCount", { count: s.stale })}</span>}
                           {s.issues > 0 && <span className="text-destructive">{t("issuesCount", { count: s.issues })}</span>}
                           <span className="font-mono tabular-nums">
                             {format.number(p.stats.keys ? s.translated / p.stats.keys : 0, { style: "percent" })}
                           </span>
                         </span>
                       </div>
-                      <ProgressBar total={p.stats.keys} translated={s.translated} reviewed={s.reviewed} stale={s.stale} />
+                      <ProgressBar total={p.stats.keys} translated={s.translated} reviewed={s.reviewed} stale={s.stale} label={localeName(l)} />
                       <p className="mt-1.5 text-xs text-muted-foreground">
                         {t("progressHint", {
                           translated: format.number(s.translated),
@@ -127,7 +134,7 @@ export default function OverviewPage() {
                       {i.issue.severity === "error" ? (
                         <CircleX className="mt-0.5 size-4 shrink-0 text-destructive" />
                       ) : (
-                        <CircleAlert className="mt-0.5 size-4 shrink-0 text-warning" />
+                        <CircleAlert className="mt-0.5 size-4 shrink-0 text-warning-foreground" />
                       )}
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -177,17 +184,17 @@ function Stat({
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string;
+  value: React.ReactNode;
   hint?: string;
   mono?: boolean;
 }) {
   return (
-    <div className="rounded-xl border p-4">
+    <div className="rounded-xl border bg-card p-4 shadow-(--shadow-card)">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Icon className="size-3.5" /> {label}
+        <Icon className="size-3.5" aria-hidden /> {label}
       </div>
-      <div className={mono ? "mt-2 truncate font-mono text-sm font-medium" : "mt-1.5 text-2xl font-semibold tracking-tight tabular-nums"}>{value}</div>
-      {hint && <div className="mt-1 truncate text-xs text-muted-foreground">{hint}</div>}
+      <div className={mono ? "mt-2 font-mono text-sm font-medium break-all" : "mt-1.5 text-2xl font-semibold tracking-tight tabular-nums"}>{value}</div>
+      {hint && <div className="mt-1 text-xs break-words text-muted-foreground">{hint}</div>}
     </div>
   );
 }
@@ -215,3 +222,6 @@ function OverviewSkeleton() {
     </div>
   );
 }
+
+const slugOf = (name: string) =>
+  name.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");

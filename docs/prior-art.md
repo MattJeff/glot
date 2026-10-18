@@ -1,6 +1,6 @@
 # Prior art — production translation feedback
 
-Background for a freedom-to-operate review of glot's feedback loop (`@glot/feedback`, `crates/server/src/feedback.rs`).
+Background for a freedom-to-operate review of glot's feedback loop (`@glot-i18n/feedback`, `crates/server/src/feedback.rs`).
 **This is not legal advice and draws no legal conclusion.** It lists public material for counsel to assess.
 Links checked on **2026-10-18**. Dates are approximate where marked "~"; counsel should confirm them with archived copies (e.g. web.archive.org).
 

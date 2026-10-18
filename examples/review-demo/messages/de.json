@@ -1,0 +1,17 @@
+{
+  "nav.home": "Startseite",
+  "nav.pricing": "Preise",
+  "hero.title": "Rechnungen, die pünktlich bezahlt werden",
+  "hero.subtitle": "Versenden Sie professionelle Rechnungen, erinnern Sie säumige Zahler automatisch und behalten Sie Ihren Cashflow im Blick.",
+  "hero.cta": "Jetzt kostenlos und unverbindlich testen",
+  "features.title": "Alles, was Sie brauchen, um bezahlt zu werden",
+  "features.draft": "Eine Rechnung in weniger als einer Minute erstellen.",
+  "features.chase": "Automatische, höfliche Zahlungserinnerungen.",
+  "features.tax": "Steuern und Währungen für 40 Länder.",
+  "pricing.title": "Einfache Preise",
+  "pricing.starter": "Starter",
+  "pricing.pro": "Pro",
+  "pricing.perMonth": "pro Monat",
+  "pricing.choose": "Tarif auswählen",
+  "footer": "© Relay. Für kleine Unternehmen gemacht."
+}

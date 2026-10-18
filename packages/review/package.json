@@ -1,0 +1,28 @@
+{
+  "name": "@glot/review",
+  "version": "0.1.0",
+  "description": "Live review: annotate translations directly on your site (pins, threads, AI rewording, realtime). Lazy-loaded, Shadow DOM, invisible to normal visitors.",
+  "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": { "type": "git", "url": "git+https://github.com/MattJeff/glot.git", "directory": "packages/review" },
+  "bugs": "https://github.com/MattJeff/glot/issues",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist"],
+  "sideEffects": true,
+  "scripts": {
+    "build": "rm -rf dist && esbuild src/index.ts src/app.ts --bundle --splitting --format=esm --minify --target=es2020 --outdir=dist && esbuild src/global.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/review.global.js && esbuild src/app.ts --bundle --format=iife --global-name=glotReviewApp --minify --target=es2020 --outfile=dist/review.app.global.js && tsc",
+    "size": "node scripts/size.mjs",
+    "test": "node --test 'test/*.test.ts'",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "esbuild": "^0.25",
+    "playwright": "1.64.1",
+    "typescript": "^5.9"
+  },
+  "publishConfig": { "access": "public" }
+}

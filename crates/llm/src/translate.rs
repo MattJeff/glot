@@ -722,7 +722,7 @@ fn syntax_rules(syntax: Syntax) -> &'static str {
             "ICU MessageFormat: placeholders look like {name} or {count, number}. Inside {x, plural, ...}, {x, select, ...} and {x, selectordinal, ...} never translate the argument name, the keyword (plural/select/selectordinal/offset) or the selectors (zero/one/two/few/many/other/=0/=1, select values); translate only the text inside the option braces, and keep `#` as-is. Keep '' escaping."
         }
         Syntax::I18next => {
-            "i18next: placeholders look like {{name}} or {{count, number}}; nesting looks like $t(key) and must be kept verbatim. Keep <0>, <1>... indexed tags."
+            "i18next: placeholders look like {{name}} or {{count, number}}; nesting looks like $t(key) and must be kept verbatim. Keep <0>, <1>... indexed tags. Plurals (the key_one/key_other files) are wrapped as {count, plural, one {...} other {...}}: never translate the argument name, the keyword or the selectors; translate only the text inside the option braces."
         }
         Syntax::Mf2 => {
             "Unicode MessageFormat 2: keep every {$var}, {$var :function option=value}, .input/.local/.match declarations and variant keys verbatim; translate only the pattern text."
@@ -732,6 +732,12 @@ fn syntax_rules(syntax: Syntax) -> &'static str {
         }
         Syntax::Rails => {
             "Rails i18n: keep every %{name} interpolation verbatim. Plurals are wrapped as {count, plural, one {...} other {...}}: never translate the argument name, the keyword or the selectors; translate only the text inside the option braces."
+        }
+        Syntax::Vue => {
+            "vue-i18n: keep every {name}, {0} and {'literal'} verbatim, and every linked message @:key / @.lower:key unchanged. A plural is `form | form | form`: keep exactly as many `|`-separated forms as the source, in the same order (they are chosen by position, not by CLDR category)."
+        }
+        Syntax::Laravel => {
+            "Laravel: keep every :name / :Name / :NAME placeholder verbatim (never translate the word after `:`). Plurals are `|`-separated forms: keep range prefixes like {0}, [1,19], [2,*] exactly; without ranges, write one form per plural form of the target language in Laravel's order (singular first)."
         }
     }
 }

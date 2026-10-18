@@ -26,6 +26,8 @@ pub enum Framework {
     Vite,
     Remix,
     Astro,
+    /// TanStack Start (Lovable's default since 2026-05): file routes, SSR.
+    TanStack,
 }
 
 impl Framework {
@@ -42,6 +44,7 @@ impl Framework {
             Framework::Vite => "Vite + React",
             Framework::Remix => "Remix / React Router",
             Framework::Astro => "Astro (React islands)",
+            Framework::TanStack => "TanStack Start",
         }
     }
 }
@@ -98,6 +101,12 @@ pub fn detect(root: &Path) -> Option<Project> {
             (Framework::NextApp, "")
         } else if layout("src/") {
             (Framework::NextApp, "src/")
+        // Several root layouts in route groups (`app/(public)/layout.tsx`, `app/admin/layout.tsx`):
+        // still the App Router, never a reason to add `pages/_app`.
+        } else if root.join("app").is_dir() && !root.join("pages").is_dir() {
+            (Framework::NextApp, "")
+        } else if root.join("src/app").is_dir() && !root.join("src/pages").is_dir() {
+            (Framework::NextApp, "src/")
         } else if root.join("src/pages").is_dir() {
             (Framework::NextPages, "src/")
         } else {
@@ -105,6 +114,8 @@ pub fn detect(root: &Path) -> Option<Project> {
         }
     } else if has("astro") {
         (Framework::Astro, "src/")
+    } else if has("@tanstack/react-start") {
+        (Framework::TanStack, "src/")
     } else if has("@remix-run/react")
         || has("react-router")
             && (root.join("app/root.tsx").is_file() || root.join("app/root.jsx").is_file())

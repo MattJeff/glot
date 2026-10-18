@@ -1,0 +1,15 @@
+# Server email catalog, translated by glot itself: `cd crates/server/emails && glot translate`.
+# Locales must be listed in crates/server/src/email.rs (CATALOGS); missing keys fall back to English.
+source_locale = "en"
+target_locales = ["fr", "es", "de", "ja", "ar"]
+files = ["{locale}.json"]
+format = "json-nested"
+syntax = "icu"
+
+[llm]
+provider = "anthropic"
+model = "claude-haiku-5-5"
+fallback_model = "claude-sonnet-5-5"
+api_key_env = "ANTHROPIC_API_KEY"
+budget_usd = 0.5
+style = "Transactional account emails. Short, plain, trustworthy. French: vouvoiement. Keep {placeholders} and 'glot' unchanged."

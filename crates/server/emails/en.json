@@ -1,0 +1,41 @@
+{
+  "emails": {
+    "common": {
+      "greeting": "Hi {name},",
+      "fallback": "If the button doesn't work, paste this link into your browser:",
+      "ignore": "If you didn't ask for this, you can ignore this email.",
+      "footer": "Sent to {email} by glot, open source i18n for SaaS. This is an account email: you can't unsubscribe from it.",
+      "footer_optional": "Sent to {email} by glot. You get this because job notifications are on in your account settings."
+    },
+    "verify": {
+      "subject": "Confirm your email address",
+      "body": "Confirm that {email} is your address to secure your glot account. The link expires in 48 hours.",
+      "cta": "Confirm email"
+    },
+    "reset": {
+      "subject": "Reset your glot password",
+      "body": "Someone asked to reset the password of your glot account. The link works once and expires in 1 hour. Resetting signs you out everywhere.",
+      "cta": "Choose a new password"
+    },
+    "password_changed": {
+      "subject": "Your glot password was changed",
+      "body": "The password of your glot account was just changed. If this wasn't you, reset it now and check your API tokens.",
+      "cta": "Reset password"
+    },
+    "email_changed": {
+      "subject": "Your glot email address was changed",
+      "body": "The email address of your glot account was changed to {new_email}. If this wasn't you, reset your password now.",
+      "cta": "Reset password"
+    },
+    "job_done": {
+      "subject": "Translation finished in {project}",
+      "body": "Your translation job in {project} is done: {done} of {total} strings processed, cost {cost} USD.",
+      "cta": "Open the job"
+    },
+    "job_failed": {
+      "subject": "Translation failed in {project}",
+      "body": "Your translation job in {project} failed after {done} of {total} strings: {error}",
+      "cta": "Open the job"
+    }
+  }
+}

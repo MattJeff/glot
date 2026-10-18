@@ -11,11 +11,16 @@ use crate::setup::{
 };
 use crate::style::*;
 
+#[path = "i18nize_swift.rs"]
+mod swift;
+
 #[derive(Clone, Copy, ValueEnum)]
 pub enum LibArg {
     Auto,
     NextIntl,
     ReactI18next,
+    /// The app's own `t(key)` hook (hand-rolled LanguageContext / useLanguage).
+    Custom,
 }
 
 #[derive(Args)]
@@ -44,14 +49,46 @@ pub struct I18nizeArgs {
     /// Only rewrite the code: do not wire the i18n library (provider, config, proxy).
     #[arg(long)]
     pub no_setup: bool,
+    /// Swift: also wrap plain `String`s shown to the user (UIKit `.text = "…"`) in `String(localized:)`.
+    #[arg(long)]
+    pub rewrite: bool,
 }
 
 pub async fn run(args: I18nizeArgs) -> Result<()> {
     let mut ws = crate::open()?;
+    if swift::is_swift(&ws) {
+        return swift::run(ws, &args);
+    }
     let project = setup::detect(&ws.root);
+    // Hand-written TS/JS dictionaries = the app has its own `t()`: rewriting it to next-intl /
+    // react-i18next would add a second runtime. Only an explicit --lib migrates.
+    let own_runtime = ws.config.files.iter().any(|f| {
+        glot_core::formats::native(glot_core::catalog::Format::Auto, std::path::Path::new(f))
+            == Some(glot_core::catalog::Format::Js)
+    }) && !["i18next", "react-i18next", "next-intl"]
+        .iter()
+        .any(|d| setup::deps(&ws.root).0.contains(*d));
+    // Its own `t()` hook: rewrite with it (never a second runtime).
+    let custom = crate::init::custom_runtime(&ws.root);
+    if own_runtime && matches!(args.lib, LibArg::Auto) && custom.is_none() {
+        bail!(
+            "this app has its own i18n runtime (dictionaries {}) but no `useLanguage()`-style hook was found: \
+             glot reads, translates and checks the dictionaries; wrap the strings with your own t() \
+             (your coding agent can, through `glot mcp`), or pass --lib to migrate",
+            ws.config.files.join(", ")
+        );
+    }
+    if matches!(args.lib, LibArg::Custom) && custom.is_none() {
+        bail!(
+            "--lib custom: no hook returning `t` (useLanguage / useTranslation / useI18n) found in the code"
+        );
+    }
+    glot_extract::i18nize::set_custom_runtime(custom.clone());
     let lib = match args.lib {
         LibArg::NextIntl => Lib::NextIntl,
         LibArg::ReactI18next => Lib::ReactI18next,
+        LibArg::Custom => Lib::Custom,
+        LibArg::Auto if own_runtime => Lib::Custom,
         LibArg::Auto => match project.as_ref().map(|p| p.framework.lib()) {
             Some(l) => l,
             None => match i18nize::detect_lib(&ws.root) {
@@ -66,11 +103,7 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         anstream::eprintln!(
             "{DIM}{} detected, target library: {}{DIM:#}",
             p.framework.label(),
-            if lib == Lib::NextIntl {
-                "next-intl"
-            } else {
-                "react-i18next"
-            }
+            lib_label(lib, custom.as_ref())
         );
     }
 
@@ -119,7 +152,9 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         .iter()
         .map(|p| cwd.join(p).to_string_lossy().into_owned())
         .collect();
-    let files = i18nize::list_files(&ws, &paths)?;
+    let mut files = i18nize::list_files(&ws, &paths)?;
+    // The dictionaries themselves are catalogs, not code to rewrite.
+    files.retain(|f| !ws.config.files.contains(f));
     if files.is_empty() {
         bail!("no source files to convert (check the paths or [extract].include in glot.toml)");
     }
@@ -189,14 +224,10 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
             }
             None => {}
         }
-    } else if !args.no_setup {
+    } else if !args.no_setup && lib != Lib::Custom {
         anstream::println!(
             "{YELLOW}note:{YELLOW:#} framework not detected: wire {} by hand (provider + config).",
-            if lib == Lib::NextIntl {
-                "next-intl"
-            } else {
-                "react-i18next"
-            }
+            lib_label(lib, None)
         );
     }
     anstream::println!(
@@ -205,6 +236,17 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         ws.config.target_locales.join(", ")
     );
     Ok(())
+}
+
+fn lib_label(lib: Lib, custom: Option<&glot_extract::i18nize::CustomRuntime>) -> String {
+    match lib {
+        Lib::NextIntl => "next-intl".into(),
+        Lib::ReactI18next => "react-i18next".into(),
+        Lib::Custom => format!(
+            "the app's own {}().t",
+            custom.map_or("useLanguage", |c| c.hook.as_str())
+        ),
+    }
 }
 
 pub(crate) fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
@@ -241,7 +283,7 @@ pub(crate) fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
     }
 }
 
-fn print_diff(diff: &str) {
+pub(crate) fn print_diff(diff: &str) {
     for line in diff.lines() {
         if line.starts_with("+++") || line.starts_with("---") {
             anstream::println!("{BOLD}{line}{BOLD:#}");

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="a1B2c3D" resname="form.name.blank">
+                <source>form.name.blank</source>
+                <target>Le nom ne peut pas être vide.</target>
+            </trans-unit>
+            <trans-unit id="e4F5g6H" resname="form.email.invalid">
+                <source>form.email.invalid</source>
+                <target>L'adresse {{ value }} n'est pas valide.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

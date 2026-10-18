@@ -102,17 +102,26 @@ fn react_i18next_ns_and_key_prefix() {
     let keys: Vec<&str> = r.usages.keys().map(String::as_str).collect();
     assert_eq!(
         keys,
-        ["login.email", "no", "session.expired", "welcome", "yes"]
+        [
+            "auth:welcome",
+            "common:no",
+            "common:yes",
+            "forms:login.email",
+            "session.expired"
+        ]
     );
-    assert_eq!(r.usages["login.email"][0].ui_role.as_deref(), Some("label"));
     assert_eq!(
-        r.usages["login.email"][0].component.as_deref(),
+        r.usages["forms:login.email"][0].ui_role.as_deref(),
+        Some("label")
+    );
+    assert_eq!(
+        r.usages["forms:login.email"][0].component.as_deref(),
         Some("LoginForm")
     );
-    assert_eq!(line_of(&r, "welcome"), [12]);
-    // `t(dynamicKey)` without keyPrefix: dynamic, but no prefix to protect.
+    assert_eq!(line_of(&r, "auth:welcome"), [12]);
+    // `t(dynamicKey)` from `useTranslation("auth")`: any key of that namespace may be used.
     assert_eq!(r.dynamic.len(), 1);
-    assert!(r.dynamic_prefixes.is_empty());
+    assert_eq!(r.dynamic_prefixes.iter().collect::<Vec<_>>(), ["auth:"]);
     // Trans children are default values, not hardcoded copy.
     assert!(r.hardcoded.is_empty(), "{:?}", r.hardcoded);
 }
@@ -159,11 +168,16 @@ fn formatjs_ids() {
 
 #[test]
 fn vue_script_t() {
-    let src = "<template>\n  <p>{{ $t('ignored.in_template') }}</p>\n</template>\n<script setup lang=\"ts\">\nconst { t } = useI18n();\nconst msg: string = t('nav.home');\nconsole.log(this.$t('nav.about'));\n</script>\n";
-    let r = scan("src/App.vue", src);
-    assert_eq!(line_of(&r, "nav.home"), [6]);
-    assert_eq!(line_of(&r, "nav.about"), [7]);
-    assert_eq!(r.usages.len(), 2);
+    let src = "<template>\n  <p>{{ $t('tpl.title') }} {{ t(\"tpl.sub\", { n }) }}</p>\n  <p v-t=\"'tpl.vt'\" :title=\"$tc('tpl.count', 2)\"></p>\n  <i18n-t keypath=\"tpl.rich\" tag=\"p\"></i18n-t>\n  <p>{{ $t(dyn) }} {{ format('x') }}</p>\n</template>\n<script setup lang=\"ts\">\nconst { t } = useI18n();\nconst msg: string = t('nav.home');\nconsole.log(this.$t('nav.about'));\n</script>\n";
+    let r = crate::extract_source("src/App.vue", src, &Default::default());
+    assert_eq!(line_of(&r, "nav.home"), [9]);
+    assert_eq!(line_of(&r, "nav.about"), [10]);
+    assert_eq!(line_of(&r, "tpl.title"), [2]);
+    assert_eq!(line_of(&r, "tpl.sub"), [2]);
+    assert_eq!(line_of(&r, "tpl.vt"), [3]);
+    assert_eq!(line_of(&r, "tpl.count"), [3]);
+    assert_eq!(line_of(&r, "tpl.rich"), [4]);
+    assert_eq!(r.usages.len(), 7, "{:?}", r.usages.keys());
 }
 
 const HARDCODED: &str = r#"import Link from "next/link";
@@ -437,4 +451,63 @@ export default function P({ open }) {
     assert!(!looks_like_css_classes("Hello world"));
     assert!(!looks_like_css_classes("in progress"));
     assert!(!looks_like_css_classes("well-known issue"));
+}
+
+#[test]
+fn jsx_text_entities_are_decoded() {
+    let r = scan(
+        "app/page.tsx",
+        "export default function P() {\n  return <p>Ce qu&apos;on voit &amp; ce qu&apos;on lit</p>;\n}\n",
+    );
+    let texts: Vec<&str> = r.hardcoded.iter().map(|h| h.text.as_str()).collect();
+    assert_eq!(texts, ["Ce qu'on voit & ce qu'on lit"]);
+}
+
+#[test]
+fn i18next_namespaces_match_namespaced_catalogs() {
+    // Anonymised from the i18n1 fixture: `common.json` and `home.json` both define `title`.
+    let r = scan(
+        "src/App.tsx",
+        "import { useTranslation, Trans } from 'react-i18next';\n\
+         export function A() { const { t } = useTranslation(['home', 'common']); const f = i18n.getFixedT(null, 'shop', 'cart');\n\
+         return <div>{t('title')}{t('common:item', { count: 2 })}{f('total')}<Trans i18nKey=\"trans\" /><Trans ns=\"home\" i18nKey=\"hero\" />{t('Note: not a namespace')}</div>; }",
+    );
+    let keys: Vec<&str> = r.usages.keys().map(String::as_str).collect();
+    assert_eq!(
+        keys,
+        [
+            "common:item",
+            "home:Note: not a namespace",
+            "home:hero",
+            "home:title",
+            "shop:cart.total",
+            "trans"
+        ]
+    );
+    let source = catalog(&[
+        ("common:title", "Home"),
+        (
+            "common:item",
+            "{count, plural, one {{{count}} item} other {{{count}} items}}",
+        ),
+        ("common:trans", "Hello <1>{{name}}</1>"),
+        ("home:title", "Welcome home"),
+        ("home:hero", "Hero"),
+        ("shop:cart.total", "Total"),
+        ("home:Note: not a namespace", "Note"),
+    ]);
+    // `common:title` is not used by `home:title`; bare `trans` matches any namespace.
+    assert_eq!(unused_keys(&r, &source), ["common:title"]);
+    assert!(missing_keys(&r, &source).is_empty());
+    // `home:title` is missing when only `common:title` exists...
+    let only_common = catalog(&[("common:title", "Home")]);
+    assert!(missing_keys(&r, &only_common).contains(&"home:title".to_string()));
+    // ...but a one-file catalog (no `{ns}`) still matches namespaced code.
+    let flat = catalog(&[("title", "Home"), ("item_one", "1"), ("item_other", "n")]);
+    let missing = missing_keys(&r, &flat);
+    assert!(
+        !missing.contains(&"home:title".to_string())
+            && !missing.contains(&"common:item".to_string())
+    );
+    assert!(unused_keys(&r, &flat).is_empty());
 }

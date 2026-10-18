@@ -1,0 +1,28 @@
+{
+  "name": "glot-experiments-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3490",
+    "build": "next build",
+    "start": "next start -p 3491",
+    "test": "pnpm build && node --test test/e2e.test.ts"
+  },
+  "dependencies": {
+    "@glot/edge": "file:../../packages/edge",
+    "@glot/insights": "file:../../packages/insights",
+    "@glot/runtime": "file:../../packages/runtime",
+    "next": "16.4.2",
+    "next-intl": "^4.14.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "@types/react": "^19",
+    "lighthouse": "^13",
+    "playwright": "1.64.1",
+    "typescript": "^5.9"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

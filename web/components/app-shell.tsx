@@ -3,13 +3,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenText,
+  CreditCard,
   FlaskConical,
   FolderKanban,
   Grid3x3,
   KeyRound,
+  UserRound,
   LayoutDashboard,
   ListChecks,
   LogOut,
+  Sparkles,
+  X,
   Menu,
   MessageSquareWarning,
   Moon,
@@ -20,12 +24,15 @@ import {
   Settings,
   TableProperties,
   Languages,
+  GitPullRequest,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore, ViewTransition } from "react";
 import { Logo, LocaleSwitcher, ThemeToggle, useLocaleName, useSwitchLocale } from "@/components/common";
 import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { ProjectCelebrations, SidebarProjectProgress } from "@/components/gamification/project-progress";
+import { VerifyEmailBanner } from "@/components/email-pages";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,9 +54,9 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, RTL_LOCALES } from "@/i18n/routing";
 import { api, qk } from "@/lib/api";
-import { useSlug } from "@/lib/hooks";
+import { useSlug, useTranslateMissing } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 const PROJECT_PAGES = [
@@ -59,6 +66,7 @@ const PROJECT_PAGES = [
   { seg: "/visual", icon: ScanEye, label: "visual" },
   { seg: "/glossary", icon: BookOpenText, label: "glossary" },
   { seg: "/jobs", icon: ListChecks, label: "jobs" },
+  { seg: "/github", icon: GitPullRequest, label: "github" },
   { seg: "/settings", icon: Settings, label: "settings" },
   // Labs (heading before /insights): growth features, less proven than the core loop.
   { seg: "/insights", icon: Radar, label: "insights" },
@@ -70,16 +78,25 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
   const t = useTranslations("shell");
   const slug = useSlug();
   const pathname = usePathname();
+  const qc = useQueryClient();
   const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
+  // Warm the project query on hover/focus so the overview renders without a skeleton.
+  const prefetch = (s: string) => qc.prefetchQuery({ queryKey: qk.project(s), queryFn: () => api.project(s) });
 
   const item = (href: string, active: boolean) =>
     cn(
-      "flex h-8 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-      active && "bg-accent font-medium text-foreground",
+      "relative flex h-8 items-center gap-2 rounded-md px-2 text-sm pointer-coarse:h-10 text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground [&_svg]:shrink-0",
+      active &&
+        "bg-accent font-medium text-foreground before:absolute before:inset-y-1.5 before:-start-2 before:w-0.5 before:rounded-full before:bg-brand",
     );
+  const current = (active: boolean) => (active ? ("page" as const) : undefined);
 
   return (
-    <nav className="flex h-full flex-col gap-6 p-3" onClick={(e) => (e.target as HTMLElement).closest("a") && onNavigate?.()}>
+    <nav
+      aria-label={t("mainNav")}
+      className="flex h-full flex-col gap-6 overflow-y-auto p-3"
+      onClick={(e) => (e.target as HTMLElement).closest("a") && onNavigate?.()}
+    >
       <Link href="/app" className="px-2 pt-1">
         <Logo />
       </Link>
@@ -97,12 +114,19 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
           {projects.data?.length === 0 && <p className="px-2 py-1 text-xs text-muted-foreground">{t("noProjects")}</p>}
           {projects.data?.map((p) => (
             <div key={p.id}>
-              <Link href={`/app/${p.slug}`} className={item(`/app/${p.slug}`, p.slug === slug && pathname === `/app/${p.slug}`)}>
+              <Link
+                href={`/app/${p.slug}`}
+                className={item(`/app/${p.slug}`, p.slug === slug && pathname === `/app/${p.slug}`)}
+                aria-current={current(p.slug === slug && pathname === `/app/${p.slug}`)}
+                onMouseEnter={() => prefetch(p.slug)}
+                onFocus={() => prefetch(p.slug)}
+              >
                 <FolderKanban className="size-4" />
                 <span className="truncate">{p.name}</span>
               </Link>
+              {p.slug === slug && <SidebarProjectProgress slug={p.slug} />}
               {p.slug === slug && (
-                <div className="ms-4 mt-0.5 space-y-0.5 border-s ps-2">
+                <div className="ms-4 mt-2 space-y-0.5 border-s ps-2">
                   {PROJECT_PAGES.slice(1).map((page) => {
                     const { seg, icon: Icon, label } = page;
                     const href = `/app/${p.slug}${seg}`;
@@ -111,7 +135,7 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
                         {seg === "/insights" && (
                           <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
                         )}
-                        <Link href={href} className={item(href, pathname === href)}>
+                        <Link href={href} className={item(href, pathname === href)} aria-current={current(pathname === href)}>
                           <Icon className="size-4" />
                           {t(label)}
                         </Link>
@@ -126,16 +150,24 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
       </div>
 
       <div className="mt-auto">
-        <Link href="/app/settings/tokens" className={item("", pathname === "/app/settings/tokens")}>
+        <Link href="/app/settings/account" className={item("", pathname === "/app/settings/account")} aria-current={current(pathname === "/app/settings/account")}>
+          <UserRound className="size-4" />
+          {t("account")}
+        </Link>
+        <Link href="/app/settings/tokens" className={item("", pathname === "/app/settings/tokens")} aria-current={current(pathname === "/app/settings/tokens")}>
           <KeyRound className="size-4" />
           {t("apiTokens")}
+        </Link>
+        <Link href="/app/settings/billing" className={item("", pathname === "/app/settings/billing")} aria-current={current(pathname === "/app/settings/billing")}>
+          <CreditCard className="size-4" />
+          {t("billing")}
         </Link>
       </div>
     </nav>
   );
 }
 
-function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
+function CommandPalette({ open, setOpen, onCreate }: { open: boolean; setOpen: (v: boolean) => void; onCreate: () => void }) {
   const t = useTranslations("palette");
   const ts = useTranslations("shell");
   const router = useRouter();
@@ -145,6 +177,20 @@ function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (v: boolean
   const switchLocale = useSwitchLocale();
   const { resolvedTheme, setTheme } = useTheme();
   const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
+  const translate = useTranslateMissing(slug);
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(search.trim()), 150);
+    return () => clearTimeout(id);
+  }, [search]);
+  // "Go to key": server-side search over key names and source text of the current project.
+  const keys = useQuery({
+    queryKey: [...qk.keys(slug), "palette", debounced],
+    queryFn: () => api.keys(slug, { q: debounced, per_page: 8 }),
+    enabled: open && !!slug && debounced.length >= 2,
+    staleTime: 30_000,
+  });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -163,10 +209,48 @@ function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (v: boolean
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen} title={ts("search")} description={t("placeholder")}>
-      <CommandInput placeholder={t("placeholder")} />
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setSearch("");
+      }}
+      title={ts("search")}
+      description={t("placeholder")}
+    >
+      <CommandInput placeholder={t("placeholder")} value={search} onValueChange={setSearch} />
       <CommandList>
-        <CommandEmpty>{t("empty")}</CommandEmpty>
+        <CommandEmpty>{keys.isFetching ? t("searching") : t("empty")}</CommandEmpty>
+        {!!keys.data?.items.length && (
+          <CommandGroup heading={t("keys")}>
+            {keys.data.items.map((k) => (
+              <CommandItem
+                key={k.key}
+                // Matched server-side: include the query so cmdk's own filter keeps the item.
+                value={`key ${k.key} ${k.source} ${search}`}
+                onSelect={() => run(() => router.push(`/app/${slug}/keys?q=${encodeURIComponent(k.key)}`))}
+              >
+                <TableProperties />
+                <span className="truncate font-mono text-xs">{k.key}</span>
+                <span className="ms-auto max-w-[45%] truncate text-xs text-muted-foreground">{k.source}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+        <CommandGroup heading={t("actions")}>
+          {slug && (
+            <CommandItem
+              value={`action translate ${t("translateMissing")}`}
+              disabled={translate.isPending}
+              onSelect={() => run(() => translate.mutate())}
+            >
+              <Sparkles /> {t("translateMissing")}
+            </CommandItem>
+          )}
+          <CommandItem value={`action create ${t("createProject")}`} onSelect={() => run(onCreate)}>
+            <Plus /> {t("createProject")}
+          </CommandItem>
+        </CommandGroup>
         {slug && (
           <CommandGroup heading={t("navigation")}>
             {PROJECT_PAGES.map(({ seg, icon: Icon, label }) => (
@@ -184,6 +268,9 @@ function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (v: boolean
           ))}
           <CommandItem onSelect={() => run(() => router.push("/app/settings/tokens"))}>
             <KeyRound /> {t("goTo", { page: ts("apiTokens") })}
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => router.push("/app/settings/billing"))}>
+            <CreditCard /> {t("goTo", { page: ts("billing") })}
           </CommandItem>
         </CommandGroup>
         <CommandGroup heading={t("preferences")}>
@@ -219,10 +306,11 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" className="rounded-full" aria-label={t("userMenu")}>
+        <Button variant="ghost" size="icon-sm" className="rounded-full">
           <Avatar className="size-7">
             <AvatarFallback className="text-[11px]">{me.isPending ? "" : initials}</AvatarFallback>
           </Avatar>
+          <span className="sr-only">{t("userMenu")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -232,8 +320,18 @@ function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
+          <Link href="/app/settings/account">
+            <UserRound /> {t("account")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href="/app/settings/tokens">
             <KeyRound /> {t("apiTokens")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/app/settings/billing">
+            <CreditCard /> {t("billing")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => logout.mutate()}>
@@ -244,8 +342,45 @@ function UserMenu() {
   );
 }
 
+// Experimental-server notice: dismissible, remembered per browser.
+const NOTE = "glot:experimental-note";
+const noteListeners = new Set<() => void>();
+function useNoteDismissed() {
+  const dismissed = useSyncExternalStore(
+    (cb) => (noteListeners.add(cb), () => noteListeners.delete(cb)),
+    () => {
+      // The notice is about self-hosting: never shown on the hosted cloud.
+      if (location.hostname === "glotlang.com" || location.hostname.endsWith(".glotlang.com")) return true;
+      try {
+        return localStorage.getItem(NOTE) === "dismissed";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const dismiss = () => {
+    try {
+      localStorage.setItem(NOTE, "dismissed");
+    } catch {
+      /* ignore */
+    }
+    noteListeners.forEach((l) => l());
+  };
+  return [dismissed, dismiss] as const;
+}
+
+// Full-bleed tools manage their own height; no banners above them.
+const FULL_BLEED = /^\/app\/[^/]+\/(keys|preview)$/;
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("shell");
+  const tc = useTranslations("common");
+  const slug = useSlug();
+  const pathname = usePathname();
+  const [noteDismissed, dismissNote] = useNoteDismissed();
+  const fullBleed = FULL_BLEED.test(pathname);
+  const locale = useLocale();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
@@ -254,11 +389,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-md bg-background px-3 py-2 text-sm font-medium shadow-(--shadow-raised) focus:not-sr-only focus:fixed focus:start-3 focus:top-3"
+      >
+        {t("skipToContent")}
+      </a>
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-e bg-sidebar lg:block">
         <SidebarNav onCreate={() => setCreateOpen(true)} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        {/* The drawer opens from the reading-start edge (right in Arabic), like the desktop sidebar. */}
+        <SheetContent side={RTL_LOCALES.includes(locale) ? "right" : "left"} className="w-72 max-w-[85vw] p-0">
           <SheetTitle className="sr-only">{t("toggleSidebar")}</SheetTitle>
           <SidebarNav onNavigate={() => setMobileOpen(false)} onCreate={() => setCreateOpen(true)} />
         </SheetContent>
@@ -272,9 +414,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setPaletteOpen(true)}
-            className="flex h-8 w-full max-w-xs items-center gap-2 rounded-md border bg-muted/40 px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
+            aria-keyshortcuts="Meta+K Control+K"
+            className="flex h-8 w-full max-w-xs items-center gap-2 rounded-md border pointer-coarse:h-10 bg-muted/40 px-2.5 text-sm text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground"
           >
-            <Search className="size-4" />
+            <Search className="size-4" aria-hidden />
             <span className="flex-1 text-start">{t("search")}</span>
             <kbd className="hidden rounded border bg-background px-1.5 font-mono text-[10px] sm:inline">⌘K</kbd>
           </button>
@@ -284,21 +427,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <UserMenu />
           </div>
         </header>
-        <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <p role="note" className="mb-6 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
-            {t.rich("experimental", {
-              docs: (c) => (
-                <Link href="/docs/self-hosting" className="font-medium underline underline-offset-2">
-                  {c}
-                </Link>
-              ),
-            })}
-          </p>
-          {children}
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1 px-4 py-6 outline-none sm:px-6 lg:px-8">
+          {!fullBleed && !noteDismissed && (
+            <div
+              role="note"
+              className="mb-6 flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 py-1.5 ps-3 pe-1.5 text-xs text-warning-foreground"
+            >
+              <p className="flex-1 py-1">
+                {t.rich("experimental", {
+                  docs: (c) => (
+                    <Link href="/docs/self-hosting" className="font-medium underline underline-offset-2">
+                      {c}
+                    </Link>
+                  ),
+                })}
+              </p>
+              <Button variant="ghost" size="icon-xs" aria-label={tc("dismiss")} onClick={dismissNote} className="hover:bg-warning/15">
+                <X />
+              </Button>
+            </div>
+          )}
+          {!fullBleed && <VerifyEmailBanner />}
+          {/* Page transition: keyed by route so each navigation fades the content (see globals.css .page). */}
+          <ViewTransition key={pathname} enter="page" exit="page" default="none">
+            <div>{children}</div>
+          </ViewTransition>
         </main>
       </div>
 
-      <CommandPalette open={paletteOpen} setOpen={setPaletteOpen} />
+      <CommandPalette open={paletteOpen} setOpen={setPaletteOpen} onCreate={() => setCreateOpen(true)} />
+      {slug && <ProjectCelebrations slug={slug} />}
       <CreateProjectDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );

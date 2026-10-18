@@ -5,7 +5,7 @@ import { BookOpenText, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, PageHeader } from "@/components/common";
+import { EmptyState, ErrorState, PageHeader, TermTip } from "@/components/common";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,7 +61,9 @@ export default function GlossaryPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader title={t("title")} subtitle={t("subtitle")} actions={terms.data?.length ? addButton : null} />
+      <PageHeader
+        title={t("title")}
+        subtitle={t.rich("subtitle", { file: (c) => <TermTip tip={t("fileTip")}>{c}</TermTip> })} actions={terms.data?.length ? addButton : null} />
       {terms.isPending ? (
         <Skeleton className="h-64 rounded-xl" />
       ) : terms.isError ? (
@@ -69,7 +71,7 @@ export default function GlossaryPage() {
       ) : terms.data.length === 0 ? (
         <EmptyState icon={BookOpenText} title={t("empty.title")} body={t("empty.body")} action={addButton} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border">
+        <div className="overflow-x-auto rounded-xl border bg-card shadow-(--shadow-card)">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
               <tr>

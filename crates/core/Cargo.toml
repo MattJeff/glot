@@ -12,7 +12,14 @@ thiserror.workspace = true
 sha2.workspace = true
 glob.workspace = true
 rustybuzz = "0.20"
+# glot labs render: bidi algorithm, WOFF2 cmap
+unicode-bidi = "0.3"
+brotli-decompressor = "5"
 icu_plurals = "2.3"
 icu_locale_core = "2.3"
 icu_locale = "2.3"
 fixed_decimal = "0.7"
+oxc_allocator = "0.154"
+oxc_ast = "0.154"
+oxc_parser = "0.154"
+oxc_span = "0.154"

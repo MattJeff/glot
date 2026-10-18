@@ -1,10 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CircleAlert, ExternalLink, Grid3x3, Info, Monitor, RotateCw, Smartphone } from "lucide-react";
+import { CircleAlert, ExternalLink, FlaskConical, Grid3x3, Info, Monitor, RotateCw, Smartphone } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CodeBlock, EmptyState, ErrorState, useLocaleName } from "@/components/common";
+import { CodeBlock, EmptyState, ErrorState, PageHeader, useLocaleName } from "@/components/common";
+import { SegmentPreview } from "@/components/experiments/results/segment-preview";
 import { KeySheet, type KeyTarget } from "@/components/key-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "@/i18n/navigation";
 import { api, ApiError, qk, type Project, type VisualIssue } from "@/lib/api";
-import { useProject, useSlug } from "@/lib/hooks";
+import { useMediaQuery, useProject, useSlug } from "@/lib/hooks";
 import { BRIDGE_SNIPPET } from "@/lib/preview-bridge";
 import { cn } from "@/lib/utils";
 import { buildUrl, issueLabel, KIND_STYLE, parseViewport, previewTarget } from "@/lib/visual";
@@ -26,9 +28,10 @@ const PSEUDO = "pseudo";
 
 export default function PreviewPage() {
   const project = useProject(useSlug());
+  const bySegment = useSearchParams().has("xp"); // ?xp=<id>: experiment arms × languages
   if (project.isError) return <ErrorState error={project.error} onRetry={() => project.refetch()} />;
   if (!project.data) return <Skeleton className="h-[70vh] rounded-xl" />;
-  return <Matrix project={project.data} />;
+  return bySegment ? <SegmentPreview project={project.data} /> : <Matrix project={project.data} />;
 }
 
 function Matrix({ project: p }: { project: Project }) {
@@ -56,6 +59,13 @@ function Matrix({ project: p }: { project: Project }) {
   const { w, h } = parseViewport(viewport);
   const defaultHeight = h * 2;
   const columns = [p.source_locale, ...(pseudo ? [PSEUDO] : []), ...p.target_locales];
+  // Phones: one locale at a time (picked in the toolbar), scaled to fit the screen width.
+  const compact = useMediaQuery("(max-width: 767px)");
+  const localeName = useLocaleName();
+  const [solo, setSolo] = useState<string>();
+  const soloCol = solo && columns.includes(solo) ? solo : (p.target_locales[0] ?? p.source_locale);
+  const shown = compact ? [soloCol] : columns;
+  const z = compact ? Math.min(zoom, (window.innerWidth - 32) / w) : zoom;
 
   // Bridge messages from the previewed app (see lib/preview-bridge.ts): exact heights + pseudo-locale.
   useEffect(() => {
@@ -83,7 +93,8 @@ function Matrix({ project: p }: { project: Project }) {
 
   if (!target.base) {
     return (
-      <div className="mx-auto max-w-3xl pt-10">
+      <div className="mx-auto max-w-3xl">
+        <PageHeader title={t("title")} subtitle={t("subtitle")} />
         <EmptyState
           icon={Grid3x3}
           title={t("noBase.title")}
@@ -108,7 +119,10 @@ function Matrix({ project: p }: { project: Project }) {
   return (
     <div className="-mx-4 -my-6 flex h-[calc(100dvh-3rem)] flex-col sm:-mx-6 lg:-mx-8">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-4 py-2.5 sm:px-6">
-        <h1 className="me-1 text-base font-semibold">{t("title")}</h1>
+        <div className="me-1 flex items-baseline gap-2">
+          <h1 className="text-base font-semibold">{t("title")}</h1>
+          <p className="hidden text-xs text-muted-foreground 2xl:block">{t("subtitle")}</p>
+        </div>
         <form
           className="flex items-center"
           onSubmit={(e) => {
@@ -135,6 +149,21 @@ function Matrix({ project: p }: { project: Project }) {
             ))}
           </datalist>
         </form>
+        {compact && (
+          <Select value={soloCol} onValueChange={setSolo}>
+            <SelectTrigger size="sm" aria-label={t("locale")}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {columns.map((c) => (
+                <SelectItem key={c} value={c}>
+                  <span className="font-mono text-xs">{c === PSEUDO ? "qps" : c}</span>{" "}
+                  {c === PSEUDO ? t("pseudoColumn") : <span className="capitalize">{localeName(c)}</span>}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         <div role="group" aria-label={t("viewport")} className="flex rounded-lg border p-0.5">
           {(["desktop", "mobile"] as const).map((d) => {
             const Icon = d === "desktop" ? Monitor : Smartphone;
@@ -179,6 +208,11 @@ function Matrix({ project: p }: { project: Project }) {
           <span className="hidden truncate font-mono text-xs text-muted-foreground md:inline" dir="ltr">
             {target.base}
           </span>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={`/app/${p.slug}/preview?xp=`}>
+              <FlaskConical aria-hidden /> {t("bySegment")}
+            </Link>
+          </Button>
           <BridgeHelp />
           <Button variant="ghost" size="icon-sm" aria-label={t("reload")} onClick={() => setReloadKey((k) => k + 1)}>
             <RotateCw />
@@ -198,13 +232,13 @@ function Matrix({ project: p }: { project: Project }) {
       {/* One scroll container for every column: scrolling is synchronised by construction. */}
       <div className="min-h-0 flex-1 overflow-auto bg-muted/30">
         <div className="flex w-max gap-4 p-4 sm:px-6" dir="ltr">
-          {columns.map((col) => {
+          {shown.map((col) => {
             const loc = col === PSEUDO ? p.source_locale : col;
             const url = buildUrl(target.base, target.pattern, loc, p.source_locale, route, true);
             const height = heights[col] ?? defaultHeight;
             const colIssues = col === PSEUDO ? [] : (issues[col] ?? []);
             return (
-              <section key={col} className="shrink-0" style={{ width: w * zoom }} aria-label={col}>
+              <section key={col} className="shrink-0" style={{ width: w * z }} aria-label={col}>
                 <ColumnHeader
                   locale={col}
                   sourceLocale={p.source_locale}
@@ -214,9 +248,9 @@ function Matrix({ project: p }: { project: Project }) {
                 />
                 <div
                   className="relative overflow-hidden rounded-lg border bg-background shadow-sm"
-                  style={{ height: height * zoom }}
+                  style={{ height: height * z }}
                 >
-                  <div className="absolute top-0 left-0 origin-top-left" style={{ width: w, height, transform: `scale(${zoom})` }}>
+                  <div className="absolute top-0 left-0 origin-top-left" style={{ width: w, height, transform: `scale(${z})` }}>
                     <iframe
                       key={`${url}:${reloadKey}`}
                       ref={(el) => {
@@ -243,7 +277,7 @@ function Matrix({ project: p }: { project: Project }) {
                                   top: i.rect!.y,
                                   width: Math.max(i.rect!.width, 8),
                                   height: Math.max(i.rect!.height, 8),
-                                  outlineWidth: 2 / zoom,
+                                  outlineWidth: 2 / z,
                                   outlineStyle: "solid",
                                 }}
                               />

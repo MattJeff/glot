@@ -390,9 +390,23 @@ pub fn setup(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
         _ if router => Mode::Router,
         _ => Mode::Spa,
     };
-    plan.create(root, &format!("{i18n}.ts"), i18n_ts(dir, o, mode));
+    // An app that already inits i18next in `src/i18n.js` (CRA, hand-written setup) keeps it: a second
+    // `i18n.ts` would shadow it and the entry already imports it (possibly through an alias).
+    let existing = exists_any(
+        root,
+        &format!("{dir}/"),
+        &["i18n.js", "i18n.jsx", "i18n.tsx"],
+    );
+    if let Some(f) = &existing {
+        plan.notes.push(format!(
+            "{f} exists, left as is (load the catalogs from it)"
+        ));
+    } else {
+        plan.create(root, &format!("{i18n}.ts"), i18n_ts(dir, o, mode));
+    }
     empty_catalogs(root, o, plan);
     match p.framework {
+        Framework::Vite if existing.is_some() => {}
         Framework::Vite => match exists_any(
             root,
             "src/",
@@ -403,6 +417,9 @@ pub fn setup(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
                 "main.js",
                 "index.tsx",
                 "index.jsx",
+                // Create React App
+                "index.ts",
+                "index.js",
             ],
         ) {
             Some(entry) => import_i18n(plan, root, &entry, &i18n),
@@ -410,6 +427,28 @@ pub fn setup(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
                 .notes
                 .push("no src/main.tsx: add `import \"./i18n\";` to your entry".into()),
         },
+        Framework::TanStack if existing.is_some() => {}
+        // Root route and router are loaded on the server and the client.
+        Framework::TanStack => {
+            match exists_any(
+                root,
+                "src/",
+                &[
+                    "routes/__root.tsx",
+                    "routes/__root.jsx",
+                    "router.tsx",
+                    "router.ts",
+                ],
+            ) {
+                Some(entry) => import_i18n(plan, root, &entry, &i18n),
+                None => plan.notes.push(
+                    "no src/routes/__root.tsx: add `import \"../i18n\";` to your root route".into(),
+                ),
+            }
+            plan.notes.push(
+                "TanStack Start renders on the server in the source locale: read the locale from the URL prefix or a cookie in the root route's `beforeLoad` and call `i18n.changeLanguage(locale)` to avoid a hydration mismatch".into(),
+            );
+        }
         Framework::Remix => match exists_any(root, "app/", &["root.tsx", "root.jsx"]) {
             Some(entry) => {
                 import_i18n(plan, root, &entry, &i18n);

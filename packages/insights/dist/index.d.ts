@@ -14,11 +14,22 @@ export type Variant = {
     arm: number;
     value: string;
 };
+/** Segmented-experiment assignment (contract §6): set by the edge, copied by @glot/runtime into sessionStorage. */
+export type Exposure = {
+    id: string;
+    cell: string;
+    arm: number;
+};
+export type Revenue = {
+    value?: number;
+    currency?: string;
+};
 /** Counts one visit per browser session and applies a running language experiment. */
 export declare function init(o: Options): Promise<void>;
 /** Conversion event: "signup", "purchase" or any name (1-40 chars of a-z0-9_-.:). Credits this session's
- * language-experiment arm and copy-variant arms. */
-export declare function track(event: string): void;
+ * language-experiment arm, copy-variant arms and segmented-experiment exposures (each experiment once per
+ * session and event). `value` (0..1e6) + `currency` (ISO 4217) count as revenue. */
+export declare function track(event: string, rev?: Revenue): void;
 /** Copy variant text served to this session for `key` (a validated variant of a running experiment), if any. */
 export declare function variant(key: string): string | undefined;
 export declare const glot: {

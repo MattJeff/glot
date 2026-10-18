@@ -2,19 +2,23 @@
 //!
 //! Supported: next-intl (`useTranslations`/`getTranslations` namespaces, `t.rich/markup/raw/has`),
 //! react-i18next/i18next (`useTranslation(ns, {keyPrefix})`, `i18n.t`, `<Trans i18nKey>`),
-//! FormatJS (`formatMessage({id})`, `<FormattedMessage id>`, `defineMessages`), vue `$t` in `<script>`.
+//! FormatJS (`formatMessage({id})`, `<FormattedMessage id>`, `defineMessages`), vue `$t` / `t` / `v-t` / `<i18n-t keypath>` (script and template).
 //!
-//! i18next namespaces (`useTranslation("ns")`, `t("ns:key")`) are dropped: glot reads one catalog
-//! tree per locale, so `ns:key` resolves to `key`. Only `keyPrefix` prefixes keys.
+//! i18next namespaces are kept: `useTranslation("home")` + `t("title")`, `t("home:title")` and
+//! `<Trans ns="home" i18nKey="title">` are `home:title`, the key of `title` in a `{ns}` catalog
+//! file (`public/locales/{locale}/home.json`). A key without namespace matches any namespace, and a
+//! namespaced key also matches a one-file catalog's bare key.
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 pub mod email;
+mod foreign;
 pub mod i18nize;
 mod scan;
 pub use scan::looks_like_css_classes;
 pub mod svg;
+pub mod swift;
 #[cfg(test)]
 mod tests;
 
@@ -40,6 +44,9 @@ pub struct ExtractReport {
     /// UI copy in object literals (config arrays, `metadata`, props objects), with a `reason`.
     #[serde(default)]
     pub config: Vec<Hardcoded>,
+    /// Non-fatal notes (`path:line: …`), e.g. Swift interpolations of unknown type.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
     pub files_scanned: usize,
 }
 
@@ -52,19 +59,32 @@ impl ExtractReport {
         self.config.extend(other.config);
         self.dynamic.extend(other.dynamic);
         self.dynamic_prefixes.extend(other.dynamic_prefixes);
+        self.warnings.extend(other.warnings);
         self.files_scanned += other.files_scanned;
     }
 
-    fn is_used(&self, key: &str) -> bool {
-        let plural_base = key
-            .rsplit_once('_')
-            .filter(|(_, s)| PLURAL_SUFFIXES.contains(s))
-            .map(|(b, _)| b);
-        self.usages.contains_key(key)
-            || plural_base.is_some_and(|b| self.usages.contains_key(b))
-            // `t.raw("list")` uses the whole subtree.
-            || key.match_indices('.').any(|(i, _)| self.usages.contains_key(&key[..i]))
-            || self.dynamic_prefixes.iter().any(|p| key.starts_with(p.as_str()))
+    /// `stripped`: usage keys without their i18next namespace.
+    fn is_used(&self, key: &str, stripped: &BTreeSet<&str>) -> bool {
+        // `home:title` (namespaced catalog) is used by `t("home:title")` or by a bare
+        // `t("title")` (default namespace unknown); `title` (one file) by `t("home:title")` too.
+        let (ns, bare) = scan::split_ns(key);
+        let has = |k: &str| self.usages.contains_key(k) || (ns.is_none() && stripped.contains(k));
+        let hit = |k: &str| {
+            let plural_base = k
+                .rsplit_once('_')
+                .filter(|(_, s)| PLURAL_SUFFIXES.contains(s))
+                .map(|(b, _)| b);
+            has(k)
+                || plural_base.is_some_and(has)
+                // `t.raw("list")` uses the whole subtree.
+                || k.match_indices('.').any(|(i, _)| has(&k[..i]))
+        };
+        hit(key)
+            || (ns.is_some() && hit(bare))
+            || self
+                .dynamic_prefixes
+                .iter()
+                .any(|p| key.starts_with(p.as_str()) || bare.starts_with(scan::strip_ns(p)))
     }
 }
 
@@ -111,6 +131,7 @@ pub fn extract(root: &Path, cfg: &ExtractConfig) -> Result<ExtractReport, Error>
     walk(root, root, &mut files)?;
     files.sort();
     let mut report = ExtractReport::default();
+    let mut swift = vec![];
     for rel in files {
         let matches = |ps: &[glob::Pattern]| ps.iter().any(|p| p.matches_with(&rel, opts));
         if !matches(&include) || matches(&exclude) {
@@ -118,7 +139,16 @@ pub fn extract(root: &Path, cfg: &ExtractConfig) -> Result<ExtractReport, Error>
         }
         let path = root.join(&rel);
         let src = std::fs::read_to_string(&path).map_err(|e| Error::Io(path, e))?;
+        if rel.ends_with(".swift") {
+            swift.push((rel, src));
+            continue;
+        }
         report.merge(extract_source(&rel, &src, cfg));
+    }
+    // Swift: interpolation types are looked up project-wide (models live in other files).
+    let types = swift::project_types(swift.iter().map(|(_, s)| s.as_str()));
+    for (rel, src) in &swift {
+        report.merge(swift::report(rel, src, &cfg.functions, &types));
     }
     Ok(report)
 }
@@ -133,7 +163,16 @@ fn walk(root: &Path, dir: &Path, out: &mut Vec<String>) -> Result<(), Error> {
         if ft.is_dir() {
             if !matches!(
                 name.to_str(),
-                Some("node_modules" | ".next" | "dist" | ".git")
+                Some(
+                    "node_modules"
+                        | ".next"
+                        | "dist"
+                        | ".git"
+                        | "Pods"
+                        | "DerivedData"
+                        | ".build"
+                        | "Carthage"
+                )
             ) {
                 walk(root, &path, out)?;
             }
@@ -174,7 +213,18 @@ fn expand_braces(g: &str) -> Vec<String> {
 
 /// Scan a single in-memory source (used by tests and MCP `get_context` on unsaved code).
 pub fn extract_source(path: &str, source: &str, cfg: &ExtractConfig) -> ExtractReport {
-    scan::scan(path, source, &cfg.functions)
+    // Rails / Django / Laravel / Symfony / Angular templates: literal patterns, not oxc.
+    if foreign::handles(path) {
+        return foreign::scan(path, source);
+    }
+    let mut report = scan::scan(path, source, &cfg.functions);
+    if path.ends_with(".ts") {
+        report.merge(foreign::angular_services(path, source));
+    }
+    if path.ends_with(".vue") {
+        report.merge(foreign::vue_template(path, source));
+    }
+    report
 }
 
 /// Build per-key context from usages, lock notes and sibling keys of the source catalog.
@@ -220,26 +270,39 @@ fn parent_of(key: &str) -> &str {
 
 /// Keys in `source` never referenced (ignores keys under a prefix used dynamically).
 pub fn unused_keys(report: &ExtractReport, source: &Catalog) -> Vec<Key> {
+    let stripped: BTreeSet<&str> = report.usages.keys().map(|u| scan::strip_ns(u)).collect();
     source
         .entries
         .keys()
-        .filter(|k| !report.is_used(k))
+        .filter(|k| !report.is_used(k, &stripped))
         .cloned()
         .collect()
 }
 
 /// Keys referenced in code but absent from `source`.
 pub fn missing_keys(report: &ExtractReport, source: &Catalog) -> Vec<Key> {
-    let has = |k: &str| {
-        source.entries.contains_key(k)
+    let exact: BTreeSet<&str> = source.entries.keys().map(String::as_str).collect();
+    let bare: BTreeSet<&str> = source.entries.keys().map(|k| scan::strip_ns(k)).collect();
+    let has = |keys: &BTreeSet<&str>, k: &str| {
+        let sub = format!("{k}.");
+        keys.contains(k)
             || PLURAL_SUFFIXES
                 .iter()
-                .any(|s| source.entries.contains_key(&format!("{k}_{s}")))
-            || source
-                .entries
-                .range(format!("{k}.")..)
+                .any(|s| keys.contains(format!("{k}_{s}").as_str()))
+            || keys
+                .range(sub.as_str()..)
                 .next()
-                .is_some_and(|(c, _)| c.starts_with(&format!("{k}.")))
+                .is_some_and(|c| c.starts_with(&sub))
     };
-    report.usages.keys().filter(|k| !has(k)).cloned().collect()
+    report
+        .usages
+        .keys()
+        .filter(|k| match scan::split_ns(k) {
+            // `t("home:title")`: that namespace, or a one-file catalog's `title`.
+            (Some(_), b) => !has(&exact, k) && !has(&exact, b),
+            // `t("title")`: any namespace.
+            (None, _) => !has(&exact, k) && !has(&bare, k),
+        })
+        .cloned()
+        .collect()
 }

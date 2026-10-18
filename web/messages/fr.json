@@ -15,7 +15,8 @@
       "subtitle": "Connectez-vous à votre espace de travail glot.",
       "switch": "Pas encore de compte ?",
       "switchLink": "Créer un compte",
-      "title": "Bon retour"
+      "title": "Bon retour",
+      "forgot": "Mot de passe oublié\\u00a0?"
     },
     "signup": {
       "submit": "Créer le compte",
@@ -38,7 +39,8 @@
     "never": "Jamais",
     "retry": "Réessayer",
     "save": "Enregistrer",
-    "saving": "Enregistrement…"
+    "saving": "Enregistrement…",
+    "dismiss": "Ignorer"
   },
   "docs": {
     "edit": "Modifier cette page sur GitHub",
@@ -53,6 +55,7 @@
       "frameworks": "Frameworks",
       "getting-started": "Installation et démarrage rapide",
       "insights": "Analyses",
+      "experiments": "Expériences segmentées",
       "integrations": "Intégrations",
       "mcp": "Serveur MCP",
       "runtime": "Repli à l’exécution",
@@ -63,12 +66,17 @@
       "mcp-remote": "MCP distant (OAuth)",
       "provenance": "Provenance IA (AI Act européen)",
       "quality": "Qualité et relecture",
-      "skills": "Compétences d'agent"
+      "review": "Revue en direct",
+      "skills": "Compétences d'agent",
+      "github": "Connecter GitHub"
     },
     "search": {
       "label": "Rechercher dans la documentation",
       "noResults": "Aucun résultat",
-      "placeholder": "Rechercher dans la doc… (/)"
+      "placeholder": "Rechercher dans la doc…",
+      "hint": "Saisissez pour rechercher dans toutes les pages de la doc. Entrée ouvre le résultat.",
+      "input": "Rechercher dans la doc…",
+      "pages": "Pages"
     },
     "sections": {
       "agents": "Agents IA",
@@ -77,7 +85,35 @@
       "start": "Premiers pas",
       "labs": "Labs (expérimental)"
     },
-    "title": "Docs"
+    "title": "Docs",
+    "copied": "Copié",
+    "copy": "Copier",
+    "next": "Suivant",
+    "pager": "Pages précédente et suivante",
+    "prev": "Précédent",
+    "skip": "Aller au contenu",
+    "start": {
+      "agent": {
+        "body": "Claude Code, Cursor, Codex et d’autres accèdent à vos clés, usages et glossaire via MCP.",
+        "title": "Agent de codage IA"
+      },
+      "all": "Toutes les pages",
+      "mobile": {
+        "body": "glot init détecte aussi les Apple String Catalogs, les strings.xml Android et les fichiers ARB Flutter.",
+        "title": "Application mobile"
+      },
+      "paths": "Commencez là où vous en êtes",
+      "solo": {
+        "body": "Une commande dans votre dépôt : détection de la stack, extraction des chaînes, traduction, vérification.",
+        "title": "Développeur solo"
+      },
+      "subtitle": "Installez glot, laissez votre agent de codage localiser votre application et gardez chaque catalogue valide dans la CI.",
+      "team": {
+        "body": "Validez chaque pull request dans la CI, relisez les traductions et partagez un tableau de bord.",
+        "title": "Équipe"
+      },
+      "title": "Documentation de glot"
+    }
   },
   "editor": {
     "anyLocale": "Toutes les langues",
@@ -126,7 +162,18 @@
     "shortcuts": "j/k pour naviguer · Entrée pour modifier · ⌘Entrée pour approuver · Échap pour annuler",
     "source": "Source",
     "title": "Clés",
-    "withIssues": "Avec problèmes"
+    "withIssues": "Avec problèmes",
+    "approveFailed": "Échec de l’approbation. La traduction n’a pas changé ; réessayez.",
+    "emptyFilteredBody": "Essayez un autre terme de recherche ou effacez les filtres pour voir toutes les clés.",
+    "noKeys": {
+      "add": "Ou ajoutez une chaîne",
+      "body": "Les clés proviennent de votre dépôt : poussez votre catalogue source avec la CLI ou ajoutez une chaîne manuellement. Elles apparaissent ici immédiatement.",
+      "push": "Poussez vos catalogues (à exécuter dans votre dépôt)",
+      "title": "Aucune clé pour le moment"
+    },
+    "saveFailed": "Échec de l’enregistrement. Votre modification est revenue dans la cellule ; corrigez-la ou appuyez sur Échap pour l’annuler.",
+    "saving": "Enregistrement…",
+    "subtitle": "Modifiez, relisez et approuvez chaque traduction, clé par clé."
   },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",
@@ -214,7 +261,10 @@
       "warm": "chaleureux"
     },
     "variant": "Variante {letter}",
-    "winner": "Gagnant"
+    "winner": "Gagnant",
+    "segmented": "Expériences segmentées",
+    "stopBody": "Chaque visiteur revoit le texte officiel de la traduction. Les résultats obtenus restent dans l’historique.",
+    "stopTitle": "Arrêter cette expérience ?"
   },
   "feedback": {
     "accept": "Accepter",
@@ -257,7 +307,9 @@
       "title": "Paramètres",
       "token": "Jeton GitHub",
       "tokenHint": "Jeton à granularité fine avec accès en écriture à Contents et Pull requests. Stocké chiffré, jamais affiché à nouveau.",
-      "tokenStored": "Jeton enregistré : laissez vide pour le conserver"
+      "tokenStored": "Jeton enregistré : laissez vide pour le conserver",
+      "catalogHint": "Emplacement du catalogue source dans le dépôt, par ex. messages/{locale}.json ({locale} = code de langue). Les PR de correction modifient ce fichier.",
+      "lockHint": "Chemin vers glot.lock, le lockfile qui enregistre les traductions générées par machine ou modifiées à la main, afin que les corrections acceptées ne soient jamais écrasées."
     },
     "source": "Source",
     "status": {
@@ -275,7 +327,9 @@
     },
     "title": "Retours",
     "userReports": "Ce que les utilisateurs ont dit",
-    "viewPr": "Voir la pull request"
+    "viewPr": "Voir la pull request",
+    "filterLabel": "Filtrer les signalements par statut",
+    "toAnnotation": "Transformer en annotation"
   },
   "glossary": {
     "add": "Ajouter un terme",
@@ -300,10 +354,11 @@
     "flags": "Règles",
     "forbiddenHint": "Variantes séparées par des virgules que le LLM ne doit pas utiliser.",
     "saved": "Terme enregistré",
-    "subtitle": "Termes du glossaire appliqués à chaque traduction. Reflète glossary.toml dans votre dépôt.",
+    "subtitle": "Termes du glossaire appliqués à chaque traduction. Reflète <file>glossary.toml</file> dans votre dépôt.",
     "term": "Terme",
     "title": "Glossaire",
-    "translations": "Traductions"
+    "translations": "Traductions",
+    "fileTip": "Le fichier de glossaire à la racine de votre dépôt. glot push et glot pull le synchronisent avec cette page, et glot check le fait respecter en CI."
   },
   "health": {
     "detail": {
@@ -334,7 +389,13 @@
       "poor": "À risque"
     },
     "subtitle": "Couverture, validation, sens (rétrotraduction) et contrôle visuel, notés de 0 à 100.",
-    "title": "Santé de la langue"
+    "title": "Santé de la langue",
+    "dimsHelp": {
+      "coverage": "Part des clés ayant une traduction dans cette langue.",
+      "errors": "Part des traductions qui passent la validation : placeholders, pluriels ICU, glossaire et longueur.",
+      "meaning": "Vérification par retro-traduction : un LLM traduit le texte dans la langue source et compare le sens. Lancée à la demande.",
+      "visual": "Part des écrans sans problème de mise en page dans le dernier rapport de contrôle visuel."
+    }
   },
   "insights": {
     "daily": {
@@ -405,7 +466,9 @@
         "inconclusive": "Effet non significatif",
         "keep": "Garder",
         "remove": "Retirer"
-      }
+      },
+      "removeBody": "L'expérience se termine et {language} quitte vos langues cibles : ses visiteurs retrouvent la langue source.",
+      "removeTitle": "Retirer {language} de vos cibles ?"
     },
     "funnel": {
       "ciTitle": "IC 95 % : {low} – {high}",
@@ -457,7 +520,32 @@
       "visits": "Visites"
     },
     "subtitle": "Les langues souhaitées par vos visiteurs, le taux de conversion de chaque langue et la rentabilité d'une nouvelle langue.",
-    "title": "Analyses"
+    "title": "Analyses",
+    "layout": {
+      "empty": "Aucune donnée de mise en page pour l'instant. Ajoutez le module optionnel à votre application (moins de 1,5 ko) :",
+      "fallback": "{n} avant le chargement de la police web",
+      "fixes": "Corrections",
+      "key": "Clé et texte",
+      "openPr": "Ouvrir la pull request",
+      "px": "{need} / {box} px",
+      "rate": "Taux de débordement",
+      "repair": "Raccourcir maintenant",
+      "repaired": "{n, plural, =0 {Aucune nouvelle variante à raccourcir} one {# variante plus courte proposée} many {# variantes plus courtes proposées} other {# variantes plus courtes proposées}}",
+      "review": "Voir dans Feedback",
+      "status": {
+        "failed": "Aucune variante adaptée",
+        "pending": "En cours",
+        "pr": "Pull request",
+        "suggested": "Suggestion"
+      },
+      "subtitle": "Chaînes traduites tronquées ou débordant de leur boîte dans les navigateurs de vos visiteurs, par langue et largeur de viewport. Échantillonnées et anonymes.",
+      "tableCaption": "Taux de débordement par clé, langue et plage de viewport. Les clés au-dessus de {min} sur au moins {views} vues sont raccourcies automatiquement.",
+      "title": "Layout RUM : débordements constatés par de vrais visiteurs",
+      "unknownKey": "clé absente de ce projet",
+      "viewport": "Viewport",
+      "views": "{n, plural, one {# vue} many {# vues} other {# vues}}",
+      "width": "Requis / boîte"
+    }
   },
   "jobStatus": {
     "done": "Terminée",
@@ -468,16 +556,20 @@
   "jobs": {
     "cost": "Coût",
     "empty": {
-      "body": "Lancez une tâche de traduction pour compléter les clés manquantes.",
+      "body": "Une tâche traduit chaque clé manquante ou obsolète avec le modèle de votre projet, valide chaque résultat et relance ceux qui échouent. Lancez-en une avec Traduire les manquantes.",
       "title": "Aucune tâche pour l'instant"
     },
     "kind": {
-      "translate": "Traduire"
+      "translate": "Traduire",
+      "github_localize": "Localiser le dépôt",
+      "github_update": "Mettre à jour la pull request"
     },
     "live": "En direct",
     "progress": "{done} / {total}",
-    "subtitle": "Exécutions de traduction en arrière-plan, mises à jour en direct.",
-    "title": "Tâches"
+    "subtitle": "Exécutions de traduction en arrière-plan, mises à jour en direct. Chaque chaîne est validée avant d'être enregistrée ; les coûts proviennent de votre fournisseur de LLM.",
+    "title": "Tâches",
+    "failed": "Échec de la tâche de traduction",
+    "finished": "Traduction terminée : {count, plural, one {# chaîne traduite et validée} many {# chaînes traduites et validées} other {# chaînes traduites et validées}}"
   },
   "keySheet": {
     "notFound": "Aucune clé correspondante",
@@ -516,189 +608,185 @@
       "tolgeePrice": "Offre gratuite et auto-hébergement gratuit, cloud dès 58 €/mois",
       "yes": "Oui"
     },
-    "core": {
-      "subtitle": "Le LLM propose. Le code décide de ce qui est écrit.",
-      "title": "Les garanties"
-    },
     "cta": {
-      "button": "Créer votre espace de travail",
-      "title": "Livrez chaque langue à chaque version."
-    },
-    "features": {
-      "byok": {
-        "body": "Anthropic, OpenAI ou tout point de terminaison compatible OpenAI, y compris les modèles locaux. Les coûts sont affichés par tâche et plafonnés par un budget.",
-        "title": "Apportez votre propre clé"
-      },
-      "glossary": {
-        "body": "Le glossaire (glossary.toml) se trouve à côté de votre code. Les traductions obligatoires, les termes interdits et les mots à ne pas traduire sont appliqués, pas seulement suggérés.",
-        "title": "Glossaire as code"
-      },
-      "lockfile": {
-        "body": "glot.lock calcule le hash de chaque source et cible. Seul le delta est traduit, et les modifications manuelles ne sont jamais écrasées.",
-        "title": "Lockfile"
-      },
-      "mcp": {
-        "body": "Claude Code, Cursor et compagnie interrogent directement les clés, le glossaire et les problèmes, et traduisent avec des références fichier:ligne et le rôle de l'interface.",
-        "title": "MCP, contexte en direct"
-      },
-      "oss": {
-        "body": "Sous licence MIT. CLI, serveur MCP, API et ce tableau de bord. Hébergez-le vous-même, forkez-le, auditez-le.",
-        "title": "Open source"
-      },
-      "subtitle": "Le LLM est toujours encadré par du code déterministe.",
-      "title": "Conçu pour les équipes qui livrent avec des agents",
-      "validator": {
-        "body": "Analyse ICU, i18next et MessageFormat 2. Variables, balises et catégories de pluriel vérifiées pour chaque langue. Les échecs sont relancés, puis escaladés vers un modèle plus performant.",
-        "title": "Validateur déterministe"
-      },
-      "visual": {
-        "body": "Playwright rend chaque langue et signale les débordements, les troncatures et les ruptures de mise en page RTL avant que vos utilisateurs ne les voient.",
-        "title": "QA visuelle"
-      }
+      "title": "Livrez chaque langue à chaque version.",
+      "body": "Une commande dans votre dépôt. Rien de cassé n'atteint vos catalogues.",
+      "docs": "Lire le guide de démarrage"
     },
     "fit": {
-      "after": "Après glot fit",
-      "afterAlt": "Libellé allemand plus court qui tient dans le bouton",
+      "after": "Après glot fit, 1 itération",
       "before": "Avant",
-      "beforeAlt": "Libellé de bouton allemand tronqué par des points de suspension",
-      "body": "L'allemand est souvent un tiers plus long que l'anglais. glot fit capture votre application en cours d'exécution dans chaque langue, mesure chaque texte par rapport à son conteneur, demande au LLM une variante plus courte qui conserve le sens et les variables, puis effectue un nouveau rendu.",
-      "caption": "Captures réelles de l'application de démonstration, en langue allemande.",
+      "body": "L'allemand est souvent d'un tiers plus long que l'anglais. glot fit capture votre application en cours d'exécution dans chaque langue, mesure chaque texte par rapport à son conteneur, demande au LLM une variante plus courte qui conserve le sens et les variables, puis effectue un nouveau rendu.",
       "eyebrow": "Budget en pixels",
       "p1": "Mesuré dans le navigateur, et non estimé à partir d'un nombre de caractères",
       "p2": "Les variantes raccourcies passent toujours le validateur et le glossaire",
-      "p3": "S'arrête après un nombre fixe de passes, sans jamais boucler sur le coût",
-      "title": "Des traductions qui tiennent dans le bouton"
-    },
-    "flow": {
-      "agent": {
-        "caption": "Votre agent ajoute une fonctionnalité et de nouvelles clés.",
-        "label": "Agent",
-        "prompt": "Ajoutez une page de paiement, dans toutes les langues"
-      },
-      "checks": {
-        "glossary": "Termes du glossaire respectés",
-        "length": "Tient dans son bouton : 96 sur 120 px",
-        "placeholders": "Variables préservées",
-        "plurals": "Catégories de pluriel CLDR"
-      },
-      "mcp": {
-        "caption": "glot lui donne un contexte en direct : glossaire, références, voisins.",
-        "label": "MCP"
-      },
-      "pr": {
-        "caption": "Seul le delta, avec un lockfile mis à jour.",
-        "label": "Pull request"
-      },
-      "title": "Du prompt à la pull request, sans casser une variable",
-      "validate": {
-        "caption": "Chaque chaîne est vérifiée par du code, pas à l'intuition.",
-        "label": "Validation"
-      }
+      "p3": "Un nombre fixe de passes, jamais de boucle sans fin",
+      "title": "Des traductions qui tiennent dans le bouton",
+      "fits": "Tient",
+      "meta": "Exécution réelle sur l'application de démo, langue allemande.",
+      "overflow": "Déborde de son bouton de 112 px"
     },
     "footer": {
       "license": "Licence MIT",
-      "tagline": "Une localisation que l'IA ne peut pas casser."
+      "tagline": "Une localisation que l'IA ne peut pas casser.",
+      "benchmark": "Benchmark",
+      "docs": "Docs",
+      "npm": "npm"
     },
     "hero": {
       "badge": "Open source · MIT · Apportez votre propre clé LLM",
-      "primary": "Commencer gratuitement",
-      "secondary": "Mettre une étoile sur GitHub",
-      "subtitle": "Votre agent de code déplace les chaînes codées en dur vers des clés et les traduit. Du code déterministe vérifie chaque sortie du LLM (placeholders, pluriels CLDR, glossaire, largeur en pixels) et refuse tout ce qui est invalide ou trop long, avec la raison exacte, jusqu'à ce que la nouvelle tentative soit valide. Rien d'invalide n'atteint vos catalogues.",
-      "terminal": "De l'anglais codé en dur à quatre langues",
+      "subtitle": "Votre agent de code déplace les chaînes codées en dur vers des clés et les traduit. glot vérifie chaque sortie du LLM avec du code déterministe et refuse tout ce qui est invalide ou trop long, avec la raison exacte, jusqu'à ce que la nouvelle tentative soit valide.",
       "title": "Votre agent localise. Le code garantit.",
-      "demoAlt": "Terminal : glot translate refuse un pluriel polonais sans few ni many, un placeholder français renommé en {nom} et un libellé allemand de 276 px pour un bouton de 120 px, renvoie les motifs au LLM, puis écrit les versions corrigées ; glot check réussit.",
-      "demoCaption": "Binaire glot réel. Le LLM de cet enregistrement est programmé pour se tromper sur trois chaînes au premier passage ; les refus et leurs messages sont ceux de glot."
-    },
-    "insights": {
-      "body": "Une balise anonyme compte les visiteurs selon leur langue préférée et la langue servie, puis compare les conversions. Pas de cookie, pas d'identifiant visiteur.",
-      "notServed": "Pas encore traduit",
-      "sample": "Données d'exemple",
-      "served": "Servie",
-      "share": "{value} visiteurs",
-      "title": "Statistiques par langue"
-    },
-    "install": {
-      "cargo": "Avec Cargo",
-      "i18nize": "Convertir une application existante",
-      "mcp": "Ajouter à votre agent",
-      "npx": "Avec npx",
-      "subtitle": "Exécutez-le en local avec votre agent, ou connectez-le à un serveur glot pour votre équipe.",
-      "title": "Installation en quelques secondes"
-    },
-    "matrix": {
-      "body": "Chaque langue d'une page côte à côte, avec les débordements, troncatures et problèmes RTL relevés par le contrôle visuel, épinglés à l'écran concerné.",
-      "issues": "{count, plural, one {# dépassement} many {# dépassements} other {# dépassements}}",
-      "ok": "Aucun problème",
-      "title": "Matrice des langues"
+      "demoAlt": "Terminal : glot translate refuse un pluriel polonais sans few ni many, un placeholder français renommé en '{nom}' et un libellé allemand de 276 px pour un bouton de 120 px, renvoie les motifs au LLM, puis écrit les versions corrigées ; glot check réussit.",
+      "demoCaption": "Binaire glot réel. Le LLM de cet enregistrement est programmé pour se tromper sur trois chaînes ; les refus sont ceux de glot.",
+      "commandHint": "Détecte votre stack i18n, extrait les chaînes, traduit, vérifie. Relancez-la après chaque modification de l'interface.",
+      "copied": "Commande copiée",
+      "copy": "Copier la commande",
+      "openApp": "Ouvrir l'application",
+      "pause": "Mettre la démo en pause",
+      "play": "Lancer la démo",
+      "proofLabel": "Informations sur le projet",
+      "proofNpm": "npm v{version}",
+      "proofOss": "Licence MIT",
+      "proofStars": "{count, plural, =0 {Étoile sur GitHub} one {# étoile sur GitHub} many {# étoiles sur GitHub} other {# étoiles sur GitHub}}"
     },
     "meta": {
-      "description": "Localisation open source pour agents de code. Chaque traduction du LLM est vérifiée par du code déterministe (placeholders, pluriels CLDR, glossaire, largeur en pixels) et refusée tant qu'elle n'est pas valide.",
-      "title": "glot : votre agent localise, le code garantit"
-    },
-    "more": {
-      "subtitle": "Ils fonctionnent et sont testés, mais ils sont plus récents que la boucle principale et peuvent évoluer. Certains nécessitent le serveur auto-hébergé expérimental.",
-      "title": "Labs : fonctionnalités plus jeunes avec les mêmes garde-fous",
-      "badge": "Labs (expérimental)"
+      "description": "Localisation open source pour agents de code. Chaque traduction du LLM est vérifiée par du code déterministe (placeholders, pluriels CLDR, glossaire, largeur en pixels) et refusée tant qu'elle n'est pas valide. 0 % de chaînes cassées dans notre benchmark, contre 14,1 % sans glot.",
+      "title": "Localisation IA open source pour agents de code"
     },
     "nav": {
       "compare": "Comparer",
-      "features": "Fonctionnalités",
-      "getStarted": "Commencer",
-      "install": "Installation",
-      "signIn": "Se connecter",
-      "workflow": "Fonctionnement",
-      "labs": "Labs"
-    },
-    "ondevice": {
-      "body": "Pour les langues que vous ne livrez pas encore, @glot/runtime traduit dans le navigateur avec l'API Translator intégrée, puis exécute le validateur de glot compilé en WebAssembly.",
-      "step1": "Traduction par le navigateur, variables masquées",
-      "step2": "Le validateur contrôle pluriels, balises, glossaire",
-      "step3": "Ce qui échoue reste dans la langue source",
-      "title": "Solution de repli sur l'appareil"
+      "docs": "Docs",
+      "experiments": "Expériences de copie",
+      "githubStars": "glot sur GitHub, {count, plural, =0 {aucune étoile pour l'instant} one {# étoile} many {# étoiles} other {# étoiles}}",
+      "guarantees": "Garanties",
+      "home": "Accueil glot",
+      "how": "Comment ça marche",
+      "label": "Principal",
+      "openApp": "Ouvrir l'application",
+      "pricing": "Tarifs",
+      "try": "Essayer"
     },
     "overlay": {
       "alt": "Popover de glot affichant une clé, sa source et ses traductions en cinq langues",
-      "body": "L'overlay de développement trouve la clé derrière le texte cliqué, l'affiche dans toutes les langues avec les problèmes du validateur en direct, et enregistre dans vos fichiers de catalogue. Le rechargement à chaud fait le reste.",
+      "body": "L'overlay de développement trouve la clé derrière le texte cliqué, l'affiche dans toutes les langues avec les problèmes du validateur en direct, et enregistre dans vos fichiers de catalogue.",
       "eyebrow": "Édition dans l'application",
       "p1": "Actions IA : suggérer, raccourcir, plus formel, tout traduire",
       "p2": "Signale le texte qui déborde de son conteneur",
-      "p3": "Dev uniquement, environ 6 ko gzippé, aucune dépendance d'exécution",
+      "p3": "Dev uniquement, environ 6 ko gzippé",
       "title": "Alt+clic sur n'importe quel texte de votre application"
     },
-    "review": {
-      "back": "Rétrotraduction",
-      "body": "Le LLM retraduit la cible dans votre langue, littéralement, explique ses choix et rend un verdict. Mis en cache jusqu'à la modification de la source ou de la cible.",
-      "explanation": "« Relance » est le terme courant en français pour une relance de paiement ; le ton est un peu plus ferme.",
-      "nuance": "Nuance",
-      "source": "Source",
-      "title": "Revue par rétrotraduction"
-    },
-    "workflow": {
-      "steps": {
-        "fit": {
-          "body": "Rend l'application en cours par langue, raccourcit ce qui déborde de sa boîte, puis relance le rendu jusqu'à ce que tout tienne.",
-          "title": "Ajuster"
-        },
-        "i18nize": {
-          "body": "Repère les chaînes d'interface codées en dur, propose des clés à partir du contexte et réécrit le code pour next-intl ou react-i18next.",
-          "title": "Extraire"
-        },
-        "review": {
-          "body": "Rétrotraduit chaque chaîne dans votre langue et explique ce qui a changé, pour que vous puissiez faire confiance aux langues que vous ne parlez pas.",
-          "title": "Relire"
-        },
-        "translate": {
-          "body": "Uniquement le delta, avec votre glossaire, le contexte fichier:ligne et le rôle UI. Chaque chaîne est validée, relancée, puis escaladée.",
-          "title": "Traduire"
-        },
-        "check": {
-          "body": "Valide chaque catalogue en CI : syntaxe, placeholders, catégories de pluriel, glossaire et largeur en pixels. Sortie avec le code 1 en cas d'erreur, annotations sur la PR.",
-          "title": "Vérifier"
-        }
+    "guarantees": {
+      "eyebrow": "Les garanties",
+      "title": "Le LLM propose. Le code décide de ce qui est écrit.",
+      "ci": {
+        "body": "glot check exécute toutes les règles hors ligne sur chaque catalogue et quitte avec le code 1 en affichant des annotations de PR.",
+        "title": "Contrôle CI"
       },
-      "subtitle": "Chaque étape est une commande CLI que votre agent de code peut également exécuter, via le serveur MCP.",
-      "title": "Quatre commandes pour tout le cycle de vie"
-    }
+      "glossary": {
+        "body": "glossaire.toml dans votre dépôt : traductions obligatoires et interdites, termes à ne pas traduire.",
+        "title": "Glossaire en code"
+      },
+      "lockfile": {
+        "body": "glot.lock enregistre les hachages de la source et de la cible. Seul le delta est traduit ; les modifications manuelles ne sont jamais écrasées.",
+        "title": "Lockfile"
+      },
+      "placeholders": {
+        "body": "Même ensemble que la source, aucun ajouté, aucun traduit. ICU, i18next et MessageFormat 2.",
+        "title": "Variables et balises"
+      },
+      "plurals": {
+        "body": "Toutes les catégories nécessaires à la langue cible : quatre pour le polonais, six pour l'arabe.",
+        "title": "Pluriels CLDR"
+      },
+      "refusal": "Refusé par glot",
+      "subtitle": "Chaque carte montre un refus réel, mot pour mot tel qu'affiché par glot.",
+      "width": {
+        "body": "Mesuré avec la police et la boîte réelles de votre application. Trop large : refusé, jamais tronqué.",
+        "title": "Largeur en pixels"
+      }
+    },
+    "agents": {
+      "agentsMd": "AGENTS.md + MCP",
+      "docs": "Configuration pour chaque agent",
+      "eyebrow": "Agents",
+      "plugin": "Plugin + MCP",
+      "prompt": "Prompt généré",
+      "rules": "Règles + MCP",
+      "skill": "Compétence d'agent",
+      "subtitle": "glot mcp fournit à votre agent vos clés, leurs emplacements d'utilisation et le glossaire. Chaque chaîne qu'il ajoute passe par le même validateur.",
+      "title": "Fonctionne avec l'agent que vous utilisez déjà"
+    },
+    "bench": {
+      "eyebrow": "Benchmark, 18 octobre 2026",
+      "glot": "Avec glot",
+      "lead": "320 messages ICU par modèle et condition, 8 langues. Mêmes prompts, mêmes modèles.",
+      "model": "Modèle",
+      "raw": "Prompt brut",
+      "rejected": "Avec glot, {haiku} (Haiku) et {sonnet} (Sonnet) des chaînes ont été refusées après de nouvelles tentatives et laissées non traduites plutôt que livrées cassées. Un juge indépendant (FormatJS + Intl.PluralRules) est d'accord.",
+      "report": "Lire le rapport complet",
+      "tableCaption": "Part des messages traduits cassés, par modèle et condition",
+      "title": "Chaînes cassées parvenues au catalogue"
+    },
+    "faq": {
+      "app": {
+        "a": "Non. La CLI et le serveur MCP effectuent toute la tâche localement. L'application ajoute un tableau de bord partagé, la relecture et la synchronisation GitHub pour les équipes.",
+        "q": "Ai-je besoin de l'application web ?"
+      },
+      "code": {
+        "a": "Les chaînes à traduire et leur contexte sont envoyés à votre fournisseur LLM, pas vos fichiers source. Rien ne part vers les auteurs de glot : il n'y a aucune télémétrie.",
+        "q": "Mon code quitte-t-il ma machine ?"
+      },
+      "cost": {
+        "a": "glot est MIT et gratuit. Vous payez votre fournisseur LLM avec votre propre clé : 850 chaînes coûtent 0,035 $ avec le modèle par défaut dans notre test. glot translate --dry-run estime d'abord, et un budget plafonne le coût.",
+        "q": "Combien ça coûte ?"
+      },
+      "fails": {
+        "a": "glot renvoie la raison exacte et réessaie deux fois, puis essaie le modèle de secours. Si cela échoue encore, rien n'est écrit : la clé est signalée comme rejetée et reste non traduite.",
+        "q": "Que se passe-t-il si le modèle continue de mal traiter une chaîne ?"
+      },
+      "more": "Plus de réponses dans la FAQ",
+      "runtime": {
+        "a": "Non. Votre application garde next-intl, i18next ou FormatJS avec des catalogues JSON simples. glot travaille sur les fichiers, dans votre dépôt et en CI.",
+        "q": "Ajoute-t-il une dépendance à l'exécution ?"
+      },
+      "title": "Questions"
+    },
+    "how": {
+      "eyebrow": "Comment ça marche",
+      "i18nize": {
+        "body": "Déplace les chaînes d'interface codées en dur vers des clés et réécrit les composants pour next-intl ou react-i18next.",
+        "title": "Extraire"
+      },
+      "init": {
+        "body": "Détecte votre bibliothèque i18n et vos catalogues, écrit glot.toml et les règles que lit votre agent de code.",
+        "title": "Détecter"
+      },
+      "subtitle": "Ou les trois d'un coup, de façon idempotente : npx glot-i18n localize.",
+      "title": "Trois étapes. Votre agent peut aussi les exécuter.",
+      "translate": {
+        "body": "Seul le delta. Chaque sortie est vérifiée ; un refus repart vers le modèle avec la raison. Toujours invalide après les nouvelles tentatives : rien n'est écrit.",
+        "title": "Traduire, validé"
+      }
+    },
+    "play": {
+      "accepted": "Accepté : glot écrirait cette traduction.",
+      "challenges": "Partir d'une traduction cassée",
+      "eyebrow": "Essayez, rien à installer",
+      "failed": "Le validateur n'a pas pu se charger. Rechargez la page pour réessayer.",
+      "loading": "Chargement du validateur…",
+      "locale": "Langue cible",
+      "note": "La largeur en pixels et le glossaire nécessitent votre application et votre dépôt : essayez-les avec la CLI.",
+      "refused": "{count, plural, one {Refusé : # erreur} many {Refusé : # erreurs} other {Refusé : # erreurs}}",
+      "reset": "Réinitialiser",
+      "score": "{refused, plural, =0 {Aucun refus pour l’instant. Essayez l’un des défis.} one {glot a refusé # de vos tentatives.} many {glot a refusé # de vos tentatives.} other {glot a refusé # de vos tentatives.}}",
+      "source": "Source (anglais, ICU)",
+      "subtitle": "Modifiez la traduction. Le même validateur que celui qui protège glot translate, compilé en WebAssembly, s’exécute dans votre navigateur à chaque frappe.",
+      "target": "Traduction",
+      "title": "Pouvez-vous casser glot ?",
+      "warnings": "{count, plural, one {# avertissement, écrit quand même} many {# avertissements, écrits quand même} other {# avertissements, écrits quand même}}"
+    },
+    "skip": "Aller au contenu"
   },
   "localeSwitcher": {
     "label": "Langue"
@@ -736,7 +824,10 @@
     "source": "source",
     "title": "Matrice des langues",
     "viewport": "Fenêtre d'affichage",
-    "zoom": "Zoom"
+    "zoom": "Zoom",
+    "bySegment": "Par segment",
+    "locale": "Langue",
+    "subtitle": "Votre application affichée côte à côte dans toutes les langues, pour repérer d’un coup d’œil les cassures de mise en page."
   },
   "notFound": {
     "back": "Retour à l'accueil",
@@ -763,7 +854,8 @@
     "recentJobs": "Tâches récentes",
     "staleCount": "{count, plural, one {# obsolète} many {# obsolètes} other {# obsolètes}}",
     "translateMissing": "Traduire les manquantes",
-    "viewAll": "Tout voir"
+    "viewAll": "Tout voir",
+    "subtitle": "État de chaque langue : couverture, validation et qualité, ainsi que la prochaine correction à faire."
   },
   "palette": {
     "empty": "Aucun résultat.",
@@ -774,7 +866,12 @@
     "preferences": "Préférences",
     "projects": "Projets",
     "switchLanguage": "Changer la langue en {language}",
-    "toggleTheme": "Changer le thème"
+    "toggleTheme": "Changer le thème",
+    "actions": "Actions",
+    "createProject": "Créer un projet",
+    "keys": "Clés",
+    "searching": "Recherche en cours…",
+    "translateMissing": "Traduire les clés manquantes"
   },
   "projects": {
     "create": {
@@ -784,11 +881,39 @@
       "slug": "Slug",
       "slugHint": "Utilisé dans les URL, la CLI et le CDN.",
       "sourceLocale": "Langue source",
-      "submit": "Créer le projet",
+      "submit": "{count, plural, one {Créer le projet avec # langue} many {Créer le projet avec # langues} other {Créer le projet avec # langues}}",
       "success": "Projet {name} créé",
       "targetLocales": "Langues cibles",
       "targetLocalesHint": "Codes BCP 47 séparés par des virgules, par ex. fr, de, pt-BR.",
-      "title": "Nouveau projet"
+      "title": "Nouveau projet",
+      "back": "Retour",
+      "next": "Continuer",
+      "pickOne": "Choisissez au moins une langue",
+      "picker": {
+        "detected": "Détectée depuis votre navigateur",
+        "multiHint": "Appuyez sur Entrée pour ajouter la première correspondance.",
+        "noMatch": "Aucune langue ne correspond. Saisissez un code BCP 47, comme pt-BR.",
+        "remove": "Retirer {language}",
+        "search": "Rechercher une langue ou saisir un code (pt-BR)",
+        "selected": "{count, plural, =0 {Aucune langue sélectionnée} one {# langue sélectionnée} many {# langues sélectionnées} other {# langues sélectionnées}}",
+        "singleHint": "Une seule langue : celle dans laquelle vos chaînes sont rédigées."
+      },
+      "slugTaken": "Ce slug est déjà pris. Essayez-en un autre.",
+      "step": "Étape {n} sur {total}",
+      "steps": {
+        "name": {
+          "description": "Généralement le nom de votre application. Le slug l'identifie dans la CLI, l'API et le CDN.",
+          "title": "Nommez votre projet"
+        },
+        "source": {
+          "description": "glot traduit à partir de cette langue. Nous avons choisi la langue de votre navigateur.",
+          "title": "Dans quelle langue votre application est-elle écrite ?"
+        },
+        "targets": {
+          "description": "Choisissez-en quelques-unes pour commencer. Vous pourrez en ajouter à tout moment.",
+          "title": "Quelles langues souhaitez-vous ?"
+        }
+      }
     },
     "empty": {
       "body": "Créez un projet, puis exécutez glot push depuis votre dépôt pour importer vos catalogues.",
@@ -797,7 +922,7 @@
     },
     "keysCount": "{count, plural, =0 {Aucune clé} one {# clé} many {# clés} other {# clés}}",
     "localesCount": "{count, plural, one {# langue} many {# langues} other {# langues}}",
-    "subtitle": "Chaque projet correspond à un glot.toml dans l'un de vos dépôts.",
+    "subtitle": "Chaque projet correspond à un glot.toml dans l'un de vos dépôts. L'anneau indique son état : couverture et validation sur toutes les langues.",
     "title": "Projets"
   },
   "review": {
@@ -832,7 +957,8 @@
     "general": {
       "name": "Nom du projet",
       "slug": "Slug",
-      "title": "Général"
+      "title": "Général",
+      "slugHint": "Utilisé par la CLI (section [server] de glot.toml), l’API et les URL CDN. Il ne peut pas être modifié."
     },
     "llm": {
       "apiKey": "Clé API",
@@ -861,7 +987,9 @@
       "stylePlaceholder": "Amical, concis, « tu » informel…",
       "title": "LLM",
       "workspaceId": "ID de l’espace de travail Anthropic",
-      "workspaceIdHint": "Requis avec les clés au niveau de l’organisation (sk-ant-usr-…). Remplace ANTHROPIC_WORKSPACE_ID."
+      "workspaceIdHint": "Requis avec les clés au niveau de l’organisation (sk-ant-usr-…). Remplace ANTHROPIC_WORKSPACE_ID.",
+      "modelHint": "Identifiant du modèle tel que votre fournisseur le nomme, par ex. claude-haiku-5-5.",
+      "styleHint": "Règles de ton et de formulation envoyées avec chaque traduction, par ex. «\\u00a0Informel, libellés courts, noms de produits en anglais\\u00a0»."
     },
     "locales": {
       "add": "Ajouter une langue",
@@ -870,7 +998,8 @@
       "remove": "Supprimer la langue {locale}",
       "source": "Langue source",
       "targets": "Langues cibles",
-      "title": "Langues"
+      "title": "Langues",
+      "sourceHint": "La langue dans laquelle vos développeurs rédigent les textes. Définie à la création du projet."
     },
     "preview": {
       "baseUrl": "URL de base",
@@ -885,12 +1014,13 @@
       "title": "Aperçu"
     },
     "saved": "Paramètres enregistrés",
-    "title": "Paramètres"
+    "title": "Paramètres",
+    "subtitle": "Nom, langues, modèle de traduction et diffusion de ce projet. Les modifications s’appliquent à la prochaine tâche."
   },
   "shell": {
     "apiTokens": "Jetons API",
     "experiments": "Expérimentations",
-    "feedback": "Retours",
+    "feedback": "Revue",
     "glossary": "Glossaire",
     "insights": "Analyses",
     "jobs": "Tâches",
@@ -907,7 +1037,12 @@
     "userMenu": "Menu du compte",
     "visual": "QA visuelle",
     "experimental": "Le serveur auto-hébergé et le tableau de bord sont expérimentaux : attendez-vous à des aspérités et à des changements incompatibles. La CLI et le serveur MCP constituent le socle stable. <docs>En savoir plus</docs>",
-    "labs": "Labs"
+    "labs": "Labs",
+    "account": "Compte",
+    "billing": "Facturation",
+    "github": "GitHub",
+    "mainNav": "Principal",
+    "skipToContent": "Aller au contenu"
   },
   "status": {
     "machine": "Automatique",
@@ -979,9 +1114,10 @@
     "notInReport": "Cet écran ne figure pas dans le rapport comparé.",
     "report": "Rapport",
     "screenshotAlt": "Capture d’écran de {route} dans la langue {locale}",
-    "subtitle": "Captures d’écran et problèmes de mise en page par langue, envoyés par glot-visual-qa.",
+    "subtitle": "Captures d’écran de chaque langue avec les problèmes de mise en page détectés par glot-visual-qa : débordement, texte tronqué, glyphes manquants. Chaque problème renvoie à la clé et à son <term>budget en pixels</term>.",
     "title": "QA visuelle",
-    "viewport": "Fenêtre d’affichage"
+    "viewport": "Fenêtre d’affichage",
+    "budgetTip": "La largeur qu’un texte peut occuper dans votre interface, mesurée dans l’application en cours d’exécution avec glot measure. Les traductions plus larges que leur budget sont signalées, et glot fit les raccourcit."
   },
   "oauth": {
     "allow": "Autoriser",
@@ -1007,5 +1143,1509 @@
     "scopes": "Autorisations",
     "subtitle": "Cette application utilisera les outils MCP de glot sur un projet, en votre nom.",
     "title": "Connecter {client} à glot"
+  },
+  "home": {
+    "demo": {
+      "check": {
+        "label": "Vérifier",
+        "body": "Placeholders, pluriels, glossaire, largeur en pixels et règles de dark patterns, dans chaque langue.",
+        "title": "Le code vérifie chaque langue"
+      },
+      "write": {
+        "label": "Écriture",
+        "body": "Une intention par version. Votre texte officiel reste la référence.",
+        "title": "L'IA rédige trois versions"
+      },
+      "announce": "Étape {n} sur {total} : {title}",
+      "audience": {
+        "de": "Allemagne · recherche",
+        "fr": "France · mobile",
+        "rest": "Tous les autres"
+      },
+      "caption": "Données d'exemple. Les messages de refus sont ceux de glot, mot pour mot.",
+      "checks": "{passed, number} sur {total, number} vérifications réussies",
+      "day": "Jour {day}",
+      "example": "Données d'exemple",
+      "eyebrow": "Voyez-le en action",
+      "fail": "Refusé",
+      "files": "{count, plural, one {# fichier modifié} many {# fichiers modifiés} other {# fichiers modifiés}}",
+      "intent": {
+        "benefit": "Bénéfice direct",
+        "simplicity": "Simplicité",
+        "urgency": "Urgence honnête"
+      },
+      "key": "Clé",
+      "label": "Expérience de copie, étape par étape",
+      "learn": {
+        "body": "Quelle version gagne, de combien, et à quel point glot en est sûr.",
+        "label": "Apprendre",
+        "title": "Le résultat, en une phrase"
+      },
+      "learning": "Encore en apprentissage. Environ {days, plural, one {# jour de plus} many {# jours de plus} other {# jours de plus}}.",
+      "merge": "Fusionner la pull request",
+      "merged": "Fusionné. Vos catalogues contiennent désormais le gagnant, dans toutes les langues.",
+      "none": "Pas encore de gagnant clair. Votre texte officiel reste actif.",
+      "official": "Texte officiel",
+      "pass": "Réussi",
+      "pause": "Mettre la démo en pause",
+      "play": "Lancer la démo",
+      "promote": "Déployer partout",
+      "ready": "Prêt",
+      "refused": "Refusé par glot",
+      "replay": "Rejouer",
+      "retried": "Trop large à la première tentative. Réécrit, puis validé.",
+      "serve": {
+        "body": "Choisi en périphérie, rendu par votre serveur. Le trafic se déplace vers ce qui fonctionne.",
+        "label": "Diffuser",
+        "title": "Chaque audience reçoit ses versions"
+      },
+      "ship": {
+        "body": "Déployer ouvre une pull request avec le texte gagnant dans toutes les langues.",
+        "label": "Livrer",
+        "title": "Le gagnant arrive dans Git"
+      },
+      "steps": "Étapes de la démo",
+      "subtitle": "Une clé, trois versions rédigées par l'IA, chaque langue vérifiée par du code, chaque audience servie avec son propre gagnant, et le résultat renvoyé dans Git.",
+      "title": "Une idée, écrite dans toutes les langues",
+      "traffic": "Part du trafic par version",
+      "version": "Version",
+      "visitors": "{count, plural, one {# visiteur} many {# visiteurs} other {# visiteurs}}",
+      "win": "{variant}\tu00a0: {lift} inscriptions (probablement entre {low} et {high}), probabilité de {probability} d'être la meilleure.",
+      "writing": "Rédaction…"
+    },
+    "footer": {
+      "benchmark": "Benchmark",
+      "docs": "Documentation",
+      "i18n": "Localisation",
+      "license": "Licence MIT",
+      "npm": "npm",
+      "pricing": "Tarifs",
+      "tagline": "Des expériences de texte et une localisation que l’IA ne peut pas casser."
+    },
+    "guarantees": {
+      "eyebrow": "Les garanties",
+      "facts": {
+        "body": "Une variante ne peut citer que les chiffres que vous avez déclarés. « Rejoignez 10 000 équipes » est refusé si 10 000 ne figure pas dans votre liste.",
+        "title": "Uniquement vos faits"
+      },
+      "glossary": {
+        "body": "Les noms de produits restent intacts. Termes obligatoires et interdits par langue, dans un fichier de votre dépôt.",
+        "title": "Votre glossaire"
+      },
+      "patterns": {
+        "body": "Urgence factice, faux compteurs d'activité, affirmations invérifiables et culpabilisation du refus sont refusés. Les prix et mentions légales ne peuvent pas être modifiés.",
+        "title": "Aucun dark pattern"
+      },
+      "patternsNote": "Les règles visent des pratiques que le droit européen de la consommation sanctionne déjà. Un rapport sans problème signifie qu'aucun signal d'alerte connu n'a été détecté, pas un avis juridique.",
+      "placeholders": {
+        "body": "Le même ensemble que la source, aucun ajouté, aucun traduit. ICU, i18next et MessageFormat 2.",
+        "title": "Variables et balises"
+      },
+      "plurals": {
+        "body": "Chaque forme dont la langue a besoin : quatre en polonais, six en arabe.",
+        "title": "Pluriels"
+      },
+      "refusal": "Refusé par glot",
+      "subtitle": "Le même validateur qui protège les traductions de glot s'applique à chaque variante, dans chaque langue. Une variante échouant dans une seule langue n'est jamais mise en ligne.",
+      "title": "L'IA propose. Le code décide de ce que voient les visiteurs.",
+      "width": {
+        "body": "Mesuré avec la police et la boîte réelles de votre application. Une variante trop large pour son bouton est refusée, jamais tronquée.",
+        "title": "Largeur en pixels"
+      }
+    },
+    "hero": {
+      "labs": "Labs",
+      "badge": "Des textes qui apprennent",
+      "commandHint": "Détecte votre stack i18n et configure glot. Les expériences tournent sur le cloud de glot ou sur votre propre serveur.",
+      "proofBench": "0,0 % de chaînes défectueuses contre 14,1 % sans glot",
+      "proofBenchNote": "Benchmark : 320 messages ICU, 8 langues, claude-haiku-5-5, 18 octobre 2026. Mêmes prompts, même modèle.",
+      "proofLabel": "Faits du projet",
+      "proofNpm": "npm v{version}",
+      "proofOss": "Sous licence MIT",
+      "proofStars": "{count, plural, =0 {Mettre une étoile sur GitHub} one {# étoile sur GitHub} many {# d'étoiles sur GitHub} other {# étoiles sur GitHub}}",
+      "start": "Commencer gratuitement",
+      "startHint": "1 expérience gratuite. Aucune carte bancaire requise.",
+      "subtitle": "Votre IA rédige des variantes de vos titres et boutons. glot vérifie chacune dans chaque langue, montre pour chaque pays, appareil et source de trafic la version qui convertit le mieux, et renvoie le gagnant dans votre dépôt sous forme de pull request.",
+      "title": "Des textes qui convertissent, dans toutes les langues."
+    },
+    "cta": {
+      "body": "Commencez par un titre. glot se charge des vérifications de rédaction, des calculs et de la pull request.",
+      "docs": "Consulter la documentation des expériences",
+      "title": "Diffusez les mots qui fonctionnent, dans toutes les langues."
+    },
+    "delivery": {
+      "cookie": {
+        "body": "glot conserve des compteurs quotidiens par version et audience. Pas d'IP, pas de user agent, pas d'identifiant de visiteur. Global Privacy Control est respecté.",
+        "title": "Aucun cookie par défaut."
+      },
+      "eyebrow": "Rapide et privé par défaut",
+      "flicker": {
+        "body": "Votre edge choisit la version, votre serveur la rend. Les visiteurs ne voient jamais l'ancien texte être remplacé.",
+        "title": "Aucun scintillement."
+      },
+      "path": {
+        "body": "Les décisions utilisent un fichier en cache actualisé chaque minute. Si glot est indisponible, tout le monde reçoit votre texte officiel.",
+        "title": "Jamais sur votre chemin critique."
+      },
+      "seo": {
+        "body": "Même URL, même canonical, jamais une version choisie pour les robots d'indexation.",
+        "title": "Les moteurs de recherche voient ce que voient les humains."
+      },
+      "small": "Les applications monopage sans rendu serveur peuvent utiliser le mode client uniquement, qui peut provoquer un scintillement.",
+      "title": "Aucun scintillement, aucune dépendance au chemin critique"
+    },
+    "faq": {
+      "agents": {
+        "a": "Tout agent compatible MCP, comme Claude Code, Cursor, Codex ou Windsurf, via npx -y glot-i18n mcp. Claude Code dispose aussi d'un plugin et d'une skill glot, et des règles AGENTS.md sont fournies pour les autres agents.",
+        "q": "Quels agents de code fonctionnent avec glot\\u00a0?"
+      },
+      "ai": {
+        "a": "Chaque variante passe par les mêmes contrôles que vos traductions, dans toutes les langues, plus des règles contre l'urgence factice, les chiffres inventés et les affirmations invérifiables. Vous pouvez exiger une validation humaine avant qu'une variante ne soit mise en ligne.",
+        "q": "Le texte rédigé par l'IA risque-t-il de nous embarrasser\\u00a0?"
+      },
+      "audiences": {
+        "a": "Oui. glot diffuse plusieurs versions d’un titre ou d’un bouton aux audiences que vous choisissez (pays, appareil, source de trafic), dans toutes les langues à la fois, et conserve celle qui convertit. Jusqu’à 4 audiences par expérience, plus tous les autres visiteurs.",
+        "q": "Puis-je afficher un texte différent selon les pays ?"
+      },
+      "cookies": {
+        "a": "glot ne dépose aucun cookie par défaut et ne stocke ni adresse IP, ni user agent, ni identifiant de visiteur, seulement des compteurs quotidiens. Un cookie de session facultatif conserve la version, rien d’autre. Le besoin de consentement relève de votre DPO ; nos notes sur la confidentialité peuvent vous aider.",
+        "q": "Ai-je besoin d’une bannière de cookies pour cela ?"
+      },
+      "cost": {
+        "a": "La CLI, le validateur et le serveur MCP local sont sous licence MIT et gratuits ; vous payez directement votre fournisseur de LLM. glot cloud propose un forfait gratuit avec 1 expérience, ainsi que les forfaits payants Pro et Team avec audiences. Auto-hébergez le serveur et rien n’est limité.",
+        "q": "Combien cela coûte-t-il ?"
+      },
+      "facts": {
+        "a": "Non. Une variante ne peut citer que les faits que vous déclarez. Tout chiffre absent de votre texte ou de vos faits est refusé. Les clés marquées comme tarif ou juridique ne peuvent pas être testées.",
+        "q": "Une variante peut-elle inventer une statistique ou une remise ?"
+      },
+      "formats": {
+        "a": "Extraction automatique des chaînes : Next.js (App et Pages Router), React Router, Astro et Vite + React. Catalogues : JSON avec syntaxe ICU, i18next ou MessageFormat 2, dictionnaires JS, fichiers Apple .xcstrings et .strings, strings.xml Android, ARB Flutter, gettext PO et YAML.",
+        "q": "Quels frameworks et formats de fichiers glot prend-il en charge ?"
+      },
+      "more": "Autres réponses dans la FAQ",
+      "seo": {
+        "a": "glot ne choisit jamais une version selon le user agent. Les robots d’indexation reçoivent une version comme n’importe quel visiteur, sur la même URL canonique, et leurs visites ne sont pas comptées. Les versions gardent le même sens.",
+        "q": "Afficher un texte différent nuit-il au référencement ?"
+      },
+      "speed": {
+        "a": "Aucun appel bloquant. La périphérie choisit la version dans un fichier en cache et votre serveur la rend, donc pas de scintillement avec le rendu serveur. Les applications monopage uniquement côté client peuvent scintiller au premier affichage. Si glot est indisponible, les visiteurs reçoivent votre texte officiel.",
+        "q": "Cela ralentit-il mon site ou provoque-t-il un scintillement ?"
+      },
+      "title": "Questions",
+      "traffic": {
+        "a": "Cela dépend de votre trafic et de votre taux de conversion. À la création d’une expérience, glot estime sa durée et suggère de fusionner une audience qui nécessiterait plus de 90 jours. Commencez par une expérience globale.",
+        "q": "Quel trafic me faut-il ?"
+      },
+      "what": {
+        "a": "glot est une CLI et un serveur MCP open source (MIT) qui localisent votre application avec votre propre clé LLM, ainsi que des expériences de texte : des versions de vos titres rédigées par l’IA, vérifiées dans chaque langue et diffusées à chaque audience. Le code refuse tout texte qui casse une variable, un pluriel, votre glossaire ou sa zone d’affichage.",
+        "q": "Qu’est-ce que glot ?"
+      },
+      "winner": {
+        "a": "glot attend au moins 7 jours et 500 visiteurs par version, relève la barre à chaque analyse, et peut conserver un petit groupe témoin pour mesurer tout ce que vous avez promu.",
+        "q": "Comment savoir qu’un gagnant est réel ?"
+      }
+    },
+    "foundation": {
+      "bench": "Lire le benchmark complet",
+      "cost": "850 chaînes coûtent 0,035 $ avec le modèle par défaut dans notre essai. Vous payez directement votre fournisseur de LLM.",
+      "eyebrow": "Le socle",
+      "link": "Localisation open source pour agents de codage",
+      "proof": "Dans notre benchmark, glot a produit 0,0 % de chaînes cassées. Les mêmes modèles avec un prompt simple en ont produit 14,1 % (Haiku) et 8,8 % (Sonnet). Un juge FormatJS indépendant confirme.",
+      "subtitle": "Les variantes reposent sur le moteur de localisation de glot. Une seule commande transfère les chaînes codées en dur vers des clés, ne traduit que ce qui a changé et refuse tout ce qui est cassé.",
+      "title": "Et votre application, dans toutes les langues que vous proposez."
+    },
+    "goals": {
+      "eyebrow": "Objectifs",
+      "goal": {
+        "body": "Une inscription, ou un achat avec sa valeur de revenu.",
+        "title": "Un seul objectif décisif"
+      },
+      "guardrail": {
+        "body": "Événements qui ne doivent pas augmenter, comme les remboursements.",
+        "title": "Garde-fous"
+      },
+      "holdout": {
+        "body": "Quelques visiteurs qui voient toujours votre texte officiel, afin de mesurer tout ce que vous avez mis en avant.",
+        "title": "Groupe témoin"
+      },
+      "subtitle": "Une version l'emporte sur l'événement qui compte pour vous, jamais sur les clics seuls.",
+      "title": "Mesurez ce qui convertit, pas ce qui est cliqué"
+    },
+    "how": {
+      "eyebrow": "Fonctionnement",
+      "footnote": "Les définitions d'expériences se trouvent dans glot.experiments.toml, à côté de votre code. glot experiments validate les vérifie hors ligne en CI.",
+      "pick": {
+        "body": "Choisissez un groupe de clés, comme le titre, le sous-titre et le bouton d'un héros, pour qu'ils changent ensemble. Nommez les audiences : pays, langue, appareil, source de trafic.",
+        "title": "Choisissez les mots"
+      },
+      "ship": {
+        "body": "glot montre à chaque audience la meilleure version, attend des preuves réelles, puis ouvre une pull request avec le gagnant. Vos catalogues restent la source de vérité.",
+        "title": "Livrez le gagnant"
+      },
+      "title": "Trois étapes. Votre agent de code peut aussi les exécuter.",
+      "write": {
+        "body": "Choisissez des intentions comme la preuve sociale ou la simplicité. glot rédige chaque variante dans chaque langue et refuse celles qui enfreignent une règle, en indiquant la raison exacte.",
+        "title": "Laissez l'IA écrire, laissez le code vérifier"
+      }
+    },
+    "install": {
+      "docs": "Lire la documentation des expériences",
+      "eyebrow": "Installation",
+      "label": "Code d'installation",
+      "subtitle": "Avec Next.js (App Router) et next-intl. Vos appels t() ne changent pas.",
+      "title": "Installation en trois lignes"
+    },
+    "integrations": {
+      "agents": {
+        "label": "Agents",
+        "value": "Claude Code, Cursor et Codex via le serveur MCP glot. Lovable, Bolt, v0 et Replit via un prompt généré."
+      },
+      "edge": {
+        "label": "Edge",
+        "value": "Proxy Next.js, Cloudflare Workers (sites statiques inclus), en-têtes géo de Cloudflare, Vercel et CloudFront."
+      },
+      "eyebrow": "Intégrations",
+      "frameworks": {
+        "label": "Frameworks",
+        "value": "Next.js (App et Pages Router), React Router, Astro, Vite + React."
+      },
+      "git": {
+        "label": "Git",
+        "value": "Application GitHub, GitHub Action avec annotations de PR, glot.experiments.toml dans votre dépôt."
+      },
+      "i18n": {
+        "label": "i18n",
+        "value": "next-intl, react-i18next, i18next, FormatJS, remix-i18next. Syntaxe ICU, i18next et MessageFormat 2."
+      },
+      "models": {
+        "label": "Modèles",
+        "value": "Votre propre clé pour Anthropic, OpenAI ou tout point de terminaison compatible OpenAI, y compris les modèles locaux."
+      },
+      "title": "Compatible avec votre stack et votre agent."
+    },
+    "meta": {
+      "description": "Générez des variantes de texte avec l'IA, validées dans chaque langue (placeholders, pluriels, glossaire, longueur), et gardez celle qui convertit pour chaque audience.",
+      "title": "glot : expériences de textes dans chaque langue, par segment"
+    },
+    "nav": {
+      "demo": "Démo",
+      "docs": "Docs",
+      "githubStars": "glot sur GitHub, {count, plural, =0 {aucune étoile pour l'instant} one {# étoile} many {# étoiles} other {# étoiles}}",
+      "guarantees": "Garanties",
+      "home": "Accueil glot",
+      "how": "Fonctionnement",
+      "i18n": "Localisation",
+      "label": "Principal",
+      "openApp": "Ouvrir l'application",
+      "pricing": "Tarifs",
+      "results": "Résultats"
+    },
+    "pricing": {
+      "body": "La CLI, le validateur et le serveur MCP local sont sous licence MIT et jamais limités. glot cloud démarre gratuitement avec une expérience. Pro ajoute des audiences, Team en ajoute davantage. Auto-hébergez le serveur et rien n'est limité.",
+      "cta": "Voir les tarifs",
+      "title": "Gratuit là où ça tourne sur votre machine."
+    },
+    "problem": {
+      "ai": {
+        "body": "Elle peut aussi oublier un placeholder de prix, ignorer les formes de pluriel du polonais, faire déborder un bouton de 112 px ou inventer « plus que 3 aujourd'hui ».",
+        "title": "L'IA peut écrire dix versions en une seconde."
+      },
+      "eyebrow": "Le problème",
+      "kicker": "glot rend la partie IA sûre et la partie tests automatique.",
+      "manual": {
+        "body": "Une variante, une langue, un script qui scintille au chargement, un tableau de bord auquel personne ne fait confiance, et un gagnant qu'il faut recopier dans le code.",
+        "title": "Tester les textes à la main ne passe pas à l'échelle."
+      },
+      "note": "Invité à « traduire ce JSON », claude-haiku-5-5 a cassé 42,5 % des messages polonais dans notre benchmark.",
+      "noteLink": "Voir le benchmark",
+      "one": {
+        "body": "Le titre que vous avez écrit pour les visiteurs américains sur ordinateur est aussi celui que voient les utilisateurs allemands de la recherche et les utilisateurs mobiles japonais.",
+        "title": "Un seul texte pour tout le monde."
+      },
+      "title": "Votre meilleur titre en anglais n'est qu'une supposition partout ailleurs."
+    },
+    "results": {
+      "alarms": {
+        "body": "Si la répartition du trafic semble fausse (un cache, un bot, un bug), les décisions sont gelées et une bannière rouge vous indique pourquoi.",
+        "title": "Des alertes impossibles à manquer."
+      },
+      "audiences": {
+        "body": "Pays, langue, appareil, source de trafic, nouveau ou ancien visiteur. Tous les autres reçoivent leur propre cellule.",
+        "title": "Jusqu'à 4 audiences."
+      },
+      "example": "Exemple",
+      "exampleSentence": "Simplicité : +18 % d'inscriptions en Allemagne (probablement entre +6 % et +30 %), 97 % de probabilité qu'elle soit la meilleure. Environ 3 jours de plus.",
+      "eyebrow": "Des résultats lisibles",
+      "noEarly": {
+        "body": "Aucun gagnant avant 7 jours et 500 visiteurs par version, pour qu'un lundi chargé ne décide jamais.",
+        "title": "Aucune conclusion hâtive."
+      },
+      "noFake": {
+        "body": "La barre monte à chaque regard, version et audience. Notre suite de tests simule des expériences où rien ne change et échoue si plus de 5 % d'entre elles déclarent un gagnant.",
+        "title": "Aucun faux gagnant."
+      },
+      "segment": {
+        "body": "glot affiche « gagnant pour l'Allemagne » uniquement si l'Allemagne bat nettement le résultat global. Sinon, il recommande de déployer partout.",
+        "title": "Des gagnants par audience, seulement s'ils sont réels."
+      },
+      "subtitle": "Pour chaque audience, glot indique quelle version gagne, de combien et avec quelle certitude, en une seule phrase. Pas de p-value.",
+      "title": "Audiences différentes, gagnants différents",
+      "traffic": {
+        "body": "Pendant l'apprentissage, davantage de visiteurs voient les versions qui semblent les meilleures. Chaque version conserve au moins 10 % jusqu'à la fin.",
+        "title": "Le trafic va à ce qui fonctionne."
+      }
+    },
+    "skip": "Aller au contenu",
+    "who": {
+      "dev": {
+        "body": "Trois lignes dans votre application Next.js. Vos appels t() ne changent pas. Les gagnants arrivent sous forme de pull requests que vous relisez comme les autres.",
+        "title": "Vous maîtrisez le code"
+      },
+      "eyebrow": "À qui cela s'adresse",
+      "growth": {
+        "body": "Lancez une expérience sur un bloc d'accueil dans chaque langue depuis le tableau de bord, ou demandez-le à votre agent de code. Lisez le résultat en une phrase.",
+        "title": "Vous maîtrisez les chiffres"
+      },
+      "l10n": {
+        "body": "Chaque variante passe par votre glossaire et votre file de relecture. Rien n'atteint un marché que vous n'avez pas approuvé.",
+        "title": "Vous maîtrisez la qualité"
+      },
+      "title": "Conçu pour ceux qui livrent les textes."
+    }
+  },
+  "account": {
+    "currentPassword": "Mot de passe actuel",
+    "email": {
+      "changed": "E-mail mis à jour",
+      "hint": "Nous enverrons un lien de confirmation à la nouvelle adresse. La modification prend effet une fois que vous l'avez ouvert.",
+      "new": "Nouvel e-mail",
+      "pending": "Lien de confirmation envoyé à {email}",
+      "submit": "Modifier l'e-mail",
+      "title": "Adresse e-mail"
+    },
+    "notifications": {
+      "accountNote": "Les e-mails de sécurité (réinitialisation du mot de passe, modification de l'e-mail ou du mot de passe) sont toujours envoyés.",
+      "jobDone": "Tâche de traduction terminée",
+      "jobDoneHint": "Recevez un e-mail lorsqu'une tâche de traduction que vous avez lancée se termine ou échoue.",
+      "title": "Notifications par e-mail"
+    },
+    "password": {
+      "changed": "Mot de passe mis à jour",
+      "hint": "8 caractères minimum. Vos autres sessions seront déconnectées.",
+      "new": "Nouveau mot de passe",
+      "submit": "Modifier le mot de passe",
+      "title": "Mot de passe"
+    },
+    "preferences": {
+      "celebrations": "Célébrer les étapes clés",
+      "celebrationsHint": "Affiche une brève notification et une petite animation lorsqu'une langue atteint 100\\u00a0% ou que les problèmes de validation tombent à zéro. Désactivez pour un tableau de bord plus sobre.",
+      "title": "Préférences"
+    },
+    "subtitle": "Votre adresse e-mail de connexion, mot de passe, notifications et préférences du tableau de bord.",
+    "title": "Compte"
+  },
+  "billing": {
+    "downgrade": "Annuler dans le portail de facturation",
+    "endsOn": "Se termine le {date}",
+    "invoice": {
+      "date": "Date",
+      "number": "Numéro",
+      "open": "Ouverte",
+      "status": "Statut",
+      "total": "Total"
+    },
+    "invoices": "Factures",
+    "manage": "Gérer la facturation",
+    "metered": "La consommation au-delà des traductions côté serveur incluses est facturée en fin de mois.",
+    "noInvoices": "Aucune facture pour le moment.",
+    "ossNote": "Les quotas s'appliquent uniquement à glot cloud. Les projets que vous travaillez localement avec la CLI ne sont pas comptés.",
+    "pastDue": "Votre dernier paiement a échoué. Mettez à jour votre moyen de paiement avant le {date} pour conserver votre offre.",
+    "plan": "Offre {plan}",
+    "renewsOn": "Renouvellement le {date}",
+    "selfHosted": "La facturation est désactivée sur ce serveur auto-hébergé : aucune limite n'est appliquée.",
+    "subtitle": "Votre offre couvre les projets cloud que vous possédez. La CLI et le serveur MCP local ne sont jamais limités.",
+    "title": "Facturation",
+    "updated": "Votre abonnement a été mis à jour. Son affichage ici peut prendre quelques secondes.",
+    "usage": "Utilisation ce mois-ci"
+  },
+  "emailAuth": {
+    "banner": {
+      "resend": "Renvoyer l’e-mail",
+      "sent": "E-mail de confirmation envoyé",
+      "text": "Confirmez votre adresse e-mail ({email}) pour sécuriser votre compte."
+    },
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "email": "E-mail",
+    "forgot": {
+      "sent": "Si un compte existe pour cette adresse, un lien de réinitialisation est en route. Il expire dans 1 heure.",
+      "submit": "Envoyer le lien",
+      "subtitle": "Saisissez l'e-mail de votre compte et nous vous enverrons un lien de réinitialisation.",
+      "title": "Réinitialiser votre mot de passe"
+    },
+    "invalidLink": "Ce lien est invalide, déjà utilisé ou expiré.",
+    "newPassword": "Nouveau mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères.",
+    "reset": {
+      "again": "Demander un nouveau lien",
+      "done": "Votre mot de passe a été mis à jour.",
+      "submit": "Mettre à jour le mot de passe",
+      "subtitle": "Vous serez déconnecté de toutes vos sessions.",
+      "title": "Choisissez un nouveau mot de passe"
+    },
+    "toDashboard": "Accéder au tableau de bord",
+    "toLogin": "Retour à la connexion",
+    "verify": {
+      "checking": "Confirmation de votre adresse…",
+      "done": "Votre adresse e-mail est confirmée.",
+      "title": "Confirmer votre e-mail"
+    }
+  },
+  "experimentResults": {
+    "back": "Expériences",
+    "bySegment": "Résultats par segment",
+    "bySegmentHint": "Chaque segment est mesuré indépendamment. Une formulation ne gagne un segment que si elle surpasse les autres avec plus de 95 % de probabilité.",
+    "cancel": "Annuler",
+    "celebrate": {
+      "body": "Promouvez-la pour ce segment ou pour tous depuis les résultats.",
+      "first": "Votre première formulation gagnante",
+      "winner": "Un segment a un gagnant"
+    },
+    "cell": {
+      "learning": "Encore en apprentissage : « {arm} » est en tête avec {p} de chances d'être le meilleur.{days, plural, =-1 {} one { Environ # jour de plus.} many { Environ # jours de plus.} other { Environ # jours de plus.}}",
+      "noDifference": "Les formulations donnent à peu près les mêmes résultats ici. Garder le texte officiel ne coûte rien.",
+      "noTraffic": "Aucun visiteur dans ce segment pour le moment.",
+      "officialWins": "Le texte officiel convertit le mieux ici. Les variantes ne sont plus diffusées à ce segment.",
+      "personalized": "Ce segment voit toujours « {arm} ». glot suggérera un nouveau test dans 90 jours.",
+      "visitors": "{n, plural, one {# visiteur} many {# visiteurs} other {# visiteurs}}",
+      "winner": "« {arm} » apporte {lift} de {goal} en plus (probablement entre {lo} et {hi}), confiance : {p}.",
+      "winnerRevenue": "« {arm} » rapporte {lift} de plus par visiteur (probablement entre {lo} et {hi}), confiance : {p}."
+    },
+    "chart": {
+      "aria": "Écart par rapport au texte officiel, avec plage probable : {summary}",
+      "caption": "Point : différence la plus probable par rapport au texte officiel. Trait : plage dans laquelle elle se situe très probablement (95 %). Les traits qui croisent le centre en pointillés signifient « pas encore certain ».",
+      "row": "{arm} : {lift}, probablement entre {lo} et {hi}"
+    },
+    "confirmAll": {
+      "after": "L'expérience se termine pour tous les segments.",
+      "body": "{keys, plural, one {# clé reçoit} many {# clés reçoivent} other {# clés reçoivent}} cette formulation dans {locales, plural, one {# langue} many {# langues} other {# langues}}, sous forme de traductions relues dans l'historique des clés. Elle sera incluse au prochain glot pull, rafraîchissement CDN ou pull request.",
+      "cta": "Promouvoir partout",
+      "title": "Faire de « {arm} » le texte officiel partout ?"
+    },
+    "confirmPropagate": {
+      "body": "glot ouvre une nouvelle expérience avec l'idée gagnante dans {segment}, à rédiger pour les {n, plural, one {# langue} many {# langues} other {# langues}} que ce test ne couvre pas. Chaque traduction est validée avant d'être diffusée ; cette expérience n'est pas modifiée.",
+      "cta": "Lancer le test",
+      "title": "Tester « {arm} » dans les autres langues\\u00a0?"
+    },
+    "confirmSegment": {
+      "after": "Le test se termine pour ce segment et ses visiteurs ne sont plus comptabilisés. glot vous rappelle de relancer un test dans 90 jours et rétablit le texte officiel si la source change.",
+      "body": "Désormais, tous les visiteurs de {segment} voient cette formulation, dans toutes les {locales, plural, one {# langue} many {# langues} other {# langues}}. Les autres visiteurs conservent le texte officiel.",
+      "cta": "Promouvoir pour ce segment",
+      "title": "Afficher « {arm} » à {segment} de façon permanente\\u00a0?"
+    },
+    "confirmStop": {
+      "body": "Tous les visiteurs revoient le texte officiel. Les résultats sont conservés ; rien ne change dans vos catalogues.",
+      "cta": "Arrêter l'expérience",
+      "title": "Arrêter « {name} »\\u00a0?"
+    },
+    "everyone": "Tous",
+    "everyoneElse": "Tous les autres",
+    "list": {
+      "meta": "{keys, plural, one {# clé} many {# clés} other {# clés}} · {locales, plural, one {# langue} many {# langues} other {# langues}}",
+      "segments": "Segments"
+    },
+    "milestones": {
+      "first": "Première expérience",
+      "firstBody": "Présenter une formulation à de vrais visiteurs",
+      "label": "Jalons de l'expérience",
+      "winner": "Premier gagnant",
+      "winnerBody": "Une variante a battu le texte officiel avec un niveau de confiance de 95\\u00a0%"
+    },
+    "official": "Officiel",
+    "pBestShort": "{p} de chances d'être en tête",
+    "pause": "Suspendre",
+    "preview": {
+      "allLanguages": "Toutes les langues",
+      "byLocale": "Langues",
+      "desktop": "Ordinateur",
+      "experiment": "Expérience",
+      "frame": "Aperçu de la page en langue {locale}",
+      "language": "Langue",
+      "mobile": "Mobile",
+      "noBase": "Définissez une URL d'aperçu pour voir les variantes dans vos pages. En attendant, voici la formulation.",
+      "noBaseCta": "Définir l'URL d'aperçu",
+      "none": {
+        "body": "Lancez une expérience sur un groupe de clés ; chaque variante apparaît ensuite ici, page par page et langue par langue.",
+        "cta": "Nouvelle expérience",
+        "title": "Aucune expérience à prévisualiser"
+      },
+      "notCounted": "Chaque ligne impose une formulation sur la page réelle. Les aperçus ne sont jamais comptés comme visites.",
+      "openTab": "Ouvrir la langue {locale} dans un nouvel onglet",
+      "route": "Route",
+      "segment": "Segment",
+      "title": "Aperçu par segment",
+      "viewport": "Fenêtre d'affichage"
+    },
+    "previewInPage": "Aperçu dans la page",
+    "promoteAll": "Déployer partout",
+    "promoteSegment": "Déployer pour ce segment",
+    "propagate": "Tester dans d'autres langues",
+    "reference": "référence",
+    "resume": "Reprendre",
+    "served": "Servi à ce segment",
+    "srm": {
+      "body": "Les variantes n'ont pas reçu la part de visiteurs attendue (p = {p}). Cela vient généralement d'une page mise en cache avec une seule variante, d'une redirection ou de robots sur une variante. Corrigez la cause ; les résultats reprennent d'eux-mêmes.",
+      "title": "Répartition du trafic incorrecte : les décisions sont figées"
+    },
+    "state": {
+      "learning": "En apprentissage",
+      "no_difference": "Aucune différence",
+      "personalized": "Personnalisé",
+      "winner": "Gagnant"
+    },
+    "status": {
+      "decided": "Gagnant trouvé",
+      "draft": "Brouillon",
+      "paused": "En pause",
+      "personalized": "Personnalisé",
+      "promoted": "Déployé",
+      "running": "En cours",
+      "stopped": "Arrêté"
+    },
+    "stop": "Arrêter",
+    "summary": {
+      "allocation": {
+        "bandit": "Le trafic se redirige vers la meilleure formulation",
+        "fixed": "Répartition fixe",
+        "segmented": "Le trafic se redirige vers la meilleure formulation, par segment"
+      },
+      "days": "{n, plural, one {# jour} many {# jours} other {# jours}}",
+      "duration": "Actif depuis",
+      "goal": "Objectif",
+      "locales": "{n, plural, one {# langue} many {# langues} other {# langues}}",
+      "pausedNote": "En pause : chaque visiteur voit le texte officiel et rien n'est comptabilisé. Les résultats sont conservés.",
+      "revenue": "Revenu par visiteur",
+      "segments": "{n, plural, one {# segment} many {# segments} other {# segments}}",
+      "since": "Depuis {date}",
+      "traffic": "Visiteurs testés",
+      "verdict": "Verdict"
+    },
+    "table": {
+      "arm": "Formulation",
+      "caption": "Résultats pour {segment}",
+      "lift": "Gain vs officiel",
+      "pBest": "Chance d'être la meilleure",
+      "range": "{lo} à {hi}",
+      "rate": "Taux de {goal}",
+      "rpv": "Revenu / visiteur",
+      "visitors": "Visiteurs"
+    },
+    "toast": {
+      "pause": "Expérience suspendue : tout le monde voit le texte officiel",
+      "promote_all": "Terminé : le texte gagnant est désormais le texte officiel",
+      "promote_segment": "Terminé : ce segment voit désormais toujours le texte gagnant",
+      "resume": "Expérience reprise",
+      "stop": "Expérience arrêtée : tout le monde voit le texte officiel"
+    },
+    "underpowered": {
+      "body": "À ce rythme, il faudrait plus de 90 jours pour détecter un écart de 20 %. Élargissez le segment ou décidez à partir du résultat pour tous.",
+      "title": "Trafic insuffisant dans ce segment"
+    },
+    "verdict": {
+      "draft": "Brouillon : pas encore affiché aux visiteurs. Terminez la configuration pour lancer le test.",
+      "elsewhere": "Pas encore de gagnant ailleurs.",
+      "learning": "Pas encore de gagnant.{days, plural, =-1 {} one { Encore environ # jour au trafic actuel.} many { Encore environ # jours au trafic actuel.} other { Encore environ # jours au trafic actuel.}}",
+      "noDifference": "Aucune variante ne dépasse nettement le texte officiel : le conserver est sans risque.",
+      "noTraffic": "Aucun visiteur pour l’instant. Les résultats apparaissent ici dès que les premiers visiteurs voient la page.",
+      "officialWins": "Le texte officiel reste le meilleur {star, select, only {pour tout le monde} rest {pour les autres} other {dans {segment}}}.",
+      "personalized": "{star, select, only {Tout le monde voit} rest {Les autres voient} other {{segment} voit}} « {arm} » de façon permanente.",
+      "promoted": "Terminé : « {arm} » est désormais le texte officiel partout.",
+      "stopped": "Arrêtée sans gagnant : tout le monde voit le texte officiel.",
+      "win": "« {arm} » convertit {lift} de mieux {star, select, only {pour tout le monde} rest {pour les autres} other {dans {segment}}} ({p} de probabilité).",
+      "winRevenue": "« {arm} » rapporte {lift} de plus par visiteur {star, select, only {pour tout le monde} rest {pour les autres} other {dans {segment}}} ({p} de probabilité).",
+      "winShort": "« {arm} » gagne {star, select, only {pour tout le monde} rest {pour les autres} other {dans {segment}}}."
+    },
+    "winner": "Gagnant",
+    "wording": "Texte par langue",
+    "wordingHint": "Le texte de chaque variante dans chaque langue. Ouvrez l’aperçu de la page pour le voir en contexte."
+  },
+  "gamification": {
+    "achieved": "Atteint",
+    "celebrate": {
+      "complete": "{language} est entièrement traduit",
+      "completeBody": "{count, plural, one {# clé a} many {# clés ont} other {# clés ont}} une traduction. Vérifiez-les ou ajoutez une autre langue.",
+      "completeMany": "{count} langues sont désormais entièrement traduites",
+      "zeroErrors": "Aucun problème de validation",
+      "zeroErrorsBody": "Chaque traduction réussit les contrôles des variables, des pluriels et du glossaire."
+    },
+    "health": "Santé du projet",
+    "healthHint": "Moyenne de la couverture et du taux de validation réussie sur les langues cibles, de 0 à 100. Ouvrez la vue d’ensemble pour le détail complet.",
+    "healthLabel": "Santé du projet {score} sur 100",
+    "localesProgress": "Progression des traductions par langue",
+    "notYet": "Pas encore atteint",
+    "ringLabel": "{language}\\u00a0: {percent} traduit",
+    "ringTooltip": "{language} · {percent} traduit · {issues, plural, =0 {aucun problème} one {# problème} many {# problèmes} other {# problèmes}}"
+  },
+  "github": {
+    "card": {
+      "subtitle": "Choisissez un dépôt : glot ouvre une pull request avec votre application localisée, prête à fusionner. Aucun terminal requis.",
+      "title": "Connecter GitHub"
+    },
+    "how": {
+      "pr": {
+        "body": "Les chaînes passent dans les catalogues, les traductions sont validées, et le tout arrive dans une seule pull request que vous relisez et fusionnez.",
+        "title": "Une seule pull request"
+      },
+      "safe": {
+        "body": "glot lit les fichiers dans un clone temporaire isolé. Aucune installation de paquets, aucun script, supprimé après chaque exécution.",
+        "title": "Votre code ne s'exécute jamais"
+      },
+      "updates": {
+        "body": "Chaque push sur votre branche ne retraduit que ce qui a changé, dans la même pull request ouverte.",
+        "title": "Toujours synchronisé"
+      }
+    },
+    "install": {
+      "already": "Déjà installé\\u00a0? Autoriser à la place",
+      "cta": "Connecter GitHub",
+      "redirecting": "Ouverture de GitHub…"
+    },
+    "job": {
+      "announce": "Étape {n} sur {total}\\u00a0: {step}",
+      "progress": "{done} sur {total} étapes terminées"
+    },
+    "linked": {
+      "change": "Changer de dépôt",
+      "failed": "La dernière exécution a échoué",
+      "prHint": "Chaque push sur {branch} met à jour cette pull request.",
+      "prReady": "La pull request #{n} est prête à être fusionnée",
+      "rerun": "Relancer",
+      "review": "Relire la pull request",
+      "upToDate": "À jour : rien à modifier dans ce dépôt.",
+      "waiting": "En attente de la première exécution…"
+    },
+    "newTab": "(s'ouvre dans un nouvel onglet)",
+    "noApp": {
+      "body": "Un administrateur crée l'application GitHub de glot une seule fois, puis chacun peut connecter ses dépôts.",
+      "docs": "Consulter le guide de configuration",
+      "setup": "Configurer l'application GitHub",
+      "title": "GitHub n'est pas encore configuré sur ce serveur glot"
+    },
+    "page": {
+      "cancel": "Annuler",
+      "disconnect": "Déconnecter le dépôt",
+      "disconnectBody": "glot cesse de mettre à jour les traductions de ce dépôt. Les pull requests ouvertes restent sur GitHub\\u00a0; vos traductions restent dans glot.",
+      "disconnectTitle": "Déconnecter {repo}\\u00a0?",
+      "disconnected": "Dépôt déconnecté",
+      "how": "Fonctionnement",
+      "subtitle": "Localisez un dépôt sans terminal\\u00a0: glot ouvre une pull request et la maintient à jour.",
+      "title": "GitHub"
+    },
+    "pick": {
+      "account": "Compte GitHub",
+      "addRepos": "Autoriser glot à accéder à GitHub",
+      "branch": "Branche de base",
+      "branchHelp": "glot lit cette branche et ouvre sa pull request vers celle-ci. Généralement, votre branche par défaut.",
+      "cancel": "Annuler",
+      "cta": "Localiser {repo}",
+      "ctaEmpty": "Choisissez un dépôt",
+      "missing": "Dépôt introuvable ?",
+      "noMatch": "Aucun dépôt ne correspond à votre recherche.",
+      "none": "glot ne voit encore aucun dépôt : ajoutez-en un dans les paramètres de la GitHub App.",
+      "private": "Privé",
+      "repo": "Dépôt",
+      "search": "Rechercher des dépôts"
+    },
+    "promise": {
+      "noCode": "N'exécute jamais votre code : pas d'installation de paquets, pas de scripts",
+      "pr": "Ouvre une pull request : rien n'est poussé sur votre branche principale",
+      "updates": "Maintient les traductions à jour à chaque push"
+    },
+    "return": {
+      "error": "GitHub n'a pas pu finaliser la connexion. Réessayez.",
+      "installed": "GitHub connecté. Choisissez maintenant un dépôt.",
+      "pending": "Installation demandée : un propriétaire de l'organisation GitHub doit l'approuver."
+    },
+    "step": {
+      "clone": "Clonage du dépôt",
+      "localize": "Extraction et traduction des chaînes",
+      "pr": "Ouverture de la pull request",
+      "push": "Envoi de la branche glot",
+      "sync": "Synchronisation des catalogues avec glot",
+      "token": "Connexion à GitHub"
+    },
+    "stepState": {
+      "current": "en cours",
+      "done": "terminé",
+      "todo": "en attente"
+    }
+  },
+  "githubAdmin": {
+    "appId": "ID de l'application",
+    "back": "Retour au tableau de bord",
+    "callbackError": "GitHub n'a pas renvoyé les identifiants de l'application. Recommencez : le lien est valable une heure.",
+    "configured": "La GitHub App est configurée.",
+    "created": "GitHub App créée : les utilisateurs peuvent désormais connecter leurs dépôts.",
+    "cta": "Créer la GitHub App",
+    "name": "Nom de l'application",
+    "nameHelp": "Unique sur GitHub, 34 caractères maximum. Les utilisateurs le voient lors de l'installation de l'application.",
+    "notAdmin": {
+      "body": "Ajoutez votre adresse e-mail à GLOT_ADMIN_EMAILS dans l'environnement serveur, puis rechargez cette page.",
+      "title": "Seuls les administrateurs peuvent créer la GitHub App"
+    },
+    "open": "Ouvrir sur GitHub",
+    "org": "Organisation (facultatif)",
+    "orgHelp": "Laissez vide pour que l'application appartienne à votre compte personnel.",
+    "permissions": "Permissions minimales demandées",
+    "recreate": "Remplacer par une nouvelle application",
+    "redirecting": "Ouverture de GitHub…",
+    "slug": "Slug",
+    "subtitle": "Créez la GitHub App de glot pour ce serveur. GitHub vous demande de confirmer, puis renvoie les identifiants à glot.",
+    "title": "GitHub App",
+    "webhook": "URL du webhook"
+  },
+  "markets": {
+    "add": "Ajouter {language}",
+    "added": "{language} ajouté aux langues cibles. Lancez une tâche de traduction pour la remplir.",
+    "badge": "Meilleure opportunité",
+    "cost": "{cost} pour traduire + ~{review} de relecture",
+    "demand": "~{share} de vos visiteurs la demandent déjà",
+    "footnote": "Basé sur {visits, plural, =0 {aucune visite pour l’instant} one {# visite} many {# visites} other {# visites}} sur {days} jours, données de marché publiques ({date}), coût du catalogue et effort RTL/police/pluriels.",
+    "headline": "Ajouter la langue {language} ({locale})",
+    "hours": "{n} h",
+    "kicker": "Prochaine langue",
+    "minutes": "{n} min",
+    "noEffort": "aucun effort technique",
+    "public": "{users} M de personnes en ligne dans cette langue",
+    "runnersUp": "Autres candidats",
+    "scoreLabel": "Score d’opportunité {score} sur 100"
+  },
+  "onboarding": {
+    "achievements": {
+      "first_locale_100": {
+        "how": "Toutes les clés traduites dans une langue.",
+        "name": "Première langue à 100 %"
+      },
+      "first_push": {
+        "how": "Vos premières clés ont atteint glot.",
+        "name": "Premier envoi"
+      },
+      "five_languages": {
+        "how": "Traductions dans cinq langues.",
+        "name": "5 langues"
+      },
+      "glossary_set": {
+        "how": "Au moins un terme de glossaire.",
+        "name": "Glossaire défini"
+      },
+      "title": "Jalons",
+      "toast": "Jalon atteint : {name}",
+      "unlocked": "Atteint le {date}",
+      "zero_errors": {
+        "how": "Toutes les traductions passent la validation.",
+        "name": "Zéro erreur"
+      }
+    },
+    "connect": {
+      "agent": {
+        "claude": "Claude Code",
+        "description": "Générez un jeton, ajoutez glot à votre agent, puis demandez-lui de localiser votre application.",
+        "json": ".mcp.json (Cursor et autres clients MCP)",
+        "prompt": "Puis demandez à votre agent",
+        "title": "Connectez votre agent"
+      },
+      "github": {
+        "description": "glot lit vos fichiers de messages depuis GitHub et ouvre des pull requests avec les traductions.",
+        "title": "Connectez votre dépôt"
+      },
+      "terminal": {
+        "description": "Générez un jeton, puis exécutez ces commandes à la racine de votre application.",
+        "localize": "1. Extrayez et traduisez vos chaînes",
+        "push": "2. Connectez ce projet et poussez",
+        "title": "Exécutez deux commandes"
+      }
+    },
+    "github": {
+      "soon": "La synchronisation GitHub est en cours de configuration. En attendant, utilisez l'agent ou le terminal : vous pourrez changer plus tard.",
+      "title": "Connecter GitHub"
+    },
+    "hide": "Masquer le guide de configuration",
+    "locales": {
+      "none": "Aucune langue cible pour l'instant. Ajoutez-en une dans les paramètres du projet.",
+      "ring": "{language} : {value} % traduit",
+      "title": "Couverture par langue"
+    },
+    "more": {
+      "badge": {
+        "body": "Affichez votre couverture de traduction. Cette étape se valide toute seule la première fois que le badge est affiché. Nécessite le CDN.",
+        "title": "Ajoutez le badge au README"
+      },
+      "cdn": {
+        "body": "Diffusez vos catalogues à chaud, sans redéployer.",
+        "cta": "Ouvrir les paramètres",
+        "title": "Activez le CDN"
+      },
+      "description": "Chaque étape se valide automatiquement selon l'état réel de votre projet. Vous pouvez les faire dans n'importe quel ordre.",
+      "done": "terminé",
+      "first_translation": {
+        "body": "Lancez une tâche de traduction, ou poussez des catalogues contenant déjà des traductions.",
+        "cta": "Ouvrir les tâches",
+        "title": "Traduire une première langue"
+      },
+      "glossary": {
+        "body": "Noms de produits et termes que glot doit conserver ou traduire de manière fixe.",
+        "cta": "Ouvrir le glossaire",
+        "title": "Ajoutez votre glossaire"
+      },
+      "invite": {
+        "body": "Les invitations d'équipe arrivent bientôt. Cette étape se valide quand un deuxième membre rejoint le projet.",
+        "title": "Invitez un coéquipier"
+      },
+      "title": "Préparez la mise en production",
+      "todo": "à faire",
+      "zero_errors": {
+        "body": "Chaque traduction conserve ses variables, ses pluriels et ses termes du glossaire.",
+        "cta": "Voir les problèmes",
+        "title": "Atteignez zéro erreur de validation"
+      }
+    },
+    "next": {
+      "cdn": "Diffusez les traductions à chaud avec le CDN.",
+      "cdnCta": "Activer le CDN",
+      "fix": "{count, plural, one {# traduction en {language} contient une erreur.} many {# traductions en {language} contiennent des erreurs.} other {# traductions en {language} contiennent des erreurs.}}",
+      "fixCta": "Vérifier",
+      "glossary": "Ajoutez les termes de votre produit pour que chaque langue les utilise de la même manière.",
+      "glossaryCta": "Ajouter un glossaire",
+      "jobStarted": "Tâche de traduction lancée",
+      "label": "Étape suivante :",
+      "push": "Envoyez vos chaînes source pour commencer.",
+      "pushCta": "Commencer la configuration",
+      "translate": "{count, plural, one {# clé manquante dans {language}.} many {# clés manquantes dans {language}.} other {# clés manquantes dans {language}.}}",
+      "translateCta": "Traduire les manquantes"
+    },
+    "overview": {
+      "continue": "Poursuivre la configuration",
+      "emptyBody": "Connectez votre code en environ 3 minutes : choisissez une méthode, copiez une commande, et cette page affichera votre premier envoi en direct.",
+      "emptyTitle": "Aucune clé pour le moment",
+      "guide": "Guide de configuration",
+      "hide": "Masquer la progression",
+      "ring": "{language} : {value} % traduit",
+      "rings": "Couverture par langue",
+      "setupProgress": "{done} sur {total} étapes de configuration terminées",
+      "setupTitle": "Terminer la configuration",
+      "start": "Démarrer le guide de configuration",
+      "title": "Prochaines étapes"
+    },
+    "path": {
+      "agent": {
+        "hint": "Claude Code, Cursor ou tout client MCP s'en charge.",
+        "name": "Agent IA"
+      },
+      "description": "Les trois méthodes aboutissent au même résultat : vos clés sont ajoutées à ce projet. Vous pouvez changer à tout moment.",
+      "github": {
+        "hint": "Synchronisez depuis votre dépôt à chaque pull request.",
+        "name": "GitHub"
+      },
+      "recommended": "Recommandé",
+      "terminal": {
+        "hint": "Une commande extrait et traduit, une autre envoie.",
+        "name": "Terminal"
+      },
+      "title": "Choisissez comment envoyer vos chaînes"
+    },
+    "progress": "Progression : {done} sur {total} étapes terminées",
+    "sideLabel": "Langues et jalons",
+    "stepDone": "terminé",
+    "stepTodo": "à faire",
+    "stepsLabel": "Étapes de configuration",
+    "subtitle": "D'un projet vide à votre première langue traduite en environ 3 minutes. Les étapes se cochent automatiquement dès que glot détecte vos données.",
+    "title": "Configurer {name}",
+    "toDashboard": "Aller au tableau de bord",
+    "token": {
+      "again": "Un jeton a déjà été créé. Générez-en un nouveau pour remplir à nouveau les commandes.",
+      "created": "Jeton créé et ajouté aux commandes ci-dessous",
+      "generate": "Générer mon jeton",
+      "once": "Copiez-le maintenant : il n'est affiché qu'une seule fois. Gardez-le secret, comme un mot de passe.",
+      "regenerate": "Générer un nouveau jeton",
+      "why": "Vos commandes nécessitent un jeton API pour ce projet."
+    },
+    "wait": {
+      "description": "Cette page se met à jour automatiquement dès que glot reçoit vos clés.",
+      "received": "{keys, plural, one {# clé reçue} many {# clés reçues} other {# clés reçues}} · {languages, plural, one {# langue cible} many {# langues cibles} other {# langues cibles}}",
+      "slowProject": "le projet dans glot.toml ou l’URL MCP est « {slug} ».",
+      "slowServer": "l’URL du serveur est {url}.",
+      "slowTitle": "Rien pour l’instant ? Vérifiez que :",
+      "slowToken": "GLOT_TOKEN est défini dans le terminal ou dans la configuration de l’agent qui envoie les chaînes.",
+      "title": "Envoyez vos premières chaînes",
+      "waiting": "En attente de votre premier envoi…"
+    }
+  },
+  "pricing": {
+    "cloud": {
+      "body": "Tableau de bord hébergé, catalogues OTA sur CDN, analyses, MCP distant pour les agents et traduction à la demande. Facturé par compte, pour les projets que vous possédez.",
+      "title": "glot cloud"
+    },
+    "compare": "Comparaison avec Lokalise, Crowdin, Tolgee et Lingo.dev : <link>voir la comparaison</link>.",
+    "cta": {
+      "free": "Commencer gratuitement",
+      "upgrade": "Passer à {plan}"
+    },
+    "current": "Forfait actuel",
+    "faq": {
+      "byok": {
+        "a": "Avec votre propre clé LLM, vous payez directement votre fournisseur et glot ne compte rien. Sans clé, le cloud peut utiliser celle de glot : chaque forfait inclut un montant mensuel, et les forfaits mensuels peuvent se poursuivre avec une facturation à l’usage.",
+        "q": "Dois-je payer les traductions ?"
+      },
+      "limits": {
+        "a": "Le point de terminaison cloud répond 402 avec un message et un lien de mise à niveau ; vos catalogues publiés continuent de fonctionner depuis votre dépôt. Les quotas sont réinitialisés le 1er de chaque mois (UTC).",
+        "q": "Que se passe-t-il lorsque j’atteins un quota ?"
+      },
+      "oss": {
+        "a": "Non. Les quotas ne s’appliquent qu’aux requêtes traitées par glot cloud. La CLI, le serveur MCP local et la GitHub Action n’appellent jamais le système de facturation.",
+        "q": "Certaines fonctionnalités de l’outil open source sont-elles limitées ?"
+      },
+      "selfHost": {
+        "a": "Oui. Le serveur se trouve dans le même dépôt MIT. Sans clés Stripe, la facturation est désactivée et toutes les limites sont levées.",
+        "q": "Puis-je auto-héberger les fonctionnalités cloud ?"
+      },
+      "tax": {
+        "a": "Les paiements, factures et TVA sont gérés par Stripe. Les factures sont disponibles dans vos paramètres de facturation ; les clients professionnels peuvent ajouter un numéro de TVA lors du paiement.",
+        "q": "Factures et TVA ?"
+      },
+      "title": "Questions"
+    },
+    "forever": "à vie",
+    "interval": "Période de facturation",
+    "meta": {
+      "description": "glot est open source et gratuit : CLI, serveur MCP local, validateur, lockfile. Payez uniquement pour le cloud hébergé : diffusion OTA, analyses, MCP distant et traduction côté serveur.",
+      "title": "Tarifs"
+    },
+    "monthly": "Mensuel",
+    "oss": {
+      "body": "Licence MIT. glot translate, check, fit, i18nize, le validateur, le lockfile et le serveur MCP local fonctionnent sur votre machine avec votre propre clé LLM. Pas de compte, pas de quota, aucune fonctionnalité réservée à un forfait payant.",
+      "cta": "Voir sur GitHub",
+      "title": "Open source : gratuit, pour toujours"
+    },
+    "ossIncluded": "CLI et serveur MCP local, sans limite",
+    "perMonth": "/ mois",
+    "perYear": "/ an",
+    "plans": {
+      "free": {
+        "name": "Gratuit",
+        "tagline": "Essayez le cloud sur un projet."
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Pour un produit en production."
+      },
+      "self_hosted": {
+        "name": "Auto-hébergé"
+      },
+      "team": {
+        "name": "Équipe",
+        "tagline": "Pour plusieurs produits et une équipe."
+      }
+    },
+    "quota": {
+      "cdn_requests": "Requêtes CDN/OTA par mois",
+      "insights_events": "Événements Insights par mois",
+      "llm_strings": "Chaînes traduites avec la clé LLM de glot par mois",
+      "mcp_calls": "Appels MCP distants par mois",
+      "notIncluded": "{name} : non inclus",
+      "ondemand_jobs": "Tâches de langue à la demande par mois",
+      "projects": "Projets cloud",
+      "seats": "Sièges",
+      "unlimited": "{name} : illimité",
+      "value": "{name} : {n}"
+    },
+    "selfHosted": "Ce serveur est auto-hébergé : la facturation est désactivée et rien n'est limité.",
+    "subtitle": "La CLI, le serveur MCP local et tout le contenu du dépôt open source sont gratuits et jamais limités. Les forfaits ne couvrent que le cloud hébergé, qui nous coûte des serveurs et de la bande passante.",
+    "title": "Gratuit là où il tourne sur votre machine. Payant là où il tourne chez nous.",
+    "usage": "Forfaits mensuels : les traductions côté serveur, avec la clé LLM de glot, au-delà du quota inclus sont facturées {price} pour 1 000 chaînes. Avec votre propre clé (BYOK), elles ne sont jamais comptées.",
+    "yearly": "Annuel"
+  },
+  "reviewPage": {
+    "composer": {
+      "body": "Commentaire",
+      "bodyHint": "Markdown : **gras**, *italique*, `code`, liens. Mentionnez un collègue avec @Nom. Ctrl+Entrée pour envoyer.",
+      "cancel": "Annuler",
+      "noText": "Aucun texte détecté à cet emplacement ; l'annotation sera épinglée à cette position.",
+      "submit": "Ajouter l'annotation",
+      "submitting": "Ajout en cours…",
+      "suggestion": "Formulation suggérée (facultatif)",
+      "suggestionHint": "Le texte devrait plutôt dire ceci. Vous pourrez l'appliquer en un clic plus tard.",
+      "title": "Nouvelle annotation"
+    },
+    "converted": "Rapport transformé en annotation",
+    "created": "Annotation ajoutée",
+    "detail": {
+      "anchor": "Texte annoté",
+      "assignee": "Assigné à",
+      "back": "Toutes les annotations",
+      "cancel": "Annuler",
+      "createKey": "Créer une clé",
+      "delete": "Supprimer l'annotation",
+      "deleteBody": "{count, plural, =0 {L'annotation sera supprimée pour tout le monde.} one {L'annotation et sa réponse seront supprimées pour tout le monde.} many {L'annotation et ses # réponses seront supprimées pour tout le monde.} other {L'annotation et ses # réponses seront supprimées pour tout le monde.}}",
+      "deleteConfirm": "Supprimer l'annotation",
+      "deleteTitle": "Supprimer l'annotation {n} ?",
+      "deleted": "Annotation supprimée",
+      "edit": "Modifier le commentaire",
+      "editText": "Modifier le texte",
+      "keep": "Conserver",
+      "more": "Plus d'actions",
+      "noKey": "Non liée à une clé",
+      "reaction": {
+        "approve": "Approuver ({count})",
+        "check": "Terminé ({count})",
+        "down": "Pouce vers le bas ({count})",
+        "eyes": "Je regarde ({count})",
+        "heart": "J'adore ({count})",
+        "up": "Pouce vers le haut ({count})"
+      },
+      "reactions": "Réactions",
+      "resolve": "Résoudre",
+      "save": "Enregistrer",
+      "status": "Statut",
+      "statusChanged": "Marqué comme {status}",
+      "title": "Annotation {n}",
+      "unassigned": "Non attribué",
+      "you": "(vous)"
+    },
+    "editor": {
+      "back": "Retour",
+      "candidates": "Clés correspondantes",
+      "createBody": "Ce texte n'est pas dans votre catalogue : il est probablement codé en dur. glot l'ajoute comme chaîne source ; un développeur remplace ensuite le littéral dans le code (glot i18nize ou une pull request).",
+      "createKey": "Créer une clé",
+      "createTitle": "Créer une clé à partir de ce texte",
+      "created": "Clé {key} créée",
+      "description": "Contexte pour les traducteurs (facultatif)",
+      "descriptionHint": "Où le texte apparaît et ce qu'il fait, par ex. \"Bouton qui lance l'essai gratuit\".",
+      "discard": "Abandonner",
+      "empty": "Texte vide. Pour supprimer cette traduction, utilisez Supprimer.",
+      "history": "Historique",
+      "inFrame": "Affiché sur le site",
+      "insert": "Insérer {name}",
+      "insertPlaceholder": "Insérer un espace réservé",
+      "invalid": "Rien n'a été enregistré : corrigez les erreurs affichées sous chaque langue.",
+      "keep": "Conserver",
+      "keyHint": "Laissez vide pour générer une clé à partir de la page et du texte.",
+      "keyName": "Nom de la clé (facultatif)",
+      "keyPlaceholder": "pricing.start_free_trial",
+      "missingPlaceholder": "L'espace réservé {name} est manquant.",
+      "noHistory": "Aucune version antérieure.",
+      "noText": "Aucun texte sélectionné",
+      "origin": {
+        "human": "Quelqu'un",
+        "machine": "IA"
+      },
+      "protected": "Les espaces réservés entre accolades sont remplis par votre application : conservez-les tous. Cliquez sur une puce pour l'insérer.",
+      "remove": "Supprimer",
+      "removeBody": "Votre site affichera la valeur de repli (en général le texte source) pour cette langue. L'historique est conservé, vous pourrez le restaurer.",
+      "removeConfirm": "Supprimer la traduction",
+      "removeTitle": "Supprimer la traduction de la langue {locale} ?",
+      "removed": "Traduction de la langue {locale} supprimée",
+      "reset": "Réinitialiser",
+      "restore": "Restaurer",
+      "reverted": "Version précédente de la langue {locale} restaurée",
+      "save": "{count, plural, =0 {Enregistrer} one {Enregistrer # langue} many {Enregistrer # langues} other {Enregistrer # langues}}",
+      "saved": "{count, plural, one {# traduction enregistrée} many {# traductions enregistrées} other {# traductions enregistrées}}",
+      "saving": "Enregistrement…",
+      "showInFrame": "Afficher sur le site",
+      "source": "Source (langue {locale})\\u00a0:",
+      "title": "Modifier le texte",
+      "undo": "Annuler",
+      "undoLast": "Annuler la dernière modification",
+      "unsaved": "{count, plural, one {# modification non enregistrée} many {# modifications non enregistrées} other {# modifications non enregistrées}}",
+      "upToDate": "Toutes les modifications enregistrées",
+      "valid": "Tout est correct"
+    },
+    "frame": {
+      "annotating": "Cliquez sur un texte de votre site pour laisser un commentaire. Appuyez sur Échap pour annuler.",
+      "cancel": "Annuler",
+      "connecting": "Connexion à votre site…",
+      "install": "Installer le widget",
+      "pickHere": "Placer l'annotation ici",
+      "picking": "Cliquez sur le texte voulu. Appuyez sur Échap pour annuler.",
+      "pickingBlind": "Le site ne peut pas encore signaler les clics. Installez le widget, ou affichez la dernière capture d'écran et cliquez dessus.",
+      "retry": "Réessayer",
+      "shotAlt": "Dernière capture d'écran de cette page issue du contrôle qualité visuel",
+      "showLive": "Afficher le site en direct",
+      "showShot": "Afficher la dernière capture d'écran",
+      "title": "Votre site : {url}",
+      "unreachable": {
+        "body": "Votre site n'a pas répondu : le widget glot n'est pas installé sur cette page, ou la page bloque son affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
+        "title": "Épingles en direct indisponibles."
+      }
+    },
+    "help": {
+      "body": "Les raccourcis à une seule clé fonctionnent lorsque vous ne saisissez pas de texte dans un champ.",
+      "c": "Commenter un texte du site",
+      "e": "Modifier le texte sélectionné",
+      "enabled": "Activer les raccourcis à une seule clé",
+      "esc": "Annuler la sélection",
+      "j": "Annotation suivante",
+      "k": "Annotation précédente",
+      "r": "Résoudre l'annotation sélectionnée",
+      "title": "Raccourcis clavier"
+    },
+    "installDialog": {
+      "body": "Une ligne dans le HTML de votre site. Elle permet à votre équipe d'annoter directement sur la page et à Review de placer les épingles avec précision.",
+      "frameBody": "Si vous ne pouvez pas ajouter le widget, ce script plus léger suffit à Review pour placer les épingles et prévisualiser les modifications. Votre site doit aussi autoriser son affichage dans un cadre (pas de X-Frame-Options DENY, et CSP frame-ancestors doit inclure ce tableau de bord).",
+      "frameTitle": "Vous voulez seulement des épingles sur cette page\föu00a0?",
+      "title": "Installer le widget glot"
+    },
+    "list": {
+      "allAuthors": "Tous les auteurs",
+      "allLocales": "Toutes les langues",
+      "allRoutes": "Toutes les pages",
+      "author": "Auteur",
+      "clearFilters": "Effacer les filtres",
+      "count": "{count, plural, =0 {Aucune annotation ne correspond} one {# annotation} many {# annotations} other {# annotations}}",
+      "empty": {
+        "body": "Appuyez sur C ou cliquez sur Commentaire, puis cliquez sur un texte de votre site pour lancer une discussion.",
+        "title": "Aucune annotation pour le moment",
+        "widgetBody": "Collez ceci dans le HTML de votre site afin que votre équipe et les relecteurs que vous invitez par lien puissent annoter directement la page.",
+        "widgetTitle": "Installez le widget en une ligne"
+      },
+      "filters": "Filtres",
+      "label": "Annotations",
+      "locale": "Langue",
+      "noMatch": "Aucune annotation ne correspond à ces filtres.",
+      "number": "Annotation {n}.",
+      "replies": "{count, plural, one {# réponse} many {# réponses} other {# réponses}}",
+      "resolvedThisWeek": "{count, plural, one {# annotation résolue cette semaine} many {# annotations résolues cette semaine} other {# annotations résolues cette semaine}}",
+      "route": "Page",
+      "search": "Rechercher des annotations",
+      "searchPlaceholder": "Rechercher un texte, une clé ou un auteur",
+      "status": "Statut",
+      "statusFilter": {
+        "active": "À faire",
+        "all": "Tous les statuts",
+        "done": "Terminé"
+      }
+    },
+    "live": {
+      "annotation": "{name} a ajouté une annotation",
+      "comment": "{name} a répondu à une annotation"
+    },
+    "noSite": {
+      "body": "Review affiche votre site en ligne avec les annotations de votre équipe par-dessus. Définissez d'abord l'URL de base de votre site ; cela prend 30 secondes.",
+      "cta": "Définir l'URL du site",
+      "title": "Connectez votre site pour le relire"
+    },
+    "openPanel": "{count, plural, =0 {Annotations} one {# annotation ouverte} many {# annotations ouvertes} other {# annotations ouvertes}}",
+    "panel": "Annotations",
+    "panelHint": "Toutes les annotations de ce projet, avec filtres, discussions et édition de texte.",
+    "pinLabel": "Annotation {n} : {body}",
+    "resolved": "Annotation {n} résolue",
+    "share": {
+      "access": "Autorisation",
+      "accessHint": {
+        "comment": "Ajoute des annotations, des réponses et des réactions.",
+        "edit": "Modifie aussi les textes, change les statuts et applique les suggestions.",
+        "read": "Voit les annotations et les discussions, sans pouvoir écrire."
+      },
+      "accessLevel": {
+        "comment": "Peut commenter",
+        "edit": "Peut commenter et modifier le texte",
+        "read": "Peut consulter"
+      },
+      "active": "{count, plural, =0 {Liens actifs} one {# lien actif} many {# liens actifs} other {# liens actifs}}",
+      "adminOnly": "Seuls les administrateurs du projet peuvent créer des liens de relecture. Demandez à un administrateur d'en partager un.",
+      "body": "Les relecteurs ouvrent votre site avec ce lien et l'annotent, sans compte requis. Les liens peuvent être révoqués à tout moment.",
+      "create": "Créer un lien",
+      "createdHint": "Toute personne disposant de ce lien obtient l'autorisation ci-dessus jusqu'à son expiration ou jusqu'à ce que vous le révoquiez.",
+      "createdTitle": "Lien prêt. Copiez-le maintenant : il ne sera plus affiché.",
+      "days": "{count, plural, one {# jour} many {# jours} other {# jours}}",
+      "expires": "Expire le {date}",
+      "expiry": "Expire après",
+      "label": "Nom (facultatif)",
+      "labelPlaceholder": "ex. relecteur allemand",
+      "never": "Jamais",
+      "neverExpires": "N'expire jamais",
+      "none": "Aucun lien actif.",
+      "revoke": "Révoquer {label}",
+      "revoked": "Lien révoqué",
+      "title": "Partager pour relecture",
+      "untitled": "Lien sans titre"
+    },
+    "status": {
+      "in_progress": "En cours",
+      "open": "Ouvert",
+      "resolved": "Résolu",
+      "wontfix": "Ne sera pas corrigé"
+    },
+    "subtitle": "Annotez votre site en direct avec votre équipe, corrigez les textes et livrez-le.",
+    "tabs": {
+      "annotations": "Annotations",
+      "reports": "Signalements utilisateurs"
+    },
+    "thread": {
+      "deleteComment": "Supprimer la réponse",
+      "editComment": "Modifier la réponse",
+      "edited": "modifié",
+      "reply": "Répondre",
+      "replyHint": "Ctrl+Entrée pour envoyer",
+      "replyPlaceholder": "Répondre…",
+      "send": "Envoyer",
+      "title": "{count, plural, =0 {Discussion} one {# réponse} many {# réponses} other {# réponses}}"
+    },
+    "title": "Relecture",
+    "toolbar": {
+      "comment": "Commenter",
+      "desktop": "Ordinateur",
+      "edit": "Modifier le texte",
+      "locale": "Langue affichée",
+      "mobile": "Mobile",
+      "reload": "Recharger le site",
+      "route": "Chemin de la page",
+      "share": "Partager",
+      "shortcuts": "Raccourcis clavier",
+      "tablet": "Tablette",
+      "viewport": "Taille d’écran"
+    },
+    "wording": {
+      "allLocales": "Validé dans {count, plural, one {# langue} many {# langues} other {# langues}}",
+      "applied": "Traduction enregistrée pour la langue {locale} et annotation résolue",
+      "apply": "Appliquer",
+      "applyAll": "Appliquer dans {count, plural, one {# langue} many {# langues} other {# langues}}",
+      "createKey": "Créer une clé",
+      "failed": "La traduction n’a pas pu être enregistrée. Réessayez.",
+      "instruction": "Instruction pour l’IA",
+      "instructionPlaceholder": "Facultatif : plus court, plus convivial…",
+      "invalidProposal": "Échoue à la validation dans au moins une langue",
+      "newWording": "Nouveau texte",
+      "noKey": "Ce texte n’est lié à aucune clé de traduction pour le moment, il ne peut donc pas être modifié ici. Créez d’abord une clé.",
+      "openPr": "Ouvrir une PR GitHub",
+      "prNeedsSettings": "Définissez un dépôt et un jeton dans Rapports utilisateur › Paramètres pour ouvrir des pull requests.",
+      "prOpened": "Pull request ouverte",
+      "previewHint": "Aperçu en direct sur le site pendant la saisie. Rien n’est enregistré tant que vous n’appliquez pas.",
+      "rejected": "{count, plural, one {# version a été écartée car elle ne respecte pas une règle (variable, glossaire, longueur).} many {# versions ont été écartées car elles ne respectent pas une règle (variable, glossaire, longueur).} other {# versions ont été écartées car elles ne respectent pas une règle (variable, glossaire, longueur).}}",
+      "rephrase": "Reformuler",
+      "rephrasing": "Reformulation…",
+      "showLocales": "Voir {count, plural, one {# langue} many {# langues} other {# langues}}",
+      "source": "Source/u00a0:",
+      "title": "Corriger le texte",
+      "variants": "Choisissez une version, survolez pour prévisualiser"
+    }
+  },
+  "xpWizard": {
+    "audience": {
+      "add": "Ajouter un segment",
+      "attr": {
+        "country": "Pays",
+        "device": "Appareil",
+        "locale": "Langues",
+        "source": "Source du trafic",
+        "visitor": "Visiteur"
+      },
+      "countryBad": "Code pays non valide\\u00a0: {codes}",
+      "countryHint": "Codes à deux lettres, séparés par des virgules. Laisser vide pour tous les pays.",
+      "days": "{n, plural, one {# jour} many {# jours} other {# jours}}",
+      "device": {
+        "desktop": "Ordinateur",
+        "mobile": "Mobile",
+        "tablet": "Tablette"
+      },
+      "estimateUnavailable": "Estimation du trafic indisponible pour le moment. Elle repose sur les 30 derniers jours de visites enregistrées par glot insights.",
+      "everyone": "Tous",
+      "everyoneElse": "Tous les autres",
+      "everyoneElseHint": "Visiteurs qui ne correspondent à aucun segment ci-dessus.",
+      "everyoneHint": "Tous les visiteurs des langues testées.",
+      "fragmentedMany": "{n} segments divisent vos visiteurs en {n} groupes et ralentissent chaque résultat. Conservez uniquement les segments pour lesquels vous attendez réellement un gagnant différent.",
+      "fragmentedSlow": "{n, plural, one {# segment nécessite} many {# segments nécessitent} other {# segments nécessitent}} plus de {max} jours. Supprimez ou élargissez {n, plural, one {ce segment} many {ces segments} other {ces segments}}, sinon le test portera surtout sur Tous les autres.",
+      "fragmentedTitle": "Votre trafic est trop dispersé",
+      "max": "{n} segments au maximum.",
+      "merged": "Trafic insuffisant : sera fusionné avec Tous les autres",
+      "name": "Segment {n}",
+      "namePlaceholder": "Trafic de recherche allemand",
+      "needs": "Nécessite environ",
+      "perDay": "visiteurs par jour",
+      "preset": {
+        "mobile": "Visiteurs mobiles",
+        "new": "Nouveaux visiteurs",
+        "search": "Trafic de recherche"
+      },
+      "remove": "Supprimer {name}",
+      "source": {
+        "direct": "Direct",
+        "email": "E-mail",
+        "paid": "Payant",
+        "referral": "Recommandation",
+        "search": "Recherche",
+        "social": "Réseaux sociaux"
+      },
+      "total": "Durée prévue : <b>{days, plural, one {# jour} many {# jours} other {# jours}}</b> pour détecter une hausse de 20 %.",
+      "unnamed": "Segment",
+      "visitor": {
+        "new": "Nouveau",
+        "returning": "Récurrent"
+      },
+      "visitorHint": "Les visiteurs nouveaux et de retour ne sont connus que s'ils ont accepté les cookies de votre site ; les autres sont comptés dans « Tous les autres »."
+    },
+    "autosaved": "Brouillon enregistré automatiquement",
+    "back": "Retour",
+    "backToList": "Toutes les expériences",
+    "block": {
+      "countries": "Un code pays n'est pas valide. Utilisez des codes ISO à deux lettres, comme DE ou FR.",
+      "currency": "Saisissez un code devise à trois lettres, comme EUR.",
+      "empty": "{n, plural, one {# texte est encore vide} many {# textes sont encore vides} other {# textes sont encore vides}}. Remplissez toutes les langues de chaque variante ou supprimez la variante.",
+      "errors": "{n, plural, one {# texte comporte une erreur de validation} many {# textes comportent une erreur de validation} other {# textes comportent une erreur de validation}}. Corrigez les cellules marquées en rouge.",
+      "goal": "Choisissez l'événement de conversion qui détermine le gagnant.",
+      "keys": "Sélectionnez au moins une clé à tester.",
+      "minN": "L'échantillon minimum doit comporter au moins {n} visiteurs par variante.",
+      "noArm": "Ajoutez au moins une variante : générez-la avec l'IA ou rédigez-la manuellement.",
+      "validating": "Vérification de vos textes en cours. Réessayez dans une seconde."
+    },
+    "continue": "Continuer vers {step}",
+    "done": "(terminé)",
+    "keys": {
+      "cropAlt": "Capture de la clé {key} dans la langue {locale} sur {route}",
+      "emptySelected": "Les clés sélectionnées apparaissent ici avec leur texte actuel dans chaque langue.",
+      "groupCount": "{n, plural, one {# clé} many {# clés} other {# clés}}",
+      "groups": "Ajouter un groupe complet",
+      "missing": "non traduit",
+      "more": "Affichage de {shown} sur {total}. Affinez la recherche pour voir les autres.",
+      "noKeys": "Ce projet ne contient pas encore de clés. Envoyez d'abord votre catalogue avec glot push.",
+      "noMatch": "Aucune clé ne correspond à « {q} ». Essayez une recherche plus courte.",
+      "openMatrix": "Ouvrir la matrice des langues",
+      "remove": "Supprimer la clé {key}",
+      "results": "Clés correspondantes",
+      "search": "Rechercher des clés",
+      "searchHint": "Saisissez une partie d'une clé ou de son texte. Des groupes de clés liées peuvent être ajoutés en un clic.",
+      "selected": "{n, plural, =0 {Aucune clé sélectionnée} one {# clé sélectionnée} many {# clés sélectionnées} other {# clés sélectionnées}}"
+    },
+    "launch": {
+      "cookie": "Mémorisation de la variante",
+      "cookieMode": {
+        "none": {
+          "body": "Rien n'est stocké sur l'appareil. Un visiteur peut voir une autre variante après un rechargement. Convient à une page d'accueil unique.",
+          "label": "Aucun cookie"
+        },
+        "session": {
+          "body": "Un cookie propriétaire ne conserve la variante que jusqu'à la fermeture du navigateur. Les visiteurs voient le même texte d'une page à l'autre. Recommandé.",
+          "label": "Cookie de session"
+        }
+      },
+      "currency": "Devise",
+      "edit": "Modifier {what}",
+      "editShort": "Modifier",
+      "everyone": "Tout le monde",
+      "gdpr": "Aucun des deux modes ne stocke d'adresse IP, d'agent utilisateur ni d'identifiant : glot ne conserve que des compteurs agrégés. Le cookie de session est conçu pour correspondre à l'exemption de la CNIL pour la mesure d'audience (sans bandeau de consentement) ; faites-la confirmer par votre DPO pour votre site. S'applique à toutes les expériences de ce projet.",
+      "goal": "Événement de conversion",
+      "goalHint": "Événements reçus de votre site au cours des 30 derniers jours. Choisissez-en un ou saisissez un autre.",
+      "goalHintNone": "Aucun événement reçu pour l'instant. Saisissez le nom transmis à track(), par exemple signup.",
+      "goalInput": "Nom de l'événement",
+      "minN": "Visiteurs minimum par variante",
+      "minNHint": "Aucune décision avant cet échantillon ni avant 7 jours, quels que soient les premiers résultats. {n} au minimum ; 500 convient à la plupart des pages d'atterrissage.",
+      "name": "Nom de l'expérience",
+      "notSet": "non défini",
+      "problems": "Corrigez avant de lancer",
+      "recap": "Récapitulatif",
+      "recapAudience": "Audience",
+      "recapGoal": "Objectif",
+      "recapKeys": "Clés",
+      "recapMin": "au moins {n} visiteurs par variante",
+      "recapVariants": "Variantes",
+      "recapVariantsValue": "{n, plural, one {# variante} many {# variantes} other {# variantes}} + officielle, {locales, plural, one {# langue} many {# langues} other {# langues}}",
+      "revenue": "Optimiser le revenu",
+      "revenueHint": "Choisissez la variante qui rapporte le plus par visiteur, et non celle qui convertit le mieux. Transmettez le montant et la devise à track() avec l'événement.",
+      "revenueIn": "revenu en {currency}",
+      "segmentN": "Segment {n}"
+    },
+    "launchCta": "Lancer l'expérience",
+    "launched": "Expérience en ligne : les visiteurs voient désormais les variantes",
+    "launching": "Lancement…",
+    "progress": "Progression de la configuration de l'expérience",
+    "restored": "Nous avons restauré votre brouillon inachevé.",
+    "saving": "Enregistrement du brouillon…",
+    "startOver": "Recommencer",
+    "stepOf": "Étape {n} sur {total}",
+    "steps": {
+      "audience": {
+        "body": "Tout le monde par défaut. Ajoutez des segments seulement si vous attendez un gagnant différent pour eux : chaque segment a besoin de son propre trafic.",
+        "short": "Audience",
+        "title": "Qui voit le test ?"
+      },
+      "keys": {
+        "body": "Choisissez les textes qui changent ensemble, comme le titre, le sous-titre et le bouton d'une section d'accueil. Chaque variante réécrit tous ces textes, dans toutes les langues.",
+        "short": "Ce qu'il faut tester",
+        "title": "Que voulez-vous tester ?"
+      },
+      "launch": {
+        "body": "Choisissez l'événement qui signifie le succès. glot affiche les variantes, compte les conversions et vous indique quand un gagnant se dégage.",
+        "short": "Objectif et lancement",
+        "title": "Qu'est-ce qui compte comme une victoire ?"
+      },
+      "variants": {
+        "body": "Une variante est une intention : une raison différente de cliquer. Laissez l'IA les rédiger à partir des intentions que vous choisissez, ou saisissez les vôtres. Chaque texte est vérifié en direct par le même validateur que vos traductions.",
+        "short": "Variantes",
+        "title": "Rédigez les variantes"
+      }
+    },
+    "subtitle": "Testez de nouvelles formulations pour quelques textes, dans toutes les langues, et laissez vos visiteurs choisir le gagnant. Quatre étapes, environ deux minutes, aucune statistique requise.",
+    "title": "Nouvelle expérience",
+    "variants": {
+      "budget": "tient en {px} px, {lines, plural, one {# ligne} many {# lignes} other {# lignes}}",
+      "cellChecking": "Vérification…",
+      "cellEmpty": "Obligatoire",
+      "cellLabel": "Variante {letter}, clé {key}, langue {locale}",
+      "cellOk": "Passe la validation",
+      "empty": "Aucune variante pour l'instant. Générez-en à partir des intentions ci-dessus, ou écrivez-en une à la main.",
+      "facts": "Faits que l'IA peut citer",
+      "factsHint": "Un par ligne. Les chiffres, notes et dates absents de cette liste sont rejetés, afin que les variantes n'inventent jamais d'affirmations.",
+      "factsPlaceholder": "2 000 équipes\nNoté 4,8/5",
+      "generate": "{n, plural, one {Générer # variante avec l'IA} many {Générer # variantes avec l'IA} other {Générer # variantes avec l'IA}}",
+      "generated": "{n, plural, one {# variante ajoutée} many {# variantes ajoutées} other {# variantes ajoutées}}",
+      "generating": "Rédaction des variantes dans toutes les langues…",
+      "gridLabel": "Variantes par langue",
+      "handWritten": "Rédigée à la main",
+      "intent": {
+        "benefit": {
+          "hint": "Ce que le visiteur obtient, immédiatement",
+          "label": "Bénéfice direct"
+        },
+        "clarity": {
+          "hint": "Indiquez exactement ce qui se passe au clic",
+          "label": "Clarté"
+        },
+        "simplicity": {
+          "hint": "Plus court, plus simple, moins de mots",
+          "label": "Simplicité"
+        },
+        "social_proof": {
+          "hint": "D'autres l'utilisent déjà et lui font confiance",
+          "label": "Preuve sociale"
+        },
+        "urgency": {
+          "hint": "Une vraie raison d'agir maintenant, sans faux compte à rebours",
+          "label": "Urgence réelle"
+        }
+      },
+      "intentOf": "Intention de la variante {letter}",
+      "intents": "Intentions",
+      "intentsHint": "Chaque intention devient une variante. Choisissez-en jusqu'à trois.",
+      "locale": "Langue",
+      "manual": "Rédiger à la main",
+      "manualLabel": "Intention d'une variante rédigée à la main",
+      "manualPlaceholder": "Votre intention, par exemple « Gratuit à vie »",
+      "maxArms": "{n} variantes maximum : plus de variantes allongent le test. Supprimez-en une pour en ajouter une autre.",
+      "noOfficial": "non traduit",
+      "official": "Officielle (témoin)",
+      "officialShort": "Officielle :",
+      "or": "ou",
+      "policyHint": "Modifiez le texte ou choisissez une autre intention. Les clés liées aux prix et au juridique ne peuvent jamais être testées.",
+      "policyTitle": "Certains textes ont été retenus",
+      "remove": "Supprimer la variante {letter}",
+      "summary": {
+        "checking": "Vérification de vos textes…",
+        "empty": "{n, plural, one {# texte} many {# textes} other {# textes}} à rédiger avant de pouvoir continuer.",
+        "errors": "{n, plural, one {# texte nécessite} many {# textes nécessitent} other {# textes nécessitent}} une correction : voir les cellules en rouge.",
+        "ok": "Tous les {total} textes passent la validation.",
+        "saveError": "Vos dernières modifications n’ont pas pu être enregistrées. Vérifiez votre connexion ; nous réessaierons dès que vous saisirez à nouveau."
+      },
+      "variantName": "Variante {letter}"
+    }
   }
 }

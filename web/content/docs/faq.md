@@ -2,7 +2,7 @@
 
 ## What does glot cost?
 
-glot is MIT-licensed: no seats, no per-word pricing, no hosted plan. You pay your LLM provider directly with your own key. Self-hosting the optional server costs whatever your Postgres and two containers cost.
+The CLI, the validator and the MCP server are MIT-licensed and free: no seats, no per-word pricing. You pay your LLM provider directly with your own key. glot cloud (dashboard, review, GitHub sync, copy experiments) has a free plan and paid Pro and Team plans: see [pricing](/pricing). Self-hosting the server costs whatever your Postgres and two containers cost, with no limits.
 
 ## How much do translations cost in LLM usage?
 
@@ -38,7 +38,7 @@ The estimate uses the real prompts, the expected output (plural forms of each ta
 | `ANTHROPIC_WORKSPACE_ID` | same | Sent as `anthropic-workspace-id`; required by organization-level user keys (`sk-ant-usr-…`) |
 | `GLOT_TOKEN` | `push`, `pull` | Server API token (name configurable with `server.token_env`) |
 | `GLOT_DEV_TOKEN` | `dev` | Fixed token for the overlay server (else `--token`, else random) |
-| `GLOT_VISUAL_QA` | `fit`, `measure`, `coverage --render`, `translate --visual` | Path to a `visual-qa` CLI to use instead of `npx -y @glot/visual-qa` |
+| `GLOT_VISUAL_QA` | `fit`, `measure`, `coverage --render`, `translate --visual` | Path to a `visual-qa` CLI to use instead of `npx -y @glot-i18n/visual-qa` |
 | `GLOT_AGENT_QA` | `parity` | Same for `agent-qa` |
 | `DATABASE_URL` | `db` | Postgres URL when `--database-url` is not given |
 
@@ -54,8 +54,8 @@ Yes, anywhere: in the JSON, with `glot set fr key "…"`, in the dashboard or wi
 
 ## Does glot add a runtime dependency?
 
-No. Your app keeps using next-intl, i18next or FormatJS with plain JSON catalogs. The only runtime packages are opt-in: [`@glot/runtime`](runtime.md) (on-device fallback), `@glot/overlay` (dev only) and `@glot/insights`.
+No. Your app keeps using next-intl, i18next or FormatJS with plain catalog files: JSON, JS dictionaries, Apple `.xcstrings` and `.strings`, Android `strings.xml`, Flutter ARB, gettext PO or YAML. The only runtime packages are opt-in: [`@glot-i18n/runtime`](runtime.md) (on-device fallback), `@glot-i18n/overlay` (dev only) and `@glot-i18n/insights`.
 
 ## How is this different from Lokalise, Crowdin or Lingo.dev?
 
-Git is the source of truth (no sync to a hosted editor), every LLM output is validated deterministically before it is written, coding agents get live context through MCP, and translations are fitted to the pixels they actually have. The comparison on the [home page](/#compare) links every cell to its public source.
+Git is the source of truth (no sync to a hosted editor), every LLM output is validated deterministically before it is written, coding agents get live context through MCP, and translations are fitted to the pixels they actually have. The comparison on the [localization page](/i18n#compare) links every cell to its public source.

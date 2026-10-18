@@ -1,7 +1,7 @@
 {
   "name": "@glot/runtime",
   "version": "0.4.0",
-  "description": "Long-tail locales at zero cost: on-device UI translation (Chrome Translator API) with glot's guarantees \u2014 masked placeholders, glossary, plural structure, WASM validation, source fallback.",
+  "description": "Long-tail locales at zero cost: on-device UI translation (Chrome Translator API) with glot's guarantees — masked placeholders, glossary, plural structure, WASM validation, source fallback.",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",
   "repository": {
@@ -30,6 +30,10 @@
       "types": "./dist/ondemand.d.ts",
       "default": "./dist/ondemand.js"
     },
+    "./experiments": {
+      "types": "./dist/experiments.d.ts",
+      "default": "./dist/experiments.js"
+    },
     "./i18next": {
       "types": "./dist/i18next.d.ts",
       "default": "./dist/i18next.js"
@@ -50,8 +54,8 @@
   "sideEffects": false,
   "scripts": {
     "build:wasm": "cd ../.. && CARGO_PROFILE_RELEASE_LTO=true CARGO_PROFILE_RELEASE_OPT_LEVEL=z CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_STRIP=true cargo build -p glot-wasm --release --target wasm32-unknown-unknown && mkdir -p packages/runtime/dist && cp ${CARGO_TARGET_DIR:-target}/wasm32-unknown-unknown/release/glot_wasm.wasm packages/runtime/dist/glot.wasm",
-    "build": "esbuild src/index.ts --bundle --format=esm --minify --target=es2022 --outfile=dist/index.js && esbuild src/next-intl.ts src/next-intl-server.ts src/i18next.ts src/ondemand.ts src/dev.ts src/provenance.ts --bundle --format=esm --minify --target=es2022 --external:react --external:next-intl --external:./index.js --external:./next-intl.js --outdir=dist && tsc",
-    "test": "node --test test/mask.test.ts test/variants.test.ts test/browser.test.ts test/ondemand.test.ts test/dev.test.ts test/provenance.test.ts",
+    "build": "esbuild src/index.ts --bundle --format=esm --minify --target=es2022 --outfile=dist/index.js && esbuild src/next-intl.ts src/next-intl-server.ts src/i18next.ts src/ondemand.ts src/experiments.ts src/dev.ts src/provenance.ts --bundle --format=esm --minify --target=es2022 --external:react --external:next-intl --external:./index.js --external:./next-intl.js --external:./experiments.js --outdir=dist && tsc",
+    "test": "node --test test/mask.test.ts test/variants.test.ts test/browser.test.ts test/ondemand.test.ts test/dev.test.ts test/provenance.test.ts test/experiments.test.ts",
     "prepack": "test -f dist/glot.wasm || npm run build:wasm; npm run build"
   },
   "peerDependencies": {

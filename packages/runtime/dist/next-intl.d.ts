@@ -31,4 +31,33 @@ export declare function GlotVariants({ children }: {
 }, "locale"> & {
     locale?: import("next-intl").Locale;
 }> | null | undefined;
+/**
+ * In the layout, inside NextIntlClientProvider: `<GlotExperiments header={(await headers()).get("x-glot-xp")}>`.
+ * Keeps this request's assignments (sessionStorage `glot_xp`) so `track()` credits the right experiment/cell/arm.
+ */
+export declare function GlotExperiments({ header, children }: {
+    header: string | null | undefined;
+    children?: ReactNode;
+}): import("react").FunctionComponentElement<import("react").ProviderProps<boolean>>;
+/** `t(key, values)` with this visitor's client-side copy variant (full dotted key); same as `t()` under SSR experiments. */
+export declare function useGlotCopy(key: string, values?: Values): string;
+/**
+ * Client-only fallback (no edge): the block — and only it — stays `visibility: hidden` until this session's
+ * assignment is known, at most `budget` ms (CSS-enforced, so it also holds without JS or with slow JS), then the
+ * official text shows. Under the edge (`<GlotExperiments>` got an `x-glot-xp`) it never masks.
+ */
+export declare function GlotCopy({ k, values, budget }: {
+    k: string;
+    values?: Values;
+    budget?: number;
+}): import("react").DetailedReactHTMLElement<{
+    "data-glot-key": string;
+    style?: undefined;
+} | {
+    "data-glot-key": string;
+    style: {
+        visibility: "hidden";
+        animation: `glot-reveal 0s ${number}ms forwards`;
+    };
+}, HTMLElement>;
 export {};

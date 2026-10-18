@@ -32,6 +32,7 @@ The server instructions tell the agent: before adding UI text, call `propose_str
 | `glossary_upsert` | Adds or updates a term. If it conflicts with an existing translation, the human is asked (elicitation) when the client supports it; otherwise nothing is written unless `overwrite: true`. |
 | `remove_keys` | Deletes keys from every catalog and the lock; warns if they are still referenced in code. |
 | `review_translation` | Back-translation into the source language, explanation and verdict (`same`, `nuance`, `different`) with a suggestion. Cached in `.glot/review.json`. |
+| `render_check` | Render safety per locale, no browser: glyphs missing from the webfonts, RTL bidi bugs, no-break spaces, quotes, digits ([Labs](labs.md#render-safety-glot-labs-render)). Fixable findings carry `fixed`, the value to pass to `set_translation`. |
 | `mine_glossary` | Finds glossary terms and inconsistent translations; `apply: true` writes the glossary and retranslates those keys. |
 
 ## Resources

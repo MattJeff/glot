@@ -194,7 +194,7 @@ async fn remote_mcp_end_to_end() {
     // ---- API token: full toolset ----
     let c = mcp_client(format!("{base}/mcp?project=demo"), &api_token).await;
     let tools = tool_names(&c.list_all_tools().await.unwrap());
-    assert_eq!(tools.len(), 11, "{tools:?}");
+    assert_eq!(tools.len(), 19, "{tools:?}"); // 11 + 5 annotations_* + 3 experiment_*
     let (ok, v) = call(
         &c,
         "propose_string",
@@ -458,7 +458,9 @@ async fn remote_mcp_end_to_end() {
     assert_eq!(
         tools,
         [
+            "annotations_list",
             "check",
+            "experiment_status",
             "get_context",
             "glossary_lookup",
             "propose_string",

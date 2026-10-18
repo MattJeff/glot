@@ -93,7 +93,7 @@ Every output goes through the [validator](concepts.md#validator) before it is wr
 
 ## Visual commands need Node.js and Chromium
 
-`glot fit`, `glot measure`, `glot coverage --render` and `glot translate --visual` drive a real browser through the `@glot/visual-qa` helper (Playwright); `glot parity` uses `@glot/agent-qa`. The glot binary itself needs neither. glot starts the helper with `npx -y @glot/visual-qa` (pinned to its own version) unless `glot-visual-qa` is on your PATH, so you only need:
+`glot fit`, `glot measure`, `glot coverage --render` and `glot translate --visual` drive a real browser through the `@glot-i18n/visual-qa` helper (Playwright); `glot parity` uses `@glot-i18n/agent-qa`. The glot binary itself needs neither. glot starts the helper with `npx -y @glot-i18n/visual-qa` (pinned to its own version) unless `glot-visual-qa` is on your PATH, so you only need:
 
 ```sh
 node --version                   # Node.js >= 20

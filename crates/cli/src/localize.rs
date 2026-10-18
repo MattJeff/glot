@@ -23,6 +23,9 @@ pub struct LocalizeArgs {
     /// Skip the code rewrite (strings already in catalogs).
     #[arg(long)]
     pub no_i18nize: bool,
+    /// Do not run the package manager (passed to `glot i18nize`); the install command is printed instead.
+    #[arg(long)]
+    pub no_install: bool,
     /// Print the agent prompt for this project and exit (like i18next-cli `--print-agent-prompt`).
     #[arg(long)]
     pub print_agent_prompt: bool,
@@ -91,6 +94,9 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
     if !a.no_i18nize {
         let mut args = vec![s("i18nize")];
         args.extend(dry.iter().chain(&flags).cloned());
+        if a.no_install {
+            args.push(s("--no-install"));
+        }
         // ponytail: unsupported framework / nothing to rewrite is not fatal, catalogs may already be complete.
         if !step("i18nize", &args)? {
             anstream::eprintln!(
@@ -128,6 +134,7 @@ pub fn agent_prompt_cmd(a: AgentPromptArgs) -> Result<ExitCode> {
 }
 
 /// Stack-specific i18n rules + the glot commands, from glot.toml when present, else detection.
+/// Also the body of the block `glot init` writes to CLAUDE.md / AGENTS.md / skills / Cursor rules.
 pub fn agent_prompt(root: &Path, target: &str) -> String {
     let d = crate::init::detect(root);
     let (source, targets, files) = match glot_core::config::Config::load(root) {
@@ -135,50 +142,135 @@ pub fn agent_prompt(root: &Path, target: &str) -> String {
         Err(_) => ("en".into(), "<locales>".into(), d.files.clone()),
     };
     let listed = targets.replace(',', ", ");
-    let catalog = files
+    let cats = files
+        .iter()
+        .map(|f| format!("`{f}`"))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let source_file = files
         .first()
         .map(|f| f.replace("{locale}", &source))
         .unwrap_or_default();
-    let usage = match d.stack {
-        "next-intl" => format!(
-            "This is a Next.js app using next-intl. Use `const t = useTranslations(\"<section>\")` in client components and `const t = await getTranslations(\"<section>\")` in server components. Catalog: {catalog}. Plurals: ICU, e.g. \"{{count, plural, one {{# invoice}} other {{# invoices}}}}\" with t(\"invoices.count\", {{ count }})."
-        ),
-        "i18next" | "react-i18next" => format!(
-            "This app uses react-i18next. Use `const {{ t }} = useTranslation()` and `<Trans>` for markup. Catalog: {catalog}. Placeholders are {{{{name}}}}; plurals use _one/_other key suffixes with t(\"key\", {{ count }})."
-        ),
-        "react-intl" => format!(
-            "This app uses react-intl (FormatJS). Use `useIntl().formatMessage({{ id }})` or `<FormattedMessage id=… />`. Catalog: {catalog}. ICU placeholders and plurals."
-        ),
-        "vue-i18n" => format!(
-            "This app uses vue-i18n. Use `$t(\"key\")` / `useI18n().t`. Catalog: {catalog}."
-        ),
-        "lingui" => {
-            format!("This app uses Lingui. Use the `t` macro / `<Trans>`. Catalog: {catalog}.")
-        }
-        _ => format!(
-            "No i18n library yet. Next.js App Router: install next-intl (catalogs messages/<locale>.json). Vite/React: react-i18next + i18next, initialized in src/i18n.ts imported first by the entry file (catalogs src/locales/<locale>.json). Current catalog pattern: {}.",
-            files.join(", ")
-        ),
-    };
-    let run = if target == "agent" {
-        format!(
-            "When asked to translate the app or add a language, run `npx -y glot-i18n localize --yes --targets {targets}` (init → i18nize → translate → check; idempotent). It needs ANTHROPIC_API_KEY or OPENAI_API_KEY. `glot check` must exit 0 before you finish; commit glot.lock with the catalogs."
+    let agent = target == "agent";
+    let copy = "Every user-facing string (headings, buttons, labels, placeholders, aria-labels, titles, toasts, errors, empty states, emails)";
+    let keys = "Keys are nested and named `<screen>.<component>.<role>`, lowercase snake_case: `billing.plan_card.upgrade_button`, `auth.login_form.email_label`. Reuse `common.*` for generic actions (`common.cancel`, `common.save`).";
+    let localize = format!(
+        "`npx -y glot-i18n localize --yes --targets {targets}` (add the new locale to the list)"
+    );
+    let own_lib = !["i18next", "next-intl", "react-intl", "lingui", "vue-i18n"].contains(&d.stack)
+        && !d.stack.contains("no i18n library");
+    let custom = own_lib.then(|| crate::init::custom_runtime(root)).flatten();
+    let own = custom.is_some() || d.stack.starts_with("custom") || d.stack == "TS/JS dictionaries";
+    let mut rules: Vec<String> = vec![];
+    let (plural, switcher) = if own {
+        // A hand-rolled runtime: keep it, never a second one (i18next / next-intl).
+        let hook = custom.as_ref().map_or_else(
+            || "the app's own `t()`".to_string(),
+            |c| format!("`const {{ t }} = {}()` from `{}`", c.hook, c.module),
+        );
+        let style = std::fs::read_to_string(root.join(&source_file))
+            .ok()
+            .and_then(|t| {
+                glot_core::formats::parse(
+                    glot_core::catalog::Format::Js,
+                    Path::new(&source_file),
+                    &t,
+                    &source,
+                )
+                .ok()
+            })
+            .and_then(|p| p.entries.keys().next().cloned())
+            .map_or_else(
+                || "the existing key style".to_string(),
+                |k| format!("the existing key style (`{k}`)"),
+            );
+        rules.push(format!(
+            "This app has its own i18n runtime: {hook}, dictionary {cats}. Keep using it: do NOT install i18next or next-intl, do NOT create a second dictionary. {copy} goes through `t('<key>')`. Add keys to the `{source}` object only, in {style}; glot fills the other locales in place."
+        ));
+        rules.push("Replace any `language === 'xx' ? … : …` you touch with `t('<key>')`.".into());
+        (
+            "No placeholders or plurals unless the app's `t()` handles them: one full sentence per key, never built by concatenation. Dates, numbers, currencies: `Intl` with the active locale.".to_string(),
+            "Language switcher: the existing context's setter (no new state, no new context).".to_string(),
         )
     } else {
-        // App builders (Lovable, Bolt, v0) usually cannot run a CLI: keep the code translation-ready.
-        format!(
-            "Translation itself happens outside this builder: the repository runs `npx -y glot-i18n localize --yes --targets {targets}` (or its GitHub workflow). If you can run commands, run it; otherwise just keep every string in the {source} catalog."
+        let (usage, plural, switcher) = match d.stack {
+            "next-intl" | "next.js (no i18n library yet)" => (
+                format!(
+                    "{copy} goes through `const t = useTranslations(\"<screen>\")` (client) or `const t = await getTranslations(\"<screen>\")` (server)"
+                ),
+                "ICU: `{count, plural, one {# invoice} other {# invoices}}` with `t(\"invoices.count\", { count })`. Placeholders `{name}`.",
+                "Language switcher: the `LocaleSwitcher` from `glot i18nize --switcher` (next-intl routing).",
+            ),
+            "i18next" | "react-i18next" | "react (no i18n library yet)" => (
+                format!(
+                    "{copy} goes through `const {{ t }} = useTranslation()` (`<Trans>` for markup)"
+                ),
+                "Placeholders `{{name}}`, plurals with `_one`/`_other` suffixes and `t(\"key\", { count })`.",
+                "Language switcher: call `setLocale(locale)` from `src/i18n.ts`.",
+            ),
+            "react-intl" => (
+                format!(
+                    "{copy} goes through `useIntl().formatMessage({{ id }})` or `<FormattedMessage id=… />`"
+                ),
+                "ICU placeholders `{name}` and plurals `{count, plural, one {#} other {#}}`.",
+                "",
+            ),
+            "vue-i18n" | "nuxt-i18n" => (
+                format!("{copy} goes through `$t(\"key\")` / `useI18n().t`"),
+                "Placeholders `{name}`, plurals `one | many` with `$t(\"key\", count)`.",
+                "",
+            ),
+            "lingui" => (
+                format!("{copy} goes through the `t` macro / `<Trans>`"),
+                "ICU placeholders and plurals.",
+                "",
+            ),
+            _ => (
+                format!("{copy} goes through the i18n library ({})", d.stack),
+                "Placeholders and plurals in the catalog syntax.",
+                "",
+            ),
+        };
+        let mut usage = usage;
+        if d.stack.contains("no i18n library") {
+            usage +=
+                ". No library is wired yet: run `glot i18nize` first (it installs and wires it)";
+        }
+        rules.push(format!(
+            "{usage}. Never hardcode text in components, never `lang === 'fr' ? … : …`."
+        ));
+        rules.push(keys.into());
+        (
+            format!(
+                "{plural} Never build sentences by concatenation. Dates, numbers, currencies: `Intl` with the active locale."
+            ),
+            switcher.to_string(),
         )
     };
+    rules.push(if agent {
+        format!("Add a string: MCP tool `propose_string` (server `glot`), then `add_string`. Without MCP: `glot add <key> \"<text>\" --note \"<where it shows, max length>\"`. Write only the `{source}` catalog; never edit {listed}: glot translates them.")
+    } else {
+        format!("Write only the `{source}` catalog ({source_file}); never create or edit {listed}: glot generates them.")
+    });
+    rules.push(plural);
+    rules.push(format!("Leave room for text 30-40% longer than `{source}`: no fixed widths on buttons, tabs, badges. Brand and product names stay untranslated."));
+    rules.push(format!(
+        "\"Make the app multilingual\" / \"add a language\": do NOT create a LanguageContext, a `translations` object or a new i18n library. {}{}",
+        if agent {
+            format!("Run {localize}.")
+        } else {
+            format!("Translation itself happens outside this builder: the repository runs {localize} (or its GitHub workflow). If you can run commands, run it; otherwise just keep every string in the `{source}` catalog.")
+        },
+        if switcher.is_empty() { String::new() } else { format!(" {switcher}") }
+    ));
+    rules.push(if agent {
+        "Before finishing: `glot check` must exit 0. Commit `glot.lock` with the catalogs.".into()
+    } else {
+        "The repository's `glot check` must pass.".into()
+    });
     format!(
-        "Internationalization rules (this app is translated with glot, https://github.com/MattJeff/glot):\n\
-         - {usage}\n\
-         - Never hardcode user-facing text: headings, buttons, labels, placeholders, aria-labels, titles, toasts, error and empty states all go through the i18n library.\n\
-         - Add new strings to the `{source}` catalog only, with nested keys named by screen and role (e.g. \"billing.plan_card.upgrade_button\"). Never create or edit other locales' files ({listed}); glot generates them.\n\
-         - Placeholders and ICU plurals, never string concatenation. Format dates, numbers and currencies with Intl using the active locale.\n\
-         - Leave room for text 30-40% longer than {source}: no fixed widths on buttons, tabs or badges.\n\
-         - Brand and product names stay untranslated.\n\
-         - {run}\n"
+        "This app is localized with glot (https://github.com/MattJeff/glot). Source locale: `{source}`. Targets: {listed}. Catalogs: {cats} (source: `{source_file}`).\n\n{}",
+        rules.iter().map(|r| format!("- {r}\n")).collect::<String>()
     )
 }
 

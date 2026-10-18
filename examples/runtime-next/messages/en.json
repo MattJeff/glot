@@ -2,10 +2,12 @@
   "home": {
     "title": "Welcome to glot, {name}",
     "files": "You have {n, plural, one {# file} other {# files}} in your Workspace",
-    "server": "This text comes from a Server Component"
+    "server": "This text comes from a Server Component",
+    "tagline": "Copy experiments without flicker"
   },
   "counter": {
     "label": "Clicks: {count}",
-    "button": "Add one"
+    "button": "Add one",
+    "buy": "Buy for €49"
   }
 }

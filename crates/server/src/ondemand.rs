@@ -173,6 +173,8 @@ pub async fn gate(
             "monthly on-demand translation budget spent",
         ));
     }
+    crate::billing::check_llm(state, p).await?;
+    crate::billing::consume(state, p.id, crate::billing::ONDEMAND).await?;
     sqlx::query("INSERT INTO jobs (id, project_id, kind, status, params) VALUES ($1, $2, 'translate', 'queued', $3)")
         .bind(Uuid::new_v4())
         .bind(p.id)

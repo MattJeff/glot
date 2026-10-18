@@ -57,13 +57,15 @@ export default function JobsPage() {
       ) : jobs.isError ? (
         <ErrorState error={jobs.error} onRetry={() => jobs.refetch()} />
       ) : jobs.data.length === 0 ? (
-        <EmptyState icon={ListChecks} title={t("empty.title")} body={t("empty.body")} />
+        <EmptyState icon={ListChecks} title={t("empty.title")} body={t("empty.body")} action={button} />
       ) : (
-        <div className="divide-y rounded-xl border">
-          {jobs.data.map((j) => (
-            <JobRow key={j.id} slug={slug} job={j} />
+        <ul className="stagger divide-y overflow-hidden rounded-xl border bg-card shadow-(--shadow-card)" aria-label={t("title")}>
+          {jobs.data.map((j, i) => (
+            <li key={j.id} style={{ "--i": i } as React.CSSProperties}>
+              <JobRow slug={slug} job={j} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

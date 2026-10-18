@@ -1,7 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-use crate::{Error, Result, catalog::Format, validate::Syntax};
+use crate::{
+    Error, Result,
+    catalog::{Format, Layout},
+    validate::Syntax,
+};
 
 pub const CONFIG_FILE: &str = "glot.toml";
 
@@ -23,6 +27,46 @@ pub struct Config {
     pub extract: ExtractConfig,
     #[serde(default)]
     pub server: Option<ServerConfig>,
+    /// i18next options read from the app's config (`keySeparator`, `nsSeparator`).
+    #[serde(default, skip_serializing_if = "I18nextConfig::is_default")]
+    pub i18next: I18nextConfig,
+}
+
+/// `[i18next]` in glot.toml, mirroring the app's i18next init options.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct I18nextConfig {
+    /// `keySeparator` (default `"."`); `false` = keys are plain strings, never nested.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key_separator: Option<Separator>,
+    /// `nsSeparator` (default `":"`): glot keys of `{ns}` files are `ns:key`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_separator: Option<Separator>,
+}
+
+/// An i18next separator: a string, or `false` (disabled).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum Separator {
+    Off(bool),
+    On(String),
+}
+
+impl Separator {
+    /// The separator, `""` when disabled.
+    fn get(sep: &Option<Self>, default: &str) -> String {
+        match sep {
+            Some(Self::On(s)) => s.clone(),
+            Some(Self::Off(false)) => String::new(),
+            _ => default.into(),
+        }
+    }
+}
+
+impl I18nextConfig {
+    fn is_default(&self) -> bool {
+        *self == Self::default()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -168,22 +212,95 @@ impl Config {
 
     /// Resolve every catalog file for `locale` (each `files` pattern with `{locale}` replaced).
     /// Patterns containing glob wildcards expand to the matching existing files (sorted).
+    /// `{ns}` (i18next namespaces, `public/locales/{locale}/{ns}.json`) expands to every namespace
+    /// file of the source locale.
     pub fn catalog_paths(&self, root: &Path, locale: &str) -> Vec<PathBuf> {
+        self.catalog_files(root, locale)
+            .into_iter()
+            .map(|(p, _)| p)
+            .collect()
+    }
+
+    /// [`Config::catalog_paths`] with how each file maps to keys (namespace prefix, i18next options).
+    pub fn catalog_files(&self, root: &Path, locale: &str) -> Vec<(PathBuf, Layout)> {
+        let base = Layout {
+            key_separator: Separator::get(&self.i18next.key_separator, "."),
+            i18next_plurals: self.syntax == Syntax::I18next,
+            ns: String::new(),
+        };
+        let ns_sep = Separator::get(&self.i18next.ns_separator, ":");
+        let ns_sep = if ns_sep.is_empty() {
+            ":".to_string()
+        } else {
+            ns_sep
+        };
         let mut out = Vec::new();
         for pattern in &self.files {
-            let pattern = android_values(pattern, locale, &self.source_locale);
-            let path = root.join(pattern.replace("{locale}", locale));
-            let s = path.to_string_lossy();
-            if s.contains(['*', '?', '[']) {
-                let mut found: Vec<PathBuf> =
-                    glob::glob(&s).into_iter().flatten().flatten().collect();
-                found.sort();
-                out.extend(found);
+            if pattern.contains("{ns}") {
+                for ns in self.namespaces(root, pattern) {
+                    let layout = Layout {
+                        ns: format!("{ns}{ns_sep}"),
+                        ..base.clone()
+                    };
+                    out.extend(
+                        self.expand(root, &pattern.replace("{ns}", &ns), locale)
+                            .into_iter()
+                            .map(|p| (p, layout.clone())),
+                    );
+                }
             } else {
-                out.push(path);
+                out.extend(
+                    self.expand(root, pattern, locale)
+                        .into_iter()
+                        .map(|p| (p, base.clone())),
+                );
             }
         }
         out
+    }
+
+    /// Namespaces of a `{ns}` pattern: the source locale's files (`translation`, i18next's
+    /// default, when there are none yet).
+    fn namespaces(&self, root: &Path, pattern: &str) -> Vec<String> {
+        let src = &self.source_locale;
+        let full = root
+            .join(android_values(pattern, src, src).replace("{locale}", src))
+            .to_string_lossy()
+            .into_owned();
+        let (pre, post) = full.split_once("{ns}").expect("checked by the caller");
+        let glob = format!(
+            "{}*{}",
+            glob::Pattern::escape(pre),
+            glob::Pattern::escape(post)
+        );
+        let mut found: Vec<String> = glob::glob(&glob)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter_map(|p| {
+                let s = p.to_string_lossy();
+                let ns = s.strip_prefix(pre)?.strip_suffix(post)?;
+                (!ns.is_empty() && !ns.contains(['/', '\\'])).then(|| ns.to_string())
+            })
+            .collect();
+        found.sort();
+        if found.is_empty() {
+            found.push("translation".into());
+        }
+        found
+    }
+
+    fn expand(&self, root: &Path, pattern: &str, locale: &str) -> Vec<PathBuf> {
+        let pattern = android_values(pattern, locale, &self.source_locale);
+        let pattern = unsuffixed_source(root, &pattern, locale, &self.source_locale);
+        let path = root.join(pattern.replace("{locale}", locale));
+        let s = path.to_string_lossy();
+        if !s.contains(['*', '?', '[']) {
+            return vec![path];
+        }
+        let mut found: Vec<PathBuf> = glob::glob(&s).into_iter().flatten().flatten().collect();
+        found.sort();
+        found
     }
 
     /// source_locale followed by target_locales.
@@ -193,6 +310,37 @@ impl Config {
             .cloned()
             .collect()
     }
+}
+
+/// Source catalogs named without their locale: `Resources.resx` (`Resources.{locale}.resx`),
+/// `messages.properties` (`messages_{locale}.properties`), Angular `messages.xlf`
+/// (`messages.{locale}.xlf`). `.resx`/`.properties` always (their convention), XLIFF when that
+/// file exists (Symfony names the source `messages.en.xlf`).
+fn unsuffixed_source(root: &Path, pattern: &str, locale: &str, source: &str) -> String {
+    if locale != source {
+        return pattern.to_string();
+    }
+    for (tag, exts, always) in [
+        (".{locale}.", &["resx"][..], true),
+        ("_{locale}.", &["properties"][..], true),
+        (".{locale}.", &["xlf", "xliff"][..], false),
+    ] {
+        let Some(ext) = exts
+            .iter()
+            .find(|e| pattern.ends_with(&format!("{tag}{e}")))
+        else {
+            continue;
+        };
+        let bare = format!(
+            "{}.{ext}",
+            &pattern[..pattern.len() - tag.len() - ext.len()]
+        );
+        let localized = root.join(pattern.replace("{locale}", locale));
+        if root.join(&bare).exists() || (always && !localized.exists()) {
+            return bare;
+        }
+    }
+    pattern.to_string()
 }
 
 /// Android resource folders: `values-{locale}` is `values` for the source locale and a resource
@@ -267,5 +415,35 @@ mod tests {
         c.save(&dir).unwrap();
         assert_eq!(Config::load(&dir).unwrap().llm.provider, "mock");
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn unsuffixed_source_catalogs() {
+        let dir = tempfile_dir("unsuffixed");
+        std::fs::write(dir.join("messages.xlf"), "").unwrap();
+        let u = |p: &str, l: &str| unsuffixed_source(&dir, p, l, "en");
+        assert_eq!(u("R/Strings.{locale}.resx", "en"), "R/Strings.resx");
+        assert_eq!(
+            u("R/Strings.{locale}.resx", "fr"),
+            "R/Strings.{locale}.resx"
+        );
+        assert_eq!(
+            u("messages_{locale}.properties", "en"),
+            "messages.properties"
+        );
+        assert_eq!(u("messages.{locale}.xlf", "en"), "messages.xlf");
+        assert_eq!(
+            u("other.{locale}.xlf", "en"),
+            "other.{locale}.xlf",
+            "Symfony keeps messages.en.xlf"
+        );
+        assert_eq!(u("{locale}.json", "en"), "{locale}.json");
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    fn tempfile_dir(tag: &str) -> std::path::PathBuf {
+        let d = std::env::temp_dir().join(format!("glot-config-{tag}-{}", std::process::id()));
+        std::fs::create_dir_all(&d).unwrap();
+        d
     }
 }

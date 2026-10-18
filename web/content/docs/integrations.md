@@ -103,7 +103,7 @@ glot dev                 # binds 127.0.0.1:4317, prints a token
 
 ```tsx
 // app/layout.tsx (Next.js App Router)
-import { GlotOverlay } from "@glot/overlay/react";
+import { GlotOverlay } from "@glot-i18n/overlay/react";
 {process.env.NODE_ENV === "development" && <GlotOverlay />}
 ```
 

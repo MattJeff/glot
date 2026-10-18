@@ -178,7 +178,7 @@ export function ArmsTable({ exp }: { exp: VariantExperiment }) {
                     <span className="font-medium">{armName(a)}</span>
                     {!a.is_control && <span className="text-xs text-muted-foreground">{TONES.includes(a.tone as Tone) ? t(`tone.${a.tone as Tone}`) : a.tone}</span>}
                     {won && (
-                      <Badge variant="secondary" className="gap-1 border-0 bg-success/15 text-success">
+                      <Badge variant="secondary" className="gap-1 border-0 bg-success/15 text-success-foreground">
                         <Trophy className="size-3" /> {t("winner")}
                       </Badge>
                     )}
@@ -210,7 +210,7 @@ export function ArmsTable({ exp }: { exp: VariantExperiment }) {
                     <span className="text-muted-foreground">{t("reference")}</span>
                   ) : (
                     <>
-                      <span className={cn(a.p_beats_control > 0.95 ? "text-success" : a.p_beats_control < 0.05 ? "text-destructive" : "")}>
+                      <span className={cn(a.p_beats_control > 0.95 ? "text-success-foreground" : a.p_beats_control < 0.05 ? "text-destructive" : "")}>
                         {lift(a.lift)}
                       </span>
                       <div className="text-xs text-muted-foreground">{t("pBeats", { p: pct(Math.min(a.p_beats_control, 0.999), a.p_beats_control > 0.99 ? 1 : 0) })}</div>
@@ -229,8 +229,8 @@ export function ArmsTable({ exp }: { exp: VariantExperiment }) {
 // ---------- card ----------
 
 const STATUS = {
-  running: { icon: CircleDashed, className: "bg-info/15 text-info" },
-  decided: { icon: Trophy, className: "bg-success/15 text-success" },
+  running: { icon: CircleDashed, className: "bg-info/15 text-info-foreground" },
+  decided: { icon: Trophy, className: "bg-success/15 text-success-foreground" },
   promoted: { icon: Check, className: "bg-muted text-muted-foreground" },
   stopped: { icon: Square, className: "bg-muted text-muted-foreground" },
 } as const;
@@ -336,9 +336,25 @@ export function ExperimentCard({
           </AlertDialog>
         )}
         {live && (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onAction("stop")}>
-            <X /> {t("stop")}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="ghost" disabled={busy}>
+                <X /> {t("stop")}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("stopTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>{t("stopBody")}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={() => onAction("stop")}>
+                  {t("stop")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </footer>
     </article>

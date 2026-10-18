@@ -10,8 +10,8 @@ import { api, qk, type Review, type Verdict } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const VERDICT_STYLE: Record<Verdict, string> = {
-  same: "bg-success/12 text-success",
-  nuance: "bg-warning/15 text-warning",
+  same: "bg-success/12 text-success-foreground",
+  nuance: "bg-warning/15 text-warning-foreground",
   different: "bg-destructive/10 text-destructive",
 };
 const VERDICT_ICON = { same: CircleCheck, nuance: TriangleAlert, different: CircleX } as const;

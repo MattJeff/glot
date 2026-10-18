@@ -25,6 +25,34 @@ use crate::scan::{
 pub enum Lib {
     NextIntl,
     ReactI18next,
+    /// The app's own `t(key)` hook (hand-rolled LanguageContext), see [`set_custom_runtime`].
+    Custom,
+}
+
+/// Hand-rolled runtime used by [`Lib::Custom`]: `const { t } = <hook>()`.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct CustomRuntime {
+    /// `useLanguage`
+    pub hook: String,
+    /// File exporting the hook, root-relative without extension (`src/contexts/LanguageContext`).
+    pub module: String,
+    /// Non-relative import specifier the app already uses (`@/contexts/LanguageContext`).
+    pub spec: Option<String>,
+}
+
+static CUSTOM: RwLock<Option<CustomRuntime>> = RwLock::new(None);
+/// (source locale, target locales) for translations read from `lang === 'fr' ? … : …`.
+static LOCALES: RwLock<(String, Vec<String>)> = RwLock::new((String::new(), Vec::new()));
+
+/// Register the app's own hook for [`Lib::Custom`] rewrites.
+pub fn set_custom_runtime(rt: Option<CustomRuntime>) {
+    *CUSTOM.write().unwrap() = rt;
+}
+
+/// Register the project locales: inline translations (`lang === 'fr' ? 'Bonjour' : 'Hello'`)
+/// become one key with its existing translations.
+pub fn set_locales(source: &str, targets: &[String]) {
+    *LOCALES.write().unwrap() = (source.to_string(), targets.to_vec());
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -71,6 +99,9 @@ pub struct Candidate {
     pub line: u32,
     /// Deterministic fallback key (`<namespace>.<slug>`).
     pub suggested_key: String,
+    /// Translations already in the code (`lang === 'fr' ? 'Bonjour' : 'Hello'`): locale -> text.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub translations: BTreeMap<String, String>,
     #[serde(skip)]
     span: (u32, u32),
     #[serde(skip)]
@@ -252,6 +283,7 @@ pub fn analyze(path: &str, source: &str, lib: Lib) -> FileAnalysis {
         t_bindings: vec![],
         translators: vec![],
         text_props: TEXT_PROPS.read().unwrap().clone(),
+        pairs: HashMap::new(),
     };
     a.visit_program(program);
     let t_bindings = std::mem::take(&mut a.t_bindings);
@@ -326,6 +358,8 @@ struct Analyzer<'s, 'f> {
     /// `t` bound to a translator hook: (offset, namespace literal or None).
     translators: Vec<(u32, Option<String>)>,
     text_props: BTreeMap<String, BTreeSet<String>>,
+    /// Inline pair helpers: `const t = (en, bn) => lang === 'en' ? en : bn` -> locale per argument.
+    pairs: HashMap<String, Vec<Option<String>>>,
 }
 
 /// One child of a JSX element, as seen by the run builder.
@@ -439,6 +473,13 @@ impl<'s> Analyzer<'s, '_> {
         if let Some(e) = msg.unknown_entity {
             return self.skip(span.start, text, &format!("unknown HTML entity {e}"));
         }
+        if self.lib == Lib::Custom && msg.parts.iter().any(|p| !matches!(p, Part::Text { .. })) {
+            return self.skip(
+                span.start,
+                text,
+                "the app's own t(key) takes no values: wrap it by hand",
+            );
+        }
         if self.lib == Lib::ReactI18next && !msg.tags.is_empty() {
             return self.skip(
                 span.start,
@@ -465,6 +506,7 @@ impl<'s> Analyzer<'s, '_> {
         self.fa.candidates.push(Candidate {
             id: 0,
             suggested_key: format!("{}.{leaf}", self.fa.namespace),
+            translations: BTreeMap::new(),
             parts: msg.parts,
             text,
             role: role.into(),
@@ -495,6 +537,14 @@ impl<'s> Analyzer<'s, '_> {
             })
             .collect();
         looks_like_text(probe.trim()).then_some(msg)
+    }
+
+    /// `message_of` for a value under a non-UI key / in an array of a config hook.
+    fn config_message_of(&self, e: &Expression) -> Option<Msg> {
+        match e.get_inner_expression() {
+            Expression::StringLiteral(s) if !looks_like_copy(&s.value) => None,
+            _ => self.message_of(e),
+        }
     }
 
     fn flatten<'a>(&self, e: &Expression<'a>, b: &mut MsgBuilder) -> bool {
@@ -556,6 +606,11 @@ impl<'s> Analyzer<'s, '_> {
     /// Candidates in an expression position (JSX child container, attribute, toast arg).
     fn collect_expr<'a>(&mut self, e: &Expression<'a>, role: &str) {
         let inner = e.get_inner_expression();
+        if let Some(br) = self.inline_translations(inner)
+            && self.push_translated(inner.span(), br, role)
+        {
+            return;
+        }
         match inner {
             Expression::StringLiteral(_)
             | Expression::TemplateLiteral(_)
@@ -588,6 +643,7 @@ impl<'s> Analyzer<'s, '_> {
                             None => Item::Break(child),
                         }
                     }
+                    x if self.inline_translations(x).is_some() => Item::Break(child),
                     x if simple_value(x) => match plural_choice(x) {
                         Some((n, one, other)) => Item::Plural(c.span, n, one, other),
                         None => Item::Arg(c.span, x),
@@ -851,6 +907,81 @@ impl<'s> Analyzer<'s, '_> {
         true
     }
 
+    /// `lang === 'fr' ? 'Bonjour' : 'Hello'` or a pair helper call `t('Hello', 'Bonjour')`:
+    /// (locale, text) per alternative, `None` locale for the final `else`.
+    fn inline_translations(&self, e: &Expression) -> Option<Vec<(Option<String>, String)>> {
+        if let Expression::CallExpression(c) = e
+            && let Some(locs) = self.pairs.get(&callee_name(&c.callee)?)
+            && c.arguments.len() == locs.len()
+        {
+            return c
+                .arguments
+                .iter()
+                .zip(locs)
+                .map(|(a, l)| Some((l.clone(), literal_text(a.as_expression()?)?)))
+                .collect();
+        }
+        locale_branches(e, &literal_text)
+    }
+
+    /// One candidate for inline translations: the source locale's text, the others kept as its
+    /// translations. `false` when the source text is not among them.
+    fn push_translated(
+        &mut self,
+        span: Span,
+        br: Vec<(Option<String>, String)>,
+        role: &str,
+    ) -> bool {
+        let (source, targets) = LOCALES.read().unwrap().clone();
+        let source = if source.is_empty() {
+            "en".to_string()
+        } else {
+            source
+        };
+        let same = |a: &str, b: &str| {
+            a.replace('_', "-")
+                .eq_ignore_ascii_case(&b.replace('_', "-"))
+        };
+        let named: Vec<&str> = br.iter().filter_map(|(l, _)| l.as_deref()).collect();
+        // The final `else` is the source when the source is not tested, else the one target left.
+        let else_loc = if !named.iter().any(|l| same(l, &source)) {
+            Some(source.clone())
+        } else {
+            let left: Vec<&String> = targets
+                .iter()
+                .filter(|t| !named.iter().any(|l| same(l, t)))
+                .collect();
+            (left.len() == 1).then(|| left[0].clone())
+        };
+        let mut by_loc: BTreeMap<String, String> = BTreeMap::new();
+        for (l, text) in br {
+            let loc = match l {
+                Some(l) => std::iter::once(&source)
+                    .chain(&targets)
+                    .find(|x| same(x, &l))
+                    .cloned()
+                    .unwrap_or(l),
+                None => match &else_loc {
+                    Some(l) => l.clone(),
+                    None => continue,
+                },
+            };
+            by_loc.entry(loc).or_insert(text);
+        }
+        let Some(text) = by_loc.remove(&source).filter(|t| looks_like_text(t.trim())) else {
+            return false;
+        };
+        by_loc.retain(|l, _| targets.contains(l));
+        let mut b = MsgBuilder::default();
+        b.text(&text);
+        let n = self.fa.candidates.len();
+        self.push(Kind::Expr, span, b.finish(), role);
+        if let Some(c) = self.fa.candidates.get_mut(n) {
+            c.translations = by_loc;
+        }
+        true
+    }
+
     fn block_hook(&self, body: &FunctionBody, fn_start: u32) -> Hook {
         let pos = body
             .directives
@@ -891,6 +1022,43 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
             && let Some(ns) = translator_ns(&it.id, init)
         {
             self.translators.push((it.span.start, ns));
+        }
+        // `const t = (en: string, fr: string) => lang === 'en' ? en : fr`.
+        if let (BindingPattern::BindingIdentifier(id), Some(Expression::ArrowFunctionExpression(f))) =
+            (&it.id, it.init.as_ref().map(|i| i.get_inner_expression()))
+            && let Some(body) = f.get_expression()
+        {
+            let params: Vec<String> = f
+                .params
+                .items
+                .iter()
+                .filter_map(|p| match &p.pattern {
+                    BindingPattern::BindingIdentifier(b) => Some(b.name.to_string()),
+                    _ => None,
+                })
+                .collect();
+            let ident = |e: &Expression| match e.get_inner_expression() {
+                Expression::Identifier(i) => Some(i.name.to_string()),
+                _ => None,
+            };
+            if params.len() >= 2
+                && params.len() == f.params.items.len()
+                && let Some(br) = locale_branches(body, &ident)
+                && br.len() == params.len()
+            {
+                let locs = params
+                    .iter()
+                    // The `else` parameter's own name says its locale: `(en, bn) => …`.
+                    .map(|p| {
+                        br.iter()
+                            .find(|(_, v)| v == p)
+                            .map(|(l, _)| l.clone().or_else(|| locale_code(p).then(|| p.clone())))
+                    })
+                    .collect::<Option<Vec<_>>>();
+                if let Some(locs) = locs {
+                    self.pairs.insert(id.name.to_string(), locs);
+                }
+            }
         }
         if let (BindingPattern::BindingIdentifier(id), Some(init)) = (&it.id, &it.init) {
             let target =
@@ -973,7 +1141,7 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
                 e.get_inner_expression(),
                 Expression::StringLiteral(_) | Expression::TemplateLiteral(_)
             )
-            && let Some(m) = self.message_of(e)
+            && let Some(m) = self.config_message_of(e)
         {
             self.push(Kind::Expr, e.get_inner_expression().span(), m, "text");
             return;
@@ -982,6 +1150,19 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
     }
 
     fn visit_object_property(&mut self, it: &ObjectProperty<'a>) {
+        // TanStack Router: `createFileRoute('/')({ component: () => <h1>…</h1> })`.
+        if let Some(k) = it.key.static_name()
+            && k.ends_with("omponent")
+            && matches!(
+                it.value.get_inner_expression(),
+                Expression::ArrowFunctionExpression(_) | Expression::FunctionExpression(_)
+            )
+        {
+            // `component` -> `RouteComponent`, `errorComponent` -> `RouteErrorComponent`.
+            let name = format!("Route{}{}", k[..1].to_uppercase(), &k[1..]);
+            self.comp_targets
+                .insert(it.value.get_inner_expression().span().start, name);
+        }
         if self.fn_depth == 0
             && let Some(k) = it.key.static_name()
             && UI_KEYS.contains(&k.as_ref())
@@ -999,7 +1180,11 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
             && let Some(k) = it.key.static_name()
             && (UI_KEYS.contains(&k.as_ref())
                 || self.in_config() && !TECH_KEYS.contains(&k.as_ref()))
-            && let Some(m) = self.message_of(&it.value)
+            && let Some(m) = if UI_KEYS.contains(&k.as_ref()) {
+                self.message_of(&it.value)
+            } else {
+                self.config_message_of(&it.value)
+            }
         {
             let in_metadata = self
                 .comp_stack
@@ -1104,8 +1289,14 @@ fn translator_ns(id: &BindingPattern, init: &Expression) -> Option<Option<String
         return None;
     };
     let name = callee_name(&c.callee)?;
+    let custom = CUSTOM
+        .read()
+        .unwrap()
+        .as_ref()
+        .is_some_and(|c| c.hook == name);
     if !binds_t
-        || !["useTranslations", "getTranslations", "useTranslation"].contains(&name.as_str())
+        || !custom
+            && !["useTranslations", "getTranslations", "useTranslation"].contains(&name.as_str())
     {
         return None;
     }
@@ -1119,9 +1310,78 @@ fn translator_ns(id: &BindingPattern, init: &Expression) -> Option<Option<String
     }
 }
 
-/// String that reads as UI copy (same heuristic as the hardcoded-string scan).
+/// Plain string literal (or template without `${}`).
+fn literal_text(e: &Expression) -> Option<String> {
+    match e.get_inner_expression() {
+        Expression::StringLiteral(s) => Some(s.value.to_string()),
+        Expression::TemplateLiteral(t) if t.expressions.is_empty() => {
+            t.quasis[0].value.cooked.map(|c| c.to_string())
+        }
+        _ => None,
+    }
+}
+
+/// `en`, `fr`, `pt-BR`, `pt_BR`.
+fn locale_code(s: &str) -> bool {
+    let (l, r) = s.split_once(['-', '_']).unwrap_or((s, ""));
+    (2..=3).contains(&l.len())
+        && l.bytes().all(|b| b.is_ascii_lowercase())
+        && (r.is_empty()
+            || (2..=4).contains(&r.len()) && r.bytes().all(|b| b.is_ascii_alphanumeric()))
+}
+
+/// `lang === 'fr' ? A : lang === 'de' ? B : C` (also `'fr' === language`, `!==` swapped) on a
+/// variable named like a language/locale: (locale, leaf(branch)) per branch, `None` for the else.
+fn locale_branches(
+    e: &Expression,
+    leaf: &dyn Fn(&Expression) -> Option<String>,
+) -> Option<Vec<(Option<String>, String)>> {
+    let Expression::ConditionalExpression(c) = e.get_inner_expression() else {
+        return None;
+    };
+    let Expression::BinaryExpression(b) = c.test.get_inner_expression() else {
+        return None;
+    };
+    let eq = match b.operator {
+        BinaryOperator::StrictEquality | BinaryOperator::Equality => true,
+        BinaryOperator::StrictInequality | BinaryOperator::Inequality => false,
+        _ => return None,
+    };
+    let (var, lit) = match (
+        b.left.get_inner_expression(),
+        b.right.get_inner_expression(),
+    ) {
+        (x, Expression::StringLiteral(s)) | (Expression::StringLiteral(s), x) => {
+            (x, s.value.to_string())
+        }
+        _ => return None,
+    };
+    let name = match var {
+        Expression::Identifier(i) => i.name.to_ascii_lowercase(),
+        Expression::StaticMemberExpression(m) => m.property.name.to_ascii_lowercase(),
+        _ => return None,
+    };
+    if !(name.contains("lang") || name.contains("locale") || name == "lng") || !locale_code(&lit) {
+        return None;
+    }
+    let (yes, no) = if eq {
+        (&c.consequent, &c.alternate)
+    } else {
+        (&c.alternate, &c.consequent)
+    };
+    let mut out = vec![(Some(lit), leaf(yes)?)];
+    match locale_branches(no, leaf) {
+        Some(rest) => out.extend(rest),
+        None => out.push((None, leaf(no)?)),
+    }
+    Some(out)
+}
+
+/// String in a config/data object that reads as UI copy. Stricter than JSX text:
+/// one lowercase word (`"postgres"`, `"en"`, `"require"`) is an identifier, not copy.
 pub fn looks_like_copy(s: &str) -> bool {
-    looks_like_text(s.trim())
+    let s = s.trim();
+    looks_like_text(s) && (s.contains(' ') || s.starts_with(char::is_uppercase))
 }
 
 /// `Button`, `useNavItems`: functions that may hold a translator.
@@ -1608,7 +1868,7 @@ fn collapse_keep_edges(s: &str) -> String {
     out
 }
 
-fn decode_entities(s: &str, unknown: &mut Option<String>) -> String {
+pub(crate) fn decode_entities(s: &str, unknown: &mut Option<String>) -> String {
     if !s.contains('&') {
         return s.to_string();
     }
@@ -1803,6 +2063,15 @@ pub fn rewrite(
                 need_use = true;
                 format!("const {t} = useTranslations({ns_arg});")
             }
+            Lib::Custom => {
+                need_use = true;
+                let hook = custom_hook()?.hook;
+                if t == "t" {
+                    format!("const {{ t }} = {hook}();")
+                } else {
+                    format!("const {{ t: {t} }} = {hook}();")
+                }
+            }
         };
         need_use |= lib == Lib::ReactI18next;
         edits.extend(comp.extra.iter().cloned());
@@ -1823,19 +2092,30 @@ pub fn rewrite(
             }
         }
     }
-    let mut imports = vec![];
+    let mut imports: Vec<String> = vec![];
     match lib {
         Lib::NextIntl => {
             if need_use && !fa.imported.contains("useTranslations") {
-                imports.push(r#"import { useTranslations } from "next-intl";"#);
+                imports.push(r#"import { useTranslations } from "next-intl";"#.into());
             }
             if need_get && !fa.imported.contains("getTranslations") {
-                imports.push(r#"import { getTranslations } from "next-intl/server";"#);
+                imports.push(r#"import { getTranslations } from "next-intl/server";"#.into());
             }
         }
         Lib::ReactI18next => {
             if !fa.imported.contains("useTranslation") {
-                imports.push(r#"import { useTranslation } from "react-i18next";"#);
+                imports.push(r#"import { useTranslation } from "react-i18next";"#.into());
+            }
+        }
+        Lib::Custom => {
+            let rt = custom_hook()?;
+            if need_use && !fa.imported.contains(&rt.hook) {
+                let dir = fa.path.rsplit_once('/').map_or("", |(d, _)| d);
+                let spec = rt
+                    .spec
+                    .clone()
+                    .unwrap_or_else(|| rel_import(dir, &rt.module));
+                imports.push(format!("import {{ {} }} from \"{spec}\";", rt.hook));
             }
         }
     }
@@ -1864,6 +2144,26 @@ pub fn rewrite(
     parses(&fa.path, &out)
         .map_err(|e| format!("rewrite does not re-parse ({e}); file left untouched"))?;
     Ok(out)
+}
+
+fn custom_hook() -> Result<CustomRuntime, String> {
+    CUSTOM
+        .read()
+        .unwrap()
+        .clone()
+        .ok_or_else(|| "--lib custom: no t() hook detected (useLanguage / useTranslation)".into())
+}
+
+/// `from_dir` -> `to` as a relative import (`../contexts/LanguageContext`).
+fn rel_import(from_dir: &str, to: &str) -> String {
+    let a: Vec<&str> = from_dir.split('/').filter(|s| !s.is_empty()).collect();
+    let b: Vec<&str> = to.split('/').filter(|s| !s.is_empty()).collect();
+    let common = a.iter().zip(&b).take_while(|(x, y)| x == y).count();
+    let rest = b[common..].join("/");
+    match a.len() - common {
+        0 => format!("./{rest}"),
+        up => format!("{}{rest}", "../".repeat(up)),
+    }
 }
 
 /// Minimal unified diff (3 lines of context). Lines are prefixed with ' ', '-', '+'.
@@ -2235,6 +2535,77 @@ export default function InvoicesPage({ user, invoices }: Props) {
         assert_eq!(
             d,
             "--- a/a.tsx\n+++ b/a.tsx\n@@ -2,7 +2,7 @@\n 2\n 3\n 4\n-5\n+X\n 6\n 7\n 8\n"
+        );
+    }
+
+    #[test]
+    fn config_hook_keeps_identifiers() {
+        // A hook built from a form-defaults object: only copy becomes t(), never ids or enum values.
+        let src = "export function useEmptyItem() {\n  return { name: '', kind: 'html', language: 'en', host: 'postgres', hint: 'Paste the page address', tags: ['Official', 'beta'] };\n}\n";
+        let (fa, out) = run("src/pages/Items.tsx", src, Lib::ReactI18next);
+        assert_eq!(texts(&fa), ["Paste the page address", "Official"]);
+        assert!(out.contains("language: 'en', host: 'postgres'"), "{out}");
+    }
+
+    /// AI-builder patterns (anonymized): the app's own `useLanguage().t`, inline language
+    /// ternaries and pair helpers (translations kept), TanStack route components.
+    #[test]
+    fn custom_runtime_ternaries_and_tanstack_routes() {
+        set_custom_runtime(Some(CustomRuntime {
+            hook: "useLanguage".into(),
+            module: "src/contexts/LanguageContext".into(),
+            spec: None,
+        }));
+        set_locales("en", &["fr".into(), "de".into()]);
+        let src = "export const Hero = () => {\n  const { t, language } = useLanguage();\n  const tr = (en: string, fr: string) => (language === 'en' ? en : fr);\n  return <section><h1>{t('hero.title')}</h1><p>No credit card required</p><h2>{language === 'fr' ? 'Nos tarifs' : 'Our pricing'}</h2><span>{tr('Cancel anytime', 'Annulez')}</span><b>Hi {name}</b></section>;\n};\n";
+        let (fa, out) = run("src/components/Hero.tsx", src, Lib::Custom);
+        assert_eq!(
+            texts(&fa),
+            ["No credit card required", "Our pricing", "Cancel anytime"]
+        );
+        let tr: Vec<_> = fa
+            .candidates
+            .iter()
+            .map(|c| c.translations.get("fr").cloned())
+            .collect();
+        assert_eq!(
+            tr,
+            [None, Some("Nos tarifs".into()), Some("Annulez".into())]
+        );
+        // The component's existing `t` is reused: no second hook, no second runtime.
+        assert!(
+            !out.contains("useTranslation") && out.matches("useLanguage()").count() == 1,
+            "{out}"
+        );
+        assert!(
+            out.contains("<h2>{t(\"hero.our_pricing_title\")}</h2>"),
+            "{out}"
+        );
+        assert!(
+            fa.skipped
+                .iter()
+                .any(|s| s.text.starts_with("Hi ") && s.reason.contains("takes no values"))
+        );
+        // A component without the hook gets it, imported relatively.
+        let (_, out) = run(
+            "src/pages/Index.tsx",
+            "export default function Index() {\n  return <p>Welcome back</p>;\n}\n",
+            Lib::Custom,
+        );
+        assert!(
+            out.contains("import { useLanguage } from \"../contexts/LanguageContext\";"),
+            "{out}"
+        );
+        assert!(out.contains("const { t } = useLanguage();"), "{out}");
+        set_custom_runtime(None);
+
+        // TanStack Start: `component: () => <…/>` in createFileRoute is a component.
+        let src = "import { createFileRoute } from '@tanstack/react-router';\nexport const Route = createFileRoute('/')({ component: () => <h1>Welcome to the dashboard</h1> });\n";
+        let (fa, out) = run("src/routes/index.tsx", src, Lib::ReactI18next);
+        assert_eq!(texts(&fa), ["Welcome to the dashboard"]);
+        assert!(
+            out.contains("const { t } = useTranslation();") && out.contains("return <h1>{t("),
+            "{out}"
         );
     }
 }
