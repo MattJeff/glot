@@ -252,6 +252,70 @@ export type Insights = {
   experiments: InsightExperiment[];
 };
 
+export type FeedbackKind = "wrong" | "awkward" | "unclear";
+export type FeedbackStatus = "open" | "proposed" | "accepted" | "rejected";
+export type FeedbackReport = { kind: FeedbackKind; text: string; suggestion: string | null; url: string | null; dom: string | null; created_at: string };
+export type FeedbackGroup = {
+  id: string;
+  key: string;
+  locale: string;
+  source: string;
+  current: string | null;
+  status: FeedbackStatus;
+  count: number;
+  proposal: string | null;
+  previous: string | null;
+  back_translation: string | null;
+  verdict: Verdict | null;
+  explanation: string | null;
+  issues: Issue[];
+  pr_url: string | null;
+  updated_at: string;
+  reports: FeedbackReport[];
+};
+export type FeedbackSettings = {
+  public_key: string;
+  threshold: number;
+  github_repo: string | null;
+  github_base: string;
+  catalog_path: string;
+  lock_path: string;
+  has_github_token: boolean;
+};
+/** github_token: write-only, "" clears, absent keeps. github_repo: "" clears. */
+export type FeedbackSettingsInput = Partial<Omit<FeedbackSettings, "public_key" | "has_github_token">> & { github_token?: string };
+// Copy experiments (variants.rs): arm 0 = official translation.
+export type VariantArm = {
+  arm: number;
+  value: string;
+  tone: string;
+  is_control: boolean;
+  views: number;
+  conversions: number;
+  rate: number;
+  alpha: number;
+  beta: number;
+  p_best: number;
+  p_beats_control: number;
+  lift: number;
+};
+export type VariantExperiment = {
+  id: string;
+  key: string;
+  locale: string;
+  source: string;
+  source_changed: boolean;
+  goal: string;
+  explore_pct: number;
+  min_n: number;
+  status: "running" | "decided" | "promoted" | "stopped";
+  winner: number | null;
+  created_at: string;
+  decided_at: string | null;
+  arms: VariantArm[];
+};
+export type NewVariantExperiment = { key: string; locale: string; variants?: number; explore_pct?: number; min_n?: number; goal?: string };
+
 export const api = {
   signup: (b: { email: string; password: string; name: string }) => request<User>("POST", "/api/auth/signup", b),
   login: (b: { email: string; password: string }) => request<User>("POST", "/api/auth/login", b),
@@ -306,6 +370,15 @@ export const api = {
     request<InsightExperiment>("POST", `${p(slug)}/insights/experiments`, b),
   decideExperiment: (slug: string, id: string, status: "kept" | "removed") =>
     request<void>("PATCH", `${p(slug)}/insights/experiments/${enc(id)}`, { status }),
+  feedback: (slug: string) => request<{ settings: FeedbackSettings; groups: FeedbackGroup[] }>("GET", `${p(slug)}/feedback`),
+  updateFeedbackSettings: (slug: string, b: FeedbackSettingsInput) => request<FeedbackSettings>("PUT", `${p(slug)}/feedback/settings`, b),
+  feedbackAction: (slug: string, id: string, action: "propose" | "accept" | "reject" | "pr", b?: { value?: string }) =>
+    request<FeedbackGroup>("POST", `${p(slug)}/feedback/${enc(id)}/${action}`, b),
+  variantExperiments: (slug: string) => request<VariantExperiment[]>("GET", `${p(slug)}/experiments`),
+  createVariantExperiment: (slug: string, b: NewVariantExperiment) =>
+    request<VariantExperiment & { rejected: { text: string; tone: string }[] }>("POST", `${p(slug)}/experiments`, b),
+  variantAction: (slug: string, id: string, action: "promote" | "stop") =>
+    request<unknown>("POST", `${p(slug)}/experiments/${enc(id)}/${action}`),
 };
 
 export const qk = {
@@ -323,4 +396,6 @@ export const qk = {
   visualReport: (slug: string, id: string) => ["visual-reports", slug, id] as const,
   preview: (slug: string) => ["preview", slug] as const,
   insights: (slug: string) => ["insights", slug] as const,
+  feedback: (slug: string) => ["feedback", slug] as const,
+  variants: (slug: string) => ["variants", slug] as const,
 };

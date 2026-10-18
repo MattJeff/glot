@@ -1,8 +1,10 @@
 import type { PreviewSettings, VisualIssue, VisualKind, VisualReport } from "@/lib/api";
 
 /** Same rule as packages/visual-qa `buildUrl`: the source locale drops its `/{locale}` segment (next-intl `as-needed`). */
-export function buildUrl(base: string, pattern: string, locale: string, sourceLocale: string, route: string) {
-  const pat = locale === sourceLocale ? pattern.replace(/\/?\{locale\}/, "") : pattern;
+// `keepSourcePrefix`: iframes side by side share one cookie jar, so an unprefixed source URL can render
+// whatever locale another iframe just stored in the locale cookie; an explicit `/en/…` pins it.
+export function buildUrl(base: string, pattern: string, locale: string, sourceLocale: string, route: string, keepSourcePrefix = false) {
+  const pat = locale === sourceLocale && !keepSourcePrefix ? pattern.replace(/\/?\{locale\}/, "") : pattern;
   let path = pat.replace("{locale}", locale).replace("{route}", route).replace(/\/{2,}/g, "/");
   if (path.length > 1) path = path.replace(/\/$/, "");
   return base.replace(/\/$/, "") + (path.startsWith("/") ? path : `/${path}`);

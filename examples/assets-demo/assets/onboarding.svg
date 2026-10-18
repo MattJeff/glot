@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360">
+  <title>Three steps to get started</title>
+  <rect width="720" height="360" fill="#eef2ff"/>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="30" y="28" width="104" height="28" rx="14" fill="#4f46e5"/>
+    <text id="badge" x="44" y="47" font-size="13" font-weight="700" fill="#ffffff" data-max-width="78">Free plan</text>
+    <rect x="30" y="80" width="200" height="140" rx="14" fill="#ffffff"/>
+    <circle cx="62" cy="116" r="16" fill="#4f46e5"/>
+    <text x="62" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">1</text>
+    <text id="step-create" x="46" y="168" font-size="20" font-weight="700" fill="#111827" data-max-width="170">Create</text>
+    <text x="46" y="196" font-size="14" fill="#4b5563" data-max-width="170">your workspace</text>
+
+    <rect x="260" y="80" width="200" height="140" rx="14" fill="#ffffff"/>
+    <circle cx="292" cy="116" r="16" fill="#4f46e5"/>
+    <text x="292" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">2</text>
+    <text id="step-invite" x="276" y="168" font-size="20" font-weight="700" fill="#111827" data-max-width="170">Invite</text>
+    <text x="276" y="196" font-size="14" fill="#4b5563" data-max-width="170">your teammates</text>
+
+    <rect x="490" y="80" width="200" height="140" rx="14" fill="#ffffff"/>
+    <circle cx="522" cy="116" r="16" fill="#4f46e5"/>
+    <text x="522" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">3</text>
+    <text id="step-ship" x="506" y="168" font-size="20" font-weight="700" fill="#111827" data-max-width="170">Ship</text>
+    <text x="506" y="196" font-size="14" fill="#4b5563" data-max-width="170">to every market</text>
+
+    <text x="360" y="300" text-anchor="middle" font-size="26" font-weight="700" fill="#312e81" data-max-width="640">Up and running in five minutes</text>
+  </g>
+</svg>

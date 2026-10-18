@@ -8,6 +8,8 @@ pub mod lock;
 pub mod measure;
 pub mod plural;
 pub mod validate;
+pub mod variants;
+pub use validate::branches;
 
 pub type Locale = String;
 pub type Key = String;

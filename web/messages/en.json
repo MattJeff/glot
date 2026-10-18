@@ -590,7 +590,9 @@
     "toggleSidebar": "Toggle navigation",
     "userMenu": "Account menu",
     "visual": "Visual QA",
-    "insights": "Insights"
+    "insights": "Insights",
+    "feedback": "Feedback",
+    "experiments": "Experiments"
   },
   "status": {
     "machine": "Machine",
@@ -787,6 +789,167 @@
         "daily": "Only daily counters per language, locale and country.",
         "size": "Under 1 kB gzipped."
       }
+    }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "subtitle": "Translations native speakers flag in production, with an AI correction for you to review.",
+    "tabs": { "live": "To review", "accepted": "Accepted", "rejected": "Rejected" },
+    "empty": {
+      "title": "No feedback yet",
+      "body": "Add the feedback widget to your app: visitors select a text, say what is wrong and suggest better wording."
+    },
+    "none": "Nothing here.",
+    "reports": "{count, plural, one {# report} other {# reports}}",
+    "status": { "open": "Open", "proposed": "Proposal ready", "accepted": "Accepted", "rejected": "Rejected" },
+    "kind": { "wrong": "Wrong", "awkward": "Awkward", "unclear": "Unclear" },
+    "source": "Source",
+    "current": "Current translation",
+    "userReports": "What users said",
+    "suggested": "Suggested: {text}",
+    "proposal": "AI proposal",
+    "backTranslation": "Back-translation",
+    "noProposal": "No proposal yet. One is generated automatically at {threshold, plural, one {# report} other {# reports}}.",
+    "propose": "Propose a correction",
+    "regenerate": "Regenerate",
+    "accept": "Accept",
+    "reject": "Reject",
+    "accepted": "Correction saved as a reviewed human translation",
+    "rejectedToast": "Feedback rejected",
+    "openPr": "Open a GitHub PR",
+    "viewPr": "View pull request",
+    "prOpened": "Pull request opened",
+    "prNeedsSettings": "Set a repository and token below to open pull requests.",
+    "install": {
+      "title": "Install the widget",
+      "body": "Uses the same public key as Insights. Pass the labels translated in your app's language."
+    },
+    "settings": {
+      "title": "Settings",
+      "threshold": "Reports before an AI proposal",
+      "repo": "GitHub repository (owner/name)",
+      "base": "Base branch",
+      "catalog": "Catalog path",
+      "lock": "Lockfile path",
+      "token": "GitHub token",
+      "tokenHint": "Fine-grained token with Contents and Pull requests write access. Stored encrypted, never shown again.",
+      "tokenStored": "Token stored — leave empty to keep it",
+      "clearToken": "Remove token",
+      "save": "Save",
+      "saved": "Feedback settings saved"
+    }
+  },
+  "docs": {
+    "title": "Docs",
+    "home": "glot home",
+    "github": "GitHub",
+    "menu": "Menu",
+    "edit": "Edit this page on GitHub",
+    "onThisPage": "On this page",
+    "search": {
+      "label": "Search the docs",
+      "placeholder": "Search docs… (/)",
+      "noResults": "No results"
+    },
+    "sections": {
+      "start": "Getting started",
+      "agents": "AI agents",
+      "guides": "Guides",
+      "reference": "Reference"
+    },
+    "pages": {
+      "getting-started": "Install & quickstart",
+      "concepts": "Concepts",
+      "mcp": "MCP server",
+      "integrations": "Integrations",
+      "frameworks": "Frameworks",
+      "runtime": "Runtime fallback",
+      "insights": "Insights",
+      "self-hosting": "Self-hosting",
+      "cli": "CLI reference",
+      "faq": "FAQ & costs"
+    }
+  },
+  "experiments": {
+    "title": "Experiments",
+    "subtitle": "The translation that converts best, per locale. glot writes validated variants of a high-stakes string and lets your visitors pick the winner.",
+    "new": "New experiment",
+    "official": "Official",
+    "variant": "Variant {letter}",
+    "winner": "Winner",
+    "reference": "reference",
+    "pBeats": "{p} chance to beat official",
+    "meta": "goal {goal} · {pct}% of traffic · min {n} per arm",
+    "source": "source",
+    "sourceChanged": "The source text changed since these variants were written: they are no longer served. Stop this experiment and start a new one.",
+    "noTraffic": "No visitor yet. Variants are served by @glot/insights to visitors of this locale.",
+    "burnIn": "Visitors on every arm",
+    "promote": "Promote {name}",
+    "keepOfficial": "Keep the official translation",
+    "promoteBody": "“{value}” becomes the official {locale} translation of {key} (reviewed, in the key history). It ships with your next glot pull, CDN refresh or PR, like any edit. The other variants stop.",
+    "keepBody": "The official translation converted best. The experiment closes and nothing changes in your catalogs.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "stop": "Stop",
+    "promotedToast": "Done: the catalog now holds the winning wording",
+    "stoppedToast": "Experiment stopped: everyone sees the official translation",
+    "history": "Finished experiments ({n})",
+    "install": "Serve variants in your app",
+    "chartAria": "Posterior conversion rate per arm: {summary}",
+    "chartCaption": "Each curve is the plausible range of an arm's conversion rate given the data so far; narrower means more certain.",
+    "status": {
+      "running": "Running",
+      "decided": "Winner found",
+      "promoted": "Promoted",
+      "stopped": "Stopped"
+    },
+    "tone": {
+      "direct": "direct",
+      "warm": "warm",
+      "urgent": "urgent",
+      "official": "official"
+    },
+    "table": {
+      "arm": "Wording",
+      "visitors": "Visitors",
+      "rate": "{goal} rate",
+      "pBest": "Chance to be best",
+      "lift": "Lift vs official"
+    },
+    "explain": {
+      "burnIn": "Every arm gets equal traffic until it reaches the minimum sample; then traffic shifts toward the arms that convert.",
+      "running": "Traffic follows the evidence (Thompson sampling). A winner is declared when one arm is best with more than 95 % probability, checked each time traffic doubles.",
+      "decided": "{name} is best with {p} probability. Losers are no longer served; promote it to make it official.",
+      "officialWins": "The official translation converts best. Variants are no longer served.",
+      "promoted": "The winning wording is now the official translation.",
+      "stopped": "Stopped: everyone sees the official translation."
+    },
+    "stats": {
+      "live": "Live experiments",
+      "liveHint": "{n, plural, one {# locale} other {# locales}}",
+      "toPromote": "Winners to promote",
+      "toPromoteHint": "P(best) above 95 %",
+      "visitors": "Visitors tested",
+      "visitorsHint": "Across live experiments"
+    },
+    "empty": {
+      "title": "Find the wording that converts",
+      "body": "Pick a CTA or a pricing headline and a locale. glot writes 2-3 variants with the same meaning in different tones, validates them, serves them to a share of your visitors and tells you which one wins."
+    },
+    "dialog": {
+      "title": "New copy experiment",
+      "body": "Variants keep the meaning, placeholders and glossary of the official translation; only those that pass validation are ever served.",
+      "key": "Key",
+      "keyHint": "A high-stakes string: call to action, pricing title, signup button.",
+      "locale": "Locale",
+      "variants": "Variants",
+      "explore": "Traffic %",
+      "minN": "Min per arm",
+      "goal": "Goal event",
+      "guardrails": "The official translation stays in the race as the reference. Traffic % is the share of visitors exposed to the experiment; the rest always see the official text.",
+      "cancel": "Cancel",
+      "submit": "Generate & start",
+      "created": "{n, plural, one {# variant} other {# variants}} validated and live{rejected, plural, =0 {} other {, # rejected}}"
     }
   }
 }

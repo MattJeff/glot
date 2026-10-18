@@ -1,0 +1,23 @@
+{
+  "name": "glot-db-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "pnpm -C ../../packages/db build && prisma generate && node src/e2e.ts"
+  },
+  "dependencies": {
+    "@glot/db": "link:../../packages/db",
+    "@prisma/client": "6.16.2"
+  },
+  "devDependencies": {
+    "prisma": "6.16.2"
+  },
+  "packageManager": "pnpm@10.18.3",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "prisma",
+      "@prisma/client",
+      "@prisma/engines"
+    ]
+  }
+}

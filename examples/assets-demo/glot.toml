@@ -1,0 +1,11 @@
+source_locale = "en"
+target_locales = ["fr", "de", "ja", "ar"]
+files = ["messages/{locale}.json"]
+syntax = "icu"
+
+[llm]
+provider = "mock"
+model = "mock"
+
+[extract]
+include = ["emails/**/*.tsx", "og/**/*.tsx"]

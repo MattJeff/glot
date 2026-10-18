@@ -206,7 +206,7 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
     Ok(())
 }
 
-fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
+pub(crate) fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
     if sp.changes.is_empty() && sp.packages.is_empty() && sp.notes.is_empty() {
         anstream::println!("{DIM}i18n runtime already wired.{DIM:#}");
         return;

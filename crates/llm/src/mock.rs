@@ -51,6 +51,9 @@ fn respond(p: &Value) -> Value {
     if p["task"] == "keys" {
         return crate::i18nize::mock_keys(p);
     }
+    if p["task"] == "seo_keywords" {
+        return crate::seo::mock(p);
+    }
     if p["task"] == "shorten" {
         return crate::visual::mock_shorten(p);
     }

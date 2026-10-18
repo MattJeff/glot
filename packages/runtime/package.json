@@ -10,6 +10,7 @@
     ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
     "./next-intl": { "types": "./dist/next-intl.d.ts", "default": "./dist/next-intl.js" },
     "./next-intl/server": { "types": "./dist/next-intl-server.d.ts", "default": "./dist/next-intl-server.js" },
+    "./ondemand": { "types": "./dist/ondemand.d.ts", "default": "./dist/ondemand.js" },
     "./i18next": { "types": "./dist/i18next.d.ts", "default": "./dist/i18next.js" },
     "./glot.wasm": "./dist/glot.wasm"
   },
@@ -17,8 +18,8 @@
   "sideEffects": false,
   "scripts": {
     "build:wasm": "cd ../.. && CARGO_PROFILE_RELEASE_LTO=true CARGO_PROFILE_RELEASE_OPT_LEVEL=z CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_STRIP=true cargo build -p glot-wasm --release --target wasm32-unknown-unknown && mkdir -p packages/runtime/dist && cp ${CARGO_TARGET_DIR:-target}/wasm32-unknown-unknown/release/glot_wasm.wasm packages/runtime/dist/glot.wasm",
-    "build": "esbuild src/index.ts --bundle --format=esm --minify --target=es2022 --outfile=dist/index.js && esbuild src/next-intl.ts src/next-intl-server.ts src/i18next.ts --bundle --format=esm --minify --target=es2022 --external:react --external:next-intl --external:./index.js --external:./next-intl.js --outdir=dist && tsc",
-    "test": "node --test test/mask.test.ts test/browser.test.ts"
+    "build": "esbuild src/index.ts --bundle --format=esm --minify --target=es2022 --outfile=dist/index.js && esbuild src/next-intl.ts src/next-intl-server.ts src/i18next.ts src/ondemand.ts --bundle --format=esm --minify --target=es2022 --external:react --external:next-intl --external:./index.js --external:./next-intl.js --outdir=dist && tsc",
+    "test": "node --test test/mask.test.ts test/variants.test.ts test/browser.test.ts test/ondemand.test.ts"
   },
   "peerDependencies": { "react": ">=18", "next-intl": ">=3" },
   "peerDependenciesMeta": { "react": { "optional": true }, "next-intl": { "optional": true } },

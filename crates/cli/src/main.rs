@@ -1,4 +1,7 @@
 //! `glot` CLI: thin layer over `glot_llm::engine::Workspace`.
+mod assets;
+mod coverage;
+mod db;
 mod dev;
 mod fit;
 mod i18nize;
@@ -6,8 +9,10 @@ mod init;
 mod measure;
 mod parity;
 mod review;
+mod seo;
 mod setup;
 mod sync;
+mod variants;
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
@@ -80,6 +85,8 @@ enum Cmd {
     Fit(fit::FitArgs),
     /// Record each key's pixel budget (box width, lines, font) from the running app into .glot/layout.json.
     Measure(measure::MeasureArgs),
+    /// Plural/select branch coverage per locale and CLDR category (`--render`: check each branch in a browser).
+    Coverage(coverage::CoverageArgs),
     /// Hardcoded strings in code, plus missing and unused keys.
     Extract {
         #[arg(long)]
@@ -120,10 +127,16 @@ enum Cmd {
     Mcp,
     /// Convert hardcoded UI strings to translation keys and rewrite the code (next-intl / react-i18next).
     I18nize(i18nize::I18nizeArgs),
+    /// Localize emails, SVG and OG images: i18nize, translate, render per locale, check.
+    Assets(assets::AssetsArgs),
     /// Local server for the in-app editing overlay (@glot/overlay).
     Dev(dev::DevArgs),
     /// Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success.
     Parity(parity::ParityArgs),
+    /// Multilingual SEO: audit hreflang/canonical/metadata per locale, fix Next.js, localize keywords.
+    Seo(seo::SeoArgs),
+    /// Translate database content (catalog, help articles…) into glot_translations (Postgres).
+    Db(db::DbArgs),
 }
 
 #[derive(Subcommand)]
@@ -202,6 +215,8 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
             batch,
             qa,
         } => {
+            // Register variants are generated from their base, so after it.
+            let (vl, vk) = (locale.clone(), key.clone());
             translate(
                 locale,
                 key,
@@ -211,10 +226,12 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
                 visual.then_some(qa),
                 batch,
             )
-            .await?
+            .await?;
+            variants::translate(&vl, &vk, force, dry_run).await?
         }
         Cmd::Fit(a) => return fit::fit(a).await,
         Cmd::Measure(a) => return measure::run(a),
+        Cmd::Coverage(a) => return coverage::run(a),
         Cmd::Extract { json } => extract(json)?,
         Cmd::Unused { prune, json } => unused(prune, json)?,
         Cmd::Add { key, value, note } => {
@@ -246,8 +263,11 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Pull => return sync::pull().await,
         Cmd::Mcp => glot_mcp::serve_stdio(std::env::current_dir()?).await?,
         Cmd::I18nize(args) => i18nize::run(args).await?,
+        Cmd::Assets(a) => return assets::run(a).await,
         Cmd::Dev(args) => dev::run(args).await?,
         Cmd::Parity(args) => return parity::run(args),
+        Cmd::Seo(args) => return seo::run(args).await,
+        Cmd::Db(args) => return db::run(args).await,
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -392,7 +412,8 @@ fn gh_escape(s: &str, prop: bool) -> String {
 
 fn check(format: Format) -> Result<ExitCode> {
     let ws = open()?;
-    let findings = ws.check();
+    let mut findings = ws.check();
+    findings.extend(variants::check(&ws));
     let errors = findings
         .iter()
         .filter(|f| f.issue.severity == Severity::Error)

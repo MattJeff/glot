@@ -200,7 +200,7 @@ function Matrix({ project: p }: { project: Project }) {
         <div className="flex w-max gap-4 p-4 sm:px-6" dir="ltr">
           {columns.map((col) => {
             const loc = col === PSEUDO ? p.source_locale : col;
-            const url = buildUrl(target.base, target.pattern, loc, p.source_locale, route);
+            const url = buildUrl(target.base, target.pattern, loc, p.source_locale, route, true);
             const height = heights[col] ?? defaultHeight;
             const colIssues = col === PSEUDO ? [] : (issues[col] ?? []);
             return (

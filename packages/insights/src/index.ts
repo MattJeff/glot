@@ -1,5 +1,5 @@
 // @glot/insights — anonymous locale demand + conversion beacon. No cookie, no visitor id:
-// one sessionStorage entry holds the experiment arm, the server stores daily counters only.
+// one sessionStorage entry holds the experiment arms, the server stores daily counters only.
 export type Options = {
   /** Project public key (dashboard → Insights). */
   key: string;
@@ -10,7 +10,9 @@ export type Options = {
   /** Called when this session is in the test arm of a language experiment: render that locale. */
   onLocale?: (locale: string) => void;
 };
-type State = { a?: string; l?: string };
+/** Copy variant served to this session for a key: experiment id, arm, text. */
+export type Variant = { id: string; arm: number; value: string };
+type State = { a?: string; l?: string; v?: Record<string, Variant> };
 
 const SK = "glot:insights";
 let opts: Options | undefined;
@@ -31,11 +33,16 @@ function send(event?: string): Promise<State> {
     route: location.pathname,
     event,
     arm: read()?.a,
+    variants: event ? arms() : undefined,
   };
   // String body = text/plain: a "simple" CORS request, no preflight.
   return fetch(`${opts.endpoint || ""}/api/insights/${opts.key}`, { method: "POST", body: JSON.stringify(body), keepalive: true })
     .then((r) => (r.ok ? r.json() : {}))
-    .then((r: { arm?: string; locale?: string }) => ({ a: r.arm, l: r.locale }))
+    .then((r: { arm?: string; locale?: string; variants?: (Variant & { key: string })[] }) => ({
+      a: r.arm,
+      l: r.locale,
+      v: r.variants?.length ? Object.fromEntries(r.variants.map(({ key, ...v }) => [key, v])) : undefined,
+    }))
     .catch(() => ({}));
 }
 
@@ -48,16 +55,29 @@ export async function init(o: Options): Promise<void> {
     try {
       sessionStorage.setItem(SK, JSON.stringify(s));
     } catch {}
+    // @glot/runtime's useGlotVariant listens for this (no import between the packages).
+    if (s.v && typeof dispatchEvent === "function") dispatchEvent(new Event("glot:variants"));
   }
   if (s.l) o.onLocale?.(s.l);
 }
 
-/** Conversion event: "signup", "purchase" or any name (1-40 chars of a-z0-9_-.:). */
+/** Conversion event: "signup", "purchase" or any name (1-40 chars of a-z0-9_-.:). Credits this session's
+ * language-experiment arm and copy-variant arms. */
 export function track(event: string): void {
   void send(event);
 }
 
-export const glot = { init, track };
+function arms(): Record<string, number> | undefined {
+  const v = read()?.v;
+  return v ? Object.fromEntries(Object.values(v).map((x) => [x.id, x.arm])) : undefined;
+}
+
+/** Copy variant text served to this session for `key` (a validated variant of a running experiment), if any. */
+export function variant(key: string): string | undefined {
+  return read()?.v?.[key]?.value;
+}
+
+export const glot = { init, track, variant };
 
 // <script src="insights.global.js" data-key="pk_…" data-endpoint="https://glot.example.com"> auto-inits.
 const el = typeof document !== "undefined" ? (document.currentScript as HTMLScriptElement | null) : null;

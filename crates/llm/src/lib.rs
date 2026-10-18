@@ -7,6 +7,7 @@ pub mod mock;
 pub mod pricing;
 pub mod provider;
 pub mod review;
+pub mod seo;
 pub mod translate;
 pub mod visual;
 

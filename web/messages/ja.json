@@ -40,6 +40,37 @@
     "save": "保存",
     "saving": "保存中…"
   },
+  "docs": {
+    "edit": "GitHub でこのページを編集",
+    "github": "GitHub",
+    "home": "glot ホーム",
+    "menu": "メニュー",
+    "onThisPage": "このページの内容",
+    "pages": {
+      "cli": "CLI リファレンス",
+      "concepts": "基本概念",
+      "faq": "FAQ・料金",
+      "frameworks": "フレームワーク",
+      "getting-started": "インストールとクイックスタート",
+      "insights": "インサイト",
+      "integrations": "インテグレーション",
+      "mcp": "MCP サーバー",
+      "runtime": "ランタイムのフォールバック",
+      "self-hosting": "セルフホスティング"
+    },
+    "search": {
+      "label": "ドキュメントを検索",
+      "noResults": "結果がありません",
+      "placeholder": "ドキュメントを検索… (/)"
+    },
+    "sections": {
+      "agents": "AI エージェント",
+      "guides": "ガイド",
+      "reference": "リファレンス",
+      "start": "はじめに"
+    },
+    "title": "ドキュメント"
+  },
   "editor": {
     "anyLocale": "すべてのロケール",
     "anyStatus": "すべてのステータス",
@@ -94,6 +125,149 @@
     "network": "ネットワークエラーです。接続を確認して、もう一度お試しください。",
     "notFound": "見つかりません。",
     "sessionExpired": "セッションが切れました。再度サインインしてください。"
+  },
+  "experiments": {
+    "burnIn": "全アームの訪問者",
+    "cancel": "キャンセル",
+    "chartAria": "アームごとの事後コンバージョン率: {summary}",
+    "chartCaption": "各曲線は、これまでのデータに基づくアームのコンバージョン率のもっともらしい範囲を示します。幅が狭いほど確度が高いことを意味します。",
+    "confirm": "確認",
+    "dialog": {
+      "body": "バリアントは、公式翻訳の意味、プレースホルダー、用語集を維持し、検証に合格したものだけが配信されます。",
+      "cancel": "キャンセル",
+      "created": "{n, plural, other {# 件のバリアント}} の検証が完了し公開中{rejected, plural, =0 {} other {、# 件却下}}",
+      "explore": "トラフィック %",
+      "goal": "目標イベント",
+      "guardrails": "公式翻訳は基準として比較対象に残ります。トラフィック % は実験に露出する訪問者の割合で、残りの訪問者には常に公式テキストが表示されます。",
+      "key": "キー",
+      "keyHint": "影響の大きい文字列: CTA、料金タイトル、サインアップボタンなど。",
+      "locale": "ロケール",
+      "minN": "アームあたりの最小数",
+      "submit": "生成して開始",
+      "title": "新しいコピー実験",
+      "variants": "バリアント"
+    },
+    "empty": {
+      "body": "CTA または料金の見出しとロケールを選択します。glot が同じ意味で異なるトーンのバリアントを 2〜3 件作成して検証し、訪問者の一部に配信して、最も効果の高いものを示します。",
+      "title": "コンバージョンにつながる文言を見つける"
+    },
+    "explain": {
+      "burnIn": "各パターンには、最小サンプル数に達するまで均等にトラフィックが割り当てられます。その後、コンバージョンの高いパターンへトラフィックが移されます。",
+      "decided": "{name} が {p} の確率で最良です。負けたパターンは配信されなくなります。正式にするには昇格させてください。",
+      "officialWins": "正式な翻訳が最もコンバージョンが高くなりました。バリアントは配信されなくなります。",
+      "promoted": "勝ちの文言が正式な翻訳になりました。",
+      "running": "トラフィックは実績データに基づいて配分されます（トンプソン・サンプリング）。1つのパターンが 95 % を超える確率で最良になると勝者と判定されます。判定はトラフィックが倍増するたびに行われます。",
+      "stopped": "停止しました: 全員が正式な翻訳を表示しています。"
+    },
+    "history": "終了した実験 ({n})",
+    "install": "アプリにバリアントを配信",
+    "keepBody": "正式な翻訳が最もコンバージョンが高くなりました。実験は終了し、カタログは変更されません。",
+    "keepOfficial": "正式な翻訳を維持",
+    "meta": "目標 {goal} · トラフィック {pct}% · 各パターン最小 {n}",
+    "new": "新しい実験",
+    "noTraffic": "まだ訪問者がいません。バリアントは @glot/insights によって、このロケールの訪問者に配信されます。",
+    "official": "正式",
+    "pBeats": "正式版を上回る確率 {p}",
+    "promote": "{name} を昇格",
+    "promoteBody": "「{value}」が {key} の正式な翻訳（{locale} ロケール）になります（レビュー済み、キーの履歴に記録）。次の glot pull、CDN の更新、または PR で、他の編集と同様に反映されます。他のバリアントは停止します。",
+    "promotedToast": "完了: カタログに勝ちの文言が反映されました",
+    "reference": "基準",
+    "source": "原文",
+    "sourceChanged": "これらのバリアントの作成後に原文が変更されたため、配信されなくなりました。この実験を停止し、新しく開始してください。",
+    "stats": {
+      "live": "実施中の実験",
+      "liveHint": "{n, plural, other {# ロケール}}",
+      "toPromote": "昇格対象の勝者",
+      "toPromoteHint": "P(最良) が 95 % 超",
+      "visitors": "テストした訪問者",
+      "visitorsHint": "実施中のすべての実験の合計"
+    },
+    "status": {
+      "decided": "勝者決定",
+      "promoted": "昇格済み",
+      "running": "実行中",
+      "stopped": "停止"
+    },
+    "stop": "停止",
+    "stoppedToast": "実験を停止しました: 全員が正式な翻訳を表示します",
+    "subtitle": "ロケールごとに最もコンバージョンの高い翻訳。glot が重要な文字列の検証済みバリアントを作成し、訪問者が勝者を選びます。",
+    "table": {
+      "arm": "文言",
+      "lift": "正式版に対するリフト",
+      "pBest": "最良となる確率",
+      "rate": "{goal} 率",
+      "visitors": "訪問者数"
+    },
+    "title": "実験",
+    "tone": {
+      "direct": "率直",
+      "official": "公式",
+      "urgent": "緊急",
+      "warm": "親しみ"
+    },
+    "variant": "バリアント {letter}",
+    "winner": "勝者"
+  },
+  "feedback": {
+    "accept": "承認",
+    "accepted": "レビュー済みの人による翻訳として修正を保存しました",
+    "backTranslation": "逆翻訳",
+    "current": "現在の翻訳",
+    "empty": {
+      "body": "アプリにフィードバックウィジェットを追加します。訪問者はテキストを選択し、問題点を伝え、より良い表現を提案できます。",
+      "title": "フィードバックはまだありません"
+    },
+    "install": {
+      "body": "Insights と同じ公開キーを使用します。アプリの言語で翻訳したラベルを渡してください。",
+      "title": "ウィジェットをインストール"
+    },
+    "kind": {
+      "awkward": "不自然",
+      "unclear": "分かりにくい",
+      "wrong": "誤り"
+    },
+    "noProposal": "まだ提案はありません。{threshold, plural, other {# 件のレポート}}で自動的に生成されます。",
+    "none": "ここには何もありません。",
+    "openPr": "GitHub PR を作成",
+    "prNeedsSettings": "プルリクエストを作成するには、下でリポジトリとトークンを設定してください。",
+    "prOpened": "プルリクエストを作成しました",
+    "proposal": "AI の提案",
+    "propose": "修正を提案",
+    "regenerate": "再生成",
+    "reject": "却下",
+    "rejectedToast": "フィードバックを却下しました",
+    "reports": "{count, plural, other {# 件のレポート}}",
+    "settings": {
+      "base": "ベースブランチ",
+      "catalog": "カタログのパス",
+      "clearToken": "トークンを削除",
+      "lock": "ロックファイルのパス",
+      "repo": "GitHub リポジトリ（owner/name）",
+      "save": "保存",
+      "saved": "フィードバック設定を保存しました",
+      "threshold": "AI 提案までのレポート数",
+      "title": "設定",
+      "token": "GitHub トークン",
+      "tokenHint": "Contents と Pull requests の書き込み権限を持つ Fine-grained トークン。暗号化して保存され、再表示されません。",
+      "tokenStored": "トークン保存済み — 空欄のままにすると維持されます"
+    },
+    "source": "原文",
+    "status": {
+      "accepted": "承認済み",
+      "open": "未対応",
+      "proposed": "提案あり",
+      "rejected": "却下"
+    },
+    "subtitle": "ネイティブスピーカーが本番環境で指摘した翻訳を、AI による修正案とともに確認できます。",
+    "suggested": "提案: {text}",
+    "tabs": {
+      "accepted": "承認済み",
+      "live": "要確認",
+      "rejected": "却下"
+    },
+    "title": "フィードバック",
+    "userReports": "ユーザーからの報告",
+    "viewPr": "プルリクエストを表示"
   },
   "glossary": {
     "add": "用語を追加",
@@ -699,6 +873,8 @@
   },
   "shell": {
     "apiTokens": "API トークン",
+    "experiments": "実験的機能",
+    "feedback": "フィードバック",
     "glossary": "用語集",
     "insights": "インサイト",
     "jobs": "ジョブ",

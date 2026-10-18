@@ -1,5 +1,5 @@
 import { chromium, type Page } from "playwright";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fontFileName, toSfnt } from "./fonts.ts";
 import { join } from "node:path";
 import { loadIndexes, match, type Index } from "./keys.ts";
@@ -40,6 +40,12 @@ export interface Options {
   /** Record, per key rendered in the source locale, the box it may use and its font (`report.layout`), and save webfonts to `fontsDir`. */
   measure?: boolean;
   fontsDir?: string;
+  /**
+   * Harness mode (`glot coverage --render`): JSON file `{ "<locale>": "<html>" }`. Each fragment replaces the
+   * body of the app page at `baseUrl` + first route (source locale, so the app's CSS and webfonts apply) and is
+   * checked like a page. Elements carry `data-glot-key` (`key#branch`): issues come back keyed.
+   */
+  harness?: string;
 }
 
 /** Pixel budget of a key (`glot measure` → `.glot/layout.json`). */
@@ -340,6 +346,7 @@ async function suggest(issue: Issue, png: Buffer, apiKey: string): Promise<strin
 }
 
 export async function run(o: Options): Promise<Report> {
+  if (o.harness) return runHarness(o);
   const shots = join(o.out, "screenshots");
   await mkdir(shots, { recursive: true });
   const browser = await chromium.launch();
@@ -452,6 +459,49 @@ export async function run(o: Options): Promise<Report> {
     await browser.close();
   }
 
+  await writeFile(join(o.out, "report.json"), JSON.stringify(report, null, 2));
+  await writeFile(join(o.out, "report.md"), toMarkdown(report));
+  return report;
+}
+
+async function runHarness(o: Options): Promise<Report> {
+  const fragments: Record<string, string> = JSON.parse(await readFile(o.harness!, "utf8"));
+  const shots = join(o.out, "screenshots");
+  await mkdir(shots, { recursive: true });
+  const report: Report = { generated_at: new Date().toISOString(), options: { ...o, locales: Object.keys(fragments) }, pages: [], issues: [] };
+  const browser = await chromium.launch();
+  try {
+    for (const vp of o.viewports) {
+      const [width, height] = vp.split("x").map(Number);
+      const page = await browser.newPage({ viewport: { width, height } });
+      const url = buildUrl(o, o.sourceLocale, o.routes[0] ?? "/");
+      for (const [locale, html] of Object.entries(fragments)) {
+        await grab(page, url);
+        await page.evaluate(([h, lang, rtl]) => {
+          document.documentElement.lang = lang;
+          document.documentElement.dir = rtl ? "rtl" : "ltr";
+          document.body.innerHTML = h;
+        }, [html, locale, RTL.has(locale.split("-")[0]) ? "1" : ""] as const);
+        await page.evaluate(() => document.fonts.ready);
+        const { found } = await page.evaluate(detect, { sourceTexts: null, checkRtl: false });
+        const slug = `${locale}_harness_${vp}`;
+        const screenshot = join("screenshots", `${slug}.png`);
+        await page.screenshot({ path: join(o.out, screenshot), fullPage: true });
+        report.pages.push({ locale, route: "harness", viewport: vp, url, screenshot });
+        for (const [i, { ctx: _ctx, ...f }] of found.entries()) {
+          const issue: Issue = { ...f, locale, route: "harness", viewport: vp };
+          if (VISUAL.includes(f.kind) && f.rect) {
+            issue.crop = join("screenshots", `${slug}_${i}_${f.kind}.png`);
+            await page.screenshot({ path: join(o.out, issue.crop), clip: { x: Math.max(0, f.rect.x - 8), y: Math.max(0, f.rect.y - 8), width: f.rect.width + 16, height: f.rect.height + 16 }, fullPage: true });
+          }
+          report.issues.push(issue);
+        }
+      }
+      await page.close();
+    }
+  } finally {
+    await browser.close();
+  }
   await writeFile(join(o.out, "report.json"), JSON.stringify(report, null, 2));
   await writeFile(join(o.out, "report.md"), toMarkdown(report));
   return report;

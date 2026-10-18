@@ -19,3 +19,5 @@ max_length_ratio = 1.6
 
 [extract]
 include = ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"]
+# Docs content (web/content/docs/*.md) is English documentation, not UI: never extracted.
+exclude = ["**/node_modules/**", "**/*.test.*", "**/*.spec.*", "content/**"]

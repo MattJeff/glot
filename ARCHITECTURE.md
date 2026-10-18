@@ -21,6 +21,7 @@
 | `crates/server` (`glot-server`) | API HTTP axum + Postgres (sqlx), jobs de traduction, CDN/OTA, SSE |
 | `web/` | Dashboard Next.js (App Router, TS, Tailwind v4, shadcn/ui, next-intl) — **traduit par glot lui-même (dogfooding)** |
 | `packages/visual-qa` | QA visuelle Playwright (débordements par locale) |
+| `packages/db` | `@glot/db` : lecture du contenu de base traduit (Prisma `withLocale`, Drizzle), migration `glot_translations` ; écrit par `glot db` (`crates/cli/src/db.rs`) |
 | `packages/agent-qa` | Parité de tâche (`glot parity`, `crates/cli/src/parity.rs`) : agent Claude vision ou mock scripté, `glot.tasks.yaml`, rapport local `.glot/parity/` (pas d'upload) |
 | `action/` | GitHub Action (`glot check` + `glot translate` + commentaire de PR) |
 
@@ -160,6 +161,8 @@ POST   /api/projects/{slug}/sync/push  {catalogs:{<loc>:{<key>:value}}, lock, gl
 GET    /api/projects/{slug}/sync/pull  -> {catalogs, lock (notes = descriptions serveur), glossary:[Term sans id]}
 
 GET    /cdn/{slug}/{locale}.json       (OTA, public si public_cdn, ETag + Cache-Control) -> JSON imbriqué
+       ?ondemand=1 : locale non livrée → 202 + job (voir « On-demand locales »), puis 200
+GET|PUT /api/projects/{slug}/ondemand  {locales:["de"]|["*"], monthly_budget_usd?, per_day}
 GET    /api/openapi.json
 GET    /healthz
 ```
@@ -231,6 +234,27 @@ Experiment = {id, locale, traffic_pct, goal, started_at, ends_at, status, decide
 Client : `@glot/insights` (`init({key, endpoint, locale, onLocale})`, `track(event)`, `<script data-key>` auto-init,
 `@glot/insights/server` `reportVisit(req, …)` pour un middleware Next/Edge). Dashboard : `/app/{slug}/insights`.
 
+## Copy experiments (`crates/server/src/variants.rs`, migration `0057_variants.sql`)
+« La traduction qui convertit le mieux », par (clé, locale). Bras 0 = traduction officielle ; 1-3 = variantes LLM
+(même sens, tons direct/warm/urgent ; provider `mock` → `"<officielle> (<ton>)"`) **insérées seulement si validées**
+(`keys::check` : placeholders/ICU/glossaire, + `measure::check` si `fit` fourni). Compteurs agrégés `variant_arms(views, conversions)`.
+```
+POST /api/projects/{slug}/experiments {key, locale, variants 2-3, explore_pct 1-100, min_n ≥ 50, goal?, fit?: measure::Fit}
+       -> 201 VariantExperiment + rejected[] (admin ; 422 no_valid_variant ; 409 si déjà live pour clé+locale)
+GET  /api/projects/{slug}/experiments -> VariantExperiment[] {…, status running|decided|promoted|stopped, winner,
+       arms:[{arm, value, tone, views, conversions, alpha, beta, p_best, p_beats_control, lift}]}
+POST …/experiments/{id}/promote -> écrit le gagnant via keys::write_translation (reviewed, historique) ; 409 sans gagnant
+POST …/experiments/{id}/stop    -> 204
+```
+Service : piggyback sur `POST /api/insights/{pk}` (même rate limit). Visite → pour chaque expérience live de la locale
+servie, `explore_pct` % des visiteurs tirent un bras (burn-in uniforme jusqu'à `min_n`/bras, puis top-two Thompson) ;
+réponse `variants:[{id,key,arm,value}]` stockée en sessionStorage. Événement = goal → `variants:{id:arm}` crédite le bras.
+Arrêt : un « look » chaque fois que le trafic total atteint `bras·min_n·2^k` ; gagnant si P(best) > 1 − 5 %/(bras·2^(k+1))
+(budget d'erreur 5 % réparti sur bras et looks : simulation A/A ≈ 2 % de faux positifs, bon bras trouvé 100/100).
+`decided` → seul le gagnant est servi, en attente de « promouvoir ». Source modifiée → plus servi.
+Client : `variant(key)` (`@glot/insights`), `useGlotVariant(key)` / `<GlotVariants>` (`@glot/runtime/next-intl`, surcharge
+les messages next-intl). Dashboard : `/app/{slug}/experiments`.
+
 ## Layout budgets (`glot measure`)
 `glot measure --base-url … --routes …` renders the source locale with visual-qa, maps each element to its key
 (rendered text → catalog regex, no instrumentation) and records the space it may use in `.glot/layout.json`
@@ -255,3 +279,120 @@ Verified end to end on real apps in `examples/frameworks/` (`GLOT_FW_APPS=… ca
 changes, Postgres clock), merged into the key lookup so an accepted hit costs no extra round trip; keys over budget
 are cached locally until the window ends, so floods never reach the database. Budget: `projects.insights_rate_per_min`,
 else `GLOT_INSIGHTS_RATE_PER_MIN`, else 1200. Over budget → 429 `rate_limited` with `Retry-After`.
+
+## Database content (`glot db`, `crates/cli/src/db.rs`, `packages/db`)
+Contenu en base (catalogue, articles d'aide, plans, notifications) traduit dans une table shadow Postgres
+`glot_translations("table", row_id, "column", locale, value, source_hash, status, model, updated_at)`, PK (table, row_id, column, locale),
+`status` = `translated` | `stale` | `failed`. Config : `[[db.tables]]` de `glot.toml` (`table`, `primary_key`, `context`,
+`columns = { col = "note" | { context, max_length } }`, `context_columns`).
+- `glot db install` : table + fonction `glot_db_changed()` + trigger `glot_db` par table (args : pk puis colonnes). UPDATE d'une colonne
+  localisée dont le hash change → `stale` ; DELETE → lignes shadow supprimées ; INSERT/changement → `NOTIFY glot_db`.
+  Texte identique à `packages/db/migrations/0001_glot_translations.sql` (test).
+- `glot db sync` : par table × locale, sélection = cellules non vides sans entrée, hash différent ou `stale` (`failed` au même hash ignoré) ;
+  `Item` = source + `KeyContext` (description = table/colonne/notes, `max_length`, `neighbors` = reste de la ligne, `previous` = ancienne
+  traduction) → `Translator` (validateur + glossaire + retries). Écriture par chunk (batch_size × 4) en transaction (reprise après
+  interruption), budget vérifié avant chaque chunk via `translate::estimate`. `--watch` : `LISTEN glot_db`, debounce 300 ms.
+- Hash = `glot_core::hash` = `left(encode(sha256(convert_to(v,'UTF8')),'hex'),16)` en SQL = `sourceHash` en JS.
+- `@glot/db` : `createGlotDb(query).localize(table, rows, locale)` ne sert une traduction que si `status='translated'` **et** son
+  `source_hash` = hash de la source courante, sinon valeur source. `glotPrisma` (extension `$extends`, `withLocale(l)` sur les lectures
+  find*) et `glotDrizzle(db)` (`$client` node-postgres ou postgres.js).
+
+## On-demand locales (`crates/server/src/ondemand.rs`, migration `0033_ondemand.sql`, `@glot/runtime/ondemand`, `packages/edge`)
+Une locale non livrée devient une vraie page traduite côté serveur sans action du dev.
+- `GET /cdn/{slug}/{locale}.json?ondemand=1` hors `target_locales` : job `done` pour la locale → 200 (catalogue, ETag, même cache) ;
+  job en cours → 202 `{status:"translating"}`, `Retry-After: 5`, `no-store` ; sinon, si autorisé, crée un job `translate` normal
+  (glossaire, validation, `llm.budget_usd`) avec `params.ondemand_locale` → 202. Sans `?ondemand=1` : 404 tant que rien n'est prêt.
+- Garde-fous (verrou `FOR UPDATE` sur la ligne projet = correct entre réplicas) : liste blanche `projects.ondemand_locales`
+  (`{*}` = toutes, `{}` = off, défaut) → 403 `ondemand_not_allowed` ; `ondemand_per_day` jobs / 24 h glissantes (défaut 5) → 429 +
+  `Retry-After` ; `ondemand_budget_usd` = somme `cost_usd` des jobs on-demand du mois → 402 `ondemand_budget_exhausted`.
+  Pas de table : l'état est dans `jobs` (index partiel `jobs_ondemand`). Job `failed` → redemandable (compte dans le quota).
+- `createOnDemandLoader({server, project, source?})` → `load(locale)` : catalogue (fusionné sur la source) ou `null` (202/erreur/glot
+  injoignable → rendre la source ; le fallback on-device du navigateur prend le relais). Cache mémoire, requêtes dédupliquées,
+  stale-while-revalidate avec `If-None-Match` ; un `null` est redemandé après `Retry-After`.
+- `packages/edge` : `route()` (préfixe `/{locale}/`, sinon cookie `glot_locale` / Accept-Language → 302 pour les navigations HTML),
+  Worker Cloudflare (pages statiques : remplit les éléments `data-glot="clé"` via HTMLRewriter) et `glotProxy` Next 16 (`proxy.ts`,
+  rewrite + en-tête `x-glot-locale`).
+
+## Branch coverage (`glot coverage`, `glot_core::branches`)
+`branches::enumerate(msg, locale, syntax)` (child module of `validate`, walks its AST) : produit cartésien des cas de chaque
+variable de sélection — `plural` : catégories CLDR de la locale avec un témoin (`witness`, ex. pl few=3 many=11 other=1.5,
+ar 0/1/2/3/11/100) + chaque `=N` ; `selectordinal` : `ordinal_witnesses` (en, langues one/other, sinon `other`) + clés du
+message ; `select` : chaque clé + `other`. Variables non atteintes ignorées (dédup), plafond `MAX_BRANCHES`. Texte rendu :
+`=N` > catégorie > `other`, `#` = témoin, autres placeholders = `render_sample`, balises retirées. MF2 : `.match` à un
+sélecteur exact ; multi-sélecteurs → texte du 1er sélecteur. i18next non couvert (pluriels = clés `_few`).
+CLI (`crates/cli/src/coverage.rs`) : mesure chaque branche (`measure::check`) ; `--render` écrit `.glot/coverage/harness.json`
+`{locale: html}` (une boîte par branche avec le budget de `.glot/layout.json`, `data-glot-key="clé#branche"`) et lance
+`glot-visual-qa --harness` (le fragment remplace le body de la page `--base-url` + 1re route : CSS/polices de l'app).
+`.glot/coverage.json` : `{locale: {key: {branch_id: {text_hash, issue|null}}}}` ; une branche n'est « vue » que si son texte
+a le même hash. Rapport par locale × catégorie (branches, vues, en échec, trop larges) ; exit 1 si échec.
+
+## Register variants (`[variants]`, `glot_core::variants`)
+`glot.toml` : `[variants] fr = ["formal", "informal"]` → locales `fr-x-formal`, `fr-x-informal` (extension privée BCP 47),
+catalogues via `files` comme les autres. Lu à part (`variants::load`) pour ne pas casser les littéraux `Config`.
+`glot translate` (puis `crates/cli/src/variants.rs`) : après la base, delta via `lock.plan(base, [variante])`, requête
+`source_locale = base`, `style` = style + `variants::instruction` (registre), glossaire de la base recopié ; lock enregistré
+contre le texte de la base. `glot check` ajoute `variants::check` (validate base → variante, `untranslated` ignoré).
+Runtime : une locale comme une autre (cookie / préférence utilisateur, ex. `NEXT_LOCALE=fr-x-informal`).
+
+## SEO multilingue (`glot seo`, `crates/cli/src/seo.rs` + `seo/`, `glot_llm::seo`)
+- `glot seo audit --base-url … [--routes a,b | --sitemap] [--url-pattern "/{locale}{route}"] [--json]` : HTML serveur
+  (ce que voit un crawler, sans navigateur) de chaque (route, locale) + cibles hreflang. Erreurs : HTTP ≠ 200, `<html lang>`,
+  canonical absent / vers une autre locale, hreflang absent / incomplet / invalide (`jp`, `en-UK`) / sans auto-référence /
+  non réciproque / cassé / mauvaise langue, title absent ou identique à la source, page indexable ≥ 90 % identique à la
+  source (« scaled content »). Warnings : x-default, title > 60 / description > 160 (largeur SERP, CJK ×2), sitemap absent ou
+  URL manquante, robots.txt sans sitemap, slug. Findings rattachés à la clé du catalogue (texte == valeur). Exit 1 si erreur.
+- `glot seo fix [--dry-run] [--yes]` (Next App Router, après i18nize, via `setup::SetupPlan`, idempotent) : `x-glot-pathname`
+  dans `i18n/proxy.ts`, `i18n/seo.ts` (`seoAlternates()` : canonical + hreflang + x-default de la requête, `SITE_URL`),
+  `alternates` inséré dans le `generateMetadata` du layout racine (ou `metadata` converti), `app/sitemap.ts` (routes
+  statiques × locales avec alternates), `app/robots.ts`.
+- `glot seo keywords [--locale] [--keys] [--apply]` : clés notées « … in generateMetadata » ; le LLM (tâche
+  `seo_keywords`) donne les requêtes que tapent les natifs + 2-3 variantes ≤ budget SERP ; termes stockés dans
+  `lock.notes` (`SEO fr: …`) ; `--apply` écrit la 1re variante qui passe `set_translation` (validation + glossaire).
+
+## Feedback (`crates/server/src/feedback.rs`, migration `0040_feedback.sql`, `packages/feedback`)
+Native speakers flag a translation in production → correction proposed → human accepts → optional GitHub PR.
+Prior art / FTO notes: `docs/prior-art.md` (one key per correction, no propagation to other occurrences).
+```
+POST   /api/feedback/{public_key}   (public, CORS *, ≤ 8 Ko, text/plain accepté ; même clé publique qu'Insights)
+         {locale, text, kind?:"wrong"|"awkward"|"unclear", suggestion?, url?, dom?, key?} -> 202 {matched}
+         Clé = `key` si connue, sinon index inverse du catalogue de la locale (ICU {…} = joker, balises ignorées ;
+         sinon plus courte valeur contenant le texte, ≥ 4 car.). Non trouvé => {matched:false}, rien stocké.
+         Vie privée : url sans query/fragment, dom = chemin de balises (pas de texte), ni IP/UA/cookie.
+         Rate limit partagé Postgres (`feedback_rate`, même schéma qu'insights) : GLOT_FEEDBACK_RATE_PER_MIN (30) → 429.
+         Regroupement par (key, locale) ; au seuil (`threshold`, défaut 3) => proposition en tâche de fond.
+GET    /api/projects/{slug}/feedback -> {settings: FeedbackSettings, groups: [Group]}
+PUT    /api/projects/{slug}/feedback/settings {threshold?, github_repo?, github_base?, catalog_path?, lock_path?,
+         github_token? (write-only chiffré comme la clé LLM ; "" efface)} -> FeedbackSettings   (admin)
+POST   /api/projects/{slug}/feedback/{id}/propose  -> Group   (pipeline de traduction gardé avec `previous` = cible
+         actuelle et signalements dans la description, puis rétro-traduction Review API)
+POST   /api/projects/{slug}/feedback/{id}/accept {value?} -> Group  (422 si le validateur trouve une erreur ;
+         écrit origin=human, status=reviewed)
+POST   /api/projects/{slug}/feedback/{id}/reject -> Group
+POST   /api/projects/{slug}/feedback/{id}/pr -> Group (pr_url) (admin, groupe accepté) : Git Data API —
+         1 commit (catalogue `catalog_path` avec {locale} + `lock_path`) sur `glot/feedback-{locale}-{id8}`, PR avec
+         tableau avant/après. Base API : GLOT_GITHUB_API (défaut https://api.github.com).
+FeedbackSettings = {public_key, threshold, github_repo|null, github_base, catalog_path, lock_path, has_github_token}
+Group = {id, key, locale, source, current, status:"open"|"proposed"|"accepted"|"rejected", count, proposal, previous,
+         back_translation, verdict, explanation, issues[], pr_url, updated_at, reports:[{kind,text,suggestion,url,dom,created_at}]}
+```
+Widget `@glot/feedback` (< 4 Ko min., Shadow DOM, `<dialog>` natif) : sélection de texte → « Improve translation »,
+ou événement `glot:improve` du badge runtime (detail {key?, text?}), ou `open(text, key)`. `<script data-key data-endpoint>`
+auto-init ; `labels` à passer traduits. Dashboard : `/app/{slug}/feedback`.
+
+## Assets : emails, SVG, OG (`glot assets`, `crates/cli/src/assets.rs`, `crates/extract/src/{email,svg}.rs`)
+`glot assets [i18nize|translate|preview|check] [--emails] [--svg] [--og]` (défaut : les 4 étapes, idempotent).
+- **i18nize** : JSX (`emails/*.tsx`, `og/*.tsx`) via `glot_llm::i18nize` (clés = namespace du chemin, `emails.<template>.*`,
+  `og.<name>.*`) + `export const subject = "…"` → `(t) => t("emails.<t>.subject")`. HTML/MJML/SVG jamais réécrits : scanner
+  de balises (`email::scan_markup`) → clés stables (`id` de l'élément sinon slug du texte), le fichier est la source de vérité
+  de son préfixe (`emails.<t>.` / `svg.<name>.` : clés disparues supprimées). `{{var}}` ⇄ `{var}`.
+- **Budgets** dans `.glot/layout.json` (même format que `glot measure`) : `<text>` SVG (`data-max-width`, sinon place
+  restante dans le viewBox selon `text-anchor`, 1 ligne), blocs OG (largeur × `lineClamp`), sujet (60 chars Latin moyens à
+  Helvetica 14px) et preheader (100). `glot translate`/`check` les appliquent : `too_wide` → retry avant écriture.
+- **translate** : `Workspace::translate` restreint aux clés des assets (lock, glossaire, validateur inchangés).
+- **preview** : évaluation statique du JSX (`email::render_jsx` : composants React Email, `t()`/`t.rich()`, ICU minimal,
+  `PreviewProps`) → `.glot/emails/<t>/<locale>.html` ; HTML/MJML substitués span par span (`lang`/`dir` posés) ;
+  SVG → `public/img/<locale>/<name>.{svg,png}` ; OG → mise en page colonne flex (`svg::og_svg`, retour à la ligne
+  avec `glot_core::measure`) → `public/og/<locale>/<name>.png`. Rendu PNG : resvg (polices système, `.glot/fonts/`).
+- **check** : `Workspace::check` sur les clés des assets + liens identiques à la source, sujet ≤ 60 / preheader ≤ 100,
+  `<Html dir>` absent pour une locale RTL (warning), largeur réellement rendue par resvg (bbox usvg) > budget, OG plus
+  haut que l'image. Exit 1 si erreur.

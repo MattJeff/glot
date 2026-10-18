@@ -13,14 +13,17 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
 
 pub mod auth;
 pub mod cdn;
+pub mod feedback;
 pub mod glossary;
 pub mod insights;
 pub mod jobs;
 pub mod keys;
+pub mod ondemand;
 pub mod openapi;
 pub mod projects;
 pub mod review;
 pub mod sync;
+pub mod variants;
 pub mod visual;
 
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
@@ -120,11 +123,15 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/openapi.json", get(openapi::spec))
         .merge(visual::routes())
         .merge(insights::routes())
+        .merge(variants::routes())
+        .merge(feedback::routes())
+        .merge(ondemand::routes())
         .layer(cors);
 
     Router::new()
         .merge(api)
         .merge(insights::public_routes())
+        .merge(feedback::public_routes())
         .route("/cdn/{slug}/{file}", get(cdn::serve))
         .route("/healthz", get(|| async { "ok" }))
         .fallback(|| async { AppError::not_found("route not found") })

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenText,
+  FlaskConical,
   FolderKanban,
   Grid3x3,
   KeyRound,
@@ -10,6 +11,7 @@ import {
   ListChecks,
   LogOut,
   Menu,
+  MessageSquareWarning,
   Moon,
   Plus,
   Radar,
@@ -56,6 +58,8 @@ const PROJECT_PAGES = [
   { seg: "/preview", icon: Grid3x3, label: "preview" },
   { seg: "/visual", icon: ScanEye, label: "visual" },
   { seg: "/insights", icon: Radar, label: "insights" },
+  { seg: "/experiments", icon: FlaskConical, label: "experiments" },
+  { seg: "/feedback", icon: MessageSquareWarning, label: "feedback" },
   { seg: "/glossary", icon: BookOpenText, label: "glossary" },
   { seg: "/jobs", icon: ListChecks, label: "jobs" },
   { seg: "/settings", icon: Settings, label: "settings" },

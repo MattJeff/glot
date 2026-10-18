@@ -10,8 +10,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
+pub mod email;
 pub mod i18nize;
 mod scan;
+pub mod svg;
 #[cfg(test)]
 mod tests;
 

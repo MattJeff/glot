@@ -5,13 +5,15 @@ use axum::{
 };
 use glot_core::catalog::{Catalog, Format};
 
-use crate::{ApiResult, AppError, AppPath, AppState, auth::authenticate};
+use crate::{ApiResult, AppError, AppPath, AppQuery, AppState, auth::authenticate};
 
 /// `GET /cdn/{slug}/{locale}.json`: nested JSON catalog for OTA updates.
 /// Public projects (public_cdn) are readable by anyone; private ones only by members.
+/// `?ondemand=1` on an unshipped locale: see `ondemand::gate` (202 while translating).
 pub async fn serve(
     State(state): State<AppState>,
     AppPath((slug, file)): AppPath<(String, String)>,
+    AppQuery(q): AppQuery<std::collections::HashMap<String, String>>,
     headers: HeaderMap,
 ) -> ApiResult<Response> {
     let not_found = || AppError::not_found("catalog not found");
@@ -25,8 +27,17 @@ pub async fn serve(
             .ok_or_else(not_found)?;
         crate::projects::load(&state, user.id, &slug, crate::projects::Role::Translator).await?;
     }
-    if locale != p.source_locale && !p.target_locales.iter().any(|l| l == locale) {
-        return Err(not_found());
+    if locale != p.source_locale
+        && !p.target_locales.iter().any(|l| l == locale)
+        && let Some(res) = crate::ondemand::gate(
+            &state,
+            &p,
+            locale,
+            q.get("ondemand").is_some_and(|v| v == "1"),
+        )
+        .await?
+    {
+        return Ok(res);
     }
 
     let rows: Vec<(String, String)> = if locale == p.source_locale {

@@ -1458,6 +1458,10 @@ fn open_tag(syntax: Syntax, name: &str, void: bool) -> String {
     }
 }
 
+/// Branch coverage (`glot coverage`): a child module so it can walk the private AST.
+#[path = "branches.rs"]
+pub mod branches;
+
 #[cfg(test)]
 mod tests {
     use super::*;

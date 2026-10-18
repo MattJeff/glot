@@ -40,6 +40,37 @@
     "save": "Enregistrer",
     "saving": "Enregistrement…"
   },
+  "docs": {
+    "edit": "Modifier cette page sur GitHub",
+    "github": "GitHub",
+    "home": "Accueil glot",
+    "menu": "Menu",
+    "onThisPage": "Sur cette page",
+    "pages": {
+      "cli": "Référence CLI",
+      "concepts": "Concepts",
+      "faq": "FAQ et coûts",
+      "frameworks": "Frameworks",
+      "getting-started": "Installation et démarrage rapide",
+      "insights": "Analyses",
+      "integrations": "Intégrations",
+      "mcp": "Serveur MCP",
+      "runtime": "Repli à l’exécution",
+      "self-hosting": "Auto-hébergement"
+    },
+    "search": {
+      "label": "Rechercher dans la documentation",
+      "noResults": "Aucun résultat",
+      "placeholder": "Rechercher dans la doc… (/)"
+    },
+    "sections": {
+      "agents": "Agents IA",
+      "guides": "Guides",
+      "reference": "Référence",
+      "start": "Premiers pas"
+    },
+    "title": "Docs"
+  },
   "editor": {
     "anyLocale": "Toutes les langues",
     "anyStatus": "Tous les statuts",
@@ -94,6 +125,149 @@
     "network": "Erreur réseau. Vérifiez votre connexion et réessayez.",
     "notFound": "Introuvable.",
     "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "experiments": {
+    "burnIn": "Visiteurs par variante",
+    "cancel": "Annuler",
+    "chartAria": "Taux de conversion a posteriori par variante : {summary}",
+    "chartCaption": "Chaque courbe représente la plage plausible du taux de conversion d’une variante au vu des données actuelles ; plus elle est étroite, plus le résultat est certain.",
+    "confirm": "Confirmer",
+    "dialog": {
+      "body": "Les variantes conservent le sens, les variables et le glossaire de la traduction officielle ; seules celles qui passent la validation sont diffusées.",
+      "cancel": "Annuler",
+      "created": "{n, plural, one {# variante validée et en ligne} many {# variantes validées et en ligne} other {# variantes validées et en ligne}}{rejected, plural, =0 {} one {, # rejetée} many {, # rejetées} other {, # rejetées}}",
+      "explore": "Trafic %",
+      "goal": "Événement objectif",
+      "guardrails": "La traduction officielle reste en lice comme référence. Le trafic % est la part des visiteurs exposés à l’expérience ; les autres voient toujours le texte officiel.",
+      "key": "Clé",
+      "keyHint": "Chaîne à forts enjeux : appel à l’action, titre de tarification, bouton d’inscription.",
+      "locale": "Langue",
+      "minN": "Minimum par variante",
+      "submit": "Générer et lancer",
+      "title": "Nouvelle expérience de texte",
+      "variants": "Variantes"
+    },
+    "empty": {
+      "body": "Choisissez un CTA ou un titre de tarification, ainsi qu'une langue. glot rédige 2 à 3 variantes au même sens, sur des tons différents, les valide, les diffuse à une partie de vos visiteurs et indique laquelle convertit le mieux.",
+      "title": "Trouvez la formulation qui convertit"
+    },
+    "explain": {
+      "burnIn": "Chaque variante reçoit un trafic égal jusqu'à atteindre l'échantillon minimal ; ensuite, le trafic se répartit vers les variantes qui convertissent.",
+      "decided": "{name} est la meilleure, avec une probabilité de {p}. Les autres variantes ne sont plus diffusées ; promouvez-la pour la rendre officielle.",
+      "officialWins": "La traduction officielle convertit le mieux. Les variantes ne sont plus diffusées.",
+      "promoted": "La formulation gagnante est désormais la traduction officielle.",
+      "running": "Le trafic suit les résultats (échantillonnage de Thompson). Un gagnant est déclaré lorsqu'une variante a plus de 95 % de probabilité d'être la meilleure, vérifié à chaque doublement du trafic.",
+      "stopped": "Arrêtée : tout le monde voit la traduction officielle."
+    },
+    "history": "Expériences terminées ({n})",
+    "install": "Diffuser les variantes dans votre application",
+    "keepBody": "La traduction officielle a le mieux converti. L'expérience se termine et rien ne change dans vos catalogues.",
+    "keepOfficial": "Garder la traduction officielle",
+    "meta": "objectif {goal} · {pct} % du trafic · min. {n} par variante",
+    "new": "Nouvelle expérience",
+    "noTraffic": "Aucun visiteur pour l'instant. Les variantes sont diffusées par @glot/insights aux visiteurs de cette langue.",
+    "official": "Officielle",
+    "pBeats": "{p} de chances de battre la version officielle",
+    "promote": "Promouvoir {name}",
+    "promoteBody": "« {value} » devient la traduction officielle de la clé {key} en langue {locale} (relue, dans l'historique de la clé). Elle sera publiée avec votre prochain glot pull, rafraîchissement CDN ou PR, comme toute modification. Les autres variantes s'arrêtent.",
+    "promotedToast": "Terminé : le catalogue contient désormais la formulation gagnante",
+    "reference": "référence",
+    "source": "source",
+    "sourceChanged": "Le texte source a changé depuis la rédaction de ces variantes : elles ne sont plus diffusées. Arrêtez cette expérience et lancez-en une nouvelle.",
+    "stats": {
+      "live": "Expériences en cours",
+      "liveHint": "{n, plural, one {# langue} many {# langues} other {# langues}}",
+      "toPromote": "Gagnants à promouvoir",
+      "toPromoteHint": "P(meilleure) supérieure à 95 %",
+      "visitors": "Visiteurs testés",
+      "visitorsHint": "Sur les expériences en cours"
+    },
+    "status": {
+      "decided": "Gagnant trouvé",
+      "promoted": "Promue",
+      "running": "En cours",
+      "stopped": "Arrêtée"
+    },
+    "stop": "Arrêter",
+    "stoppedToast": "Expérience arrêtée : tout le monde voit la traduction officielle",
+    "subtitle": "La traduction qui convertit le mieux, par langue. glot rédige des variantes validées d'une chaîne à fort enjeu et laisse vos visiteurs désigner la gagnante.",
+    "table": {
+      "arm": "Formulation",
+      "lift": "Gain vs officielle",
+      "pBest": "Chances d'être la meilleure",
+      "rate": "Taux de {goal}",
+      "visitors": "Visiteurs"
+    },
+    "title": "Expériences",
+    "tone": {
+      "direct": "direct",
+      "official": "officiel",
+      "urgent": "urgent",
+      "warm": "chaleureux"
+    },
+    "variant": "Variante {letter}",
+    "winner": "Gagnant"
+  },
+  "feedback": {
+    "accept": "Accepter",
+    "accepted": "Correction enregistrée comme traduction humaine relue",
+    "backTranslation": "Retraduction",
+    "current": "Traduction actuelle",
+    "empty": {
+      "body": "Ajoutez le widget de retour à votre application : les visiteurs sélectionnent un texte, indiquent ce qui ne va pas et proposent une meilleure formulation.",
+      "title": "Aucun retour pour l'instant"
+    },
+    "install": {
+      "body": "Utilisez la même clé publique qu'Insights. Transmettez les libellés traduits dans la langue de votre application.",
+      "title": "Installer le widget"
+    },
+    "kind": {
+      "awkward": "Maladroit",
+      "unclear": "Peu clair",
+      "wrong": "Incorrect"
+    },
+    "noProposal": "Aucune proposition pour l'instant. Une proposition est générée automatiquement à {threshold, plural, one {# signalement} many {# signalements} other {# signalements}}.",
+    "none": "Rien ici.",
+    "openPr": "Ouvrir une PR GitHub",
+    "prNeedsSettings": "Renseignez un dépôt et un jeton ci-dessous pour ouvrir des pull requests.",
+    "prOpened": "Pull request ouverte",
+    "proposal": "Proposition IA",
+    "propose": "Proposer une correction",
+    "regenerate": "Régénérer",
+    "reject": "Rejeter",
+    "rejectedToast": "Retour rejeté",
+    "reports": "{count, plural, one {# signalement} many {# signalements} other {# signalements}}",
+    "settings": {
+      "base": "Branche de base",
+      "catalog": "Chemin du catalogue",
+      "clearToken": "Supprimer le jeton",
+      "lock": "Chemin du lockfile",
+      "repo": "Dépôt GitHub (propriétaire/nom)",
+      "save": "Enregistrer",
+      "saved": "Paramètres de retour enregistrés",
+      "threshold": "Signalements avant une proposition IA",
+      "title": "Paramètres",
+      "token": "Jeton GitHub",
+      "tokenHint": "Jeton à granularité fine avec accès en écriture à Contents et Pull requests. Stocké chiffré, jamais affiché à nouveau.",
+      "tokenStored": "Jeton enregistré : laissez vide pour le conserver"
+    },
+    "source": "Source",
+    "status": {
+      "accepted": "Accepté",
+      "open": "Ouvert",
+      "proposed": "Proposition prête",
+      "rejected": "Rejeté"
+    },
+    "subtitle": "Traductions signalées par des locuteurs natifs en production, avec une correction proposée par l'IA à examiner.",
+    "suggested": "Suggestion : {text}",
+    "tabs": {
+      "accepted": "Acceptés",
+      "live": "À examiner",
+      "rejected": "Rejetés"
+    },
+    "title": "Retours",
+    "userReports": "Ce que les utilisateurs ont dit",
+    "viewPr": "Voir la pull request"
   },
   "glossary": {
     "add": "Ajouter un terme",
@@ -699,6 +873,8 @@
   },
   "shell": {
     "apiTokens": "Jetons API",
+    "experiments": "Expérimentations",
+    "feedback": "Retours",
     "glossary": "Glossaire",
     "insights": "Analyses",
     "jobs": "Tâches",

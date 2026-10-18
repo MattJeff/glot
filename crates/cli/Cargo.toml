@@ -23,6 +23,9 @@ reqwest.workspace = true
 clap = { version = "4", features = ["derive"] }
 anstream = "1"
 anstyle = "1"
+# glot db (database content → glot_translations)
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres"] }
+toml.workspace = true
 # glot dev (overlay server)
 axum = "0.8"
 tower-http = { version = "0.6", features = ["cors"] }
@@ -35,6 +38,9 @@ oxc_ast_visit = "0.154"
 oxc_parser = "0.154"
 oxc_span = "0.154"
 oxc_syntax = "0.154"
+# glot assets (SVG / OG images -> PNG); same rustybuzz/ttf-parser as glot-core
+log = "0.4"
+resvg = { version = "0.45", default-features = false, features = ["text", "system-fonts", "memmap-fonts"] }
 
 [dev-dependencies]
 assert_cmd = "2"

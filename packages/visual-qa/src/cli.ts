@@ -22,6 +22,7 @@ const { values: v } = parseArgs({
     upload: { type: "string" },
     project: { type: "string" },
     label: { type: "string" },
+    harness: { type: "string" },
     help: { type: "boolean", short: "h" },
   },
 });
@@ -30,7 +31,8 @@ if (v.help) {
   console.log(`glot-visual-qa [--base-url URL] [--routes /,/login] [--locales fr,de] [--source-locale en]
   [--url-pattern "/{locale}{route}"] [--viewports 1280x800,390x844] [--out .glot/visual-qa]
   [--suggest] [--catalogs "messages/{locale}.json"] [--map "*"|key1,key2] [--measure [--fonts-dir .glot/fonts]] [--fail-on overflow,clamp,overlap,untranslated,tofu,rtl|none]
-  [--upload <glot-server-url> --project <slug> [--label "commit abc123"]]   (token: GLOT_TOKEN)`);
+  [--upload <glot-server-url> --project <slug> [--label "commit abc123"]]   (token: GLOT_TOKEN)
+  [--harness fragments.json]   (glot coverage --render: mount {"<locale>": "<html>"} on the base-url page)`);
   process.exit(0);
 }
 
@@ -49,6 +51,7 @@ const report = await run({
   map: v.map,
   measure: v.measure,
   fontsDir: v["fonts-dir"],
+  harness: v.harness,
 });
 
 if (v.upload) {

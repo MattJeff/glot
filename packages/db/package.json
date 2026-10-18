@@ -1,0 +1,16 @@
+{
+  "name": "@glot/db",
+  "version": "0.1.0",
+  "description": "Localized database content for Prisma and Drizzle: read glot_translations (filled by `glot db sync`) with source fallback.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist", "migrations"],
+  "scripts": {
+    "build": "esbuild src/index.ts --format=esm --platform=node --target=node20 --outdir=dist && tsc",
+    "test": "node --test 'test/*.test.ts'"
+  },
+  "devDependencies": { "@types/node": "^25", "esbuild": "^0.25", "typescript": "^5.9" }
+}

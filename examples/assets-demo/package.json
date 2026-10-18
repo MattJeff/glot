@@ -1,0 +1,9 @@
+{
+  "name": "glot-assets-demo",
+  "private": true,
+  "dependencies": {
+    "@react-email/components": "^0.5.0",
+    "next-intl": "^4.0.0",
+    "react": "^19.0.0"
+  }
+}

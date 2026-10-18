@@ -6,7 +6,8 @@
     "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start -p 3100",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:cli-docs": "node --no-warnings scripts/gen-cli-docs.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.4",
@@ -16,6 +17,7 @@
     "cmdk": "^1.1.1",
     "cn": "^0.5.0",
     "lucide-react": "^1.59.0",
+    "marked": "^16.4.2",
     "next": "16.4.2",
     "next-intl": "^4.14.9",
     "next-themes": "^0.4.6",

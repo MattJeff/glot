@@ -70,7 +70,7 @@ pub fn deps(root: &Path) -> (BTreeSet<String>, serde_json::Value) {
     (deps, pkg)
 }
 
-fn exists_any(root: &Path, base: &str, names: &[&str]) -> Option<String> {
+pub(crate) fn exists_any(root: &Path, base: &str, names: &[&str]) -> Option<String> {
     names
         .iter()
         .map(|n| format!("{base}{n}"))
@@ -186,7 +186,7 @@ pub struct SetupPlan {
 }
 
 impl SetupPlan {
-    fn create(&mut self, root: &Path, rel: &str, content: String) {
+    pub(crate) fn create(&mut self, root: &Path, rel: &str, content: String) {
         if let Ok(cur) = std::fs::read_to_string(root.join(rel)) {
             if cur != content {
                 self.notes.push(format!("{rel} exists, left as is"));
@@ -204,7 +204,7 @@ impl SetupPlan {
 
     /// Edit an existing file; `f` returns None when it is already set up, Err(note) when it can't.
     /// A file edited twice in one plan gets one change: `f` sees the previous edit's result.
-    fn edit(
+    pub(crate) fn edit(
         &mut self,
         root: &Path,
         rel: &str,

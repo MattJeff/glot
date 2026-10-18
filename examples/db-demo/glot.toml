@@ -1,0 +1,14 @@
+source_locale = "en"
+target_locales = ["de", "fr"]
+files = []
+
+[llm]
+provider = "mock" # offline demo; use "anthropic" + ANTHROPIC_API_KEY for real translations
+budget_usd = 1.0
+
+[[db.tables]]
+table = "Product"
+primary_key = "id"
+context = "Catalog of an outdoor gear shop"
+context_columns = ["category"]
+columns = { name = { context = "Product name on cards and the product page", max_length = 60 }, description = "Product page description, 1-2 sentences" }

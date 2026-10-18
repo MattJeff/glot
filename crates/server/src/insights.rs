@@ -66,6 +66,9 @@ pub struct Hit {
     country: Option<String>,
     /// Experiment arm previously returned to this session.
     arm: Option<String>,
+    /// Copy-experiment arms assigned to this session (`variants.rs`): {experiment id: arm}.
+    #[serde(default)]
+    variants: BTreeMap<Uuid, i32>,
     // ponytail: `route` is accepted for forward compat but never stored.
     #[allow(dead_code)]
     route: Option<String>,
@@ -76,6 +79,9 @@ pub struct HitResponse {
     /// Locale to render for this session when it is in the test arm of a running experiment.
     pub locale: Option<String>,
     pub arm: Option<String>,
+    /// Copy variants to render for this session (visits only).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub variants: Vec<crate::variants::Assigned>,
 }
 
 /// Primary language subtag, lowercased: `de-AT` → `de`.
@@ -270,9 +276,12 @@ pub async fn ingest(
     .bind(event)
     .execute(&state.db)
     .await?;
+    let variants =
+        crate::variants::on_hit(&state, project_id, &hit.served, event, &hit.variants).await?;
     Ok(Json(HitResponse {
         locale,
         arm: arm.map(String::from),
+        variants,
     })
     .into_response())
 }
@@ -453,7 +462,7 @@ fn new_key() -> String {
     format!("pk_{}", hex::encode(rand::random::<[u8; 12]>()))
 }
 
-async fn public_key(state: &AppState, project_id: Uuid) -> ApiResult<String> {
+pub async fn public_key(state: &AppState, project_id: Uuid) -> ApiResult<String> {
     sqlx::query(
         "INSERT INTO insight_keys (project_id, public_key) VALUES ($1, $2) ON CONFLICT DO NOTHING",
     )

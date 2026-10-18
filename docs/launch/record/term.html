@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>glot i18nize</title>
+<style>
+body{margin:0;background:#0b0f17;font:14px/1.45 "SF Mono",Menlo,monospace;color:#d6deeb}
+.bar{height:34px;background:#161b26;display:flex;align-items:center;gap:8px;padding:0 14px}
+.bar i{width:12px;height:12px;border-radius:50%;display:block}.bar span{margin-left:12px;color:#7d8590;font-size:12px}
+#t{padding:14px 18px;height:calc(100vh - 62px);overflow:hidden;white-space:pre}
+.p{color:#7ee787}.c{color:#fff}.add{color:#7ee787}.del{color:#ff7b72}.hunk{color:#79c0ff}.key{color:#d2a8ff}.ok{color:#7ee787;font-weight:bold}.bold{font-weight:bold;color:#fff}
+.cur{display:inline-block;width:8px;height:16px;background:#d6deeb;vertical-align:-3px}
+</style>
+<div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>~/acme-invoices — glot (mock provider)</span></div>
+<div id="t"></div>
+<script>
+const steps = __DATA__;
+const t = document.getElementById("t");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const line = (html) => { const d = document.createElement("div"); d.innerHTML = html || " "; t.appendChild(d); t.scrollTop = t.scrollHeight; return d; };
+const esc = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+(async () => {
+  await sleep(600);
+  for (const s of steps) {
+    const d = line('<span class="p">$ </span><span class="c"></span><span class="cur"></span>');
+    const c = d.querySelector(".c");
+    for (const ch of s.cmd) { c.textContent += ch; await sleep(45); }
+    await sleep(400); d.querySelector(".cur").remove();
+    for (const [l, k] of s.out) { line(`<span class="${k}">${esc(l)}</span>`); await sleep(s.out.length > 20 ? 70 : 140); }
+    await sleep(2200);
+    line("");
+  }
+  line('<span class="p">$ </span><span class="cur"></span>');
+  document.title = "done";
+})();
+</script>

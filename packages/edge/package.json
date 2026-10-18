@@ -1,0 +1,22 @@
+{
+  "name": "@glot/edge",
+  "version": "0.1.0",
+  "description": "Edge templates for glot on-demand locales: Cloudflare Worker (static/marketing sites) and Next.js proxy (locale URLs + Accept-Language).",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/route.ts",
+    "./worker": "./src/worker.ts",
+    "./next": "./src/next-proxy.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": { "@glot/runtime": "link:../runtime" },
+  "peerDependencies": { "next": ">=15" },
+  "peerDependenciesMeta": { "next": { "optional": true } },
+  "devDependencies": { "@types/node": "^25", "next": "16.4.2", "react": "19.3.0", "react-dom": "19.3.0", "typescript": "^5.9" },
+  "packageManager": "pnpm@10.18.3"
+}
