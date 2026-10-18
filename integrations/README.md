@@ -1,6 +1,6 @@
 # Integrations
 
-Everything that puts glot where developers and AI agents already are. Nothing here is published yet; the checklist at the end lists what to do per channel.
+Everything that puts glot where developers and AI agents already are. Published channels are listed in the main README; the checklist at the end is the per-release procedure.
 
 | Path | What |
 |---|---|
@@ -23,7 +23,7 @@ Everything that puts glot where developers and AI agents already are. Nothing he
 - **Codex** (and any agent reading `AGENTS.md`): append [`agents/AGENTS.md`](agents/AGENTS.md) to your `AGENTS.md`. MCP: `codex mcp add glot -- npx -y glot-i18n mcp`.
 - **Windsurf**: copy [`agents/windsurf/glot.md`](agents/windsurf/glot.md) to `.windsurf/rules/`. MCP: same JSON as Cursor in `~/.codeium/windsurf/mcp_config.json`.
 
-The MCP server is stdio only (`glot mcp`) and must start inside a project with `glot.toml` (run `glot init` first).
+The MCP server is stdio only (`glot mcp`). It starts in any repo; until `glot.toml` exists, every tool answers with how to run `glot init`.
 
 ## Badge
 
