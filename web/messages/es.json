@@ -310,12 +310,12 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Suscripción, gratis para código abierto",
+      "crowdinPrice": "Planes de pago tras prueba de 14 días, gratis para código abierto",
       "feature": "Función",
-      "footnote": "Basado en el sitio web público y la documentación de cada proveedor a octubre de 2026. Parcial significa limitado, dependiente del plan o a través de una integración. Los planes y funciones cambian: consulta las fuentes.",
+      "footnote": "Comprobado en el sitio web público y la documentación de cada proveedor el 18 de octubre de 2026. Parcial significa limitado, según el plan o a través de una integración. No significa que no encontramos esa función en la documentación pública. Los planes cambian: cada celda enlaza a su fuente.",
       "glotPrice": "Gratis (MIT) + tu uso de LLM",
-      "lingoPrice": "CLI gratis, motor alojado de pago",
-      "lokalisePrice": "Suscripción, consulta precios",
+      "lingoPrice": "CLI gratis con tu propia clave, motor alojado $0 base + uso",
+      "lokalisePrice": "Desde $149/mes, prueba de 14 días",
       "no": "No",
       "partial": "Parcial",
       "rows": {
@@ -328,9 +328,10 @@
         "price": "Precio",
         "validator": "Validación determinista de cada cadena"
       },
-      "sources": "Fuentes:",
-      "subtitle": "En qué se diferencia glot de las plataformas de traducción alojadas y de la otra opción de código abierto.",
+      "sources": "Fuentes y fechas de cada celda",
+      "subtitle": "En qué se diferencia glot de las plataformas de traducción alojadas y de otras herramientas para desarrolladores.",
       "title": "Comparar",
+      "tolgeePrice": "Plan gratuito y autoalojamiento gratis, nube desde €58/mes",
       "yes": "Sí"
     },
     "core": {

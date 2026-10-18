@@ -58,5 +58,10 @@ description = "Competitor name"
 do_not_translate = true
 
 [[term]]
+term = "Tolgee"
+description = "Competitor name"
+do_not_translate = true
+
+[[term]]
 term = "GitHub"
 do_not_translate = true

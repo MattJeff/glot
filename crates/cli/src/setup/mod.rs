@@ -52,6 +52,8 @@ pub struct Project {
     pub base: &'static str,
     pub pm: &'static str,
     pub next_major: u32,
+    /// `react-router` major (Remix / React Router projects), 0 when absent.
+    pub rr_major: u32,
     pub deps: BTreeSet<String>,
 }
 
@@ -131,22 +133,28 @@ pub fn detect(root: &Path) -> Option<Project> {
             })
             .unwrap_or("npm")
     };
-    let next_major = pkg["dependencies"]["next"]
-        .as_str()
-        .map(|v| {
-            v.trim_start_matches(['^', '~', '>', '=', ' '])
-                .split('.')
-                .next()
-                .unwrap_or("")
-                .parse()
-                .unwrap_or(16)
-        })
-        .unwrap_or(16);
+    // `*` / `latest` / workspace specs count as the latest major.
+    let major = |dep: &str, latest: u32| {
+        ["dependencies", "devDependencies"]
+            .iter()
+            .find_map(|k| pkg[k][dep].as_str())
+            .map(|v| {
+                v.trim_start_matches(['^', '~', '>', '=', ' '])
+                    .split('.')
+                    .next()
+                    .unwrap_or("")
+                    .parse()
+                    .unwrap_or(latest)
+            })
+    };
+    let next_major = major("next", 16).unwrap_or(16);
+    let rr_major = major("react-router", 8).unwrap_or(0);
     Some(Project {
         framework,
         base,
         pm,
         next_major,
+        rr_major,
         deps,
     })
 }
@@ -195,21 +203,30 @@ impl SetupPlan {
     }
 
     /// Edit an existing file; `f` returns None when it is already set up, Err(note) when it can't.
+    /// A file edited twice in one plan gets one change: `f` sees the previous edit's result.
     fn edit(
         &mut self,
         root: &Path,
         rel: &str,
         f: impl FnOnce(&str) -> std::result::Result<Option<String>, String>,
     ) {
-        let Ok(old) = std::fs::read_to_string(root.join(rel)) else {
-            return;
+        let pending = self.changes.iter().position(|c| c.path == rel);
+        let cur = match pending {
+            Some(i) => self.changes[i].new.clone(),
+            None => match std::fs::read_to_string(root.join(rel)) {
+                Ok(s) => s,
+                Err(_) => return,
+            },
         };
-        match f(&old) {
-            Ok(Some(new)) if new != old => self.changes.push(Change {
-                path: rel.into(),
-                old: Some(old),
-                new,
-            }),
+        match f(&cur) {
+            Ok(Some(new)) if new != cur => match pending {
+                Some(i) => self.changes[i].new = new,
+                None => self.changes.push(Change {
+                    path: rel.into(),
+                    old: Some(cur),
+                    new,
+                }),
+            },
             Ok(_) => {}
             Err(note) => self.notes.push(format!("{rel}: {note}")),
         }
@@ -279,8 +296,8 @@ pub fn plan(root: &Path, p: &Project, o: &Opts) -> SetupPlan {
             next::pages(root, p, o, &mut plan);
         }
         _ => {
-            need(&mut plan, "i18next", "i18next@^25");
-            need(&mut plan, "react-i18next", "react-i18next@^15");
+            need(&mut plan, "i18next", "i18next@^26");
+            need(&mut plan, "react-i18next", "react-i18next@^17");
             react::setup(root, p, o, &mut plan);
         }
     }

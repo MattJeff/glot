@@ -230,15 +230,40 @@ fn next_config(
 }
 
 #[derive(Default)]
-struct LayoutVisitor {
-    html_lang: Option<(u32, u32)>,
+pub(super) struct LayoutVisitor {
+    pub(super) html_lang: Option<(u32, u32)>,
     body: Option<(u32, u32)>,
     children: Option<(u32, u32)>,
     component: Option<(u32, u32)>,
+    /// Outermost JSX trees (elements or fragments not nested in another JSX node).
+    roots: Vec<(u32, u32)>,
+    depth: u32,
+}
+
+impl LayoutVisitor {
+    /// The JSX tree holding `<Component />`, so siblings (`<Header />`) get the provider too.
+    fn component_root(&self) -> Option<(u32, u32)> {
+        let (s, e) = self.component?;
+        self.roots
+            .iter()
+            .copied()
+            .find(|&(rs, re)| rs <= s && e <= re)
+    }
 }
 
 impl<'a> Visit<'a> for LayoutVisitor {
+    fn visit_jsx_fragment(&mut self, it: &JSXFragment<'a>) {
+        if self.depth == 0 {
+            self.roots.push((it.span.start, it.span.end));
+        }
+        self.depth += 1;
+        walk::walk_jsx_fragment(self, it);
+        self.depth -= 1;
+    }
     fn visit_jsx_element(&mut self, it: &JSXElement<'a>) {
+        if self.depth == 0 {
+            self.roots.push((it.span.start, it.span.end));
+        }
         if let JSXElementName::Identifier(n) = &it.opening_element.name {
             if n.name == "html" {
                 for a in &it.opening_element.attributes {
@@ -263,7 +288,9 @@ impl<'a> Visit<'a> for LayoutVisitor {
         {
             self.component = Some((it.span.start, it.span.end));
         }
+        self.depth += 1;
         walk::walk_jsx_element(self, it);
+        self.depth -= 1;
     }
     fn visit_jsx_expression_container(&mut self, it: &JSXExpressionContainer<'a>) {
         if let Some(Expression::Identifier(id)) = it.expression.as_expression()
@@ -276,7 +303,7 @@ impl<'a> Visit<'a> for LayoutVisitor {
     }
 }
 
-fn scan_layout(path: &str, src: &str) -> Option<LayoutVisitor> {
+pub(super) fn scan_layout(path: &str, src: &str) -> Option<LayoutVisitor> {
     let alloc = Allocator::default();
     let program = parse(&alloc, path, src)?;
     let mut v = LayoutVisitor::default();
@@ -485,7 +512,7 @@ export function I18nProvider({{ children }}: {{ children: ReactNode }}) {{
             }
             let v = scan_layout(&app, src).ok_or("does not parse")?;
             let (s, e) = v
-                .component
+                .component_root()
                 .ok_or("no <Component {...pageProps} />: wrap it in <I18nProvider> by hand")?;
             let wrapped = apply_edits(
                 src,

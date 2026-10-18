@@ -306,3 +306,190 @@ async fn insights_end_to_end() {
         .await
         .ok();
 }
+
+/// Two router instances (two AppState, same database) share one per-project budget; old windows are reused, not piled up.
+#[tokio::test]
+async fn insights_rate_limit_shared_across_instances() {
+    let url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgres://glot:glot@localhost:5433/glot".into());
+    let Ok(admin) = PgPool::connect(&url).await else {
+        eprintln!("SKIPPED: postgres unreachable at {url}");
+        return;
+    };
+    let db = format!("glot_test_{}", uuid::Uuid::new_v4().simple());
+    sqlx::query(&format!("CREATE DATABASE {db}"))
+        .execute(&admin)
+        .await
+        .unwrap();
+    let pool = PgPool::connect_with(url.parse::<PgConnectOptions>().unwrap().database(&db))
+        .await
+        .unwrap();
+    glot_server::MIGRATOR.run(&pool).await.unwrap();
+    let project = uuid::Uuid::new_v4();
+    sqlx::query(
+        "INSERT INTO projects (id, slug, name, source_locale, target_locales, llm, insights_rate_per_min)
+         VALUES ($1, 'rl', 'RL', 'en', '{}', '{}', 50)",
+    )
+    .bind(project)
+    .execute(&pool)
+    .await
+    .unwrap();
+    sqlx::query("INSERT INTO insight_keys (project_id, public_key) VALUES ($1, 'pk_rl')")
+        .bind(project)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let apps: Vec<_> = (0..2)
+        .map(|_| {
+            glot_server::router(
+                glot_server::AppState::new(pool.clone(), "test-secret", false),
+                "http://localhost:3100",
+            )
+        })
+        .collect();
+    let hit = {
+        let apps = apps.clone();
+        move |i: usize| {
+            let app = apps[i % 2].clone();
+            let uri = if i >= 1_000_000 {
+                "/api/insights/pk_bench"
+            } else {
+                "/api/insights/pk_rl"
+            };
+            async move {
+                let req = Request::builder()
+                    .method(Method::POST)
+                    .uri(uri)
+                    .header("content-type", "text/plain")
+                    .body(Body::from(r#"{"langs":["de"],"served":"en"}"#))
+                    .unwrap();
+                let res = app.oneshot(req).await.unwrap();
+                let retry = res
+                    .headers()
+                    .get(header::RETRY_AFTER)
+                    .map(|v| v.to_str().unwrap().parse::<u64>().unwrap());
+                (res.status(), retry)
+            }
+        }
+    };
+    // Stay clear of a minute boundary so the burst lands in one window.
+    let left: f64 = sqlx::query_scalar("SELECT 60 - extract(second FROM now())::float8")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    if left < 15.0 {
+        tokio::time::sleep(std::time::Duration::from_secs_f64(left + 1.0)).await;
+    }
+
+    // 200 concurrent hits split across both instances: exactly the budget (50) goes through.
+    let mut set = tokio::task::JoinSet::new();
+    for i in 0..200 {
+        set.spawn(hit.clone()(i));
+    }
+    let results = set.join_all().await;
+    let ok = results.iter().filter(|r| r.0 == StatusCode::OK).count();
+    assert_eq!(ok, 50, "{results:?}");
+    for (s, retry) in &results {
+        if *s != StatusCode::OK {
+            assert_eq!(*s, StatusCode::TOO_MANY_REQUESTS);
+            assert!((1..=60).contains(&retry.unwrap()), "{retry:?}");
+        }
+    }
+    let n: i64 = sqlx::query_scalar("SELECT sum(n)::int8 FROM insight_daily")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(n, 50);
+
+    // Cleanup: a newer window reuses the project's single row (counter reset), the table never grows.
+    // (The local block cache is keyed by public key, so test the reset with a fresh key on the same project.)
+    sqlx::query("UPDATE insight_rate SET window_start = window_start - interval '1 hour'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    sqlx::query("UPDATE insight_keys SET public_key = 'pk_rl2'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    let req = Request::builder()
+        .method(Method::POST)
+        .uri("/api/insights/pk_rl2")
+        .body(Body::from(r#"{"served":"en"}"#))
+        .unwrap();
+    assert_eq!(
+        apps[1].clone().oneshot(req).await.unwrap().status(),
+        StatusCode::OK
+    );
+    let rows: Vec<(i32,)> = sqlx::query_as("SELECT hits FROM insight_rate")
+        .fetch_all(&pool)
+        .await
+        .unwrap();
+    assert_eq!(rows, vec![(1,)]);
+    sqlx::query("DELETE FROM projects")
+        .execute(&pool)
+        .await
+        .unwrap();
+    let left: i64 = sqlx::query_scalar("SELECT count(*) FROM insight_rate")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(left, 0, "rows go away with the project");
+
+    // Throughput (informative): accepted path, budget out of reach.
+    if std::env::var("GLOT_BENCH").is_ok() {
+        sqlx::query(
+            "INSERT INTO projects (id, slug, name, source_locale, target_locales, llm, insights_rate_per_min)
+             VALUES ($1, 'rl', 'RL', 'en', '{}', '{}', 100000000)",
+        )
+        .bind(project)
+        .execute(&pool)
+        .await
+        .unwrap();
+        sqlx::query("INSERT INTO insight_keys (project_id, public_key) VALUES ($1, 'pk_bench')")
+            .bind(project)
+            .execute(&pool)
+            .await
+            .unwrap();
+        let t = std::time::Instant::now();
+        let n = 20_000;
+        let mut set = tokio::task::JoinSet::new();
+        for w in 0..64 {
+            let hit = hit.clone();
+            set.spawn(async move {
+                for i in 0..n / 64 {
+                    assert_eq!(hit(1_000_000 + w + i).await.0, StatusCode::OK);
+                }
+            });
+        }
+        set.join_all().await;
+        eprintln!(
+            "accepted: {:.0} hits/s",
+            n as f64 / t.elapsed().as_secs_f64()
+        );
+        sqlx::query("UPDATE projects SET insights_rate_per_min = 1")
+            .execute(&pool)
+            .await
+            .unwrap();
+        let t = std::time::Instant::now();
+        let mut set = tokio::task::JoinSet::new();
+        for w in 0..64 {
+            let hit = hit.clone();
+            set.spawn(async move {
+                for i in 0..n / 64 {
+                    hit(1_000_000 + w + i).await;
+                }
+            });
+        }
+        set.join_all().await;
+        eprintln!(
+            "rejected: {:.0} hits/s",
+            n as f64 / t.elapsed().as_secs_f64()
+        );
+    }
+
+    drop(pool);
+    sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
+        .execute(&admin)
+        .await
+        .ok();
+}

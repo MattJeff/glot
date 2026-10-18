@@ -310,12 +310,12 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Abo, kostenlos für Open Source",
+      "crowdinPrice": "Kostenpflichtige Tarife nach 14-tägiger Testphase, kostenlos für Open Source",
       "feature": "Funktion",
-      "footnote": "Basierend auf der öffentlichen Website und Dokumentation des jeweiligen Anbieters, Stand Oktober 2026. Teilweise bedeutet eingeschränkt, tarifabhängig oder über eine Integration. Tarife und Funktionen ändern sich: Prüfen Sie die Quellen.",
+      "footnote": "Geprüft anhand der öffentlichen Websites und Dokumentationen der jeweiligen Anbieter am 18. Oktober 2026. Teilweise bedeutet eingeschränkt, tarifabhängig oder über eine Integration. Nein bedeutet, dass wir in der öffentlichen Dokumentation keine solche Funktion gefunden haben. Tarife ändern sich: Jede Zelle ist mit ihrer Quelle verlinkt.",
       "glotPrice": "Kostenlos (MIT) + Ihre LLM-Nutzung",
-      "lingoPrice": "Kostenlose CLI, kostenpflichtige gehostete Engine",
-      "lokalisePrice": "Abo, siehe Preise",
+      "lingoPrice": "Kostenlose CLI mit eigenem Schlüssel, gehostete Engine $0 Grundpreis + Nutzung",
+      "lokalisePrice": "Ab $149/Monat, 14-tägige Testphase",
       "no": "Nein",
       "partial": "Teilweise",
       "rows": {
@@ -328,9 +328,10 @@
         "price": "Preis",
         "validator": "Deterministische Validierung jedes Strings"
       },
-      "sources": "Quellen:",
-      "subtitle": "Wo sich glot von gehosteten Übersetzungsplattformen und von der anderen Open-Source-Option unterscheidet.",
+      "sources": "Quellen und Daten für jede Zelle",
+      "subtitle": "Wo sich glot von gehosteten Übersetzungsplattformen und anderen entwicklerorientierten Tools unterscheidet.",
       "title": "Vergleich",
+      "tolgeePrice": "Kostenloser Tarif und kostenloses Self-Hosting, Cloud ab 58 €/Monat",
       "yes": "Ja"
     },
     "core": {

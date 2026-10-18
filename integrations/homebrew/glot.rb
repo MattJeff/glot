@@ -7,23 +7,23 @@ class Glot < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/MattJeff/glot/releases/download/v0.1.0/glot-aarch64-apple-darwin.tar.gz"
-      sha256 "9c41ea372b0d3b1794713c9112fd0619c8d1d6af7a5e06d988908e8881149d0b"
+      url "https://github.com/MattJeff/glot/releases/download/v0.2.0/glot-aarch64-apple-darwin.tar.gz"
+      sha256 "0fac628d527179576cafd195a541e50975dffcb83a8ec1fecb221585aa141d76"
     end
     on_intel do
-      url "https://github.com/MattJeff/glot/releases/download/v0.1.0/glot-x86_64-apple-darwin.tar.gz"
-      sha256 "6a3b688cccecc40f62f9dbb21b2543a27ae2449507b4a4e939ea2a6973fcf39e"
+      url "https://github.com/MattJeff/glot/releases/download/v0.2.0/glot-x86_64-apple-darwin.tar.gz"
+      sha256 "841868db784b07ec842711af657d0143b44bfd9d52dc2d02cbb62c7386eb3546"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/MattJeff/glot/releases/download/v0.1.0/glot-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "a13f0ef316c245bf92c76dcb99ea261a3319a4e9a30d230ee957d4c58fa25cf5"
+      url "https://github.com/MattJeff/glot/releases/download/v0.2.0/glot-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "c21c574cbd5be78c0b9b54e9e4be88879553bb3ac0dfb08ab11e49bc2bcb15f3"
     end
     on_intel do
-      url "https://github.com/MattJeff/glot/releases/download/v0.1.0/glot-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "4911d770a830cf78947b161c7f3fcff87119acc729b261efe8c821e0be853b74"
+      url "https://github.com/MattJeff/glot/releases/download/v0.2.0/glot-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "3f1b6e30611122cca3f0e9da2eab61317a77b308f6ad4e3098a0190817cc327a"
     end
   end
 

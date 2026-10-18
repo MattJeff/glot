@@ -523,8 +523,13 @@ jobs:
 
 fn glot_on_path() -> bool {
     let exe = if cfg!(windows) { "glot.exe" } else { "glot" };
-    std::env::var_os("PATH")
-        .is_some_and(|p| std::env::split_paths(&p).any(|d| d.join(exe).is_file()))
+    // npx puts its temporary bin dir on PATH while it runs: that `glot` disappears afterwards.
+    std::env::var_os("PATH").is_some_and(|p| {
+        std::env::split_paths(&p).any(|d| {
+            let s = d.to_string_lossy();
+            !s.contains("_npx") && !s.contains("node_modules") && d.join(exe).is_file()
+        })
+    })
 }
 
 #[cfg(test)]

@@ -178,7 +178,7 @@ fn next_pages_router() {
         ),
         (
             "pages/_app.tsx",
-            "import type { AppProps } from \"next/app\";\n\nexport default function App({ Component, pageProps }: AppProps) {\n  return <Component {...pageProps} />;\n}\n",
+            "import type { AppProps } from \"next/app\";\n\nexport default function App({ Component, pageProps }: AppProps) {\n  return <><Header /><Component {...pageProps} /></>;\n}\n",
         ),
         (
             "next.config.mjs",
@@ -201,7 +201,9 @@ fn next_pages_router() {
         "{app}"
     );
     assert!(
-        app.contains("return <I18nProvider><Component {...pageProps} /></I18nProvider>;"),
+        app.contains(
+            "return <I18nProvider><><Header /><Component {...pageProps} /></></I18nProvider>;"
+        ),
         "{app}"
     );
 }
@@ -228,7 +230,7 @@ fn react_i18next_vite_remix_astro() {
     let plan = super::plan(vite.path(), &p, &o);
     assert_eq!(
         plan.install_cmd().as_deref(),
-        Some("bun add i18next@^25 react-i18next@^15")
+        Some("bun add i18next@^26 react-i18next@^17")
     );
     let i18n = get(&plan, "src/i18n.ts");
     assert!(
@@ -237,7 +239,7 @@ fn react_i18next_vite_remix_astro() {
     );
     assert!(
         i18n.contains(
-            "resources: { \"en\": { translation: l_en }, \"fr\": { translation: l_fr } }"
+            "export const resources = { \"en\": { translation: l_en }, \"fr\": { translation: l_fr } };"
         ),
         "{i18n}"
     );
@@ -262,6 +264,10 @@ fn react_i18next_vite_remix_astro() {
     let plan = super::plan(remix.path(), &p, &o);
     assert!(get(&plan, "app/i18n.ts").contains("from \"../src/locales/en.json\""));
     assert!(get(&plan, "app/root.tsx").starts_with("import \"./i18n\";\n"));
+    // React Router 7: remix-i18next v7 (`/middleware` entry) behind `future.v8_middleware`.
+    assert!(get(&plan, "app/middleware/i18next.ts").contains("from \"remix-i18next/middleware\""));
+    assert!(get(&plan, "react-router.config.ts").contains("future: { v8_middleware: true }"));
+    assert!(plan.packages.contains(&"remix-i18next@^7".to_string()));
 
     let astro = fixture(&[
         (
@@ -301,4 +307,122 @@ fn relative_imports() {
         rel_import("src/i18n", "messages/en.json"),
         "../../messages/en.json"
     );
+}
+
+#[test]
+fn react_router_8_ssr_wiring() {
+    let dir = fixture(&[
+        (
+            "package.json",
+            r#"{"dependencies":{"react":"19","react-router":"^8.4.0","@react-router/node":"^8.4.0","isbot":"5"}}"#,
+        ),
+        ("pnpm-lock.yaml", ""),
+        (
+            "app/root.tsx",
+            "import { Outlet, Scripts } from \"react-router\";\n\nexport function Layout({ children }: { children: React.ReactNode }) {\n  return (\n    <html lang=\"en\">\n      <body>{children}<Scripts /></body>\n    </html>\n  );\n}\n\nexport default function App() {\n  return <Outlet />;\n}\n",
+        ),
+    ]);
+    let root = dir.path();
+    let p = detect(root).unwrap();
+    assert_eq!((p.framework, p.rr_major), (Framework::Remix, 8));
+    let o = Opts {
+        catalog: "app/locales/{locale}.json".into(),
+        ..opts(Routing::Cookie)
+    };
+    let plan = super::plan(root, &p, &o);
+    assert_eq!(
+        plan.install_cmd().as_deref(),
+        Some("pnpm add i18next@^26 react-i18next@^17 remix-i18next@^8")
+    );
+    // One change per file even though root.tsx is edited twice (i18n import + middleware).
+    assert_eq!(
+        paths(&plan)
+            .iter()
+            .filter(|p| **p == "app/root.tsx")
+            .count(),
+        1
+    );
+    let rootf = get(&plan, "app/root.tsx");
+    assert!(rootf.contains("import \"./i18n\";"), "{rootf}");
+    assert!(
+        rootf.contains("<html lang={useTranslation().i18n.language}>"),
+        "{rootf}"
+    );
+    assert!(
+        rootf.contains("import { useTranslation } from \"react-i18next\";"),
+        "{rootf}"
+    );
+    assert!(
+        rootf.ends_with("export const middleware = [i18nextMiddleware];\n"),
+        "{rootf}"
+    );
+    assert!(get(&plan, "app/middleware/i18next.ts").contains("from \"remix-i18next\";"));
+    let entry = get(&plan, "app/entry.server.tsx");
+    assert!(
+        entry.contains("<I18nextProvider i18n={instance(loadContext)}>"),
+        "{entry}"
+    );
+    let i18n = get(&plan, "app/i18n.ts");
+    assert!(i18n.contains("document.documentElement.lang"), "{i18n}");
+    assert!(i18n.contains("document.cookie"), "{i18n}");
+    assert!(!paths(&plan).contains(&"react-router.config.ts"));
+
+    write(root, &plan).unwrap();
+    let again = super::plan(root, &p, &o);
+    assert!(again.changes.is_empty(), "{:?}", paths(&again));
+    assert!(again.notes.is_empty(), "{:?}", again.notes);
+}
+
+#[test]
+fn astro_i18n_routing_and_middleware() {
+    let dir = fixture(&[
+        (
+            "package.json",
+            r#"{"dependencies":{"astro":"^7.4.0","@astrojs/react":"7","react":"19"}}"#,
+        ),
+        (
+            "astro.config.mjs",
+            "import { defineConfig } from \"astro/config\";\nimport react from \"@astrojs/react\";\n\nexport default defineConfig({\n  integrations: [react()],\n});\n",
+        ),
+        (
+            "src/layouts/Layout.astro",
+            "---\nconst { title } = Astro.props;\n---\n<html lang=\"en\">\n  <body><slot /></body>\n</html>\n",
+        ),
+        (
+            "src/components/Hello.tsx",
+            "import { useTranslation } from \"react-i18next\";\nexport function Hello() { const { t } = useTranslation(); return <p>{t(\"hi\")}</p>; }\n",
+        ),
+    ]);
+    let root = dir.path();
+    let p = detect(root).unwrap();
+    let o = Opts {
+        catalog: "src/locales/{locale}.json".into(),
+        ..opts(Routing::Cookie)
+    };
+    let plan = super::plan(root, &p, &o);
+    assert_eq!(
+        get(&plan, "astro.config.mjs"),
+        "import { defineConfig } from \"astro/config\";\nimport react from \"@astrojs/react\";\n\nexport default defineConfig({\n  integrations: [react()],\n  i18n: {\n    locales: [\"en\",\"fr\"],\n    defaultLocale: \"en\",\n    // Pages are written once: /fr/... renders them in French (glot i18nize).\n    fallback: { \"fr\": \"en\" },\n    routing: { prefixDefaultLocale: false, fallbackType: \"rewrite\" },\n  },\n});\n"
+    );
+    assert!(get(&plan, "src/layouts/Layout.astro").contains("<html lang={Astro.currentLocale}>"));
+    assert!(get(&plan, "src/middleware.ts").contains("ctx.currentLocale"));
+    assert!(get(&plan, "src/i18n.ts").contains("window.location.assign"));
+
+    write(root, &plan).unwrap();
+    let again = super::plan(root, &p, &o);
+    assert!(again.changes.is_empty(), "{:?}", paths(&again));
+    assert!(again.notes.is_empty(), "{:?}", again.notes);
+}
+
+#[test]
+fn html_lang_rewrite() {
+    assert_eq!(
+        react::html_lang("<html lang='en' dir=\"ltr\">", "x").as_deref(),
+        Some("<html lang={x} dir=\"ltr\">")
+    );
+    assert_eq!(
+        react::html_lang("<html>", "x").as_deref(),
+        Some("<html lang={x}>")
+    );
+    assert_eq!(react::html_lang("<div>", "x"), None);
 }

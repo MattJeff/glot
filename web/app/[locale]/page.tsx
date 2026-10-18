@@ -39,13 +39,8 @@ import {
 import { DEMO, GITHUB_URL, INSTALL_CARGO, INSTALL_NPX, mcpJson } from "@/lib/snippets";
 import { cn } from "@/lib/utils";
 
-// Public pages the comparison is based on.
-const SOURCES = [
-  "https://lokalise.com/pricing",
-  "https://crowdin.com/pricing",
-  "https://lingo.dev",
-  "https://github.com/lingodotdev/lingo.dev",
-];
+// Every cell is sourced (URL + date) in this file.
+const COMPARE_SOURCES = `${GITHUB_URL}/blob/main/docs/comparison-sources.md`;
 
 export default async function Landing({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -71,16 +66,17 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
   ] as const;
 
   type Cell = "yes" | "no" | "partial" | string;
-  const vendors = ["glot", "lokalise", "crowdin", "lingo"] as const;
+  const vendors = ["glot", "lokalise", "crowdin", "lingo", "tolgee"] as const;
+  // ponytail: checked 2026-10-18, see docs/comparison-sources.md before changing a cell.
   const rows: { label: string; cells: Record<(typeof vendors)[number], Cell> }[] = [
-    { label: t("compare.rows.price"), cells: { glot: t("compare.glotPrice"), lokalise: t("compare.lokalisePrice"), crowdin: t("compare.crowdinPrice"), lingo: t("compare.lingoPrice") } },
-    { label: t("compare.rows.openSource"), cells: { glot: "yes", lokalise: "no", crowdin: "no", lingo: "partial" } },
-    { label: t("compare.rows.byok"), cells: { glot: "yes", lokalise: "no", crowdin: "partial", lingo: "yes" } },
-    { label: t("compare.rows.validator"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "partial" } },
-    { label: t("compare.rows.gitNative"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "yes" } },
-    { label: t("compare.rows.mcp"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "yes" } },
-    { label: t("compare.rows.inContext"), cells: { glot: "yes", lokalise: "yes", crowdin: "yes", lingo: "no" } },
-    { label: t("compare.rows.fit"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "no" } },
+    { label: t("compare.rows.price"), cells: { glot: t("compare.glotPrice"), lokalise: t("compare.lokalisePrice"), crowdin: t("compare.crowdinPrice"), lingo: t("compare.lingoPrice"), tolgee: t("compare.tolgeePrice") } },
+    { label: t("compare.rows.openSource"), cells: { glot: "yes", lokalise: "no", crowdin: "no", lingo: "partial", tolgee: "partial" } },
+    { label: t("compare.rows.byok"), cells: { glot: "yes", lokalise: "no", crowdin: "yes", lingo: "yes", tolgee: "yes" } },
+    { label: t("compare.rows.validator"), cells: { glot: "yes", lokalise: "partial", crowdin: "yes", lingo: "no", tolgee: "partial" } },
+    { label: t("compare.rows.gitNative"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "yes", tolgee: "partial" } },
+    { label: t("compare.rows.mcp"), cells: { glot: "yes", lokalise: "yes", crowdin: "yes", lingo: "yes", tolgee: "yes" } },
+    { label: t("compare.rows.inContext"), cells: { glot: "yes", lokalise: "yes", crowdin: "yes", lingo: "no", tolgee: "yes" } },
+    { label: t("compare.rows.fit"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "no", tolgee: "partial" } },
   ];
   const cell = (v: Cell) => {
     if (v === "yes") return <Check aria-label={t("compare.yes")} className="mx-auto size-4 text-success" />;
@@ -261,7 +257,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
             <h2 className="text-3xl font-semibold tracking-tight">{t("compare.title")}</h2>
             <p className="mt-2 text-muted-foreground">{t("compare.subtitle")}</p>
             <div className="mt-10 overflow-x-auto rounded-xl border bg-background">
-              <table className="w-full min-w-[720px] text-sm">
+              <table className="w-full min-w-[840px] text-sm">
                 <thead>
                   <tr className="border-b text-muted-foreground">
                     <th scope="col" className="px-4 py-3 text-start font-medium">{t("compare.feature")}</th>
@@ -272,6 +268,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Lokalise"}</th>
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Crowdin"}</th>
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Lingo.dev"}</th>
+                    <th scope="col" className="px-4 py-3 text-center font-medium">{"Tolgee"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -292,13 +289,10 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
               </table>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">{t("compare.footnote")}</p>
-            <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
-              <span>{t("compare.sources")}</span>
-              {SOURCES.map((s) => (
-                <a key={s} href={s} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
-                  {new URL(s).host}
-                </a>
-              ))}
+            <p className="mt-1 text-xs text-muted-foreground">
+              <a href={COMPARE_SOURCES} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
+                {t("compare.sources")}
+              </a>
             </p>
           </div>
         </section>

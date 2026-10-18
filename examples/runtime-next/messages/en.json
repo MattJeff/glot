@@ -1,0 +1,11 @@
+{
+  "home": {
+    "title": "Welcome to glot, {name}",
+    "files": "You have {n, plural, one {# file} other {# files}} in your Workspace",
+    "server": "This text comes from a Server Component"
+  },
+  "counter": {
+    "label": "Clicks: {count}",
+    "button": "Add one"
+  }
+}

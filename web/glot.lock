@@ -2141,8 +2141,8 @@
         "reviewed": false
       },
       "landing.compare.crowdinPrice": {
-        "source_hash": "b3fcc271532c7196",
-        "target_hash": "694653048b960201",
+        "source_hash": "8440d95831f5a5b8",
+        "target_hash": "b18ff20d35f711b9",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2159,8 +2159,8 @@
         "reviewed": false
       },
       "landing.compare.footnote": {
-        "source_hash": "49d734647717b67a",
-        "target_hash": "20783ad069190021",
+        "source_hash": "0cc21e53b1975035",
+        "target_hash": "7f126ea8f1423498",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2177,8 +2177,8 @@
         "reviewed": false
       },
       "landing.compare.lingoPrice": {
-        "source_hash": "a74e8c3dccd0e3d9",
-        "target_hash": "f7b5d9319088b1c9",
+        "source_hash": "fabb658d7ac4443f",
+        "target_hash": "4ca04f55a4ab6247",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2186,8 +2186,8 @@
         "reviewed": false
       },
       "landing.compare.lokalisePrice": {
-        "source_hash": "00c0679c15e7d2c5",
-        "target_hash": "f53a7e3021401534",
+        "source_hash": "1ff536fc6da6360a",
+        "target_hash": "6ea4515371c7f634",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2285,8 +2285,8 @@
         "reviewed": false
       },
       "landing.compare.sources": {
-        "source_hash": "949b2bad4e06d045",
-        "target_hash": "dfb146a4006887f3",
+        "source_hash": "87ef238c6db01068",
+        "target_hash": "aa681a6a620eaa56",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2294,8 +2294,8 @@
         "reviewed": false
       },
       "landing.compare.subtitle": {
-        "source_hash": "557c2ddcb73c8a9d",
-        "target_hash": "76c3b0b91f99d6f8",
+        "source_hash": "e244205f1d6f613e",
+        "target_hash": "f19f31ea57a89efd",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2305,6 +2305,15 @@
       "landing.compare.title": {
         "source_hash": "e888155d8c7d2e3c",
         "target_hash": "110d9a24771416b1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "landing.compare.tolgeePrice": {
+        "source_hash": "6f12a78fde7a5050",
+        "target_hash": "f16b70f459e96e2b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7336,8 +7345,8 @@
         "reviewed": false
       },
       "landing.compare.crowdinPrice": {
-        "source_hash": "b3fcc271532c7196",
-        "target_hash": "53cc4beef708ad4a",
+        "source_hash": "8440d95831f5a5b8",
+        "target_hash": "f6258e66288c3c95",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7354,8 +7363,8 @@
         "reviewed": false
       },
       "landing.compare.footnote": {
-        "source_hash": "49d734647717b67a",
-        "target_hash": "4a9c869f9874f95f",
+        "source_hash": "0cc21e53b1975035",
+        "target_hash": "482f3674e1ad450d",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7372,8 +7381,8 @@
         "reviewed": false
       },
       "landing.compare.lingoPrice": {
-        "source_hash": "a74e8c3dccd0e3d9",
-        "target_hash": "3aabcdee197ec397",
+        "source_hash": "fabb658d7ac4443f",
+        "target_hash": "5b5c11eec34c70b8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7381,8 +7390,8 @@
         "reviewed": false
       },
       "landing.compare.lokalisePrice": {
-        "source_hash": "00c0679c15e7d2c5",
-        "target_hash": "23114b897ce02974",
+        "source_hash": "1ff536fc6da6360a",
+        "target_hash": "d70c3361f25feda8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7480,8 +7489,8 @@
         "reviewed": false
       },
       "landing.compare.sources": {
-        "source_hash": "949b2bad4e06d045",
-        "target_hash": "ad5ba73cb0d51a1c",
+        "source_hash": "87ef238c6db01068",
+        "target_hash": "adab547b9a7f5287",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7489,8 +7498,8 @@
         "reviewed": false
       },
       "landing.compare.subtitle": {
-        "source_hash": "557c2ddcb73c8a9d",
-        "target_hash": "d6150ac3b2f7efff",
+        "source_hash": "e244205f1d6f613e",
+        "target_hash": "57fb2d2552d83e21",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7500,6 +7509,15 @@
       "landing.compare.title": {
         "source_hash": "e888155d8c7d2e3c",
         "target_hash": "79a63c24b8cc2200",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "landing.compare.tolgeePrice": {
+        "source_hash": "6f12a78fde7a5050",
+        "target_hash": "75fd0fd93590a979",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12531,8 +12549,8 @@
         "reviewed": false
       },
       "landing.compare.crowdinPrice": {
-        "source_hash": "b3fcc271532c7196",
-        "target_hash": "5462c9220c85d7c9",
+        "source_hash": "8440d95831f5a5b8",
+        "target_hash": "625454ffcd20b8f1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12549,8 +12567,8 @@
         "reviewed": false
       },
       "landing.compare.footnote": {
-        "source_hash": "49d734647717b67a",
-        "target_hash": "8eff7e6ec5dd5d51",
+        "source_hash": "0cc21e53b1975035",
+        "target_hash": "6bae344ad30e0615",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12567,8 +12585,8 @@
         "reviewed": false
       },
       "landing.compare.lingoPrice": {
-        "source_hash": "a74e8c3dccd0e3d9",
-        "target_hash": "03d84a9d515a21ed",
+        "source_hash": "fabb658d7ac4443f",
+        "target_hash": "c5464cd875c386c9",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12576,8 +12594,8 @@
         "reviewed": false
       },
       "landing.compare.lokalisePrice": {
-        "source_hash": "00c0679c15e7d2c5",
-        "target_hash": "40063d8daca54919",
+        "source_hash": "1ff536fc6da6360a",
+        "target_hash": "37099b8eb67a94b1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12675,8 +12693,8 @@
         "reviewed": false
       },
       "landing.compare.sources": {
-        "source_hash": "949b2bad4e06d045",
-        "target_hash": "c8bcd060bd0e6bbe",
+        "source_hash": "87ef238c6db01068",
+        "target_hash": "19cad63f0b348318",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12684,8 +12702,8 @@
         "reviewed": false
       },
       "landing.compare.subtitle": {
-        "source_hash": "557c2ddcb73c8a9d",
-        "target_hash": "3b0a564f1ab423ca",
+        "source_hash": "e244205f1d6f613e",
+        "target_hash": "4cb5e9200e8d50c1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12695,6 +12713,15 @@
       "landing.compare.title": {
         "source_hash": "e888155d8c7d2e3c",
         "target_hash": "58d55554ece4bf3b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "landing.compare.tolgeePrice": {
+        "source_hash": "6f12a78fde7a5050",
+        "target_hash": "85fecc8c8f6468d3",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17726,8 +17753,8 @@
         "reviewed": false
       },
       "landing.compare.crowdinPrice": {
-        "source_hash": "b3fcc271532c7196",
-        "target_hash": "57f0a7b52883a480",
+        "source_hash": "8440d95831f5a5b8",
+        "target_hash": "47496750a47fa8f6",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17744,8 +17771,8 @@
         "reviewed": false
       },
       "landing.compare.footnote": {
-        "source_hash": "49d734647717b67a",
-        "target_hash": "1a36b1499da5dd64",
+        "source_hash": "0cc21e53b1975035",
+        "target_hash": "75a8a28dfee205aa",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17762,8 +17789,8 @@
         "reviewed": false
       },
       "landing.compare.lingoPrice": {
-        "source_hash": "a74e8c3dccd0e3d9",
-        "target_hash": "61677419e800b08b",
+        "source_hash": "fabb658d7ac4443f",
+        "target_hash": "41b82e6b383981ae",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17771,8 +17798,8 @@
         "reviewed": false
       },
       "landing.compare.lokalisePrice": {
-        "source_hash": "00c0679c15e7d2c5",
-        "target_hash": "6a79e90173a6fbb9",
+        "source_hash": "1ff536fc6da6360a",
+        "target_hash": "4c25864ecd41974f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17870,8 +17897,8 @@
         "reviewed": false
       },
       "landing.compare.sources": {
-        "source_hash": "949b2bad4e06d045",
-        "target_hash": "e12a8ec6b9397af5",
+        "source_hash": "87ef238c6db01068",
+        "target_hash": "e84e4f09001bdb81",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17879,8 +17906,8 @@
         "reviewed": false
       },
       "landing.compare.subtitle": {
-        "source_hash": "557c2ddcb73c8a9d",
-        "target_hash": "fa1a58aaa5abeabd",
+        "source_hash": "e244205f1d6f613e",
+        "target_hash": "d4c3484b99c16553",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -17890,6 +17917,15 @@
       "landing.compare.title": {
         "source_hash": "e888155d8c7d2e3c",
         "target_hash": "941136ff5662394c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "landing.compare.tolgeePrice": {
+        "source_hash": "6f12a78fde7a5050",
+        "target_hash": "65c113f4506a0109",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -22921,8 +22957,8 @@
         "reviewed": false
       },
       "landing.compare.crowdinPrice": {
-        "source_hash": "b3fcc271532c7196",
-        "target_hash": "91aecd969e449250",
+        "source_hash": "8440d95831f5a5b8",
+        "target_hash": "3cbd46b8f6a2f70f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -22939,8 +22975,8 @@
         "reviewed": false
       },
       "landing.compare.footnote": {
-        "source_hash": "49d734647717b67a",
-        "target_hash": "ec82c99d127e85b3",
+        "source_hash": "0cc21e53b1975035",
+        "target_hash": "e9a0c966c2ed131f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -22957,8 +22993,8 @@
         "reviewed": false
       },
       "landing.compare.lingoPrice": {
-        "source_hash": "a74e8c3dccd0e3d9",
-        "target_hash": "ac6a0c77262bdbdf",
+        "source_hash": "fabb658d7ac4443f",
+        "target_hash": "4eb9f3fb019d9664",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -22966,8 +23002,8 @@
         "reviewed": false
       },
       "landing.compare.lokalisePrice": {
-        "source_hash": "00c0679c15e7d2c5",
-        "target_hash": "344725516505274c",
+        "source_hash": "1ff536fc6da6360a",
+        "target_hash": "2fde4ab2cf68b8d7",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -23065,8 +23101,8 @@
         "reviewed": false
       },
       "landing.compare.sources": {
-        "source_hash": "949b2bad4e06d045",
-        "target_hash": "3f26b0cc72b5d616",
+        "source_hash": "87ef238c6db01068",
+        "target_hash": "cc9f3bc2671214c0",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -23074,8 +23110,8 @@
         "reviewed": false
       },
       "landing.compare.subtitle": {
-        "source_hash": "557c2ddcb73c8a9d",
-        "target_hash": "d3f59604b4c10d7d",
+        "source_hash": "e244205f1d6f613e",
+        "target_hash": "72ff053f24cfb704",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -23085,6 +23121,15 @@
       "landing.compare.title": {
         "source_hash": "e888155d8c7d2e3c",
         "target_hash": "2ddd4be2e164808a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "landing.compare.tolgeePrice": {
+        "source_hash": "6f12a78fde7a5050",
+        "target_hash": "ac60b512bc9765c8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"

@@ -239,3 +239,19 @@ Webfonts are converted to TTF in `.glot/fonts/`. `glot_core::measure` shapes tex
 fallbacks per script) so `validate` can raise `too_wide` **without a browser**; the translation prompt carries the
 budget ("must fit in 110px at Inter 14px/500 ≈ 16 Latin chars") and the retry loop fixes it before writing.
 When a budget exists for a key it replaces the noisy length-ratio warning.
+
+## Framework setup (`glot i18nize`)
+`glot i18nize` wires the runtime it detects, idempotently (a second run changes nothing), and every edit shows up in `--dry-run`:
+- **Next App Router** → next-intl (`i18n/request.ts`, `proxy.ts`/`middleware.ts`, plugin, provider; cookie routing by default, `--routing prefix`).
+- **Next Pages Router** → built-in `i18n` + provider wrapping the whole `_app` tree.
+- **React Router 7/8 (Remix)** → remix-i18next middleware: one i18next instance per request (`?lng` → cookie `glot-locale` → `Accept-Language`), `entry.server.tsx` with `I18nextProvider`, dynamic `<html lang>`. SSR renders the requested locale.
+- **Astro (React islands)** → native i18n routing with `fallbackType: "rewrite"` (`/fr/...` reuses pages), `src/middleware.ts` sets the locale before islands render. Shared instance: safe for static builds, not for concurrent on-demand rendering.
+- **Vite + React** → react-i18next init imported in the entry (SPA, client-side only).
+Verified end to end on real apps in `examples/frameworks/` (`GLOT_FW_APPS=… cargo test -p glot-cli --test frameworks`).
+
+## Insights rate limit
+`POST /api/insights/{public_key}` is limited per project and per minute **across replicas**: one atomic
+`INSERT … ON CONFLICT DO UPDATE … RETURNING hits` on `insight_rate` (one row per project, reset when the minute
+changes, Postgres clock), merged into the key lookup so an accepted hit costs no extra round trip; keys over budget
+are cached locally until the window ends, so floods never reach the database. Budget: `projects.insights_rate_per_min`,
+else `GLOT_INSIGHTS_RATE_PER_MIN`, else 1200. Over budget → 429 `rate_limited` with `Retry-After`.

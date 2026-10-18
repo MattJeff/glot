@@ -128,47 +128,63 @@ fn valid_event(e: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b"_-.:".contains(&b))
 }
 
-/// Hits accepted per public key per minute. The key ships in page source, so anyone can post with it.
-const HITS_PER_MINUTE: u32 = 1200;
+/// Default hits per project per minute (`GLOT_INSIGHTS_RATE_PER_MIN`); `projects.insights_rate_per_min` overrides.
+/// The public key ships in page source, so anyone can post with it.
+static DEFAULT_RATE: std::sync::LazyLock<i32> = std::sync::LazyLock::new(|| {
+    std::env::var("GLOT_INSIGHTS_RATE_PER_MIN")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .filter(|n| *n > 0)
+        .unwrap_or(1200)
+});
 
-/// Fixed-window counter: returns false once `key` used its budget for `minute`.
-/// ponytail: per-process memory; behind several replicas the budget multiplies — move to Postgres/Redis then.
-fn allow_hit(
-    window: &mut (u64, std::collections::HashMap<String, u32>),
-    key: &str,
-    minute: u64,
-) -> bool {
-    if window.0 != minute {
-        *window = (minute, Default::default());
-    }
-    let n = window.1.entry(key.to_string()).or_default();
-    *n += 1;
-    *n <= HITS_PER_MINUTE
+/// Keys whose shared budget is spent, with the unix second their window ends: rejected without touching Postgres,
+/// so a flood costs one DB round trip per instance per window. Correctness lives in `insight_rate`, this is a cache.
+static BLOCKED: std::sync::LazyLock<std::sync::Mutex<std::collections::HashMap<String, u64>>> =
+    std::sync::LazyLock::new(Default::default);
+
+fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
 }
 
-static HIT_WINDOW: std::sync::LazyLock<
-    std::sync::Mutex<(u64, std::collections::HashMap<String, u32>)>,
-> = std::sync::LazyLock::new(Default::default);
+/// Seconds left on a block for `key`, if any.
+fn blocked_for(map: &std::collections::HashMap<String, u64>, key: &str, now: u64) -> Option<u64> {
+    map.get(key)
+        .filter(|until| **until > now)
+        .map(|until| until - now)
+}
+
+/// Remember that `key` is over budget until `until`; drops expired entries (bounded by keys blocked right now).
+fn block(map: &mut std::collections::HashMap<String, u64>, key: &str, until: u64, now: u64) {
+    map.retain(|_, t| *t > now);
+    map.insert(key.to_string(), until);
+}
+
+fn rate_limited(retry_after: u64) -> axum::response::Response {
+    use axum::response::IntoResponse;
+    (
+        [(header::RETRY_AFTER, retry_after.max(1).to_string())],
+        AppError::new(
+            StatusCode::TOO_MANY_REQUESTS,
+            "rate_limited",
+            "too many insight hits for this key; see Retry-After",
+        ),
+    )
+        .into_response()
+}
 
 pub async fn ingest(
     State(state): State<AppState>,
     AppPath(key): AppPath<String>,
     headers: HeaderMap,
     body: Bytes,
-) -> ApiResult<Json<HitResponse>> {
-    let minute = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |d| d.as_secs() / 60);
-    if !allow_hit(
-        &mut HIT_WINDOW.lock().unwrap_or_else(|e| e.into_inner()),
-        &key,
-        minute,
-    ) {
-        return Err(AppError::new(
-            axum::http::StatusCode::TOO_MANY_REQUESTS,
-            "rate_limited",
-            "too many insight hits for this key; retry next minute",
-        ));
+) -> ApiResult<axum::response::Response> {
+    use axum::response::IntoResponse;
+    let lock = || BLOCKED.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(s) = blocked_for(&lock(), &key, unix_now()) {
+        return Ok(rate_limited(s));
     }
     // Any content type: the snippet posts text/plain to avoid a CORS preflight.
     let hit: Hit = serde_json::from_slice(&body)
@@ -183,12 +199,32 @@ pub async fn ingest(
             ));
         }
     };
-    let project_id: Uuid =
-        sqlx::query_scalar("SELECT project_id FROM insight_keys WHERE public_key = $1")
-            .bind(&key)
-            .fetch_optional(&state.db)
-            .await?
-            .ok_or_else(|| AppError::not_found("unknown insights key"))?;
+    // Key lookup + shared fixed-window counter in one atomic statement (no extra round trip per hit).
+    // Window = the DB clock's minute, so replicas with skewed clocks still agree; a newer minute resets the row.
+    // ponytail: one DB increment per accepted hit (the hit already costs 2 more queries); batch increments
+    // locally and flush every ~2 s only if a single key must take > ~5k hits/s (one hot row).
+    let (project_id, hits, budget, window_end): (Uuid, i32, Option<i32>, i64) = sqlx::query_as(
+        "WITH k AS (
+           SELECT k.project_id, p.insights_rate_per_min AS budget
+           FROM insight_keys k JOIN projects p ON p.id = k.project_id WHERE k.public_key = $1)
+         INSERT INTO insight_rate AS r (project_id, window_start, hits)
+         SELECT project_id, date_trunc('minute', now()), 1 FROM k
+         ON CONFLICT (project_id) DO UPDATE SET
+           hits = CASE WHEN excluded.window_start > r.window_start THEN 1 ELSE r.hits + 1 END,
+           window_start = greatest(r.window_start, excluded.window_start)
+         RETURNING r.project_id, r.hits, (SELECT budget FROM k),
+           extract(epoch FROM r.window_start + interval '1 minute')::int8",
+    )
+    .bind(&key)
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or_else(|| AppError::not_found("unknown insights key"))?;
+    if hits > budget.unwrap_or(*DEFAULT_RATE) {
+        let now = unix_now();
+        let until = window_end.max(0) as u64;
+        block(&mut lock(), &key, until, now);
+        return Ok(rate_limited(until.saturating_sub(now)));
+    }
     let accept = headers
         .get(header::ACCEPT_LANGUAGE)
         .and_then(|v| v.to_str().ok());
@@ -237,7 +273,8 @@ pub async fn ingest(
     Ok(Json(HitResponse {
         locale,
         arm: arm.map(String::from),
-    }))
+    })
+    .into_response())
 }
 
 // ---------- stats ----------
@@ -876,13 +913,22 @@ mod rate_limit_tests {
     use super::*;
 
     #[test]
-    fn budget_per_key_and_minute() {
-        let mut w = Default::default();
-        for _ in 0..HITS_PER_MINUTE {
-            assert!(allow_hit(&mut w, "k", 1));
-        }
-        assert!(!allow_hit(&mut w, "k", 1));
-        assert!(allow_hit(&mut w, "other", 1));
-        assert!(allow_hit(&mut w, "k", 2));
+    fn local_block_cache() {
+        let mut m = Default::default();
+        assert_eq!(blocked_for(&m, "k", 100), None);
+        block(&mut m, "k", 160, 100);
+        assert_eq!(blocked_for(&m, "k", 100), Some(60));
+        assert_eq!(blocked_for(&m, "other", 100), None);
+        assert_eq!(blocked_for(&m, "k", 160), None, "window over");
+        block(&mut m, "x", 220, 170);
+        assert!(!m.contains_key("k"), "expired entries are dropped");
+    }
+
+    #[test]
+    fn retry_after_header() {
+        let r = rate_limited(0);
+        assert_eq!(r.status(), StatusCode::TOO_MANY_REQUESTS);
+        assert_eq!(r.headers()[header::RETRY_AFTER], "1");
+        assert_eq!(rate_limited(42).headers()[header::RETRY_AFTER], "42");
     }
 }

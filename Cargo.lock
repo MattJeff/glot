@@ -937,7 +937,7 @@ checksum = "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
 
 [[package]]
 name = "glot-cli"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anstream",
  "anstyle",
@@ -969,7 +969,7 @@ dependencies = [
 
 [[package]]
 name = "glot-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "glob",
  "rustybuzz",
@@ -982,7 +982,7 @@ dependencies = [
 
 [[package]]
 name = "glot-extract"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "glob",
  "glot-core",
@@ -998,7 +998,7 @@ dependencies = [
 
 [[package]]
 name = "glot-llm"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1019,7 +1019,7 @@ dependencies = [
 
 [[package]]
 name = "glot-mcp"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "glot-core",
@@ -1037,7 +1037,7 @@ dependencies = [
 
 [[package]]
 name = "glot-server"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "aes-gcm",
  "anyhow",
@@ -1065,7 +1065,7 @@ dependencies = [
 
 [[package]]
 name = "glot-wasm"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "glot-core",
  "serde",

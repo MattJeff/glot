@@ -187,12 +187,12 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Subscription, free for open source",
+      "crowdinPrice": "Paid plans after a 14-day trial, free for open source",
       "feature": "Feature",
-      "footnote": "Based on each vendor's public website and docs as of October 2026. Partial means limited, plan-dependent or through an integration. Plans and features change: check the sources.",
+      "footnote": "Checked against each vendor's public website and docs on October 18, 2026. Partial means limited, plan-dependent or through an integration. No means we found no such feature in public docs. Plans change: every cell is linked to its source.",
       "glotPrice": "Free (MIT) + your LLM usage",
-      "lingoPrice": "Free CLI, paid hosted engine",
-      "lokalisePrice": "Subscription, see pricing",
+      "lingoPrice": "Free CLI with your own key, hosted engine $0 base + usage",
+      "lokalisePrice": "From $149/mo, 14-day trial",
       "no": "No",
       "partial": "Partial",
       "rows": {
@@ -205,9 +205,10 @@
         "price": "Price",
         "validator": "Deterministic validation of every string"
       },
-      "sources": "Sources:",
-      "subtitle": "Where glot differs from hosted translation platforms and from the other open-source option.",
+      "sources": "Sources and dates for every cell",
+      "subtitle": "Where glot differs from hosted translation platforms and other developer-first tools.",
       "title": "Compare",
+      "tolgeePrice": "Free tier and free self-host, cloud from €58/mo",
       "yes": "Yes"
     },
     "core": {

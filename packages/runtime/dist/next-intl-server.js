@@ -1,0 +1,1 @@
+import{createElement as s}from"react";import{getTranslations as o}from"next-intl/server";import{T as a}from"./next-intl.js";async function g(t){let n=await o(t);return(e,r)=>s(a,{k:t?`${t}.${e}`:e,values:r},n(e,r))}export{g as getGlotTranslations};
