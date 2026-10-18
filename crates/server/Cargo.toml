@@ -1,0 +1,31 @@
+[package]
+name = "glot-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glot-core.workspace = true
+glot-llm.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+axum = "0.8"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "uuid", "chrono", "json", "migrate", "macros", "derive"] }
+tower-http = { version = "0.6", features = ["trace", "cors", "compression-gzip"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+argon2 = "0.5"
+aes-gcm = "0.10"
+rand = "0.9"
+hex = "0.4"
+uuid = { version = "1", features = ["v4", "serde"] }
+utoipa = { version = "5", features = ["uuid", "chrono"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

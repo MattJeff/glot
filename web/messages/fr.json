@@ -1,0 +1,434 @@
+{
+  "auth": {
+    "errors": {
+      "invalid": "E-mail ou mot de passe invalide.",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères."
+    },
+    "fields": {
+      "email": "E-mail",
+      "name": "Nom",
+      "password": "Mot de passe",
+      "passwordHint": "Au moins 8 caractères."
+    },
+    "login": {
+      "submit": "Se connecter",
+      "subtitle": "Connectez-vous à votre espace de travail glot.",
+      "switch": "Pas encore de compte ?",
+      "switchLink": "Créer un compte",
+      "title": "Bon retour"
+    },
+    "signup": {
+      "submit": "Créer le compte",
+      "subtitle": "Gratuit et open source. Apportez votre propre clé LLM.",
+      "switch": "Vous avez déjà un compte ?",
+      "switchLink": "Se connecter",
+      "title": "Créez votre compte"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "copied": "Copié dans le presse-papiers",
+    "copy": "Copier",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "github": "GitHub",
+    "never": "Jamais",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…"
+  },
+  "editor": {
+    "anyLocale": "Toutes les langues",
+    "anyStatus": "Tous les statuts",
+    "approve": "Approuver",
+    "approved": "Approuvé",
+    "clearFilters": "Effacer les filtres",
+    "columns": "Langues",
+    "columnsHint": "Colonnes à afficher",
+    "detail": {
+      "by": "par {author}",
+      "description": "Description",
+      "doNotTranslate": "Ne pas traduire",
+      "glossary": "Correspondances du glossaire",
+      "history": "Historique",
+      "noDescription": "Aucune description. Ajoutez-en une pour donner plus de contexte au LLM.",
+      "noGlossary": "Aucun terme du glossaire dans ce texte source.",
+      "noHistory": "Aucun historique pour le moment.",
+      "noReferences": "Aucune référence de code trouvée.",
+      "references": "Références",
+      "selectKey": "Sélectionnez une clé pour voir son contexte.",
+      "title": "Détails",
+      "toggle": "Afficher/masquer les détails",
+      "translations": "Traductions"
+    },
+    "editPlaceholder": "Traduction pour la langue {locale}",
+    "empty": "Aucune clé ne correspond à ces filtres.",
+    "emptyValue": "Pas encore traduit",
+    "issuesTooltip": "{count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
+    "key": "Clé",
+    "loadMore": "Chargement en cours…",
+    "origin": {
+      "human": "Manuelle",
+      "imported": "Importée",
+      "machine": "Automatique"
+    },
+    "results": "{count, plural, =0 {Aucune clé} one {# clé} many {# clés} other {# clés}}",
+    "saved": "Enregistré",
+    "savedWithIssues": "Enregistré avec {count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
+    "score": "Score {score}",
+    "search": "Rechercher clés et texte…",
+    "shortcuts": "j/k pour naviguer · Entrée pour modifier · ⌘Entrée pour approuver · Échap pour annuler",
+    "source": "Source",
+    "title": "Clés",
+    "withIssues": "Avec problèmes"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue. Veuillez réessayer.",
+    "network": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+    "notFound": "Introuvable.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "glossary": {
+    "add": "Ajouter un terme",
+    "caseSensitive": "Sensible à la casse",
+    "deleteConfirm": {
+      "body": "Les traductions futures n'appliqueront plus ce terme.",
+      "title": "Supprimer « {term} » ?"
+    },
+    "deleted": "Terme supprimé",
+    "description": "Description",
+    "dialog": {
+      "createTitle": "Nouveau terme",
+      "editTitle": "Modifier le terme",
+      "forbiddenFor": "Interdits (langue {locale})",
+      "translationFor": "Traduction (langue {locale})"
+    },
+    "doNotTranslate": "Ne pas traduire",
+    "empty": {
+      "body": "Ajoutez des noms de produit et du vocabulaire métier pour que chaque langue reste cohérente.",
+      "title": "Aucun terme dans le glossaire"
+    },
+    "flags": "Règles",
+    "forbiddenHint": "Variantes séparées par des virgules que le LLM ne doit pas utiliser.",
+    "saved": "Terme enregistré",
+    "subtitle": "Termes du glossaire appliqués à chaque traduction. Reflète glossary.toml dans votre dépôt.",
+    "term": "Terme",
+    "title": "Glossaire",
+    "translations": "Traductions"
+  },
+  "jobStatus": {
+    "done": "Terminée",
+    "failed": "Échouée",
+    "queued": "En attente",
+    "running": "En cours"
+  },
+  "jobs": {
+    "cost": "Coût",
+    "empty": {
+      "body": "Lancez une tâche de traduction pour compléter les clés manquantes.",
+      "title": "Aucune tâche pour l'instant"
+    },
+    "kind": {
+      "translate": "Traduire"
+    },
+    "live": "En direct",
+    "progress": "{done} / {total}",
+    "subtitle": "Exécutions de traduction en arrière-plan, mises à jour en direct.",
+    "title": "Tâches"
+  },
+  "landing": {
+    "compare": {
+      "crowdinPrice": "Offres payantes, ~50 $+/mois",
+      "feature": "Fonctionnalité",
+      "footnote": "Prix d'entrée indicatifs issus des pages tarifaires publiques ; vérifiez les offres actuelles auprès de chaque éditeur.",
+      "glotPrice": "Gratuit + votre usage de LLM",
+      "lokalisePrice": "Offres payantes, ~120 $+/mois",
+      "no": "Non",
+      "partial": "Partiel",
+      "rows": {
+        "byok": "Apportez votre propre clé LLM",
+        "gitNative": "Git comme source de vérité (lockfile)",
+        "mcp": "Serveur MCP pour agents de codage",
+        "openSource": "Open source",
+        "price": "Prix",
+        "validator": "Validation déterministe de chaque chaîne"
+      },
+      "subtitle": "Gestion des traductions sans tarification par siège.",
+      "title": "Comparatif",
+      "yes": "Oui"
+    },
+    "cta": {
+      "button": "Créer votre espace de travail",
+      "title": "Livrez chaque langue à chaque version."
+    },
+    "features": {
+      "byok": {
+        "body": "Anthropic, OpenAI ou tout point de terminaison compatible OpenAI, y compris les modèles locaux. Les coûts sont affichés par tâche et plafonnés par un budget.",
+        "title": "Apportez votre propre clé"
+      },
+      "glossary": {
+        "body": "Le glossaire (glossary.toml) se trouve à côté de votre code. Les traductions obligatoires, les termes interdits et les mots à ne pas traduire sont appliqués, pas seulement suggérés.",
+        "title": "Glossaire as code"
+      },
+      "lockfile": {
+        "body": "glot.lock calcule le hash de chaque source et cible. Seul le delta est traduit, et les modifications manuelles ne sont jamais écrasées.",
+        "title": "Lockfile"
+      },
+      "mcp": {
+        "body": "Claude Code, Cursor et compagnie interrogent directement les clés, le glossaire et les problèmes, et traduisent avec des références fichier:ligne et le rôle de l'interface.",
+        "title": "MCP, contexte en direct"
+      },
+      "oss": {
+        "body": "Sous licence MIT. CLI, serveur MCP, API et ce tableau de bord. Hébergez-le vous-même, forkez-le, auditez-le.",
+        "title": "Open source"
+      },
+      "subtitle": "Le LLM est toujours encadré par du code déterministe.",
+      "title": "Conçu pour les équipes qui livrent avec des agents",
+      "validator": {
+        "body": "Analyse ICU, i18next et MessageFormat 2. Variables, balises et catégories de pluriel vérifiées pour chaque langue. Les échecs sont relancés, puis escaladés vers un modèle plus performant.",
+        "title": "Validateur déterministe"
+      },
+      "visual": {
+        "body": "Playwright rend chaque langue et signale les débordements, les troncatures et les ruptures de mise en page RTL avant que vos utilisateurs ne les voient.",
+        "title": "QA visuelle"
+      }
+    },
+    "flow": {
+      "agent": {
+        "caption": "Votre agent ajoute une fonctionnalité et de nouvelles clés.",
+        "label": "Agent",
+        "prompt": "Ajoutez une page de paiement, dans toutes les langues"
+      },
+      "checks": {
+        "glossary": "Termes du glossaire respectés",
+        "length": "Ratio de longueur 1,3× (sous 1,6×)",
+        "placeholders": "Variables préservées",
+        "plurals": "Catégories de pluriel CLDR"
+      },
+      "mcp": {
+        "caption": "glot lui donne un contexte en direct : glossaire, références, voisins.",
+        "label": "MCP"
+      },
+      "pr": {
+        "caption": "Seul le delta, avec un lockfile mis à jour.",
+        "label": "Pull request"
+      },
+      "title": "Du prompt à la pull request, sans casser une variable",
+      "validate": {
+        "caption": "Chaque chaîne est vérifiée par du code, pas à l'intuition.",
+        "label": "Validation"
+      }
+    },
+    "footer": {
+      "license": "Licence MIT",
+      "tagline": "Une localisation que l'IA ne peut pas casser."
+    },
+    "hero": {
+      "badge": "Open source · MIT · Apportez votre propre clé LLM",
+      "primary": "Commencer gratuitement",
+      "secondary": "Mettre une étoile sur GitHub",
+      "subtitle": "Votre agent de code écrit les fonctionnalités. glot les livre dans chaque langue : traductions LLM sensibles au contexte, encadrées par un validateur déterministe, un lockfile et un glossaire versionnés dans Git.",
+      "title": "L'i18n que votre agent IA ne peut pas casser."
+    },
+    "install": {
+      "cargo": "Avec Cargo",
+      "mcp": "Ajouter à votre agent",
+      "npx": "Avec npx",
+      "subtitle": "Exécutez-le en local avec votre agent, ou connectez-le à un serveur glot pour votre équipe.",
+      "title": "Installation en quelques secondes"
+    },
+    "meta": {
+      "description": "Localisation open source pour SaaS, conçue pour les agents de code. Validation déterministe, un lockfile, un glossaire en tant que code et un serveur MCP.",
+      "title": "glot : i18n que l'IA ne peut pas casser"
+    },
+    "nav": {
+      "compare": "Comparer",
+      "features": "Fonctionnalités",
+      "getStarted": "Commencer",
+      "install": "Installation",
+      "signIn": "Se connecter"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Langue"
+  },
+  "notFound": {
+    "back": "Retour à l'accueil",
+    "title": "Page introuvable"
+  },
+  "overview": {
+    "budget": "sur un budget de {budget}",
+    "cost": "Dépenses LLM",
+    "issuesCount": "{count, plural, =0 {Aucun problème} one {# problème} many {# problèmes} other {# problèmes}}",
+    "jobStarted": "Tâche de traduction lancée",
+    "keys": "Clés",
+    "locales": "Langues",
+    "model": "Modèle",
+    "noBudget": "Aucun budget défini",
+    "noIssues": "Aucun problème ouvert. Toutes les traductions passent la validation.",
+    "noJobs": "Aucune tâche pour l'instant. Traduisez les clés manquantes pour en lancer une.",
+    "noKeys": {
+      "body": "Poussez vos catalogues depuis votre dépôt pour commencer.",
+      "title": "Aucune clé pour l'instant"
+    },
+    "openIssues": "Problèmes ouverts",
+    "progress": "Progression par langue",
+    "progressHint": "{translated} sur {total} traduits · {reviewed} relus",
+    "recentJobs": "Tâches récentes",
+    "staleCount": "{count, plural, one {# obsolète} many {# obsolètes} other {# obsolètes}}",
+    "translateMissing": "Traduire les manquantes",
+    "viewAll": "Tout voir"
+  },
+  "palette": {
+    "empty": "Aucun résultat.",
+    "goTo": "Aller à {page}",
+    "navigation": "Navigation",
+    "openProject": "Ouvrir {name}",
+    "placeholder": "Saisissez une commande ou une recherche…",
+    "preferences": "Préférences",
+    "projects": "Projets",
+    "switchLanguage": "Changer la langue en {language}",
+    "toggleTheme": "Changer le thème"
+  },
+  "projects": {
+    "create": {
+      "description": "Vous pourrez modifier les langues et les paramètres LLM plus tard.",
+      "name": "Nom",
+      "namePlaceholder": "Mon SaaS",
+      "slug": "Slug",
+      "slugHint": "Utilisé dans les URL, la CLI et le CDN.",
+      "sourceLocale": "Langue source",
+      "submit": "Créer le projet",
+      "success": "Projet {name} créé",
+      "targetLocales": "Langues cibles",
+      "targetLocalesHint": "Codes BCP 47 séparés par des virgules, par ex. fr, de, pt-BR.",
+      "title": "Nouveau projet"
+    },
+    "empty": {
+      "body": "Créez un projet, puis exécutez glot push depuis votre dépôt pour importer vos catalogues.",
+      "cta": "Créer votre premier projet",
+      "title": "Aucun projet pour le moment"
+    },
+    "keysCount": "{count, plural, =0 {Aucune clé} one {# clé} many {# clés} other {# clés}}",
+    "localesCount": "{count, plural, one {# langue} many {# langues} other {# langues}}",
+    "subtitle": "Chaque projet correspond à un glot.toml dans l'un de vos dépôts.",
+    "title": "Projets"
+  },
+  "settings": {
+    "cdn": {
+      "description": "Diffusez vos catalogues en JSON, avec les en-têtes ETag et de cache.",
+      "enable": "Activer le CDN public",
+      "example": "URL d'exemple",
+      "title": "CDN public"
+    },
+    "danger": {
+      "confirmBody": "Cette action est irréversible. Saisissez {slug} pour confirmer.",
+      "confirmTitle": "Supprimer {name} ?",
+      "delete": "Supprimer le projet",
+      "deleted": "Projet supprimé",
+      "description": "La suppression d'un projet supprime ses clés, traductions, glossaire et tâches. Votre dépôt n'est pas modifié.",
+      "title": "Zone dangereuse"
+    },
+    "general": {
+      "name": "Nom du projet",
+      "slug": "Slug",
+      "title": "Général"
+    },
+    "llm": {
+      "apiKey": "Clé API",
+      "apiKeySet": "Une clé est enregistrée. Laissez vide pour la conserver.",
+      "apiKeyUnset": "Aucune clé enregistrée pour le moment.",
+      "baseUrl": "URL de base",
+      "baseUrlHint": "Pour Ollama, vLLM, OpenRouter et d'autres points de terminaison compatibles.",
+      "budget": "Budget (USD)",
+      "budgetHint": "Les tâches s'arrêtent lorsque ce budget est atteint.",
+      "description": "Votre propre clé de fournisseur. glot n'applique jamais de marge sur l'usage du LLM.",
+      "fallback": "Modèle de secours",
+      "fallbackHint": "Utilisé lorsque la validation échoue encore après une nouvelle tentative.",
+      "judge": "Modèle d'évaluation",
+      "judgeHint": "Attribue une note de 0 à 100 aux traductions.",
+      "model": "Modèle",
+      "provider": "Fournisseur",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "Factice (tests)",
+        "openai": "OpenAI",
+        "openai-compatible": "Compatible OpenAI"
+      },
+      "style": "Guide de style",
+      "stylePlaceholder": "Amical, concis, « tu » informel…",
+      "title": "LLM"
+    },
+    "locales": {
+      "add": "Ajouter une langue",
+      "addPlaceholder": "ex. pt-BR",
+      "description": "La langue source est fixe. Les langues cibles sont traduites par les tâches et la CLI.",
+      "remove": "Supprimer la langue {locale}",
+      "source": "Langue source",
+      "targets": "Langues cibles",
+      "title": "Langues"
+    },
+    "saved": "Paramètres enregistrés",
+    "title": "Paramètres"
+  },
+  "shell": {
+    "apiTokens": "Jetons API",
+    "glossary": "Glossaire",
+    "jobs": "Tâches",
+    "keys": "Clés",
+    "logout": "Se déconnecter",
+    "newProject": "Nouveau projet",
+    "noProjects": "Aucun projet pour l'instant",
+    "overview": "Vue d'ensemble",
+    "projects": "Projets",
+    "search": "Rechercher…",
+    "settings": "Paramètres",
+    "toggleSidebar": "Afficher/masquer la navigation",
+    "userMenu": "Menu du compte"
+  },
+  "status": {
+    "machine": "Automatique",
+    "missing": "Manquant",
+    "reviewed": "Relu",
+    "stale": "Obsolète"
+  },
+  "theme": {
+    "dark": "Sombre",
+    "label": "Thème",
+    "light": "Clair",
+    "system": "Système"
+  },
+  "tokens": {
+    "create": "Nouveau jeton",
+    "created": "Créé",
+    "empty": {
+      "body": "Créez un jeton pour connecter la CLI ou votre agent de code.",
+      "title": "Aucun jeton"
+    },
+    "lastUsed": "Dernière utilisation",
+    "name": "Nom",
+    "namePlaceholder": "ex. laptop, github-actions",
+    "reveal": {
+      "body": "C’est la seule fois qu’il sera affiché. Stockez-le dans un gestionnaire de secrets ou dans l’environnement de votre shell.",
+      "title": "Copiez votre jeton maintenant"
+    },
+    "revoke": "Révoquer",
+    "revokeConfirm": {
+      "body": "Tout ce qui utilise ce jeton cessera de fonctionner immédiatement.",
+      "title": "Révoquer « {name} » ?"
+    },
+    "revoked": "Jeton révoqué",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "Connectez-vous une fois ; la CLI conserve le jeton pour ce serveur.",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "Ajoutez glot à Claude Code, Cursor ou à n’importe quel client MCP.",
+      "title": "Connectez vos outils"
+    },
+    "subtitle": "Les jetons authentifient la CLI glot, le serveur MCP et la CI.",
+    "title": "Jetons d’API"
+  }
+}

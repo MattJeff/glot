@@ -1,0 +1,21 @@
+[package]
+name = "glot-mcp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glot-core.workspace = true
+glot-llm.workspace = true
+glot-extract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+rmcp = { version = "3.5.1", features = ["server", "client", "macros", "transport-io", "elicitation"] }
+schemars = "1"
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

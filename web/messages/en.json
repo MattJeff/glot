@@ -1,0 +1,434 @@
+{
+  "auth": {
+    "errors": {
+      "invalid": "Invalid email or password.",
+      "passwordTooShort": "Password must be at least 8 characters."
+    },
+    "fields": {
+      "email": "Email",
+      "name": "Name",
+      "password": "Password",
+      "passwordHint": "At least 8 characters."
+    },
+    "login": {
+      "submit": "Sign in",
+      "subtitle": "Sign in to your glot workspace.",
+      "switch": "No account yet?",
+      "switchLink": "Create one",
+      "title": "Welcome back"
+    },
+    "signup": {
+      "submit": "Create account",
+      "subtitle": "Free and open source. Bring your own LLM key.",
+      "switch": "Already have an account?",
+      "switchLink": "Sign in",
+      "title": "Create your account"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "Cancel",
+    "close": "Close",
+    "copied": "Copied to clipboard",
+    "copy": "Copy",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "github": "GitHub",
+    "never": "Never",
+    "retry": "Retry",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "editor": {
+    "anyLocale": "Any locale",
+    "anyStatus": "Any status",
+    "approve": "Approve",
+    "approved": "Approved",
+    "clearFilters": "Clear filters",
+    "columns": "Locales",
+    "columnsHint": "Columns to display",
+    "detail": {
+      "by": "by {author}",
+      "description": "Description",
+      "doNotTranslate": "Do not translate",
+      "glossary": "Glossary matches",
+      "history": "History",
+      "noDescription": "No description. Add one to give the LLM more context.",
+      "noGlossary": "No glossary terms in this source text.",
+      "noHistory": "No history yet.",
+      "noReferences": "No code references found.",
+      "references": "References",
+      "selectKey": "Select a key to see its context.",
+      "title": "Details",
+      "toggle": "Toggle details",
+      "translations": "Translations"
+    },
+    "editPlaceholder": "Translation for {locale}",
+    "empty": "No keys match these filters.",
+    "emptyValue": "Not translated yet",
+    "issuesTooltip": "{count, plural, one {# issue} other {# issues}}",
+    "key": "Key",
+    "loadMore": "Loading more…",
+    "origin": {
+      "human": "Human",
+      "imported": "Imported",
+      "machine": "Machine"
+    },
+    "results": "{count, plural, =0 {No keys} one {# key} other {# keys}}",
+    "saved": "Saved",
+    "savedWithIssues": "Saved with {count, plural, one {# issue} other {# issues}}",
+    "score": "Score {score}",
+    "search": "Search keys and text…",
+    "shortcuts": "j/k to move · Enter to edit · ⌘Enter to approve · Esc to cancel",
+    "source": "Source",
+    "title": "Keys",
+    "withIssues": "With issues"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Check your connection and try again.",
+    "notFound": "Not found.",
+    "sessionExpired": "Your session expired. Please sign in again."
+  },
+  "glossary": {
+    "add": "Add term",
+    "caseSensitive": "Case sensitive",
+    "deleteConfirm": {
+      "body": "Future translations will no longer enforce this term.",
+      "title": "Delete “{term}”?"
+    },
+    "deleted": "Term deleted",
+    "description": "Description",
+    "dialog": {
+      "createTitle": "New term",
+      "editTitle": "Edit term",
+      "forbiddenFor": "Forbidden ({locale})",
+      "translationFor": "Translation ({locale})"
+    },
+    "doNotTranslate": "Do not translate",
+    "empty": {
+      "body": "Add product names and domain vocabulary so every locale stays consistent.",
+      "title": "No glossary terms"
+    },
+    "flags": "Rules",
+    "forbiddenHint": "Comma-separated variants the LLM must not use.",
+    "saved": "Term saved",
+    "subtitle": "Terms enforced on every translation. Mirrors glossary.toml in your repository.",
+    "term": "Term",
+    "title": "Glossary",
+    "translations": "Translations"
+  },
+  "jobStatus": {
+    "done": "Done",
+    "failed": "Failed",
+    "queued": "Queued",
+    "running": "Running"
+  },
+  "jobs": {
+    "cost": "Cost",
+    "empty": {
+      "body": "Start a translation job to fill in missing keys.",
+      "title": "No jobs yet"
+    },
+    "kind": {
+      "translate": "Translate"
+    },
+    "live": "Live",
+    "progress": "{done} / {total}",
+    "subtitle": "Background translation runs, updated live.",
+    "title": "Jobs"
+  },
+  "landing": {
+    "compare": {
+      "crowdinPrice": "Paid plans, ~$50+/mo",
+      "feature": "Feature",
+      "footnote": "Indicative entry prices from public pricing pages; check each vendor for current plans.",
+      "glotPrice": "Free + your LLM usage",
+      "lokalisePrice": "Paid plans, ~$120+/mo",
+      "no": "No",
+      "partial": "Partial",
+      "rows": {
+        "byok": "Bring your own LLM key",
+        "gitNative": "Git as source of truth (lockfile)",
+        "mcp": "MCP server for coding agents",
+        "openSource": "Open source",
+        "price": "Price",
+        "validator": "Deterministic validation of every string"
+      },
+      "subtitle": "Translation management without per-seat pricing.",
+      "title": "Compare",
+      "yes": "Yes"
+    },
+    "cta": {
+      "button": "Create your workspace",
+      "title": "Ship every language with every release."
+    },
+    "features": {
+      "byok": {
+        "body": "Anthropic, OpenAI or any OpenAI-compatible endpoint, including local models. Costs are shown per job and capped by a budget.",
+        "title": "Bring your own key"
+      },
+      "glossary": {
+        "body": "glossary.toml lives next to your code. Required translations, forbidden terms and do-not-translate words are enforced, not suggested.",
+        "title": "Glossary as code"
+      },
+      "lockfile": {
+        "body": "glot.lock hashes every source and target. Only the delta gets translated, and hand edits are never overwritten.",
+        "title": "Lockfile"
+      },
+      "mcp": {
+        "body": "Claude Code, Cursor and friends query keys, glossary and issues directly, and translate with file:line references and UI role.",
+        "title": "MCP, live context"
+      },
+      "oss": {
+        "body": "MIT licensed. CLI, MCP server, API and this dashboard. Self-host it, fork it, audit it.",
+        "title": "Open source"
+      },
+      "subtitle": "The LLM is always surrounded by deterministic code.",
+      "title": "Built for teams that ship with agents",
+      "validator": {
+        "body": "ICU, i18next and MessageFormat 2 parsing. Placeholders, tags and plural categories checked for every locale. Failures are retried, then escalated to a stronger model.",
+        "title": "Deterministic validator"
+      },
+      "visual": {
+        "body": "Playwright renders every locale and flags overflow, truncation and RTL layout breaks before your users see them.",
+        "title": "Visual QA"
+      }
+    },
+    "flow": {
+      "agent": {
+        "caption": "Your agent adds a feature and new keys.",
+        "label": "Agent",
+        "prompt": "Add a checkout page, in every locale"
+      },
+      "checks": {
+        "glossary": "Glossary terms respected",
+        "length": "Length ratio 1.3× (under 1.6×)",
+        "placeholders": "Placeholders preserved",
+        "plurals": "CLDR plural categories"
+      },
+      "mcp": {
+        "caption": "glot gives it live context: glossary, refs, neighbours.",
+        "label": "MCP"
+      },
+      "pr": {
+        "caption": "Only the delta, with an updated lockfile.",
+        "label": "Pull request"
+      },
+      "title": "From prompt to pull request, without breaking a placeholder",
+      "validate": {
+        "caption": "Every string is checked by code, not by vibes.",
+        "label": "Validation"
+      }
+    },
+    "footer": {
+      "license": "MIT License",
+      "tagline": "Localization that AI can't break."
+    },
+    "hero": {
+      "badge": "Open source · MIT · Bring your own LLM key",
+      "primary": "Start for free",
+      "secondary": "Star on GitHub",
+      "subtitle": "Your coding agent writes features. glot ships them in every language: context-aware LLM translations, wrapped in a deterministic validator, a lockfile and a glossary that live in Git.",
+      "title": "i18n your AI agent can't break."
+    },
+    "install": {
+      "cargo": "With Cargo",
+      "mcp": "Add to your agent",
+      "npx": "With npx",
+      "subtitle": "Run it locally with your agent, or connect it to a glot server for your team.",
+      "title": "Install in seconds"
+    },
+    "meta": {
+      "description": "Open-source localization for SaaS built for coding agents. Deterministic validation, a lockfile, glossary-as-code and an MCP server.",
+      "title": "glot: i18n that AI can't break"
+    },
+    "nav": {
+      "compare": "Compare",
+      "features": "Features",
+      "getStarted": "Get started",
+      "install": "Install",
+      "signIn": "Sign in"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Language"
+  },
+  "notFound": {
+    "back": "Back home",
+    "title": "Page not found"
+  },
+  "overview": {
+    "budget": "of {budget} budget",
+    "cost": "LLM spend",
+    "issuesCount": "{count, plural, =0 {No issues} one {# issue} other {# issues}}",
+    "jobStarted": "Translation job started",
+    "keys": "Keys",
+    "locales": "Locales",
+    "model": "Model",
+    "noBudget": "No budget set",
+    "noIssues": "No open issues. Every translation passes validation.",
+    "noJobs": "No jobs yet. Translate missing keys to start one.",
+    "noKeys": {
+      "body": "Push your catalogs from your repository to get started.",
+      "title": "No keys yet"
+    },
+    "openIssues": "Open issues",
+    "progress": "Progress by locale",
+    "progressHint": "{translated} of {total} translated · {reviewed} reviewed",
+    "recentJobs": "Recent jobs",
+    "staleCount": "{count, plural, one {# stale} other {# stale}}",
+    "translateMissing": "Translate missing",
+    "viewAll": "View all"
+  },
+  "palette": {
+    "empty": "No results.",
+    "goTo": "Go to {page}",
+    "navigation": "Navigation",
+    "openProject": "Open {name}",
+    "placeholder": "Type a command or search…",
+    "preferences": "Preferences",
+    "projects": "Projects",
+    "switchLanguage": "Switch language to {language}",
+    "toggleTheme": "Toggle theme"
+  },
+  "projects": {
+    "create": {
+      "description": "You can change locales and LLM settings later.",
+      "name": "Name",
+      "namePlaceholder": "My SaaS",
+      "slug": "Slug",
+      "slugHint": "Used in URLs, the CLI and the CDN.",
+      "sourceLocale": "Source locale",
+      "submit": "Create project",
+      "success": "Project {name} created",
+      "targetLocales": "Target locales",
+      "targetLocalesHint": "Comma-separated BCP 47 codes, e.g. fr, de, pt-BR.",
+      "title": "New project"
+    },
+    "empty": {
+      "body": "Create a project, then run glot push from your repository to import your catalogs.",
+      "cta": "Create your first project",
+      "title": "No projects yet"
+    },
+    "keysCount": "{count, plural, =0 {No keys} one {# key} other {# keys}}",
+    "localesCount": "{count, plural, one {# locale} other {# locales}}",
+    "subtitle": "Each project maps to a glot.toml in one of your repositories.",
+    "title": "Projects"
+  },
+  "settings": {
+    "cdn": {
+      "description": "Serve catalogs over the air as JSON, with ETag and cache headers.",
+      "enable": "Enable public CDN",
+      "example": "Example URL",
+      "title": "Public CDN"
+    },
+    "danger": {
+      "confirmBody": "This cannot be undone. Type {slug} to confirm.",
+      "confirmTitle": "Delete {name}?",
+      "delete": "Delete project",
+      "deleted": "Project deleted",
+      "description": "Deleting a project removes its keys, translations, glossary and jobs. Your repository is not touched.",
+      "title": "Danger zone"
+    },
+    "general": {
+      "name": "Project name",
+      "slug": "Slug",
+      "title": "General"
+    },
+    "llm": {
+      "apiKey": "API key",
+      "apiKeySet": "A key is stored. Leave empty to keep it.",
+      "apiKeyUnset": "No key stored yet.",
+      "baseUrl": "Base URL",
+      "baseUrlHint": "For Ollama, vLLM, OpenRouter and other compatible endpoints.",
+      "budget": "Budget (USD)",
+      "budgetHint": "Jobs stop when this budget is reached.",
+      "description": "Your own provider key. glot never marks up LLM usage.",
+      "fallback": "Fallback model",
+      "fallbackHint": "Used when validation still fails after a retry.",
+      "judge": "Judge model",
+      "judgeHint": "Scores translations from 0 to 100.",
+      "model": "Model",
+      "provider": "Provider",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "Mock (testing)",
+        "openai": "OpenAI",
+        "openai-compatible": "OpenAI-compatible"
+      },
+      "style": "Style guide",
+      "stylePlaceholder": "Friendly, concise, informal “tu” in French…",
+      "title": "LLM"
+    },
+    "locales": {
+      "add": "Add locale",
+      "addPlaceholder": "e.g. pt-BR",
+      "description": "The source locale is fixed. Target locales are translated by jobs and the CLI.",
+      "remove": "Remove {locale}",
+      "source": "Source locale",
+      "targets": "Target locales",
+      "title": "Locales"
+    },
+    "saved": "Settings saved",
+    "title": "Settings"
+  },
+  "shell": {
+    "apiTokens": "API tokens",
+    "glossary": "Glossary",
+    "jobs": "Jobs",
+    "keys": "Keys",
+    "logout": "Sign out",
+    "newProject": "New project",
+    "noProjects": "No projects yet",
+    "overview": "Overview",
+    "projects": "Projects",
+    "search": "Search…",
+    "settings": "Settings",
+    "toggleSidebar": "Toggle navigation",
+    "userMenu": "Account menu"
+  },
+  "status": {
+    "machine": "Machine",
+    "missing": "Missing",
+    "reviewed": "Reviewed",
+    "stale": "Stale"
+  },
+  "theme": {
+    "dark": "Dark",
+    "label": "Theme",
+    "light": "Light",
+    "system": "System"
+  },
+  "tokens": {
+    "create": "New token",
+    "created": "Created",
+    "empty": {
+      "body": "Create a token to connect the CLI or your coding agent.",
+      "title": "No tokens"
+    },
+    "lastUsed": "Last used",
+    "name": "Name",
+    "namePlaceholder": "e.g. laptop, github-actions",
+    "reveal": {
+      "body": "This is the only time it will be shown. Store it in a secret manager or your shell environment.",
+      "title": "Copy your token now"
+    },
+    "revoke": "Revoke",
+    "revokeConfirm": {
+      "body": "Anything using this token will stop working immediately.",
+      "title": "Revoke “{name}”?"
+    },
+    "revoked": "Token revoked",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "Log in once; the CLI stores the token for this server.",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "Add glot to Claude Code, Cursor or any MCP client.",
+      "title": "Connect your tools"
+    },
+    "subtitle": "Tokens authenticate the glot CLI, the MCP server and CI.",
+    "title": "API tokens"
+  }
+}

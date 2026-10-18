@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: glot
+      POSTGRES_PASSWORD: glot
+      POSTGRES_DB: glot
+    ports:
+      - "${GLOT_PG_PORT:-5433}:5432"
+    volumes:
+      - glot-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glot -d glot"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  server:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: crates/server/Dockerfile
+    environment:
+      DATABASE_URL: postgres://glot:glot@postgres:5432/glot
+      GLOT_BIND: 0.0.0.0:8790
+      GLOT_WEB_ORIGIN: ${GLOT_WEB_ORIGIN:-http://localhost:3100}
+      GLOT_SECRET_KEY: ${GLOT_SECRET_KEY:-change-me}
+    ports:
+      - "${GLOT_API_PORT:-8790}:8790"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    profiles: ["full"]
+    build:
+      context: web
+      args:
+        GLOT_API_URL: http://server:8790
+    ports:
+      - "${GLOT_WEB_PORT:-3100}:3100"
+    depends_on:
+      - server
+
+volumes:
+  glot-pg:

@@ -1,0 +1,28 @@
+# We translate our own dashboard (web/) with glot, via our own action.
+name: dogfood
+on:
+  pull_request:
+    paths: ["web/messages/en.json"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  translate:
+    # Secrets are not available to fork PRs.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Dogfood the code in this PR, not the last release.
+      - run: cargo install --path crates/cli --locked
+      - uses: ./action
+        with:
+          working-directory: web
+          command: both
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}

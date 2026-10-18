@@ -1,0 +1,29 @@
+[package]
+name = "glot-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "glot"
+path = "src/main.rs"
+
+[dependencies]
+glot-core.workspace = true
+glot-llm.workspace = true
+glot-extract.workspace = true
+glot-mcp.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest.workspace = true
+clap = { version = "4", features = ["derive"] }
+anstream = "1"
+anstyle = "1"
+
+[dev-dependencies]
+assert_cmd = "2"
+tempfile = "3"

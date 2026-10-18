@@ -1,0 +1,170 @@
+name: glot
+description: Validate and translate i18n catalogs with glot, commit the result and comment on the pull request.
+branding:
+  icon: globe
+  color: blue
+
+inputs:
+  version:
+    description: glot release tag (e.g. v0.1.0) or "latest". Skipped when `glot` is already on PATH.
+    default: latest
+  working-directory:
+    description: Directory containing glot.toml.
+    default: .
+  command:
+    description: "check | translate | both"
+    default: check
+  comment:
+    description: Post (or update) a summary comment on the pull request.
+    default: "true"
+  anthropic-api-key:
+    description: LLM key used by `glot translate` (exported as ANTHROPIC_API_KEY).
+    default: ""
+  fail-on-error:
+    description: Fail the job when `glot check` reports errors.
+    default: "true"
+  github-token:
+    description: Token used to push commits and comment.
+    default: ${{ github.token }}
+
+outputs:
+  check-exit-code:
+    description: Exit code of `glot check`.
+    value: ${{ steps.check.outputs.code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install glot
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        REPO: ${{ github.action_repository || github.repository }}
+      run: |
+        set -euo pipefail
+        if command -v glot >/dev/null; then echo "Using $(command -v glot)"; exit 0; fi
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64)     target=x86_64-unknown-linux-gnu ;;
+          Linux-ARM64)   target=aarch64-unknown-linux-gnu ;;
+          macOS-ARM64)   target=aarch64-apple-darwin ;;
+          macOS-X64)     target=x86_64-apple-darwin ;;
+          Windows-X64)   target=x86_64-pc-windows-msvc ;;
+          *) target=unknown ;;
+        esac
+        ext=tar.gz; [ "$RUNNER_OS" = Windows ] && ext=zip
+        if [ "$VERSION" = latest ]; then
+          url="https://github.com/$REPO/releases/latest/download/glot-$target.$ext"
+        else
+          url="https://github.com/$REPO/releases/download/$VERSION/glot-$target.$ext"
+        fi
+        bin="$RUNNER_TEMP/glot-bin"; mkdir -p "$bin"
+        if curl -fsSL "$url" -o "$RUNNER_TEMP/glot.$ext"; then
+          if [ "$ext" = zip ]; then unzip -oq "$RUNNER_TEMP/glot.$ext" -d "$bin"; else tar -xzf "$RUNNER_TEMP/glot.$ext" -C "$bin"; fi
+          echo "$bin" >> "$GITHUB_PATH"
+        else
+          echo "::notice::No prebuilt glot for $target ($VERSION), building from source"
+          tag=(); [ "$VERSION" != latest ] && tag=(--tag "$VERSION")
+          cargo install --locked --git "https://github.com/$REPO" ${tag[@]+"${tag[@]}"} glot-cli
+        fi
+
+    - name: Translate
+      id: translate
+      if: inputs.command == 'translate' || inputs.command == 'both'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        NO_COLOR: "1"
+      run: |
+        set -o pipefail
+        glot translate --yes | tee "$RUNNER_TEMP/glot-translate.log"
+        cost=$(sed -n 's/^Cost: \$\([0-9.]*\).*/\1/p' "$RUNNER_TEMP/glot-translate.log" | tail -1)
+        echo "cost=${cost:-0}" >> "$GITHUB_OUTPUT"
+
+    - name: Commit translations
+      if: steps.translate.outcome == 'success'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        HEAD_REF: ${{ github.head_ref }}
+      run: |
+        set -euo pipefail
+        git add -A .
+        if git diff --cached --quiet; then echo "No translation changes"; exit 0; fi
+        if [ -z "$HEAD_REF" ] || ! git symbolic-ref -q HEAD >/dev/null; then
+          # ponytail: pushing the synthetic PR merge commit would pollute the branch; require a branch checkout.
+          echo "::warning::Not on a branch (checkout with ref: \${{ github.head_ref }}); skipping commit"
+          git reset -q; exit 0
+        fi
+        git config user.name "glot[bot]"
+        git config user.email "glot-bot@users.noreply.github.com"
+        git commit -qm "i18n: glot translate"
+        git push origin "HEAD:refs/heads/$HEAD_REF"
+
+    - name: Check
+      id: check
+      if: always() && inputs.command != 'translate'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        NO_COLOR: "1"
+      run: |
+        set +e
+        glot check --format github
+        echo "code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Comment on PR
+      if: always() && inputs.comment == 'true' && github.event.pull_request.number
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR: ${{ github.event.pull_request.number }}
+        COST: ${{ steps.translate.outputs.cost }}
+        CHECK_CODE: ${{ steps.check.outputs.code }}
+        NO_COLOR: "1"
+      run: |
+        set -euo pipefail
+        marker='<!-- glot-report -->'
+        status=$(glot status --json)
+        findings=$(glot check --format json || true)
+        {
+          echo "$marker"
+          echo "## 🌐 glot"
+          echo
+          echo "| Locale | Translated | Missing | Stale | Reviewed | Errors | Warnings |"
+          echo "|---|---:|---:|---:|---:|---:|---:|"
+          jq -r '.locales | to_entries[] | "| `\(.key)` | \(.value.translated)/\(.value.total) | \(.value.missing) | \(.value.stale) | \(.value.reviewed) | \(.value.errors) | \(.value.warnings) |"' <<<"$status"
+          echo
+          n=$(jq length <<<"$findings")
+          if [ "$n" -gt 0 ]; then
+            echo "<details><summary><b>$n issue(s)</b></summary>"
+            echo
+            echo "| | Locale | Key | Issue |"
+            echo "|---|---|---|---|"
+            jq -r '.[:50][] | "| \(if .issue.severity == "error" then "❌" else "⚠️" end) | `\(.locale)` | `\(.key)` | \(.issue.message | gsub("\\|"; "\\|") | gsub("\n"; " ")) |"' <<<"$findings"
+            if [ "$n" -gt 50 ]; then echo "| | | | …and $((n - 50)) more |"; fi
+            echo
+            echo "</details>"
+          else
+            echo "✅ No issues."
+          fi
+          if [ -n "$COST" ]; then echo; echo "Translation cost: **\$$COST**"; fi
+        } > "$RUNNER_TEMP/glot-comment.md"
+        cat "$RUNNER_TEMP/glot-comment.md" >> "$GITHUB_STEP_SUMMARY"
+        repo="$GITHUB_REPOSITORY"
+        id=$(gh api "repos/$repo/issues/$PR/comments" --paginate --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -1) || id=
+        # Fork PRs get a read-only token: keep the report in the job summary instead of failing.
+        if [ -n "$id" ]; then
+          gh api -X PATCH "repos/$repo/issues/comments/$id" -F "body=@$RUNNER_TEMP/glot-comment.md" >/dev/null
+        else
+          gh pr comment "$PR" --repo "$repo" --body-file "$RUNNER_TEMP/glot-comment.md"
+        fi || echo "::warning::Could not post the PR comment (read-only token?); report is in the job summary"
+
+    - name: Fail on check errors
+      if: always() && inputs.fail-on-error == 'true' && steps.check.outputs.code != '' && steps.check.outputs.code != '0'
+      shell: bash
+      run: |
+        echo "::error::glot check reported errors"
+        exit 1

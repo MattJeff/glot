@@ -1,0 +1,24 @@
+{
+  "name": "@glot/visual-qa",
+  "version": "0.1.0",
+  "description": "Visual QA for localized UIs: detects overflowing, truncated, untranslated and tofu text per locale with Playwright.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "glot-visual-qa": "dist/cli.js" },
+  "files": ["dist"],
+  "engines": { "node": ">=25" },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test 'test/*.test.ts'",
+    "qa": "node src/cli.ts"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "typescript": "^5.9"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

@@ -1,0 +1,17 @@
+[package]
+name = "glot-extract"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glot-core.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+glob.workspace = true
+oxc_allocator = "0.154"
+oxc_ast = "0.154"
+oxc_ast_visit = "0.154"
+oxc_parser = "0.154"
+oxc_span = "0.154"
+oxc_syntax = "0.154"
