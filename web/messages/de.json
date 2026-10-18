@@ -1,0 +1,434 @@
+{
+  "auth": {
+    "errors": {
+      "invalid": "Ungültige E-Mail oder ungültiges Passwort.",
+      "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein."
+    },
+    "fields": {
+      "email": "E-Mail",
+      "name": "Name",
+      "password": "Passwort",
+      "passwordHint": "Mindestens 8 Zeichen."
+    },
+    "login": {
+      "submit": "Anmelden",
+      "subtitle": "Melden Sie sich bei Ihrem glot-Arbeitsbereich an.",
+      "switch": "Noch kein Konto?",
+      "switchLink": "Konto erstellen",
+      "title": "Willkommen zurück"
+    },
+    "signup": {
+      "submit": "Konto erstellen",
+      "subtitle": "Kostenlos und Open Source. Bringen Sie Ihren eigenen LLM-Schlüssel mit.",
+      "switch": "Sie haben bereits ein Konto?",
+      "switchLink": "Anmelden",
+      "title": "Erstellen Sie Ihr Konto"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "copied": "In die Zwischenablage kopiert",
+    "copy": "Kopieren",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "github": "GitHub",
+    "never": "Nie",
+    "retry": "Erneut versuchen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…"
+  },
+  "editor": {
+    "anyLocale": "Alle Sprachen",
+    "anyStatus": "Alle Status",
+    "approve": "Freigeben",
+    "approved": "Freigegeben",
+    "clearFilters": "Filter zurücksetzen",
+    "columns": "Sprachen",
+    "columnsHint": "Anzuzeigende Spalten",
+    "detail": {
+      "by": "von {author}",
+      "description": "Beschreibung",
+      "doNotTranslate": "Nicht übersetzen",
+      "glossary": "Glossar-Treffer",
+      "history": "Verlauf",
+      "noDescription": "Keine Beschreibung. Fügen Sie eine hinzu, um dem LLM mehr Kontext zu geben.",
+      "noGlossary": "Keine Glossar-Begriffe in diesem Quelltext.",
+      "noHistory": "Noch kein Verlauf vorhanden.",
+      "noReferences": "Keine Code-Referenzen gefunden.",
+      "references": "Referenzen",
+      "selectKey": "Wählen Sie einen Schlüssel, um seinen Kontext anzuzeigen.",
+      "title": "Details",
+      "toggle": "Details ein-/ausblenden",
+      "translations": "Übersetzungen"
+    },
+    "editPlaceholder": "Übersetzung für Sprache {locale}",
+    "empty": "Keine Schlüssel entsprechen diesen Filtern.",
+    "emptyValue": "Noch nicht übersetzt",
+    "issuesTooltip": "{count, plural, one {# Problem} other {# Probleme}}",
+    "key": "Schlüssel",
+    "loadMore": "Lade weitere…",
+    "origin": {
+      "human": "Manuell",
+      "imported": "Importiert",
+      "machine": "Maschinell"
+    },
+    "results": "{count, plural, =0 {Keine Schlüssel} one {# Schlüssel} other {# Schlüssel}}",
+    "saved": "Gespeichert",
+    "savedWithIssues": "Gespeichert mit {count, plural, one {# Problem} other {# Problemen}}",
+    "score": "Score {score}",
+    "search": "Schlüssel und Text durchsuchen…",
+    "shortcuts": "j/k verschieben · Enter bearbeiten · ⌘Enter freigeben · Esc abbrechen",
+    "source": "Quelle",
+    "title": "Schlüssel",
+    "withIssues": "Mit Problemen"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "network": "Netzwerkfehler. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "notFound": "Nicht gefunden.",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+  },
+  "glossary": {
+    "add": "Begriff hinzufügen",
+    "caseSensitive": "Groß-/Kleinschreibung beachten",
+    "deleteConfirm": {
+      "body": "Künftige Übersetzungen erzwingen diesen Begriff nicht mehr.",
+      "title": "„{term}“ löschen?"
+    },
+    "deleted": "Begriff gelöscht",
+    "description": "Beschreibung",
+    "dialog": {
+      "createTitle": "Neuer Begriff",
+      "editTitle": "Begriff bearbeiten",
+      "forbiddenFor": "Verboten (Sprache: {locale})",
+      "translationFor": "Übersetzung (Sprache: {locale})"
+    },
+    "doNotTranslate": "Nicht übersetzen",
+    "empty": {
+      "body": "Fügen Sie Produktnamen und Fachvokabular hinzu, damit jede Sprache konsistent bleibt.",
+      "title": "Keine Glossarbegriffe"
+    },
+    "flags": "Regeln",
+    "forbiddenHint": "Durch Kommas getrennte Varianten, die das LLM nicht verwenden darf.",
+    "saved": "Begriff gespeichert",
+    "subtitle": "Begriffe, die in jeder Übersetzung gelten. Spiegelt glossary.toml in Ihrem Repository.",
+    "term": "Begriff",
+    "title": "Glossar",
+    "translations": "Übersetzungen"
+  },
+  "jobStatus": {
+    "done": "Fertig",
+    "failed": "Fehlgeschlagen",
+    "queued": "Wartend",
+    "running": "Läuft"
+  },
+  "jobs": {
+    "cost": "Kosten",
+    "empty": {
+      "body": "Starten Sie einen Übersetzungsjob, um fehlende Schlüssel zu ergänzen.",
+      "title": "Noch keine Jobs"
+    },
+    "kind": {
+      "translate": "Übersetzen"
+    },
+    "live": "Live",
+    "progress": "{done} / {total}",
+    "subtitle": "Hintergrund-Übersetzungsläufe, live aktualisiert.",
+    "title": "Jobs"
+  },
+  "landing": {
+    "compare": {
+      "crowdinPrice": "Kostenpflichtige Tarife, ~$50+/Monat",
+      "feature": "Funktion",
+      "footnote": "Richtpreise laut öffentlicher Preisseiten; aktuelle Tarife bitte beim jeweiligen Anbieter prüfen.",
+      "glotPrice": "Kostenlos + Ihre LLM-Nutzung",
+      "lokalisePrice": "Kostenpflichtige Tarife, ~$120+/Monat",
+      "no": "Nein",
+      "partial": "Teilweise",
+      "rows": {
+        "byok": "Eigenen LLM-Schlüssel mitbringen",
+        "gitNative": "Git als Quelle der Wahrheit (Lockfile)",
+        "mcp": "MCP-Server für Coding-Agenten",
+        "openSource": "Open Source",
+        "price": "Preis",
+        "validator": "Deterministische Validierung jedes Strings"
+      },
+      "subtitle": "Übersetzungsverwaltung ohne Abrechnung pro Nutzer.",
+      "title": "Vergleich",
+      "yes": "Ja"
+    },
+    "cta": {
+      "button": "Arbeitsbereich erstellen",
+      "title": "Mit jedem Release in jeder Sprache ausliefern."
+    },
+    "features": {
+      "byok": {
+        "body": "Anthropic, OpenAI oder jeder OpenAI-kompatible Endpunkt, einschließlich lokaler Modelle. Kosten werden pro Job angezeigt und durch ein Budget begrenzt.",
+        "title": "Eigenen Schlüssel mitbringen"
+      },
+      "glossary": {
+        "body": "glossary.toml liegt neben Ihrem Code. Pflichtübersetzungen, verbotene Begriffe und nicht zu übersetzende Wörter werden erzwungen, nicht nur vorgeschlagen.",
+        "title": "Glossar als Code"
+      },
+      "lockfile": {
+        "body": "glot.lock erfasst Hashes jeder Quell- und Zielzeichenkette. Nur die Änderungen werden übersetzt, manuelle Änderungen werden nie überschrieben.",
+        "title": "Lockfile"
+      },
+      "mcp": {
+        "body": "Claude Code, Cursor und Co. fragen Schlüssel, Glossar und Probleme direkt ab und übersetzen mit Datei:Zeile-Verweisen und UI-Rolle.",
+        "title": "MCP, Live-Kontext"
+      },
+      "oss": {
+        "body": "MIT-lizenziert. CLI, MCP-Server, API und dieses Dashboard. Selbst hosten, forken, prüfen.",
+        "title": "Open Source"
+      },
+      "subtitle": "Das LLM wird immer von deterministischem Code umgeben.",
+      "title": "Entwickelt für Teams, die mit Agenten ausliefern",
+      "validator": {
+        "body": "Parsing für ICU, i18next und MessageFormat 2. Platzhalter, Tags und Pluralkategorien werden für jede Sprache geprüft. Fehlgeschlagene Läufe werden wiederholt und dann an ein stärkeres Modell eskaliert.",
+        "title": "Deterministischer Validator"
+      },
+      "visual": {
+        "body": "Playwright rendert jede Sprache und meldet Überlauf, Abschneiden und RTL-Layoutfehler, bevor Ihre Nutzer sie sehen.",
+        "title": "Visuelle QA"
+      }
+    },
+    "flow": {
+      "agent": {
+        "caption": "Ihr Agent ergänzt ein Feature und neue Schlüssel.",
+        "label": "Agent",
+        "prompt": "Eine Checkout-Seite hinzufügen, in jeder Sprache"
+      },
+      "checks": {
+        "glossary": "Glossarbegriffe eingehalten",
+        "length": "Längenverhältnis 1,3× (unter 1,6×)",
+        "placeholders": "Platzhalter erhalten",
+        "plurals": "CLDR-Pluralkategorien"
+      },
+      "mcp": {
+        "caption": "glot liefert live Kontext: Glossar, Verweise, Nachbarn.",
+        "label": "MCP"
+      },
+      "pr": {
+        "caption": "Nur das Delta, mit aktualisiertem Lockfile.",
+        "label": "Pull Request"
+      },
+      "title": "Vom Prompt zum Pull Request, ohne einen Platzhalter zu beschädigen",
+      "validate": {
+        "caption": "Jede Zeichenkette wird per Code geprüft, nicht nach Bauchgefühl.",
+        "label": "Validierung"
+      }
+    },
+    "footer": {
+      "license": "MIT-Lizenz",
+      "tagline": "Lokalisierung, die KI nicht kaputtmachen kann."
+    },
+    "hero": {
+      "badge": "Open Source · MIT · Eigenen LLM-Schlüssel verwenden",
+      "primary": "Kostenlos starten",
+      "secondary": "Stern auf GitHub vergeben",
+      "subtitle": "Ihr Coding-Agent schreibt Features. glot liefert sie in jeder Sprache aus: kontextbewusste LLM-Übersetzungen, eingebettet in einen deterministischen Validator, ein Lockfile und ein Glossar, das in Git liegt.",
+      "title": "i18n, das Ihr KI-Agent nicht kaputtmachen kann."
+    },
+    "install": {
+      "cargo": "Mit Cargo",
+      "mcp": "Zu Ihrem Agenten hinzufügen",
+      "npx": "Mit npx",
+      "subtitle": "Führen Sie es lokal mit Ihrem Agenten aus oder verbinden Sie es mit einem glot-Server für Ihr Team.",
+      "title": "In Sekunden installiert"
+    },
+    "meta": {
+      "description": "Open-Source-Lokalisierung für SaaS, entwickelt für Coding-Agenten. Deterministische Validierung, ein Lockfile, Glossar als Code und ein MCP-Server.",
+      "title": "glot: i18n, das KI nicht kaputt machen kann"
+    },
+    "nav": {
+      "compare": "Vergleichen",
+      "features": "Funktionen",
+      "getStarted": "Loslegen",
+      "install": "Installieren",
+      "signIn": "Anmelden"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Sprache"
+  },
+  "notFound": {
+    "back": "Zur Startseite",
+    "title": "Seite nicht gefunden"
+  },
+  "overview": {
+    "budget": "von {budget} Budget",
+    "cost": "LLM-Ausgaben",
+    "issuesCount": "{count, plural, =0 {Keine Probleme} one {# Problem} other {# Probleme}}",
+    "jobStarted": "Übersetzungsjob gestartet",
+    "keys": "Schlüssel",
+    "locales": "Sprachen",
+    "model": "Modell",
+    "noBudget": "Kein Budget festgelegt",
+    "noIssues": "Keine offenen Probleme. Jede Übersetzung besteht die Validierung.",
+    "noJobs": "Noch keine Jobs. Fehlende Schlüssel übersetzen, um einen zu starten.",
+    "noKeys": {
+      "body": "Pushen Sie Ihre Kataloge aus Ihrem Repository, um loszulegen.",
+      "title": "Noch keine Schlüssel"
+    },
+    "openIssues": "Offene Probleme",
+    "progress": "Fortschritt nach Sprache",
+    "progressHint": "{translated} von {total} übersetzt · {reviewed} geprüft",
+    "recentJobs": "Letzte Jobs",
+    "staleCount": "{count, plural, one {# veraltet} other {# veraltet}}",
+    "translateMissing": "Fehlende übersetzen",
+    "viewAll": "Alle anzeigen"
+  },
+  "palette": {
+    "empty": "Keine Ergebnisse.",
+    "goTo": "Zu {page} wechseln",
+    "navigation": "Navigation",
+    "openProject": "{name} öffnen",
+    "placeholder": "Befehl eingeben oder suchen…",
+    "preferences": "Einstellungen",
+    "projects": "Projekte",
+    "switchLanguage": "Sprache auf {language} umstellen",
+    "toggleTheme": "Design umschalten"
+  },
+  "projects": {
+    "create": {
+      "description": "Sie können Sprachen und LLM-Einstellungen später ändern.",
+      "name": "Name",
+      "namePlaceholder": "Mein SaaS",
+      "slug": "Slug",
+      "slugHint": "Wird in URLs, der CLI und dem CDN verwendet.",
+      "sourceLocale": "Ausgangssprache",
+      "submit": "Projekt erstellen",
+      "success": "Projekt {name} erstellt",
+      "targetLocales": "Zielsprachen",
+      "targetLocalesHint": "Durch Kommas getrennte BCP-47-Codes, z. B. fr, de, pt-BR.",
+      "title": "Neues Projekt"
+    },
+    "empty": {
+      "body": "Erstellen Sie ein Projekt und führen Sie dann glot push in Ihrem Repository aus, um Ihre Kataloge zu importieren.",
+      "cta": "Erstellen Sie Ihr erstes Projekt",
+      "title": "Noch keine Projekte"
+    },
+    "keysCount": "{count, plural, =0 {Keine Schlüssel} one {# Schlüssel} other {# Schlüssel}}",
+    "localesCount": "{count, plural, one {# Sprache} other {# Sprachen}}",
+    "subtitle": "Jedes Projekt entspricht einer glot.toml in einem Ihrer Repositories.",
+    "title": "Projekte"
+  },
+  "settings": {
+    "cdn": {
+      "description": "Kataloge als JSON bereitstellen, mit ETag- und Cache-Headern.",
+      "enable": "Öffentliches CDN aktivieren",
+      "example": "Beispiel-URL",
+      "title": "Öffentliches CDN"
+    },
+    "danger": {
+      "confirmBody": "Dies kann nicht rückgängig gemacht werden. Geben Sie {slug} zur Bestätigung ein.",
+      "confirmTitle": "{name} löschen?",
+      "delete": "Projekt löschen",
+      "deleted": "Projekt gelöscht",
+      "description": "Beim Löschen eines Projekts werden seine Schlüssel, Übersetzungen, sein Glossar und seine Jobs entfernt. Ihr Repository bleibt unverändert.",
+      "title": "Gefahrenzone"
+    },
+    "general": {
+      "name": "Projektname",
+      "slug": "Slug",
+      "title": "Allgemein"
+    },
+    "llm": {
+      "apiKey": "API-Schlüssel",
+      "apiKeySet": "Ein Schlüssel ist gespeichert. Leer lassen, um ihn beizubehalten.",
+      "apiKeyUnset": "Noch kein Schlüssel gespeichert.",
+      "baseUrl": "Basis-URL",
+      "baseUrlHint": "Für Ollama, vLLM, OpenRouter und andere kompatible Endpunkte.",
+      "budget": "Budget (USD)",
+      "budgetHint": "Jobs werden angehalten, sobald dieses Budget erreicht ist.",
+      "description": "Ihr eigener Schlüssel des Anbieters. glot berechnet keinen Aufschlag auf die LLM-Nutzung.",
+      "fallback": "Ausweichmodell",
+      "fallbackHint": "Wird verwendet, wenn die Validierung nach einem erneuten Versuch weiterhin fehlschlägt.",
+      "judge": "Bewertungsmodell",
+      "judgeHint": "Bewertet Übersetzungen von 0 bis 100.",
+      "model": "Modell",
+      "provider": "Anbieter",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "Mock (Tests)",
+        "openai": "OpenAI",
+        "openai-compatible": "OpenAI-kompatibel"
+      },
+      "style": "Stilrichtlinie",
+      "stylePlaceholder": "Freundlich, knapp, im Französischen informell mit „tu“…",
+      "title": "LLM"
+    },
+    "locales": {
+      "add": "Sprache hinzufügen",
+      "addPlaceholder": "z. B. pt-BR",
+      "description": "Die Quellsprache ist festgelegt. Zielsprachen werden von Jobs und der CLI übersetzt.",
+      "remove": "Sprache {locale} entfernen",
+      "source": "Quellsprache",
+      "targets": "Zielsprachen",
+      "title": "Sprachen"
+    },
+    "saved": "Einstellungen gespeichert",
+    "title": "Einstellungen"
+  },
+  "shell": {
+    "apiTokens": "API-Tokens",
+    "glossary": "Glossar",
+    "jobs": "Jobs",
+    "keys": "Schlüssel",
+    "logout": "Abmelden",
+    "newProject": "Neues Projekt",
+    "noProjects": "Noch keine Projekte",
+    "overview": "Übersicht",
+    "projects": "Projekte",
+    "search": "Suchen…",
+    "settings": "Einstellungen",
+    "toggleSidebar": "Navigation umschalten",
+    "userMenu": "Kontomenü"
+  },
+  "status": {
+    "machine": "Maschinell",
+    "missing": "Fehlend",
+    "reviewed": "Geprüft",
+    "stale": "Veraltet"
+  },
+  "theme": {
+    "dark": "Dunkel",
+    "label": "Design",
+    "light": "Hell",
+    "system": "System"
+  },
+  "tokens": {
+    "create": "Neuer Token",
+    "created": "Erstellt",
+    "empty": {
+      "body": "Erstellen Sie einen Token, um die CLI oder Ihren Coding-Agenten zu verbinden.",
+      "title": "Keine Tokens"
+    },
+    "lastUsed": "Zuletzt verwendet",
+    "name": "Name",
+    "namePlaceholder": "z. B. Laptop, github-actions",
+    "reveal": {
+      "body": "Er wird nur einmal angezeigt. Speichern Sie ihn in einem Secret Manager oder in Ihrer Shell-Umgebung.",
+      "title": "Kopieren Sie Ihren Token jetzt"
+    },
+    "revoke": "Widerrufen",
+    "revokeConfirm": {
+      "body": "Alle Anwendungen, die diesen Token verwenden, funktionieren sofort nicht mehr.",
+      "title": "„{name}“ widerrufen?"
+    },
+    "revoked": "Token widerrufen",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "Einmal anmelden; die CLI speichert den Token für diesen Server.",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "Fügen Sie glot zu Claude Code, Cursor oder einem beliebigen MCP-Client hinzu.",
+      "title": "Tools verbinden"
+    },
+    "subtitle": "Tokens authentifizieren die glot CLI, den MCP-Server und CI.",
+    "title": "API-Tokens"
+  }
+}

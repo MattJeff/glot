@@ -1,0 +1,434 @@
+{
+  "auth": {
+    "errors": {
+      "invalid": "メールアドレスまたはパスワードが正しくありません。",
+      "passwordTooShort": "パスワードは8文字以上で入力してください。"
+    },
+    "fields": {
+      "email": "メールアドレス",
+      "name": "名前",
+      "password": "パスワード",
+      "passwordHint": "8文字以上です。"
+    },
+    "login": {
+      "submit": "サインイン",
+      "subtitle": "glot ワークスペースにサインインします。",
+      "switch": "アカウントをお持ちではありませんか？",
+      "switchLink": "作成する",
+      "title": "おかえりなさい"
+    },
+    "signup": {
+      "submit": "アカウントを作成",
+      "subtitle": "無料かつオープンソース。ご自身のLLMキーを使用できます。",
+      "switch": "すでにアカウントをお持ちですか？",
+      "switchLink": "サインイン",
+      "title": "アカウントの作成"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "copied": "クリップボードにコピーしました",
+    "copy": "コピー",
+    "create": "作成",
+    "delete": "削除",
+    "edit": "編集",
+    "github": "GitHub",
+    "never": "無期限",
+    "retry": "再試行",
+    "save": "保存",
+    "saving": "保存中…"
+  },
+  "editor": {
+    "anyLocale": "すべてのロケール",
+    "anyStatus": "すべてのステータス",
+    "approve": "承認",
+    "approved": "承認しました",
+    "clearFilters": "フィルターをクリア",
+    "columns": "ロケール",
+    "columnsHint": "表示する列",
+    "detail": {
+      "by": "作成者: {author}",
+      "description": "説明",
+      "doNotTranslate": "翻訳しない",
+      "glossary": "用語集の一致",
+      "history": "履歴",
+      "noDescription": "説明はありません。LLM がより正確に翻訳できるよう、説明を追加してください。",
+      "noGlossary": "この原文に用語集の用語はありません。",
+      "noHistory": "履歴はまだありません。",
+      "noReferences": "コードの参照は見つかりませんでした。",
+      "references": "参照",
+      "selectKey": "キーを選択すると、その文脈が表示されます。",
+      "title": "詳細",
+      "toggle": "詳細を切り替え",
+      "translations": "翻訳"
+    },
+    "editPlaceholder": "ロケール {locale} の翻訳",
+    "empty": "このフィルターに一致するキーはありません。",
+    "emptyValue": "まだ翻訳されていません",
+    "issuesTooltip": "{count, plural, other {# 件の問題}}",
+    "key": "キー",
+    "loadMore": "さらに読み込み中…",
+    "origin": {
+      "human": "人力",
+      "imported": "インポート",
+      "machine": "機械翻訳"
+    },
+    "results": "{count, plural, =0 {キーなし} other {# 件のキー}}",
+    "saved": "保存しました",
+    "savedWithIssues": "{count, plural, other {保存しました（# 件の問題あり）}}",
+    "score": "スコア {score}",
+    "search": "キーとテキストを検索…",
+    "shortcuts": "j/k で移動 · Enter で編集 · ⌘Enter で承認 · Esc でキャンセル",
+    "source": "原文",
+    "title": "キー",
+    "withIssues": "問題あり"
+  },
+  "errors": {
+    "generic": "問題が発生しました。もう一度お試しください。",
+    "network": "ネットワークエラーです。接続を確認して、もう一度お試しください。",
+    "notFound": "見つかりません。",
+    "sessionExpired": "セッションが切れました。再度サインインしてください。"
+  },
+  "glossary": {
+    "add": "用語を追加",
+    "caseSensitive": "大文字と小文字を区別",
+    "deleteConfirm": {
+      "body": "今後の翻訳では、この用語は適用されなくなります。",
+      "title": "「{term}」を削除しますか？"
+    },
+    "deleted": "用語を削除しました",
+    "description": "説明",
+    "dialog": {
+      "createTitle": "新しい用語",
+      "editTitle": "用語を編集",
+      "forbiddenFor": "禁止ロケール ({locale})",
+      "translationFor": "翻訳ロケール ({locale})"
+    },
+    "doNotTranslate": "翻訳しない",
+    "empty": {
+      "body": "製品名や専門用語を追加して、すべてのロケールで表記を統一してください。",
+      "title": "用語集の用語はありません"
+    },
+    "flags": "ルール",
+    "forbiddenHint": "LLM が使用してはならない表記（カンマ区切り）",
+    "saved": "用語を保存しました",
+    "subtitle": "用語集はすべての翻訳に適用されます。リポジトリ内の glossary.toml を反映します。",
+    "term": "用語",
+    "title": "用語集",
+    "translations": "翻訳"
+  },
+  "jobStatus": {
+    "done": "完了",
+    "failed": "失敗",
+    "queued": "待機中",
+    "running": "実行中"
+  },
+  "jobs": {
+    "cost": "コスト",
+    "empty": {
+      "body": "翻訳ジョブを開始して、不足しているキーを補完します。",
+      "title": "ジョブはまだありません"
+    },
+    "kind": {
+      "translate": "翻訳"
+    },
+    "live": "ライブ",
+    "progress": "{done} / {total}",
+    "subtitle": "バックグラウンドの翻訳実行をリアルタイムで更新します。",
+    "title": "ジョブ"
+  },
+  "landing": {
+    "compare": {
+      "crowdinPrice": "有料プラン、~$50+/月",
+      "feature": "機能",
+      "footnote": "参考価格は各社の公開料金ページに基づきます。最新のプランは各社でご確認ください。",
+      "glotPrice": "無料 + LLM の利用料",
+      "lokalisePrice": "有料プラン、~$120+/月",
+      "no": "非対応",
+      "partial": "一部対応",
+      "rows": {
+        "byok": "独自の LLM キーを使用",
+        "gitNative": "Git を信頼できる唯一の情報源（ロックファイル）",
+        "mcp": "コーディングエージェント向けの MCP サーバー",
+        "openSource": "オープンソース",
+        "price": "価格",
+        "validator": "すべての文字列を決定論的に検証"
+      },
+      "subtitle": "座席数に応じた課金なしで翻訳を管理。",
+      "title": "比較",
+      "yes": "対応"
+    },
+    "cta": {
+      "button": "ワークスペースを作成",
+      "title": "リリースのたびに、すべての言語を出荷。"
+    },
+    "features": {
+      "byok": {
+        "body": "Anthropic、OpenAI、または OpenAI 互換のエンドポイント（ローカルモデルを含む）に対応。コストはジョブごとに表示され、予算で上限を設定できます。",
+        "title": "独自のキーを持ち込む"
+      },
+      "glossary": {
+        "body": "用語集ファイルの glossary.toml はコードのすぐ隣に置きます。必須の訳語、禁止用語、翻訳しない語は、提案ではなく強制的に適用されます。",
+        "title": "コードとしての用語集"
+      },
+      "lockfile": {
+        "body": "glot.lock はすべてのソースとターゲットをハッシュ化します。差分だけが翻訳され、手動編集が上書きされることはありません。",
+        "title": "ロックファイル"
+      },
+      "mcp": {
+        "body": "Claude Code、Cursor などが、キー、用語集、課題を直接照会し、ファイル:行番号の参照と UI ロールを使って翻訳します。",
+        "title": "MCP、ライブコンテキスト"
+      },
+      "oss": {
+        "body": "MIT ライセンス。CLI、MCP サーバー、API、このダッシュボード。セルフホストし、フォークし、監査できます。",
+        "title": "オープンソース"
+      },
+      "subtitle": "LLM は、常に決定論的なコードで囲まれています。",
+      "title": "エージェントで出荷するチームのために",
+      "validator": {
+        "body": "ICU、i18next、MessageFormat 2 のパース。プレースホルダー、タグ、複数形カテゴリを全ロケールで検証。失敗は再試行され、その後より高性能なモデルにエスカレーションされます。",
+        "title": "決定論的バリデーター"
+      },
+      "visual": {
+        "body": "Playwright が全ロケールをレンダリングし、ユーザーが見る前に、はみ出し、切り詰め、RTL レイアウトの崩れを検出します。",
+        "title": "ビジュアル QA"
+      }
+    },
+    "flow": {
+      "agent": {
+        "caption": "エージェントが機能と新しいキーを追加します。",
+        "label": "エージェント",
+        "prompt": "すべてのロケールで、チェックアウトページを追加"
+      },
+      "checks": {
+        "glossary": "用語集の用語を遵守",
+        "length": "長さの比率 1.3×（1.6× 未満）",
+        "placeholders": "プレースホルダーを保持",
+        "plurals": "CLDR の複数形カテゴリ"
+      },
+      "mcp": {
+        "caption": "glot がライブコンテキストを提供します：用語集、参照、周辺の文字列。",
+        "label": "MCP"
+      },
+      "pr": {
+        "caption": "差分のみ。ロックファイルも更新されます。",
+        "label": "プルリクエスト"
+      },
+      "title": "プロンプトからプルリクエストまで、プレースホルダーを壊さずに",
+      "validate": {
+        "caption": "すべての文字列は、勘ではなくコードで検証されます。",
+        "label": "検証"
+      }
+    },
+    "footer": {
+      "license": "MIT ライセンス",
+      "tagline": "AI に壊されないローカライゼーション。"
+    },
+    "hero": {
+      "badge": "オープンソース · MIT · 独自の LLM キーを持ち込み",
+      "primary": "無料で始める",
+      "secondary": "GitHub でスターを付ける",
+      "subtitle": "コーディングエージェントが機能を書き、glot がそれをあらゆる言語で届けます。文脈を考慮した LLM 翻訳を、決定論的バリデーター、ロックファイル、Git で管理される用語集で包みます。",
+      "title": "AI エージェントに壊されない i18n。"
+    },
+    "install": {
+      "cargo": "Cargo で",
+      "mcp": "エージェントに追加",
+      "npx": "npx を使用",
+      "subtitle": "エージェントでローカルに実行するか、チーム用の glot サーバーに接続します。",
+      "title": "数秒でインストール"
+    },
+    "meta": {
+      "description": "コーディングエージェント向けに作られた、SaaS 向けのオープンソースのローカライズ基盤。決定的なバリデーション、ロックファイル、コード化された用語集、MCP サーバーを備えています。",
+      "title": "glot: AI に壊されない i18n"
+    },
+    "nav": {
+      "compare": "比較",
+      "features": "機能",
+      "getStarted": "はじめる",
+      "install": "インストール",
+      "signIn": "サインイン"
+    }
+  },
+  "localeSwitcher": {
+    "label": "言語"
+  },
+  "notFound": {
+    "back": "ホームに戻る",
+    "title": "ページが見つかりません"
+  },
+  "overview": {
+    "budget": "予算 {budget} 中",
+    "cost": "LLM 利用料",
+    "issuesCount": "{count, plural, =0 {問題なし} other {# 件の問題}}",
+    "jobStarted": "翻訳ジョブを開始しました",
+    "keys": "キー",
+    "locales": "ロケール",
+    "model": "モデル",
+    "noBudget": "予算が未設定です",
+    "noIssues": "未解決の問題はありません。すべての翻訳がバリデーションに合格しています。",
+    "noJobs": "ジョブはまだありません。不足しているキーを翻訳すると開始されます。",
+    "noKeys": {
+      "body": "リポジトリからカタログをプッシュして始めましょう。",
+      "title": "キーはまだありません"
+    },
+    "openIssues": "未解決の問題",
+    "progress": "ロケール別の進捗",
+    "progressHint": "{translated} / {total} 件翻訳済み · {reviewed} 件レビュー済み",
+    "recentJobs": "最近のジョブ",
+    "staleCount": "{count, plural, other {# 件が古い}}",
+    "translateMissing": "不足分を翻訳",
+    "viewAll": "すべて表示"
+  },
+  "palette": {
+    "empty": "結果がありません。",
+    "goTo": "{page} へ移動",
+    "navigation": "ナビゲーション",
+    "openProject": "{name} を開く",
+    "placeholder": "コマンドを入力または検索…",
+    "preferences": "環境設定",
+    "projects": "プロジェクト",
+    "switchLanguage": "言語を{language}に切り替え",
+    "toggleTheme": "テーマを切り替え"
+  },
+  "projects": {
+    "create": {
+      "description": "ロケールとLLM設定は後から変更できます。",
+      "name": "名前",
+      "namePlaceholder": "My SaaS",
+      "slug": "スラッグ",
+      "slugHint": "URL、CLI、CDNで使用されます。",
+      "sourceLocale": "ソースロケール",
+      "submit": "プロジェクトを作成",
+      "success": "プロジェクト {name} を作成しました",
+      "targetLocales": "ターゲットロケール",
+      "targetLocalesHint": "カンマ区切りの BCP 47 コード（例: fr, de, pt-BR）。",
+      "title": "新規プロジェクト"
+    },
+    "empty": {
+      "body": "プロジェクトを作成したら、リポジトリで glot push を実行してカタログをインポートしてください。",
+      "cta": "最初のプロジェクトを作成",
+      "title": "プロジェクトがまだありません"
+    },
+    "keysCount": "{count, plural, =0 {キーなし} other {# キー}}",
+    "localesCount": "{count, plural, other {# ロケール}}",
+    "subtitle": "各プロジェクトは、リポジトリのいずれかにある glot.toml に対応します。",
+    "title": "プロジェクト"
+  },
+  "settings": {
+    "cdn": {
+      "description": "カタログを ETag とキャッシュヘッダー付きの JSON で配信します。",
+      "enable": "公開CDNを有効にする",
+      "example": "URLの例",
+      "title": "公開CDN"
+    },
+    "danger": {
+      "confirmBody": "この操作は取り消せません。確認のため {slug} と入力してください。",
+      "confirmTitle": "{name} を削除しますか？",
+      "delete": "プロジェクトを削除",
+      "deleted": "プロジェクトを削除しました",
+      "description": "プロジェクトを削除すると、キー、翻訳、用語集、ジョブが削除されます。リポジトリは変更されません。",
+      "title": "危険な操作"
+    },
+    "general": {
+      "name": "プロジェクト名",
+      "slug": "スラッグ",
+      "title": "一般"
+    },
+    "llm": {
+      "apiKey": "APIキー",
+      "apiKeySet": "APIキーは保存済みです。変更しない場合は空欄のままにしてください。",
+      "apiKeyUnset": "APIキーはまだ保存されていません。",
+      "baseUrl": "ベースURL",
+      "baseUrlHint": "Ollama、vLLM、OpenRouter などの互換エンドポイント用。",
+      "budget": "予算（USD）",
+      "budgetHint": "この予算に達すると、ジョブは停止します。",
+      "description": "お使いのプロバイダーのキーです。glot は LLM の利用料金に上乗せしません。",
+      "fallback": "フォールバックモデル",
+      "fallbackHint": "再試行後も検証に失敗した場合に使用されます。",
+      "judge": "評価モデル",
+      "judgeHint": "翻訳を 0〜100 でスコア化します。",
+      "model": "モデル",
+      "provider": "プロバイダー",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "モック（テスト用）",
+        "openai": "OpenAI",
+        "openai-compatible": "OpenAI 互換"
+      },
+      "style": "スタイルガイド",
+      "stylePlaceholder": "親しみやすく簡潔に、フランス語はくだけた「tu」…",
+      "title": "LLM"
+    },
+    "locales": {
+      "add": "ロケールを追加",
+      "addPlaceholder": "例: pt-BR",
+      "description": "ソースロケールは固定です。ターゲットロケールはジョブと CLI で翻訳されます。",
+      "remove": "{locale} ロケールを削除",
+      "source": "ソースロケール",
+      "targets": "ターゲットロケール",
+      "title": "ロケール"
+    },
+    "saved": "設定を保存しました",
+    "title": "設定"
+  },
+  "shell": {
+    "apiTokens": "API トークン",
+    "glossary": "用語集",
+    "jobs": "ジョブ",
+    "keys": "キー",
+    "logout": "サインアウト",
+    "newProject": "新規プロジェクト",
+    "noProjects": "プロジェクトはまだありません",
+    "overview": "概要",
+    "projects": "プロジェクト",
+    "search": "検索…",
+    "settings": "設定",
+    "toggleSidebar": "ナビゲーションを切り替え",
+    "userMenu": "アカウントメニュー"
+  },
+  "status": {
+    "machine": "機械翻訳",
+    "missing": "未翻訳",
+    "reviewed": "レビュー済み",
+    "stale": "要更新"
+  },
+  "theme": {
+    "dark": "ダーク",
+    "label": "テーマ",
+    "light": "ライト",
+    "system": "システム"
+  },
+  "tokens": {
+    "create": "新しいトークン",
+    "created": "作成日",
+    "empty": {
+      "body": "トークンを作成して、CLIまたはコーディングエージェントを接続します。",
+      "title": "トークンがありません"
+    },
+    "lastUsed": "最終使用日",
+    "name": "名前",
+    "namePlaceholder": "例: laptop, github-actions",
+    "reveal": {
+      "body": "このトークンが表示されるのは今回のみです。シークレットマネージャーまたはシェル環境に保存してください。",
+      "title": "トークンを今すぐコピー"
+    },
+    "revoke": "失効",
+    "revokeConfirm": {
+      "body": "このトークンを使用しているものは、すぐに動作しなくなります。",
+      "title": "“{name}”を失効しますか？"
+    },
+    "revoked": "トークンを失効しました",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "一度ログインすると、CLIがこのサーバーのトークンを保存します。",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "Claude Code、Cursor、任意の MCP クライアントに glot を追加します。",
+      "title": "ツールを接続"
+    },
+    "subtitle": "トークンは glot CLI、MCP サーバー、CI の認証に使用されます。",
+    "title": "APIトークン"
+  }
+}
