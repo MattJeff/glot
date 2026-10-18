@@ -48,7 +48,7 @@ pub struct FitArgs {
 }
 
 /// visual-qa entry point: $GLOT_VISUAL_QA, else this repo's package, else the npm bin.
-fn qa_command() -> Command {
+pub(crate) fn qa_command() -> Command {
     let script = std::env::var("GLOT_VISUAL_QA")
         .map(PathBuf::from)
         .ok()

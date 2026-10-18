@@ -63,16 +63,20 @@ pause
 say "… $("$GLOT" extract --json | grep -c '"suggested_key"') hardcoded strings in total"
 
 # ───────────────────────────────────────────────────────────────────────────────
-step "glot i18nize" "Rewrite the code to t() calls, name keys, turn concatenations into ICU plurals."
+step "glot i18nize" "Rewrite the code to t() calls, name keys, turn concatenations into ICU plurals, then wire next-intl (proxy, provider, config)."
 pause
 I18NIZED=0
 if has i18nize; then
-  run i18nize --yes --lib next-intl
+  # Install next-intl only when the app will run (pnpm available); otherwise just print the command.
+  INSTALL=--no-install
+  [[ "${NO_APP:-0}" != 1 ]] && command -v pnpm >/dev/null && INSTALL=""
+  run i18nize --yes --switcher $INSTALL
   I18NIZED=1
   echo
   say "What changed:"
   git --no-pager diff --stat | tail -1
   git --no-pager diff -U0 app/page.tsx | grep -E '^[-+] ' | head -8
+  say "Runtime wired by i18nize: $(git ls-files --others --exclude-standard | grep -E '^(i18n/|proxy|components/LocaleSwitcher)' | tr '\n' ' ')"
   say "Source catalog: $(grep -c '": "' locales/en.json) strings in locales/en.json"
 else
   skip i18nize
@@ -84,67 +88,11 @@ else
   run add common.save "Save" --note "Verb: submit button of the new-invoice form"
 fi
 
-# ───────────────────────────────────────────────────────────────────────────────
-# i18nize rewrites the code; wiring the runtime is the app's job. Minimal next-intl setup:
-# /fr/invoices is rewritten to /invoices with an x-locale header (no app/[locale] move needed).
-if [[ "$I18NIZED" == 1 ]]; then
-  step "Wire next-intl" "pnpm add next-intl + i18n/request.ts + proxy.ts + NextIntlClientProvider (glot ships no runtime)."
-  pause
-  LOCALES_TS="\"$(echo "en,$TARGETS" | sed 's/,/","/g')\""
-  mkdir -p i18n
-  cat > i18n/request.ts <<EOF
-import { getRequestConfig } from "next-intl/server";
-import { headers } from "next/headers";
-
-const LOCALES = [$LOCALES_TS];
-
-export default getRequestConfig(async () => {
-  const h = (await headers()).get("x-locale") ?? "en";
-  const locale = LOCALES.includes(h) ? h : "en";
-  return { locale, messages: (await import(\`../locales/\${locale}.json\`)).default };
-});
-EOF
-  cat > proxy.ts <<EOF
-import { NextResponse, type NextRequest } from "next/server";
-
-const LOCALES = [$LOCALES_TS];
-
-export function proxy(req: NextRequest) {
-  const [, first, ...rest] = req.nextUrl.pathname.split("/");
-  const headers = new Headers(req.headers);
-  if (first !== "en" && LOCALES.includes(first)) {
-    headers.set("x-locale", first);
-    const url = req.nextUrl.clone();
-    url.pathname = "/" + rest.join("/");
-    return NextResponse.rewrite(url, { request: { headers } });
-  }
-  headers.set("x-locale", "en");
-  return NextResponse.next({ request: { headers } });
-}
-
-export const config = { matcher: ["/((?!_next|.*\\\\..*).*)"] };
-EOF
-  cat > next.config.ts <<'EOF'
-import type { NextConfig } from "next";
-import createNextIntlPlugin from "next-intl/plugin";
-
-const nextConfig: NextConfig = {};
-
-export default createNextIntlPlugin()(nextConfig);
-EOF
-  perl -0pi -e 's/^/import { NextIntlClientProvider } from "next-intl";\nimport { getLocale } from "next-intl\/server";\n/;
-    s/export default function RootLayout/export default async function RootLayout/;
-    s/<html lang="en">/<html lang={await getLocale()}>/;
-    s/<ToastProvider>/<NextIntlClientProvider>\n          <ToastProvider>/;
-    s/<\/ToastProvider>/<\/ToastProvider>\n        <\/NextIntlClientProvider>/' app/layout.tsx
-  say "wrote i18n/request.ts, proxy.ts, next.config.ts, app/layout.tsx"
-fi
-
 # The running app gives translate --visual and fit something to look at.
 APP_UP=0
 if [[ "$I18NIZED" == 1 && "${NO_APP:-0}" != 1 ]] && command -v pnpm >/dev/null; then
   say "pnpm install + next dev on :$PORT …"
-  if pnpm install --silent --prefer-offline >/dev/null 2>&1 && pnpm add next-intl@^4 --silent >/dev/null 2>&1; then
+  if pnpm install --silent --prefer-offline >/dev/null 2>&1; then
     pnpm exec next dev -p "$PORT" >"$WORK/.dev.log" 2>&1 &
     DEV_PID=$!
     for _ in $(seq 1 60); do curl -sf "$BASE/" >/dev/null 2>&1 && { APP_UP=1; break; }; sleep 1; done

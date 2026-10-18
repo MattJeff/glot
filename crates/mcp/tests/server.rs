@@ -140,3 +140,10 @@ async fn end_to_end() {
 
     c.cancel().await.unwrap();
 }
+
+/// Plugins and MCP registries start the server in repos without glot.toml: it must come up.
+#[test]
+fn starts_without_a_project() {
+    let dir = tempfile::tempdir().unwrap();
+    assert!(glot_mcp::GlotServer::open(dir.path()).is_ok());
+}

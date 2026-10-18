@@ -28,7 +28,15 @@ pub struct Workspace {
     pub catalogs: BTreeMap<Locale, Catalog>,
     /// key -> base64 PNG crop of where it renders; attached to translation calls (`glot translate --visual`).
     pub visual: BTreeMap<Key, String>,
+    /// Progress lines of long operations (`translate --batch` polling).
+    pub progress: Option<fn(&str)>,
+    /// `translate`: first pass through the Anthropic Message Batches API (-50 %, asynchronous);
+    /// retries and escalation stay direct calls.
+    pub batch: bool,
 }
+
+/// Pending Message Batch of `translate --batch`, kept until its results are written (resume after Ctrl-C).
+pub const BATCH_FILE: &str = ".glot/batch.json";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct LocaleStatus {
@@ -67,11 +75,15 @@ pub struct TranslateReport {
     /// Items rejected because of remaining errors (not written).
     pub rejected: BTreeMap<Locale, Vec<Translated>>,
     pub usage: Usage,
-    /// Expected cost (first pass + judge + `RETRY_MARGIN`), from the real prompts.
+    /// Expected cost (first pass + judge + probable retries/escalation, prompt cache), from the real
+    /// prompts; with `batch`, the first pass at the batch price.
     pub estimated_cost_usd: f64,
-    /// Pessimistic bound: `ESTIMATE_MAX_FACTOR` × the expected cost.
+    /// Pessimistic bound (see `translate::Estimate::max_cost_usd`).
     #[serde(default)]
     pub estimated_cost_max_usd: f64,
+    /// Expected cost with `--batch` (first pass at -50 %).
+    #[serde(default)]
+    pub estimated_batch_cost_usd: f64,
     #[serde(default)]
     pub estimated_input_tokens: u64,
     #[serde(default)]
@@ -98,10 +110,6 @@ pub struct Proposal {
     pub key_exists: bool,
 }
 
-/// Upper bound of the cost range: tokenizer variance (~±30 %) + heavy retries/escalation to fallback_model.
-// ponytail: flat factor; derive from fallback_model price if users need a tighter bound.
-const ESTIMATE_MAX_FACTOR: f64 = 2.0;
-
 impl Workspace {
     /// Find root from `start` (walk up to glot.toml) and load everything.
     pub fn open(start: &Path) -> Result<Self> {
@@ -126,6 +134,8 @@ impl Workspace {
             lock,
             catalogs,
             visual: BTreeMap::new(),
+            progress: None,
+            batch: false,
         })
     }
 
@@ -237,6 +247,7 @@ impl Workspace {
     pub fn check(&self) -> Vec<Finding> {
         let source = self.source();
         let mut out = vec![];
+        let layout = glot_core::measure::load_layout(&self.root).unwrap_or_default();
         for loc in &self.config.target_locales {
             let Some(target) = self.catalogs.get(loc) else {
                 continue;
@@ -256,13 +267,19 @@ impl Workspace {
                     .get(loc)
                     .and_then(|e| e.get(key))
                     .is_some_and(|e| e.target_hash == glot_core::hash::hash(value));
-                for issue in self
-                    .validate(loc, src, value, None)
-                    .into_iter()
-                    .filter(|i| {
-                        !(decided && i.code == glot_core::validate::IssueCode::Untranslated)
-                    })
-                {
+                let fit = layout.get(key);
+                let mut issues = self.validate(loc, src, value, None);
+                if let Some(f) = fit {
+                    // Measured pixel budget: TooWide replaces the length-ratio warning.
+                    issues.retain(|i| {
+                        !(i.code == glot_core::validate::IssueCode::TooLong
+                            && i.severity == Severity::Warning)
+                    });
+                    issues.extend(glot_core::measure::check(value, self.config.syntax, f));
+                }
+                for issue in issues.into_iter().filter(|i| {
+                    !(decided && i.code == glot_core::validate::IssueCode::Untranslated)
+                }) {
                     out.push(Finding {
                         locale: loc.clone(),
                         key: key.clone(),
@@ -322,6 +339,11 @@ impl Workspace {
 
         let mut jobs: Vec<Request> = vec![];
         let mut contexts: Option<BTreeMap<Key, KeyContext>> = None;
+        // Pixel budgets from `glot measure`: the validator rejects too-wide translations before writing.
+        let layout = glot_core::measure::load_layout(&self.root).unwrap_or_else(|e| {
+            tracing::warn!("ignoring {}: {e}", glot_core::measure::LAYOUT_FILE);
+            Default::default()
+        });
         for loc in &locales {
             let manual = of(&plan.manual_edits, loc);
             let keys: Vec<Key> = if opts.force {
@@ -351,11 +373,14 @@ impl Workspace {
                 .into_iter()
                 .map(|k| Item {
                     source: source.entries[&k].clone(),
-                    context: ctx.get(&k).cloned().unwrap_or_else(|| KeyContext {
-                        key: k.clone(),
-                        description: self.lock.notes.get(&k).cloned(),
-                        ..Default::default()
-                    }),
+                    context: KeyContext {
+                        fit: layout.get(&k).cloned(),
+                        ..ctx.get(&k).cloned().unwrap_or_else(|| KeyContext {
+                            key: k.clone(),
+                            description: self.lock.notes.get(&k).cloned(),
+                            ..Default::default()
+                        })
+                    },
                     previous: target.entries.get(&k).filter(|v| !v.is_empty()).cloned(),
                     key: k,
                 })
@@ -384,12 +409,19 @@ impl Workspace {
                 req.target_locale.clone(),
                 req.items.iter().map(|i| i.key.clone()).collect(),
             );
-            let e = translate::estimate(&self.config, req);
-            report.estimated_input_tokens += e.input_tokens;
-            report.estimated_output_tokens += e.output_tokens;
-            report.estimated_cost_usd += e.cost_usd;
+            let e = translate::estimate_full(&self.config, req, &self.visual);
+            let u = &e.expected;
+            report.estimated_input_tokens +=
+                u.input_tokens + u.cache_creation_tokens + u.cache_read_tokens;
+            report.estimated_output_tokens += u.output_tokens;
+            report.estimated_cost_usd += if self.batch {
+                e.batch_cost_usd
+            } else {
+                u.cost_usd
+            };
+            report.estimated_batch_cost_usd += e.batch_cost_usd;
+            report.estimated_cost_max_usd += e.max_cost_usd;
         }
-        report.estimated_cost_max_usd = report.estimated_cost_usd * ESTIMATE_MAX_FACTOR;
         if opts.dry_run {
             return Ok(report);
         }
@@ -424,6 +456,11 @@ impl Workspace {
                 &self.config,
                 crate::visual::wrap(provider::from_config(&self.config.llm, None)?, &self.visual),
             );
+            let firsts = if self.batch {
+                self.run_batch(&translator, &jobs).await?
+            } else {
+                BTreeMap::new()
+            };
             for req in jobs {
                 let loc = req.target_locale.clone();
                 if let Some(b) = budget.filter(|b| report.usage.cost_usd >= *b) {
@@ -433,7 +470,7 @@ impl Workspace {
                         budget: b,
                     });
                 }
-                let (results, usage) = translator.translate(req).await?;
+                let (results, usage) = translator.translate_from(req, &firsts).await?;
                 report.usage.add(&usage);
                 let (ok, bad): (Vec<_>, Vec<_>) = results
                     .into_iter()
@@ -463,9 +500,102 @@ impl Workspace {
                     report.rejected.insert(loc, bad);
                 }
             }
+            if self.batch {
+                let _ = std::fs::remove_file(self.root.join(BATCH_FILE));
+            }
         }
         self.lock.save(&self.root)?;
         Ok(report)
+    }
+
+    /// Submit (or resume, from `BATCH_FILE`) the first pass of every job as one Message Batch, poll
+    /// until it ends, return custom_id -> completion. Custom ids are content hashes, so a rerun with
+    /// the same prompts picks the stored batch (and its fetched results) up instead of paying twice.
+    async fn run_batch(
+        &self,
+        t: &Translator,
+        jobs: &[Request],
+    ) -> Result<BTreeMap<String, provider::Completion>> {
+        #[derive(Serialize, Deserialize)]
+        struct Pending {
+            id: String,
+            ids: BTreeSet<String>,
+            #[serde(default)]
+            results: Option<BTreeMap<String, provider::Completion>>,
+        }
+        let path = self.root.join(BATCH_FILE);
+        let save = |p: &Pending| -> Result<()> {
+            let io = |e: std::io::Error| Error::Other(format!("{}: {e}", path.display()));
+            std::fs::create_dir_all(path.parent().unwrap_or(&self.root)).map_err(io)?;
+            std::fs::write(&path, serde_json::to_string(p).unwrap_or_default()).map_err(io)
+        };
+        let say = |m: &str| {
+            if let Some(f) = self.progress {
+                f(m)
+            }
+        };
+        let mut reqs: BTreeMap<String, provider::CompletionRequest> =
+            jobs.iter().flat_map(|r| t.first_pass(r)).collect();
+        let pending: Option<Pending> = std::fs::read_to_string(&path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .filter(|p: &Pending| reqs.keys().all(|id| p.ids.contains(id)));
+        if let Some(r) = pending.as_ref().and_then(|p| p.results.clone()) {
+            say(&format!(
+                "Reusing the results of batch {}",
+                pending.as_ref().map_or("", |p| &p.id)
+            ));
+            return Ok(r);
+        }
+        let client = provider::batch_client(&self.config.llm, None, &BTreeMap::new())?;
+        let mut status = match pending {
+            Some(p) => {
+                say(&format!("Resuming batch {}", p.id));
+                client.status(&p.id).await?
+            }
+            None => {
+                for r in reqs.values_mut() {
+                    crate::visual::attach(&self.visual, r);
+                }
+                let list: Vec<_> = reqs.into_iter().collect();
+                let s = client.submit(&list).await?;
+                save(&Pending {
+                    id: s.id.clone(),
+                    ids: list.into_iter().map(|(id, _)| id).collect(),
+                    results: None,
+                })?;
+                say(&format!(
+                    "Submitted batch {} (resume with the same command if interrupted)",
+                    s.id
+                ));
+                s
+            }
+        };
+        let mut wait = std::time::Duration::from_secs(1);
+        while !status.ended() {
+            tokio::time::sleep(wait).await;
+            wait = (wait * 2).min(std::time::Duration::from_secs(30));
+            status = client.status(&status.id).await?;
+            let c = |k: &str| status.request_counts.get(k).copied().unwrap_or(0);
+            let done = c("succeeded") + c("errored") + c("canceled") + c("expired");
+            say(&format!(
+                "Batch {}: {done}/{} done",
+                status.id,
+                done + c("processing")
+            ));
+        }
+        let results = client.results(&status).await?;
+        let ids = std::fs::read_to_string(&path)
+            .ok()
+            .and_then(|s| serde_json::from_str::<Pending>(&s).ok())
+            .map(|p| p.ids)
+            .unwrap_or_else(|| results.keys().cloned().collect());
+        save(&Pending {
+            id: status.id.clone(),
+            ids,
+            results: Some(results.clone()),
+        })?;
+        Ok(results)
     }
 
     fn file_format(&self, path: &Path) -> Format {

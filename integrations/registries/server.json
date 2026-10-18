@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.MattJeff/glot",
+  "title": "glot",
+  "description": "AI-native i18n: live string context, validated translations, glossary for your app catalogs",
+  "websiteUrl": "https://github.com/MattJeff/glot",
+  "repository": {
+    "url": "https://github.com/MattJeff/glot",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "glot-i18n",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "packageArguments": [
+        { "type": "positional", "value": "mcp", "description": "Run the MCP server on stdio" }
+      ],
+      "environmentVariables": [
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "description": "LLM key used by the translate tool (or OPENAI_API_KEY, per glot.toml). Not needed for context, check or add.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

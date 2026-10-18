@@ -14,6 +14,7 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
 pub mod auth;
 pub mod cdn;
 pub mod glossary;
+pub mod insights;
 pub mod jobs;
 pub mod keys;
 pub mod openapi;
@@ -118,10 +119,12 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route(&format!("{p}/keys/{{key}}/review"), get(review::review_one))
         .route("/api/openapi.json", get(openapi::spec))
         .merge(visual::routes())
+        .merge(insights::routes())
         .layer(cors);
 
     Router::new()
         .merge(api)
+        .merge(insights::public_routes())
         .route("/cdn/{slug}/{file}", get(cdn::serve))
         .route("/healthz", get(|| async { "ok" }))
         .fallback(|| async { AppError::not_found("route not found") })

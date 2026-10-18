@@ -1,0 +1,34 @@
+{
+  "name": "@glot/runtime",
+  "version": "0.1.0",
+  "description": "Long-tail locales at zero cost: on-device UI translation (Chrome Translator API) with glot's guarantees — masked placeholders, glossary, plural structure, WASM validation, source fallback.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./next-intl": { "types": "./dist/next-intl.d.ts", "default": "./dist/next-intl.js" },
+    "./i18next": { "types": "./dist/i18next.d.ts", "default": "./dist/i18next.js" },
+    "./glot.wasm": "./dist/glot.wasm"
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build:wasm": "cd ../.. && CARGO_PROFILE_RELEASE_LTO=true CARGO_PROFILE_RELEASE_OPT_LEVEL=z CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_STRIP=true cargo build -p glot-wasm --release --target wasm32-unknown-unknown && mkdir -p packages/runtime/dist && cp ${CARGO_TARGET_DIR:-target}/wasm32-unknown-unknown/release/glot_wasm.wasm packages/runtime/dist/glot.wasm",
+    "build": "esbuild src/index.ts --bundle --format=esm --minify --target=es2022 --outfile=dist/index.js && esbuild src/next-intl.ts src/i18next.ts --bundle --format=esm --minify --target=es2022 --external:react --external:next-intl --external:./index.js --outdir=dist && tsc",
+    "test": "node --test test/mask.test.ts test/browser.test.ts"
+  },
+  "peerDependencies": { "react": ">=18", "next-intl": ">=3" },
+  "peerDependenciesMeta": { "react": { "optional": true }, "next-intl": { "optional": true } },
+  "devDependencies": {
+    "@types/node": "^25",
+    "@types/react": "^19",
+    "esbuild": "^0.25",
+    "next-intl": "^4",
+    "playwright": "1.64.1",
+    "react": "^19",
+    "typescript": "^5.9"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

@@ -1,0 +1,16 @@
+---
+trigger: model_decision
+description: Internationalization with glot. Apply when making the app multilingual, adding/changing user-facing UI text, or touching translation catalogs.
+---
+
+## Internationalization (glot)
+
+When the user wants the app in other languages (i18n, l10n, translations, multilingual), or when adding user-facing text to an app that has `glot.toml`, use glot. Run `glot`, or `npx -y glot-i18n` if it is not installed.
+
+- No `glot.toml` yet: install the i18n library if missing (Next.js App Router: `next-intl`; other React: `react-i18next` + `i18next`), then `glot init --yes --targets <locales>`.
+- Hardcoded strings: `glot extract --json`, then `glot i18nize --dry-run`, then `glot i18nize --yes`; wire the library's provider/init once.
+- New UI text: write it only in the source catalog. With the glot MCP server: `propose_string` then `add_string`; without: `glot add <key> "<text>" --note "<context>"`. Never hardcode it in components.
+- Translations: `glot translate --yes` (needs `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`). Never edit target-locale catalogs by hand; for a deliberate fix use `glot set <locale> <key> "<value>"`.
+- Keep placeholders and ICU plurals intact; never build sentences by string concatenation.
+- Before finishing: `glot check` must exit 0. Commit `glot.lock` with the catalogs.
+- Text overflowing in the running app: `glot fit --base-url <url> --routes <routes>`.

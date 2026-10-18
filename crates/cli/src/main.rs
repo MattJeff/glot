@@ -3,7 +3,10 @@ mod dev;
 mod fit;
 mod i18nize;
 mod init;
+mod measure;
+mod parity;
 mod review;
+mod setup;
 mod sync;
 
 use anyhow::{Context, Result, bail};
@@ -66,11 +69,17 @@ enum Cmd {
         /// Capture the running app and show the LLM where each key renders (`--base-url`, `--routes`).
         #[arg(long)]
         visual: bool,
+        /// First pass through the Anthropic Message Batches API: -50 %, asynchronous (minutes to hours).
+        /// Resumable: rerun the same command if interrupted.
+        #[arg(long)]
+        batch: bool,
         #[command(flatten)]
         qa: fit::QaArgs,
     },
     /// Shorten translations that overflow in the running app, re-render, repeat until they fit.
     Fit(fit::FitArgs),
+    /// Record each key's pixel budget (box width, lines, font) from the running app into .glot/layout.json.
+    Measure(measure::MeasureArgs),
     /// Hardcoded strings in code, plus missing and unused keys.
     Extract {
         #[arg(long)]
@@ -113,6 +122,8 @@ enum Cmd {
     I18nize(i18nize::I18nizeArgs),
     /// Local server for the in-app editing overlay (@glot/overlay).
     Dev(dev::DevArgs),
+    /// Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success.
+    Parity(parity::ParityArgs),
 }
 
 #[derive(Subcommand)]
@@ -188,9 +199,22 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
             dry_run,
             yes,
             visual,
+            batch,
             qa,
-        } => translate(locale, key, force, dry_run, yes, visual.then_some(qa)).await?,
+        } => {
+            translate(
+                locale,
+                key,
+                force,
+                dry_run,
+                yes,
+                visual.then_some(qa),
+                batch,
+            )
+            .await?
+        }
         Cmd::Fit(a) => return fit::fit(a).await,
+        Cmd::Measure(a) => return measure::run(a),
         Cmd::Extract { json } => extract(json)?,
         Cmd::Unused { prune, json } => unused(prune, json)?,
         Cmd::Add { key, value, note } => {
@@ -223,6 +247,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Mcp => glot_mcp::serve_stdio(std::env::current_dir()?).await?,
         Cmd::I18nize(args) => i18nize::run(args).await?,
         Cmd::Dev(args) => dev::run(args).await?,
+        Cmd::Parity(args) => return parity::run(args),
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -462,8 +487,11 @@ async fn translate(
     dry_run: bool,
     yes: bool,
     visual: Option<fit::QaArgs>,
+    batch: bool,
 ) -> Result<()> {
     let mut ws = open()?;
+    ws.batch = batch;
+    ws.progress = Some(|m| anstream::eprintln!("{DIM}{m}{DIM:#}"));
     let opts = TranslateOptions {
         locales: (!locales.is_empty()).then_some(locales),
         keys: (!keys.is_empty()).then_some(keys),
@@ -497,6 +525,12 @@ async fn translate(
         dry.estimated_input_tokens / 1000,
         dry.estimated_output_tokens / 1000
     );
+    if !batch && ws.config.llm.provider == "anthropic" {
+        anstream::println!(
+            "{DIM}With --batch: ~${:.4} (first pass at -50 %, asynchronous){DIM:#}",
+            dry.estimated_batch_cost_usd
+        );
+    }
     if dry_run {
         return Ok(());
     }
@@ -511,6 +545,12 @@ async fn translate(
     if let Some(qa) = &visual {
         let keys: Vec<String> = dry.planned.values().flatten().cloned().collect();
         ws.visual = fit::capture(&ws, qa, &keys)?;
+        let e = ws.translate(opts.clone()).await?;
+        anstream::println!(
+            "Estimated cost with screenshots: {BOLD}${:.4}{BOLD:#} {DIM}(up to ${:.4}){DIM:#}",
+            e.estimated_cost_usd,
+            e.estimated_cost_max_usd
+        );
     }
     anstream::eprintln!("{DIM}Translating…{DIM:#}");
     let report = ws
@@ -536,9 +576,11 @@ async fn translate(
     }
     let u = &report.usage;
     anstream::println!(
-        "Cost: {BOLD}${:.4}{BOLD:#} {DIM}({} in / {} out tokens){DIM:#}",
+        "Cost: {BOLD}${:.4}{BOLD:#} {DIM}({} in + {} cache write + {} cache read / {} out tokens){DIM:#}",
         u.cost_usd,
         u.input_tokens,
+        u.cache_creation_tokens,
+        u.cache_read_tokens,
         u.output_tokens
     );
     Ok(())

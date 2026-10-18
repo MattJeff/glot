@@ -13,7 +13,7 @@ use crate::provider::{Completion, CompletionRequest, Provider};
 use crate::translate::{extract_payload, parse_json, payload_block};
 
 /// Anthropic accepts more, but past a handful the crops stop helping and cost tokens.
-const MAX_IMAGES: usize = 8;
+pub const MAX_IMAGES: usize = 8;
 
 pub fn png_b64(path: &Path) -> std::io::Result<String> {
     Ok(base64::engine::general_purpose::STANDARD.encode(std::fs::read(path)?))
@@ -42,27 +42,47 @@ impl Provider for VisualProvider {
     }
 
     async fn complete(&self, mut req: CompletionRequest) -> Result<Completion> {
-        let items = extract_payload(&req.user)
-            .and_then(|p| p["items"].as_array().cloned())
-            .unwrap_or_default();
-        let mut shown = vec![];
-        for key in items.iter().filter_map(|i| i["key"].as_str()) {
-            if req.images.len() >= MAX_IMAGES {
-                break;
-            }
-            if let Some(img) = self.crops.get(key) {
-                req.images.push(img.clone());
-                shown.push(format!("image {} = `{key}`", req.images.len()));
-            }
-        }
-        if !shown.is_empty() {
-            req.user += &format!(
-                "\n\nScreenshots of the running app (source locale) show where these strings appear: {}. \
-Use them to pick the right meaning (verb vs noun, button vs label) and a length that fits the same box.",
-                shown.join(", ")
-            );
-        }
+        attach(&self.crops, &mut req);
         self.inner.complete(req).await
+    }
+}
+
+/// Attach the crops of the batch's keys (max `MAX_IMAGES`) to a translation request.
+pub fn attach(crops: &BTreeMap<Key, String>, req: &mut CompletionRequest) {
+    let items = extract_payload(&req.user)
+        .and_then(|p| p["items"].as_array().cloned())
+        .unwrap_or_default();
+    let mut shown = vec![];
+    for key in items.iter().filter_map(|i| i["key"].as_str()) {
+        if req.images.len() >= MAX_IMAGES {
+            break;
+        }
+        if let Some(img) = crops.get(key) {
+            req.images.push(img.clone());
+            shown.push(format!("image {} = `{key}`", req.images.len()));
+        }
+    }
+    if !shown.is_empty() {
+        req.user += &format!(
+            "\n\nScreenshots of the running app (source locale) show where these strings appear: {}. \
+Use them to pick the right meaning (verb vs noun, button vs label) and a length that fits the same box.",
+            shown.join(", ")
+        );
+    }
+}
+
+/// Vision input tokens of a base64 PNG (Anthropic: w×h/750, ~1600 max after downscaling).
+pub fn image_tokens(b64: &str) -> u64 {
+    let head = base64::engine::general_purpose::STANDARD
+        .decode(b64.get(..32).unwrap_or(b64))
+        .unwrap_or_default();
+    let dim = |at: usize| {
+        head.get(at..at + 4)
+            .map(|b| u32::from_be_bytes([b[0], b[1], b[2], b[3]]) as u64)
+    };
+    match (dim(16), dim(20)) {
+        (Some(w), Some(h)) if w > 0 && h > 0 => (w * h).div_ceil(750).min(1600),
+        _ => 1600,
     }
 }
 
@@ -187,6 +207,24 @@ pub(crate) fn mock_shorten(p: &Value) -> Value {
         }
     }
     json!({ "value": value.join(" ") })
+}
+
+/// Mock retry of a translation rejected as `TooWide`: shorten the rejected attempt to `fit_chars`,
+/// and by 15 % more on every further rejection (as a real model tightens its wording).
+pub(crate) fn mock_fit(item: &Value) -> Option<String> {
+    let rejected = item["rejected_attempt"].as_str()?;
+    let too_wide = item["issues_to_fix"]
+        .as_array()?
+        .iter()
+        .any(|m| m.as_str().is_some_and(|m| m.starts_with("Too wide")));
+    if !too_wide {
+        return None;
+    }
+    let n = rejected.chars().count();
+    let max = (item["fit_chars"].as_u64().unwrap_or(n as u64) as usize).min(n * 85 / 100);
+    mock_shorten(&json!({"current": rejected, "max_chars": max}))["value"]
+        .as_str()
+        .map(str::to_string)
 }
 
 #[cfg(test)]

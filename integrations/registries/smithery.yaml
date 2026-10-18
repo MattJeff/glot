@@ -1,0 +1,16 @@
+# Smithery (local/stdio install). Copy to the repo root. Verify against https://smithery.ai/docs before publishing.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      anthropicApiKey:
+        type: string
+        description: Optional. Needed only for the translate tool.
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'glot-i18n', 'mcp'],
+      env: config.anthropicApiKey ? { ANTHROPIC_API_KEY: config.anthropicApiKey } : {}
+    })
+  exampleConfig: {}

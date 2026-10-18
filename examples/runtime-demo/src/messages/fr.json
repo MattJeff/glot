@@ -1,0 +1,8 @@
+{
+  "home": {
+    "title": "Bon retour, {name} !",
+    "files": "Tu as {n, plural, one {# fichier} many {# fichiers} other {# fichiers}} dans l''espace de travail {folder}.",
+    "invite": "Invite ton équipe sur glot : <b>c''est gratuit</b>.",
+    "cta": "Ouvrir ton espace de travail"
+  }
+}

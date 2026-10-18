@@ -5,6 +5,10 @@ use std::collections::BTreeMap;
 
 use glot_llm::i18nize::{self, Lib, Plan};
 
+use crate::setup::{
+    self, Routing,
+    refactor::{self, Source},
+};
 use crate::style::*;
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -27,20 +31,88 @@ pub struct I18nizeArgs {
     /// i18n library the rewritten code targets.
     #[arg(long, value_enum, default_value_t = LibArg::Auto)]
     pub lib: LibArg,
+    /// Next.js locale URLs: `cookie` (`/fr/...` selects and remembers the locale, no `app/[locale]` move)
+    /// or `prefix` (non-default locales always under `/fr/...`).
+    #[arg(long, value_enum, default_value_t = Routing::Cookie)]
+    pub routing: Routing,
+    /// Also generate a ready-to-use `<LocaleSwitcher />` component.
+    #[arg(long)]
+    pub switcher: bool,
+    /// Do not run the package manager; print the install command instead.
+    #[arg(long)]
+    pub no_install: bool,
+    /// Only rewrite the code: do not wire the i18n library (provider, config, proxy).
+    #[arg(long)]
+    pub no_setup: bool,
 }
 
 pub async fn run(args: I18nizeArgs) -> Result<()> {
     let mut ws = crate::open()?;
+    let project = setup::detect(&ws.root);
     let lib = match args.lib {
         LibArg::NextIntl => Lib::NextIntl,
         LibArg::ReactI18next => Lib::ReactI18next,
-        LibArg::Auto => match i18nize::detect_lib(&ws.root) {
+        LibArg::Auto => match project.as_ref().map(|p| p.framework.lib()) {
             Some(l) => l,
-            None => bail!(
-                "cannot detect the i18n library from package.json; pass --lib next-intl|react-i18next"
-            ),
+            None => match i18nize::detect_lib(&ws.root) {
+                Some(l) => l,
+                None => bail!(
+                    "cannot detect the framework from package.json; pass --lib next-intl|react-i18next"
+                ),
+            },
         },
     };
+    if let Some(p) = &project {
+        anstream::eprintln!(
+            "{DIM}{} detected, target library: {}{DIM:#}",
+            p.framework.label(),
+            if lib == Lib::NextIntl {
+                "next-intl"
+            } else {
+                "react-i18next"
+            }
+        );
+    }
+
+    // Project-wide passes: text props of local components, module configs -> hooks.
+    let all: Vec<Source> = glot_extract::i18nize::source_files(&ws.root, &ws.config.extract)?
+        .into_iter()
+        .filter_map(|path| {
+            let src = std::fs::read_to_string(ws.root.join(&path)).ok()?;
+            Some(Source { path, src })
+        })
+        .collect();
+    glot_extract::i18nize::set_text_props(refactor::text_props(&all));
+    let cfg = refactor::config_hooks(&all);
+    for w in &cfg.warnings {
+        anstream::eprintln!("{YELLOW}warning:{YELLOW:#} {w}");
+    }
+    if !cfg.files.is_empty() {
+        anstream::println!(
+            "{BOLD}{}{BOLD:#} module-level configs become hooks so their copy can be translated:",
+            cfg.converted.len()
+        );
+        for c in &cfg.converted {
+            anstream::println!("  {GREEN}~{GREEN:#} {c}");
+        }
+        if args.dry_run {
+            for (path, old, new) in &cfg.files {
+                print_diff(&glot_extract::i18nize::unified_diff(path, old, new));
+            }
+            anstream::println!(
+                "{DIM}(the i18nize plan below is computed before this refactor){DIM:#}\n"
+            );
+        } else {
+            if !args.yes && !crate::confirm("Apply this refactor?")? {
+                anstream::println!("Aborted, nothing written.");
+                return Ok(());
+            }
+            for (path, _, new) in &cfg.files {
+                std::fs::write(ws.root.join(path), new)?;
+            }
+        }
+    }
+
     let cwd = std::env::current_dir()?;
     let paths: Vec<String> = args
         .paths
@@ -68,33 +140,100 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         }
     }
     summary(&plan);
-    if args.dry_run || plan.converted() == 0 {
+
+    let setup_on = !args.no_setup && project.as_ref().is_some_and(|p| p.framework.lib() == lib);
+    let opts = |ws: &glot_llm::engine::Workspace| setup::Opts {
+        routing: args.routing,
+        switcher: args.switcher,
+        locales: std::iter::once(ws.config.source_locale.clone())
+            .chain(ws.config.target_locales.iter().cloned())
+            .collect(),
+        catalog: ws.config.files.first().cloned().unwrap_or_default(),
+    };
+    if args.dry_run {
+        if setup_on && let Some(p) = &project {
+            let sp = setup::plan(&ws.root, p, &opts(&ws));
+            print_setup(&sp, true);
+        }
         return Ok(());
     }
-    if !args.yes
-        && !crate::confirm(&format!(
-            "Rewrite {} files and add the keys to the source catalog?",
-            plan.changed_files().count()
-        ))?
-    {
-        anstream::println!("Aborted, nothing written.");
-        return Ok(());
+    if plan.converted() > 0 {
+        if !args.yes
+            && !crate::confirm(&format!(
+                "Rewrite {} files and add the keys to the source catalog?",
+                plan.changed_files().count()
+            ))?
+        {
+            anstream::println!("Aborted, nothing written.");
+            return Ok(());
+        }
+        i18nize::apply(&mut ws, &plan)?;
     }
-    i18nize::apply(&mut ws, &plan)?;
+    if setup_on && let Some(p) = &project {
+        // After the rewrite: the layout may have just been converted, and Astro islands need it.
+        let sp = setup::plan(&ws.root, p, &opts(&ws));
+        setup::write(&ws.root, &sp)?;
+        for (k, v, note) in &sp.keys {
+            if !ws.source().entries.contains_key(k) {
+                ws.add_source(k, v, Some(note))?;
+            }
+        }
+        print_setup(&sp, false);
+        match sp.install_cmd() {
+            Some(cmd) if args.no_install => {
+                anstream::println!("{YELLOW}install:{YELLOW:#} run {BOLD}{cmd}{BOLD:#}")
+            }
+            Some(cmd) => {
+                anstream::eprintln!("{DIM}$ {cmd}{DIM:#}");
+                setup::install(&ws.root, &sp)?;
+            }
+            None => {}
+        }
+    } else if !args.no_setup {
+        anstream::println!(
+            "{YELLOW}note:{YELLOW:#} framework not detected: wire {} by hand (provider + config).",
+            if lib == Lib::NextIntl {
+                "next-intl"
+            } else {
+                "react-i18next"
+            }
+        );
+    }
     anstream::println!(
         "{GREEN}✓ done.{GREEN:#} Next: {BOLD}glot translate{BOLD:#} to fill {}",
         ws.config.target_locales.join(", ")
     );
-    if lib == Lib::NextIntl
-        && !std::fs::read_to_string(ws.root.join("package.json"))
-            .unwrap_or_default()
-            .contains("\"next-intl\"")
-    {
-        anstream::println!(
-            "{YELLOW}note:{YELLOW:#} add and configure next-intl (`pnpm add next-intl`, i18n/request.ts, NextIntlClientProvider)."
-        );
-    }
     Ok(())
+}
+
+fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
+    if sp.changes.is_empty() && sp.packages.is_empty() && sp.notes.is_empty() {
+        anstream::println!("{DIM}i18n runtime already wired.{DIM:#}");
+        return;
+    }
+    anstream::println!("{BOLD}i18n runtime setup{BOLD:#}");
+    for c in &sp.changes {
+        if dry_run {
+            print_diff(&glot_extract::i18nize::unified_diff(
+                &c.path,
+                c.old.as_deref().unwrap_or(""),
+                &c.new,
+            ));
+        } else {
+            let what = if c.old.is_some() {
+                "edited "
+            } else {
+                "created"
+            };
+            anstream::println!("  {GREEN}{what}{GREEN:#} {}", c.path);
+        }
+    }
+    if dry_run && let Some(cmd) = sp.install_cmd() {
+        anstream::println!("  {YELLOW}would run{YELLOW:#} {cmd}");
+    }
+    for n in &sp.notes {
+        anstream::println!("  {YELLOW}note:{YELLOW:#} {n}");
+    }
 }
 
 fn print_diff(diff: &str) {

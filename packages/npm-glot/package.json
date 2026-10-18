@@ -1,0 +1,14 @@
+{
+  "name": "glot-i18n",
+  "version": "0.1.0",
+  "description": "AI-native i18n for SaaS: glot CLI + MCP server (prebuilt binary, SHA-256 verified).",
+  "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": { "type": "git", "url": "git+https://github.com/MattJeff/glot.git", "directory": "packages/npm-glot" },
+  "keywords": ["i18n", "l10n", "translation", "mcp", "next-intl", "i18next", "ai", "claude"],
+  "mcpName": "io.github.MattJeff/glot",
+  "bin": { "glot": "bin/glot.js", "glot-i18n": "bin/glot.js" },
+  "files": ["bin/glot.js", "install.js", "checksums.json"],
+  "scripts": { "postinstall": "node install.js" },
+  "engines": { "node": ">=18" }
+}

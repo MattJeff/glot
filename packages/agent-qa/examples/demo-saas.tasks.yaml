@@ -1,0 +1,31 @@
+# Task parity for examples/demo-saas once i18nized (`glot i18nize`, next-intl, keys as generated).
+# Success conditions reference catalog KEYS, so the same check works in every locale.
+# `script` drives `--provider mock` (CI, no tokens); the Claude agent only reads `goal`.
+
+- id: create_invoice
+  goal: Create a draft invoice for Acme Corp, billed in euros.
+  start: /invoices
+  success: { text_visible_key: new_invoice_form.draft_created_line_items }
+  script:
+    - click: invoices_view.new_invoice_button
+    - type: { selector: "input[name=customer]", text: Acme Corp }
+    - select: { selector: "select[name=currency]", option_key: new_invoice_form.euro_label }
+    - click: new_invoice_form.save_button
+
+- id: send_reminder
+  goal: Invoice INV-1042 is overdue. Send the customer a payment reminder.
+  start: /invoices
+  max_steps: 8
+  success: { text_visible_key: invoice_actions.reminder_sent }
+  script:
+    - click: { selector: "a[href='/invoices/inv_1042']" }
+    - click: invoice_actions.send_reminder_button
+
+- id: invite_admin
+  goal: Invite sam@acme.dev to the team as an admin.
+  start: /settings/team
+  success: { text_visible_key: invite_member_form.invitation_sent }
+  script:
+    - type: { key: invite_member_form.teammate_email_address_aria, text: sam@acme.dev }
+    - select: { key: invite_member_form.role_aria, option_key: invite_member_form.admin }
+    - click: invite_member_form.send_invite_button

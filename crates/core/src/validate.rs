@@ -29,6 +29,8 @@ pub enum IssueCode {
     KeywordTranslated,
     TagMismatch,
     TooLong,
+    /// Renders wider than its measured box in the app (`.glot/layout.json`, see `measure`).
+    TooWide,
     WhitespaceMismatch,
     GlossaryViolation,
     DoNotTranslateViolation,
@@ -150,6 +152,82 @@ pub fn validate(
         ));
     }
     out
+}
+
+/// The message as a user would see it: placeholders replaced by realistic sample values, plurals and
+/// selects by their longest branch, markup dropped. Unparseable text is returned as is.
+pub fn render_sample(text: &str, syntax: Syntax) -> String {
+    fn sample(name: &str, format: Option<&str>) -> &'static str {
+        let n = name.to_ascii_lowercase();
+        let f = format.unwrap_or_default();
+        let has = |w: &[&str]| w.iter().any(|w| n.contains(w));
+        match () {
+            _ if f.contains("currency")
+                || has(&["amount", "price", "total", "balance", "cost"]) =>
+            {
+                "$1,234.56"
+            }
+            _ if f.starts_with("date") || has(&["date", "day", "when", "time"]) => "Sep 12, 2026",
+            _ if f.contains("percent") || has(&["percent", "ratio", "rate"]) => "42%",
+            _ if f.starts_with("number")
+                || f.starts_with("integer")
+                || has(&[
+                    "count",
+                    "num",
+                    "remaining",
+                    "seats",
+                    "days",
+                    "steps",
+                    "qty",
+                    "quantity",
+                    "size",
+                ])
+                || n == "n" =>
+            {
+                "12"
+            }
+            _ if has(&["email", "mail"]) => "alex.martin@example.com",
+            _ if has(&["url", "link", "domain"]) => "acme.example.com",
+            _ if has(&[
+                "name", "user", "customer", "client", "member", "author", "owner",
+            ]) =>
+            {
+                "Alex Martin"
+            }
+            _ => "Example",
+        }
+    }
+    fn render(nodes: &[Node], out: &mut String) {
+        for n in nodes {
+            match n {
+                Node::Text(t) => out.push_str(t),
+                Node::Arg { name, format } => out.push_str(sample(name, format.as_deref())),
+                Node::Pound => out.push_str("12"),
+                Node::Choice(c) => {
+                    let longest = c
+                        .options
+                        .iter()
+                        .map(|(_, b)| {
+                            let mut s = String::new();
+                            render(b, &mut s);
+                            s
+                        })
+                        .max_by_key(|s| s.chars().count())
+                        .unwrap_or_default();
+                    out.push_str(&longest);
+                }
+                Node::Open(_) | Node::Close(_) | Node::Void(_) | Node::Ref(_) => {}
+            }
+        }
+    }
+    match parse(text, syntax) {
+        Ok(nodes) => {
+            let mut s = String::new();
+            render(&nodes, &mut s);
+            s
+        }
+        Err(_) => text.to_string(),
+    }
 }
 
 pub fn has_errors(issues: &[Issue]) -> bool {

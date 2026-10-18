@@ -17,15 +17,32 @@ impl Provider for MockProvider {
     }
 
     async fn complete(&self, req: CompletionRequest) -> Result<Completion> {
-        let payload = crate::translate::extract_payload(&req.user).unwrap_or(Value::Null);
+        let mut payload = crate::translate::extract_payload(&req.user).unwrap_or(Value::Null);
+        if payload.is_object() && payload.get("glossary").is_none() {
+            payload["glossary"] = system_glossary(&req.system, payload["target_locale"].as_str());
+        }
         let text = respond(&payload).to_string();
         Ok(Completion {
             input_tokens: ((req.system.len() + req.user.len()) / 4) as u32,
             output_tokens: (text.len() / 4) as u32,
             text,
             model: "mock".into(), // priced as free whatever model was asked
+            ..Default::default()
         })
     }
+}
+
+/// Glossary lines of the translation system prompt: `- "term" => "translation" …`.
+fn system_glossary(system: &str, locale: Option<&str>) -> Value {
+    let terms: Vec<Value> = system
+        .lines()
+        .filter_map(|l| {
+            let (term, rest) = l.strip_prefix("- \"")?.split_once("\" => \"")?;
+            let tr = rest.split('"').next()?;
+            Some(json!({"term": term, "translations": {locale?: tr}}))
+        })
+        .collect();
+    Value::Array(terms)
 }
 
 fn respond(p: &Value) -> Value {
@@ -62,6 +79,10 @@ fn respond(p: &Value) -> Value {
         .iter()
         .filter_map(|i| {
             let key = i["key"].as_str()?.to_string();
+            // Rejected for its pixel budget: answer like a model would, with a shorter wording.
+            if let Some(v) = crate::visual::mock_fit(i) {
+                return Some((key, Value::String(v)));
+            }
             Some((
                 key,
                 Value::String(fake_translate(i["source"].as_str()?, locale, &glossary)),

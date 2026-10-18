@@ -1,0 +1,10 @@
+{
+  "name": "glot",
+  "version": "0.1.0",
+  "description": "Internationalize and translate your app with glot (CLI + MCP, deterministic validator).",
+  "author": { "name": "MattJeff" },
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": "https://github.com/MattJeff/glot",
+  "license": "MIT",
+  "keywords": ["i18n", "l10n", "translation", "next-intl", "i18next"]
+}

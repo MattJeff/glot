@@ -13,8 +13,10 @@ use oxc_syntax::operator::BinaryOperator;
 use oxc_syntax::scope::ScopeFlags;
 use serde::{Deserialize, Serialize};
 
+use std::sync::RwLock;
+
 use crate::scan::{
-    SKIP_TEXT_IN, attr_role, callee_name, elem_name, looks_like_text, path_prefix, snake,
+    attr_role, callee_name, elem_name, looks_like_text, path_prefix, skips_text, snake,
     suggest_key, tag_role,
 };
 
@@ -98,6 +100,10 @@ struct Comp {
     blocked: Option<String>,
     /// Translator variable: `t`, or `tr` when the component already binds `t`.
     tname: &'static str,
+    /// `useX()` hook returning a literal (module config turned into a hook): every text value is copy.
+    config: bool,
+    /// Edits applied only when the component gets a translator (`metadata` -> `generateMetadata`).
+    extra: Vec<(u32, u32, String)>,
 }
 
 #[derive(Debug, Clone)]
@@ -125,6 +131,16 @@ pub struct FileAnalysis {
     use_client: bool,
     imported: BTreeSet<String>,
     import_pos: Option<(u32, bool)>,
+}
+
+/// Component name -> props rendered as text by that component (`<StatCard delta="..." />`).
+/// ponytail: process-wide because `analyze` is called per file by glot-llm; keyed by name only
+/// (two components with the same name merge their props).
+static TEXT_PROPS: RwLock<BTreeMap<String, BTreeSet<String>>> = RwLock::new(BTreeMap::new());
+
+/// Register text props found by a project-wide pass, used by the next `analyze` calls.
+pub fn set_text_props(props: BTreeMap<String, BTreeSet<String>>) {
+    *TEXT_PROPS.write().unwrap() = props;
 }
 
 /// Files matched by `[extract]` include/exclude (relative to `root`, sorted).
@@ -225,6 +241,7 @@ pub fn analyze(path: &str, source: &str, lib: Lib) -> FileAnalysis {
         roles: vec![],
         skip_text: 0,
         t_bindings: vec![],
+        text_props: TEXT_PROPS.read().unwrap().clone(),
     };
     a.visit_program(program);
     let t_bindings = std::mem::take(&mut a.t_bindings);
@@ -276,6 +293,7 @@ struct Analyzer<'s, 'f> {
     roles: Vec<(Option<&'static str>, String)>,
     skip_text: usize,
     t_bindings: Vec<(String, u32)>,
+    text_props: BTreeMap<String, BTreeSet<String>>,
 }
 
 /// One child of a JSX element, as seen by the run builder.
@@ -300,6 +318,37 @@ const UI_KEYS: &[&str] = &[
     "tooltip",
     "helper",
     "caption",
+];
+/// Keys whose values are never copy, even in a config hook.
+pub const TECH_KEYS: &[&str] = &[
+    "id",
+    "key",
+    "href",
+    "to",
+    "url",
+    "src",
+    "icon",
+    "className",
+    "class",
+    "type",
+    "kind",
+    "status",
+    "variant",
+    "color",
+    "tone",
+    "email",
+    "slug",
+    "path",
+    "route",
+    "value",
+    "date",
+    "currency",
+    "locale",
+    "format",
+    "method",
+    "target",
+    "rel",
+    "size",
 ];
 const INLINE_TAGS: &[&str] = &[
     "b", "strong", "em", "i", "u", "a", "Link", "span", "mark", "small", "abbr",
@@ -668,23 +717,85 @@ impl<'s> Analyzer<'s, '_> {
         name: Option<String>,
         is_async: bool,
         hook: Option<Hook>,
+        config: bool,
     ) -> bool {
         self.fn_depth += 1;
         let name = name.or_else(|| self.comp_targets.get(&span.start).cloned());
         match (name, hook) {
-            (Some(n), Some(hook)) if n.starts_with(|c: char| c.is_ascii_uppercase()) => {
+            (Some(n), Some(hook)) if is_component_name(&n) => {
                 self.fa.comps.push(Comp {
                     span: (span.start, span.end),
                     is_async,
                     hook,
                     blocked: None,
                     tname: "t",
+                    config: config && n.starts_with("use"),
+                    extra: vec![],
                 });
                 self.comp_stack.push((self.fa.comps.len() - 1, n));
                 true
             }
             _ => false,
         }
+    }
+
+    /// Inside a config hook (`useNavItems() { return [...] }`).
+    fn in_config(&self) -> bool {
+        self.comp_stack
+            .last()
+            .is_some_and(|(c, _)| self.fa.comps[*c].config)
+    }
+
+    /// `export const metadata = { title: "..." }` -> `export async function generateMetadata()`.
+    fn metadata_decl(&mut self, decl: &VariableDeclaration<'_>) -> bool {
+        let [d] = decl.declarations.as_slice() else {
+            return false;
+        };
+        let (BindingPattern::BindingIdentifier(id), Some(init)) = (&d.id, &d.init) else {
+            return false;
+        };
+        let obj = init.get_inner_expression();
+        if id.name != "metadata"
+            || self.lib != Lib::NextIntl
+            || self.fa.use_client
+            || !matches!(obj, Expression::ObjectExpression(_))
+        {
+            return false;
+        }
+        let ret = d
+            .type_annotation
+            .as_ref()
+            .map(|a| format!(": Promise<{}>", self.text_of(a.type_annotation.span())))
+            .unwrap_or_default();
+        let (start, end) = (init.span().start, init.span().end);
+        self.fa.comps.push(Comp {
+            span: (decl.span.start, decl.span.end),
+            is_async: true,
+            hook: Hook::Expr {
+                start,
+                end,
+                indent: "  ".into(),
+                outer: String::new(),
+            },
+            blocked: None,
+            tname: "t",
+            config: false,
+            extra: vec![
+                (
+                    decl.span.start,
+                    start,
+                    format!("async function generateMetadata(){ret} "),
+                ),
+                (end, decl.span.end, String::new()),
+            ],
+        });
+        self.comp_stack
+            .push((self.fa.comps.len() - 1, "generateMetadata".into()));
+        self.fn_depth += 1;
+        self.visit_expression(init);
+        self.fn_depth -= 1;
+        self.comp_stack.pop();
+        true
     }
 
     fn block_hook(&self, body: &FunctionBody, fn_start: u32) -> Hook {
@@ -752,7 +863,8 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
     fn visit_function(&mut self, it: &Function<'a>, flags: ScopeFlags) {
         let hook = it.body.as_ref().map(|b| self.block_hook(b, it.span.start));
         let name = it.id.as_ref().map(|i| i.name.to_string());
-        let is_comp = self.enter_fn(it.span, name, it.r#async, hook);
+        let config = it.body.as_ref().is_some_and(|b| returns_literal(b));
+        let is_comp = self.enter_fn(it.span, name, it.r#async, hook, config);
         walk::walk_function(self, it, flags);
         self.fn_depth -= 1;
         if is_comp {
@@ -773,12 +885,42 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
                 }
             }),
         };
-        let is_comp = self.enter_fn(it.span, None, it.r#async, hook);
+        let config = match it.get_function_body() {
+            Some(b) => returns_literal(b),
+            None => it
+                .get_expression()
+                .is_some_and(|e| is_literal(e.get_inner_expression())),
+        };
+        let is_comp = self.enter_fn(it.span, None, it.r#async, hook, config);
         walk::walk_arrow_function_expression(self, it);
         self.fn_depth -= 1;
         if is_comp {
             self.comp_stack.pop();
         }
+    }
+
+    fn visit_export_declaration(&mut self, it: &ExportDeclaration<'a>) {
+        if let Declaration::VariableDeclaration(d) = &it.declaration
+            && self.metadata_decl(d)
+        {
+            return;
+        }
+        walk::walk_export_declaration(self, it);
+    }
+
+    fn visit_array_expression_element(&mut self, it: &ArrayExpressionElement<'a>) {
+        if self.in_config()
+            && let Some(e) = it.as_expression()
+            && matches!(
+                e.get_inner_expression(),
+                Expression::StringLiteral(_) | Expression::TemplateLiteral(_)
+            )
+            && let Some(m) = self.message_of(e)
+        {
+            self.push(Kind::Expr, e.get_inner_expression().span(), m, "text");
+            return;
+        }
+        walk::walk_array_expression_element(self, it);
     }
 
     fn visit_object_property(&mut self, it: &ObjectProperty<'a>) {
@@ -797,10 +939,22 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
         if self.fn_depth > 0
             && !self.comp_stack.is_empty()
             && let Some(k) = it.key.static_name()
-            && UI_KEYS.contains(&k.as_ref())
+            && (UI_KEYS.contains(&k.as_ref())
+                || self.in_config() && !TECH_KEYS.contains(&k.as_ref()))
             && let Some(m) = self.message_of(&it.value)
         {
-            let role = attr_role(&k).unwrap_or("label");
+            let in_metadata = self
+                .comp_stack
+                .last()
+                .is_some_and(|(_, n)| n == "generateMetadata");
+            let role = match attr_role(&k) {
+                // Page `<title>` / meta description, not a hover tooltip.
+                _ if in_metadata && k == "title" => "heading",
+                _ if in_metadata => "text",
+                Some(r) => r,
+                None if UI_KEYS.contains(&k.as_ref()) => "label",
+                None => "text",
+            };
             self.push(Kind::Expr, it.value.get_inner_expression().span(), m, role);
             return;
         }
@@ -823,7 +977,7 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
 
     fn visit_jsx_element(&mut self, it: &JSXElement<'a>) {
         let tag = elem_name(&it.opening_element.name);
-        let skip = SKIP_TEXT_IN.contains(&tag.as_str());
+        let skip = skips_text(&tag, &it.opening_element);
         self.roles.push((tag_role(&tag), tag.clone()));
         self.skip_text += skip as usize;
         self.visit_jsx_opening_element(&it.opening_element);
@@ -838,7 +992,14 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
 
     fn visit_jsx_attribute(&mut self, it: &JSXAttribute<'a>) {
         let role = match &it.name {
-            JSXAttributeName::Identifier(id) => attr_role(&id.name),
+            JSXAttributeName::Identifier(id) => attr_role(&id.name).or_else(|| {
+                // Prop the target component renders as text: `<StatCard delta="+12%" />`.
+                let comp = &self.roles.last()?.1;
+                self.text_props
+                    .get(comp)?
+                    .contains(id.name.as_str())
+                    .then_some("text")
+            }),
             JSXAttributeName::NamespacedName(_) => None,
         };
         match (role, &it.value) {
@@ -859,6 +1020,31 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
             _ => walk::walk_jsx_attribute(self, it),
         }
     }
+}
+
+/// String that reads as UI copy (same heuristic as the hardcoded-string scan).
+pub fn looks_like_copy(s: &str) -> bool {
+    looks_like_text(s.trim())
+}
+
+/// `Button`, `useNavItems`: functions that may hold a translator.
+pub fn is_component_name(n: &str) -> bool {
+    n.starts_with(|c: char| c.is_ascii_uppercase())
+        || n.strip_prefix("use")
+            .is_some_and(|r| r.starts_with(|c: char| c.is_ascii_uppercase()))
+}
+
+fn is_literal(e: &Expression) -> bool {
+    matches!(
+        e,
+        Expression::ArrayExpression(_) | Expression::ObjectExpression(_)
+    )
+}
+
+/// Body is only `return <array|object literal>`.
+fn returns_literal(b: &FunctionBody) -> bool {
+    matches!(b.statements.as_slice(), [Statement::ReturnStatement(r)]
+        if r.argument.as_ref().is_some_and(|e| is_literal(e.get_inner_expression())))
 }
 
 /// Values safe to pass as message arguments (primitives in practice).
@@ -891,10 +1077,16 @@ fn simple_value(e: &Expression) -> bool {
                 && !last.starts_with(|ch: char| ch.is_ascii_uppercase())
                 && !last.starts_with("render")
                 && !last.starts_with("use")
+                // `items.map((i) => <li>..</li>)` renders JSX through its callback: not a value.
                 && !c.arguments.iter().any(|a| {
                     matches!(
                         a.as_expression(),
-                        Some(Expression::JSXElement(_) | Expression::JSXFragment(_))
+                        Some(
+                            Expression::JSXElement(_)
+                                | Expression::JSXFragment(_)
+                                | Expression::ArrowFunctionExpression(_)
+                                | Expression::FunctionExpression(_)
+                        )
                     )
                 })
         }
@@ -1373,6 +1565,7 @@ pub fn rewrite(
             }
         };
         need_use |= lib == Lib::ReactI18next;
+        edits.extend(comp.extra.iter().cloned());
         match &comp.hook {
             Hook::Block { pos, indent } => edits.push((*pos, *pos, format!("\n{indent}{stmt}"))),
             Hook::Expr {
@@ -1688,6 +1881,39 @@ export default function InvoicesPage({ user, invoices }: Props) {
             out.contains(r#"{t("steps_left", { count: remaining })}"#),
             "{out}"
         );
+    }
+
+    #[test]
+    fn metadata_config_hooks_text_props_and_map_callbacks() {
+        let src = "import type { Metadata } from \"next\";\n\nexport const metadata: Metadata = {\n  title: \"Invoices — Acme\",\n};\n\nexport default function Page() {\n  return <ul>{ITEMS.map((i) => <li key={i}>Last active {i}</li>)}</ul>;\n}\n";
+        let (fa, out) = run("app/invoices/page.tsx", src, Lib::NextIntl);
+        assert_eq!(texts(&fa), ["Invoices — Acme", "Last active {i}"]);
+        assert!(
+            out.contains("export async function generateMetadata(): Promise<Metadata> {\n  const t = await getTranslations(\"invoices\");\n  return {\n  title: t(\"invoices_acme_title\"),\n};\n}\n"),
+            "{out}"
+        );
+        assert!(
+            out.contains(r#"<li key={i}>{tr("last_active", { i })}</li>"#)
+                || out.contains(r#"{t("last_active", { i })}"#),
+            "{out}"
+        );
+
+        let src = "export function useNav() {\n  return [{ href: \"/\", label: \"Dashboard\", features: [\"Unlimited invoices\"], icon: \"◧\", tagline: \"For small teams\" }];\n}\n";
+        let (fa, out) = run("lib/data.ts", src, Lib::NextIntl);
+        assert_eq!(
+            texts(&fa),
+            ["Dashboard", "Unlimited invoices", "For small teams"]
+        );
+        assert!(
+            out.contains("export function useNav() {\n  const t = useTranslations(\"lib.data\");"),
+            "{out}"
+        );
+
+        set_text_props([("StatCard".to_string(), ["delta".to_string()].into())].into());
+        let src = "export function Home() {\n  return <StatCard delta=\"+12% vs last month\" active=\"team\" />;\n}\n";
+        let (fa, _) = run("app/page.tsx", src, Lib::NextIntl);
+        set_text_props(BTreeMap::new());
+        assert_eq!(texts(&fa), ["+12% vs last month"]);
     }
 
     #[test]

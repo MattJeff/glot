@@ -1,0 +1,6 @@
+{
+  "term": [
+    { "term": "Workspace", "translations": { "fr": "Espace de travail", "de": "Arbeitsbereich", "es": "Espacio de trabajo", "pl": "Obszar roboczy", "ja": "ワークスペース" } },
+    { "term": "glot", "do_not_translate": true }
+  ]
+}

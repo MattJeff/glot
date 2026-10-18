@@ -1,6 +1,10 @@
 import {
   ArrowRight,
   Bot,
+  Maximize2,
+  Undo2,
+  Wand2,
+  Languages,
   BookOpenText,
   Check,
   CircleAlert,
@@ -20,8 +24,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import {
+  COMMANDS,
+  FitVisual,
+  FlowStep,
+  InsightsTile,
+  MatrixTile,
+  OnDeviceTile,
+  OverlayVisual,
+  ReviewTile,
+  Showcase,
+  Terminal,
+} from "@/components/landing";
 import { DEMO, GITHUB_URL, INSTALL_CARGO, INSTALL_NPX, mcpJson } from "@/lib/snippets";
 import { cn } from "@/lib/utils";
+
+// Public pages the comparison is based on.
+const SOURCES = [
+  "https://lokalise.com/pricing",
+  "https://crowdin.com/pricing",
+  "https://lingo.dev",
+  "https://github.com/lingodotdev/lingo.dev",
+];
 
 export default async function Landing({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -39,14 +63,24 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
     { icon: Star, key: "oss" },
   ] as const;
 
+  const workflow = [
+    { key: "i18nize", icon: Wand2, cmd: COMMANDS.i18nize },
+    { key: "translate", icon: Languages, cmd: COMMANDS.translate },
+    { key: "fit", icon: Maximize2, cmd: COMMANDS.fit },
+    { key: "review", icon: Undo2, cmd: COMMANDS.review },
+  ] as const;
+
   type Cell = "yes" | "no" | "partial" | string;
-  const rows: { label: string; glot: Cell; lokalise: Cell; crowdin: Cell }[] = [
-    { label: t("compare.rows.price"), glot: t("compare.glotPrice"), lokalise: t("compare.lokalisePrice"), crowdin: t("compare.crowdinPrice") },
-    { label: t("compare.rows.openSource"), glot: "yes", lokalise: "no", crowdin: "no" },
-    { label: t("compare.rows.byok"), glot: "yes", lokalise: "no", crowdin: "partial" },
-    { label: t("compare.rows.validator"), glot: "yes", lokalise: "partial", crowdin: "partial" },
-    { label: t("compare.rows.gitNative"), glot: "yes", lokalise: "no", crowdin: "no" },
-    { label: t("compare.rows.mcp"), glot: "yes", lokalise: "partial", crowdin: "partial" },
+  const vendors = ["glot", "lokalise", "crowdin", "lingo"] as const;
+  const rows: { label: string; cells: Record<(typeof vendors)[number], Cell> }[] = [
+    { label: t("compare.rows.price"), cells: { glot: t("compare.glotPrice"), lokalise: t("compare.lokalisePrice"), crowdin: t("compare.crowdinPrice"), lingo: t("compare.lingoPrice") } },
+    { label: t("compare.rows.openSource"), cells: { glot: "yes", lokalise: "no", crowdin: "no", lingo: "partial" } },
+    { label: t("compare.rows.byok"), cells: { glot: "yes", lokalise: "no", crowdin: "partial", lingo: "yes" } },
+    { label: t("compare.rows.validator"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "partial" } },
+    { label: t("compare.rows.gitNative"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "yes" } },
+    { label: t("compare.rows.mcp"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "yes" } },
+    { label: t("compare.rows.inContext"), cells: { glot: "yes", lokalise: "yes", crowdin: "yes", lingo: "no" } },
+    { label: t("compare.rows.fit"), cells: { glot: "yes", lokalise: "partial", crowdin: "partial", lingo: "no" } },
   ];
   const cell = (v: Cell) => {
     if (v === "yes") return <Check aria-label={t("compare.yes")} className="mx-auto size-4 text-success" />;
@@ -63,6 +97,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
             <Logo />
           </Link>
           <nav className="hidden items-center gap-5 text-sm text-muted-foreground md:flex">
+            <a href="#workflow" className="hover:text-foreground">{t("nav.workflow")}</a>
             <a href="#features" className="hover:text-foreground">{t("nav.features")}</a>
             <a href="#compare" className="hover:text-foreground">{t("nav.compare")}</a>
             <a href="#install" className="hover:text-foreground">{t("nav.install")}</a>
@@ -84,30 +119,30 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
         {/* Hero */}
         <section className="relative overflow-hidden border-b">
           <div aria-hidden className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)] opacity-60" />
-          <div className="relative mx-auto max-w-6xl px-4 pt-20 pb-16 text-center sm:pt-28">
-            <Badge variant="outline" className="mb-6 gap-1.5 rounded-full bg-background px-3 py-1 text-xs font-normal">
-              <span className="size-1.5 rounded-full bg-brand" />
-              {t("hero.badge")}
-            </Badge>
-            <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-              {t("hero.title")}
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-              {t("hero.subtitle")}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" asChild className="h-10 px-4">
-                <Link href="/signup">
-                  {t("hero.primary")} <ArrowRight className="rtl:rotate-180" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="h-10 px-4">
-                <a href={GITHUB_URL} target="_blank" rel="noreferrer">
-                  <Star /> {t("hero.secondary")}
-                </a>
-              </Button>
+          <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-16 pb-16 sm:pt-24 lg:grid-cols-[1.1fr_1fr]">
+            <div className="text-center lg:text-start">
+              <Badge variant="outline" className="mb-6 gap-1.5 rounded-full bg-background px-3 py-1 text-xs font-normal">
+                <span className="size-1.5 rounded-full bg-brand" />
+                {t("hero.badge")}
+              </Badge>
+              <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{t("hero.title")}</h1>
+              <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg lg:mx-0">
+                {t("hero.subtitle")}
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                <Button size="lg" asChild className="h-11 px-5">
+                  <Link href="/signup">
+                    {t("hero.primary")} <ArrowRight className="rtl:rotate-180" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild className="h-11 px-5">
+                  <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+                    <Star /> {t("hero.secondary")}
+                  </a>
+                </Button>
+              </div>
             </div>
-            <CodeBlock code={INSTALL_CARGO} className="mx-auto mt-6 max-w-xs text-start" />
+            <Terminal label={t("hero.terminal")} />
           </div>
 
           {/* Flow demo: agent -> MCP -> validation -> PR */}
@@ -153,10 +188,62 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        {/* Features */}
-        <section id="features" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-20">
-          <h2 className="text-3xl font-semibold tracking-tight">{t("features.title")}</h2>
-          <p className="mt-2 text-muted-foreground">{t("features.subtitle")}</p>
+        {/* Workflow: one command per step */}
+        <section id="workflow" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-20">
+          <h2 className="text-3xl font-semibold tracking-tight text-balance">{t("workflow.title")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("workflow.subtitle")}</p>
+          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {workflow.map(({ key, icon: Icon, cmd }, i) => (
+              <li key={key} className="flex flex-col rounded-xl border bg-card p-5">
+                <div className="flex items-center gap-2">
+                  <span className="grid size-6 place-items-center rounded-md border bg-muted font-mono text-[11px]">{i + 1}</span>
+                  <Icon aria-hidden className="size-4 text-brand" />
+                  <h3 className="font-medium">{t(`workflow.steps.${key}.title`)}</h3>
+                </div>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{t(`workflow.steps.${key}.body`)}</p>
+                <code dir="ltr" className="mt-4 block truncate rounded-md border bg-muted/50 px-2.5 py-1.5 font-mono text-xs">
+                  {cmd}
+                </code>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Showcases */}
+        <section id="features" className="scroll-mt-16 border-t">
+          <div className="mx-auto max-w-6xl space-y-24 px-4 py-20">
+            <Showcase eyebrow={t("fit.eyebrow")} title={t("fit.title")} body={t("fit.body")} points={[t("fit.p1"), t("fit.p2"), t("fit.p3")]}>
+              <FitVisual />
+            </Showcase>
+            <Showcase
+              flip
+              eyebrow={t("overlay.eyebrow")}
+              title={t("overlay.title")}
+              body={t("overlay.body")}
+              points={[t("overlay.p1"), t("overlay.p2"), t("overlay.p3")]}
+            >
+              <OverlayVisual />
+            </Showcase>
+          </div>
+        </section>
+
+        <section className="border-t bg-muted/30">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <h2 className="text-3xl font-semibold tracking-tight text-balance">{t("more.title")}</h2>
+            <p className="mt-2 text-muted-foreground">{t("more.subtitle")}</p>
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              <ReviewTile />
+              <MatrixTile />
+              <InsightsTile />
+              <OnDeviceTile />
+            </div>
+          </div>
+        </section>
+
+        {/* Deterministic core */}
+        <section className="mx-auto max-w-6xl px-4 py-20">
+          <h2 className="text-3xl font-semibold tracking-tight">{t("core.title")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("core.subtitle")}</p>
           <div className="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, key, ...f }) => (
               <div key={key} className={cn("bg-background p-6", "wide" in f && f.wide && "lg:col-span-2")}>
@@ -174,7 +261,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
             <h2 className="text-3xl font-semibold tracking-tight">{t("compare.title")}</h2>
             <p className="mt-2 text-muted-foreground">{t("compare.subtitle")}</p>
             <div className="mt-10 overflow-x-auto rounded-xl border bg-background">
-              <table className="w-full min-w-[560px] text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b text-muted-foreground">
                     <th scope="col" className="px-4 py-3 text-start font-medium">{t("compare.feature")}</th>
@@ -184,21 +271,35 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
                     {/* Vendor names are proper nouns. */}
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Lokalise"}</th>
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Crowdin"}</th>
+                    <th scope="col" className="px-4 py-3 text-center font-medium">{"Lingo.dev"}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.label} className="border-b last:border-0">
                       <th scope="row" className="px-4 py-3 text-start font-normal">{r.label}</th>
-                      <td className="bg-brand/5 px-4 py-3 text-center font-medium">{cell(r.glot)}</td>
-                      <td className="px-4 py-3 text-center text-muted-foreground">{cell(r.lokalise)}</td>
-                      <td className="px-4 py-3 text-center text-muted-foreground">{cell(r.crowdin)}</td>
+                      {vendors.map((v) => (
+                        <td
+                          key={v}
+                          className={cn("px-4 py-3 text-center", v === "glot" ? "bg-brand/5 font-medium" : "text-muted-foreground")}
+                        >
+                          {cell(r.cells[v])}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">{t("compare.footnote")}</p>
+            <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+              <span>{t("compare.sources")}</span>
+              {SOURCES.map((s) => (
+                <a key={s} href={s} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
+                  {new URL(s).host}
+                </a>
+              ))}
+            </p>
           </div>
         </section>
 
@@ -210,6 +311,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
             <div className="space-y-4">
               <CodeBlock label={t("install.cargo")} code={INSTALL_CARGO} />
               <CodeBlock label={t("install.npx")} code={INSTALL_NPX} />
+              <CodeBlock label={t("install.i18nize")} code={COMMANDS.i18nize} />
             </div>
             <CodeBlock label={t("install.mcp")} code={mcpJson()} />
           </div>
@@ -218,7 +320,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
         <section className="border-t">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 py-20 text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-balance">{t("cta.title")}</h2>
-            <Button size="lg" asChild className="h-10 px-4">
+            <Button size="lg" asChild className="h-11 px-5">
               <Link href="/signup">
                 {t("cta.button")} <ArrowRight className="rtl:rotate-180" />
               </Link>
@@ -238,34 +340,5 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
         </div>
       </footer>
     </div>
-  );
-}
-
-function FlowStep({
-  n,
-  icon: Icon,
-  label,
-  caption,
-  children,
-}: {
-  n: number;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  caption: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <li className="relative flex flex-col rounded-xl border bg-card p-4 shadow-xs">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="grid size-6 place-items-center rounded-md border bg-muted font-mono text-[11px]">{n}</span>
-        <Icon className="size-4 text-brand" />
-        <span className="text-sm font-medium">{label}</span>
-      </div>
-      <div className="flex-1">{children}</div>
-      <p className="mt-3 text-xs text-muted-foreground">{caption}</p>
-      {n < 4 && (
-        <ArrowRight aria-hidden className="absolute top-1/2 -end-3 z-10 hidden size-4 -translate-y-1/2 rounded-full bg-background text-muted-foreground md:block rtl:rotate-180" />
-      )}
-    </li>
   );
 }

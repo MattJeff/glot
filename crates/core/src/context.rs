@@ -22,4 +22,7 @@ pub struct KeyContext {
     /// Sibling keys (same prefix) with their source values.
     pub neighbors: Vec<(Key, String)>,
     pub screenshot: Option<String>,
+    /// Pixel budget measured in the running app (`glot measure`, `.glot/layout.json`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fit: Option<crate::measure::Fit>,
 }

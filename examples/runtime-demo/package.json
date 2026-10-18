@@ -1,0 +1,12 @@
+{
+  "name": "glot-runtime-demo",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": {
+    "@glot/runtime": "link:../../packages/runtime",
+    "intl-messageformat": "^10.7.16"
+  },
+  "devDependencies": { "vite": "^7.1.0" },
+  "packageManager": "pnpm@10.18.3"
+}

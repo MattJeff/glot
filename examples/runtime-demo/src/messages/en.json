@@ -1,0 +1,8 @@
+{
+  "home": {
+    "title": "Welcome back, {name}!",
+    "files": "You have {n, plural, one {# file} other {# files}} in the {folder} Workspace.",
+    "invite": "Invite your team to glot: <b>it's free</b>.",
+    "cta": "Open your Workspace"
+  }
+}

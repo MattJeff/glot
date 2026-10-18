@@ -21,7 +21,7 @@ use rmcp::{
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde_json::{Value, json};
-use tokio::sync::{Mutex, OwnedMutexGuard};
+use tokio::sync::{Mutex, OwnedMappedMutexGuard, OwnedMutexGuard};
 
 use glot_core::{Locale, glossary::Term, lock::Plan, validate};
 use glot_llm::engine::{TranslateOptions, Workspace};
@@ -49,25 +49,35 @@ pub async fn serve_stdio(start: PathBuf) -> anyhow::Result<()> {
 
 #[derive(Clone)]
 pub struct GlotServer {
-    ws: Arc<Mutex<Workspace>>,
+    // None until a glot.toml is found: the server must start in any repo (plugins, registries
+    // probe it) and tell the agent to run `glot init` instead of dying.
+    ws: Arc<Mutex<Option<Workspace>>>,
+    start: PathBuf,
     tool_router: ToolRouter<Self>,
     prompt_router: PromptRouter<Self>,
 }
 
 impl GlotServer {
     pub fn open(start: &Path) -> anyhow::Result<Self> {
-        let ws = Workspace::open(start).map_err(|e| {
-            anyhow::anyhow!(
-                "no usable glot project from {}: {e} (run `glot init` to create glot.toml)",
+        let ws = Workspace::open(start).ok();
+        if ws.is_none() {
+            tracing::warn!(
+                "no glot.toml from {}: tools will ask to run `glot init`",
                 start.display()
-            )
-        })?;
-        Ok(Self::new(ws))
+            );
+        }
+        Ok(Self::build(ws, start.to_path_buf()))
     }
 
     pub fn new(ws: Workspace) -> Self {
+        let start = ws.root.clone();
+        Self::build(Some(ws), start)
+    }
+
+    fn build(ws: Option<Workspace>, start: PathBuf) -> Self {
         Self {
             ws: Arc::new(Mutex::new(ws)),
+            start,
             tool_router: Self::tool_router() + Self::review_router(),
             prompt_router: Self::prompt_router(),
         }
@@ -77,12 +87,22 @@ impl GlotServer {
     /// Runs in its own task so a panic inside the engine becomes an error, not a dead server.
     async fn with_ws<F, Fut>(&self, f: F) -> Result<Value, String>
     where
-        F: FnOnce(OwnedMutexGuard<Workspace>) -> Fut + Send + 'static,
+        F: FnOnce(OwnedMappedMutexGuard<Option<Workspace>, Workspace>) -> Fut + Send + 'static,
         Fut: Future<Output = Result<Value, String>> + Send + 'static,
     {
         let ws = self.ws.clone();
+        let start = self.start.clone();
         let task = tokio::spawn(async move {
-            let mut g = ws.lock_owned().await;
+            let mut slot = ws.lock_owned().await;
+            if slot.is_none() {
+                *slot = Some(Workspace::open(&start).map_err(|_| {
+                    format!(
+                        "No glot project in {}. Run `glot init --yes` (or `npx glot-i18n init --yes`) in the app root, then retry.",
+                        start.display()
+                    )
+                })?);
+            }
+            let mut g = OwnedMutexGuard::map(slot, |o| o.as_mut().expect("set above"));
             g.reload().map_err(|e| {
                 format!(
                     "could not reload the project ({e}); fix glot.toml / catalog JSON and retry"
@@ -98,7 +118,7 @@ impl GlotServer {
 
     async fn run<F, Fut>(&self, f: F) -> CallToolResult
     where
-        F: FnOnce(OwnedMutexGuard<Workspace>) -> Fut + Send + 'static,
+        F: FnOnce(OwnedMappedMutexGuard<Option<Workspace>, Workspace>) -> Fut + Send + 'static,
         Fut: Future<Output = Result<Value, String>> + Send + 'static,
     {
         match self.with_ws(f).await {

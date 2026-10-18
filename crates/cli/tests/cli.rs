@@ -73,7 +73,9 @@ fn init_is_idempotent_and_writes_integration() {
     }
     let mcp: serde_json::Value =
         serde_json::from_str(&fs::read_to_string(r.join(".mcp.json")).unwrap()).unwrap();
-    assert_eq!(mcp["mcpServers"]["glot"]["args"][0], "mcp");
+    // `glot mcp` when glot is on PATH, `npx -y glot-i18n mcp` otherwise.
+    let args = mcp["mcpServers"]["glot"]["args"].as_array().unwrap();
+    assert_eq!(args.last().unwrap(), "mcp");
 
     // Second run: nothing duplicated, user edits kept.
     fs::write(

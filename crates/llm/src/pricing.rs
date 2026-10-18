@@ -41,8 +41,53 @@ pub fn price_per_mtok(model: &str) -> Option<(f64, f64)> {
 }
 
 pub fn cost_usd(model: &str, input_tokens: u32, output_tokens: u32) -> f64 {
+    cost_cached_usd(model, input_tokens, 0, 0, output_tokens)
+}
+
+/// Message Batches API: every token (cache reads/writes included) at 50 %.
+pub const BATCH_DISCOUNT: f64 = 0.5;
+
+/// (cache write, cache read) multipliers of the input price. Anthropic: 5-minute writes 1.25×, reads
+/// 0.1× (Opus 5.5 0.05×, Fable 5.1 0.025×). OpenAI: automatic caching, no write premium, reads
+/// 0.1× (gpt-5) / 0.25× (gpt-4.1, o-series) / 0.5× (gpt-4o). Others: no known discount.
+pub fn cache_factors(model: &str) -> (f64, f64) {
+    let m = model
+        .rsplit('/')
+        .next()
+        .unwrap_or(model)
+        .to_ascii_lowercase();
+    let p = |x: &str| m.starts_with(x);
+    if p("claude-fable-5-1") || p("claude-mythos-5-1") {
+        (1.25, 0.025)
+    } else if p("claude-opus-5-5") {
+        (1.25, 0.05)
+    } else if p("claude-") {
+        (1.25, 0.1)
+    } else if p("gpt-5") {
+        (1.0, 0.1)
+    } else if p("gpt-4.1") || p("o3") || p("o4") {
+        (1.0, 0.25)
+    } else if p("gpt-4o") {
+        (1.0, 0.5)
+    } else {
+        (1.0, 1.0)
+    }
+}
+
+/// Cost with prompt caching: `input_tokens` is the uncached part only.
+pub fn cost_cached_usd(
+    model: &str,
+    input_tokens: u32,
+    cache_write: u32,
+    cache_read: u32,
+    output_tokens: u32,
+) -> f64 {
     match price_per_mtok(model) {
-        Some((i, o)) => (input_tokens as f64 * i + output_tokens as f64 * o) / 1_000_000.0,
+        Some((i, o)) => {
+            let (w, r) = cache_factors(model);
+            let input = input_tokens as f64 + cache_write as f64 * w + cache_read as f64 * r;
+            (input * i + output_tokens as f64 * o) / 1_000_000.0
+        }
         None => {
             tracing::warn!(model, "unknown model price, cost counted as $0");
             0.0
@@ -64,5 +109,10 @@ mod tests {
         );
         assert_eq!(price_per_mtok("llama3.2"), None);
         assert!((cost_usd("claude-sonnet-5-5", 1_000_000, 100_000) - 3.0).abs() < 1e-9);
+        // Sonnet 5.5: write $2.50, read $0.20 per MTok; Opus 5.5 reads at $0.20.
+        let c = cost_cached_usd("claude-sonnet-5-5", 0, 1_000_000, 1_000_000, 0);
+        assert!((c - 2.7).abs() < 1e-9, "{c}");
+        assert!((cost_cached_usd("claude-opus-5-5", 0, 0, 1_000_000, 0) - 0.2).abs() < 1e-9);
+        assert!((cost_cached_usd("gpt-4o", 0, 0, 1_000_000, 0) - 1.25).abs() < 1e-9);
     }
 }

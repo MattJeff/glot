@@ -187,24 +187,32 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Paid plans, ~$50+/mo",
+      "crowdinPrice": "Subscription, free for open source",
       "feature": "Feature",
-      "footnote": "Indicative entry prices from public pricing pages; check each vendor for current plans.",
-      "glotPrice": "Free + your LLM usage",
-      "lokalisePrice": "Paid plans, ~$120+/mo",
+      "footnote": "Based on each vendor's public website and docs as of October 2026. Partial means limited, plan-dependent or through an integration. Plans and features change: check the sources.",
+      "glotPrice": "Free (MIT) + your LLM usage",
+      "lingoPrice": "Free CLI, paid hosted engine",
+      "lokalisePrice": "Subscription, see pricing",
       "no": "No",
       "partial": "Partial",
       "rows": {
         "byok": "Bring your own LLM key",
+        "fit": "Rendered pixel-budget fitting",
         "gitNative": "Git as source of truth (lockfile)",
+        "inContext": "In-context editing in your app",
         "mcp": "MCP server for coding agents",
         "openSource": "Open source",
         "price": "Price",
         "validator": "Deterministic validation of every string"
       },
-      "subtitle": "Translation management without per-seat pricing.",
+      "sources": "Sources:",
+      "subtitle": "Where glot differs from hosted translation platforms and from the other open-source option.",
       "title": "Compare",
       "yes": "Yes"
+    },
+    "core": {
+      "subtitle": "The LLM is always surrounded by code that can say no.",
+      "title": "The deterministic core"
     },
     "cta": {
       "button": "Create your workspace",
@@ -242,6 +250,19 @@
         "title": "Visual QA"
       }
     },
+    "fit": {
+      "after": "After glot fit",
+      "afterAlt": "Shorter German label that fits the button",
+      "before": "Before",
+      "beforeAlt": "German button label cut off with an ellipsis",
+      "body": "German is often a third longer than English. glot fit captures your running app in every locale, measures each text against its container, asks the LLM for a shorter variant that keeps the meaning and the placeholders, then renders again.",
+      "caption": "Real captures from the demo app, German locale.",
+      "eyebrow": "Pixel budget",
+      "p1": "Measured in the browser, not guessed from a character count",
+      "p2": "Shortened variants still pass the validator and glossary",
+      "p3": "Stops after a fixed number of passes, never loops on cost",
+      "title": "Translations that fit the button"
+    },
     "flow": {
       "agent": {
         "caption": "Your agent adds a feature and new keys.",
@@ -276,26 +297,93 @@
       "badge": "Open source · MIT · Bring your own LLM key",
       "primary": "Start for free",
       "secondary": "Star on GitHub",
-      "subtitle": "Your coding agent writes features. glot ships them in every language: context-aware LLM translations, wrapped in a deterministic validator, a lockfile and a glossary that live in Git.",
+      "subtitle": "Point glot at a codebase full of hardcoded strings. One command moves them to keys and rewrites your components; your LLM translates, deterministic code checks every string, and the result lands in Git.",
+      "terminal": "From hardcoded English to four languages",
       "title": "i18n your AI agent can't break."
+    },
+    "insights": {
+      "body": "An anonymous beacon counts visitors by preferred language and the locale you served them, then compares conversion. No cookie, no visitor id.",
+      "notServed": "Not translated yet",
+      "sample": "Example data",
+      "served": "Served",
+      "share": "{value} of visitors",
+      "title": "Insights per language"
     },
     "install": {
       "cargo": "With Cargo",
+      "i18nize": "Convert an existing app",
       "mcp": "Add to your agent",
       "npx": "With npx",
       "subtitle": "Run it locally with your agent, or connect it to a glot server for your team.",
       "title": "Install in seconds"
     },
+    "matrix": {
+      "body": "Every locale of a page side by side, with overflow, truncation and RTL issues from visual QA pinned to the screen they break.",
+      "issues": "{count, plural, one {# overflow} other {# overflows}}",
+      "ok": "No issues",
+      "title": "Locale matrix"
+    },
     "meta": {
       "description": "Open-source localization for SaaS built for coding agents. Deterministic validation, a lockfile, glossary-as-code and an MCP server.",
       "title": "glot: i18n that AI can't break"
+    },
+    "more": {
+      "subtitle": "Quality you can check without speaking the language, and data on which language to add next.",
+      "title": "See what your users see"
     },
     "nav": {
       "compare": "Compare",
       "features": "Features",
       "getStarted": "Get started",
       "install": "Install",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "workflow": "How it works"
+    },
+    "ondevice": {
+      "body": "For languages you don't ship yet, @glot/runtime translates in the browser with the built-in Translator API, then runs glot's validator compiled to WebAssembly.",
+      "step1": "Browser translates, placeholders masked",
+      "step2": "Validator checks plurals, tags, glossary",
+      "step3": "Anything that fails stays in the source language",
+      "title": "On-device fallback"
+    },
+    "overlay": {
+      "alt": "glot overlay popover showing a key, its source and its translations in five languages",
+      "body": "The dev overlay finds the key behind the text you clicked, shows it in every locale with live validator issues, and saves to your catalog files. Hot reload does the rest.",
+      "eyebrow": "In-app editing",
+      "p1": "AI actions: suggest, shorten, more formal, translate all",
+      "p2": "Flags text that overflows its container",
+      "p3": "Dev only, about 6 kB gzipped, no runtime dependencies",
+      "title": "Alt+click any text in your app"
+    },
+    "review": {
+      "back": "Back-translation",
+      "body": "The LLM translates the target back into your language literally, explains its choices and gives a verdict. Cached until the source or the target changes.",
+      "explanation": "“Relance” is the usual French term for a payment reminder; the tone is slightly firmer.",
+      "nuance": "Nuance",
+      "source": "Source",
+      "title": "Back-translation review"
+    },
+    "workflow": {
+      "steps": {
+        "fit": {
+          "body": "Renders the running app per locale, shortens what overflows its box, re-renders until it fits.",
+          "title": "Fit"
+        },
+        "i18nize": {
+          "body": "Finds hardcoded UI strings, proposes keys from context and rewrites the code for next-intl or react-i18next.",
+          "title": "Extract"
+        },
+        "review": {
+          "body": "Back-translates each string into your language and explains what changed, so you can trust languages you don't speak.",
+          "title": "Review"
+        },
+        "translate": {
+          "body": "Only the delta, with your glossary, file:line context and UI role. Every string validated, retried, then escalated.",
+          "title": "Translate"
+        }
+      },
+      "subtitle": "Each step is a CLI command your coding agent can run too, through the MCP server.",
+      "title": "Four commands, the whole lifecycle"
     }
   },
   "localeSwitcher": {
@@ -440,6 +528,10 @@
       "baseUrlHint": "For Ollama, vLLM, OpenRouter and other compatible endpoints.",
       "budget": "Budget (USD)",
       "budgetHint": "Jobs stop when this budget is reached.",
+      "extraHeaders": "Extra headers",
+      "extraHeadersHint": "One \"Name: value\" per line, sent with every LLM call. Not for secrets: credentials are refused.",
+      "workspaceId": "Anthropic workspace ID",
+      "workspaceIdHint": "Required with organization-level keys (sk-ant-usr-…). Overrides ANTHROPIC_WORKSPACE_ID.",
       "description": "Your own provider key. glot never marks up LLM usage.",
       "fallback": "Fallback model",
       "fallbackHint": "Used when validation still fails after a retry.",
@@ -496,7 +588,8 @@
     "settings": "Settings",
     "toggleSidebar": "Toggle navigation",
     "userMenu": "Account menu",
-    "visual": "Visual QA"
+    "visual": "Visual QA",
+    "insights": "Insights"
   },
   "status": {
     "machine": "Machine",
@@ -571,5 +664,128 @@
     "subtitle": "Screenshots and layout issues per locale, uploaded by glot-visual-qa.",
     "title": "Visual QA",
     "viewport": "Viewport"
+  },
+  "insights": {
+    "title": "Insights",
+    "subtitle": "Which languages your visitors want, how each locale converts, and whether a new language pays off.",
+    "goal": "Goal event",
+    "period": "Period",
+    "lastDays": "Last {days} days",
+    "empty": {
+      "title": "No visits yet",
+      "body": "Add the snippet below to your app. Within minutes you will see which languages your visitors prefer and which ones you don't offer."
+    },
+    "hero": {
+      "kicker": "Biggest demand gap",
+      "headline": "<strong>{share}</strong> of your visitors prefer <strong>{language}</strong> — you don't offer it.",
+      "potential": "≈ {n} more {goal} per month if they converted like visitors served in their own language",
+      "cost": "translating {keys, plural, one {# key} other {# keys}} costs ≈ {cost}",
+      "cta": "Test {language}",
+      "covered": "Every language your visitors prefer is already offered."
+    },
+    "stats": {
+      "visits": "Visits",
+      "unserved": "Unserved demand",
+      "unservedHint": "{n, plural, =0 {no missing language} one {# language not offered} other {# languages not offered}}",
+      "sourceConv": "{goal} rate (source)",
+      "potential": "Potential per month",
+      "potentialHint": "extra {goal} across missing languages"
+    },
+    "demand": {
+      "title": "Demand gap",
+      "subtitle": "Visitors by preferred browser language. Missing languages first, sorted by demand.",
+      "language": "Language",
+      "share": "Share of visitors",
+      "conversion": "Conversion",
+      "potential": "Potential / mo",
+      "cost": "Cost to launch",
+      "action": "Action",
+      "visitsTitle": "{n, plural, one {# visit} other {# visits}}",
+      "offered": "Offered",
+      "testing": "Testing",
+      "test": "Test"
+    },
+    "daily": {
+      "title": "Daily visits",
+      "subtitle": "Visits whose preferred language you don't offer, out of all visits.",
+      "unserved": "Not offered",
+      "served": "Offered"
+    },
+    "funnel": {
+      "title": "Conversion by locale ({goal})",
+      "subtitle": "Rate per served locale with its 95 % confidence interval, against the source language.",
+      "empty": "No conversion data yet.",
+      "source": "source",
+      "pts": "pts",
+      "ciTitle": "95 % CI: {low} – {high}",
+      "legendSource": "source rate",
+      "legendCi": "95 % confidence interval",
+      "sampleSize": "· n = {n}"
+    },
+    "exp": {
+      "title": "Language experiments",
+      "subtitle": "Serve a language to part of the visitors who prefer it, measure, then keep or remove it.",
+      "new": "New experiment",
+      "empty": "No experiment yet. Start one from a missing language above.",
+      "meta": "{pct} % of traffic · goal {goal}",
+      "endsIn": "ends {when}",
+      "ended": "measurement over",
+      "kept": "kept",
+      "removed": "removed",
+      "verdict": {
+        "collecting": "Collecting",
+        "keep": "Keep",
+        "remove": "Remove",
+        "inconclusive": "No clear effect"
+      },
+      "explain": {
+        "collecting": "Not enough visitors yet to conclude: wait for the required sample (or the end date) before deciding.",
+        "keep": "The test language converts better, and the confidence interval excludes zero.",
+        "remove": "The test language converts worse, and the confidence interval excludes zero.",
+        "inconclusive": "No measurable difference. Keep it if the cost is low or the market is strategic."
+      },
+      "armTest": "Test · {language}",
+      "armControl": "Control · {language}",
+      "diff": "Difference (test − control)",
+      "pts": "pts",
+      "ciAria": "95 % confidence interval from {low} to {high} points",
+      "sample": "Visitors per arm (smallest) / required",
+      "sampleUnknown": "The required sample appears once the control arm records a conversion.",
+      "keep": "Keep",
+      "remove": "Remove",
+      "early": "Deciding now is premature",
+      "keptToast": "Language kept",
+      "removedToast": "Language removed from targets",
+      "dialogTitle": "Test a language",
+      "dialogBody": "Visitors who prefer this language get it in the chosen share of sessions; the others stay on the source language as a control.",
+      "locale": "Locale",
+      "traffic": "Traffic (%)",
+      "days": "Duration (days)",
+      "goal": "Goal event",
+      "costNote": "The locale joins your target languages. Translating {keys, plural, one {# key} other {# keys}} costs ≈ {cost}: run the translation before traffic arrives.",
+      "translateNote": "The locale joins your target languages: run the translation before traffic arrives.",
+      "cancel": "Cancel",
+      "start": "Start experiment",
+      "started": "Experiment started for {language}"
+    },
+    "install": {
+      "title": "Install the snippet",
+      "subtitle": "A script tag, an npm import or a Next.js middleware. Same public key for all three.",
+      "show": "Show",
+      "tabScript": "Script tag",
+      "tabMiddleware": "Next.js middleware",
+      "publicKey": "Public key",
+      "rotate": "Rotate key",
+      "rotateTitle": "Rotate the public key?",
+      "rotateBody": "The current key stops working immediately. Update the snippet in your app with the new key.",
+      "rotated": "New public key generated",
+      "cancel": "Cancel",
+      "privacy": {
+        "noCookie": "No cookie, no visitor id: one sessionStorage entry for the experiment arm.",
+        "noIp": "No IP address, user agent or route stored.",
+        "daily": "Only daily counters per language, locale and country.",
+        "size": "Under 1 kB gzipped."
+      }
+    }
   }
 }

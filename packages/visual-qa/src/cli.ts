@@ -16,6 +16,8 @@ const { values: v } = parseArgs({
     suggest: { type: "boolean", default: false },
     catalogs: { type: "string" },
     map: { type: "string" },
+    measure: { type: "boolean", default: false },
+    "fonts-dir": { type: "string" },
     "fail-on": { type: "string", default: "overflow" },
     upload: { type: "string" },
     project: { type: "string" },
@@ -27,7 +29,7 @@ const { values: v } = parseArgs({
 if (v.help) {
   console.log(`glot-visual-qa [--base-url URL] [--routes /,/login] [--locales fr,de] [--source-locale en]
   [--url-pattern "/{locale}{route}"] [--viewports 1280x800,390x844] [--out .glot/visual-qa]
-  [--suggest] [--catalogs "messages/{locale}.json"] [--map "*"|key1,key2] [--fail-on overflow,clamp,overlap,untranslated,tofu,rtl|none]
+  [--suggest] [--catalogs "messages/{locale}.json"] [--map "*"|key1,key2] [--measure [--fonts-dir .glot/fonts]] [--fail-on overflow,clamp,overlap,untranslated,tofu,rtl|none]
   [--upload <glot-server-url> --project <slug> [--label "commit abc123"]]   (token: GLOT_TOKEN)`);
   process.exit(0);
 }
@@ -45,6 +47,8 @@ const report = await run({
   suggest: v.suggest!,
   catalogs: v.catalogs,
   map: v.map,
+  measure: v.measure,
+  fontsDir: v["fonts-dir"],
 });
 
 if (v.upload) {

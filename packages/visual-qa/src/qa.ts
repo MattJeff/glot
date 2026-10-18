@@ -1,5 +1,6 @@
 import { chromium, type Page } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
+import { fontFileName, toSfnt } from "./fonts.ts";
 import { join } from "node:path";
 import { loadIndexes, match, type Index } from "./keys.ts";
 
@@ -36,6 +37,20 @@ export interface Options {
   catalogs?: string;
   /** Crop every element mapped to a key ("*") or to these keys, into `report.keys`. */
   map?: string;
+  /** Record, per key rendered in the source locale, the box it may use and its font (`report.layout`), and save webfonts to `fontsDir`. */
+  measure?: boolean;
+  fontsDir?: string;
+}
+
+/** Pixel budget of a key (`glot measure` → `.glot/layout.json`). */
+export interface Fit {
+  max_width_px: number;
+  /** null: wraps freely (only each word must fit). */
+  max_lines: number | null;
+  font: { family: string; postscript?: string; size_px: number; weight: number; letter_spacing_px: number; text_transform?: string };
+  /** Source text as rendered and its width: calibrates glot's browser-free measure. */
+  text?: string;
+  text_px?: number;
 }
 
 export interface Mapped {
@@ -53,6 +68,7 @@ export interface Report {
   pages: { locale: string; route: string; viewport: string; url: string; screenshot: string }[];
   issues: Issue[];
   keys?: Mapped[];
+  layout?: Record<string, Fit>;
 }
 
 const VISUAL: Kind[] = ["overflow", "clamp", "overlap"];
@@ -177,6 +193,105 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
   return { found, texts, els: shown };
 }
 
+
+type Probe = Omit<Fit, "font"> & { text: string; ownText: string; font: Fit["font"] & { css: string } };
+
+/**
+ * Runs inside the page. For each element with its own text: the room its text has before it overflows.
+ * Probe: lengthen the text 13x and watch the box. Not growing => fixed width; growing then
+ * overflowing => it hit a limit (max-width, flex); growing to fit => unconstrained (skipped).
+ * Marks measured elements with `data-glot-m` (document order) so CDP can read their real fonts.
+ */
+function probe(): Probe[] {
+  const out: Probe[] = [];
+  const px = (v: string) => parseFloat(v) || 0;
+  for (const e of Array.from(document.querySelectorAll("[data-glot-m]"))) e.removeAttribute("data-glot-m");
+  const els = Array.from(document.body.querySelectorAll("*")).filter(
+    (el) => !["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(el.tagName),
+  );
+  for (const el of els) {
+    const own = Array.from(el.childNodes).filter((n) => n.nodeType === 3 && n.textContent!.trim()) as Text[];
+    if (!own.length) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width <= 2 || r.height <= 2) continue;
+    const cs = getComputedStyle(el);
+    // Inline text lives in its nearest block-level box.
+    let box = el as HTMLElement;
+    while (getComputedStyle(box).display === "inline" && box.parentElement) box = box.parentElement;
+    const bs = getComputedStyle(box);
+    const padX = px(bs.paddingLeft) + px(bs.paddingRight);
+    const padY = px(bs.paddingTop) + px(bs.paddingBottom);
+    const rangeOf = (n: Node, whole = false) => {
+      const g = document.createRange();
+      if (whole) g.selectNodeContents(n); else g.selectNode(n);
+      return g;
+    };
+    const ownW = () => own.reduce((w, n) => w + rangeOf(n).getBoundingClientRect().width, 0);
+    const lines0 = own.reduce((m, n) => Math.max(m, new Set(Array.from(rangeOf(n).getClientRects()).map((q) => Math.round(q.top))).size), 0);
+    const textW = ownW();
+    // Icons and other children share the line: their width is not available to the text.
+    const other = lines0 <= 1 ? Math.max(0, rangeOf(box, true).getBoundingClientRect().width - textW) : 0;
+    const b0 = box.getBoundingClientRect();
+    const cw0 = box.clientWidth - padX, ch0 = box.clientHeight - padY;
+    const orig = own[0].data;
+    own[0].data = orig + (" " + orig.trim()).repeat(12);
+    const b1 = box.getBoundingClientRect();
+    const cw1 = box.clientWidth - padX;
+    const t1 = rangeOf(box, true).getBoundingClientRect();
+    const overflows = box.scrollWidth > box.clientWidth + 1 || t1.right > b1.right + 1 || t1.left < b1.left - 1
+      || box.scrollHeight > box.clientHeight + 1 || t1.bottom > b1.bottom + 1;
+    own[0].data = orig;
+    const grewW = b1.width - b0.width > 0.5, grewH = b1.height - b0.height > 0.5;
+    const clamp = parseInt(bs.getPropertyValue("-webkit-line-clamp"));
+    const lh = cs.lineHeight === "normal" ? px(cs.fontSize) * 1.2 : px(cs.lineHeight);
+    let lines: number | null;
+    if (clamp > 0) lines = clamp;
+    else if (/nowrap|pre$/.test(cs.whiteSpace + " " + bs.whiteSpace) || /nowrap/.test(cs.textWrap + bs.textWrap)) lines = 1;
+    else if (!grewH && overflows) lines = Math.max(1, Math.floor((ch0 + 1) / lh));
+    else lines = null;
+    let width: number;
+    if (!grewW) width = cw0 - other;
+    else if (overflows) width = cw1 - other;
+    else continue; // the box grows with its text: nothing to overflow
+    el.setAttribute("data-glot-m", String(out.length));
+    out.push({
+      max_width_px: Math.floor(width * 10) / 10,
+      max_lines: lines,
+      font: {
+        family: cs.fontFamily, css: cs.fontFamily, size_px: px(cs.fontSize), weight: parseInt(cs.fontWeight) || 400,
+        letter_spacing_px: cs.letterSpacing === "normal" ? 0 : px(cs.letterSpacing),
+        ...(cs.textTransform !== "none" ? { text_transform: cs.textTransform } : {}),
+      },
+      text: (el as HTMLElement).innerText?.trim() || el.textContent!.trim(),
+      ownText: own.map((n) => n.data).join(" ").replace(/\s+/g, " ").trim(),
+      text_px: lines0 <= 1 ? Math.round(textW * 100) / 100 : undefined,
+    });
+  }
+  return out;
+}
+
+/** Real font of each `data-glot-m` element (the one rendering most glyphs), via CDP. */
+async function platformFonts(page: Page): Promise<{ familyName: string; postScriptName?: string }[]> {
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await cdp.send("DOM.enable");
+    await cdp.send("CSS.enable");
+    const { root } = await cdp.send("DOM.getDocument", { depth: 0 });
+    const { nodeIds } = await cdp.send("DOM.querySelectorAll", { nodeId: root.nodeId, selector: "[data-glot-m]" });
+    const out = [];
+    for (const nodeId of nodeIds) {
+      const { fonts } = await cdp.send("CSS.getPlatformFontsForNode", { nodeId });
+      out.push([...fonts].sort((a, b) => b.glyphCount - a.glyphCount)[0] ?? { familyName: "" });
+    }
+    return out;
+  } finally {
+    await cdp.detach();
+  }
+}
+
+/** Tightest budget wins when a key renders in several places. */
+const capacity = (f: Fit) => f.max_width_px * (f.max_lines ?? 50);
+
 const slugOf = (route: string) => route.replace(/[^\w]+/g, "_").replace(/^_|_$/g, "") || "index";
 
 const RTL = new Set(["ar", "he", "fa", "ur"]);
@@ -235,6 +350,32 @@ export async function run(o: Options): Promise<Report> {
   const wanted = o.map === "*" ? null : new Set((o.map ?? "").split(",").map((k) => k.trim()).filter(Boolean));
   const seen = new Set<string>();
   const pad = 8;
+  const fontsDir = o.fontsDir ?? join(o.out, "fonts");
+  const fontSaves: Promise<void>[] = [];
+  const measureKeys = async (page: Page) => {
+    const probes = await page.evaluate(probe);
+    const fonts = await platformFonts(page);
+    report.layout ??= {};
+    for (const [i, p] of probes.entries()) {
+      const key = match(indexes[o.sourceLocale], p.text);
+      if (!key || (o.map && wanted && !wanted.has(key))) continue;
+      const f = fonts[i];
+      const fit: Fit = {
+        max_width_px: p.max_width_px,
+        max_lines: p.max_lines,
+        font: {
+          family: f?.familyName || p.font.css.split(",")[0].replace(/["']/g, "").trim(),
+          ...(f?.postScriptName ? { postscript: f.postScriptName } : {}),
+          size_px: p.font.size_px, weight: p.font.weight, letter_spacing_px: p.font.letter_spacing_px,
+          ...(p.font.text_transform ? { text_transform: p.font.text_transform } : {}),
+        },
+        text: p.ownText,
+        ...(p.text_px !== undefined ? { text_px: p.text_px } : {}),
+      };
+      const prev = report.layout[key];
+      if (!prev || capacity(fit) < capacity(prev)) report.layout[key] = fit;
+    }
+  };
   const clipOf = (r: Rect, p = pad) => ({ x: Math.max(0, r.x - p), y: Math.max(0, r.y - p), width: r.width + 2 * p, height: r.height + 2 * p });
   // One crop per (locale, key): the first place it renders.
   const mapKeys = async (page: Page, els: El[], locale: string, route: string, vp: string, slug: string) => {
@@ -254,6 +395,16 @@ export async function run(o: Options): Promise<Report> {
     for (const vp of o.viewports) {
       const [width, height] = vp.split("x").map(Number);
       const page = await browser.newPage({ viewport: { width, height } });
+      if (o.measure) {
+        await mkdir(fontsDir, { recursive: true });
+        page.on("response", (res) => {
+          if (res.request().resourceType() !== "font") return;
+          fontSaves.push(res.body().then(async (body) => {
+            const sfnt = toSfnt(body);
+            if (sfnt) await writeFile(join(fontsDir, fontFileName(sfnt)), sfnt);
+          }).catch((e) => console.warn(`font ${res.url()}: ${e}`)));
+        });
+      }
       for (const route of o.routes) {
         // Locale-prefixed visits leave a locale cookie (next-intl NEXT_LOCALE) that would turn the source page into the last locale.
         await page.context().clearCookies();
@@ -261,6 +412,7 @@ export async function run(o: Options): Promise<Report> {
         const src = await page.evaluate(detect, { sourceTexts: null, checkRtl: false });
         const sourceTexts = src.texts;
         await mapKeys(page, src.els, o.sourceLocale, route, vp, `${o.sourceLocale}_${slugOf(route)}_${vp}`);
+        if (o.measure) await measureKeys(page);
 
         for (const locale of o.locales) {
           const url = buildUrl(o, locale, route);
@@ -296,6 +448,7 @@ export async function run(o: Options): Promise<Report> {
       await page.close();
     }
   } finally {
+    await Promise.all(fontSaves);
     await browser.close();
   }
 

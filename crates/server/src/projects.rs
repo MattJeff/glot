@@ -27,6 +27,24 @@ pub struct LlmStored {
     pub judge_model: Option<String>,
     pub base_url: Option<String>,
     pub budget_usd: Option<f64>,
+    /// Sent as `anthropic-workspace-id` (org-level user keys must name the workspace to bill).
+    /// Falls back to the `ANTHROPIC_WORKSPACE_ID` env var when unset.
+    #[serde(default)]
+    pub anthropic_workspace_id: Option<String>,
+    /// Extra non-secret HTTP headers sent with every LLM call of the project.
+    #[serde(default)]
+    pub extra_headers: BTreeMap<String, String>,
+}
+
+impl LlmStored {
+    /// Headers for `glot_llm::provider::from_config_with` (jobs + Review API).
+    pub fn headers(&self) -> BTreeMap<String, String> {
+        let mut h = self.extra_headers.clone();
+        if let Some(ws) = &self.anthropic_workspace_id {
+            h.insert("anthropic-workspace-id".into(), ws.clone());
+        }
+        h
+    }
 }
 
 impl Default for LlmStored {
@@ -39,6 +57,8 @@ impl Default for LlmStored {
             judge_model: d.judge_model,
             base_url: None,
             budget_usd: None,
+            anthropic_workspace_id: None,
+            extra_headers: BTreeMap::new(),
         }
     }
 }
@@ -65,6 +85,8 @@ pub struct LlmView {
     pub judge_model: Option<String>,
     pub has_api_key: bool,
     pub budget_usd: Option<f64>,
+    pub anthropic_workspace_id: Option<String>,
+    pub extra_headers: BTreeMap<String, String>,
 }
 
 #[derive(Serialize, Default, sqlx::FromRow, utoipa::ToSchema)]
@@ -186,6 +208,8 @@ async fn view(state: &AppState, p: ProjectRow) -> ApiResult<Project> {
             judge_model: llm.judge_model,
             has_api_key: p.api_key_enc.is_some(),
             budget_usd: llm.budget_usd,
+            anthropic_workspace_id: llm.anthropic_workspace_id,
+            extra_headers: llm.extra_headers,
         },
         stats: Stats { keys, locales },
     })
@@ -291,6 +315,61 @@ pub struct LlmSettings {
     api_key: Option<String>,
     base_url: Option<String>,
     budget_usd: Option<f64>,
+    /// Absent keeps the stored value, "" clears it.
+    anthropic_workspace_id: Option<String>,
+    /// Absent keeps the stored headers; non-secret only (auth headers are refused).
+    extra_headers: Option<BTreeMap<String, String>>,
+}
+
+/// Header names that carry credentials or are managed by the HTTP client: never user-set.
+fn secret_header(name: &str) -> bool {
+    let n = name.to_ascii_lowercase();
+    [
+        "authorization",
+        "proxy-authorization",
+        "cookie",
+        "host",
+        "content-length",
+        "content-type",
+        "anthropic-version",
+    ]
+    .contains(&n.as_str())
+        || ["key", "token", "secret", "auth", "password"]
+            .iter()
+            .any(|w| n.contains(w))
+}
+
+fn clean_headers(h: BTreeMap<String, String>) -> ApiResult<BTreeMap<String, String>> {
+    if h.len() > 20 {
+        return Err(AppError::bad_request("extra_headers: at most 20 headers"));
+    }
+    let mut out = BTreeMap::new();
+    for (k, v) in h {
+        let k = k.trim().to_ascii_lowercase();
+        if k.is_empty()
+            || k.len() > 64
+            || !k
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+        {
+            return Err(AppError::bad_request(format!(
+                "extra_headers: invalid header name \"{k}\""
+            )));
+        }
+        if secret_header(&k) {
+            return Err(AppError::bad_request(format!(
+                "extra_headers: \"{k}\" looks like a credential; use api_key instead"
+            )));
+        }
+        let v = v.trim().to_string();
+        if v.len() > 256 || v.chars().any(char::is_control) {
+            return Err(AppError::bad_request(format!(
+                "extra_headers: invalid value for \"{k}\""
+            )));
+        }
+        out.insert(k, v);
+    }
+    Ok(out)
 }
 
 #[derive(Deserialize)]
@@ -344,6 +423,25 @@ pub async fn update(
             None => {}
         }
         let nonempty = |s: Option<String>| s.filter(|s| !s.trim().is_empty());
+        let prev = p.llm.0.clone();
+        let anthropic_workspace_id = match l.anthropic_workspace_id {
+            None => prev.anthropic_workspace_id,
+            Some(ws) => {
+                let ws = ws.trim().to_string();
+                if ws.len() > 128
+                    || !ws
+                        .bytes()
+                        .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+                {
+                    return Err(AppError::bad_request("invalid anthropic_workspace_id"));
+                }
+                Some(ws).filter(|w| !w.is_empty())
+            }
+        };
+        let extra_headers = match l.extra_headers {
+            None => prev.extra_headers,
+            Some(h) => clean_headers(h)?,
+        };
         p.llm = DbJson(LlmStored {
             provider: l.provider,
             model: l.model,
@@ -351,6 +449,8 @@ pub async fn update(
             judge_model: nonempty(l.judge_model),
             base_url: nonempty(l.base_url),
             budget_usd: l.budget_usd,
+            anthropic_workspace_id,
+            extra_headers,
         });
     }
     sqlx::query(

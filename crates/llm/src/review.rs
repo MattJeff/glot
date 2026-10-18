@@ -114,7 +114,7 @@ pub async fn review(
                 chunk,
             ))
             .await?;
-        usage.add(&Usage::of(&c.model, c.input_tokens, c.output_tokens));
+        usage.add(&Usage::of_completion(&c));
         let parsed = parse_json(&c.text).unwrap_or(Value::Null);
         for i in chunk {
             let v = &parsed["reviews"][&i.key];

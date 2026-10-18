@@ -154,6 +154,129 @@
     "subtitle": "Abdeckung, Validierung, Bedeutung (Rückübersetzung) und visuelle QA, bewertet von 0–100.",
     "title": "Zustand der Sprache"
   },
+  "insights": {
+    "daily": {
+      "served": "Angeboten",
+      "subtitle": "Besuche, deren bevorzugte Sprache Sie nicht anbieten, bezogen auf alle Besuche.",
+      "title": "Tägliche Besuche",
+      "unserved": "Nicht angeboten"
+    },
+    "demand": {
+      "action": "Aktion",
+      "conversion": "Conversion",
+      "cost": "Startkosten",
+      "language": "Sprache",
+      "offered": "Angeboten",
+      "potential": "Potenzial / Monat",
+      "share": "Anteil der Besucher",
+      "subtitle": "Besucher nach bevorzugter Browsersprache. Fehlende Sprachen zuerst, sortiert nach Nachfrage.",
+      "test": "Testen",
+      "testing": "Im Test",
+      "title": "Nachfragelücke",
+      "visitsTitle": "{n, plural, one {# Besuch} other {# Besuche}}"
+    },
+    "empty": {
+      "body": "Fügen Sie das Snippet unten in Ihre App ein. Innerhalb weniger Minuten sehen Sie, welche Sprachen Ihre Besucher bevorzugen und welche Sie nicht anbieten.",
+      "title": "Noch keine Besuche"
+    },
+    "exp": {
+      "armControl": "Kontrolle · {language}",
+      "armTest": "Test · {language}",
+      "cancel": "Abbrechen",
+      "ciAria": "95 % Konfidenzintervall von {low} bis {high} Punkte",
+      "costNote": "Die Sprache kommt zu Ihren Zielsprachen hinzu. Das Übersetzen von {keys, plural, one {# Schlüssel} other {# Schlüssel}} kostet ≈ {cost}: Starten Sie die Übersetzung, bevor Traffic eintrifft.",
+      "days": "Dauer (Tage)",
+      "dialogBody": "Besucher, die diese Sprache bevorzugen, erhalten sie in dem gewählten Anteil der Sitzungen; die übrigen bleiben als Kontrolle in der Ausgangssprache.",
+      "dialogTitle": "Eine Sprache testen",
+      "diff": "Differenz (Test − Kontrolle)",
+      "early": "Jetzt zu entscheiden ist verfrüht",
+      "empty": "Noch kein Experiment. Starten Sie eines über einer fehlenden Sprache oben.",
+      "ended": "Messung beendet",
+      "endsIn": "endet {when}",
+      "explain": {
+        "collecting": "Noch nicht genug Besucher für ein Ergebnis: Warten Sie die erforderliche Stichprobe (oder das Enddatum) ab, bevor Sie entscheiden.",
+        "inconclusive": "Kein messbarer Unterschied. Behalten Sie sie bei, wenn die Kosten gering sind oder der Markt strategisch ist.",
+        "keep": "Die Testsprache konvertiert besser, und das Konfidenzintervall schließt null aus.",
+        "remove": "Die Testsprache konvertiert schlechter, und das Konfidenzintervall schließt null aus."
+      },
+      "goal": "Zielereignis",
+      "keep": "Behalten",
+      "kept": "behalten",
+      "keptToast": "Sprache behalten",
+      "locale": "Sprache",
+      "meta": "{pct} % des Traffics · Ziel {goal}",
+      "new": "Neues Experiment",
+      "pts": "Pkt.",
+      "remove": "Entfernen",
+      "removed": "entfernt",
+      "removedToast": "Sprache aus den Zielsprachen entfernt",
+      "sample": "Besucher pro Gruppe (kleinste) / benötigt",
+      "sampleUnknown": "Die benötigte Stichprobe erscheint, sobald die Kontrollgruppe eine Conversion erfasst.",
+      "start": "Experiment starten",
+      "started": "Experiment für {language} gestartet",
+      "subtitle": "Eine Sprache einem Teil der Besucher ausliefern, die sie bevorzugen, messen und dann behalten oder entfernen.",
+      "title": "Sprachexperimente",
+      "traffic": "Traffic (%)",
+      "translateNote": "Die Sprache kommt zu Ihren Zielsprachen hinzu: Führen Sie die Übersetzung aus, bevor der Traffic eintrifft.",
+      "verdict": {
+        "collecting": "Sammelt Daten",
+        "inconclusive": "Kein klarer Effekt",
+        "keep": "Behalten",
+        "remove": "Entfernen"
+      }
+    },
+    "funnel": {
+      "ciTitle": "95 % KI: {low} – {high}",
+      "empty": "Noch keine Conversion-Daten.",
+      "legendCi": "95 %-Konfidenzintervall",
+      "legendSource": "Quellrate",
+      "pts": "Pkt.",
+      "sampleSize": "· n = {n}",
+      "source": "Quelle",
+      "subtitle": "Rate pro ausgelieferter Sprache mit ihrem 95 %-Konfidenzintervall, im Vergleich zur Ausgangssprache.",
+      "title": "Conversion nach Sprache ({goal})"
+    },
+    "goal": "Zielereignis",
+    "hero": {
+      "cost": "Übersetzen von {keys, plural, one {# Schlüssel} other {# Schlüsseln}} kostet ≈ {cost}",
+      "covered": "Jede Sprache, die Ihre Besucher bevorzugen, wird bereits angeboten.",
+      "cta": "{language} testen",
+      "headline": "<strong>{share}</strong> Ihrer Besucher bevorzugen <strong>{language}</strong> – Sie bieten sie nicht an.",
+      "kicker": "Größte Nachfragelücke",
+      "potential": "≈ {n} zusätzliche {goal} pro Monat, wenn sie so konvertieren wie Besucher in ihrer eigenen Sprache"
+    },
+    "install": {
+      "cancel": "Abbrechen",
+      "privacy": {
+        "daily": "Nur tägliche Zähler pro Sprache, Sprachvariante und Land.",
+        "noCookie": "Kein Cookie, keine Besucher-ID: ein sessionStorage-Eintrag für die Experimentgruppe.",
+        "noIp": "Keine IP-Adresse, kein User-Agent und keine Route gespeichert.",
+        "size": "Unter 1 kB gzipped."
+      },
+      "publicKey": "Öffentlicher Schlüssel",
+      "rotate": "Schlüssel rotieren",
+      "rotateBody": "Der aktuelle Schlüssel funktioniert sofort nicht mehr. Aktualisieren Sie das Snippet in Ihrer App mit dem neuen Schlüssel.",
+      "rotateTitle": "Den öffentlichen Schlüssel rotieren?",
+      "rotated": "Neuer öffentlicher Schlüssel erzeugt",
+      "show": "Anzeigen",
+      "subtitle": "Ein Script-Tag, ein npm-Import oder eine Next.js-Middleware. Für alle drei gilt derselbe öffentliche Schlüssel.",
+      "tabMiddleware": "Next.js-Middleware",
+      "tabScript": "Script-Tag",
+      "title": "Snippet installieren"
+    },
+    "lastDays": "Letzte {days} Tage",
+    "period": "Zeitraum",
+    "stats": {
+      "potential": "Potenzial pro Monat",
+      "potentialHint": "zusätzlich {goal} über fehlende Sprachen",
+      "sourceConv": "{goal}-Rate (Quelle)",
+      "unserved": "Ungedeckte Nachfrage",
+      "unservedHint": "{n, plural, =0 {keine fehlende Sprache} one {# Sprache nicht angeboten} other {# Sprachen nicht angeboten}}",
+      "visits": "Besuche"
+    },
+    "subtitle": "Welche Sprachen Ihre Besucher wünschen, wie jede Sprache konvertiert und ob sich eine neue Sprache lohnt.",
+    "title": "Insights"
+  },
   "jobStatus": {
     "done": "Fertig",
     "failed": "Fehlgeschlagen",
@@ -187,24 +310,32 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Kostenpflichtige Tarife, ~$50+/Monat",
+      "crowdinPrice": "Abo, kostenlos für Open Source",
       "feature": "Funktion",
-      "footnote": "Richtpreise laut öffentlicher Preisseiten; aktuelle Tarife bitte beim jeweiligen Anbieter prüfen.",
-      "glotPrice": "Kostenlos + Ihre LLM-Nutzung",
-      "lokalisePrice": "Kostenpflichtige Tarife, ~$120+/Monat",
+      "footnote": "Basierend auf der öffentlichen Website und Dokumentation des jeweiligen Anbieters, Stand Oktober 2026. Teilweise bedeutet eingeschränkt, tarifabhängig oder über eine Integration. Tarife und Funktionen ändern sich: Prüfen Sie die Quellen.",
+      "glotPrice": "Kostenlos (MIT) + Ihre LLM-Nutzung",
+      "lingoPrice": "Kostenlose CLI, kostenpflichtige gehostete Engine",
+      "lokalisePrice": "Abo, siehe Preise",
       "no": "Nein",
       "partial": "Teilweise",
       "rows": {
         "byok": "Eigenen LLM-Schlüssel mitbringen",
+        "fit": "Anpassung ans gerenderte Pixelbudget",
         "gitNative": "Git als Quelle der Wahrheit (Lockfile)",
+        "inContext": "Bearbeitung direkt in Ihrer App",
         "mcp": "MCP-Server für Coding-Agenten",
         "openSource": "Open Source",
         "price": "Preis",
         "validator": "Deterministische Validierung jedes Strings"
       },
-      "subtitle": "Übersetzungsverwaltung ohne Abrechnung pro Nutzer.",
+      "sources": "Quellen:",
+      "subtitle": "Wo sich glot von gehosteten Übersetzungsplattformen und von der anderen Open-Source-Option unterscheidet.",
       "title": "Vergleich",
       "yes": "Ja"
+    },
+    "core": {
+      "subtitle": "Das LLM ist stets von Code umgeben, der Nein sagen kann.",
+      "title": "Der deterministische Kern"
     },
     "cta": {
       "button": "Arbeitsbereich erstellen",
@@ -242,6 +373,19 @@
         "title": "Visuelle QA"
       }
     },
+    "fit": {
+      "after": "Nach glot fit",
+      "afterAlt": "Kürzeres deutsches Label, das in den Button passt",
+      "before": "Vorher",
+      "beforeAlt": "Deutsches Button-Label, mit Auslassungspunkten abgeschnitten",
+      "body": "Deutsch ist oft ein Drittel länger als Englisch. glot fit erfasst Ihre laufende App in jeder Sprache, misst jeden Text gegen seinen Container, fragt das LLM nach einer kürzeren Variante, die Bedeutung und Platzhalter beibehält, und rendert dann neu.",
+      "caption": "Echte Aufnahmen aus der Demo-App in deutscher Sprache.",
+      "eyebrow": "Pixelbudget",
+      "p1": "Im Browser gemessen, nicht anhand der Zeichenanzahl geschätzt",
+      "p2": "Gekürzte Varianten bestehen weiterhin die Prüfung durch Validator und Glossar",
+      "p3": "Stoppt nach einer festen Anzahl von Durchläufen und läuft nie kostenbedingt endlos",
+      "title": "Übersetzungen, die in den Button passen"
+    },
     "flow": {
       "agent": {
         "caption": "Ihr Agent ergänzt ein Feature und neue Schlüssel.",
@@ -276,26 +420,93 @@
       "badge": "Open Source · MIT · Eigenen LLM-Schlüssel verwenden",
       "primary": "Kostenlos starten",
       "secondary": "Stern auf GitHub vergeben",
-      "subtitle": "Ihr Coding-Agent schreibt Features. glot liefert sie in jeder Sprache aus: kontextbewusste LLM-Übersetzungen, eingebettet in einen deterministischen Validator, ein Lockfile und ein Glossar, das in Git liegt.",
+      "subtitle": "Richten Sie glot auf eine Codebasis voller fest codierter Strings. Ein Befehl überführt sie in Schlüssel und schreibt Ihre Komponenten um. Ihr LLM übersetzt, deterministischer Code prüft jeden String, und das Ergebnis landet in Git.",
+      "terminal": "Von fest codiertem Englisch zu vier Sprachen",
       "title": "i18n, das Ihr KI-Agent nicht kaputtmachen kann."
+    },
+    "insights": {
+      "body": "Ein anonymer Beacon zählt Besucher nach bevorzugter Sprache und der Sprache, die Sie ihnen ausgeliefert haben, und vergleicht dann die Conversion. Kein Cookie, keine Besucher-ID.",
+      "notServed": "Noch nicht übersetzt",
+      "sample": "Beispieldaten",
+      "served": "Ausgeliefert",
+      "share": "{value} der Besucher",
+      "title": "Insights pro Sprache"
     },
     "install": {
       "cargo": "Mit Cargo",
+      "i18nize": "Bestehende App konvertieren",
       "mcp": "Zu Ihrem Agenten hinzufügen",
       "npx": "Mit npx",
       "subtitle": "Führen Sie es lokal mit Ihrem Agenten aus oder verbinden Sie es mit einem glot-Server für Ihr Team.",
       "title": "In Sekunden installiert"
     },
+    "matrix": {
+      "body": "Jede Sprache einer Seite nebeneinander, mit Überläufen, Kürzungen und RTL-Fehlern aus der visuellen QA, angeheftet an den Bildschirm, auf dem sie entstehen.",
+      "issues": "{count, plural, one {# Überlauf} other {# Überläufe}}",
+      "ok": "Keine Probleme",
+      "title": "Matrix der Sprachen"
+    },
     "meta": {
       "description": "Open-Source-Lokalisierung für SaaS, entwickelt für Coding-Agenten. Deterministische Validierung, ein Lockfile, Glossar als Code und ein MCP-Server.",
       "title": "glot: i18n, das KI nicht kaputt machen kann"
+    },
+    "more": {
+      "subtitle": "Qualität, die Sie ohne Sprachkenntnisse prüfen können, und Daten darüber, welche Sprache als Nächstes hinzukommen sollte.",
+      "title": "Sehen, was Ihre Nutzer sehen"
     },
     "nav": {
       "compare": "Vergleichen",
       "features": "Funktionen",
       "getStarted": "Loslegen",
       "install": "Installieren",
-      "signIn": "Anmelden"
+      "signIn": "Anmelden",
+      "workflow": "So funktioniert's"
+    },
+    "ondevice": {
+      "body": "Für Sprachen, die Sie noch nicht ausliefern, übersetzt @glot/runtime im Browser mit der integrierten Translator API und führt danach den Validator von glot aus, kompiliert nach WebAssembly.",
+      "step1": "Browser übersetzt, Platzhalter maskiert",
+      "step2": "Validator prüft Plurale, Tags, Glossar",
+      "step3": "Was fehlschlägt, bleibt in der Ausgangssprache",
+      "title": "On-Device-Fallback"
+    },
+    "overlay": {
+      "alt": "glot-Overlay-Popover mit einem Schlüssel, dessen Quelle und Übersetzungen in fünf Sprachen",
+      "body": "Das Dev-Overlay findet den Schlüssel hinter dem angeklickten Text, zeigt ihn in jeder Sprache mit aktiven Validator-Problemen und speichert in Ihre Katalogdateien. Hot Reload erledigt den Rest.",
+      "eyebrow": "Bearbeitung in der App",
+      "p1": "KI-Aktionen: vorschlagen, kürzen, förmlicher formulieren, alle übersetzen",
+      "p2": "Markiert Text, der seinen Container überläuft",
+      "p3": "Nur für Dev, etwa 6 kB gzipped, keine Laufzeitabhängigkeiten",
+      "title": "Alt+Klick auf beliebigen Text in Ihrer App"
+    },
+    "review": {
+      "back": "Rückübersetzung",
+      "body": "Das LLM übersetzt das Ziel wörtlich zurück in Ihre Sprache, erklärt seine Entscheidungen und gibt ein Urteil ab. Zwischengespeichert, bis sich Quelle oder Ziel ändert.",
+      "explanation": "„Relance“ ist der gängige französische Begriff für eine Zahlungserinnerung; der Ton ist etwas bestimmter.",
+      "nuance": "Nuance",
+      "source": "Quelle",
+      "title": "Prüfung per Rückübersetzung"
+    },
+    "workflow": {
+      "steps": {
+        "fit": {
+          "body": "Rendert die laufende App pro Sprache, kürzt, was seine Box überläuft, und rendert neu, bis es passt.",
+          "title": "Anpassen"
+        },
+        "i18nize": {
+          "body": "Findet fest codierte UI-Strings, schlägt Schlüssel aus dem Kontext vor und schreibt den Code für next-intl oder react-i18next um.",
+          "title": "Extrahieren"
+        },
+        "review": {
+          "body": "Übersetzt jeden String zurück in Ihre Sprache und erklärt, was sich geändert hat, damit Sie Sprachen vertrauen können, die Sie nicht sprechen.",
+          "title": "Prüfen"
+        },
+        "translate": {
+          "body": "Nur das Delta, mit Ihrem Glossar, Kontext Datei:Zeile und UI-Rolle. Jede Zeichenkette wird validiert, erneut versucht und anschließend eskaliert.",
+          "title": "Übersetzen"
+        }
+      },
+      "subtitle": "Jeder Schritt ist ein CLI-Befehl, den auch Ihr Coding-Agent über den MCP-Server ausführen kann.",
+      "title": "Vier Befehle, der gesamte Lebenszyklus"
     }
   },
   "localeSwitcher": {
@@ -441,6 +652,8 @@
       "budget": "Budget (USD)",
       "budgetHint": "Jobs werden angehalten, sobald dieses Budget erreicht ist.",
       "description": "Ihr eigener Schlüssel des Anbieters. glot berechnet keinen Aufschlag auf die LLM-Nutzung.",
+      "extraHeaders": "Zusätzliche Header",
+      "extraHeadersHint": "Ein „Name: Wert“ pro Zeile, wird mit jedem LLM-Aufruf gesendet. Nicht für Geheimnisse: Zugangsdaten werden abgelehnt.",
       "fallback": "Ausweichmodell",
       "fallbackHint": "Wird verwendet, wenn die Validierung nach einem erneuten Versuch weiterhin fehlschlägt.",
       "judge": "Bewertungsmodell",
@@ -455,7 +668,9 @@
       },
       "style": "Stilrichtlinie",
       "stylePlaceholder": "Freundlich, knapp, im Französischen informell mit „tu“…",
-      "title": "LLM"
+      "title": "LLM",
+      "workspaceId": "Anthropic-Arbeitsbereichs-ID",
+      "workspaceIdHint": "Erforderlich bei Schlüsseln auf Organisationsebene (sk-ant-usr-…). Überschreibt ANTHROPIC_WORKSPACE_ID."
     },
     "locales": {
       "add": "Sprache hinzufügen",
@@ -484,6 +699,7 @@
   "shell": {
     "apiTokens": "API-Tokens",
     "glossary": "Glossar",
+    "insights": "Einblicke",
     "jobs": "Jobs",
     "keys": "Schlüssel",
     "logout": "Abmelden",

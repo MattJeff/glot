@@ -146,7 +146,8 @@ async fn reviews(
         let llm_err = |e: glot_llm::Error| {
             AppError::new(StatusCode::UNPROCESSABLE_ENTITY, "llm_error", e.to_string())
         };
-        let provider = glot_llm::provider::from_config(&cfg, api_key).map_err(llm_err)?;
+        let provider =
+            glot_llm::provider::from_config_with(&cfg, api_key, &llm.headers()).map_err(llm_err)?;
         let glossary = crate::glossary::load(&state.db, p.id).await?;
         let model = llm.judge_model.clone().unwrap_or_else(|| llm.model.clone());
         let (got, _usage) = glot_llm::review::review(

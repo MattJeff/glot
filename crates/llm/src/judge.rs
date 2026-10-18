@@ -88,7 +88,7 @@ pub async fn judge(
     let c = provider
         .complete(request(model, source_locale, target_locale, items))
         .await?;
-    let usage = Usage::of(&c.model, c.input_tokens, c.output_tokens);
+    let usage = Usage::of_completion(&c);
     let parsed = parse_json(&c.text).unwrap_or(Value::Null);
     let verdicts = items
         .iter()

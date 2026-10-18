@@ -21,9 +21,25 @@
 | `crates/server` (`glot-server`) | API HTTP axum + Postgres (sqlx), jobs de traduction, CDN/OTA, SSE |
 | `web/` | Dashboard Next.js (App Router, TS, Tailwind v4, shadcn/ui, next-intl) — **traduit par glot lui-même (dogfooding)** |
 | `packages/visual-qa` | QA visuelle Playwright (débordements par locale) |
+| `packages/agent-qa` | Parité de tâche (`glot parity`, `crates/cli/src/parity.rs`) : agent Claude vision ou mock scripté, `glot.tasks.yaml`, rapport local `.glot/parity/` (pas d'upload) |
 | `action/` | GitHub Action (`glot check` + `glot translate` + commentaire de PR) |
 
 Ports dev : API `8790`, web `3100`, Postgres docker `5433` (`postgres://glot:glot@localhost:5433/glot`).
+
+## Coûts LLM
+- **Prompt caching** : le system prompt (règles + glossaire de la locale, identique pour tous les lots d'une locale) est le
+  préfixe stable, marqué `cache_control` (Anthropic) ; le glossaire n'est plus répété dans le payload utilisateur. OpenAI
+  cache automatiquement le même préfixe. `Usage` compte `cache_creation_tokens` / `cache_read_tokens`, prix réels dans
+  `pricing::cost_cached_usd` (écriture 1,25×, lecture 0,1× ; Opus 5.5 0,05× ; Fable 5.1 0,025× ; OpenAI 0,1-0,5×).
+- **`glot translate --batch`** : 1er passage via l'API Message Batches d'Anthropic (-50 %), polling avec progression ;
+  retries/escalade en appels directs. `custom_id` = hash du prompt ; l'id du lot (puis ses résultats) est gardé dans
+  `.glot/batch.json` : relancer la même commande reprend le lot au lieu de repayer. Requêtes errored/expired => appel direct.
+- **Estimation** (`translate::estimate_full`) : prompts réels + sortie attendue (formes plurielles de la locale cible,
+  raisonnement ×3,5 min 400) + images `--visual` + juge + **appels de retry/escalade** (chacun renvoie tout le system
+  prompt, escalade au prix de `fallback_model`) pondérés par leur probabilité ; max = tous les retries + escalade sur
+  30 % des items, variance tokenizer 1,3×, aucun hit de cache. Cause de l'écart observé (0,071 $ réel > 0,060 $ max) :
+  l'ancien calcul ne comptait qu'une marge de 10 % pour les retries, alors que chaque retry renvoie le system prompt et
+  que l'escalade Sonnet coûte 20× Haiku.
 
 ## Fichiers projet (côté utilisateur)
 `glot.toml` :
@@ -100,9 +116,14 @@ PATCH  /api/projects/{slug}    {name?,target_locales?,llm?: LlmSettings,style?,p
 DELETE /api/projects/{slug}
 
 Project = {id,slug,name,source_locale,target_locales[],style,public_cdn,created_at,
-           llm: {provider,model,fallback_model,judge_model,has_api_key,budget_usd},
+           llm: {provider,model,fallback_model,judge_model,has_api_key,budget_usd,
+                 anthropic_workspace_id,extra_headers},
            stats: {keys, locales: {<loc>: {translated,reviewed,stale,issues}}}}
-LlmSettings = {provider,model,fallback_model?,judge_model?,api_key?(write-only),base_url?,budget_usd?}
+LlmSettings = {provider,model,fallback_model?,judge_model?,api_key?(write-only),base_url?,budget_usd?,
+               anthropic_workspace_id?,extra_headers?: {<name>: <value>}}
+  anthropic_workspace_id / extra_headers : absents => conservés ; "" vide le workspace. Envoyés à chaque appel LLM
+  du projet (jobs + Review API) ; `anthropic-workspace-id` = ce réglage, sinon env ANTHROPIC_WORKSPACE_ID.
+  extra_headers = non secrets uniquement (≤ 20 ; 400 sur authorization/cookie/x-api-key/*key*/*token*/*secret*/*auth*).
 
 GET    /api/projects/{slug}/keys?q=&locale=&status=&page=1&per_page=50
          -> {items:[KeyRow], total}
@@ -182,3 +203,39 @@ GET|PUT /api/projects/{slug}/preview   PreviewSettings {base_url|null, url_patte
 CLI : `glot-visual-qa … --upload <server-url> --project <slug> [--label x]` (token `GLOT_TOKEN`, `packages/visual-qa/src/upload.ts`).
 Dashboard : `/app/{slug}/preview` (matrice de locales en iframes) et `/app/{slug}/visual` (galerie, avant/après).
 Bridge optionnel côté app (`web/lib/preview-bridge.ts`, snippet affiché dans la matrice) : `postMessage` `glot:height` / `glot:ready` vers le parent, reçoit `glot:pseudo {on}`.
+
+## Insights (`crates/server/src/insights.rs`, migration `0024_insights.sql`, `packages/insights`)
+« ROI incertain par langue » : demande réelle par langue, conversion par locale, expériences de langue.
+Vie privée : aucun cookie, aucune IP / UA / route stockés ; uniquement des compteurs journaliers
+`insight_daily(day, preferred, served, country, arm, event, n)` (`event="$view"` = une visite par session navigateur).
+```
+POST   /api/insights/{public_key}   (public, CORS *, corps ≤ 4 Ko, text/plain accepté)
+         {langs:[navigator.languages], served, event?, country?, arm?, route?(ignorée)} -> {locale|null, arm|null}
+         preferred = 1re langue valide de langs sinon Accept-Language (sous-tag primaire) ; country = body ou cf-ipcountry /
+         x-vercel-ip-country / cloudfront-viewer-country. Si une expérience tourne pour cette langue, une visite tire un bras
+         (traffic_pct) ; locale renvoyée = langue à servir (bras test). Les événements réutilisent le bras envoyé.
+GET    /api/projects/{slug}/insights?days=30&goal=signup -> Insights (crée la clé publique si absente)
+Insights = {public_key, days, goal, source_locale, offered[], keys, events[], total_visits,
+  demand:[{language, visits, share, offered, conversions, conversion_rate, est_extra_conversions|null (par 30 j),
+           est_cost_usd|null (dry-run translate::estimate, toutes les clés), top_countries:[[cc,n]]}],   // manquantes d'abord
+  funnel:[{locale, is_source, visits, conversions, rate, ci_low, ci_high}],   // Wilson 95 %
+  daily:[{day, visits, unserved}], experiments:[Experiment]}
+POST   /api/projects/{slug}/insights/rotate-key -> {public_key}                      (admin ; l'ancienne clé → 404)
+POST   /api/projects/{slug}/insights/experiments {locale, traffic_pct 1-100, days 1-90, goal?} -> Experiment (admin ;
+         ajoute la locale aux target_locales ; 409 si déjà une expérience en cours pour la langue)
+PATCH  /api/projects/{slug}/insights/experiments/{id} {status:"kept"|"removed"} -> 204 (removed retire la locale des cibles)
+Experiment = {id, locale, traffic_pct, goal, started_at, ends_at, status, decided_at, test:Arm, control:Arm,
+  diff, ci_low, ci_high (IC 95 % différence de proportions), required_per_arm|null (lift relatif +20 %, α .05, puissance .8),
+  verdict:"collecting"|"keep"|"remove"|"inconclusive"}   // pas de verdict avant n requis ou date de fin
+```
+Client : `@glot/insights` (`init({key, endpoint, locale, onLocale})`, `track(event)`, `<script data-key>` auto-init,
+`@glot/insights/server` `reportVisit(req, …)` pour un middleware Next/Edge). Dashboard : `/app/{slug}/insights`.
+
+## Layout budgets (`glot measure`)
+`glot measure --base-url … --routes …` renders the source locale with visual-qa, maps each element to its key
+(rendered text → catalog regex, no instrumentation) and records the space it may use in `.glot/layout.json`
+(versionable): `{ "<key>": { "max_width_px", "max_lines", "font": { family, size_px, weight, letter_spacing, transform } } }`.
+Webfonts are converted to TTF in `.glot/fonts/`. `glot_core::measure` shapes text with rustybuzz (system-font
+fallbacks per script) so `validate` can raise `too_wide` **without a browser**; the translation prompt carries the
+budget ("must fit in 110px at Inter 14px/500 ≈ 16 Latin chars") and the retry loop fixes it before writing.
+When a budget exists for a key it replaces the noisy length-ratio warning.

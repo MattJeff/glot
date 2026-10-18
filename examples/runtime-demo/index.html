@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>glot runtime demo</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+    code { background: #f2f2f2; padding: 1px 4px; border-radius: 4px; }
+    #status { color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <label>Locale <select id="locale"></select></label>
+  <span id="status"></span>
+  <hr />
+  <main id="app"></main>
+  <p id="status2" style="color:#666;font-size:13px">
+    Shipped: <code>en</code>, <code>fr</code>. Any other locale is translated on this device by Chrome's Translator API
+    (Chrome 138+ desktop), with placeholders, plurals and the glossary (<code>Workspace</code>, <code>glot</code>) kept, and each
+    string validated by glot's WASM validator. Add <code>?fake</code> to simulate the API in other browsers.
+  </p>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

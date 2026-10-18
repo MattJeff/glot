@@ -5,6 +5,7 @@ pub mod context;
 pub mod glossary;
 pub mod hash;
 pub mod lock;
+pub mod measure;
 pub mod plural;
 pub mod validate;
 

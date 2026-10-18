@@ -19,6 +19,17 @@ const HOOKS: &[&str] = &[
     "useI18n",
 ];
 /// Elements whose text content is code or a translation default, never UI copy to extract.
+/// Code-like elements, or any element opting out with the HTML-standard `translate="no"`
+/// (package names, commands, example values): their text and attributes are never extracted.
+pub(crate) fn skips_text(tag: &str, el: &JSXOpeningElement) -> bool {
+    SKIP_TEXT_IN.contains(&tag)
+        || el.attributes.iter().any(|a| {
+            matches!(a, JSXAttributeItem::Attribute(a)
+                if matches!(&a.name, JSXAttributeName::Identifier(id) if id.name == "translate")
+                    && attr_str(a).is_some_and(|(v, _)| v == "no"))
+        })
+}
+
 pub(crate) const SKIP_TEXT_IN: &[&str] = &[
     "code",
     "pre",
@@ -318,7 +329,7 @@ impl<'a> Visit<'a> for Scanner<'_> {
 
     fn visit_jsx_element(&mut self, it: &JSXElement<'a>) {
         let tag = elem_name(&it.opening_element.name);
-        let skip = SKIP_TEXT_IN.contains(&tag.as_str());
+        let skip = skips_text(&tag, &it.opening_element);
         self.frames.push(Frame::Element(tag_role(&tag)));
         self.skip_text += skip as usize;
         walk::walk_jsx_element(self, it);

@@ -1,0 +1,147 @@
+# One-click "Translate this app": copy to .github/workflows/glot-onboard.yml in your app's repo,
+# then Actions → "glot onboard" → Run workflow. It installs an i18n library if needed, runs
+# glot init + i18nize (+ translate when ANTHROPIC_API_KEY is set) and opens a pull request.
+# Repo setting required: Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+name: glot onboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: Target locales (comma separated)
+        default: fr,es,de
+      source:
+        description: Source locale
+        default: en
+      paths:
+        description: Paths to internationalize (space separated, empty = whole project)
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  onboard:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE: ${{ inputs.source }}
+      TARGETS: ${{ inputs.targets }}
+      PATHS: ${{ inputs.paths }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      NO_COLOR: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Optional PAT with `workflow` scope so the PR can also add .github/workflows/glot.yml.
+          token: ${{ secrets.GLOT_TOKEN || github.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install glot
+        # The npm package verifies the binary against the SHA-256 checksums pinned in its version.
+        # Needs a glot release that ships `i18nize` (after v0.1.0); pin it, e.g. glot-i18n@0.2.0.
+        run: npm install -g glot-i18n
+
+      - name: Add an i18n library if missing
+        id: lib
+        shell: bash
+        run: |
+          set -euo pipefail
+          deps=$(jq -r '(.dependencies // {}) + (.devDependencies // {}) | keys[]' package.json)
+          has() { grep -qx "$1" <<<"$deps"; }
+          if has next-intl || has react-i18next || has i18next || has next-i18next; then
+            echo "added=" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ -f package-lock.json ]; then pm="npm install"
+          elif [ -f pnpm-lock.yaml ]; then corepack enable; pm="pnpm add"
+          elif [ -f yarn.lock ]; then corepack enable; pm="yarn add"
+          elif [ -f bun.lockb ] || [ -f bun.lock ]; then pm="npx -y bun add"
+          else pm="npm install"; fi
+          if has next; then libs="next-intl"; else libs="i18next react-i18next"; fi
+          # shellcheck disable=SC2086
+          $pm $libs
+          echo "added=$libs" >> "$GITHUB_OUTPUT"
+
+      - name: Wire react-i18next (Vite / React apps)
+        if: steps.lib.outputs.added == 'i18next react-i18next'
+        shell: bash
+        run: |
+          set -euo pipefail
+          main=
+          for f in src/main.tsx src/main.jsx src/index.tsx src/index.jsx src/main.ts src/main.js; do
+            [ -f "$f" ] && { main=$f; break; }
+          done
+          [ -n "$main" ] || { echo "::warning::No src/main.* entry found; wire i18next by hand"; exit 0; }
+          ext=js; case "$main" in *.ts|*.tsx) ext=ts ;; esac
+          mkdir -p src/locales
+          [ -f "src/locales/$SOURCE.json" ] || echo '{}' > "src/locales/$SOURCE.json"
+          cat > "src/i18n.$ext" <<JS
+          import i18n from "i18next";
+          import { initReactI18next } from "react-i18next";
+
+          // Added by glot onboard: every src/locales/<locale>.json is a language.
+          const catalogs = import.meta.glob("./locales/*.json", { eager: true, import: "default" });
+          const resources = Object.fromEntries(
+            Object.entries(catalogs).map(([path, translation]) => [path.slice("./locales/".length, -".json".length), { translation }]),
+          );
+
+          i18n.use(initReactI18next).init({
+            resources,
+            lng: navigator.language.split("-")[0],
+            fallbackLng: "$SOURCE",
+            interpolation: { escapeValue: false },
+          });
+
+          export default i18n;
+          JS
+          printf 'import "./i18n";\n%s\n' "$(cat "$main")" > "$main"
+
+      - name: glot init + i18nize
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -f glot.toml ] || glot init --yes --source "$SOURCE" --targets "$TARGETS"
+          # shellcheck disable=SC2086
+          glot i18nize --yes $PATHS
+
+      - name: glot translate
+        if: env.ANTHROPIC_API_KEY != ''
+        run: glot translate --yes
+
+      - name: Open pull request
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GLOT_TOKEN || github.token }}
+          HAS_PAT: ${{ secrets.GLOT_TOKEN != '' }}
+          LIB: ${{ steps.lib.outputs.added }}
+        run: |
+          set -euo pipefail
+          # GITHUB_TOKEN cannot push workflow files; without GLOT_TOKEN, the PR body explains how to add it.
+          if [ "$HAS_PAT" != true ] && ! git ls-files --error-unmatch .github/workflows/glot.yml >/dev/null 2>&1; then
+            rm -f .github/workflows/glot.yml
+          fi
+          branch="glot/onboard-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to change"; exit 0; }
+          git -c user.name="glot[bot]" -c user.email="glot-bot@users.noreply.github.com" commit -qm "i18n: internationalize with glot"
+          git push -q origin "$branch"
+          check=$(glot check >/dev/null 2>&1 && echo "passes" || echo "reports issues (see the glot workflow)")
+          {
+            echo "This PR moves hardcoded UI strings into translation catalogs with [glot](https://github.com/MattJeff/glot)."
+            echo
+            [ -n "$LIB" ] && echo "- Added \`$LIB\`." && echo
+            echo "| Locale | Translated | Missing |"
+            echo "|---|---:|---:|"
+            glot status --json | jq -r '.locales | to_entries[] | "| `\(.key)` | \(.value.translated)/\(.value.total) | \(.value.missing) |"'
+            echo
+            echo "\`glot check\` $check."
+            [ -n "$ANTHROPIC_API_KEY" ] || echo "- No \`ANTHROPIC_API_KEY\` secret: strings are extracted but not translated yet. Add the secret and run \`glot translate\`."
+            [ "$LIB" = next-intl ] && echo "- Next.js: finish the next-intl setup (\`i18n/request.ts\`, \`createNextIntlPlugin\` in next.config, \`NextIntlClientProvider\` in the root layout): https://next-intl.dev/docs/getting-started/app-router"
+            [ "$HAS_PAT" = true ] || echo "- Keep translations up to date on every PR: run \`glot init --force\` locally (or copy the GitHub Action snippet from the glot README) to add \`.github/workflows/glot.yml\`."
+            echo
+            echo "Check the preview, then merge."
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --title "Translate this app with glot ($TARGETS)" --body-file "$RUNNER_TEMP/body.md" --head "$branch"

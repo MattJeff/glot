@@ -365,3 +365,19 @@ fn brace_expansion() {
     );
     assert_eq!(crate::expand_braces("{a,b}/*.{x,y}").len(), 4);
 }
+
+#[test]
+fn translate_no_opts_out() {
+    let r = scan(
+        "app/page.tsx",
+        r#"export default function P() {
+  return <div>
+    <span translate="no">npm install acme</span>
+    <input translate="no" placeholder="x-team: growth" />
+    <p>Real copy here</p>
+  </div>;
+}"#,
+    );
+    let texts: Vec<_> = r.hardcoded.iter().map(|h| h.text.as_str()).collect();
+    assert_eq!(texts, ["Real copy here"]);
+}

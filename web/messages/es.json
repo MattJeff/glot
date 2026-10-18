@@ -154,6 +154,129 @@
     "subtitle": "Cobertura, validación, significado (retrotraducción) y QA visual, puntuados de 0 a 100.",
     "title": "Estado del idioma"
   },
+  "insights": {
+    "daily": {
+      "served": "Ofrecido",
+      "subtitle": "Visitas cuyo idioma preferido no ofrece, sobre el total de visitas.",
+      "title": "Visitas diarias",
+      "unserved": "No ofrecido"
+    },
+    "demand": {
+      "action": "Acción",
+      "conversion": "Conversión",
+      "cost": "Coste de lanzamiento",
+      "language": "Idioma",
+      "offered": "Ofrecido",
+      "potential": "Potencial / mes",
+      "share": "Cuota de visitantes",
+      "subtitle": "Visitantes por idioma preferido del navegador. Primero los idiomas que faltan, ordenados por demanda.",
+      "test": "Probar",
+      "testing": "En prueba",
+      "title": "Brecha de demanda",
+      "visitsTitle": "{n, plural, one {# visita} many {# visitas} other {# visitas}}"
+    },
+    "empty": {
+      "body": "Añada el fragmento siguiente a su aplicación. En cuestión de minutos verá qué idiomas prefieren sus visitantes y cuáles no ofrece.",
+      "title": "Aún no hay visitas"
+    },
+    "exp": {
+      "armControl": "Control · {language}",
+      "armTest": "Prueba · {language}",
+      "cancel": "Cancelar",
+      "ciAria": "Intervalo de confianza del 95 % de {low} a {high} puntos",
+      "costNote": "El idioma se suma a sus idiomas de destino. Traducir {keys, plural, one {# clave} many {# claves} other {# claves}} cuesta ≈ {cost}: realice la traducción antes de que llegue el tráfico.",
+      "days": "Duración (días)",
+      "dialogBody": "Los visitantes que prefieren este idioma lo reciben en el porcentaje de sesiones elegido; los demás permanecen en el idioma original como control.",
+      "dialogTitle": "Probar un idioma",
+      "diff": "Diferencia (prueba − control)",
+      "early": "Decidir ahora es prematuro",
+      "empty": "Aún no hay experimentos. Inicie uno desde un idioma que falta arriba.",
+      "ended": "medición finalizada",
+      "endsIn": "termina {when}",
+      "explain": {
+        "collecting": "Aún no hay suficientes visitantes para concluir: espere a la muestra requerida (o a la fecha de finalización) antes de decidir.",
+        "inconclusive": "Sin diferencia medible. Manténgalo si el coste es bajo o el mercado es estratégico.",
+        "keep": "El idioma de prueba convierte mejor y el intervalo de confianza no incluye el cero.",
+        "remove": "El idioma de prueba convierte peor y el intervalo de confianza no incluye el cero."
+      },
+      "goal": "Evento objetivo",
+      "keep": "Mantener",
+      "kept": "Mantenido",
+      "keptToast": "Idioma mantenido",
+      "locale": "Idioma",
+      "meta": "{pct} % del tráfico · objetivo {goal}",
+      "new": "Nuevo experimento",
+      "pts": "pts",
+      "remove": "Eliminar",
+      "removed": "eliminado",
+      "removedToast": "Idioma eliminado de los destinos",
+      "sample": "Visitantes por brazo (mínimo) / requeridos",
+      "sampleUnknown": "La muestra requerida aparece cuando el brazo de control registra una conversión.",
+      "start": "Iniciar experimento",
+      "started": "Experimento iniciado para {language}",
+      "subtitle": "Sirva un idioma a una parte de los visitantes que lo prefieren, mida y luego manténgalo o elimínelo.",
+      "title": "Experimentos de idioma",
+      "traffic": "Tráfico (%)",
+      "translateNote": "El idioma se añade a sus idiomas de destino: ejecute la traducción antes de que llegue el tráfico.",
+      "verdict": {
+        "collecting": "Recopilando",
+        "inconclusive": "Sin efecto claro",
+        "keep": "Mantener",
+        "remove": "Eliminar"
+      }
+    },
+    "funnel": {
+      "ciTitle": "IC 95 %: {low} – {high}",
+      "empty": "Aún no hay datos de conversión.",
+      "legendCi": "Intervalo de confianza del 95 %",
+      "legendSource": "tasa de origen",
+      "pts": "pts",
+      "sampleSize": "· n = {n}",
+      "source": "origen",
+      "subtitle": "Tasa por idioma servido con su intervalo de confianza del 95 %, frente al idioma de origen.",
+      "title": "Conversión por idioma ({goal})"
+    },
+    "goal": "Evento objetivo",
+    "hero": {
+      "cost": "traducir {keys, plural, one {# clave} many {# claves} other {# claves}} cuesta ≈ {cost}",
+      "covered": "Ya ofrece todos los idiomas que prefieren sus visitantes.",
+      "cta": "Probar {language}",
+      "headline": "<strong>{share}</strong> de sus visitantes prefiere <strong>{language}</strong> — y no lo ofrece.",
+      "kicker": "Mayor demanda sin cubrir",
+      "potential": "≈ {n} {goal} más al mes si convirtieran como los visitantes atendidos en su propio idioma"
+    },
+    "install": {
+      "cancel": "Cancelar",
+      "privacy": {
+        "daily": "Solo contadores diarios por idioma, configuración regional y país.",
+        "noCookie": "Sin cookies ni ID de visitante: una entrada de sessionStorage para el brazo del experimento.",
+        "noIp": "No se almacenan dirección IP, user agent ni ruta.",
+        "size": "Menos de 1 kB comprimido con gzip."
+      },
+      "publicKey": "Clave pública",
+      "rotate": "Rotar clave",
+      "rotateBody": "La clave actual deja de funcionar de inmediato. Actualiza el fragmento de tu app con la nueva clave.",
+      "rotateTitle": "¿Rotar la clave pública?",
+      "rotated": "Nueva clave pública generada",
+      "show": "Mostrar",
+      "subtitle": "Una etiqueta script, una importación de npm o un middleware de Next.js. La misma clave pública para las tres.",
+      "tabMiddleware": "Middleware de Next.js",
+      "tabScript": "Etiqueta script",
+      "title": "Instalar el fragmento"
+    },
+    "lastDays": "Últimos {days} días",
+    "period": "Periodo",
+    "stats": {
+      "potential": "Potencial por mes",
+      "potentialHint": "{goal} adicionales en los idiomas que faltan",
+      "sourceConv": "Tasa de {goal} (origen)",
+      "unserved": "Demanda no atendida",
+      "unservedHint": "{n, plural, =0 {ningún idioma sin ofrecer} one {# idioma no ofrecido} many {# idiomas no ofrecidos} other {# idiomas no ofrecidos}}",
+      "visits": "Visitas"
+    },
+    "subtitle": "Qué idiomas quieren tus visitantes, cómo convierte cada idioma y si merece la pena añadir uno nuevo.",
+    "title": "Insights"
+  },
   "jobStatus": {
     "done": "Completada",
     "failed": "Fallida",
@@ -187,24 +310,32 @@
   },
   "landing": {
     "compare": {
-      "crowdinPrice": "Planes de pago, ~$50+/mes",
+      "crowdinPrice": "Suscripción, gratis para código abierto",
       "feature": "Función",
-      "footnote": "Precios de entrada orientativos de las páginas públicas de precios; consulta los planes actuales de cada proveedor.",
-      "glotPrice": "Gratis + tu uso de LLM",
-      "lokalisePrice": "Planes de pago, ~$120+/mes",
+      "footnote": "Basado en el sitio web público y la documentación de cada proveedor a octubre de 2026. Parcial significa limitado, dependiente del plan o a través de una integración. Los planes y funciones cambian: consulta las fuentes.",
+      "glotPrice": "Gratis (MIT) + tu uso de LLM",
+      "lingoPrice": "CLI gratis, motor alojado de pago",
+      "lokalisePrice": "Suscripción, consulta precios",
       "no": "No",
       "partial": "Parcial",
       "rows": {
         "byok": "Trae tu propia clave de LLM",
+        "fit": "Ajuste por presupuesto de píxeles renderizado",
         "gitNative": "Git como fuente de verdad (lockfile)",
+        "inContext": "Edición en contexto en tu app",
         "mcp": "Servidor MCP para agentes de programación",
         "openSource": "Código abierto",
         "price": "Precio",
         "validator": "Validación determinista de cada cadena"
       },
-      "subtitle": "Gestión de traducciones sin precio por usuario.",
+      "sources": "Fuentes:",
+      "subtitle": "En qué se diferencia glot de las plataformas de traducción alojadas y de la otra opción de código abierto.",
       "title": "Comparar",
       "yes": "Sí"
+    },
+    "core": {
+      "subtitle": "El LLM siempre está rodeado de código que puede decir que no.",
+      "title": "El núcleo determinista"
     },
     "cta": {
       "button": "Crea tu espacio de trabajo",
@@ -242,6 +373,19 @@
         "title": "QA visual"
       }
     },
+    "fit": {
+      "after": "Después de glot fit",
+      "afterAlt": "Etiqueta alemana más corta que cabe en el botón",
+      "before": "Antes",
+      "beforeAlt": "Etiqueta de botón en alemán cortada con puntos suspensivos",
+      "body": "El alemán suele ser un tercio más largo que el inglés. glot fit captura tu app en ejecución en cada idioma, mide cada texto frente a su contenedor, pide al LLM una variante más corta que conserve el significado y los marcadores, y vuelve a renderizar.",
+      "caption": "Capturas reales de la app de demostración, en idioma alemán.",
+      "eyebrow": "Presupuesto de píxeles",
+      "p1": "Medido en el navegador, no estimado a partir del número de caracteres",
+      "p2": "Las variantes acortadas siguen pasando el validador y el glosario",
+      "p3": "Se detiene tras un número fijo de pasadas, nunca itera sin límite por coste",
+      "title": "Traducciones que caben en el botón"
+    },
     "flow": {
       "agent": {
         "caption": "Tu agente añade una funcionalidad y claves nuevas.",
@@ -276,26 +420,93 @@
       "badge": "Código abierto · MIT · Trae tu propia clave de LLM",
       "primary": "Empieza gratis",
       "secondary": "Dale una estrella en GitHub",
-      "subtitle": "Tu agente de programación escribe funcionalidades. glot las publica en todos los idiomas: traducciones con LLM sensibles al contexto, envueltas en un validador determinista, con un lockfile y un glosario que viven en Git.",
+      "subtitle": "Apunta glot a un código lleno de cadenas codificadas en duro. Un solo comando las pasa a claves y reescribe tus componentes; tu LLM traduce, un código determinista verifica cada cadena y el resultado llega a Git.",
+      "terminal": "Del inglés codificado en duro a cuatro idiomas",
       "title": "i18n que tu agente de IA no puede romper."
+    },
+    "insights": {
+      "body": "Una baliza anónima cuenta visitantes por idioma preferido y por el idioma que les servisteis, y luego compara la conversión. Sin cookies ni ID de visitante.",
+      "notServed": "Aún sin traducir",
+      "sample": "Datos de ejemplo",
+      "served": "Servido",
+      "share": "{value} de visitantes",
+      "title": "Estadísticas por idioma"
     },
     "install": {
       "cargo": "Con Cargo",
+      "i18nize": "Convertir una app existente",
       "mcp": "Añadir a tu agente",
       "npx": "Con npx",
       "subtitle": "Ejecútalo en local con tu agente o conéctalo a un servidor de glot para tu equipo.",
       "title": "Instálalo en segundos"
     },
+    "matrix": {
+      "body": "Todos los idiomas de una página en paralelo, con desbordamientos, truncados y problemas RTL del QA visual fijados en la pantalla donde ocurren.",
+      "issues": "{count, plural, one {# desbordamiento} many {# desbordamientos} other {# desbordamientos}}",
+      "ok": "Sin problemas",
+      "title": "Matriz de idiomas"
+    },
     "meta": {
       "description": "Localización de código abierto para SaaS, diseñada para agentes de programación. Validación determinista, un lockfile, glosario como código y un servidor MCP.",
       "title": "glot: i18n que la IA no puede romper"
+    },
+    "more": {
+      "subtitle": "Calidad que puedes comprobar sin hablar el idioma, y datos sobre qué idioma añadir a continuación.",
+      "title": "Mira lo que ven tus usuarios"
     },
     "nav": {
       "compare": "Comparar",
       "features": "Funciones",
       "getStarted": "Empezar",
       "install": "Instalar",
-      "signIn": "Iniciar sesión"
+      "signIn": "Iniciar sesión",
+      "workflow": "Cómo funciona"
+    },
+    "ondevice": {
+      "body": "Para idiomas que aún no publicas, @glot/runtime traduce en el navegador con la API Translator integrada y luego ejecuta el validador de glot compilado a WebAssembly.",
+      "step1": "El navegador traduce, con los marcadores enmascarados",
+      "step2": "El validador revisa plurales, etiquetas y glosario",
+      "step3": "Lo que falle se queda en el idioma original",
+      "title": "Respaldo en el dispositivo"
+    },
+    "overlay": {
+      "alt": "Popover del overlay de glot que muestra una clave, su texto original y sus traducciones en cinco idiomas",
+      "body": "El overlay de desarrollo encuentra la clave detrás del texto en el que hiciste clic, la muestra en todos los idiomas con los problemas del validador en vivo y guarda en tus archivos de catálogo. La recarga en caliente hace el resto.",
+      "eyebrow": "Edición dentro de la app",
+      "p1": "Acciones de IA: sugerir, acortar, más formal, traducir todo",
+      "p2": "Marca el texto que desborda su contenedor",
+      "p3": "Solo en desarrollo, unos 6 kB comprimidos, sin dependencias de runtime",
+      "title": "Alt+clic en cualquier texto de tu app"
+    },
+    "review": {
+      "back": "Retrotraducción",
+      "body": "El LLM traduce el texto de destino de vuelta a tu idioma de forma literal, explica sus decisiones y emite un veredicto. Se guarda en caché hasta que cambie el original o el destino.",
+      "explanation": "«Relance» es el término francés habitual para un recordatorio de pago; el tono es algo más firme.",
+      "nuance": "Matiz",
+      "source": "Original",
+      "title": "Revisión de retrotraducción"
+    },
+    "workflow": {
+      "steps": {
+        "fit": {
+          "body": "Renderiza la app en ejecución por idioma, acorta lo que desborda su caja y vuelve a renderizar hasta que encaja.",
+          "title": "Ajustar"
+        },
+        "i18nize": {
+          "body": "Encuentra cadenas de UI codificadas en duro, propone claves según el contexto y reescribe el código para next-intl o react-i18next.",
+          "title": "Extraer"
+        },
+        "review": {
+          "body": "Retraduce cada cadena a tu idioma y explica qué ha cambiado, para que puedas confiar en idiomas que no hablas.",
+          "title": "Revisión"
+        },
+        "translate": {
+          "body": "Solo el delta, con su glosario, contexto archivo:línea y rol de la UI. Cada cadena se valida, se reintenta y luego se escala.",
+          "title": "Traducir"
+        }
+      },
+      "subtitle": "Cada paso es un comando de CLI que su agente de programación también puede ejecutar, a través del servidor MCP.",
+      "title": "Cuatro comandos, todo el ciclo de vida"
     }
   },
   "localeSwitcher": {
@@ -441,6 +652,8 @@
       "budget": "Presupuesto (USD)",
       "budgetHint": "Las tareas se detienen al alcanzar este presupuesto.",
       "description": "Clave propia del proveedor. glot no aplica recargos al uso de LLM.",
+      "extraHeaders": "Encabezados adicionales",
+      "extraHeadersHint": "Uno «Nombre: valor» por línea, enviado con cada llamada a LLM. No para secretos: se rechazan las credenciales.",
       "fallback": "Modelo de respaldo",
       "fallbackHint": "Se usa cuando la validación sigue fallando tras un reintento.",
       "judge": "Modelo evaluador",
@@ -455,7 +668,9 @@
       },
       "style": "Guía de estilo",
       "stylePlaceholder": "Amigable, conciso, “tú” informal en francés…",
-      "title": "LLM"
+      "title": "LLM",
+      "workspaceId": "ID de espacio de trabajo de Anthropic",
+      "workspaceIdHint": "Obligatorio con claves de nivel de organización (sk-ant-usr-…). Sustituye a ANTHROPIC_WORKSPACE_ID."
     },
     "locales": {
       "add": "Añadir idioma",
@@ -484,6 +699,7 @@
   "shell": {
     "apiTokens": "Tokens de API",
     "glossary": "Glosario",
+    "insights": "Estadísticas",
     "jobs": "Tareas",
     "keys": "Claves",
     "logout": "Cerrar sesión",

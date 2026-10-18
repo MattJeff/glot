@@ -1,0 +1,995 @@
+{
+  "generated_by": "packages/visual-qa/test/measure.test.ts",
+  "cases": [
+    {
+      "text": "Save",
+      "px": 31.48,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Cancel",
+      "px": 44.44,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Send invite",
+      "px": 71.17,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Mark as paid",
+      "px": 82.45,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Create invoice",
+      "px": 90.84,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Get started for free",
+      "px": 122.67,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Rechnung erstellen",
+      "px": 123.55,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Als bezahlt markieren",
+      "px": 137.91,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Einladung senden",
+      "px": 113.84,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Zahlungserinnerung",
+      "px": 126.94,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Enregistrer les modifications",
+      "px": 181.41,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Créer une facture",
+      "px": 112.11,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Marquer comme payée",
+      "px": 146.64,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Ça déborde, n'est-ce pas ?",
+      "px": 169.56,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Guardar cambios",
+      "px": 109.09,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Configuración de facturación",
+      "px": 184.7,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "WAVE AVATAR Typography",
+      "px": 167.22,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "1,234.56 € — 42%",
+      "px": 115.25,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "iiiiiiiiiiii",
+      "px": 37.92,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "MMMMMMMM",
+      "px": 96.27,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "The quick brown fox jumps over the lazy dog",
+      "px": 284.84,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Überweisung fällig",
+      "px": 119.28,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Ångström Øresund",
+      "px": 120.36,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "{count} items",
+      "px": 86.13,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Invite teammates to your workspace",
+      "px": 232.73,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "AV To Ty Wa",
+      "px": 77.22,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Löschen",
+      "px": 53.92,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Archivieren",
+      "px": 71.61,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Mitglied entfernen",
+      "px": 116.38,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Abonnement kündigen",
+      "px": 144.42,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Save",
+      "px": 35.97,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Cancel",
+      "px": 50.8,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Send invite",
+      "px": 81.33,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Mark as paid",
+      "px": 94.23,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Create invoice",
+      "px": 103.81,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Get started for free",
+      "px": 140.2,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Rechnung erstellen",
+      "px": 141.19,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Als bezahlt markieren",
+      "px": 157.61,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Einladung senden",
+      "px": 130.11,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Zahlungserinnerung",
+      "px": 145.06,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Enregistrer les modifications",
+      "px": 207.31,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Créer une facture",
+      "px": 128.13,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Marquer comme payée",
+      "px": 167.59,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Ça déborde, n'est-ce pas ?",
+      "px": 193.78,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Guardar cambios",
+      "px": 124.69,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Configuración de facturación",
+      "px": 211.08,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "WAVE AVATAR Typography",
+      "px": 191.11,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "1,234.56 € — 42%",
+      "px": 131.72,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "iiiiiiiiiiii",
+      "px": 43.33,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "MMMMMMMM",
+      "px": 110.03,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "The quick brown fox jumps over the lazy dog",
+      "px": 325.53,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Überweisung fällig",
+      "px": 136.33,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Ångström Øresund",
+      "px": 137.55,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "{count} items",
+      "px": 98.42,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Invite teammates to your workspace",
+      "px": 265.97,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "AV To Ty Wa",
+      "px": 88.25,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Löschen",
+      "px": 61.63,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Archivieren",
+      "px": 81.83,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Mitglied entfernen",
+      "px": 133,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Abonnement kündigen",
+      "px": 165.05,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Save",
+      "px": 28.98,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Cancel",
+      "px": 41.09,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Send invite",
+      "px": 66.5,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Mark as paid",
+      "px": 76.67,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Create invoice",
+      "px": 84.86,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Get started for free",
+      "px": 115.16,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Rechnung erstellen",
+      "px": 114.89,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Als bezahlt markieren",
+      "px": 128.7,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Einladung senden",
+      "px": 105.58,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Zahlungserinnerung",
+      "px": 117.8,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Enregistrer les modifications",
+      "px": 169.98,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Créer une facture",
+      "px": 104.59,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Marquer comme payée",
+      "px": 135.2,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Ça déborde, n'est-ce pas ?",
+      "px": 158.34,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Guardar cambios",
+      "px": 101.02,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Configuración de facturación",
+      "px": 172.31,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "WAVE AVATAR Typography",
+      "px": 154.33,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "1,234.56 € — 42%",
+      "px": 106.8,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "iiiiiiiiiiii",
+      "px": 38.5,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "MMMMMMMM",
+      "px": 86.52,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "The quick brown fox jumps over the lazy dog",
+      "px": 265.64,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Überweisung fällig",
+      "px": 111.25,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Ångström Øresund",
+      "px": 111.16,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "{count} items",
+      "px": 80.31,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Invite teammates to your workspace",
+      "px": 216.48,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "AV To Ty Wa",
+      "px": 71.69,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Löschen",
+      "px": 49.72,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Archivieren",
+      "px": 66.88,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Mitglied entfernen",
+      "px": 108.75,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Abonnement kündigen",
+      "px": 133.28,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    }
+  ]
+}

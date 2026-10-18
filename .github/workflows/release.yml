@@ -43,3 +43,17 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: glot-${{ matrix.target }}.*
+
+  checksums:
+    # install.sh and the npm wrapper verify archives against this file.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish SHA256SUMS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release download "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY" -p 'glot-*' -D dist
+          cd dist && sha256sum glot-* > SHA256SUMS && cat SHA256SUMS
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS -R "$GITHUB_REPOSITORY" --clobber

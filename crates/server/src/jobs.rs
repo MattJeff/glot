@@ -323,7 +323,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
         extract: Default::default(),
         server: None,
     };
-    let provider = glot_llm::provider::from_config(&config.llm, api_key)?;
+    let provider = glot_llm::provider::from_config_with(&config.llm, api_key, &p.llm.0.headers())?;
     let translator = Translator::new(&config, provider);
     let glossary = crate::glossary::load(&state.db, p.id)
         .await

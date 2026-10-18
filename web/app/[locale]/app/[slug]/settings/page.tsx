@@ -81,7 +81,13 @@ function SettingsForm({ project: p }: { project: Project }) {
     // ponytail: Project.llm doesn't expose base_url in the contract, so it can't be prefilled.
     base_url: "",
     budget_usd: p.llm.budget_usd,
+    anthropic_workspace_id: p.llm.anthropic_workspace_id ?? "",
   });
+  const [headers, setHeaders] = useState(
+    Object.entries(p.llm.extra_headers ?? {})
+      .map(([k, v]) => `${k}: ${v}`)
+      .join("\n"),
+  );
   const [confirm, setConfirm] = useState("");
   const set = <K extends keyof LlmSettings>(k: K, v: LlmSettings[K]) => setLlm((s) => ({ ...s, [k]: v }));
 
@@ -98,6 +104,14 @@ function SettingsForm({ project: p }: { project: Project }) {
           fallback_model: llm.fallback_model || null,
           judge_model: llm.judge_model || null,
           budget_usd: llm.budget_usd ?? null,
+          anthropic_workspace_id: llm.anthropic_workspace_id ?? "",
+          extra_headers: Object.fromEntries(
+            headers
+              .split("\n")
+              .filter((l) => l.includes(":"))
+              .map((l) => [l.slice(0, l.indexOf(":")).trim(), l.slice(l.indexOf(":") + 1).trim()])
+              .filter(([k]) => k),
+          ),
           ...(llm.api_key ? { api_key: llm.api_key } : {}),
           ...(llm.base_url ? { base_url: llm.base_url } : {}),
         },
@@ -242,6 +256,30 @@ function SettingsForm({ project: p }: { project: Project }) {
             />
           </Field>
         )}
+        {llm.provider === "anthropic" && (
+          <Field id="s-workspace" label={t("llm.workspaceId")} hint={t("llm.workspaceIdHint")}>
+            <Input
+              id="s-workspace"
+              value={llm.anthropic_workspace_id ?? ""}
+              onChange={(e) => set("anthropic_workspace_id", e.target.value)}
+              placeholder="wrkspc_…"
+              dir="ltr"
+              className="font-mono"
+            />
+          </Field>
+        )}
+        <Field id="s-headers" label={t("llm.extraHeaders")} hint={t("llm.extraHeadersHint")}>
+          <Textarea
+            id="s-headers"
+            rows={2}
+            value={headers}
+            onChange={(e) => setHeaders(e.target.value)}
+            placeholder="x-team: growth"
+            translate="no"
+            dir="ltr"
+            className="font-mono"
+          />
+        </Field>
         <Field id="s-budget" label={t("llm.budget")} hint={t("llm.budgetHint")}>
           <Input
             id="s-budget"

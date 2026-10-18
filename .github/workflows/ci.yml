@@ -72,3 +72,23 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm test
+
+  packages:
+    # Mock-mode tests of the JS packages (no tokens). agent-qa reuses visual-qa sources.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 25
+      - run: pnpm install --frozen-lockfile
+        working-directory: packages/visual-qa
+      - run: pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium
+        working-directory: packages/agent-qa
+      - run: pnpm typecheck && pnpm test
+        working-directory: packages/agent-qa
+      - run: node --test 'test/*.test.ts'
+        working-directory: packages/insights

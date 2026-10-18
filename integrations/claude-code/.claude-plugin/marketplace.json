@@ -1,0 +1,12 @@
+{
+  "name": "glot",
+  "description": "glot: AI-native i18n for SaaS apps",
+  "owner": { "name": "MattJeff", "url": "https://github.com/MattJeff" },
+  "plugins": [
+    {
+      "name": "glot",
+      "source": "./glot",
+      "description": "Internationalize and translate your app with glot: skill, /glot:i18nize, /glot:translate and the glot MCP server."
+    }
+  ]
+}

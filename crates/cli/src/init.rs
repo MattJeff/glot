@@ -63,7 +63,19 @@ pub fn detect(root: &Path) -> Detected {
     } else if has("vue-i18n") {
         ("vue-i18n", "icu", "src/locales/{locale}.json")
     } else {
-        ("generic", "icu", "locales/{locale}.json")
+        // No i18n library yet: `glot i18nize` will install react-i18next outside Next.js, whose
+        // catalogs use i18next syntax and are bundled from the app's source dir.
+        match crate::setup::detect(root).map(|p| (p.framework, p.base)) {
+            Some((f, base)) if f.lib() == glot_extract::i18nize::Lib::ReactI18next => {
+                let file = if base == "app/" {
+                    "app/locales/{locale}.json"
+                } else {
+                    "src/locales/{locale}.json"
+                };
+                ("react-i18next", "i18next", file)
+            }
+            _ => ("generic", "icu", "locales/{locale}.json"),
+        }
     };
 
     let (mut files, locales) = find_catalogs(root);
@@ -288,7 +300,12 @@ impl Writer<'_> {
         }
         servers.insert(
             "glot".into(),
-            serde_json::json!({ "command": "glot", "args": ["mcp"] }),
+            // Prefer the installed binary; projects that only use `npx glot-i18n` get the npx form.
+            if glot_on_path() {
+                serde_json::json!({ "command": "glot", "args": ["mcp"] })
+            } else {
+                serde_json::json!({ "command": "npx", "args": ["-y", "glot-i18n", "mcp"] })
+            },
         );
         self.write(rel, &(serde_json::to_string_pretty(&json)? + "\n"))?;
         self.report(rel, if existed { "updated" } else { "created" });
@@ -504,6 +521,12 @@ jobs:
         + "\n"
 }
 
+fn glot_on_path() -> bool {
+    let exe = if cfg!(windows) { "glot.exe" } else { "glot" };
+    std::env::var_os("PATH")
+        .is_some_and(|p| std::env::split_paths(&p).any(|d| d.join(exe).is_file()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -532,5 +555,19 @@ mod tests {
         assert_eq!(d.syntax, "i18next");
         assert_eq!(d.files, vec!["public/locales/{locale}/common.json"]);
         assert_eq!(d.locales.len(), 2);
+    }
+
+    #[test]
+    fn vite_without_i18n_lib_gets_i18next_syntax() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        std::fs::write(
+            r.join("package.json"),
+            r#"{"dependencies":{"react":"19","vite":"6"}}"#,
+        )
+        .unwrap();
+        let d = detect(r);
+        assert_eq!((d.stack, d.syntax), ("react-i18next", "i18next"));
+        assert_eq!(d.files, vec!["src/locales/{locale}.json"]);
     }
 }

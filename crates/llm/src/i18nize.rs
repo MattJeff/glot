@@ -234,7 +234,7 @@ async fn name_file(
         images: vec![],
     };
     let c = provider.complete(req).await.map_err(|e| e.to_string())?;
-    let usage = Usage::of(&c.model, c.input_tokens, c.output_tokens);
+    let usage = Usage::of_completion(&c);
     let v = translate::parse_json(&c.text).ok_or("LLM answer is not JSON")?;
     let mut out = HashMap::new();
     for cand in &cands {

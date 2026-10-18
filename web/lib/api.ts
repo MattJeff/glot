@@ -22,6 +22,8 @@ export type Project = {
     judge_model: string | null;
     has_api_key: boolean;
     budget_usd: number | null;
+    anthropic_workspace_id?: string | null;
+    extra_headers?: Record<string, string>;
   };
   stats: { keys: number; locales: Record<string, LocaleStats> };
 };
@@ -33,6 +35,10 @@ export type LlmSettings = {
   api_key?: string;
   base_url?: string | null;
   budget_usd?: number | null;
+  /** "" clears; absent keeps. */
+  anthropic_workspace_id?: string;
+  /** Non-secret headers; absent keeps. */
+  extra_headers?: Record<string, string>;
 };
 export type ProjectPatch = {
   name?: string;
@@ -192,6 +198,60 @@ function qs(params: Record<string, string | number | undefined>) {
   return out ? `?${out}` : "";
 }
 
+export type InsightArm = { visits: number; conversions: number; rate: number };
+export type InsightVerdict = "collecting" | "keep" | "remove" | "inconclusive";
+export type InsightExperiment = {
+  id: string;
+  locale: string;
+  traffic_pct: number;
+  goal: string;
+  started_at: string;
+  ends_at: string;
+  status: "running" | "kept" | "removed";
+  decided_at: string | null;
+  test: InsightArm;
+  control: InsightArm;
+  diff: number;
+  ci_low: number;
+  ci_high: number;
+  required_per_arm: number | null;
+  verdict: InsightVerdict;
+};
+export type InsightDemand = {
+  language: string;
+  visits: number;
+  share: number;
+  offered: boolean;
+  conversions: number;
+  conversion_rate: number | null;
+  est_extra_conversions: number | null;
+  est_cost_usd: number | null;
+  top_countries: [string, number][];
+};
+export type InsightFunnel = {
+  locale: string;
+  is_source: boolean;
+  visits: number;
+  conversions: number;
+  rate: number;
+  ci_low: number;
+  ci_high: number;
+};
+export type Insights = {
+  public_key: string;
+  days: number;
+  goal: string;
+  source_locale: string;
+  offered: string[];
+  keys: number;
+  events: string[];
+  total_visits: number;
+  demand: InsightDemand[];
+  funnel: InsightFunnel[];
+  daily: { day: string; visits: number; unserved: number }[];
+  experiments: InsightExperiment[];
+};
+
 export const api = {
   signup: (b: { email: string; password: string; name: string }) => request<User>("POST", "/api/auth/signup", b),
   login: (b: { email: string; password: string }) => request<User>("POST", "/api/auth/login", b),
@@ -240,6 +300,12 @@ export const api = {
     `${p(slug)}/visual-reports/${enc(id)}/files/${path.split("/").map(enc).join("/")}`,
   preview: (slug: string) => request<PreviewSettings>("GET", `${p(slug)}/preview`),
   updatePreview: (slug: string, b: PreviewSettings) => request<PreviewSettings>("PUT", `${p(slug)}/preview`, b),
+  insights: (slug: string, q: { days?: number; goal?: string }) => request<Insights>("GET", `${p(slug)}/insights${qs(q)}`),
+  rotateInsightsKey: (slug: string) => request<{ public_key: string }>("POST", `${p(slug)}/insights/rotate-key`),
+  createExperiment: (slug: string, b: { locale: string; traffic_pct: number; days: number; goal?: string }) =>
+    request<InsightExperiment>("POST", `${p(slug)}/insights/experiments`, b),
+  decideExperiment: (slug: string, id: string, status: "kept" | "removed") =>
+    request<void>("PATCH", `${p(slug)}/insights/experiments/${enc(id)}`, { status }),
 };
 
 export const qk = {
@@ -256,4 +322,5 @@ export const qk = {
   visualReports: (slug: string) => ["visual-reports", slug] as const,
   visualReport: (slug: string, id: string) => ["visual-reports", slug, id] as const,
   preview: (slug: string) => ["preview", slug] as const,
+  insights: (slug: string) => ["insights", slug] as const,
 };
