@@ -4,39 +4,38 @@
 
 **Tagline** (60 chars max):
 
-> Open-source i18n for SaaS, validated before it ships
+> Your agent localizes your app. Code refuses what's broken.
 
-Alternatives: `Translate your SaaS from your coding agent, safely` · `AI translations with a lockfile and a validator`
+Alternatives: `AI translations refused until they fit the button` · `Localization your coding agent can't break`
 
-**Topics**: Developer Tools, Open Source, Artificial Intelligence, SaaS
+**Topics**: Developer Tools, Open Source, Artificial Intelligence
 
 **Description** (260 chars max):
 
-> glot internationalizes a React/Next app (117 hardcoded strings → 0 on our demo), translates only what changed with your own LLM key, and validates every output (plurals, placeholders, glossary, pixel width) before writing it. CLI + MCP server, MIT.
+> Your coding agent moves strings to keys and translates them. glot checks every LLM output (placeholders, CLDR plurals, glossary, pixel width measured in your app) and refuses it, with the reason, until the retry is valid. CLI + MCP server, MIT.
 
 **Gallery** (in order):
 
-1. `web/public/launch/i18nize.gif`: extract → i18nize → extract on the demo app
-2. `web/public/launch/overlay.gif`: Alt+click a label in the running app, edit the German, saved and validated
-3. `web/public/launch/locale-matrix.gif`: every locale side by side in the dashboard
-4. `web/public/launch/fit-before-after.png`: German overflow before / after `glot fit` (re-record with a real model first, see checklist)
-5. Screenshot of `/docs` (concepts page)
+1. `web/public/launch/refusal.gif`: glot refuses three bad translations and writes the valid retries (scripted LLM; say so in the caption, or re-record with a real model first)
+2. `web/public/launch/fit-before-after.png`: German overflow before / after `glot fit` (real model)
+3. `web/public/launch/i18nize.gif`: extract → i18nize → extract on the demo app
+4. `web/public/launch/overlay.gif`: Alt+click a label in the running app, edit the German, saved and validated
 
 **Maker's first comment**:
 
 ---
 
-Hi Product Hunt! I'm the maker of glot.
+Hi Product Hunt! I'm the maker of glot, a young open-source project.
 
-Most SaaS apps ship in English because internationalizing is a week of moving strings into JSON, and then every LLM translation needs a human to check plurals and placeholders. glot automates both halves and refuses to write anything it cannot verify:
+LLMs translate UI copy well enough, but they still drop Polish plural forms, rename `{name}` to `{nom}`, and write German labels twice as wide as the button. glot puts deterministic code between the model and your catalogs:
 
-1. `glot i18nize` rewrites hardcoded UI strings to translation calls and wires next-intl or react-i18next (Next.js, React Router, Astro, Vite).
-2. `glot translate` translates only missing and changed strings with your own Anthropic/OpenAI/Ollama key. Each output is checked for syntax, CLDR plural forms, placeholders, glossary terms and width; failures are retried, then escalated, then rejected.
-3. Your coding agent stays in the loop through an MCP server (Claude Code plugin, Cursor, Codex).
+1. Your coding agent (Claude Code, Cursor, Codex, through the MCP server) or the CLI moves hardcoded strings to keys and translates the delta.
+2. Every output is checked: syntax, placeholders, CLDR plural categories, glossary, and width against the box measured in your running app. A refused string goes back to the model with the exact reason; nothing invalid is written.
+3. `glot.lock` keeps hand edits from being overwritten.
 
-It is MIT and free; you pay your LLM provider directly. For scale: 850 strings with batch mode cost us $0.035 on Haiku.
+The pixel budget and the validator in the loop are the parts I think are new. The self-hosted dashboard and the growth features (insights, experiments) are experimental and labelled as such.
 
-What I'd like to hear: which stack you'd want next, and what a translation tool has broken for you before.
+MIT and free; you pay your LLM provider directly. I'd like to hear what a translation tool has broken for you before.
 
 ---
 

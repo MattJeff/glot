@@ -240,7 +240,17 @@ fn screaming(n: &str) -> bool {
             .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
 }
 
+/// `plans`, `pricingTiers`: camelCase data a component maps over (`metadata` & co. are Next's).
+fn camel_data(n: &str) -> bool {
+    n.starts_with(|c: char| c.is_ascii_lowercase())
+        && n.chars().all(|c| c.is_ascii_alphanumeric())
+        && !["metadata", "viewport", "config"].contains(&n)
+}
+
 fn hook_name(n: &str) -> String {
+    if !screaming(n) {
+        return format!("use{}{}", n[..1].to_ascii_uppercase(), &n[1..]);
+    }
     let camel: String = n
         .split('_')
         .filter(|w| !w.is_empty())
@@ -272,6 +282,41 @@ fn has_copy(e: &Expression) -> bool {
     }
 }
 
+/// A copy-only key (`description`, `cta`...) holds copy: `[{ name, email, role }]` is data.
+fn has_ui_copy(e: &Expression) -> bool {
+    const UI: &[&str] = &[
+        "label",
+        "title",
+        "description",
+        "placeholder",
+        "text",
+        "heading",
+        "subtitle",
+        "cta",
+        "message",
+        "tooltip",
+        "caption",
+        "features",
+    ];
+    match e.get_inner_expression() {
+        Expression::ArrayExpression(a) => a
+            .elements
+            .iter()
+            .any(|x| x.as_expression().is_some_and(has_ui_copy)),
+        Expression::ObjectExpression(o) => o.properties.iter().any(|p| match p {
+            ObjectPropertyKind::ObjectProperty(p) => {
+                p.key
+                    .static_name()
+                    .is_some_and(|k| UI.contains(&k.as_ref()))
+                    && has_copy(&p.value)
+                    || has_ui_copy(&p.value)
+            }
+            _ => false,
+        }),
+        _ => false,
+    }
+}
+
 /// Module-level `const NAME = <literal with copy>`: (declaration, declarator).
 fn config_decls<'b, 'a>(
     program: &'b Program<'a>,
@@ -294,7 +339,7 @@ fn config_decls<'b, 'a>(
                 return None;
             };
             let init = decl.init.as_ref()?;
-            (screaming(&id.name)
+            ((screaming(&id.name) || camel_data(&id.name) && has_ui_copy(init))
                 && matches!(
                     init.get_inner_expression(),
                     Expression::ArrayExpression(_) | Expression::ObjectExpression(_)
@@ -623,6 +668,16 @@ pub fn config_hooks(files: &[Source]) -> ConfigPlan {
         per_file.push((fi, specs, v.uses.refs, visible));
     }
 
+    // camelCase data is converted only when a component reads it (else it may be plain data).
+    let rendered: BTreeSet<(String, String)> = per_file
+        .iter()
+        .flat_map(|(_, _, refs, visible)| {
+            refs.iter()
+                .filter(|r| matches!(r.kind, RefKind::InComponent(..)))
+                .map(|r| (visible[&r.name].clone(), r.name.clone()))
+        })
+        .collect();
+    configs.retain(|c| screaming(&c.name) || rendered.contains(&(c.path.clone(), c.name.clone())));
     let ok = |c: &Config| !unsafe_.contains_key(&(c.path.clone(), c.name.clone()));
     for c in &configs {
         match unsafe_.get(&(c.path.clone(), c.name.clone())) {
@@ -777,6 +832,19 @@ mod tests {
             "import { useNav } from \"@/lib/data\";\n\nexport function Sidebar() {\n  const NAV = useNav();\n  return <nav>{NAV.map((i) => <a key={i.href}>{i.label}</a>)}</nav>;\n}\n"
         );
         assert!(get("components/PlanCard.tsx").is_none());
+
+        // camelCase data mapped by a component (create-next-app style) becomes a hook too.
+        let files = [src(
+            "app/page.tsx",
+            "const plans = [{ name: \"Starter\", description: \"For small teams\" }];\n\nexport default function Home() {\n  return <ul>{plans.map((p) => <li key={p.name}>{p.description}</li>)}</ul>;\n}\n",
+        )];
+        let plan = config_hooks(&files);
+        assert_eq!(plan.converted, ["app/page.tsx: plans -> usePlans()"]);
+        assert!(
+            plan.files[0].2.contains("const plans = usePlans();"),
+            "{}",
+            plan.files[0].2
+        );
     }
 
     #[test]

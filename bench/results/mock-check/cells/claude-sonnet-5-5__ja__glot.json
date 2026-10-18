@@ -1,0 +1,3017 @@
+{
+  "model": "claude-sonnet-5-5",
+  "locale": "ja",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "⟦ja⟧ {count, plural, other {# files}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.002",
+      "target": "⟦ja⟧ {count, plural, =0 {No files yet} other {# files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.003",
+      "target": "⟦ja⟧ {count, plural, other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.004",
+      "target": "⟦ja⟧ {count, plural, =0 {No comments yet} other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.005",
+      "target": "⟦ja⟧ {count, plural, other {# members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.006",
+      "target": "⟦ja⟧ {count, plural, =0 {No members yet} other {# members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.007",
+      "target": "⟦ja⟧ {count, plural, other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.008",
+      "target": "⟦ja⟧ {count, plural, =0 {No tasks yet} other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.009",
+      "target": "⟦ja⟧ {count, plural, other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.010",
+      "target": "⟦ja⟧ {count, plural, =0 {No messages yet} other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.011",
+      "target": "⟦ja⟧ {count, plural, other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.012",
+      "target": "⟦ja⟧ {count, plural, =0 {No seats yet} other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "⟦ja⟧ {count, plural, other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.014",
+      "target": "⟦ja⟧ {count, plural, =0 {No reviews yet} other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.015",
+      "target": "⟦ja⟧ {count, plural, other {# downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.016",
+      "target": "⟦ja⟧ {count, plural, =0 {No downloads yet} other {# downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.017",
+      "target": "⟦ja⟧ {count, plural, other {# notifications}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.018",
+      "target": "⟦ja⟧ {count, plural, =0 {No notifications yet} other {# notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.019",
+      "target": "⟦ja⟧ {count, plural, other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.020",
+      "target": "⟦ja⟧ {count, plural, =0 {No invitations yet} other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.021",
+      "target": "⟦ja⟧ {count, plural, other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.022",
+      "target": "⟦ja⟧ {count, plural, =0 {No errors yet} other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.023",
+      "target": "⟦ja⟧ {count, plural, other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.024",
+      "target": "⟦ja⟧ {count, plural, =0 {No warnings yet} other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.025",
+      "target": "⟦ja⟧ {count, plural, other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "⟦ja⟧ {count, plural, =0 {No results yet} other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.027",
+      "target": "⟦ja⟧ {count, plural, other {# attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.028",
+      "target": "⟦ja⟧ {count, plural, =0 {No attachments yet} other {# attachments}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.029",
+      "target": "⟦ja⟧ {count, plural, other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.030",
+      "target": "⟦ja⟧ {count, plural, =0 {No subscribers yet} other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.031",
+      "target": "⟦ja⟧ {count, plural, other {# days}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.032",
+      "target": "⟦ja⟧ {count, plural, =0 {No days yet} other {# days}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.033",
+      "target": "⟦ja⟧ {count, plural, other {# hours}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.034",
+      "target": "⟦ja⟧ {count, plural, =0 {No hours yet} other {# hours}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.035",
+      "target": "⟦ja⟧ {count, plural, other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.036",
+      "target": "⟦ja⟧ {count, plural, =0 {No minutes yet} other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.037",
+      "target": "⟦ja⟧ {count, plural, other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "⟦ja⟧ {count, plural, =0 {No steps yet} other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.039",
+      "target": "⟦ja⟧ {count, plural, other {# credits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.040",
+      "target": "⟦ja⟧ {count, plural, =0 {No credits yet} other {# credits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.041",
+      "target": "⟦ja⟧ {count, plural, other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.042",
+      "target": "⟦ja⟧ {count, plural, =0 {No photos yet} other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.043",
+      "target": "⟦ja⟧ {count, plural, other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.044",
+      "target": "⟦ja⟧ {count, plural, =0 {No deployments yet} other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.045",
+      "target": "⟦ja⟧ {count, plural, other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.046",
+      "target": "⟦ja⟧ {count, plural, =0 {No keys yet} other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.047",
+      "target": "⟦ja⟧ {count, plural, other {# drafts}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.048",
+      "target": "⟦ja⟧ {count, plural, =0 {No drafts yet} other {# drafts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.049",
+      "target": "⟦ja⟧ {count, plural, other {# replies}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.050",
+      "target": "⟦ja⟧ {count, plural, =0 {No replies yet} other {# replies}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "⟦ja⟧ {count, plural, other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.052",
+      "target": "⟦ja⟧ {count, plural, =0 {No votes yet} other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.053",
+      "target": "⟦ja⟧ {count, plural, other {# followers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.054",
+      "target": "⟦ja⟧ {count, plural, =0 {No followers yet} other {# followers}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.055",
+      "target": "⟦ja⟧ {count, plural, other {# items}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.056",
+      "target": "⟦ja⟧ {count, plural, =0 {No items yet} other {# items}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.057",
+      "target": "⟦ja⟧ {count, plural, other {# tickets}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.058",
+      "target": "⟦ja⟧ {count, plural, =0 {No tickets yet} other {# tickets}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.059",
+      "target": "⟦ja⟧ {count, plural, other {# events}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.060",
+      "target": "⟦ja⟧ {count, plural, =0 {No events yet} other {# events}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.061",
+      "target": "⟦ja⟧ {count, plural, other {# pages}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.062",
+      "target": "⟦ja⟧ {count, plural, =0 {No pages yet} other {# pages}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "⟦ja⟧ {count, plural, other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.064",
+      "target": "⟦ja⟧ {count, plural, =0 {No tags yet} other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.065",
+      "target": "⟦ja⟧ {count, plural, other {# branches}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.066",
+      "target": "⟦ja⟧ {count, plural, =0 {No branches yet} other {# branches}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.067",
+      "target": "⟦ja⟧ {count, plural, other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.068",
+      "target": "⟦ja⟧ {count, plural, =0 {No commits yet} other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.069",
+      "target": "⟦ja⟧ {count, plural, other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.070",
+      "target": "⟦ja⟧ {count, plural, =0 {No contacts yet} other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.071",
+      "target": "⟦ja⟧ {count, plural, other {# orders}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.072",
+      "target": "⟦ja⟧ {count, plural, =0 {No orders yet} other {# orders}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.073",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new files} other {# new files}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.074",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new comments} other {# new comments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.075",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new members} other {# new members}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new tasks} other {# new tasks}}. {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.077",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new messages} other {# new messages}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.078",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new seats} other {# new seats}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.079",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new reviews} other {# new reviews}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.080",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new downloads} other {# new downloads}}.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.081",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new notifications} other {# new notifications}}. {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.082",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new invitations} other {# new invitations}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.083",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new errors} other {# new errors}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.084",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new warnings} other {# new warnings}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.085",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new results} other {# new results}}.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.086",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new attachments} other {# new attachments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.087",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new subscribers} other {# new subscribers}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "⟦ja⟧ You have {count, plural, =0 {no new days} other {# new days}}.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural_offset.001",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a file} =1 {{name} added a file} other {{name} and # others added files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.002",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a comment} =1 {{name} added a comment} other {{name} and # others added comments}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.003",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a member} =1 {{name} added a member} other {{name} and # others added members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.004",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a task} =1 {{name} added a task} other {{name} and # others added tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.005",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a message} =1 {{name} added a message} other {{name} and # others added messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.006",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a seat} =1 {{name} added a seat} other {{name} and # others added seats}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural_offset.007",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a review} =1 {{name} added a review} other {{name} and # others added reviews}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural_offset.008",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a download} =1 {{name} added a download} other {{name} and # others added downloads}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural_offset.009",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a notification} =1 {{name} added a notification} other {{name} and # others added notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.010",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a invitation} =1 {{name} added a invitation} other {{name} and # others added invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.011",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a error} =1 {{name} added a error} other {{name} and # others added errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.012",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a warning} =1 {{name} added a warning} other {{name} and # others added warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a result} =1 {{name} added a result} other {{name} and # others added results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.014",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a attachment} =1 {{name} added a attachment} other {{name} and # others added attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.015",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a subscriber} =1 {{name} added a subscriber} other {{name} and # others added subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.016",
+      "target": "⟦ja⟧ {count, plural, offset:1 =0 {Nobody added a day} =1 {{name} added a day} other {{name} and # others added days}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.001",
+      "target": "⟦ja⟧ {gender, select, female {She replied to your comment} male {He replied to your comment} other {They replied to your comment}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.002",
+      "target": "⟦ja⟧ {gender, select, female {{name} updated her profile} male {{name} updated his profile} other {{name} updated their profile}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.003",
+      "target": "⟦ja⟧ {gender, select, female {Invite her to the team} male {Invite him to the team} other {Invite them to the team}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.004",
+      "target": "⟦ja⟧ {gender, select, female {{name} is now an admin. She can manage billing.} male {{name} is now an admin. He can manage billing.} other {{name} is now an admin. They can manage billing.}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "select.005",
+      "target": "⟦ja⟧ {role, select, owner {Owner} admin {Admin} member {Member} guest {Guest} other {Unknown role}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.006",
+      "target": "⟦ja⟧ {status, select, open {Open} closed {Closed} merged {Merged} draft {Draft} other {Unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.007",
+      "target": "⟦ja⟧ {status, select, paid {Paid} due {Due} overdue {Overdue} void {Void} other {Pending}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.008",
+      "target": "⟦ja⟧ {plan, select, free {Free plan} pro {Pro plan} team {Team plan} enterprise {Enterprise plan} other {Custom plan}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "⟦ja⟧ {platform, select, ios {Open the iPhone app} android {Open the Android app} other {Open the web app}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.010",
+      "target": "⟦ja⟧ {device, select, mobile {Scan this code with your phone} desktop {Click the link below} other {Follow the instructions}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.011",
+      "target": "⟦ja⟧ {visibility, select, public {Anyone with the link can view} private {Only invited people can view} other {Visibility unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.012",
+      "target": "⟦ja⟧ {state, select, running {Running} queued {Queued} failed {Failed} success {Passed} other {Skipped}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.013",
+      "target": "⟦ja⟧ {type, select, bug {Bug report} feature {Feature request} question {Question} other {Issue}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.014",
+      "target": "⟦ja⟧ {gender, select, female {Welcome back, {name}! She who returns gets a gift.} other {Welcome back, {name}!}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.015",
+      "target": "⟦ja⟧ {reason, select, expired {Your session expired. Sign in again.} revoked {Your access was revoked by an admin.} other {You were signed out.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.016",
+      "target": "⟦ja⟧ {method, select, card {Pay by card} sepa {Pay by SEPA debit} paypal {Pay with PayPal} other {Choose a payment method}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.017",
+      "target": "⟦ja⟧ {gender, select, female {Your friend {name} invited you. Join her on the team.} male {Your friend {name} invited you. Join him on the team.} other {Your friend {name} invited you. Join them on the team.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.018",
+      "target": "⟦ja⟧ {tone, select, success {Saved} error {Could not save} other {Saving…}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.019",
+      "target": "⟦ja⟧ {priority, select, urgent {Urgent} high {High} medium {Medium} low {Low} other {None}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.020",
+      "target": "⟦ja⟧ {theme, select, light {Light} dark {Dark} other {System}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.021",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a file with you} male {{name} shared a file with you} other {{name} shared a file with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a comment with you} male {{name} shared a comment with you} other {{name} shared a comment with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.023",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a member with you} male {{name} shared a member with you} other {{name} shared a member with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.024",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a task with you} male {{name} shared a task with you} other {{name} shared a task with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.025",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a message with you} male {{name} shared a message with you} other {{name} shared a message with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.026",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a seat with you} male {{name} shared a seat with you} other {{name} shared a seat with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.027",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a review with you} male {{name} shared a review with you} other {{name} shared a review with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.028",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a download with you} male {{name} shared a download with you} other {{name} shared a download with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.029",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a notification with you} male {{name} shared a notification with you} other {{name} shared a notification with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.030",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a invitation with you} male {{name} shared a invitation with you} other {{name} shared a invitation with you}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.031",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a error with you} male {{name} shared a error with you} other {{name} shared a error with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.032",
+      "target": "⟦ja⟧ {gender, select, female {{name} shared a warning with you} male {{name} shared a warning with you} other {{name} shared a warning with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.001",
+      "target": "⟦ja⟧ You finished {rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "⟦ja⟧ This is your {n, selectordinal, two {#nd} few {#rd} other {#th}} visit this week",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.003",
+      "target": "⟦ja⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} attempt failed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.004",
+      "target": "⟦ja⟧ Renews on the {day, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of each month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.005",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} anniversary with {company}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.006",
+      "target": "⟦ja⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.007",
+      "target": "⟦ja⟧ Reminder: the {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} payment is due",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.008",
+      "target": "⟦ja⟧ Step {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of the setup",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.009",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} file this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.010",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} comment this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.011",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} member this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.012",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} task this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.013",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} message this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.014",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} seat this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} review this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.016",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} download this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.017",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} notification this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.018",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} invitation this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.019",
+      "target": "⟦ja⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} error this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.001",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# files}} to her list} male {{name} added {count, plural, other {# files}} to his list} other {{name} added {count, plural, other {# files}} to their list}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "nested.002",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# comments}} to her list} male {{name} added {count, plural, other {# comments}} to his list} other {{name} added {count, plural, other {# comments}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.003",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# members}} to her list} male {{name} added {count, plural, other {# members}} to his list} other {{name} added {count, plural, other {# members}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.004",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# tasks}} to her list} male {{name} added {count, plural, other {# tasks}} to his list} other {{name} added {count, plural, other {# tasks}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.005",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# messages}} to her list} male {{name} added {count, plural, other {# messages}} to his list} other {{name} added {count, plural, other {# messages}} to their list}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "nested.006",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# seats}} to her list} male {{name} added {count, plural, other {# seats}} to his list} other {{name} added {count, plural, other {# seats}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.007",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# reviews}} to her list} male {{name} added {count, plural, other {# reviews}} to his list} other {{name} added {count, plural, other {# reviews}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# downloads}} to her list} male {{name} added {count, plural, other {# downloads}} to his list} other {{name} added {count, plural, other {# downloads}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.009",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# notifications}} to her list} male {{name} added {count, plural, other {# notifications}} to his list} other {{name} added {count, plural, other {# notifications}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.010",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# invitations}} to her list} male {{name} added {count, plural, other {# invitations}} to his list} other {{name} added {count, plural, other {# invitations}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.011",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# errors}} to her list} male {{name} added {count, plural, other {# errors}} to his list} other {{name} added {count, plural, other {# errors}} to their list}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "nested.012",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# warnings}} to her list} male {{name} added {count, plural, other {# warnings}} to his list} other {{name} added {count, plural, other {# warnings}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.013",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# results}} to her list} male {{name} added {count, plural, other {# results}} to his list} other {{name} added {count, plural, other {# results}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.014",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# attachments}} to her list} male {{name} added {count, plural, other {# attachments}} to his list} other {{name} added {count, plural, other {# attachments}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.015",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# subscribers}} to her list} male {{name} added {count, plural, other {# subscribers}} to his list} other {{name} added {count, plural, other {# subscribers}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.016",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# days}} to her list} male {{name} added {count, plural, other {# days}} to his list} other {{name} added {count, plural, other {# days}} to their list}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "nested.017",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# hours}} to her list} male {{name} added {count, plural, other {# hours}} to his list} other {{name} added {count, plural, other {# hours}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.018",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# minutes}} to her list} male {{name} added {count, plural, other {# minutes}} to his list} other {{name} added {count, plural, other {# minutes}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.019",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# steps}} to her list} male {{name} added {count, plural, other {# steps}} to his list} other {{name} added {count, plural, other {# steps}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.020",
+      "target": "⟦ja⟧ {gender, select, female {{name} added {count, plural, other {# credits}} to her list} male {{name} added {count, plural, other {# credits}} to his list} other {{name} added {count, plural, other {# credits}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "⟦ja⟧ {count, plural, =0 {No files selected} other {<b>#</b> files selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.022",
+      "target": "⟦ja⟧ {count, plural, =0 {No comments selected} other {<b>#</b> comments selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.023",
+      "target": "⟦ja⟧ {count, plural, =0 {No members selected} other {<b>#</b> members selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.024",
+      "target": "⟦ja⟧ {count, plural, =0 {No tasks selected} other {<b>#</b> tasks selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.025",
+      "target": "⟦ja⟧ {count, plural, =0 {No messages selected} other {<b>#</b> messages selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.026",
+      "target": "⟦ja⟧ {count, plural, =0 {No seats selected} other {<b>#</b> seats selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.027",
+      "target": "⟦ja⟧ {count, plural, =0 {No reviews selected} other {<b>#</b> reviews selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.028",
+      "target": "⟦ja⟧ {count, plural, =0 {No downloads selected} other {<b>#</b> downloads selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.029",
+      "target": "⟦ja⟧ {count, plural, =0 {No notifications selected} other {<b>#</b> notifications selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.030",
+      "target": "⟦ja⟧ {count, plural, =0 {No invitations selected} other {<b>#</b> invitations selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.031",
+      "target": "⟦ja⟧ {count, plural, =0 {No errors selected} other {<b>#</b> errors selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.032",
+      "target": "⟦ja⟧ {count, plural, =0 {No warnings selected} other {<b>#</b> warnings selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.033",
+      "target": "⟦ja⟧ {count, plural, =0 {No results selected} other {<b>#</b> results selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.034",
+      "target": "⟦ja⟧ {count, plural, =0 {No attachments selected} other {<b>#</b> attachments selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.035",
+      "target": "⟦ja⟧ {count, plural, =0 {No subscribers selected} other {<b>#</b> subscribers selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.036",
+      "target": "⟦ja⟧ {count, plural, =0 {No days selected} other {<b>#</b> days selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "placeholders.001",
+      "target": "⟦ja⟧ {actor} moved {item} from {from} to {to",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "placeholders.002",
+      "target": "⟦ja⟧ {name} invited {email} to {team}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.003",
+      "target": "⟦ja⟧ {user} changed the due date of {task} to {date}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.004",
+      "target": "⟦ja⟧ Showing {start}–{end} of {total} results",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.005",
+      "target": "⟦ja⟧ {name} commented on {title}: “{excerpt}”",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.006",
+      "target": "⟦ja⟧ {author} merged {count, number} commits into {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.007",
+      "target": "⟦ja⟧ Uploaded {fileName} ({size}) to {folder}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.008",
+      "target": "⟦ja⟧ {name} and {other} are typing…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.009",
+      "target": "⟦ja⟧ Signed in as {email} on {device}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "⟦ja⟧ {percent, number, percent} of {quota} used",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.011",
+      "target": "⟦ja⟧ Last synced {time} by {name}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.012",
+      "target": "⟦ja⟧ {user} renamed {oldName} to {newName}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.013",
+      "target": "⟦ja⟧ {used} of {limit} GB used — upgrade to get {extra} GB more",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.014",
+      "target": "⟦ja⟧ {count, number} views since {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.015",
+      "target": "⟦ja⟧ {name} assigned {task} to {assignee}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.016",
+      "target": "⟦ja⟧ {sender} sent you {amount, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.017",
+      "target": "⟦ja⟧ 請求書 {number} for {amount} is due on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.018",
+      "target": "⟦ja⟧ {app} wants to access your {resource}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.019",
+      "target": "⟦ja⟧ From {start, time, short} to {end, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.020",
+      "target": "⟦ja⟧ {name} replied in {channel} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.021",
+      "target": "⟦ja⟧ Order {id} ships to {city}, {country}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "⟦ja⟧ {owner}/{repo} · {stars} stars · updated {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.023",
+      "target": "⟦ja⟧ Hello {firstName}, your trial ends in {days} days",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.024",
+      "target": "⟦ja⟧ {author} wrote {words, number} words in {minutes} minutes",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.025",
+      "target": "⟦ja⟧ {a} vs {b}: {delta, number, percent} difference",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.026",
+      "target": "⟦ja⟧ {name} joined {team} via {method}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.027",
+      "target": "⟦ja⟧ Transfer {amount} from {source} to {target}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.028",
+      "target": "⟦ja⟧ {count} of {total} checks passed on {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.029",
+      "target": "⟦ja⟧ Rated {score} out of {max} by {reviewer}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.030",
+      "target": "⟦ja⟧ {city} · {temp}° · feels like {feels}°",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.031",
+      "target": "⟦ja⟧ {name} ({role}) left {team}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.032",
+      "target": "⟦ja⟧ Moved {count} items to {folder} — {undo}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.033",
+      "target": "⟦ja⟧ Reset link sent to {email}. It expires in {minutes} minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.034",
+      "target": "⟦ja⟧ {name} reacted {emoji} to your message in {channel}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "⟦ja⟧ Your export of {rows, number} rows is ready: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.036",
+      "target": "⟦ja⟧ {x} × {y} px, {size} KB",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.037",
+      "target": "⟦ja⟧ Version {version} released on {date, date, short} by {author}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.038",
+      "target": "⟦ja⟧ Paid {amount} with card ending in {last4}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.039",
+      "target": "⟦ja⟧ {seconds, plural, other {# seconds}} until {action}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.040",
+      "target": "⟦ja⟧ Between {min} and {max} characters, currently {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.041",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# files}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.042",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# comments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.043",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# members}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.044",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# tasks}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.045",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# messages}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.046",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# seats}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# reviews}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.048",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# downloads}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.049",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# notifications}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.050",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# invitations}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.051",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# errors}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.052",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# warnings}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.053",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# results}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.054",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# attachments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.055",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# subscribers}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.056",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# days}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.057",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# hours}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.058",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# minutes}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.059",
+      "target": "⟦ja⟧ {name} deleted {count, plural, other {# steps}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "⟦ja⟧ {name} deleted {count, pluriel, other {# credits}} from {location} on {date, date, medium}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "tags.001",
+      "target": "⟦ja⟧ By continuing you accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.002",
+      "target": "⟦ja⟧ <b>Heads up:</b> this action cannot be undone.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.003",
+      "target": "⟦ja⟧ Need help? <link>Contact support</link> or read the <docs>docs</docs>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.004",
+      "target": "⟦ja⟧ Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.005",
+      "target": "⟦ja⟧ Your trial ends in <b>{days} days</b>. <link>Upgrade now</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.006",
+      "target": "⟦ja⟧ Signed in as <b>{email}</b>. <link>Not you?</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.007",
+      "target": "⟦ja⟧ <b>{name}</b> mentioned you in <link>{title}</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.008",
+      "target": "⟦ja⟧ Drag files here or <link>browse</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.009",
+      "target": "⟦ja⟧ We sent a code to <b>{phone}</b>.<br/>It expires in 10 minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.010",
+      "target": "⟦ja⟧ <i>Optional</i> — leave empty to use the default",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.011",
+      "target": "⟦ja⟧ Read our <link>guide</link> to <b>get started</b> in minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "⟦ja⟧ This repository is <b>archived</b>. It is <i>read-only</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.013",
+      "target": "⟦ja⟧ <b>Tip:</b> type <code>/</code> to open the command menu.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.014",
+      "target": "⟦ja⟧ Your card was declined. <link>Update payment details</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.015",
+      "target": "⟦ja⟧ <b>{count}</b> people viewed this <link>post</link> today",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.016",
+      "target": "⟦ja⟧ Already have an account? <link>Sign in</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.017",
+      "target": "⟦ja⟧ Don't have an account? <link>Create one</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.018",
+      "target": "⟦ja⟧ Forgot your password? <link>Reset it</link>",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.019",
+      "target": "⟦ja⟧ <strong>Warning:</strong> deleting <b>{name}</b> also deletes its data.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.020",
+      "target": "⟦ja⟧ Learn more about <link>keyboard shortcuts</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.021",
+      "target": "⟦ja⟧ Built with <heart>love</heart> by the community",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.022",
+      "target": "⟦ja⟧ Reply to <b>{name}</b> in <channel>#{channel}</channel>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.023",
+      "target": "⟦ja⟧ Your changes are saved <b>automatically</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.024",
+      "target": "⟦ja⟧ <b>New:</b> try the redesigned editor. <link>Learn more</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "⟦ja⟧ Click <b>Publish</b> when you are ready.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.026",
+      "target": "⟦ja⟧ Use at least <b>8 characters</b> with a <b>number</b> and a <b>symbol</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.027",
+      "target": "⟦ja⟧ Questions? Email us at <link>{email}</link>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.028",
+      "target": "⟦ja⟧ <b>{percent}%</b> complete — <link>see details</link>",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.029",
+      "target": "⟦ja⟧ You are viewing an <b>older version</b>. <link>Go to latest</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.030",
+      "target": "⟦ja⟧ Invite people with this link: <code>{url}</code>",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.031",
+      "target": "⟦ja⟧ <b>{count, plural, other {# files}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.032",
+      "target": "⟦ja⟧ <b>{count, plural, other {# comments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.033",
+      "target": "⟦ja⟧ <b>{count, pluriel, other {# members}}</b> need your attention. <link>Review</link>",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "tags.034",
+      "target": "⟦ja⟧ <b>{count, plural, other {# tasks}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.035",
+      "target": "⟦ja⟧ <b>{count, plural, other {# messages}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.036",
+      "target": "⟦ja⟧ <b>{count, plural, other {# seats}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.037",
+      "target": "⟦ja⟧ <b>{count, plural, other {# reviews}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.038",
+      "target": "⟦ja⟧ <b>{count, plural, other {# downloads}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.039",
+      "target": "⟦ja⟧ <b>{count, plural, other {# notifications}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.040",
+      "target": "⟦ja⟧ <b>{count, plural, other {# invitations}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.041",
+      "target": "⟦ja⟧ <b>{count, plural, other {# errors}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.042",
+      "target": "⟦ja⟧ <b>{count, plural, other {# warnings}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.043",
+      "target": "⟦ja⟧ <b>{count, plural, other {# results}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.044",
+      "target": "⟦ja⟧ <b>{count, plural, other {# attachments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.045",
+      "target": "⟦ja⟧ <b>{count, plural, other {# subscribers}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.046",
+      "target": "⟦ja⟧ <b>{count, plural, other {# days}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.047",
+      "target": "⟦ja⟧ <b>{count, plural, other {# hours}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.048",
+      "target": "⟦ja⟧ <b>{count, plural, other {# minutes}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.049",
+      "target": "⟦ja⟧ <b>{count, plural, other {# steps}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "⟦ja⟧ <b>{count, plural, other {# credits}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.001",
+      "target": "⟦ja⟧ Don''t show this again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.002",
+      "target": "⟦ja⟧ It''s {name}''s turn",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.003",
+      "target": "⟦ja⟧ You haven''t saved your changes",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.004",
+      "target": "⟦ja⟧ Type '{'name'}' to insert the user''s name",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.005",
+      "target": "⟦ja⟧ Use '{'curly braces'}' for variables",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.006",
+      "target": "⟦ja⟧ We couldn''t find that page",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.007",
+      "target": "⟦ja⟧ Can''t connect to the server",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.008",
+      "target": "⟦ja⟧ {name}''s workspace",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "apostrophe.009",
+      "target": "⟦ja⟧ That''s all for today!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.010",
+      "target": "⟦ja⟧ Let''s get started",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.011",
+      "target": "⟦ja⟧ You''re all caught up",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "⟦ja⟧ Isn''t working? Try again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.013",
+      "target": "⟦ja⟧ Shouldn''t take long…",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.014",
+      "target": "⟦ja⟧ The file ''{file}'' was renamed",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.015",
+      "target": "⟦ja⟧ Here''s what''s new in {version}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.016",
+      "target": "⟦ja⟧ {count, plural, other {# people haven''t replied}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.017",
+      "target": "⟦ja⟧ I''m not a robot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.018",
+      "target": "⟦ja⟧ What''s on your mind, {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.019",
+      "target": "⟦ja⟧ Today''s schedule",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.020",
+      "target": "⟦ja⟧ Write '#' to mention a channel",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.021",
+      "target": "⟦ja⟧ {name}''s birthday is today",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.022",
+      "target": "⟦ja⟧ Haven''t received the email?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.023",
+      "target": "⟦ja⟧ Wasn''t me — secure my account",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.024",
+      "target": "⟦ja⟧ You''ll lose access on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "⟦ja⟧ Who''s online",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.026",
+      "target": "⟦ja⟧ Aren''t you forgetting something?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.027",
+      "target": "⟦ja⟧ O''Brien & Partners invoice",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "apostrophe.028",
+      "target": "⟦ja⟧ Here''s your receipt",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.029",
+      "target": "⟦ja⟧ Didn''t get a code? Resend in {seconds}s",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.030",
+      "target": "⟦ja⟧ We''ve updated our terms",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.001",
+      "target": "⟦ja⟧ Create ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.002",
+      "target": "⟦ja⟧ ワークスペース settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.003",
+      "target": "⟦ja⟧ Leave ワークスペース",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.004",
+      "target": "⟦ja⟧ Switch ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.005",
+      "target": "⟦ja⟧ Your ワークスペース is ready",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.006",
+      "target": "⟦ja⟧ {name} invited you to the {workspace} ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "⟦ja⟧ Delete this ワークスペース?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.008",
+      "target": "⟦ja⟧ Download 請求書",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.009",
+      "target": "⟦ja⟧ 請求書 {number}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.010",
+      "target": "⟦ja⟧ Send 請求書 to {email}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.011",
+      "target": "⟦ja⟧ This 請求書 is overdue",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.012",
+      "target": "⟦ja⟧ Void 請求書",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.013",
+      "target": "⟦ja⟧ New プロジェクト",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.014",
+      "target": "⟦ja⟧ Archive プロジェクト",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.015",
+      "target": "⟦ja⟧ プロジェクト settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.016",
+      "target": "⟦ja⟧ {name} created the プロジェクト {project}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.017",
+      "target": "⟦ja⟧ Rename プロジェクト",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.018",
+      "target": "⟦ja⟧ Back to ダッシュボード",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.019",
+      "target": "⟦ja⟧ Open ダッシュボード",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "⟦ja⟧ ダッシュボード is loading…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.021",
+      "target": "⟦ja⟧ Customize your ダッシュボード",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.022",
+      "target": "⟦ja⟧ 請求",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.023",
+      "target": "⟦ja⟧ Manage 請求",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.024",
+      "target": "⟦ja⟧ 請求 email",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.025",
+      "target": "⟦ja⟧ 請求 is handled by the ワークスペース owner",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.026",
+      "target": "⟦ja⟧ Each プロジェクト belongs to one ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.027",
+      "target": "⟦ja⟧ Add the 請求書 to the プロジェクト",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.028",
+      "target": "⟦ja⟧ Pin this プロジェクト to your ダッシュボード",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.029",
+      "target": "⟦ja⟧ 請求 history for this ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.030",
+      "target": "⟦ja⟧ {count, plural, other {# 請求書s}} in this ワークスペース",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.031",
+      "target": "⟦ja⟧ Moving a プロジェクト to another ワークスペース keeps its 請求書 history",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "⟦ja⟧ The ダッシュボード shows every プロジェクト you can access",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.033",
+      "target": "⟦ja⟧ Your 請求 details appear on every 請求書",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.001",
+      "target": "⟦ja⟧ Sign in with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.002",
+      "target": "⟦ja⟧ Connect Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.003",
+      "target": "⟦ja⟧ Pay with Stripe",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.004",
+      "target": "⟦ja⟧ Powered by glot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.005",
+      "target": "⟦ja⟧ Import from GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.006",
+      "target": "⟦ja⟧ Post updates to Slack",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.007",
+      "target": "⟦ja⟧ Your Stripe account is connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.008",
+      "target": "⟦ja⟧ Acme Cloud keeps your data in the EU",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.009",
+      "target": "⟦ja⟧ Sign in with OAuth",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.010",
+      "target": "⟦ja⟧ Create API key",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.011",
+      "target": "⟦ja⟧ API rate limit reached",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "⟦ja⟧ Markdown is supported",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.013",
+      "target": "⟦ja⟧ Paste Markdown here",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.014",
+      "target": "⟦ja⟧ Revoke the API key {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.015",
+      "target": "⟦ja⟧ glot translates your app on every pull request",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.016",
+      "target": "⟦ja⟧ Disconnect GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.017",
+      "target": "⟦ja⟧ {count, plural, other {# Slack channels}} connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.018",
+      "target": "⟦ja⟧ Stripe will email the receipt to {email}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.019",
+      "target": "⟦ja⟧ Acme uses cookies to keep you signed in",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.020",
+      "target": "⟦ja⟧ Export to Markdown",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.021",
+      "target": "⟦ja⟧ Your OAuth token expired",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.022",
+      "target": "⟦ja⟧ Read the API docs",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.023",
+      "target": "⟦ja⟧ Welcome to Acme, {name}!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "⟦ja⟧ Sync issues with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.025",
+      "target": "⟦ja⟧ Slack notifications are paused",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.026",
+      "target": "⟦ja⟧ Manage your Stripe subscription",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.027",
+      "target": "⟦ja⟧ glot found {count} untranslated keys",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.028",
+      "target": "⟦ja⟧ Copy the API URL",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.029",
+      "target": "⟦ja⟧ Install the Acme GitHub app",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.030",
+      "target": "⟦ja⟧ Send a test message to Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.001",
+      "target": "⟦ja⟧ Save",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.002",
+      "target": "⟦ja⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.003",
+      "target": "⟦ja⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.004",
+      "target": "⟦ja⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.005",
+      "target": "⟦ja⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.006",
+      "target": "⟦ja⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "⟦ja⟧ Share",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.008",
+      "target": "⟦ja⟧ Order",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.009",
+      "target": "⟦ja⟧ Order",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.010",
+      "target": "⟦ja⟧ Free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.011",
+      "target": "⟦ja⟧ Clear",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.012",
+      "target": "⟦ja⟧ Back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.013",
+      "target": "⟦ja⟧ Run",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.014",
+      "target": "⟦ja⟧ Draft",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.015",
+      "target": "⟦ja⟧ Match case",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.016",
+      "target": "⟦ja⟧ Apply",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.017",
+      "target": "⟦ja⟧ Book",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.018",
+      "target": "⟦ja⟧ Track",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "⟦ja⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.020",
+      "target": "⟦ja⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.021",
+      "target": "⟦ja⟧ Left",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.022",
+      "target": "⟦ja⟧ Second",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.023",
+      "target": "⟦ja⟧ Second",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.024",
+      "target": "⟦ja⟧ Bill",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.025",
+      "target": "⟦ja⟧ Fine",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.026",
+      "target": "⟦ja⟧ Mute",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.027",
+      "target": "⟦ja⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.028",
+      "target": "⟦ja⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.029",
+      "target": "⟦ja⟧ Follow",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.030",
+      "target": "⟦ja⟧ Feed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.031",
+      "target": "⟦ja⟧ Kind",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "⟦ja⟧ Present",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.033",
+      "target": "⟦ja⟧ Present",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.034",
+      "target": "⟦ja⟧ Export",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.035",
+      "target": "⟦ja⟧ Lead",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.036",
+      "target": "⟦ja⟧ Board",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.037",
+      "target": "⟦ja⟧ Ship",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.038",
+      "target": "⟦ja⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.039",
+      "target": "⟦ja⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.040",
+      "target": "⟦ja⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.001",
+      "target": "⟦ja⟧ Save",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.002",
+      "target": "⟦ja⟧ Sign up",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.003",
+      "target": "⟦ja⟧ Start",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.004",
+      "target": "⟦ja⟧ Upgrade",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.005",
+      "target": "⟦ja⟧ Invite",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.006",
+      "target": "⟦ja⟧ Add member {count}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "width.007",
+      "target": "⟦ja⟧ Log out",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.008",
+      "target": "⟦ja⟧ Try",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.009",
+      "target": "⟦ja⟧ Get",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.010",
+      "target": "⟦ja⟧ Learn",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.011",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.012",
+      "target": "⟦ja⟧ Cancel",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.013",
+      "target": "⟦ja⟧ Confirm",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.014",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.015",
+      "target": "⟦ja⟧ Delete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.016",
+      "target": "⟦ja⟧ Resend",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.017",
+      "target": "⟦ja⟧ Show",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.018",
+      "target": "⟦ja⟧ Mark as read",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "width.019",
+      "target": "⟦ja⟧ Go back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.020",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.021",
+      "target": "⟦ja⟧ Unsubscribe {count}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "width.022",
+      "target": "⟦ja⟧ Book a",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.023",
+      "target": "⟦ja⟧ Copy",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.024",
+      "target": "⟦ja⟧ Edit",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.025",
+      "target": "⟦ja⟧ New",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.026",
+      "target": "⟦ja⟧ Select",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.027",
+      "target": "⟦ja⟧ Sort by",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.028",
+      "target": "⟦ja⟧ View all",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "⟦ja⟧ Retry",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.030",
+      "target": "⟦ja⟧ Accept",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.031",
+      "target": "⟦ja⟧ Decline",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "width.032",
+      "target": "⟦ja⟧ Submit",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.033",
+      "target": "⟦ja⟧ Next",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.034",
+      "target": "⟦ja⟧ Skip",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.035",
+      "target": "⟦ja⟧ Finish",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.036",
+      "target": "⟦ja⟧ Overview {count}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "width.037",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.038",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.039",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.040",
+      "target": "⟦ja⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.041",
+      "target": "⟦ja⟧ Integrations {count}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "width.042",
+      "target": "⟦ja⟧ Usage",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.043",
+      "target": "⟦ja⟧ Logs",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "width.044",
+      "target": "⟦ja⟧ Your plan renews automatically",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.045",
+      "target": "⟦ja⟧ Invite teammates to collaborate in",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.046",
+      "target": "⟦ja⟧ Connect your bank to get paid faster.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.001",
+      "target": "⟦ja⟧ Updated {date, date, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.002",
+      "target": "⟦ja⟧ Due {date, date, full}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.003",
+      "target": "⟦ja⟧ Starts at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.004",
+      "target": "⟦ja⟧ {amount, number, ::currency/USD} per month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.005",
+      "target": "⟦ja⟧ {n, number, integer} people",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.006",
+      "target": "⟦ja⟧ {ratio, number, percent} complete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.007",
+      "target": "⟦ja⟧ Joined {date, date, ::yyyyMMMM}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "⟦ja⟧ Total: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.009",
+      "target": "⟦ja⟧ {size, number, ::compact-short} downloads",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.010",
+      "target": "⟦ja⟧ {bytes, number, ::unit/megabyte} free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.011",
+      "target": "⟦ja⟧ Next charge on {date, date, medium} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.012",
+      "target": "⟦ja⟧ {count, plural, other {Billed every # years: {price, number, ::currency/USD}}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.013",
+      "target": "⟦ja⟧ {temp, number, ::unit/celsius} outside",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.014",
+      "target": "⟦ja⟧ Average: {avg, number, ::precision-integer} ms",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.015",
+      "target": "⟦ja⟧ {distance, number, ::unit/kilometer} away",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.016",
+      "target": "⟦ja⟧ Expires {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.017",
+      "target": "⟦ja⟧ Created {date, date} at {time, time}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.018",
+      "target": "⟦ja⟧ Discount: {off, number, percent}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.019",
+      "target": "⟦ja⟧ {rating, number, ::precision-integer} stars",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.020",
+      "target": "⟦ja⟧ Balance: {balance, number, ::currency/GBP}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 73065,
+    "output_tokens": 13535,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0
+  },
+  "calls": 33,
+  "call_ms": 33,
+  "wall_ms": 442
+}

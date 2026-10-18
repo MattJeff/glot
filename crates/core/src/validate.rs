@@ -13,6 +13,11 @@ pub enum Syntax {
     I18next,
     /// Unicode MessageFormat 2.0.
     Mf2,
+    /// printf-style placeholders (Apple `%@`, Android `%1$s`, gettext `%d`, Python `%(name)s`)
+    /// with ICU plural/select wrappers produced by the native formats (`glot_core::formats`).
+    Printf,
+    /// Rails / Ruby i18n `%{name}`, ICU plural wrapper for `one:`/`other:` mappings.
+    Rails,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -255,6 +260,8 @@ fn syntax_issue(e: &str, syntax: Syntax) -> Issue {
         Syntax::Icu => "ICU MessageFormat",
         Syntax::I18next => "i18next",
         Syntax::Mf2 => "MessageFormat 2",
+        Syntax::Printf => "printf/ICU",
+        Syntax::Rails => "Rails i18n",
     };
     error(
         IssueCode::SyntaxError,
@@ -348,6 +355,12 @@ fn parse(text: &str, syntax: Syntax) -> Result<Vec<Node>, String> {
         Syntax::Icu => p.icu_seq(0, false)?,
         Syntax::I18next => p.i18n_seq()?,
         Syntax::Mf2 => p.mf2()?,
+        Syntax::Printf => printf_args(p.icu_seq(0, false)?, &mut 0),
+        Syntax::Rails => {
+            // `%{name}` is ICU's `{name}` behind a `%`.
+            p.s = text.replace("%{", "{").chars().collect();
+            p.icu_seq(0, false)?
+        }
     };
     check_tags(&nodes)?;
     Ok(nodes)
@@ -1099,6 +1112,101 @@ struct Expr {
     markup: Option<Node>,
 }
 
+/// printf placeholders in text nodes => args named by position (`%@`, `%d` count per message /
+/// per plural branch; `%2$s` explicit) or by name (`%(name)s`); the conversion is the format, so
+/// `%d` vs `%@` is reported as a changed format. `%%` is a literal percent.
+fn printf_args(nodes: Vec<Node>, next: &mut usize) -> Vec<Node> {
+    let mut out = vec![];
+    for n in nodes {
+        match n {
+            Node::Text(t) => split_printf(&t, next, &mut out),
+            Node::Choice(mut c) => {
+                for (_, body) in c.options.iter_mut() {
+                    *body = printf_args(std::mem::take(body), &mut next.clone());
+                }
+                out.push(Node::Choice(c));
+            }
+            other => out.push(other),
+        }
+    }
+    out
+}
+
+fn split_printf(t: &str, next: &mut usize, out: &mut Vec<Node>) {
+    let c: Vec<char> = t.chars().collect();
+    let mut text = String::new();
+    let mut i = 0;
+    while i < c.len() {
+        if c[i] != '%' {
+            text.push(c[i]);
+            i += 1;
+            continue;
+        }
+        if c.get(i + 1) == Some(&'%') {
+            text.push_str("%%");
+            i += 2;
+            continue;
+        }
+        // xcstrings substitution branches refer to their number as `%arg`.
+        if c[i + 1..].starts_with(&['a', 'r', 'g']) {
+            flush(out, &mut text);
+            out.push(Node::Arg {
+                name: "arg".into(),
+                format: None,
+            });
+            i += 4;
+            continue;
+        }
+        let mut j = i + 1;
+        let mut name = None;
+        if c.get(j) == Some(&'(') {
+            let end = c[j..].iter().position(|&x| x == ')').map(|p| j + p);
+            if let Some(e) = end {
+                name = Some(c[j + 1..e].iter().collect::<String>());
+                j = e + 1;
+            }
+        } else {
+            let digits = c[j..].iter().take_while(|x| x.is_ascii_digit()).count();
+            if digits > 0 && c.get(j + digits) == Some(&'$') {
+                name = Some(c[j..j + digits].iter().collect::<String>());
+                j += digits + 1;
+            }
+        }
+        while c.get(j).is_some_and(|x| "-+0#'".contains(*x)) {
+            j += 1;
+        }
+        while c
+            .get(j)
+            .is_some_and(|x| x.is_ascii_digit() || *x == '*' || *x == '.')
+        {
+            j += 1;
+        }
+        while c.get(j).is_some_and(|x| "hlqLztj".contains(*x)) {
+            j += 1;
+        }
+        // ponytail: no `o`/`U`/`D`, so "50% off" stays text.
+        match c.get(j).filter(|x| "@dixXfFeEgGcCsSpaAu".contains(**x)) {
+            Some(conv) => {
+                flush(out, &mut text);
+                let name = name.unwrap_or_else(|| {
+                    *next += 1;
+                    next.to_string()
+                });
+                out.push(Node::Arg {
+                    name,
+                    format: Some(conv.to_string()),
+                });
+                i = j + 1;
+            }
+            None => {
+                text.push('%');
+                i += 1;
+            }
+        }
+    }
+    flush(out, &mut text);
+}
+
 fn flush(out: &mut Vec<Node>, text: &mut String) {
     if !text.is_empty() {
         out.push(Node::Text(std::mem::take(text)));
@@ -1117,12 +1225,90 @@ struct Checker<'a> {
 
 const CATEGORIES: [&str; 6] = ["zero", "one", "two", "few", "many", "other"];
 
+/// CLDR keyword a translated plural selector stands for (`un` => `one`, `autre` => `other`).
+// ponytail: the languages LLMs most often translate selectors into; extend when a new one shows up in reports.
+fn untranslated_keyword(k: &str) -> Option<&'static str> {
+    let k = k.to_lowercase();
+    const T: &[(&str, &[&str])] = &[
+        ("zero", &["zéro", "cero", "null", "nul", "ноль"]),
+        (
+            "one",
+            &[
+                "un", "une", "uno", "una", "um", "uma", "ein", "eine", "eins", "один", "одна",
+                "jeden", "jedna", "een",
+            ],
+        ),
+        (
+            "two",
+            &[
+                "deux", "dos", "zwei", "dois", "duas", "due", "два", "dwa", "twee",
+            ],
+        ),
+        (
+            "few",
+            &[
+                "peu",
+                "quelques",
+                "pocos",
+                "pocas",
+                "wenige",
+                "einige",
+                "poucos",
+                "pochi",
+                "несколько",
+                "kilka",
+                "weinig",
+            ],
+        ),
+        (
+            "many",
+            &[
+                "beaucoup",
+                "muchos",
+                "muchas",
+                "viele",
+                "muitos",
+                "molti",
+                "много",
+                "wiele",
+                "veel",
+            ],
+        ),
+        (
+            "other",
+            &[
+                "autre",
+                "autres",
+                "otro",
+                "otros",
+                "otra",
+                "andere",
+                "anderes",
+                "outro",
+                "outros",
+                "altro",
+                "altri",
+                "другой",
+                "другие",
+                "inne",
+                "inny",
+            ],
+        ),
+    ];
+    T.iter()
+        .find(|(_, w)| w.contains(&k.as_str()))
+        .map(|(c, _)| *c)
+}
+
 impl Checker<'_> {
     fn ph(&self, name: &str) -> String {
         match self.syntax {
             Syntax::Icu => format!("{{{name}}}"),
             Syntax::I18next => format!("{{{{{name}}}}}"),
             Syntax::Mf2 => format!("{{${name}}}"),
+            Syntax::Printf if name.chars().all(|c| c.is_ascii_digit()) => format!("%{name}$…"),
+            Syntax::Printf => format!("%({name})…"),
+            Syntax::Rails => format!("%{{{name}}}"),
         }
     }
 
@@ -1282,10 +1468,11 @@ impl Checker<'_> {
             v
         };
         let (src, tgt) = (collect(self.src), collect(self.tgt));
-        let required: Vec<&str> = categories(self.locale)
-            .iter()
-            .map(PluralCategory::as_str)
-            .collect();
+        let names = |v: Vec<PluralCategory>| -> Vec<&'static str> {
+            v.iter().map(PluralCategory::as_str).collect()
+        };
+        let cardinal = names(categories(self.locale));
+        let ordinal = names(crate::plural::ordinal_categories(self.locale));
         let is_mf2 = self.syntax == Syntax::Mf2;
         let other = if is_mf2 { "`*`" } else { "`other`" };
         let mut issues = Vec::new();
@@ -1297,7 +1484,12 @@ impl Checker<'_> {
             } else {
                 format!("`{{{}, {}, …}}`", c.name, c.keyword)
             };
-            let keys: Vec<&str> = c.options.iter().map(|(k, _)| k.as_str()).collect();
+            let mut keys: Vec<&str> = c.options.iter().map(|(k, _)| k.as_str()).collect();
+            let required = if c.kind == Kind::Ordinal {
+                &ordinal
+            } else {
+                &cardinal
+            };
             if c.kind == Kind::Unknown {
                 let fix = same
                     .first()
@@ -1309,6 +1501,16 @@ impl Checker<'_> {
                 ));
                 continue;
             }
+            // A translated selector (`un`, `autre`) is reported as such, not also as a missing category.
+            let fixes: Vec<(&str, &str)> = if matches!(c.kind, Kind::Plural | Kind::Ordinal) {
+                keys.iter()
+                    .filter(|k| !CATEGORIES.contains(k))
+                    .filter_map(|k| untranslated_keyword(k).map(|e| (*k, e)))
+                    .collect()
+            } else {
+                vec![]
+            };
+            keys.extend(fixes.iter().map(|(_, e)| *e));
             if !keys.contains(&"other") {
                 issues.push(error(
                     IssueCode::PluralCategoryMissing,
@@ -1327,6 +1529,10 @@ impl Checker<'_> {
                         .copied()
                         .filter(|k| !CATEGORIES.contains(k) && !exact(k))
                         .collect();
+                    let hints: String = fixes
+                        .iter()
+                        .map(|(k, e)| format!("`{k}` is a translated keyword, use `{e}`; "))
+                        .collect();
                     if !bad.is_empty() {
                         let ex = if is_mf2 {
                             "exact numbers like `0`"
@@ -1336,16 +1542,18 @@ impl Checker<'_> {
                         issues.push(error(
                             IssueCode::KeywordTranslated,
                             format!(
-                                "{shown}: {} not valid plural selector(s); selectors must stay untranslated CLDR keywords (zero, one, two, few, many, other) or {ex}. {} needs: {}.",
+                                "{shown}: {} not valid plural selector(s); {hints}selectors must stay untranslated CLDR keywords (zero, one, two, few, many, other) or {ex}. {} needs: {}.",
                                 bad.iter().map(|k| format!("`{k}`")).collect::<Vec<_>>().join(", "),
                                 self.locale,
                                 required.join(", ")
                             ),
                         ));
                     }
-                    if c.kind == Kind::Ordinal {
-                        continue;
-                    }
+                    let what = if c.kind == Kind::Ordinal {
+                        "ordinal"
+                    } else {
+                        "plural"
+                    };
                     let missing: Vec<&str> = required
                         .iter()
                         .copied()
@@ -1354,7 +1562,8 @@ impl Checker<'_> {
                     // CLDR `many` in fr/es/it/pt/ca only applies to 1e6+ compact numbers: warn, don't block.
                     let (soft, missing): (Vec<&str>, Vec<&str>) =
                         missing.into_iter().partition(|m| {
-                            *m == "many"
+                            c.kind == Kind::Plural
+                                && *m == "many"
                                 && matches!(
                                     crate::plural::language(self.locale).as_str(),
                                     "fr" | "es" | "it" | "pt" | "ca" | "vec"
@@ -1370,7 +1579,7 @@ impl Checker<'_> {
                         issues.push(error(
                             IssueCode::PluralCategoryMissing,
                             format!(
-                                "{shown} is missing plural categories required by {}: {}. Add {} (all required: {}).",
+                                "{shown} is missing {what} categories required by {}: {}. Add {} (all required: {}).",
                                 self.locale,
                                 missing.join(", "),
                                 missing.iter().map(|m| if is_mf2 { format!("`{m} {{{{…}}}}`") } else { format!("`{m} {{…}}`") }).collect::<Vec<_>>().join(", "),
@@ -1433,14 +1642,14 @@ impl Checker<'_> {
         }
         // A plural in the source must survive in languages that distinguish more than `other`.
         for s in src.iter().filter(|s| s.kind == Kind::Plural) {
-            if required.len() > 1 && !tgt.iter().any(|t| t.name == s.name) {
+            if cardinal.len() > 1 && !tgt.iter().any(|t| t.name == s.name) {
                 issues.push(error(
                     IssueCode::PluralCategoryMissing,
                     format!(
                         "The source pluralizes on `{}` but the translation has no plural for it; {} needs the categories {}.",
                         self.ph(&s.name),
                         self.locale,
-                        required.join(", ")
+                        cardinal.join(", ")
                     ),
                 ));
             }
@@ -1639,11 +1848,49 @@ mod tests {
             &Constraints::default(),
         );
         let c: Vec<_> = i.iter().map(|i| i.code).collect();
+        // Translated selectors are named with their fix, not reported as missing `one` / `other`.
+        assert_eq!(c, [KeywordTranslated], "{i:?}");
+        assert!(i.iter().any(|i| {
+            i.message.contains("`un`, `autre`")
+                && i.message
+                    .contains("`un` is a translated keyword, use `one`")
+                && i.message
+                    .contains("`autre` is a translated keyword, use `other`")
+        }));
+        // Ordinals: categories required per locale (en: one, two, few, other).
+        let ord = "{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}";
+        let ord_gb = "{n, selectordinal, one {# st} two {# nd} few {# rd} other {# th}}";
         assert!(
-            c.contains(&KeywordTranslated) && c.contains(&PluralCategoryMissing),
-            "{c:?}"
+            icu(ord, ord_gb, "en-GB").is_empty(),
+            "{:?}",
+            validate(ord, ord_gb, "en-GB", Syntax::Icu, &Constraints::default())
         );
-        assert!(i.iter().any(|i| i.message.contains("`un`, `autre`")));
+        let i = validate(
+            ord,
+            "{n, selectordinal, one {#st} other {#th}}",
+            "en",
+            Syntax::Icu,
+            &Constraints::default(),
+        );
+        assert_eq!(
+            i.iter().map(|i| i.code).collect::<Vec<_>>(),
+            [PluralCategoryMissing]
+        );
+        assert!(
+            i[0].message.contains("ordinal categories") && i[0].message.contains("two, few"),
+            "{}",
+            i[0].message
+        );
+        assert!(icu(ord, "{n, selectordinal, one {#er} other {#e}}", "fr").is_empty());
+        assert!(
+            !icu(ord, "{n, selectordinal, other {#e}}", "fr").is_empty(),
+            "fr needs `one` (1er)"
+        );
+        assert!(icu(ord, "{n, selectordinal, other {#.}}", "de").is_empty());
+        assert_eq!(
+            icu(ord, "{n, selectordinal, un {#er} autre {#e}}", "fr"),
+            [KeywordTranslated]
+        );
 
         assert_eq!(
             icu("{d, date, short}", "{d, date, court}", "fr"),
@@ -1831,10 +2078,8 @@ mod tests {
         assert!(codes(src, fr_no_star, "fr", s).is_empty());
         let fr_bad =
             ".input {$count :number}\n.match $count\n0 {{Aucun}}\nun {{a}}\nmany {{b}}\n* {{c}}";
-        assert_eq!(
-            codes(src, fr_bad, "fr", s),
-            [KeywordTranslated, PluralCategoryMissing]
-        );
+        // `un` is reported as a translated `one`, not also as "one missing".
+        assert_eq!(codes(src, fr_bad, "fr", s), [KeywordTranslated]);
         // Locals are not placeholders.
         let local = ".local $n = {$count :integer}\n{{You have {$n} messages}}";
         assert_eq!(

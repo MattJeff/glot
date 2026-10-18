@@ -128,6 +128,7 @@ fn budget(stack: &[Tag], text: usize) -> Fit {
         },
         text: None,
         text_px: None,
+        occurrences: vec![],
     }
 }
 
@@ -404,6 +405,7 @@ pub fn og_svg(root: &Node, locale: &str) -> Og {
                     font: font(b),
                     text: None,
                     text_px: None,
+                    occurrences: vec![],
                 },
             ));
         }

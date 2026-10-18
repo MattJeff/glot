@@ -74,6 +74,7 @@ pub(crate) fn scan(path: &str, source: &str, key_fns: &[String]) -> ExtractRepor
         components: vec![],
         frames: vec![],
         skip_text: 0,
+        in_key_call: 0,
         report: ExtractReport {
             files_scanned: 1,
             ..Default::default()
@@ -125,6 +126,8 @@ struct Scanner<'s> {
     components: Vec<String>,
     frames: Vec<Frame>,
     skip_text: usize,
+    /// Inside a translation call's arguments (`t("k", {name: "Bob"})`, `defineMessages`).
+    in_key_call: usize,
     report: ExtractReport,
 }
 
@@ -229,6 +232,39 @@ impl Scanner<'_> {
             text,
             ui_role: Some(role.into()),
             component: self.components.last().cloned(),
+            reason: None,
+        });
+    }
+
+    /// UI copy in an object literal (`const plans = [{ description: "For individuals" }]`,
+    /// `metadata`, props objects): visible once rendered, but never wrapped in `t()`.
+    fn config_string(&mut self, raw: &str, prop: &str, offset: u32) {
+        if self.is_test || self.skip_text > 0 || self.in_key_call > 0 {
+            return;
+        }
+        let text = raw.split_whitespace().collect::<Vec<_>>().join(" ");
+        // ponytail: one lowercase word (`name: "email"`, `variant: "primary"`) is an identifier, not copy.
+        if !looks_like_text(&text)
+            || !(text.contains(' ') || text.starts_with(|c: char| c.is_uppercase()))
+        {
+            return;
+        }
+        let role = match prop {
+            "label" | "placeholder" => prop,
+            "title" | "heading" | "subtitle" => "heading",
+            "cta" => "button",
+            "tooltip" => "title",
+            _ => "text",
+        };
+        self.report.config.push(Hardcoded {
+            at: self.at(offset),
+            suggested_key: suggest_key(self.path, &text, role),
+            text,
+            ui_role: Some(role.into()),
+            component: self.components.last().cloned(),
+            reason: Some(format!(
+                "`{prop}` in a config/data object: store a key and translate it where it renders"
+            )),
         });
     }
 
@@ -299,8 +335,10 @@ impl<'a> Visit<'a> for Scanner<'_> {
 
     fn visit_call_expression(&mut self, it: &CallExpression<'a>) {
         let name = callee_name(&it.callee);
+        let mut key_call = false;
         if let Some(n) = &name {
             if let Some(prefix) = self.key_prefix_for(n) {
+                key_call = true;
                 if let Some(arg) = it.arguments.first().and_then(|a| a.as_expression()) {
                     self.record_key_arg(arg, &prefix, it.span.start);
                 }
@@ -308,6 +346,7 @@ impl<'a> Visit<'a> for Scanner<'_> {
                 && let Some(Expression::ObjectExpression(o)) =
                     it.arguments.first().and_then(|a| a.as_expression())
             {
+                key_call = true;
                 for p in &o.properties {
                     if let ObjectPropertyKind::ObjectProperty(p) = p
                         && let Some(id) = obj_prop(&p.value, "id")
@@ -317,14 +356,29 @@ impl<'a> Visit<'a> for Scanner<'_> {
                 }
             }
         }
+        let classes = name.as_deref().is_some_and(|n| CLASS_FNS.contains(&n));
         let toast = name.is_some_and(|n| n == "toast" || n.starts_with("toast."));
         if toast {
             self.frames.push(Frame::Hard(Some("toast")));
         }
+        self.in_key_call += key_call as usize;
+        self.skip_text += classes as usize;
         walk::walk_call_expression(self, it);
+        self.skip_text -= classes as usize;
+        self.in_key_call -= key_call as usize;
         if toast {
             self.frames.pop();
         }
+    }
+
+    fn visit_object_property(&mut self, it: &ObjectProperty<'a>) {
+        if let Some(prop) = it.key.static_name()
+            && UI_PROPS.contains(&prop.as_ref())
+            && let Some(s) = str_of(&it.value)
+        {
+            self.config_string(&s, &prop, it.value.span().start);
+        }
+        walk::walk_object_property(self, it);
     }
 
     fn visit_jsx_element(&mut self, it: &JSXElement<'a>) {
@@ -521,9 +575,89 @@ pub(crate) fn strip_ns(key: &str) -> &str {
     }
 }
 
+/// Class-name helpers: their string arguments are CSS classes, never copy.
+pub(crate) const CLASS_FNS: &[&str] = &["cn", "clsx", "cva", "twMerge", "classNames", "cx", "tv"];
+
+/// Object properties whose string value is UI copy (`extract`: "not converted yet (config/data)").
+pub(crate) const UI_PROPS: &[&str] = &[
+    "label",
+    "title",
+    "description",
+    "placeholder",
+    "cta",
+    "text",
+    "name",
+    "heading",
+    "subtitle",
+    "tooltip",
+    "message",
+];
+
+/// `"flex items-center gap-2"`, `"md:hidden"`, `"text-sm font-medium"`: every token is a
+/// lowercase class-like word and each is a utility (has `-`, `:`, `[`, `/`) or a bare utility name.
+pub fn looks_like_css_classes(s: &str) -> bool {
+    const BARE: &[&str] = &[
+        "flex",
+        "grid",
+        "block",
+        "inline",
+        "hidden",
+        "relative",
+        "absolute",
+        "fixed",
+        "sticky",
+        "static",
+        "truncate",
+        "underline",
+        "italic",
+        "uppercase",
+        "lowercase",
+        "capitalize",
+        "container",
+        "border",
+        "rounded",
+        "shadow",
+        "outline",
+        "ring",
+        "transition",
+        "grow",
+        "shrink",
+        "contents",
+        "table",
+        "invisible",
+        "visible",
+        "antialiased",
+        "prose",
+        "group",
+        "peer",
+        "dark",
+        "active",
+        "disabled",
+        "btn",
+        "card",
+        "row",
+        "col",
+    ];
+    let mut tokens = s.split_whitespace().peekable();
+    tokens.peek().is_some()
+        && tokens.all(|t| {
+            let t = t.strip_prefix('!').unwrap_or(t);
+            t.bytes().all(|b| {
+                b.is_ascii_lowercase() || b.is_ascii_digit() || b"-:/[]._%#()&>=,'".contains(&b)
+            }) && (t.contains(['-', ':', '[', '/']) || BARE.contains(&t))
+        })
+}
+
 /// Heuristic: user-visible copy vs. code-ish strings (class names, urls, ids, paths...).
 pub(crate) fn looks_like_text(s: &str) -> bool {
     if s.chars().count() < 2 || !s.chars().any(char::is_alphabetic) {
+        return false;
+    }
+    // Initials / avatar fallbacks ("AL", "JD"): not copy. "OK" is.
+    if s.len() <= 3 && s.bytes().all(|b| b.is_ascii_uppercase()) && s != "OK" {
+        return false;
+    }
+    if looks_like_css_classes(s) {
         return false;
     }
     if s.contains(char::is_whitespace) {

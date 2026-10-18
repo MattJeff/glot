@@ -17,6 +17,10 @@ async-trait.workspace = true
 reqwest.workspace = true
 futures = "0.3"
 base64 = "0.22"
+# quality routing (risk key patterns), translation memory (fuzzy match, TMX)
+glob.workspace = true
+strsim = "0.11"
+roxmltree = "0.20"
 
 [dev-dependencies]
 tempfile = "3"

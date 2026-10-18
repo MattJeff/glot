@@ -1,16 +1,39 @@
 {
   "name": "@glot/db",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Localized database content for Prisma and Drizzle: read glot_translations (filled by `glot db sync`) with source fallback.",
   "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/db"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist", "migrations"],
-  "scripts": {
-    "build": "esbuild src/index.ts --format=esm --platform=node --target=node20 --outdir=dist && tsc",
-    "test": "node --test 'test/*.test.ts'"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
-  "devDependencies": { "@types/node": "^25", "esbuild": "^0.25", "typescript": "^5.9" }
+  "files": [
+    "dist",
+    "migrations"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && esbuild src/index.ts --format=esm --platform=node --target=node20 --outdir=dist && tsc",
+    "test": "node --test 'test/*.test.ts'",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "esbuild": "^0.25",
+    "typescript": "^5.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,0 +1,106 @@
+# glot production stack: one VPS, Caddy in front. See web/content/docs/deploy-hetzner.md.
+#   cd deploy && docker compose -f compose.prod.yml up -d --build --wait
+# Variables come from deploy/.env (compose reads it from the compose file's directory).
+name: glot
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "5" }
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: glot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      POSTGRES_DB: glot
+    # ponytail: two knobs sized for a 4 GB box; pgtune when the DB outgrows it.
+    command: postgres -c shared_buffers=256MB -c max_connections=50
+    volumes:
+      - pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glot -d glot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    mem_limit: 1g
+    logging: *logging
+
+  server:
+    image: glot-server:latest
+    build:
+      context: ..
+      dockerfile: crates/server/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://glot:${POSTGRES_PASSWORD}@postgres:5432/glot
+      GLOT_BIND: 0.0.0.0:8790
+      GLOT_SECRET_KEY: ${GLOT_SECRET_KEY:?set GLOT_SECRET_KEY in deploy/.env}
+      # https:// origin => session cookie gets `Secure` (SameSite=Lax, host-only on app.<domain>).
+      GLOT_WEB_ORIGIN: https://app.${GLOT_DOMAIN:?set GLOT_DOMAIN}${GLOT_PORT_SUFFIX:-}
+      GLOT_PUBLIC_URL: https://api.${GLOT_DOMAIN}${GLOT_PORT_SUFFIX:-}
+      GLOT_MCP_ALLOWED_ORIGINS: ${GLOT_MCP_ALLOWED_ORIGINS:-}
+      GLOT_MCP_RATE_PER_MIN: ${GLOT_MCP_RATE_PER_MIN:-120}
+      GLOT_INSIGHTS_RATE_PER_MIN: ${GLOT_INSIGHTS_RATE_PER_MIN:-1200}
+      GLOT_FEEDBACK_RATE_PER_MIN: ${GLOT_FEEDBACK_RATE_PER_MIN:-30}
+      RUST_LOG: ${RUST_LOG:-glot_server=info,tower_http=info}
+      GLOT_LOG_FORMAT: json
+    depends_on:
+      postgres: { condition: service_healthy }
+    # The image has no curl: bash /dev/tcp is enough for a liveness probe.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8790 && printf 'GET /healthz HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q ok <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    mem_limit: 512m
+    logging: *logging
+
+  web:
+    image: glot-web:latest
+    build:
+      context: ../web
+      args:
+        GLOT_API_URL: http://server:8790  # baked into Next rewrites (/api, /cdn -> server)
+    restart: unless-stopped
+    depends_on:
+      server: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/').then(r=>process.exit(r.status<500?0:1),()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: 512m
+    logging: *logging
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "${GLOT_HTTP_PORT:-80}:80"
+      - "${GLOT_HTTPS_PORT:-443}:443"
+      - "${GLOT_HTTPS_PORT:-443}:443/udp"  # HTTP/3
+    environment:
+      GLOT_DOMAIN: ${GLOT_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # certificates: keep it, or Let's Encrypt rate limits bite
+      - caddy_config:/config
+    depends_on:
+      web: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    mem_limit: 256m
+    logging: *logging
+
+volumes:
+  pg:
+  caddy_data:
+  caddy_config:

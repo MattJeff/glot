@@ -21,6 +21,8 @@ const STRINGS = [
   "iiiiiiiiiiii", "MMMMMMMM", "The quick brown fox jumps over the lazy dog", "Überweisung fällig",
   "Ångström Øresund", "{count} items", "Invite teammates to your workspace", "AV To Ty Wa",
   "Löschen", "Archivieren", "Mitglied entfernen", "Abonnement kündigen",
+  // Ligatures and kerning pairs (rustybuzz gets kern/liga explicitly).
+  "Office waffle fluffy fjord", "AVATAR Yoga WAVE Typo", "Tâche effectuée",
 ];
 const FONTS = [
   { size_px: 14, letter_spacing_px: 0 },
@@ -125,4 +127,76 @@ test("woff2 → sfnt keeps metrics tables", async (t) => {
   const tags = Array.from({ length: sfnt.readUInt16BE(4) }, (_, i) => sfnt.toString("latin1", 12 + 16 * i, 16 + 16 * i));
   for (const tag of ["cmap", "head", "hhea", "hmtx", "maxp", "name"]) assert.ok(tags.includes(tag), `${tag} in ${tags}`);
   assert.ok(!tags.includes("glyf"));
+});
+
+test("--measure: dev key markers split two identical \"Save\" into two budgets; per-occurrence detail, tightest wins", async () => {
+  const { encodeKey } = await import("../../runtime/src/dev.ts");
+  const btn = (w: number, key: string) =>
+    `<button style="width:${w}px;padding:0;border:0;white-space:nowrap;overflow:hidden;font-size:14px">${encodeKey(key)}Save</button>`;
+  const html = `<!doctype html><html lang="en"><style>${FACE}</style><body>
+    ${btn(60, "toolbar.save")} ${btn(200, "dialog.save")}
+    ${btn(90, "common.cancel")} ${btn(150, "common.cancel")}
+    <button style="width:70px;padding:0;border:0;white-space:nowrap;overflow:hidden;font-size:14px">Save</button>
+  </body></html>`;
+  const server = await serve({ "/": html });
+  const dir = await mkdtemp(join(tmpdir(), "glot-measure-"));
+  await writeFile(join(dir, "en.json"), JSON.stringify({
+    toolbar: { save: "Save" }, dialog: { save: "Save" }, common: { cancel: "Save" },
+  }));
+  try {
+    const r = await run({
+      baseUrl: `http://localhost:${port(server)}`, routes: ["/"], locales: [], sourceLocale: "en",
+      urlPattern: "/{locale}{route}", viewports: ["800x600"], out: dir, suggest: false,
+      catalogs: join(dir, "{locale}.json"), measure: true, fontsDir: join(dir, "fonts"),
+    });
+    const l = r.layout!;
+    assert.equal(l["toolbar.save"].max_width_px, 60);
+    assert.equal(l["dialog.save"].max_width_px, 200);
+    assert.equal(l["toolbar.save"].text, "Save", "markers are stripped before measuring");
+    assert.deepEqual(l["common.cancel"].occurrences!.map((o) => [o.max_width_px, o.by]), [[90, "marker"], [150, "marker"]]);
+    assert.equal(l["common.cancel"].max_width_px, 90, "tightest occurrence wins");
+    // The unmarked "Save" falls back to text matching (first key with that text).
+    const byText = Object.values(l).flatMap((f) => f.occurrences!).filter((o) => o.by === "text");
+    assert.deepEqual(byText.map((o) => o.max_width_px), [70]);
+  } finally {
+    server.close();
+  }
+});
+
+test("browser line counts of Japanese with punctuation (kinsoku fixture for glot-core, macOS)", async (t) => {
+  if (process.platform !== "darwin") return t.skip("Hiragino is macOS-only");
+  const TEXTS = [
+    "設定を保存しました。変更は次回のログインから有効になります。",
+    "「請求書」を作成、送信、そして支払いを確認します。",
+    "メンバーを招待する（最大五人）、または後で追加する。",
+    "ファイルが見つかりません！もう一度お試しください？",
+    "保存、キャンセル、削除。",
+  ];
+  const font = { family: "Hiragino Sans", postscript: "HiraginoSans-W3", size_px: 16, weight: 400, letter_spacing_px: 0 };
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage();
+    await page.setContent(`<!doctype html><html lang="ja"><body style="margin:0"></body></html>`);
+    const cases = await page.evaluate(({ texts, font }) => {
+      const out = [];
+      for (const text of texts) {
+        for (let width = 48; width <= 320; width += 13) {
+          const d = document.createElement("div");
+          d.style.cssText = `width:${width}px;font:${font.weight} ${font.size_px}px "${font.family}";line-height:20px`;
+          d.textContent = text;
+          document.body.append(d);
+          const g = document.createRange();
+          g.selectNodeContents(d);
+          const lines = new Set(Array.from(g.getClientRects()).map((r) => Math.round(r.top))).size;
+          d.remove();
+          out.push({ text, width, lines, font });
+        }
+      }
+      return out;
+    }, { texts: TEXTS, font });
+    const file = join(FIXTURES, "browser-lines-ja.json");
+    if (process.env.GLOT_UPDATE_FIXTURE === "1" || !existsSync(file)) await writeFile(file, JSON.stringify({ generated_by: "packages/visual-qa/test/measure.test.ts", cases }, null, 2) + "\n");
+  } finally {
+    await browser.close();
+  }
 });

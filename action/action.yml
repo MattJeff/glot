@@ -6,8 +6,11 @@ branding:
 
 inputs:
   version:
-    description: glot release tag (e.g. v0.1.0) or "latest". Skipped when `glot` is already on PATH.
-    default: latest
+    description: >-
+      glot release tag (e.g. v0.3.0). Default: the version pinned in this action's VERSION file, so
+      `@v0` always installs the binary it was released with. "latest" only when you ask for it.
+      Skipped when `glot` is already on PATH.
+    default: ""
   working-directory:
     description: Directory containing glot.toml.
     default: .
@@ -18,14 +21,28 @@ inputs:
     description: Post (or update) a summary comment on the pull request.
     default: "true"
   anthropic-api-key:
-    description: LLM key used by `glot translate` (exported as ANTHROPIC_API_KEY).
+    description: Exported as ANTHROPIC_API_KEY for `glot translate`.
+    default: ""
+  openai-api-key:
+    description: Exported as OPENAI_API_KEY (provider openai / openai-compatible).
+    default: ""
+  llm-api-key:
+    description: Generic LLM key, exported under glot.toml's `llm.api_key_env` (else the provider's default variable).
+    default: ""
+  anthropic-workspace-id:
+    description: Exported as ANTHROPIC_WORKSPACE_ID (org-level user keys sk-ant-usr-… must name the workspace to bill).
     default: ""
   fail-on-error:
     description: Fail the job when `glot check` reports errors.
     default: "true"
   github-token:
-    description: Token used to push commits and comment.
+    description: Token used to comment on the pull request.
     default: ${{ github.token }}
+  token:
+    description: >-
+      Token used to push the translation commit (PAT or GitHub App token). Empty: push with the
+      checkout credentials (GITHUB_TOKEN), whose pushes do not trigger new workflow runs.
+    default: ""
 
 outputs:
   check-exit-code:
@@ -42,30 +59,37 @@ runs:
         REPO: ${{ github.action_repository || github.repository }}
       run: |
         set -euo pipefail
-        if command -v glot >/dev/null; then echo "Using $(command -v glot)"; exit 0; fi
+        if command -v glot >/dev/null; then echo "Using $(command -v glot) ($(glot --version))"; exit 0; fi
+        [ -n "$VERSION" ] || VERSION=$(tr -d '[:space:]' < "$GITHUB_ACTION_PATH/VERSION")
+        if [ "$VERSION" = latest ]; then
+          VERSION=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" | sed 's|.*/tag/||')
+        fi
+        case "$VERSION" in v*) ;; *) echo "::error::Invalid glot version '$VERSION'"; exit 1 ;; esac
         case "${RUNNER_OS}-${RUNNER_ARCH}" in
           Linux-X64)     target=x86_64-unknown-linux-gnu ;;
           Linux-ARM64)   target=aarch64-unknown-linux-gnu ;;
           macOS-ARM64)   target=aarch64-apple-darwin ;;
           macOS-X64)     target=x86_64-apple-darwin ;;
           Windows-X64)   target=x86_64-pc-windows-msvc ;;
-          *) target=unknown ;;
+          *)
+            echo "::notice::No prebuilt glot for ${RUNNER_OS}-${RUNNER_ARCH}, building $VERSION from source"
+            cargo install --locked --git "https://github.com/$REPO" --tag "$VERSION" glot-cli
+            exit 0 ;;
         esac
         ext=tar.gz; [ "$RUNNER_OS" = Windows ] && ext=zip
-        if [ "$VERSION" = latest ]; then
-          url="https://github.com/$REPO/releases/latest/download/glot-$target.$ext"
-        else
-          url="https://github.com/$REPO/releases/download/$VERSION/glot-$target.$ext"
+        asset="glot-$target.$ext"
+        base="https://github.com/$REPO/releases/download/$VERSION"
+        dl="$RUNNER_TEMP/glot-dl"; bin="$RUNNER_TEMP/glot-bin"; mkdir -p "$dl" "$bin"
+        curl -fsSL "$base/$asset" -o "$dl/$asset" || { echo "::error::Download failed: $base/$asset"; exit 1; }
+        curl -fsSL "$base/SHA256SUMS" -o "$dl/SHA256SUMS" || { echo "::error::No SHA256SUMS in release $VERSION; refusing to install"; exit 1; }
+        expected=$(awk -v f="$asset" '$2 == f || $2 == "*"f { print $1 }' "$dl/SHA256SUMS")
+        if command -v sha256sum >/dev/null; then actual=$(sha256sum "$dl/$asset" | cut -d' ' -f1); else actual=$(shasum -a 256 "$dl/$asset" | cut -d' ' -f1); fi
+        if [ -z "$expected" ] || [ "$actual" != "$expected" ]; then
+          echo "::error::Checksum mismatch for $asset (expected '${expected:-none}', got $actual)"; exit 1
         fi
-        bin="$RUNNER_TEMP/glot-bin"; mkdir -p "$bin"
-        if curl -fsSL "$url" -o "$RUNNER_TEMP/glot.$ext"; then
-          if [ "$ext" = zip ]; then unzip -oq "$RUNNER_TEMP/glot.$ext" -d "$bin"; else tar -xzf "$RUNNER_TEMP/glot.$ext" -C "$bin"; fi
-          echo "$bin" >> "$GITHUB_PATH"
-        else
-          echo "::notice::No prebuilt glot for $target ($VERSION), building from source"
-          tag=(); [ "$VERSION" != latest ] && tag=(--tag "$VERSION")
-          cargo install --locked --git "https://github.com/$REPO" ${tag[@]+"${tag[@]}"} glot-cli
-        fi
+        if [ "$ext" = zip ]; then unzip -oq "$dl/$asset" -d "$bin"; else tar -xzf "$dl/$asset" -C "$bin"; fi
+        echo "$bin" >> "$GITHUB_PATH"
+        echo "Installed $("$bin/glot" --version) (sha256 verified)"
 
     - name: Translate
       id: translate
@@ -73,10 +97,22 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        IN_ANTHROPIC_KEY: ${{ inputs.anthropic-api-key }}
+        IN_OPENAI_KEY: ${{ inputs.openai-api-key }}
+        IN_LLM_KEY: ${{ inputs.llm-api-key }}
+        IN_WORKSPACE: ${{ inputs.anthropic-workspace-id }}
         NO_COLOR: "1"
       run: |
-        set -o pipefail
+        set -euo pipefail
+        # Empty inputs keep whatever the job env already sets.
+        if [ -n "$IN_ANTHROPIC_KEY" ]; then export ANTHROPIC_API_KEY="$IN_ANTHROPIC_KEY"; fi
+        if [ -n "$IN_OPENAI_KEY" ]; then export OPENAI_API_KEY="$IN_OPENAI_KEY"; fi
+        if [ -n "$IN_WORKSPACE" ]; then export ANTHROPIC_WORKSPACE_ID="$IN_WORKSPACE"; fi
+        if [ -n "$IN_LLM_KEY" ]; then
+          py=$(command -v python3 || command -v python)
+          var=$("$py" -c 'import tomllib; l = tomllib.load(open("glot.toml", "rb")).get("llm", {}); print(l.get("api_key_env") or ("OPENAI_API_KEY" if l.get("provider", "").startswith("openai") else "ANTHROPIC_API_KEY"))')
+          export "$var=$IN_LLM_KEY"
+        fi
         glot translate --yes | tee "$RUNNER_TEMP/glot-translate.log"
         cost=$(sed -n 's/^Cost: \$\([0-9.]*\).*/\1/p' "$RUNNER_TEMP/glot-translate.log" | tail -1)
         echo "cost=${cost:-0}" >> "$GITHUB_OUTPUT"
@@ -86,11 +122,16 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        GH_TOKEN: ${{ inputs.github-token }}
+        PUSH_TOKEN: ${{ inputs.token }}
         HEAD_REF: ${{ github.head_ref }}
       run: |
         set -euo pipefail
-        git add -A .
+        # Stage only what glot writes: catalogs (glot.toml `files`, {locale} -> *), the lock and pixel budgets.
+        py=$(command -v python3 || command -v python)
+        specs=(); paths=()
+        while IFS= read -r f; do specs+=("$f"); done < <("$py" -c 'import tomllib; [print(":(glob)" + f.replace("{locale}", "*")) for f in tomllib.load(open("glot.toml", "rb"))["files"]]')
+        while IFS= read -r -d '' f; do paths+=("$f"); done < <(git ls-files -z -m -o --exclude-standard -- "${specs[@]}" glot.lock .glot/layout.json)
+        if [ ${#paths[@]} -gt 0 ]; then git add -A -- "${paths[@]}"; fi
         if git diff --cached --quiet; then echo "No translation changes"; exit 0; fi
         if [ -z "$HEAD_REF" ] || ! git symbolic-ref -q HEAD >/dev/null; then
           # ponytail: pushing the synthetic PR merge commit would pollute the branch; require a branch checkout.
@@ -100,7 +141,15 @@ runs:
         git config user.name "glot[bot]"
         git config user.email "glot-bot@users.noreply.github.com"
         git commit -qm "i18n: glot translate"
-        git push origin "HEAD:refs/heads/$HEAD_REF"
+        auth=()
+        if [ -n "$PUSH_TOKEN" ]; then
+          # Replace the checkout's GITHUB_TOKEN header so the push runs as the PAT / App (and triggers CI).
+          b64=$(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$b64"
+          key="http.$GITHUB_SERVER_URL/.extraheader"
+          auth=(-c "$key=" -c "$key=AUTHORIZATION: basic $b64")
+        fi
+        git ${auth[@]+"${auth[@]}"} push origin "HEAD:refs/heads/$HEAD_REF"
 
     - name: Check
       id: check

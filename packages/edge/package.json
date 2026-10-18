@@ -1,22 +1,61 @@
 {
   "name": "@glot/edge",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Edge templates for glot on-demand locales: Cloudflare Worker (static/marketing sites) and Next.js proxy (locale URLs + Accept-Language).",
   "license": "MIT",
-  "private": true,
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/edge"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
   "type": "module",
   "exports": {
-    ".": "./src/route.ts",
-    "./worker": "./src/worker.ts",
-    "./next": "./src/next-proxy.ts"
+    ".": {
+      "types": "./dist/route.d.ts",
+      "default": "./dist/route.js"
+    },
+    "./worker": {
+      "types": "./dist/worker.d.ts",
+      "default": "./dist/worker.js"
+    },
+    "./next": {
+      "types": "./dist/next-proxy.d.ts",
+      "default": "./dist/next-proxy.js"
+    }
   },
   "scripts": {
+    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak",
+    "prepack": "npm run build",
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": { "@glot/runtime": "link:../runtime" },
-  "peerDependencies": { "next": ">=15" },
-  "peerDependenciesMeta": { "next": { "optional": true } },
-  "devDependencies": { "@types/node": "^25", "next": "16.4.2", "react": "19.3.0", "react-dom": "19.3.0", "typescript": "^5.9" },
-  "packageManager": "pnpm@10.18.3"
+  "peerDependencies": {
+    "next": ">=15"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "^5.9",
+    "@glot/runtime": "link:../runtime",
+    "esbuild": "^0.25"
+  },
+  "packageManager": "pnpm@10.18.3",
+  "main": "dist/route.js",
+  "types": "dist/route.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
 }

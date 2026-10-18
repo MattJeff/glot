@@ -294,7 +294,7 @@ fn render(
     std::fs::write(&file, serde_json::to_string(&pages)?)?;
     let n: usize = pages.values().map(|p| p.matches("<div").count()).sum();
     anstream::eprintln!("{DIM}Rendering {n} branch(es) on {}…{DIM:#}", qa.base_url);
-    let o = crate::fit::qa_command()
+    let o = crate::fit::node_tool("visual-qa")
         .current_dir(&ws.root)
         .args([
             "--base-url",
@@ -315,9 +315,9 @@ fn render(
         .arg("--out")
         .arg(out.join("visual"))
         .output()
-        .context("cannot run visual-qa (node >= 25 and packages/visual-qa deps installed?)")?;
+        .with_context(|| crate::fit::tool_missing("visual-qa"))?;
     if !o.status.success() {
-        bail!("visual-qa failed: {}", String::from_utf8_lossy(&o.stderr));
+        return Err(crate::fit::tool_failed("visual-qa", &o.stderr));
     }
     let report: serde_json::Value = serde_json::from_str(
         &std::fs::read_to_string(out.join("visual/report.json"))

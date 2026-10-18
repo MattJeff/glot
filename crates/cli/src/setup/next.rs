@@ -44,10 +44,21 @@ export const routing = {{
     )
 }
 
-fn request_ts(dir: &str, o: &Opts) -> String {
+fn request_ts(dir: &str, o: &Opts, segment: bool) -> String {
+    let (import, read) = if segment {
+        (
+            r#"import { locale as rootLocale } from "next/root-params";"#,
+            "// `app/[locale]` root segment: static per locale, compatible with `cacheComponents`.\n  const requested = await rootLocale();",
+        )
+    } else {
+        (
+            r#"import { headers } from "next/headers";"#,
+            "// Set by the proxy from the URL prefix or the NEXT_LOCALE cookie (i18n/proxy.ts).\n  const requested = (await headers()).get(\"x-glot-locale\");",
+        )
+    };
     format!(
         r#"import {{ getRequestConfig }} from "next-intl/server";
-import {{ headers }} from "next/headers";
+{import}
 import {{ routing }} from "./routing";
 
 type Messages = Record<string, unknown>;
@@ -71,8 +82,7 @@ function merge(base: Messages, over: Messages): Messages {{
 }}
 
 export default getRequestConfig(async () => {{
-  // Set by the proxy from the URL prefix or the NEXT_LOCALE cookie (i18n/proxy.ts).
-  const requested = (await headers()).get("x-glot-locale");
+  {read}
   const locale = routing.locales.find((l) => l === requested) ?? routing.defaultLocale;
   const source = await load(routing.defaultLocale);
   return {{ locale, messages: locale === routing.defaultLocale ? source : merge(source, await load(locale)) }};
@@ -82,12 +92,21 @@ export default getRequestConfig(async () => {{
     )
 }
 
+const PROXY_HEADER: &str = r#"const headers = new Headers(req.headers);
+    headers.set("x-glot-locale", locale);
+    url.pathname = rest;
+    res = prefixed ? NextResponse.rewrite(url, { request: { headers } }) : NextResponse.next({ request: { headers } });"#;
+
+/// `app/[locale]`: unprefixed URLs are served by the `/{locale}/...` route (cookie or default).
+const PROXY_SEGMENT: &str = r#"url.pathname = `/${locale}${rest === "/" ? "" : rest}`;
+    res = prefixed ? NextResponse.next() : NextResponse.rewrite(url);"#;
+
 const PROXY_TS: &str = r#"import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./routing";
 
 const COOKIE = "NEXT_LOCALE";
 
-/** Locale from the URL prefix (`/fr/...`, rewritten to `/...`) or the cookie, passed to i18n/request.ts. */
+/** Locale from the URL prefix (`/fr/...`) or the NEXT_LOCALE cookie, passed on to i18n/request.ts. */
 export function i18nProxy(req: NextRequest) {
   const { locales, defaultLocale, localePrefix } = routing;
   const path = req.nextUrl.pathname;
@@ -102,10 +121,7 @@ export function i18nProxy(req: NextRequest) {
     url.pathname = locale === defaultLocale ? rest : `/${locale}${rest === "/" ? "" : rest}`;
     res = NextResponse.redirect(url);
   } else {
-    const headers = new Headers(req.headers);
-    headers.set("x-glot-locale", locale);
-    url.pathname = rest;
-    res = prefixed ? NextResponse.rewrite(url, { request: { headers } }) : NextResponse.next({ request: { headers } });
+    ELSE
   }
   if (prefixed && saved !== locale) {
     res.cookies.set(COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
@@ -343,9 +359,23 @@ fn wrap_children(
 pub fn app(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
     let b = p.base;
     let i18n = format!("{b}i18n");
+    // `cacheComponents` forbids reading headers outside <Suspense>: the locale then comes from an
+    // `app/[locale]` root segment (static per locale), the proxy rewriting unprefixed URLs into it.
+    let segment = root.join(format!("{b}app/[locale]")).is_dir() || cache_components(root);
+    if segment {
+        move_to_locale_segment(root, b, plan);
+    }
     plan.create(root, &format!("{i18n}/routing.ts"), routing_ts(o));
-    plan.create(root, &format!("{i18n}/request.ts"), request_ts(&i18n, o));
-    plan.create(root, &format!("{i18n}/proxy.ts"), PROXY_TS.into());
+    plan.create(
+        root,
+        &format!("{i18n}/request.ts"),
+        request_ts(&i18n, o, segment),
+    );
+    plan.create(
+        root,
+        &format!("{i18n}/proxy.ts"),
+        PROXY_TS.replace("ELSE", if segment { PROXY_SEGMENT } else { PROXY_HEADER }),
+    );
     match exists_any(
         root,
         b,
@@ -378,16 +408,27 @@ pub fn app(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
         Some(r#"import createNextIntlPlugin from "next-intl/plugin";"#),
         Some(r#"const createNextIntlPlugin = require("next-intl/plugin");"#),
     );
-    if let Some(layout) = exists_any(
-        root,
-        b,
-        &[
-            "app/layout.tsx",
-            "app/layout.jsx",
-            "app/layout.js",
-            "app/layout.ts",
-        ],
-    ) {
+    let app_dir = if segment {
+        format!("{b}app/[locale]/")
+    } else {
+        format!("{b}app/")
+    };
+    let layout = ["layout.tsx", "layout.jsx", "layout.js", "layout.ts"]
+        .iter()
+        .map(|n| format!("{app_dir}{n}"))
+        .find(|p| root.join(p).is_file() || plan.moved_from(p).is_some());
+    if let Some(layout) = layout {
+        let routing = rel_import(&app_dir, &format!("{i18n}/routing"));
+        plan.edit(root, &layout.clone(), |src| {
+            if !segment || src.contains("generateStaticParams") {
+                return Ok(None);
+            }
+            let with = format!(
+                "{}\n\n// One static render per locale (glot i18nize).\nexport function generateStaticParams() {{\n  return routing.locales.map((locale) => ({{ locale }}));\n}}\n",
+                src.trim_end()
+            );
+            Ok(add_import(&layout, &with, &format!("import {{ routing }} from \"{routing}\";")))
+        });
         plan.edit(root, &layout.clone(), |src| {
             if src.contains("NextIntlClientProvider") {
                 return Ok(None);
@@ -429,6 +470,106 @@ pub fn app(root: &Path, p: &Project, o: &Opts, plan: &mut SetupPlan) {
             app_switcher(&dir, b),
         );
     }
+}
+
+/// `cacheComponents: true` in next.config.
+fn cache_components(root: &Path) -> bool {
+    [
+        "next.config.ts",
+        "next.config.mjs",
+        "next.config.js",
+        "next.config.mts",
+        "next.config.cjs",
+    ]
+    .iter()
+    .filter_map(|n| std::fs::read_to_string(root.join(n)).ok())
+    .any(|s| s.replace(' ', "").contains("cacheComponents:true"))
+}
+
+/// Entries that stay at the `app/` root: route handlers and files Next only reads there.
+fn stays_at_root(name: &str) -> bool {
+    let stem = name.split('.').next().unwrap_or(name);
+    name == "api"
+        || name.starts_with('[')
+        || matches!(
+            stem,
+            "favicon" | "robots" | "sitemap" | "manifest" | "global-error" | "global-not-found"
+        )
+}
+
+/// Plan `app/*` -> `app/[locale]/*`, fixing what the move breaks: relative imports leaving
+/// `app/` get one more `../`, and `LayoutProps<"/x">` / `PageProps<"/x">` route types.
+fn move_to_locale_segment(root: &Path, b: &str, plan: &mut SetupPlan) {
+    let app = format!("{b}app");
+    if root.join(format!("{app}/[locale]")).is_dir() {
+        return;
+    }
+    let Ok(rd) = std::fs::read_dir(root.join(&app)) else {
+        return;
+    };
+    let mut names: Vec<String> = rd
+        .flatten()
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .filter(|n| !stays_at_root(n))
+        .collect();
+    names.sort();
+    for n in names {
+        let from = format!("{app}/{n}");
+        let to = format!("{app}/[locale]/{n}");
+        let mut files = vec![];
+        collect(root, &from, &mut files);
+        plan.moves.push((from.clone(), to.clone()));
+        for f in files {
+            let depth = f[app.len() + 1..].matches('/').count();
+            let new = f.replacen(&from, &to, 1);
+            plan.edit(root, &new, |src| Ok(Some(relocate(src, depth))));
+        }
+    }
+}
+
+fn collect(root: &Path, rel: &str, out: &mut Vec<String>) {
+    match std::fs::read_dir(root.join(rel)) {
+        Ok(rd) => {
+            for e in rd.flatten() {
+                collect(
+                    root,
+                    &format!("{rel}/{}", e.file_name().to_string_lossy()),
+                    out,
+                );
+            }
+        }
+        Err(_) => {
+            let ext = rel.rsplit('.').next().unwrap_or("");
+            if ["ts", "tsx", "js", "jsx", "mjs", "mts", "css", "scss"].contains(&ext) {
+                out.push(rel.into());
+            }
+        }
+    }
+}
+
+/// Source text of a file moved one level down (`app/x` -> `app/[locale]/x`), `depth` = number
+/// of directories between `app/` and the file.
+// ponytail: textual, any string literal starting with `../`; an AST pass if it ever misfires.
+fn relocate(src: &str, depth: usize) -> String {
+    let mut out = String::with_capacity(src.len() + 16);
+    let mut rest = src;
+    while let Some(i) = rest.find(['"', '\'', '`']) {
+        out.push_str(&rest[..=i]);
+        rest = &rest[i + 1..];
+        let lead = (0..)
+            .take_while(|k| rest.get(k * 3..).is_some_and(|r| r.starts_with("../")))
+            .count();
+        if lead > depth {
+            out.push_str("../");
+        }
+    }
+    out.push_str(rest);
+    for t in ["LayoutProps<\"/", "PageProps<\"/"] {
+        out = out
+            .replace(t, &format!("{t}[locale]/"))
+            .replace("[locale]/\"", "[locale]\"");
+    }
+    out
 }
 
 fn ident(l: &str) -> String {

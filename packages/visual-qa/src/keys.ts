@@ -1,7 +1,21 @@
 // Reverse index: rendered text -> catalog key, without any instrumentation of the app.
 import { readFile } from "node:fs/promises";
 
-export const norm = (s: string) => s.replace(/\s+/g, " ").trim().toLowerCase();
+// Dev key markers (`@glot/runtime/dev`, `GLOT_DEV_KEYS=1`): U+2063, key bytes as variation selectors, U+2063.
+const MARK = /\u2063([\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+)\u2063/gu;
+
+/** Keys marked in `text` (document order) and the text without markers. */
+export function decodeKeys(text: string): { keys: string[]; text: string } {
+  const keys: string[] = [];
+  const clean = text.replace(MARK, (_, bytes: string) => {
+    const b = Array.from(bytes, (c) => { const p = c.codePointAt(0)!; return p < 0xe0100 ? p - 0xfe00 : p - 0xe0100 + 16; });
+    keys.push(new TextDecoder().decode(new Uint8Array(b)));
+    return "";
+  });
+  return { keys, text: clean };
+}
+
+export const norm = (s: string) => decodeKeys(s).text.replace(/\s+/g, " ").trim().toLowerCase();
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -90,6 +104,8 @@ export function buildIndex(entries: Record<string, string>): Index {
 }
 
 export function match(idx: Index | undefined, text: string): string | undefined {
+  const marked = decodeKeys(text).keys[0];
+  if (marked) return marked;
   if (!idx) return;
   const n = norm(text);
   if (!n) return;

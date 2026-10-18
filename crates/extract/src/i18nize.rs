@@ -100,6 +100,9 @@ struct Comp {
     blocked: Option<String>,
     /// Translator variable: `t`, or `tr` when the component already binds `t`.
     tname: &'static str,
+    /// The component already has `const t = useTranslations(ns?)` / `const { t } = useTranslation()`:
+    /// reused when its namespace fits the keys (else `tname` + a new hook).
+    reuse: Option<Option<String>>,
     /// `useX()` hook returning a literal (module config turned into a hook): every text value is copy.
     config: bool,
     /// Edits applied only when the component gets a translator (`metadata` -> `generateMetadata`).
@@ -165,7 +168,13 @@ pub fn source_files(
 /// Namespace for a file: `app/invoices/page.tsx` -> `invoices`, root page -> `home`.
 pub fn namespace_for(path: &str) -> String {
     let p = path_prefix(path);
-    if p.is_empty() { "home".into() } else { p }
+    let stem = path.rsplit('/').next().unwrap_or(path).split('.').next();
+    match (p.is_empty(), stem) {
+        // The root layout holds site-wide copy (metadata, header), not the home page's.
+        (true, Some("layout")) => "layout".into(),
+        (true, _) => "home".into(),
+        _ => p,
+    }
 }
 
 fn source_type(path: &str) -> Option<SourceType> {
@@ -241,18 +250,26 @@ pub fn analyze(path: &str, source: &str, lib: Lib) -> FileAnalysis {
         roles: vec![],
         skip_text: 0,
         t_bindings: vec![],
+        translators: vec![],
         text_props: TEXT_PROPS.read().unwrap().clone(),
     };
     a.visit_program(program);
     let t_bindings = std::mem::take(&mut a.t_bindings);
+    let translators = std::mem::take(&mut a.translators);
     for c in &mut fa.comps {
+        c.reuse = translators
+            .iter()
+            .find(|(p, _)| *p >= c.span.0 && *p < c.span.1)
+            .map(|(_, ns)| ns.clone());
         let bound = |name: &str| {
             t_bindings
                 .iter()
                 .any(|(n, p)| n == name && *p >= c.span.0 && *p < c.span.1)
         };
         if bound("t") {
-            if bound("tr") {
+            if c.reuse.is_some() {
+                c.tname = if bound("tr") { "t" } else { "tr" };
+            } else if bound("tr") {
                 c.blocked = Some("`t` and `tr` are already defined in this component".into());
             } else {
                 c.tname = "tr";
@@ -274,6 +291,19 @@ pub fn analyze(path: &str, source: &str, lib: Lib) -> FileAnalysis {
         });
     }
     fa.candidates = keep;
+    // An existing `useTranslations("billing")` names the file's namespace, so its `t` fits the keys.
+    if lib == Lib::NextIntl
+        && let Some(ns) = fa.comps.iter().find_map(|c| c.reuse.clone().flatten())
+        && ns != fa.namespace
+    {
+        let old = format!("{}.", fa.namespace);
+        for c in &mut fa.candidates {
+            if let Some(leaf) = c.suggested_key.strip_prefix(&old) {
+                c.suggested_key = format!("{ns}.{leaf}");
+            }
+        }
+        fa.namespace = ns;
+    }
     for (i, c) in fa.candidates.iter_mut().enumerate() {
         c.id = i;
     }
@@ -293,6 +323,8 @@ struct Analyzer<'s, 'f> {
     roles: Vec<(Option<&'static str>, String)>,
     skip_text: usize,
     t_bindings: Vec<(String, u32)>,
+    /// `t` bound to a translator hook: (offset, namespace literal or None).
+    translators: Vec<(u32, Option<String>)>,
     text_props: BTreeMap<String, BTreeSet<String>>,
 }
 
@@ -301,6 +333,8 @@ enum Item<'b, 'a> {
     Text(Span),
     Str(Span, String),
     Arg(Span, &'b Expression<'a>),
+    /// `{n === 1 ? "item" : "items"}`, `{pluralize("item", n)}`: (count, one, other).
+    Plural(Span, &'b Expression<'a>, String, String),
     Tag(&'b JSXElement<'a>, String),
     Break(&'b JSXChild<'a>),
 }
@@ -421,7 +455,12 @@ impl<'s> Analyzer<'s, '_> {
                 Part::Arg { .. } => " ",
             })
             .collect();
-        let leaf = suggest_key(self.path, &slug_text, role);
+        let slug_role = if role == "meta title" {
+            "heading"
+        } else {
+            role
+        };
+        let leaf = suggest_key(self.path, &slug_text, slug_role);
         let leaf = leaf.rsplit_once('.').map_or(leaf.as_str(), |(_, l)| l);
         self.fa.candidates.push(Candidate {
             id: 0,
@@ -491,6 +530,10 @@ impl<'s> Analyzer<'s, '_> {
                         };
                         b.text(c);
                         if let Some(x) = t.expressions.get(i) {
+                            if let Some((n, one, other)) = plural_choice(x.get_inner_expression()) {
+                                b.plural(self.text_of(n.span()), n, &one, &other);
+                                continue;
+                            }
                             if !simple_value(x.get_inner_expression())
                                 && !matches!(
                                     x.get_inner_expression(),
@@ -545,8 +588,14 @@ impl<'s> Analyzer<'s, '_> {
                             None => Item::Break(child),
                         }
                     }
-                    x if simple_value(x) => Item::Arg(c.span, x),
-                    _ => Item::Break(child),
+                    x if simple_value(x) => match plural_choice(x) {
+                        Some((n, one, other)) => Item::Plural(c.span, n, one, other),
+                        None => Item::Arg(c.span, x),
+                    },
+                    x => match plural_choice(x) {
+                        Some((n, one, other)) => Item::Plural(c.span, n, one, other),
+                        None => Item::Break(child),
+                    },
                 },
                 None => Item::Break(child),
             },
@@ -627,6 +676,7 @@ impl<'s> Analyzer<'s, '_> {
             .filter_map(|i| match i {
                 Item::Text(s) => Some(jsx_clean(self.text_of(*s))),
                 Item::Str(_, s) => Some(s.clone()),
+                Item::Plural(_, _, _, other) => Some(other.clone()),
                 _ => None,
             })
             .collect::<Vec<_>>()
@@ -657,6 +707,7 @@ impl<'s> Analyzer<'s, '_> {
                 }
                 Item::Str(_, s) => b.text(s),
                 Item::Arg(_, e) => b.arg(self.text_of(e.span()), e),
+                Item::Plural(_, n, one, other) => b.plural(self.text_of(n.span()), n, one, other),
                 Item::Tag(el, tag) => {
                     let mut inner = String::new();
                     for c in &el.children {
@@ -693,7 +744,7 @@ impl<'s> Analyzer<'s, '_> {
                 let raw = self.text_of(*s);
                 s.start + (raw.len() - raw.trim_start().len()) as u32
             }
-            Item::Str(s, _) | Item::Arg(s, _) => s.start,
+            Item::Str(s, _) | Item::Arg(s, _) | Item::Plural(s, ..) => s.start,
             Item::Tag(el, _) => el.span.start,
             Item::Break(_) => unreachable!(),
         };
@@ -702,7 +753,7 @@ impl<'s> Analyzer<'s, '_> {
                 let raw = self.text_of(*s);
                 s.end - (raw.len() - raw.trim_end().len()) as u32
             }
-            Item::Str(s, _) | Item::Arg(s, _) => s.end,
+            Item::Str(s, _) | Item::Arg(s, _) | Item::Plural(s, ..) => s.end,
             Item::Tag(el, _) => el.span.end,
             Item::Break(_) => unreachable!(),
         };
@@ -729,6 +780,7 @@ impl<'s> Analyzer<'s, '_> {
                     hook,
                     blocked: None,
                     tname: "t",
+                    reuse: None,
                     config: config && n.starts_with("use"),
                     extra: vec![],
                 });
@@ -779,6 +831,7 @@ impl<'s> Analyzer<'s, '_> {
             },
             blocked: None,
             tname: "t",
+            reuse: None,
             config: false,
             extra: vec![
                 (
@@ -834,6 +887,11 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
     }
 
     fn visit_variable_declarator(&mut self, it: &VariableDeclarator<'a>) {
+        if let Some(init) = &it.init
+            && let Some(ns) = translator_ns(&it.id, init)
+        {
+            self.translators.push((it.span.start, ns));
+        }
         if let (BindingPattern::BindingIdentifier(id), Some(init)) = (&it.id, &it.init) {
             let target =
                 match init.get_inner_expression() {
@@ -949,7 +1007,8 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
                 .is_some_and(|(_, n)| n == "generateMetadata");
             let role = match attr_role(&k) {
                 // Page `<title>` / meta description, not a hover tooltip.
-                _ if in_metadata && k == "title" => "heading",
+                _ if in_metadata && k == "title" => "meta title",
+                _ if in_metadata && k == "description" => "meta description",
                 _ if in_metadata => "text",
                 Some(r) => r,
                 None if UI_KEYS.contains(&k.as_ref()) => "label",
@@ -963,6 +1022,10 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
 
     fn visit_call_expression(&mut self, it: &CallExpression<'a>) {
         let name = callee_name(&it.callee).unwrap_or_default();
+        // `cn("flex gap-2", ..)`, `cva(..)`: CSS classes, never copy.
+        if crate::scan::CLASS_FNS.contains(&name.as_str()) {
+            return;
+        }
         if (name == "toast" || name.starts_with("toast.") || name == "alert" || name == "confirm")
             && let Some(first) = it.arguments.first().and_then(|a| a.as_expression())
         {
@@ -1019,6 +1082,40 @@ impl<'a> Visit<'a> for Analyzer<'_, '_> {
             }
             _ => walk::walk_jsx_attribute(self, it),
         }
+    }
+}
+
+/// `const t = useTranslations("ns")`, `const t = await getTranslations()`, `const { t } = useTranslation()`:
+/// Some(namespace literal or None). A non-literal namespace or option is not reusable.
+fn translator_ns(id: &BindingPattern, init: &Expression) -> Option<Option<String>> {
+    let binds_t = match id {
+        BindingPattern::BindingIdentifier(b) => b.name == "t",
+        BindingPattern::ObjectPattern(o) => o.properties.iter().any(|p| {
+            p.key.static_name().as_deref() == Some("t")
+                && matches!(&p.value, BindingPattern::BindingIdentifier(b) if b.name == "t")
+        }),
+        _ => false,
+    };
+    let mut e = init.get_inner_expression();
+    if let Expression::AwaitExpression(a) = e {
+        e = a.argument.get_inner_expression();
+    }
+    let Expression::CallExpression(c) = e else {
+        return None;
+    };
+    let name = callee_name(&c.callee)?;
+    if !binds_t
+        || !["useTranslations", "getTranslations", "useTranslation"].contains(&name.as_str())
+    {
+        return None;
+    }
+    match c.arguments.as_slice() {
+        [] => Some(None),
+        [a] => match a.as_expression()?.get_inner_expression() {
+            Expression::StringLiteral(s) => Some(Some(s.value.to_string())),
+            _ => None,
+        },
+        _ => None,
     }
 }
 
@@ -1211,6 +1308,45 @@ impl MsgBuilder {
         self.parts.push(Part::Arg { name });
     }
 
+    /// Explicit plural; a directly preceding `{n} ` of the same count folds in as `#`.
+    fn plural(&mut self, src: &str, e: &Expression, one: &str, other: &str) {
+        self.has_text = true;
+        let (mut one, mut other) = (one.to_string(), other.to_string());
+        if let [.., Part::Arg { name }, Part::Text { text }] = self.parts.as_slice()
+            && !text.is_empty()
+            && text.trim().is_empty()
+            && self.args.iter().any(|(n, s)| n == name && s == src)
+        {
+            one = format!("# {one}");
+            other = format!("# {other}");
+            self.parts.truncate(self.parts.len() - 2);
+            self.numeric.truncate(self.numeric.len() - 2);
+        }
+        let arg = match self.args.iter().position(|(_, s)| s == src) {
+            Some(i) => {
+                let used = self
+                    .parts
+                    .iter()
+                    .any(|p| matches!(p, Part::Arg { name } if *name == self.args[i].0));
+                if !used && !self.args.iter().any(|(n, _)| n == "count") {
+                    self.args[i].0 = "count".into();
+                }
+                self.args[i].0.clone()
+            }
+            None => {
+                let n = if self.args.iter().any(|(n, _)| n == "count") {
+                    arg_name(e)
+                } else {
+                    "count".into()
+                };
+                self.args.push((n.clone(), src.to_string()));
+                n
+            }
+        };
+        self.parts.push(Part::Plural { arg, one, other });
+        self.numeric.push(false);
+    }
+
     fn tag(&mut self, tag: &str, text: String, open: String, close: String) {
         let base = snake(tag);
         let base = if base.is_empty() {
@@ -1276,6 +1412,95 @@ impl MsgBuilder {
             tags: self.tags,
             unknown_entity: self.unknown_entity,
         }
+    }
+}
+
+/// `n === 1 ? "item" : "items"` (also `!==`, `1 === n`, `n > 1` swapped), `pluralize("item", n)`,
+/// `pluralize(n, "item", "items")`: (count expression, one, other).
+fn plural_choice<'b, 'a>(e: &'b Expression<'a>) -> Option<(&'b Expression<'a>, String, String)> {
+    let word = |e: &Expression| match e.get_inner_expression() {
+        Expression::StringLiteral(s) if s.value.chars().any(char::is_alphabetic) => {
+            Some(s.value.to_string())
+        }
+        _ => None,
+    };
+    match e.get_inner_expression() {
+        Expression::ConditionalExpression(c) => {
+            let (a, b) = (word(&c.consequent)?, word(&c.alternate)?);
+            let Expression::BinaryExpression(t) = c.test.get_inner_expression() else {
+                return None;
+            };
+            let one = |x: &Expression| matches!(x.get_inner_expression(), Expression::NumericLiteral(n) if n.value == 1.0);
+            let (n, lit_right) = if one(&t.right) {
+                (&t.left, true)
+            } else if one(&t.left) {
+                (&t.right, false)
+            } else {
+                return None;
+            };
+            if !simple_value(n.get_inner_expression()) {
+                return None;
+            }
+            use BinaryOperator::*;
+            // `a` is shown when the test holds.
+            let singular_when_true = match (t.operator, lit_right) {
+                (Equality | StrictEquality, _) => true,
+                (Inequality | StrictInequality, _) => false,
+                (GreaterThan, true) | (LessThan, false) => false,
+                _ => return None,
+            };
+            let (one, other) = if singular_when_true { (a, b) } else { (b, a) };
+            Some((n.get_inner_expression(), one, other))
+        }
+        Expression::CallExpression(c)
+            if matches!(
+                callee_name(&c.callee).as_deref(),
+                Some("pluralize" | "plural")
+            ) =>
+        {
+            let args: Vec<&Expression> = c
+                .arguments
+                .iter()
+                .filter_map(|a| a.as_expression())
+                .collect();
+            let words: Vec<String> = args.iter().filter_map(|a| word(a)).collect();
+            let n = args.iter().find(|a| {
+                word(a).is_none()
+                    && !matches!(a.get_inner_expression(), Expression::BooleanLiteral(_))
+                    && simple_value(a.get_inner_expression())
+            })?;
+            let one = words.first()?.clone();
+            let other = words
+                .get(1)
+                .cloned()
+                .unwrap_or_else(|| english_plural(&one));
+            // `pluralize("item", n, true)` -> "3 items".
+            let inclusive = args.iter().any(
+                |a| matches!(a.get_inner_expression(), Expression::BooleanLiteral(b) if b.value),
+            );
+            Some(if inclusive {
+                (
+                    n.get_inner_expression(),
+                    format!("# {one}"),
+                    format!("# {other}"),
+                )
+            } else {
+                (n.get_inner_expression(), one, other)
+            })
+        }
+        _ => None,
+    }
+}
+
+// ponytail: regular English plurals only; irregular words should pass both forms.
+fn english_plural(w: &str) -> String {
+    let b = w.as_bytes();
+    if w.ends_with('y') && b.len() > 1 && !b"aeiou".contains(&b[b.len() - 2]) {
+        format!("{}ies", &w[..w.len() - 1])
+    } else if ["s", "x", "z", "ch", "sh"].iter().any(|s| w.ends_with(s)) {
+        format!("{w}es")
+    } else {
+        format!("{w}s")
     }
 }
 
@@ -1499,6 +1724,18 @@ pub fn rewrite(
     let ns = &fa.namespace;
     let prefix = format!("{ns}.");
     let scoped = lib == Lib::NextIntl && keys.values().all(|k| k.starts_with(&prefix));
+    let ns_ok = |reuse: &Option<String>| match lib {
+        Lib::NextIntl if scoped => reuse.as_deref() == Some(ns.as_str()),
+        _ => reuse.is_none(),
+    };
+    // (translator name, existing translator reused)
+    let tname = |ci: usize| -> (&str, bool) {
+        let comp = &fa.comps[ci];
+        match &comp.reuse {
+            Some(r) if ns_ok(r) => ("t", true),
+            _ => (comp.tname, false),
+        }
+    };
     let mut edits: Vec<(u32, u32, String)> = vec![];
     let mut used_comps = BTreeSet::new();
     for c in &fa.candidates {
@@ -1526,7 +1763,7 @@ pub fn rewrite(
         }
         let call = format!(
             "{}{}({k:?}{})",
-            fa.comps[c.comp].tname,
+            tname(c.comp).0,
             if rich { ".rich" } else { "" },
             if vals.is_empty() {
                 String::new()
@@ -1551,7 +1788,10 @@ pub fn rewrite(
     let (mut need_use, mut need_get) = (false, false);
     for &ci in &used_comps {
         let comp = &fa.comps[ci];
-        let t = comp.tname;
+        let (t, reused) = tname(ci);
+        if reused {
+            continue;
+        }
         let stmt = match lib {
             Lib::ReactI18next if t == "t" => "const { t } = useTranslation();".to_string(),
             Lib::ReactI18next => format!("const {{ t: {t} }} = useTranslation();"),
@@ -1914,6 +2154,51 @@ export default function InvoicesPage({ user, invoices }: Props) {
         let (fa, _) = run("app/page.tsx", src, Lib::NextIntl);
         set_text_props(BTreeMap::new());
         assert_eq!(texts(&fa), ["+12% vs last month"]);
+    }
+
+    #[test]
+    fn first_contact_patterns() {
+        // Plural ternary and pluralize(): one ICU message, not fragments.
+        let src = "export function Cart({ n, files }) {\n  return <div><p>{n} {n === 1 ? \"item\" : \"items\"} in your cart</p><p>Uploaded {pluralize(\"file\", files, true)}</p><p>{n !== 1 ? \"Rows\" : \"Row\"} selected</p></div>;\n}\n";
+        let (fa, out) = run("components/Cart.tsx", src, Lib::NextIntl);
+        assert_eq!(
+            texts(&fa),
+            [
+                "{count, plural, one {# item} other {# items}} in your cart",
+                "Uploaded {count, plural, one {# file} other {# files}}",
+                "{count, plural, one {Row} other {Rows}} selected",
+            ]
+        );
+        assert!(out.contains(r#"t("items_cart", { count: n })"#), "{out}");
+
+        // An existing translator is reused, with its namespace.
+        let src = "import { useTranslations } from \"next-intl\";\n\nexport function Billing() {\n  const t = useTranslations(\"billing\");\n  return <div><h1>{t(\"title\")}</h1><p>Manage your plan</p></div>;\n}\n";
+        let (fa, out) = run("components/Billing.tsx", src, Lib::NextIntl);
+        assert_eq!(fa.namespace, "billing");
+        assert!(out.contains(r#"<p>{t("manage_plan")}</p>"#), "{out}");
+        assert!(
+            !out.contains("tr") && out.matches("useTranslations(").count() == 1,
+            "{out}"
+        );
+        let src = "import { useTranslation } from \"react-i18next\";\n\nexport function Nav() {\n  const { t } = useTranslation();\n  return <p>Manage your plan</p>;\n}\n";
+        let (_, out) = run("src/Nav.tsx", src, Lib::ReactI18next);
+        assert!(
+            out.contains(r#"{t("nav.manage_plan")}"#)
+                && out.matches("useTranslation(").count() == 1,
+            "{out}"
+        );
+
+        // Root layout metadata: `layout` namespace, meta roles.
+        let src = "export const metadata = { title: \"Create Next App\", description: \"Generated by create next app\" };\n";
+        let (fa, _) = run("app/layout.tsx", src, Lib::NextIntl);
+        assert_eq!(fa.namespace, "layout");
+        let roles: Vec<&str> = fa.candidates.iter().map(|c| c.role.as_str()).collect();
+        assert_eq!(roles, ["meta title", "meta description"]);
+
+        // Avatar initials and class helpers are not copy.
+        let src = "export function U() {\n  return <div className={cn(\"flex gap-2\", \"Primary Button\")}><span>AL</span><b>{clsx(\"Big Title\")}</b></div>;\n}\n";
+        let (fa, _) = run("components/U.tsx", src, Lib::NextIntl);
+        assert!(fa.candidates.is_empty(), "{:?}", texts(&fa));
     }
 
     #[test]

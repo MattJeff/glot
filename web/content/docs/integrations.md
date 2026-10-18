@@ -73,17 +73,23 @@ jobs:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-It validates catalogs (inline annotations), translates the delta, commits catalogs and `glot.lock` to the PR branch, and keeps one PR comment up to date with coverage, issues and cost.
+It validates catalogs (inline annotations), translates the delta, commits the catalogs, `glot.lock` and `.glot/layout.json` to the PR branch (nothing else), and keeps one PR comment up to date with coverage, issues and cost. The binary is pinned to the action release and verified against the release's `SHA256SUMS`.
 
 | Input | Default | |
 |---|---|---|
 | `command` | `check` | `check`, `translate` or `both` |
 | `working-directory` | `.` | Directory containing `glot.toml` |
-| `version` | `latest` | glot release tag; skipped when `glot` is on PATH |
+| `version` | pinned to the action release | glot release tag, or `latest`; skipped when `glot` is on PATH |
 | `anthropic-api-key` | | Exported as `ANTHROPIC_API_KEY` |
+| `openai-api-key` | | Exported as `OPENAI_API_KEY` |
+| `llm-api-key` | | Exported under `llm.api_key_env` (else the provider's default variable) |
+| `anthropic-workspace-id` | | Exported as `ANTHROPIC_WORKSPACE_ID` (org-level keys `sk-ant-usr-…`) |
 | `comment` | `true` | Post or update the summary comment |
 | `fail-on-error` | `true` | Fail the job when `glot check` reports errors |
-| `github-token` | `github.token` | Used to push commits and comment |
+| `github-token` | `github.token` | Used to comment |
+| `token` | | PAT or GitHub App token used to push. Commits pushed with the default `GITHUB_TOKEN` do not trigger CI runs; set this if required checks must run on the translation commit |
+
+Permissions: `contents: write` to push (`contents: read` is enough for `command: check`), `pull-requests: write` to comment. Details in [`action/README.md`](https://github.com/MattJeff/glot/blob/main/action/README.md).
 
 Output: `check-exit-code`.
 

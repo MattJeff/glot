@@ -17,46 +17,41 @@ const DEMAND = [
 const REVIEW_SAMPLE = { source: "Send reminder", target: "Envoyer une relance", back: "Send a follow-up", locale: "fr" };
 
 const MATRIX = [
-  { locale: "en", label: "Send reminder", issues: 0 },
-  { locale: "de", label: "Erinnerung senden", issues: 1 },
-  { locale: "fr", label: "Envoyer une relance", issues: 0 },
-  { locale: "ja", label: "リマインダーを送信", issues: 0 },
-  { locale: "ar", label: "إرسال تذكير", issues: 0, rtl: true },
-  { locale: "es", label: "Enviar recordatorio", issues: 1 },
+  { locale: "en", sample: "Send reminder", issues: 0 },
+  { locale: "de", sample: "Erinnerung senden", issues: 1 },
+  { locale: "fr", sample: "Envoyer une relance", issues: 0 },
+  { locale: "ja", sample: "リマインダーを送信", issues: 0 },
+  { locale: "ar", sample: "إرسال تذكير", issues: 0, rtl: true },
+  { locale: "es", sample: "Enviar recordatorio", issues: 1 },
 ];
 
 export const COMMANDS = {
-  hero: ["npx glot init", "glot i18nize --yes", "glot translate"],
-  heroOutput: ["✓ 125 strings → keys, 14 files rewritten", "✓ fr  de  es  ja   125 written, 0 errors"],
   i18nize: "glot i18nize --yes",
   translate: "glot translate",
+  check: "glot check --format github",
   fit: "glot fit --locales de",
-  review: "glot review --locale fr",
 };
 
-export function Terminal({ label }: { label: string }) {
+/** Real recording (docs/launch/record/refusal.sh): the LLM is scripted to fail, the refusals are glot's. */
+export function RefusalDemo({ label, caption }: { label: string; caption: string }) {
   return (
-    <div dir="ltr" className="overflow-hidden rounded-xl border bg-card text-start shadow-sm">
-      <div className="flex items-center gap-1.5 border-b bg-muted/50 px-3 py-2">
-        <span aria-hidden className="size-2.5 rounded-full bg-muted-foreground/25" />
-        <span aria-hidden className="size-2.5 rounded-full bg-muted-foreground/25" />
-        <span aria-hidden className="size-2.5 rounded-full bg-muted-foreground/25" />
-        <span className="ms-2 truncate text-xs text-muted-foreground">{label}</span>
+    <figure className="min-w-0">
+      <div dir="ltr" className="overflow-hidden rounded-xl border bg-[#0b0f17] shadow-sm">
+        <video
+          src="/launch/refusal.webm"
+          poster="/launch/refusal.png"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label={label}
+          width={1100}
+          height={680}
+          className="h-auto w-full"
+        />
       </div>
-      <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed">
-        {COMMANDS.hero.map((c) => (
-          <div key={c}>
-            <span className="text-muted-foreground select-none">$ </span>
-            {c}
-          </div>
-        ))}
-        {COMMANDS.heroOutput.map((o) => (
-          <div key={o} className="text-success">
-            {o}
-          </div>
-        ))}
-      </pre>
-    </div>
+      <figcaption className="mt-2 text-xs text-muted-foreground">{caption}</figcaption>
+    </figure>
   );
 }
 
@@ -219,7 +214,7 @@ export async function MatrixTile() {
                 m.issues > 0 ? "w-3/4 border-dashed border-warning" : "w-full",
               )}
             >
-              {m.label}
+              {m.sample}
             </div>
           </li>
         ))}

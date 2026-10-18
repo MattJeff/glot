@@ -7,13 +7,15 @@ pub mod mock;
 pub mod pricing;
 pub mod provider;
 pub mod review;
+pub mod routing;
 pub mod seo;
+pub mod tm;
 pub mod translate;
 pub mod visual;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("missing API key: set {0}")]
+    #[error("missing API key: set {0} (or try without a key: glot translate --provider mock)")]
     MissingApiKey(String),
     #[error("provider error ({provider}): {message}")]
     Provider { provider: String, message: String },

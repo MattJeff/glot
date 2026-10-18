@@ -60,3 +60,16 @@ test("issue is attached to its key from catalogs alone (no data-glot-key)", asyn
     server.close();
   }
 });
+
+test("dev key markers: decoded first, invisible to text matching", async () => {
+  const { encodeKey, getGlotMessages } = await import("../../runtime/src/dev.ts");
+  const { decodeKeys } = await import("../src/keys.ts");
+  const m = getGlotMessages({ a: { save: "Save" }, "clé.ü": "Ça" }, true);
+  assert.equal(decodeKeys(m.a.save).keys[0], "a.save");
+  assert.deepEqual(decodeKeys(m["clé.ü"]), { keys: ["clé.ü"], text: "Ça" });
+  const idx = buildIndex({ first: "Save", second: "Save" });
+  assert.equal(match(idx, "Save"), "first");
+  assert.equal(match(idx, encodeKey("second") + "Save"), "second");
+  assert.equal(match(idx, ` ${encodeKey("zz")} `), "zz");
+  assert.equal(getGlotMessages({ a: "x" }, false).a, "x");
+});

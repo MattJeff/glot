@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import type { OverlayOptions } from "./index";
+import type { OverlayOptions } from "./index.js";
 
 /** `<GlotOverlay />` — mounts the overlay once on the client, dev only. Renders nothing. */
 export function GlotOverlay(props: OverlayOptions) {
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
     (window as any).GLOT_OVERLAY_MANUAL = true;
-    import("@glot/overlay").then((m) => m.init(props));
+    import("./index.js").then((m) => m.init(props));
   }, []);
   return null;
 }

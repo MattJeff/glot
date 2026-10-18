@@ -2,9 +2,9 @@
 
 **Title** (80 chars max):
 
-> Show HN: Glot – open-source i18n for SaaS where every LLM translation is validated
+> Show HN: Glot – your coding agent localizes your app, code refuses what's broken
 
-Alternative: `Show HN: Glot – a CLI + MCP server that internationalizes a React app and checks every translation`
+Alternative: `Show HN: Glot – LLM translations refused until they fit the button and keep the plurals`
 
 **URL**: https://github.com/MattJeff/glot
 
@@ -12,30 +12,22 @@ Alternative: `Show HN: Glot – a CLI + MCP server that internationalizes a Reac
 
 ---
 
-Hi HN, I built glot because every "AI translation" tool I tried would happily write `{count, plural, one {# article}}` into a Polish catalog (missing `few`/`many`), translate a placeholder name, or overwrite the fix a colleague made by hand last week.
+Hi HN. glot is a young open-source project (MIT, Rust CLI + MCP server) built on one idea: your coding agent can do the localization work, as long as deterministic code decides what gets written.
 
-glot is a Rust CLI (MIT) that sits next to the i18n library you already use (next-intl, i18next, FormatJS). The LLM is never trusted on its own:
+The README GIF shows the loop. The LLM proposes a Polish plural without `few`/`many`, renames `{name}` to `{nom}` in French, and gives a German button label that renders 276 px wide in a 120 px box. glot refuses all three with the exact reason ("missing plural categories required by pl: few, many", "placeholder `{nom}` does not exist in the source", "must fit in one line of 120px at Geist 14px/400; it renders 276px wide"), sends those reasons back to the model, checks the retries and writes only those. In that recording the LLM is scripted to fail on cue (a good model rarely does on demand); the binary and every message are real, and the script in the repo reruns it with a real model doing the retries.
 
-- Every output goes through a deterministic validator before it is written: ICU / i18next / MessageFormat 2 syntax, placeholders, CLDR plural categories of the target locale, rich-text tags, glossary terms, length. A failure is retried with the issues in the prompt, then escalated to a fallback model. If it still fails, nothing is written.
-- `glot.lock` hashes source and target per key. Only missing or stale strings are translated, and a translation edited by hand is never overwritten without `--force`.
-- `glossary.toml` lives in the repo and is enforced by the validator.
+Two things I have not seen elsewhere:
 
-It also does the part before translation. On the demo app in the repo (a small Next.js invoicing SaaS with everything hardcoded), `glot extract` finds 117 hardcoded strings; `glot i18nize` rewrites the code to `t()` calls (including turning `"You have " + n + " overdue invoices"` into an ICU plural) and wires next-intl; `extract` then reports none left. It supports Next (App and Pages Router), React Router 7/8, Astro with React islands and Vite + React.
+- **Pixel budgets.** `glot measure` records each key's box (width, lines, font) from your running app. Translations are then shaped with that font file (rustybuzz, no browser) and refused if they don't fit, before they are written. `glot fit` shortens what already overflows and re-renders until it fits.
+- **The validator in the loop**, not after it: ICU / i18next / MessageFormat 2 syntax, placeholders, CLDR plural categories of the target locale, glossary terms and width are checked on every model output. A failure is retried with the issues in the prompt (2 retries, then a fallback model). If it still fails, nothing is written and the key is reported.
 
-Other pieces, all in the same repo:
+Around that: `glot.lock` hashes source and target per key, so only the delta is translated and a hand edit is never overwritten without `--force`. `glot i18nize` moves hardcoded strings to keys and rewrites JSX for next-intl or react-i18next (117 hardcoded strings → 0 on the demo app in the repo). `glot mcp` lets Claude Code, Cursor or Codex see your keys, where they are used and the glossary, and add strings through the same validator.
 
-- `glot mcp`: an MCP server so Claude Code, Cursor or Codex get your keys, where each is used (file:line, UI role, component), the glossary and notes, and add strings through `propose_string` → `add_string` instead of hardcoding them.
-- `glot measure` records each key's pixel box from the running app; the validator then shapes translations with rustybuzz (no browser) and flags the ones that will not fit. `glot fit` shortens what overflows and re-renders until it fits.
-- `glot dev` + a 6 kB overlay: Alt+click any text in your running app to edit it in every locale, validated on save.
-- An optional self-hosted dashboard (Rust/axum + Postgres + Next.js). The dashboard itself is translated by glot in CI.
+What it is not (yet): code rewriting is JS/TS/JSX only; pixel budgets need your app running locally with Playwright; the self-hosted server and dashboard are experimental; SEO, database content, emails/images and task parity live under `glot labs` because they are newer and less used.
 
-Costs: you bring your own key. With Haiku as the default model, translating 850 strings with `--batch` (Anthropic's Message Batches API, -50 %) cost $0.035. The system prompt with the glossary is a cached prefix, so repeated batches pay ~10 % of it. `glot translate --dry-run` prints an estimate first; an early version underestimated (real $0.071 vs a $0.060 "max") because it ignored that every retry re-sends the system prompt, which is now modeled.
+Bring your own key (Anthropic, OpenAI, any OpenAI-compatible endpoint). `npx glot-i18n init` to try it, `--provider mock` to try it without a key.
 
-Known limits: code rewriting is for JS/TS/JSX only; the Astro setup shares one i18next instance (fine for static builds, not for concurrent SSR); visual features need your app running locally with Playwright; the on-device fallback for unshipped languages uses Chrome's Translator API, so other browsers fall back to the source language.
-
-Install: `npx glot-i18n init`, `brew install mattjeff/glot/glot`, or the Claude Code plugin (`claude plugin marketplace add MattJeff/glot`).
-
-I would love feedback on the validator rules and on what breaks with your stack.
+I'd love feedback on the validator rules and on what breaks with your stack.
 
 ---
 
@@ -43,4 +35,5 @@ Notes for posting:
 
 - Post Tuesday–Thursday, 8–10am US Eastern. Stay in the thread for the first 3 hours.
 - Do not ask for upvotes anywhere. Reply to every technical question with specifics and links to code.
-- Likely questions to prepare for: why not Lingo.dev / Tolgee (point to `docs/comparison-sources.md`), privacy (what is sent to the LLM: strings + context, not source files, no telemetry), quality vs DeepL, why Rust.
+- Say "scripted LLM" before anyone asks; link `docs/launch/record/refusal.sh`. Re-record with a real model for the retries before posting if you can (see the checklist).
+- Likely questions: why not Lingo.dev / Tolgee (point to `docs/comparison-sources.md`), privacy (strings + context are sent to the LLM, not source files, no telemetry), quality vs DeepL, why Rust, cost (`glot translate --dry-run` prints an estimate; quote a number only with its setup written down).

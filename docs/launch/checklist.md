@@ -16,6 +16,7 @@ Drafts in this folder: [Show HN](show-hn.md), [Product Hunt](product-hunt.md), [
   - [ ] "-50 %" batch and "~10 %" cached prefix match Anthropic's current pricing;
   - [ ] overlay "~6 kB gzip" (`packages/overlay`, `pnpm build`).
 - [x] fit before/after re-recorded with a real model ("Zahlungserinnerung senden" → "Mahnung", claude-haiku-5-5, $0.0002).
+- [ ] Re-record the refusal demo with a real model doing the retries (step 6), and update its caption in the README and the landing (`landing.hero.demoCaption`).
 - [ ] Re-record i18nize / overlay / locale matrix with a real model (they use the mock provider, which prefixes `⟦de⟧`), see below.
 - [ ] README renders on GitHub: GIFs load (i18nize.gif is ~5.5 MB), links resolve.
 - [x] Locale matrix: the source-locale frame now keeps its `/{locale}` prefix, so cookie routing no longer leaks another frame's locale.
@@ -63,8 +64,16 @@ node docs/launch/record/overlay.mjs $WORK
 #    with preview settings {base_url: "http://localhost:3255", url_pattern: "/{locale}{route}"}; session cookie in $WORK/cj
 node docs/launch/record/matrix.mjs $WORK 1
 
+# 6. Refusal (README hero): real glot binary, LLM scripted to fail on the first pass
+CARGO_TARGET_DIR=target/integ cargo build -p glot-cli
+docs/launch/record/refusal.sh $WORK/refusal
+#    with a real model doing the retries (first pass still injected; any OpenAI-compatible endpoint):
+UPSTREAM=https://api.anthropic.com/v1 UPSTREAM_KEY=$ANTHROPIC_API_KEY MODEL=claude-haiku-5-5 docs/launch/record/refusal.sh $WORK/refusal
+LABEL="first pass injected, retries by claude-haiku-5-5" python3 docs/launch/record/refusal-term.py $WORK/refusal
+node docs/launch/record/term.mjs $WORK/refusal     # then ffmpeg below -> web/public/launch/refusal.{webm,gif}, last frame -> refusal.png
+
 # GIFs
 ffmpeg -i in.webm -vf "fps=10,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle" out.gif
 ```
 
-Outputs go to `web/public/launch/` (`i18nize`, `overlay`, `locale-matrix` as `.gif` + `.webm`, `fit-before-after.png`, `overlay.png`, `locale-matrix.png`). Scripts write their files under `$WORK` (videos in `$WORK/vid/…`).
+Outputs go to `web/public/launch/` (`refusal`, `i18nize`, `overlay`, `locale-matrix` as `.gif` + `.webm`, `fit-before-after.png`, `overlay.png`, `locale-matrix.png`). Scripts write their files under `$WORK` (videos in `$WORK/vid/…`).

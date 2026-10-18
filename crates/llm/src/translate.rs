@@ -49,6 +49,9 @@ pub struct Translated {
     /// Remaining issues after retries (errors => value must not be written).
     pub issues: Vec<Issue>,
     pub attempts: u8,
+    /// Attempts the validator refused before this one: (model, value, issues). Shown by `glot translate`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub refused: Vec<(String, String, Vec<Issue>)>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -109,6 +112,8 @@ const MAX_TOKENS: u32 = 16_000;
 /// optional judge -> items under score_threshold get a LowScore warning.
 pub struct Translator {
     provider: Box<dyn Provider>,
+    /// Serves `fallback_model` (and a judge on that model) when it lives on another provider.
+    fallback_provider: Option<Box<dyn Provider>>,
     model: String,
     fallback_model: Option<String>,
     judge_model: Option<String>,
@@ -121,6 +126,7 @@ impl Translator {
     pub fn new(cfg: &Config, provider: Box<dyn Provider>) -> Self {
         Self {
             provider,
+            fallback_provider: None,
             model: cfg.llm.model.clone(),
             fallback_model: cfg
                 .llm
@@ -134,14 +140,27 @@ impl Translator {
         }
     }
 
+    /// Cross-provider escalation: `fallback_model` is called on `p` (`llm.fallback_provider`).
+    pub fn with_fallback_provider(mut self, p: Option<Box<dyn Provider>>) -> Self {
+        self.fallback_provider = p;
+        self
+    }
+
+    fn provider_for(&self, model: &str) -> &dyn Provider {
+        match &self.fallback_provider {
+            Some(p) if self.fallback_model.as_deref() == Some(model) => p.as_ref(),
+            _ => self.provider.as_ref(),
+        }
+    }
+
     pub async fn translate(&self, req: Request) -> Result<(Vec<Translated>, Usage)> {
         self.translate_from(req, &BTreeMap::new()).await
     }
 
     /// First-pass prompts of every batch of `req`, keyed by `request_id` (Message Batches custom ids).
     pub fn first_pass(&self, req: &Request) -> Vec<(String, CompletionRequest)> {
-        req.items
-            .chunks(self.batch_size)
+        split(req, &self.model, self.batch_size)
+            .into_iter()
             .map(|chunk| {
                 let batch: Vec<_> = chunk.iter().map(|i| (i, None)).collect();
                 let c = completion_request(req, &self.model, &batch);
@@ -158,9 +177,8 @@ impl Translator {
         firsts: &BTreeMap<String, Completion>,
     ) -> Result<(Vec<Translated>, Usage)> {
         // Futures built eagerly (they are lazy): a closure inside the stream breaks `Send` (rustc higher-ranked lifetime issue).
-        let batches: Vec<_> = req
-            .items
-            .chunks(self.batch_size)
+        let batches: Vec<_> = split(&req, &self.model, self.batch_size)
+            .into_iter()
             .map(|chunk| {
                 let first = (!firsts.is_empty())
                     .then(|| {
@@ -199,6 +217,7 @@ impl Translator {
                 score: None,
                 issues: vec![],
                 attempts: 0,
+                refused: vec![],
             })
             .collect();
 
@@ -238,6 +257,10 @@ impl Translator {
                 t.attempts += 1;
                 match values.get(&items[i].key).and_then(Value::as_str) {
                     Some(v) => {
+                        if validate::has_errors(&t.issues) && !t.value.is_empty() {
+                            t.refused
+                                .push((t.model.clone(), t.value.clone(), t.issues.clone()));
+                        }
                         t.value = v.to_string();
                         t.model = model.to_string();
                         t.issues = self.check(req, &items[i], v);
@@ -269,7 +292,7 @@ impl Translator {
                 .collect();
             if !ji.is_empty() {
                 match judge::judge(
-                    self.provider.as_ref(),
+                    self.provider_for(jm),
                     jm,
                     &req.source_locale,
                     &req.target_locale,
@@ -305,6 +328,62 @@ impl Translator {
                 }
             }
         }
+
+        // Score escalation: what the judge rated under `score_threshold` gets one pass on
+        // `fallback_model` (e.g. local first pass -> remote model), kept only if it validates.
+        if let Some(fb) = self.fallback_model.as_deref() {
+            let low: Vec<usize> = (0..items.len())
+                .filter(|&i| {
+                    done[i].model != fb && done[i].score.is_some_and(|s| s < self.score_threshold)
+                })
+                .collect();
+            if !low.is_empty() {
+                // The judge's notes go back as issues to fix (the prompt only lists errors).
+                let prev: Vec<Translated> = low
+                    .iter()
+                    .map(|&i| {
+                        let mut t = done[i].clone();
+                        for x in t
+                            .issues
+                            .iter_mut()
+                            .filter(|x| x.code == IssueCode::LowScore)
+                        {
+                            x.severity = Severity::Error;
+                        }
+                        t
+                    })
+                    .collect();
+                let batch: Vec<_> = low
+                    .iter()
+                    .zip(&prev)
+                    .map(|(&i, p)| (&items[i], Some(p)))
+                    .collect();
+                match self.call(req, fb, &batch).await {
+                    Ok((values, u)) => {
+                        usage.add(&u);
+                        for &i in &low {
+                            let Some(v) = values.get(&items[i].key).and_then(Value::as_str) else {
+                                continue;
+                            };
+                            let issues = self.check(req, &items[i], v);
+                            if validate::has_errors(&issues) {
+                                continue;
+                            }
+                            let t = &mut done[i];
+                            t.refused
+                                .push((t.model.clone(), t.value.clone(), t.issues.clone()));
+                            t.value = v.to_string();
+                            t.model = fb.to_string();
+                            // ponytail: the escalated value is not re-judged; its score comes from the validator only.
+                            t.score = None;
+                            t.issues = issues;
+                            t.attempts += 1;
+                        }
+                    }
+                    Err(e) => tracing::warn!("score escalation failed: {e}"),
+                }
+            }
+        }
         Ok((done, usage))
     }
 
@@ -334,7 +413,7 @@ impl Translator {
         batch: &[(&Item, Option<&Translated>)],
     ) -> Result<(Map<String, Value>, Usage)> {
         let c = self
-            .provider
+            .provider_for(model)
             .complete(completion_request(req, model, batch))
             .await?;
         Ok(parse_completion(&c, model))
@@ -350,6 +429,33 @@ fn parse_completion(c: &Completion, model: &str) -> (Map<String, Value>, Usage) 
         tracing::warn!(model, "could not parse JSON from model output");
     }
     (map.unwrap_or_default(), Usage::of_completion(c))
+}
+
+/// Batches of at most `batch_size` items whose prompt stays under the model's long-prompt threshold
+/// (Claude Haiku 5.5 bills a request whose prompt exceeds 100K tokens at 5x). Deterministic: the
+/// Message Batches custom ids depend on it.
+pub fn split<'a>(req: &'a Request, model: &str, batch_size: usize) -> Vec<&'a [Item]> {
+    let batch_size = batch_size.max(1);
+    let Some(limit) = pricing::long_prompt_threshold(model) else {
+        return req.items.chunks(batch_size).collect();
+    };
+    // ponytail: char heuristic with the tokenizer margin; `--visual` image crops are not counted.
+    let budget = (limit as f64 / TOKENIZER_MAX) as u64;
+    let fixed = estimate_tokens(&system_prompt(req));
+    let mut out = vec![];
+    let (mut start, mut used) = (0, fixed);
+    for (i, item) in req.items.iter().enumerate() {
+        let t = estimate_tokens(&user_prompt(req, &[(item, None)]));
+        if i > start && (i - start >= batch_size || used + t > budget) {
+            out.push(&req.items[start..i]);
+            (start, used) = (i, fixed);
+        }
+        used += t;
+    }
+    if start < req.items.len() {
+        out.push(&req.items[start..]);
+    }
+    out
 }
 
 /// Content hash of a request (16 hex chars): stable Message Batches custom id.
@@ -447,7 +553,12 @@ pub fn estimate(cfg: &Config, req: &Request) -> Usage {
 pub fn estimate_full(cfg: &Config, req: &Request, crops: &BTreeMap<Key, String>) -> Estimate {
     let mut est = Estimate::default();
     let mut expected_batched = 0.0;
-    let model = cfg.llm.model.as_str();
+    let local = format!("local:{}", cfg.llm.model);
+    let model = if cfg.llm.provider == "local" {
+        local.as_str()
+    } else {
+        cfg.llm.model.as_str()
+    };
     let fallback = cfg.llm.fallback_model.as_deref().filter(|m| *m != model);
     let factor = output_factor(&req.target_locale);
     let src_cats = plural::categories(&req.source_locale).len().max(1) as f64;
@@ -513,7 +624,10 @@ pub fn estimate_full(cfg: &Config, req: &Request, crops: &BTreeMap<Key, String>)
         pricing::cost_cached_usd(m, t(user), t(sys), 0, t(out))
     };
     let mut max = 0.0;
-    for (n, chunk) in req.items.chunks(cfg.llm.batch_size.max(1)).enumerate() {
+    for (n, chunk) in split(req, model, cfg.llm.batch_size.max(1))
+        .into_iter()
+        .enumerate()
+    {
         let all: Vec<&Item> = chunk.iter().collect();
         let len = chunk.len() as f64;
         // First pass. Up to CONCURRENCY batches start together: they all write the cache.
@@ -543,6 +657,7 @@ pub fn estimate_full(cfg: &Config, req: &Request, crops: &BTreeMap<Key, String>)
                         message: "placeholder {name} is missing from the translation".into(),
                     }],
                     attempts: 1,
+                    refused: vec![],
                 })
                 .collect();
             let batch: Vec<_> = picked
@@ -611,6 +726,12 @@ fn syntax_rules(syntax: Syntax) -> &'static str {
         }
         Syntax::Mf2 => {
             "Unicode MessageFormat 2: keep every {$var}, {$var :function option=value}, .input/.local/.match declarations and variant keys verbatim; translate only the pattern text."
+        }
+        Syntax::Printf => {
+            "printf-style (iOS/Android/gettext): keep every %@, %d, %s, %1$s, %2$@, %.2f, %(name)s and %% verbatim (positional %1$s may be reordered, never change the conversion letter). Plurals are wrapped as {count, plural, one {...} other {...}}: never translate the argument name, the keyword or the selectors; translate only the text inside the option braces."
+        }
+        Syntax::Rails => {
+            "Rails i18n: keep every %{name} interpolation verbatim. Plurals are wrapped as {count, plural, one {...} other {...}}: never translate the argument name, the keyword or the selectors; translate only the text inside the option braces."
         }
     }
 }
@@ -772,6 +893,36 @@ pub(crate) fn parse_json(text: &str) -> Option<Value> {
 #[cfg(test)]
 mod tests {
     use super::parse_json;
+
+    #[test]
+    fn split_under_long_prompt_threshold() {
+        use super::*;
+        let item = |n: usize| Item {
+            key: format!("k{n}"),
+            source: "x".repeat(20_000),
+            context: KeyContext::default(),
+            previous: None,
+        };
+        let req = Request {
+            source_locale: "en".into(),
+            target_locale: "fr".into(),
+            items: (0..40).map(item).collect(),
+            glossary: vec![],
+            syntax: Syntax::Icu,
+            style: None,
+        };
+        // 40 x ~5.7K tokens: Haiku 5.5 batches stay under 100K / 1.3, no threshold for Sonnet.
+        let h = split(&req, "claude-haiku-5-5", 100);
+        assert!(h.len() > 1);
+        assert_eq!(h.iter().map(|c| c.len()).sum::<usize>(), 40);
+        for c in &h {
+            let batch: Vec<_> = c.iter().map(|i| (i, None)).collect();
+            let r = completion_request(&req, "claude-haiku-5-5", &batch);
+            assert!(estimate_tokens(&r.system) + estimate_tokens(&r.user) < 100_000);
+        }
+        assert_eq!(split(&req, "claude-sonnet-5-5", 100).len(), 1);
+        assert_eq!(split(&req, "claude-sonnet-5-5", 15).len(), 3);
+    }
 
     #[test]
     fn lenient_json() {

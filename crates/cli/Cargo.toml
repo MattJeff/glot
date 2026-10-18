@@ -41,6 +41,8 @@ oxc_syntax = "0.154"
 # glot assets (SVG / OG images -> PNG); same rustybuzz/ttf-parser as glot-core
 log = "0.4"
 resvg = { version = "0.45", default-features = false, features = ["text", "system-fonts", "memmap-fonts"] }
+# glot queue import (XLIFF)
+roxmltree = "0.20"
 
 [dev-dependencies]
 assert_cmd = "2"

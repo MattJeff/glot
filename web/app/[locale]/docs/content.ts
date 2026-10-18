@@ -7,9 +7,10 @@ import { GITHUB_URL } from "@/lib/snippets";
 // Page and section titles shown in the chrome come from messages (`docs.pages.*`, `docs.sections.*`).
 export const NAV = [
   { section: "start", pages: ["getting-started", "concepts"] },
-  { section: "agents", pages: ["mcp", "integrations"] },
-  { section: "guides", pages: ["frameworks", "runtime", "insights", "self-hosting"] },
-  { section: "reference", pages: ["cli", "faq"] },
+  { section: "agents", pages: ["mcp", "integrations", "skills"] },
+  { section: "guides", pages: ["frameworks", "runtime", "quality", "provenance"] },
+  { section: "reference", pages: ["cli", "faq", "benchmark"] },
+  { section: "labs", pages: ["labs", "insights", "self-hosting", "deploy-hetzner", "mcp-remote"] },
 ] as const;
 
 export type Slug = (typeof NAV)[number]["pages"][number];

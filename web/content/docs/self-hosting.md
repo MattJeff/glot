@@ -1,5 +1,7 @@
 # Self-hosting
 
+> **Experimental.** The server and dashboard work (the dashboard is translated by glot in CI) but are young: expect rough edges and breaking changes between minor versions, and back up the database. The stable core is the CLI and the MCP server, which need no server at all.
+
 The CLI and the MCP server work with no server at all: Git is the source of truth. The optional server adds a shared dashboard (keys editor, review, glossary, jobs, locale matrix, visual reports, [Insights](insights.md)), an HTTP API, and an OTA CDN for catalogs. It is the same open-source code; there is no hosted-only feature.
 
 ## Docker Compose
@@ -22,6 +24,10 @@ Three services: `postgres` (17), `server` (Rust, axum) and `web` (Next.js standa
 | `GLOT_WEB_ORIGIN` | `http://localhost:3100` | Set it to the dashboard URL if you change the web port or put it behind a domain |
 | `GLOT_API_URL` (web build arg) | `http://server:8790` | Baked into the Next build (rewrites are resolved at build time): changing it means rebuilding `web` |
 | `GLOT_INSIGHTS_RATE_PER_MIN` | 1200 | Insights beacon budget per project per minute |
+| `GLOT_FEEDBACK_RATE_PER_MIN` | 30 | Feedback widget budget per project per minute |
+| `DATABASE_URL` | set by Compose | Postgres URL (required when running `glot-server` outside Compose) |
+| `GLOT_BIND` | `127.0.0.1:8790` | Listen address of `glot-server` outside Compose |
+| `GLOT_GITHUB_API` | `https://api.github.com` | GitHub API base for feedback PRs (GitHub Enterprise) |
 
 Only Postgres needs a volume. Put the web container behind your reverse proxy with TLS; it proxies `/api` and `/cdn` to the server, so one origin is enough and the session cookie just works.
 

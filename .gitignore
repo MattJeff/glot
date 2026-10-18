@@ -5,3 +5,5 @@ node_modules
 *.log
 .glot/
 *.tsbuildinfo
+.env.*
+!.env.example

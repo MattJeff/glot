@@ -1,0 +1,39 @@
+# French translations for Acme.
+msgid ""
+msgstr ""
+"Project-Id-Version: acme 1.0\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Title of the dashboard page
+#: templates/dashboard.html:12
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: views.py:40
+#, python-format
+msgid "Welcome, %(name)s!"
+msgstr ""
+
+#, fuzzy, python-format
+msgid "You have %(count)s unread message"
+msgid_plural "You have %(count)s unread messages"
+msgstr[0] "Vous avez %(count)s message"
+msgstr[1] "Vous avez %(count)s messages"
+
+msgctxt "verb"
+msgid "Open"
+msgstr "Ouvrir"
+
+msgid ""
+"A long text that spans "
+"several lines.\n"
+msgstr ""
+"Un long texte qui s'étend "
+"sur plusieurs lignes.\n"
+
+#~ msgid "Old"
+#~ msgstr "Ancien"

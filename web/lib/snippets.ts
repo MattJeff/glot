@@ -26,9 +26,9 @@ export const DEMO = {
   source: `"checkout.items": "{count, plural,
   one {# item} other {# items}}"`,
   diff: [
-    { sign: "+", text: `"items": "{count, plural, one {# article} other {# articles}}"` },
-    { sign: "+", text: `"pay": "Payer {amount}"` },
-    { sign: "~", text: "glot.lock  2 entries" },
+    { sign: "+", code: `"items": "{count, plural, one {# article} other {# articles}}"` },
+    { sign: "+", code: `"pay": "Payer {amount}"` },
+    { sign: "~", code: "glot.lock  2 entries" },
   ],
   file: "messages/fr.json",
 };

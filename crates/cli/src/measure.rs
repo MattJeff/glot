@@ -1,7 +1,7 @@
 //! `glot measure`: render the source locale, record each key's pixel budget in `.glot/layout.json`
 //! (box width × lines + font) and save the app's webfonts to `.glot/fonts/`. `glot translate` then
 //! rejects translations that would not fit, before writing them.
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use std::process::ExitCode;
 
 use glot_core::measure::{FONTS_DIR, Fit, LAYOUT_FILE, load_layout, measure_text, save_layout};
@@ -24,7 +24,7 @@ pub fn run(a: MeasureArgs) -> Result<ExitCode> {
         qa.routes.join(","),
         qa.viewports.join(",")
     );
-    let o = crate::fit::qa_command()
+    let o = crate::fit::node_tool("visual-qa")
         .current_dir(&ws.root)
         .args([
             "--base-url",
@@ -50,9 +50,9 @@ pub fn run(a: MeasureArgs) -> Result<ExitCode> {
         .arg("--out")
         .arg(&out)
         .output()
-        .context("cannot run visual-qa (node >= 25 and packages/visual-qa deps installed?)")?;
+        .with_context(|| crate::fit::tool_missing("visual-qa"))?;
     if !o.status.success() {
-        bail!("visual-qa failed: {}", String::from_utf8_lossy(&o.stderr));
+        return Err(crate::fit::tool_failed("visual-qa", &o.stderr));
     }
     let report: serde_json::Value = serde_json::from_str(
         &std::fs::read_to_string(out.join("report.json"))
@@ -104,6 +104,48 @@ pub fn run(a: MeasureArgs) -> Result<ExitCode> {
         anstream::println!(
             "  {BOLD}{key}{BOLD:#}  {DIM}{}{DIM:#}",
             glot_core::measure::hint(fit)
+        );
+    }
+    // A key rendered in boxes of different sizes keeps the tightest; the detail stays in layout.json.
+    for (key, fit) in &measured {
+        let mut widths: Vec<f32> = fit.occurrences.iter().map(|o| o.max_width_px).collect();
+        widths.sort_by(f32::total_cmp);
+        widths.dedup();
+        if widths.len() > 1 {
+            anstream::println!(
+                "  {BOLD}{key}{BOLD:#}  {DIM}{} occurrence(s), budgets {}px → {}px kept{DIM:#}",
+                fit.occurrences.len(),
+                widths
+                    .iter()
+                    .map(|w| w.to_string())
+                    .collect::<Vec<_>>()
+                    .join("/"),
+                fit.max_width_px
+            );
+        }
+    }
+    // Same source text under several keys, mapped by text: only the first key got a budget.
+    let mut by_text: std::collections::BTreeMap<String, Vec<&String>> = Default::default();
+    for (k, v) in &source.entries {
+        by_text.entry(v.trim().to_lowercase()).or_default().push(k);
+    }
+    let ambiguous: Vec<String> = measured
+        .iter()
+        .filter(|(_, f)| f.occurrences.iter().any(|o| o.by == "text"))
+        .filter_map(|(k, _)| {
+            let same = &by_text[&source.entries.get(k)?.trim().to_lowercase()];
+            (same.len() > 1).then(|| {
+                same.iter()
+                    .map(|s| s.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" = ")
+            })
+        })
+        .collect();
+    if !ambiguous.is_empty() {
+        anstream::println!(
+            "{YELLOW}ambiguous{YELLOW:#} same text under several keys, mapped to the first: {}. Run the app with GLOT_DEV_KEYS=1 (getGlotMessages from @glot/runtime/dev) for exact keys.",
+            ambiguous.join(", ")
         );
     }
     if !drift.is_empty() {

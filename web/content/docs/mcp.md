@@ -27,7 +27,7 @@ The server instructions tell the agent: before adding UI text, call `propose_str
 | `check` | Deterministic QA, no network. At most 100 issues per call with the total; page with `offset`. |
 | `set_translation` | Sets one translation by hand (recorded as human, never overwritten by `translate`). Nothing is written if it fails validation. |
 | `find_hardcoded` | User-visible literals not wrapped in a translation call, with file:line, UI role, component and a suggested key. |
-| `internationalize_file` | Converts a whole file in one step (same engine as `glot i18nize`). `dry_run` (default `true`) returns the diff, the keys and the skipped strings; `dry_run: false` writes the file and the source catalog. |
+| `i18nize_file` | Converts a whole file in one step (same engine as `glot i18nize`). `dry_run` (default `true`) returns the diff, the keys and the skipped strings; `dry_run: false` writes the file and the source catalog. |
 | `glossary_lookup` | Glossary terms; with `text`, only the terms it contains. |
 | `glossary_upsert` | Adds or updates a term. If it conflicts with an existing translation, the human is asked (elicitation) when the client supports it; otherwise nothing is written unless `overwrite: true`. |
 | `remove_keys` | Deletes keys from every catalog and the lock; warns if they are still referenced in code. |

@@ -6,8 +6,11 @@ mod dev;
 mod fit;
 mod i18nize;
 mod init;
+mod localize;
 mod measure;
 mod parity;
+mod provenance;
+mod queue;
 mod review;
 mod seo;
 mod setup;
@@ -34,7 +37,12 @@ pub mod style {
 use style::*;
 
 #[derive(Parser)]
-#[command(name = "glot", version, about = "AI-native localization for SaaS apps")]
+#[command(
+    name = "glot",
+    version,
+    about = "Your coding agent localizes your app; deterministic code guarantees nothing broken or too long lands in your catalogs.",
+    help_template = HELP
+)]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
@@ -78,6 +86,9 @@ enum Cmd {
         /// Resumable: rerun the same command if interrupted.
         #[arg(long)]
         batch: bool,
+        /// LLM provider for this run, overriding glot.toml (`mock`: offline, free, no API key).
+        #[arg(long, value_parser = ["mock", "anthropic", "openai", "openai-compatible"])]
+        provider: Option<String>,
         #[command(flatten)]
         qa: fit::QaArgs,
     },
@@ -86,6 +97,7 @@ enum Cmd {
     /// Record each key's pixel budget (box width, lines, font) from the running app into .glot/layout.json.
     Measure(measure::MeasureArgs),
     /// Plural/select branch coverage per locale and CLDR category (`--render`: check each branch in a browser).
+    #[command(hide = true)] // legacy spelling of `glot labs coverage`
     Coverage(coverage::CoverageArgs),
     /// Hardcoded strings in code, plus missing and unused keys.
     Extract {
@@ -93,6 +105,7 @@ enum Cmd {
         json: bool,
     },
     /// Source keys never referenced in code.
+    #[command(hide = true)] // legacy spelling of `glot labs unused`
     Unused {
         /// Delete them from every catalog.
         #[arg(long)]
@@ -118,26 +131,150 @@ enum Cmd {
     #[command(subcommand)]
     Glossary(GlossaryCmd),
     /// Back-translate translations and explain them; `--stale` sorts cosmetic vs real source changes.
+    #[command(hide = true)] // legacy spelling of `glot labs review`
     Review(review::ReviewArgs),
-    /// Upload catalogs, lock and glossary to the glot server.
+    /// (experimental server) Upload catalogs, lock and glossary to the glot server.
     Push,
-    /// Download catalogs, lock and glossary from the glot server.
+    /// (experimental server) Download catalogs, lock and glossary from the glot server.
     Pull,
     /// Run the MCP server on stdio.
     Mcp,
     /// Convert hardcoded UI strings to translation keys and rewrite the code (next-intl / react-i18next).
     I18nize(i18nize::I18nizeArgs),
     /// Localize emails, SVG and OG images: i18nize, translate, render per locale, check.
+    #[command(hide = true)] // legacy spelling of `glot labs assets`
     Assets(assets::AssetsArgs),
     /// Local server for the in-app editing overlay (@glot/overlay).
     Dev(dev::DevArgs),
+    /// Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success.
+    #[command(hide = true)] // legacy spelling of `glot labs parity`
+    Parity(parity::ParityArgs),
+    /// Multilingual SEO: audit hreflang/canonical/metadata per locale, fix Next.js, localize keywords.
+    #[command(hide = true)] // legacy spelling of `glot labs seo`
+    Seo(seo::SeoArgs),
+    /// Translate database content (catalog, help articles…) into glot_translations (Postgres).
+    #[command(hide = true)] // legacy spelling of `glot labs db`
+    Db(db::DbArgs),
+    /// Experimental commands outside the core loop (the old `glot <cmd>` spelling still works).
+    #[command(subcommand)]
+    Labs(LabsCmd),
+    /// One step: init (if needed) → i18nize → translate → check → status. Idempotent.
+    Localize(localize::LocalizeArgs),
+    /// Print a ready-to-paste i18n prompt for a coding agent or app builder (Lovable, Bolt, v0).
+    AgentPrompt(localize::AgentPromptArgs),
+    /// AI-translation provenance from glot.lock (export json/csv/html, runtime catalog).
+    #[command(subcommand)]
+    Provenance(provenance::ProvenanceCmd),
+    /// Human review queue: translations under `[qa] review_threshold` or risk-tagged (approve, edit, export, import).
+    #[command(hide = true)] // legacy spelling of `glot labs queue`
+    Queue(queue::QueueArgs),
+    /// Translation memory (.glot/tm.json): exchange it with other projects and tools as TMX.
+    #[command(subcommand, hide = true)] // legacy spelling of `glot labs tm`
+    Tm(queue::TmCmd),
+}
+
+/// Experimental: useful, less proven than the core loop. Also callable without `labs` (old spelling).
+#[derive(Subcommand)]
+enum LabsCmd {
+    /// Plural/select branch coverage per locale and CLDR category (`--render`: check each branch in a browser).
+    Coverage(coverage::CoverageArgs),
+    /// Back-translate translations and explain them; `--stale` sorts cosmetic vs real source changes.
+    Review(review::ReviewArgs),
     /// Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success.
     Parity(parity::ParityArgs),
     /// Multilingual SEO: audit hreflang/canonical/metadata per locale, fix Next.js, localize keywords.
     Seo(seo::SeoArgs),
     /// Translate database content (catalog, help articles…) into glot_translations (Postgres).
     Db(db::DbArgs),
+    /// Localize emails, SVG and OG images: i18nize, translate, render per locale, check.
+    Assets(assets::AssetsArgs),
+    /// Source keys never referenced in code (`--prune` deletes them).
+    Unused {
+        #[arg(long)]
+        prune: bool,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Human review queue: translations under `[qa] review_threshold` or risk-tagged (approve, edit, export, import).
+    Queue(queue::QueueArgs),
+    /// Translation memory (.glot/tm.json): exchange it with other projects and tools as TMX.
+    #[command(subcommand)]
+    Tm(queue::TmCmd),
 }
+
+impl From<LabsCmd> for Cmd {
+    fn from(l: LabsCmd) -> Cmd {
+        match l {
+            LabsCmd::Coverage(a) => Cmd::Coverage(a),
+            LabsCmd::Review(a) => Cmd::Review(a),
+            LabsCmd::Parity(a) => Cmd::Parity(a),
+            LabsCmd::Seo(a) => Cmd::Seo(a),
+            LabsCmd::Db(a) => Cmd::Db(a),
+            LabsCmd::Assets(a) => Cmd::Assets(a),
+            LabsCmd::Unused { prune, json } => Cmd::Unused { prune, json },
+            LabsCmd::Queue(a) => Cmd::Queue(a),
+            LabsCmd::Tm(c) => Cmd::Tm(c),
+        }
+    }
+}
+
+/// Grouped top-level help. ponytail: clap has no subcommand headings, so the list is written by hand;
+/// `help_lists_every_visible_command` fails when a visible command is missing from it.
+const HELP: &str = "\
+{about}
+
+{usage-heading} {usage}
+
+Start
+  init        Detect the i18n stack, write glot.toml + rules for your coding agent
+                $ glot init
+  i18nize     Turn hardcoded UI strings into keys and rewrite the code
+                $ glot i18nize --dry-run app/page.tsx
+  translate   Translate missing/stale strings; invalid output is refused, retried, never written
+                $ glot translate --locale fr,de --dry-run
+  localize    All of the above in one idempotent step, then check
+                $ glot localize --yes --targets fr,de
+
+Guarantees
+  check       Validate every catalog: syntax, placeholders, CLDR plurals, glossary, width (CI)
+                $ glot check --format github
+  status      Coverage per locale, stale strings, hand edits protected by glot.lock
+                $ glot status
+  extract     Hardcoded strings in code, missing and unused keys
+                $ glot extract
+  set         Set a translation by hand (validated, then never overwritten)
+                $ glot set de nav.billing \"Abrechnung\"
+  add         Add or replace a source string
+                $ glot add nav.billing \"Billing\" --note \"sidebar link\"
+  glossary    Terms enforced by the validator (glossary.toml)
+                $ glot glossary add Workspace --fr \"Espace de travail\"
+
+Pixel budgets
+  measure     Record each key's box (width, lines, font) from the running app
+                $ glot measure --base-url http://localhost:3000 --routes /,/billing
+  fit         Shorten translations that overflow, re-render until they fit
+                $ glot fit --base-url http://localhost:3000 --routes / --locales de
+
+Your agent and your app
+  mcp         MCP server: your coding agent reads keys, context and the glossary, adds strings
+                $ claude mcp add glot -- glot mcp
+  dev         Alt+click any text in the running app to edit it (validated)
+                $ glot dev
+  agent-prompt  Print a ready-to-paste i18n prompt for a coding agent or app builder
+                $ glot agent-prompt
+  provenance  Who/what produced each translation (model, date, reviewer), for AI-disclosure
+                $ glot provenance export --format csv
+
+Server (experimental)
+  push, pull  Sync catalogs, lock and glossary with a self-hosted glot server
+
+Labs
+  labs        coverage, review, parity, seo, db, assets, unused, queue, tm:
+              `glot labs --help`
+
+Options:
+{options}
+";
 
 #[derive(Subcommand)]
 enum GlossaryCmd {
@@ -190,9 +327,17 @@ async fn main() -> ExitCode {
     }
 }
 
+/// `glot translate --provider`: overrides `[llm] provider` for every workspace this run opens.
+static PROVIDER: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
 fn open() -> Result<Workspace> {
     let cwd = std::env::current_dir()?;
-    Workspace::open(&cwd).context("cannot open glot workspace (run `glot init` first?)")
+    let mut ws =
+        Workspace::open(&cwd).context("cannot open glot workspace (run `glot init` first?)")?;
+    if let Some(p) = PROVIDER.get() {
+        ws.config.llm.provider = p.clone();
+    }
+    Ok(ws)
 }
 
 fn print_json<T: serde::Serialize>(v: &T) -> Result<()> {
@@ -213,8 +358,12 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
             yes,
             visual,
             batch,
+            provider,
             qa,
         } => {
+            if let Some(p) = provider {
+                let _ = PROVIDER.set(p);
+            }
             // Register variants are generated from their base, so after it.
             let (vl, vk) = (locale.clone(), key.clone());
             translate(
@@ -268,6 +417,12 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Parity(args) => return parity::run(args),
         Cmd::Seo(args) => return seo::run(args).await,
         Cmd::Db(args) => return db::run(args).await,
+        Cmd::Queue(a) => return queue::run(a),
+        Cmd::Tm(c) => return queue::tm(c),
+        Cmd::Labs(l) => return Box::pin(run(l.into())).await,
+        Cmd::Localize(a) => return localize::run(a),
+        Cmd::AgentPrompt(a) => return localize::agent_prompt_cmd(a),
+        Cmd::Provenance(c) => return provenance::run(c),
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -312,17 +467,19 @@ fn status(json: bool) -> Result<()> {
         );
     }
     let p = &st.plan;
-    let todo = p.missing.len() + p.stale.len();
+    let todo = p.missing.len() + p.stale.len() + p.invalid.len();
     println!();
-    if todo == 0 {
+    if todo == 0 && p.invalid_human.is_empty() {
         anstream::println!("{GREEN}Up to date.{GREEN:#}");
-    } else {
+    } else if todo > 0 {
         anstream::println!(
-            "Plan: {} missing, {} stale → {BOLD}glot translate{BOLD:#}",
+            "Plan: {} missing, {} stale, {} invalid → {BOLD}glot translate{BOLD:#}",
             p.missing.len(),
-            p.stale.len()
+            p.stale.len(),
+            p.invalid.len()
         );
     }
+    print_invalid_human(&p.invalid_human);
     for (n, label) in [
         (p.manual_edits.len(), "edited by hand"),
         (p.untracked.len(), "untracked (imported)"),
@@ -333,6 +490,20 @@ fn status(json: bool) -> Result<()> {
         }
     }
     Ok(())
+}
+
+/// Invalid translations a human owns: glot won't overwrite them, show the exact fix command.
+fn print_invalid_human(items: &[(String, String)]) {
+    if items.is_empty() {
+        return;
+    }
+    anstream::println!(
+        "{RED}{} invalid hand-edited/reviewed translations{RED:#} (not retranslated; see `glot check`), fix with:",
+        items.len()
+    );
+    for (loc, key) in items {
+        anstream::println!("  glot set {loc} {key} \"<fixed translation>\"");
+    }
 }
 
 fn code_str(code: IssueCode) -> String {
@@ -522,7 +693,25 @@ async fn translate(
     // The dry run is the single source of truth for what will be sent (handles --force, filters, manual edits).
     let dry = ws.translate(opts.clone()).await?;
     let total: usize = dry.planned.values().map(Vec::len).sum();
-    if total == 0 {
+    let human: Vec<(String, String)> = ws
+        .plan()
+        .invalid_human
+        .into_iter()
+        .filter(|(l, k)| {
+            opts.locales.as_ref().is_none_or(|w| w.contains(l))
+                && opts.keys.as_ref().is_none_or(|w| w.contains(k))
+        })
+        .collect();
+    print_invalid_human(&human);
+    let reused: usize = dry.tm_reused.values().map(Vec::len).sum();
+    if reused > 0 {
+        anstream::println!(
+            "Translation memory: {BOLD}{reused}{BOLD:#} strings reused {DIM}(0 token; saves ~${:.4}, ~{}k tokens){DIM:#}",
+            dry.tm_saved.cost_usd,
+            (dry.tm_saved.input_tokens + dry.tm_saved.output_tokens) / 1000
+        );
+    }
+    if total == 0 && reused == 0 {
         anstream::println!("{GREEN}Nothing to translate.{GREEN:#}");
         return Ok(());
     }
@@ -533,19 +722,28 @@ async fn translate(
         .map(|(l, ks)| format!("{l} ({})", ks.len()))
         .collect::<Vec<_>>()
         .join(", ");
+    let mock = ws.config.llm.provider == "mock";
     anstream::println!(
         "Plan: {BOLD}{total}{BOLD:#} strings → {summary}  {DIM}model {}{DIM:#}",
-        ws.config.llm.model
+        if mock {
+            "mock (offline, no API key)"
+        } else {
+            &ws.config.llm.model
+        }
     );
     let (estimate, max) = (
         dry.estimated_cost_usd,
         dry.estimated_cost_max_usd.max(dry.estimated_cost_usd),
     );
-    anstream::println!(
-        "Estimated cost: {BOLD}${estimate:.4}{BOLD:#} {DIM}(up to ${max:.4}; ~{}k in / {}k out tokens){DIM:#}",
-        dry.estimated_input_tokens / 1000,
-        dry.estimated_output_tokens / 1000
-    );
+    if mock {
+        anstream::println!("Estimated cost: {BOLD}$0{BOLD:#} {DIM}(mock provider){DIM:#}");
+    } else {
+        anstream::println!(
+            "Estimated cost: {BOLD}${estimate:.4}{BOLD:#} {DIM}(up to ${max:.4}; ~{}k in / {}k out tokens){DIM:#}",
+            dry.estimated_input_tokens / 1000,
+            dry.estimated_output_tokens / 1000
+        );
+    }
     if !batch && ws.config.llm.provider == "anthropic" {
         anstream::println!(
             "{DIM}With --batch: ~${:.4} (first pass at -50 %, asynchronous){DIM:#}",
@@ -581,6 +779,26 @@ async fn translate(
         })
         .await?;
     for (loc, items) in &report.written {
+        // What the validator refused on the way, so nobody has to take "validated" on faith.
+        for t in items.iter().filter(|t| !t.refused.is_empty()) {
+            for (n, (model, value, issues)) in t.refused.iter().enumerate() {
+                anstream::println!(
+                    "  {RED}✗ refused{RED:#} {loc:<6} {}  {DIM}attempt {} ({model}){DIM:#}\n      {value:?}",
+                    t.key,
+                    n + 1
+                );
+                for i in issues.iter().filter(|i| i.severity == Severity::Error) {
+                    anstream::println!("      {RED}↳{RED:#} {}", i.message);
+                }
+            }
+            anstream::println!(
+                "  {GREEN}✓ fixed{GREEN:#}   {loc:<6} {}  {DIM}attempt {} ({}){DIM:#}\n      {:?}",
+                t.key,
+                t.attempts,
+                t.model,
+                t.value
+            );
+        }
         anstream::println!("  {GREEN}✓{GREEN:#} {loc:<6} {} written", items.len());
     }
     for (loc, items) in &report.rejected {
@@ -595,7 +813,24 @@ async fn translate(
             anstream::println!("      {}  {DIM}{reasons}{DIM:#}", t.key);
         }
     }
+    let reused: usize = report.tm_reused.values().map(Vec::len).sum();
+    if reused > 0 {
+        anstream::println!(
+            "  {GREEN}✓{GREEN:#} {reused} from translation memory {DIM}(saved ~${:.4}){DIM:#}",
+            report.tm_saved.cost_usd
+        );
+    }
+    let queued: usize = report.needs_review.values().map(Vec::len).sum();
+    if queued > 0 {
+        anstream::println!(
+            "  {YELLOW}●{YELLOW:#} {queued} queued for human review {DIM}(glot queue){DIM:#}"
+        );
+    }
     let u = &report.usage;
+    if mock {
+        anstream::println!("Cost: {BOLD}$0{BOLD:#} {DIM}(mock provider){DIM:#}");
+        return Ok(());
+    }
     anstream::println!(
         "Cost: {BOLD}${:.4}{BOLD:#} {DIM}({} in + {} cache write + {} cache read / {} out tokens){DIM:#}",
         u.cost_usd,
@@ -616,6 +851,7 @@ fn extract(json: bool) -> Result<()> {
         return print_json(&serde_json::json!({
             "files_scanned": report.files_scanned,
             "hardcoded": report.hardcoded,
+            "config": report.config,
             "missing": missing,
             "unused": unused,
             "dynamic": report.dynamic,
@@ -633,6 +869,22 @@ fn extract(json: bool) -> Result<()> {
                 h.at.path,
                 h.at.line,
                 h.text,
+                h.suggested_key
+            );
+        }
+    }
+    if !report.config.is_empty() {
+        anstream::println!(
+            "\n{BOLD}Not converted yet (config/data) ({}){BOLD:#}  {DIM}UI copy in objects/arrays, still not wrapped in t(){DIM:#}",
+            report.config.len()
+        );
+        for h in &report.config {
+            anstream::println!(
+                "  {}:{}  {:?}  {DIM}{} → {}{DIM:#}",
+                h.at.path,
+                h.at.line,
+                h.text,
+                h.reason.as_deref().unwrap_or_default(),
                 h.suggested_key
             );
         }
@@ -660,7 +912,11 @@ fn extract(json: bool) -> Result<()> {
             println!("  {k}");
         }
     }
-    if report.hardcoded.is_empty() && missing.is_empty() && unused.is_empty() {
+    if report.hardcoded.is_empty()
+        && report.config.is_empty()
+        && missing.is_empty()
+        && unused.is_empty()
+    {
         anstream::println!("{GREEN}✓ nothing to report{GREEN:#}");
     }
     Ok(())
@@ -930,6 +1186,24 @@ mod tests {
         assert_eq!(t.translations["fr"], "Espace");
         assert_eq!(t.description.as_deref(), Some("x"));
         assert!(parse_term("x".into(), &["--fr".into()]).is_err());
+    }
+
+    #[test]
+    fn help_lists_every_visible_command() {
+        use clap::CommandFactory;
+        for c in Cli::command()
+            .get_subcommands()
+            .filter(|c| !c.is_hide_set())
+        {
+            let n = c.get_name();
+            assert!(
+                n == "help"
+                    || [format!("\n  {n} "), format!("\n  {n},"), format!(" {n}  ")]
+                        .iter()
+                        .any(|p| HELP.contains(p.as_str())),
+                "`glot {n}` is visible but missing from HELP (or add #[command(hide = true)])"
+            );
+        }
     }
 
     #[test]

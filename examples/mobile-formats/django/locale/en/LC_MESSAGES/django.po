@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Title of the dashboard page
+msgid "Dashboard"
+msgstr ""
+
+#, python-format
+msgid "Welcome, %(name)s!"
+msgstr ""
+
+#, python-format
+msgid "You have %(count)s unread message"
+msgid_plural "You have %(count)s unread messages"
+msgstr[0] ""
+msgstr[1] ""

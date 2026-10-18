@@ -13,9 +13,6 @@ jobs:
     # Secrets are not available to fork PRs.
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    env:
-      # Only needed for org-level user keys (sk-ant-usr-…); the composite action inherits job env.
-      ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,3 +26,5 @@ jobs:
           working-directory: web
           command: both
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Only needed for org-level user keys (sk-ant-usr-…).
+          anthropic-workspace-id: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}

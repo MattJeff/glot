@@ -56,7 +56,14 @@
       "integrations": "Integrationen",
       "mcp": "MCP-Server",
       "runtime": "Laufzeit-Fallback",
-      "self-hosting": "Self-Hosting"
+      "self-hosting": "Selbst gehosteter Server",
+      "benchmark": "Benchmark",
+      "deploy-hetzner": "Auf einem VPS deployen",
+      "labs": "Labs-Übersicht",
+      "mcp-remote": "Remote-MCP (OAuth)",
+      "provenance": "KI-Herkunft (EU-KI-Verordnung)",
+      "quality": "Qualität & Review",
+      "skills": "Agent-Skills"
     },
     "search": {
       "label": "Doku durchsuchen",
@@ -67,7 +74,8 @@
       "agents": "KI-Agenten",
       "guides": "Anleitungen",
       "reference": "Referenz",
-      "start": "Erste Schritte"
+      "start": "Erste Schritte",
+      "labs": "Labs (experimentell)"
     },
     "title": "Doku"
   },
@@ -509,8 +517,8 @@
       "yes": "Ja"
     },
     "core": {
-      "subtitle": "Das LLM ist stets von Code umgeben, der Nein sagen kann.",
-      "title": "Der deterministische Kern"
+      "subtitle": "Das LLM schlägt vor. Code entscheidet, was geschrieben wird.",
+      "title": "Die Garantien"
     },
     "cta": {
       "button": "Arbeitsbereich erstellen",
@@ -569,7 +577,7 @@
       },
       "checks": {
         "glossary": "Glossarbegriffe eingehalten",
-        "length": "Längenverhältnis 1,3× (unter 1,6×)",
+        "length": "Passt in den Button: 96 von 120 px",
         "placeholders": "Platzhalter erhalten",
         "plurals": "CLDR-Pluralkategorien"
       },
@@ -595,9 +603,11 @@
       "badge": "Open Source · MIT · Eigenen LLM-Schlüssel verwenden",
       "primary": "Kostenlos starten",
       "secondary": "Stern auf GitHub vergeben",
-      "subtitle": "Richten Sie glot auf eine Codebasis voller fest codierter Strings. Ein Befehl überführt sie in Schlüssel und schreibt Ihre Komponenten um. Ihr LLM übersetzt, deterministischer Code prüft jeden String, und das Ergebnis landet in Git.",
+      "subtitle": "Ihr Coding-Agent überführt fest codierte Strings in Schlüssel und übersetzt sie. Deterministischer Code prüft jede LLM-Ausgabe (Platzhalter, CLDR-Plurale, Glossar, Pixelbreite) und lehnt alles ab, was kaputt oder zu lang ist, mit dem genauen Grund, bis der Versuch gültig ist. Nichts Ungültiges erreicht Ihre Kataloge.",
       "terminal": "Von fest codiertem Englisch zu vier Sprachen",
-      "title": "i18n, das Ihr KI-Agent nicht kaputtmachen kann."
+      "title": "Ihr Agent lokalisiert. Code garantiert.",
+      "demoAlt": "Terminal: glot translate lehnt ein polnisches Plural ab, dem few und many fehlen, einen französischen Platzhalter, der in {nom} umbenannt wurde, und ein deutsches Label, das für einen 120-px-Button 276 px breit ist. Die Gründe gehen an das LLM zurück, dann schreibt glot die korrigierten Versionen; glot check besteht.",
+      "demoCaption": "Echtes glot-Binary. Das LLM in dieser Aufnahme ist so vorprogrammiert, dass es beim ersten Durchlauf drei Strings falsch macht; die Ablehnungen und ihre Meldungen stammen von glot."
     },
     "insights": {
       "body": "Ein anonymer Beacon zählt Besucher nach bevorzugter Sprache und der Sprache, die Sie ihnen ausgeliefert haben, und vergleicht dann die Conversion. Kein Cookie, keine Besucher-ID.",
@@ -622,12 +632,13 @@
       "title": "Matrix der Sprachen"
     },
     "meta": {
-      "description": "Open-Source-Lokalisierung für SaaS, entwickelt für Coding-Agenten. Deterministische Validierung, ein Lockfile, Glossar als Code und ein MCP-Server.",
-      "title": "glot: i18n, das KI nicht kaputt machen kann"
+      "description": "Open-Source-Lokalisierung für Coding-Agenten. Jede LLM-Übersetzung wird durch deterministischen Code geprüft (Platzhalter, CLDR-Plurale, Glossar, Pixelbreite) und abgelehnt, bis sie gültig ist.",
+      "title": "glot: Ihr Agent lokalisiert, Code garantiert"
     },
     "more": {
-      "subtitle": "Qualität, die Sie ohne Sprachkenntnisse prüfen können, und Daten darüber, welche Sprache als Nächstes hinzukommen sollte.",
-      "title": "Sehen, was Ihre Nutzer sehen"
+      "subtitle": "Sie funktionieren und sind getestet, sind aber neuer als der Kernablauf und können sich ändern. Einige benötigen den experimentellen Self-Hosted-Server.",
+      "title": "Labs: jüngere Funktionen unter denselben Leitplanken",
+      "badge": "Labs (experimentell)"
     },
     "nav": {
       "compare": "Vergleichen",
@@ -635,7 +646,8 @@
       "getStarted": "Loslegen",
       "install": "Installieren",
       "signIn": "Anmelden",
-      "workflow": "So funktioniert's"
+      "workflow": "So funktioniert's",
+      "labs": "Labs"
     },
     "ondevice": {
       "body": "Für Sprachen, die Sie noch nicht ausliefern, übersetzt @glot/runtime im Browser mit der integrierten Translator API und führt danach den Validator von glot aus, kompiliert nach WebAssembly.",
@@ -678,6 +690,10 @@
         "translate": {
           "body": "Nur das Delta, mit Ihrem Glossar, Kontext Datei:Zeile und UI-Rolle. Jede Zeichenkette wird validiert, erneut versucht und anschließend eskaliert.",
           "title": "Übersetzen"
+        },
+        "check": {
+          "body": "Validiert jeden Katalog in der CI: Syntax, Platzhalter, Plural-Kategorien, Glossar und Pixelbreite. Exit 1 bei jedem Fehler, Annotationen im PR.",
+          "title": "Prüfen"
         }
       },
       "subtitle": "Jeder Schritt ist ein CLI-Befehl, den auch Ihr Coding-Agent über den MCP-Server ausführen kann.",
@@ -889,7 +905,9 @@
     "settings": "Einstellungen",
     "toggleSidebar": "Navigation umschalten",
     "userMenu": "Kontomenü",
-    "visual": "Visuelle QA"
+    "visual": "Visuelle QA",
+    "experimental": "Der Self-Hosted-Server und das Dashboard sind experimentell: Rechnen Sie mit Ecken und Kanten sowie Breaking Changes. Die CLI und der MCP-Server bilden den stabilen Kern. <docs>Mehr erfahren</docs>",
+    "labs": "Labs"
   },
   "status": {
     "machine": "Maschinell",
@@ -964,5 +982,30 @@
     "subtitle": "Screenshots und Layoutprobleme pro Sprache, hochgeladen von glot-visual-qa.",
     "title": "Visual QA",
     "viewport": "Viewport"
+  },
+  "oauth": {
+    "allow": "Zulassen",
+    "deny": "Ablehnen",
+    "invalid": "Ungültige Autorisierungsanfrage",
+    "noProjects": "Sie haben noch kein Projekt. Legen Sie zuerst eines im Dashboard an.",
+    "project": "Projekt",
+    "redirect": "Sie werden zurück zu {host} geleitet.",
+    "scope": {
+      "read": {
+        "body": "Status, Schlüssel und ihr Kontext, Probleme, Glossar.",
+        "title": "Lesen"
+      },
+      "translate": {
+        "body": "Übersetzungsjobs und KI-Reviews ausführen (verbraucht das LLM-Budget des Projekts).",
+        "title": "Übersetzen"
+      },
+      "write": {
+        "body": "Quelltexte hinzufügen, Übersetzungen und das Glossar bearbeiten, GitHub-Pull-Requests öffnen.",
+        "title": "Schreiben"
+      }
+    },
+    "scopes": "Berechtigungen",
+    "subtitle": "Diese App nutzt die MCP-Tools von glot für ein Projekt, in Ihrem Namen.",
+    "title": "{client} mit glot verbinden"
   }
 }

@@ -13,6 +13,7 @@ use std::path::Path;
 pub mod email;
 pub mod i18nize;
 mod scan;
+pub use scan::looks_like_css_classes;
 pub mod svg;
 #[cfg(test)]
 mod tests;
@@ -36,6 +37,9 @@ pub struct ExtractReport {
     /// Static prefixes of dynamic keys (`t(`errors.${code}`)` => `errors.`); keys under them count as used.
     #[serde(default)]
     pub dynamic_prefixes: BTreeSet<Key>,
+    /// UI copy in object literals (config arrays, `metadata`, props objects), with a `reason`.
+    #[serde(default)]
+    pub config: Vec<Hardcoded>,
     pub files_scanned: usize,
 }
 
@@ -45,6 +49,7 @@ impl ExtractReport {
             self.usages.entry(k).or_default().extend(v);
         }
         self.hardcoded.extend(other.hardcoded);
+        self.config.extend(other.config);
         self.dynamic.extend(other.dynamic);
         self.dynamic_prefixes.extend(other.dynamic_prefixes);
         self.files_scanned += other.files_scanned;
@@ -81,6 +86,9 @@ pub struct Hardcoded {
     pub component: Option<String>,
     /// e.g. `settings.billing.save_button`, derived from file path, component and text.
     pub suggested_key: Key,
+    /// Why it is still hardcoded (config/data entries only).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, thiserror::Error)]

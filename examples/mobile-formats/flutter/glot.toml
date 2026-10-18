@@ -1,0 +1,9 @@
+source_locale = "en"
+target_locales = ["de"]
+files = ["lib/l10n/app_{locale}.arb"]
+format = "arb"
+syntax = "icu"
+
+[llm]
+provider = "mock"   # swap for "anthropic" + api_key_env
+model = "mock"

@@ -8,8 +8,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "dist",
-    "skipLibCheck": true,
-    "paths": { "@glot/overlay": ["./src/index.ts"] }
+    "skipLibCheck": true
   },
   "include": ["src"]
 }

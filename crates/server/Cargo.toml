@@ -26,7 +26,11 @@ rand = "0.9"
 hex = "0.4"
 uuid = { version = "1", features = ["v4", "serde"] }
 utoipa = { version = "5", features = ["uuid", "chrono"] }
+rmcp = { version = "3.5.1", features = ["server", "macros", "transport-streamable-http-server"] }
+schemars = "1"
+base64 = "0.23"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
 http-body-util = "0.1"
+rmcp = { version = "3.5.1", features = ["client", "transport-streamable-http-client-reqwest"] }

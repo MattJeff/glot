@@ -11,7 +11,8 @@ const { values: v } = parseArgs({
     locales: { type: "string", default: "en,fr" },
     "source-locale": { type: "string", default: "en" },
     "url-pattern": { type: "string", default: "/{locale}{route}" },
-    "locale-cookie": { type: "string" },
+    // What `glot i18nize` generates: NEXT_LOCALE (Next proxy), glot-locale (React Router / i18next). "" = none.
+    "locale-cookie": { type: "string", default: "NEXT_LOCALE,glot-locale" },
     catalogs: { type: "string" },
     provider: { type: "string", default: "anthropic" },
     model: { type: "string", default: MODEL },
@@ -25,7 +26,7 @@ const { values: v } = parseArgs({
 
 if (v.help) {
   console.log(`glot-agent-qa [--tasks glot.tasks.yaml] [--base-url URL] [--locales en,fr,de] [--source-locale en]
-  [--url-pattern "/{locale}{route}"] [--locale-cookie NEXT_LOCALE] [--catalogs "messages/{locale}.json"]
+  [--url-pattern "/{locale}{route}"] [--locale-cookie NEXT_LOCALE,glot-locale] [--catalogs "messages/{locale}.json"]
   [--provider anthropic|mock] [--model ${MODEL}] [--max-steps 15] [--viewport 1280x800]
   [--out .glot/parity] [--min-parity 90]      (anthropic: ANTHROPIC_API_KEY or an \`ant auth login\` profile)`);
   process.exit(0);

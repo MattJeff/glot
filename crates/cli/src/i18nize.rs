@@ -200,18 +200,23 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         );
     }
     anstream::println!(
-        "{GREEN}✓ done.{GREEN:#} Next: {BOLD}glot translate{BOLD:#} to fill {}",
+        "{GREEN}✓ done.{GREEN:#} Next: {BOLD}{} translate{BOLD:#} to fill {}",
+        crate::init::cli_name(),
         ws.config.target_locales.join(", ")
     );
     Ok(())
 }
 
 pub(crate) fn print_setup(sp: &setup::SetupPlan, dry_run: bool) {
-    if sp.changes.is_empty() && sp.packages.is_empty() && sp.notes.is_empty() {
+    if sp.changes.is_empty() && sp.packages.is_empty() && sp.notes.is_empty() && sp.moves.is_empty()
+    {
         anstream::println!("{DIM}i18n runtime already wired.{DIM:#}");
         return;
     }
     anstream::println!("{BOLD}i18n runtime setup{BOLD:#}");
+    for (from, to) in &sp.moves {
+        anstream::println!("  {GREEN}moved  {GREEN:#} {from} -> {to}");
+    }
     for c in &sp.changes {
         if dry_run {
             print_diff(&glot_extract::i18nize::unified_diff(

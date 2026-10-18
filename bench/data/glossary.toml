@@ -1,0 +1,56 @@
+# glot-bench glossary (CC0). Same file feeds both conditions: the raw prompt lists it, glot enforces it.
+
+[[term]]
+term = "Workspace"
+description = "Shared space of a team"
+translations = { fr = "espace de travail", de = "Arbeitsbereich", es = "espacio de trabajo", pl = "obszar roboczy", ru = "рабочее пространство", ar = "مساحة العمل", ja = "ワークスペース", zh = "工作区" }
+forbidden = { fr = ["espace de travaux"] }
+
+[[term]]
+term = "Invoice"
+translations = { fr = "facture", de = "Rechnung", es = "factura", pl = "faktura", ru = "счет", ar = "فاتورة", ja = "請求書", zh = "发票" }
+
+[[term]]
+term = "Project"
+translations = { fr = "projet", de = "Projekt", es = "proyecto", pl = "projekt", ru = "проект", ar = "مشروع", ja = "プロジェクト", zh = "项目" }
+
+[[term]]
+term = "Dashboard"
+translations = { fr = "tableau de bord", de = "Dashboard", es = "panel", pl = "pulpit", ru = "панель", ar = "لوحة التحكم", ja = "ダッシュボード", zh = "仪表板" }
+
+[[term]]
+term = "Billing"
+translations = { fr = "facturation", de = "Abrechnung", es = "facturación", pl = "rozliczenia", ru = "оплата", ar = "الفوترة", ja = "請求", zh = "账单" }
+
+[[term]]
+term = "glot"
+do_not_translate = true
+
+[[term]]
+term = "GitHub"
+do_not_translate = true
+
+[[term]]
+term = "Slack"
+do_not_translate = true
+
+[[term]]
+term = "Stripe"
+do_not_translate = true
+
+[[term]]
+term = "Acme"
+do_not_translate = true
+
+[[term]]
+term = "OAuth"
+do_not_translate = true
+
+[[term]]
+term = "API"
+do_not_translate = true
+case_sensitive = true
+
+[[term]]
+term = "Markdown"
+do_not_translate = true

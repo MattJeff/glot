@@ -14,7 +14,7 @@ pub struct InitArgs {
     /// Target locales, comma separated (default: other detected locales).
     #[arg(long, value_delimiter = ',')]
     targets: Vec<String>,
-    /// LLM provider: anthropic | openai | openai-compatible | mock.
+    /// LLM provider: anthropic | openai | openai-compatible | gemini (Gemini 3 Flash preset) | mock.
     #[arg(long)]
     provider: Option<String>,
     /// Accept detected defaults without prompting.
@@ -24,6 +24,9 @@ pub struct InitArgs {
     #[arg(long)]
     force: bool,
 }
+
+#[path = "init_native.rs"]
+mod native;
 
 const MARK_START: &str = "<!-- glot:start -->";
 const MARK_END: &str = "<!-- glot:end -->";
@@ -52,6 +55,21 @@ pub fn detect(root: &Path) -> Detected {
         deps.iter()
             .any(|d| d == n || d.starts_with(&format!("{n}/")))
     };
+    // Mobile / gettext / Rails catalogs, unless a JS i18n library says otherwise.
+    let js = [
+        "next-intl",
+        "i18next",
+        "react-i18next",
+        "next-i18next",
+        "react-intl",
+        "@lingui",
+        "vue-i18n",
+    ];
+    if !js.iter().any(|n| has(n))
+        && let Some(d) = native::detect(root)
+    {
+        return d;
+    }
     let (stack, syntax, default_file) = if has("next-intl") {
         ("next-intl", "icu", "messages/{locale}.json")
     } else if has("react-i18next") || has("i18next") || has("next-i18next") {
@@ -74,6 +92,12 @@ pub fn detect(root: &Path) -> Detected {
                 };
                 ("react-i18next", "i18next", file)
             }
+            // `glot i18nize` installs next-intl, whose convention is `messages/{locale}.json`.
+            Some(_) => (
+                "next.js (no i18n library yet)",
+                "icu",
+                "messages/{locale}.json",
+            ),
             _ => ("generic", "icu", "locales/{locale}.json"),
         }
     };
@@ -179,7 +203,14 @@ pub fn run(args: InitArgs) -> Result<()> {
     } else {
         args.targets.clone()
     };
-    if !args.yes && std::io::stdin().is_terminal() {
+    let interactive = !args.yes && std::io::stdin().is_terminal();
+    if !interactive && args.targets.is_empty() && d.locales.is_empty() {
+        anstream::println!(
+            "{DIM}No locales found and no terminal to ask: source {source}, targets {} (change with --source / --targets fr,de).{DIM:#}",
+            targets.join(", ")
+        );
+    }
+    if interactive {
         if args.source.is_none() {
             source = prompt("Source locale", &source)?;
         }
@@ -218,17 +249,41 @@ pub fn run(args: InitArgs) -> Result<()> {
     let block = agent_block(&source, &targets, &d.files);
     w.block("CLAUDE.md", &block, true)?;
     w.block("AGENTS.md", &block, false)?;
-    w.file(
-        ".claude/skills/glot/SKILL.md",
-        &format!("{SKILL_HEAD}{block}{SKILL_TAIL}"),
-    )?;
+    // Same skill for Claude Code and the shared Agent Skills path (Codex, Cursor, Copilot, Gemini CLI).
+    for dir in [".claude", ".agents"] {
+        w.file(
+            &format!("{dir}/skills/glot/SKILL.md"),
+            &format!("{SKILL_HEAD}{block}{SKILL_TAIL}"),
+        )?;
+    }
     w.file(".cursor/rules/glot.mdc", &format!("{CURSOR_HEAD}{block}\n"))?;
     w.file(".github/workflows/glot.yml", &workflow(&provider))?;
 
-    anstream::println!(
-        "\n{BOLD}Next:{BOLD:#} {DIM}glot status{DIM:#} · {DIM}glot translate --dry-run{DIM:#} · {DIM}glot check{DIM:#}"
-    );
+    let glot = cli_name();
+    let hardcoded = glot_llm::engine::Workspace::open(&root)
+        .and_then(|ws| ws.extract())
+        .map_or(0, |r| r.hardcoded.len());
+    if hardcoded > 0 {
+        anstream::println!(
+            "\n{BOLD}Next:{BOLD:#} {hardcoded} hardcoded strings found: run {BOLD}{glot} i18nize{BOLD:#} to move them into the catalog and wire the i18n library ({DIM}--dry-run{DIM:#} to preview), then {DIM}{glot} translate{DIM:#}"
+        );
+    } else {
+        anstream::println!(
+            "\n{BOLD}Next:{BOLD:#} {DIM}{glot} status{DIM:#} · {DIM}{glot} translate --dry-run{DIM:#} · {DIM}{glot} check{DIM:#}"
+        );
+    }
     Ok(())
+}
+
+/// How the user runs glot, for hints: `npx glot-i18n` when it runs from the npm package.
+pub fn cli_name() -> &'static str {
+    let exe = std::env::current_exe().unwrap_or_default();
+    let s = exe.to_string_lossy();
+    if s.contains("node_modules") || s.contains("_npx") {
+        "npx glot-i18n"
+    } else {
+        "glot"
+    }
 }
 
 fn prompt(label: &str, default: &str) -> Result<String> {
@@ -368,9 +423,13 @@ fn glot_toml(
         ),
         "openai" => ("gpt-5-mini", Some("gpt-5"), Some("OPENAI_API_KEY")),
         "openai-compatible" => ("llama3.1", None, None),
+        // Preset: Gemini through its OpenAI-compatible endpoint.
+        "gemini" => ("gemini-3-flash-preview", None, Some("GEMINI_API_KEY")),
         "mock" => ("mock", None, None),
         other => {
-            bail!("unknown provider `{other}` (anthropic | openai | openai-compatible | mock)")
+            bail!(
+                "unknown provider `{other}` (anthropic | openai | openai-compatible | gemini | mock)"
+            )
         }
     };
     let ex = glot_core::config::ExtractConfig::default();
@@ -390,14 +449,19 @@ fn glot_toml(
          target_locales = {}\n\
          # Catalog files, `{{locale}}` is replaced by each locale.\n\
          files = {}\n\
-         format = \"auto\"   # auto | json-nested | json-flat\n\
-         syntax = \"{}\"   # icu | i18next | mf2\n\n\
+         format = \"auto\"   # auto | json-nested | json-flat | xcstrings | strings | android | arb | po | yaml\n\
+         syntax = \"{}\"   # icu | i18next | mf2 | printf | rails\n\n\
          [llm]\n\
-         provider = \"{provider}\"   # anthropic | openai | openai-compatible | mock\n\
+         provider = \"{}\"   # anthropic | openai | openai-compatible | mock\n\
          model = \"{model}\"\n",
         toml_list(targets),
         toml_list(&d.files),
         d.syntax,
+        if provider == "gemini" {
+            "openai-compatible"
+        } else {
+            provider
+        },
     );
     if let Some(f) = fallback {
         s += &format!("fallback_model = \"{f}\"\n");
@@ -407,6 +471,9 @@ fn glot_toml(
     }
     if provider == "openai-compatible" {
         s += "base_url = \"http://localhost:11434/v1\"\n";
+    }
+    if provider == "gemini" {
+        s += "base_url = \"https://generativelanguage.googleapis.com/v1beta/openai\"\n";
     }
     s += &format!(
         "budget_usd = 5.0\n\
@@ -494,6 +561,7 @@ fn workflow(provider: &str) -> String {
         "openai" | "openai-compatible" => {
             "\n        env:\n          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}"
         }
+        "gemini" => "\n        env:\n          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}",
         "mock" => "",
         _ => "\n          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}",
     };
@@ -574,5 +642,17 @@ mod tests {
         let d = detect(r);
         assert_eq!((d.stack, d.syntax), ("react-i18next", "i18next"));
         assert_eq!(d.files, vec!["src/locales/{locale}.json"]);
+    }
+
+    #[test]
+    fn next_without_i18n_lib_gets_next_intl_convention() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        std::fs::write(r.join("package.json"), r#"{"dependencies":{"next":"16"}}"#).unwrap();
+        std::fs::create_dir_all(r.join("app")).unwrap();
+        std::fs::write(r.join("app/layout.tsx"), "").unwrap();
+        let d = detect(r);
+        assert_eq!(d.stack, "next.js (no i18n library yet)");
+        assert_eq!(d.files, vec!["messages/{locale}.json"]);
     }
 }

@@ -57,12 +57,13 @@ const PROJECT_PAGES = [
   { seg: "/keys", icon: TableProperties, label: "keys" },
   { seg: "/preview", icon: Grid3x3, label: "preview" },
   { seg: "/visual", icon: ScanEye, label: "visual" },
-  { seg: "/insights", icon: Radar, label: "insights" },
-  { seg: "/experiments", icon: FlaskConical, label: "experiments" },
-  { seg: "/feedback", icon: MessageSquareWarning, label: "feedback" },
   { seg: "/glossary", icon: BookOpenText, label: "glossary" },
   { seg: "/jobs", icon: ListChecks, label: "jobs" },
   { seg: "/settings", icon: Settings, label: "settings" },
+  // Labs (heading before /insights): growth features, less proven than the core loop.
+  { seg: "/insights", icon: Radar, label: "insights" },
+  { seg: "/experiments", icon: FlaskConical, label: "experiments" },
+  { seg: "/feedback", icon: MessageSquareWarning, label: "feedback" },
 ] as const;
 
 function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreate: () => void }) {
@@ -102,13 +103,19 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
               </Link>
               {p.slug === slug && (
                 <div className="ms-4 mt-0.5 space-y-0.5 border-s ps-2">
-                  {PROJECT_PAGES.slice(1).map(({ seg, icon: Icon, label }) => {
+                  {PROJECT_PAGES.slice(1).map((page) => {
+                    const { seg, icon: Icon, label } = page;
                     const href = `/app/${p.slug}${seg}`;
                     return (
-                      <Link key={seg} href={href} className={item(href, pathname === href)}>
-                        <Icon className="size-4" />
-                        {t(label)}
-                      </Link>
+                      <div key={seg}>
+                        {seg === "/insights" && (
+                          <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
+                        )}
+                        <Link href={href} className={item(href, pathname === href)}>
+                          <Icon className="size-4" />
+                          {t(label)}
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -278,6 +285,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <p role="note" className="mb-6 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+            {t.rich("experimental", {
+              docs: (c) => (
+                <Link href="/docs/self-hosting" className="font-medium underline underline-offset-2">
+                  {c}
+                </Link>
+              ),
+            })}
+          </p>
           {children}
         </main>
       </div>

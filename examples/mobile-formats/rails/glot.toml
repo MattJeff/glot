@@ -1,0 +1,9 @@
+source_locale = "en"
+target_locales = ["es"]
+files = ["config/locales/{locale}.yml"]
+format = "yaml"
+syntax = "rails"
+
+[llm]
+provider = "mock"   # swap for "anthropic" + api_key_env
+model = "mock"

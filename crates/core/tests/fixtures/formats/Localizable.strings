@@ -1,0 +1,9 @@
+/* Title of the welcome screen */
+"welcome.title" = "Welcome to Acme";
+
+/* Greeting, %@ is the user's first name */
+"welcome.greeting" = "Hello, %@!";
+
+// Button
+"action.save" = "Save";
+"quote" = "She said \"hi\"\nthen left";

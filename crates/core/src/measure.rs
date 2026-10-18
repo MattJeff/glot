@@ -51,6 +51,23 @@ pub struct Fit {
     pub text: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub text_px: Option<f32>,
+    /// Every place the key rendered (`glot measure`); the budget above is the tightest of them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub occurrences: Vec<Occurrence>,
+}
+
+/// One rendering of a key: route × viewport × element, with its own box.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Occurrence {
+    pub route: String,
+    pub viewport: String,
+    /// CSS path of the element (`main > div:nth-of-type(2) > button`).
+    pub selector: String,
+    pub max_width_px: f32,
+    pub max_lines: Option<u32>,
+    /// `marker`: mapped by the dev key marker (`GLOT_DEV_KEYS=1`, exact); `text`: by rendered text
+    /// (two keys with the same source text are ambiguous: the first one gets both boxes).
+    pub by: String,
 }
 
 pub type Layout = BTreeMap<Key, Fit>;
@@ -398,7 +415,7 @@ pub fn measure_text(text: &str, font: &Font) -> f32 {
                 let f = &faces[i];
                 let mut buf = UnicodeBuffer::new();
                 buf.push_str(run);
-                let shaped = rustybuzz::shape(f, &[], buf);
+                let shaped = rustybuzz::shape(f, features(), buf);
                 let units: i32 = shaped.glyph_positions().iter().map(|p| p.x_advance).sum();
                 units as f32 * font.size_px / f.units_per_em() as f32
             }
@@ -417,6 +434,18 @@ pub fn measure_text(text: &str, font: &Font) -> f32 {
     }
     width += flush(&mut run, cur.flatten());
     width + font.letter_spacing_px * text.chars().count() as f32
+}
+
+/// OpenType features browsers enable by default for horizontal text (CSS `font-kerning: auto`,
+/// `font-variant-ligatures: normal`), passed explicitly so shaping never depends on shaper defaults.
+fn features() -> &'static [rustybuzz::Feature] {
+    static F: OnceLock<Vec<rustybuzz::Feature>> = OnceLock::new();
+    F.get_or_init(|| {
+        [b"kern", b"liga", b"clig", b"calt"]
+            .iter()
+            .map(|t| rustybuzz::Feature::new(Tag::from_bytes(t), 1, ..))
+            .collect()
+    })
 }
 
 /// Browser width / our width on the source as rendered (1.0 without a reference), clamped.
@@ -439,15 +468,75 @@ fn breaks_anywhere(c: char) -> bool {
     matches!(c as u32, 0x3040..=0x30FF | 0x3400..=0x9FFF | 0xF900..=0xFAFF | 0xFF00..=0xFFEF)
 }
 
+/// Japanese/Chinese kinsoku (minimal, CSS `line-break: normal` like Chromium): no line may start with
+/// these closing marks (small kana and ー may, as in the browser)…
+fn no_start(c: char) -> bool {
+    matches!(
+        c,
+        '、' | '。'
+            | '，'
+            | '．'
+            | '」'
+            | '』'
+            | '）'
+            | '】'
+            | '〉'
+            | '》'
+            | '〕'
+            | '！'
+            | '？'
+            | '・'
+            | '…'
+            | '!'
+            | '?'
+            | ','
+            | '.'
+            | ')'
+            | ':'
+            | ';'
+    )
+}
+
+/// …and none may end with these opening ones.
+fn no_end(c: char) -> bool {
+    matches!(c, '「' | '『' | '（' | '【' | '〈' | '《' | '〔' | '(')
+}
+
+/// Unbreakable units of a whitespace-free word: CJK breaks between any two chars, except
+/// before a closing mark or after an opening one (kinsoku); Latin runs inside stay whole.
+fn break_units(w: &str) -> Vec<String> {
+    if !w.chars().any(breaks_anywhere) {
+        return vec![w.to_string()];
+    }
+    let mut units: Vec<String> = vec![];
+    let mut prev: Option<char> = None;
+    for c in w.chars() {
+        let split = prev.is_some_and(|p| {
+            (breaks_anywhere(c) || breaks_anywhere(p)) && !no_start(c) && !no_end(p)
+        });
+        match units.last_mut() {
+            Some(u) if !split => u.push(c),
+            _ => units.push(c.to_string()),
+        }
+        prev = Some(c);
+    }
+    units
+}
+
 /// Lines needed to lay out `text` greedily in `width` px (`u32::MAX` if a single word is wider).
-fn lines_needed(words: &[(String, f32)], space: f32, width: f32) -> u32 {
+/// `words`: (separated from the previous one by a space, width). CJK units of one word have no space.
+fn lines_needed(words: &[(bool, f32)], space: f32, width: f32) -> u32 {
     let mut lines = 1;
     let mut x = 0.0;
-    for (i, (_, w)) in words.iter().enumerate() {
+    for (i, (gap, w)) in words.iter().enumerate() {
         if *w > width + 0.5 {
             return u32::MAX;
         }
-        let add = if i == 0 || x == 0.0 { *w } else { space + w };
+        let add = if i == 0 || x == 0.0 || !gap {
+            *w
+        } else {
+            space + w
+        };
         if x + add > width + 0.5 {
             lines += 1;
             x = *w;
@@ -461,17 +550,12 @@ fn lines_needed(words: &[(String, f32)], space: f32, width: f32) -> u32 {
 /// `(width needed on one line, lines needed in the box)` for a plain rendered string.
 fn layout_of(text: &str, fit: &Fit, k: f32) -> (f32, u32) {
     let one = measure_text(text, &fit.font) * k;
-    let mut words: Vec<(String, f32)> = vec![];
+    let mut words: Vec<(bool, f32)> = vec![];
     for w in text.split_whitespace() {
-        // ponytail: CJK splits per char; kinsoku (no break before 。、) is ignored, slightly optimistic.
-        if w.chars().any(breaks_anywhere) {
-            words.extend(w.chars().map(|c| (c.to_string(), 0.0)));
-        } else {
-            words.push((w.to_string(), 0.0));
+        // ponytail: minimal kinsoku (closing/opening marks); no hanging punctuation or line-end compression.
+        for (i, u) in break_units(w).iter().enumerate() {
+            words.push((i == 0, measure_text(u, &fit.font) * k));
         }
-    }
-    for (w, px) in words.iter_mut() {
-        *px = measure_text(w, &fit.font) * k;
     }
     let space = measure_text("a a", &fit.font) * k - measure_text("aa", &fit.font) * k;
     (one, lines_needed(&words, space.max(0.0), fit.max_width_px))
@@ -591,6 +675,7 @@ mod tests {
             },
             text: None,
             text_px: None,
+            occurrences: vec![],
         }
     }
 
@@ -638,6 +723,61 @@ mod tests {
             )
             .is_some()
         );
+    }
+
+    #[test]
+    fn kinsoku_units() {
+        assert_eq!(break_units("保存する。"), ["保", "存", "す", "る。"]);
+        assert_eq!(
+            break_units("「設定」を開く、"),
+            ["「設", "定」", "を", "開", "く、"]
+        );
+        assert_eq!(break_units("Glotで翻訳"), ["Glot", "で", "翻", "訳"]);
+        assert_eq!(break_units("ちょっと"), ["ち", "ょ", "っ", "と"]);
+        assert_eq!(break_units("hello"), ["hello"]);
+    }
+
+    /// Line count vs Chromium on Japanese with punctuation (fixture: `packages/visual-qa/test/measure.test.ts`, macOS only).
+    #[test]
+    fn kinsoku_matches_browser_lines() {
+        let file =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/browser-lines-ja.json");
+        if !cfg!(target_os = "macos") || !file.exists() {
+            return;
+        }
+        let fixture: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(file).unwrap()).unwrap();
+        let (mut bad, mut off) = (vec![], 0);
+        let cases = fixture["cases"].as_array().unwrap();
+        for case in cases {
+            let font: Font = serde_json::from_value(case["font"].clone()).unwrap();
+            let f = Fit {
+                max_width_px: case["width"].as_f64().unwrap() as f32,
+                max_lines: None,
+                font,
+                text: None,
+                text_px: None,
+                occurrences: vec![],
+            };
+            let text = case["text"].as_str().unwrap();
+            let ours = layout_of(text, &f, 1.0).1;
+            let browser = case["lines"].as_u64().unwrap() as u32;
+            // Never optimistic; one extra line at most (Chromium's `text-spacing-trim` half-width
+            // punctuation at line ends is not modelled).
+            if ours < browser || ours > browser + 1 {
+                bad.push(format!(
+                    "{text:?} @{}px: rust {ours} vs browser {browser}",
+                    f.max_width_px
+                ));
+            }
+            off += (ours != browser) as usize;
+        }
+        eprintln!(
+            "kinsoku: {off}/{} line counts differ from Chromium",
+            cases.len()
+        );
+        assert!(bad.is_empty(), "{bad:#?}");
+        assert!(off * 20 <= cases.len(), "{off} mismatches");
     }
 
     #[test]

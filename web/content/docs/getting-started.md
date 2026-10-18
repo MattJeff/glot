@@ -67,6 +67,20 @@ On the bundled demo app (`examples/demo-saas`, a small Next.js invoicing SaaS), 
 
 ## 3. `glot translate`
 
+### Try it without a key
+
+The `mock` provider needs no API key and no network: it writes placeholder translations (`⟦fr⟧ …`) through the same pipeline (plan, validator, lockfile, catalogs), so you can see what glot does before paying for anything.
+
+```sh
+glot init --yes --targets fr,de --provider mock
+glot translate --yes
+glot status
+```
+
+Switch to a real provider later by editing `[llm]` in `glot.toml`, then run `glot translate --force` to replace the placeholders.
+
+### With an LLM key
+
 ```sh
 export ANTHROPIC_API_KEY=...
 glot translate --dry-run        # plan + estimated cost, writes nothing
@@ -76,6 +90,17 @@ glot check                      # deterministic QA, exit 1 on errors (--format t
 ```
 
 Every output goes through the [validator](concepts.md#validator) before it is written. Hand-edited translations are never overwritten without `--force`. `glot status` shows coverage per locale and what the next `translate` would do.
+
+## Visual commands need Node.js and Chromium
+
+`glot fit`, `glot measure`, `glot coverage --render` and `glot translate --visual` drive a real browser through the `@glot/visual-qa` helper (Playwright); `glot parity` uses `@glot/agent-qa`. The glot binary itself needs neither. glot starts the helper with `npx -y @glot/visual-qa` (pinned to its own version) unless `glot-visual-qa` is on your PATH, so you only need:
+
+```sh
+node --version                   # Node.js >= 20
+npx -y playwright install chromium
+```
+
+To use a local checkout instead, set `GLOT_VISUAL_QA=/path/to/visual-qa/dist/cli.js` (`GLOT_AGENT_QA` for `parity`).
 
 ## Next steps
 

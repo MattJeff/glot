@@ -1,0 +1,9 @@
+source_locale = "en"
+target_locales = ["fr", "ja"]
+files = ["App/Localizable.xcstrings"]
+format = "xcstrings"
+syntax = "printf"
+
+[llm]
+provider = "mock"   # swap for "anthropic" + api_key_env
+model = "mock"

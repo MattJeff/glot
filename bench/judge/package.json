@@ -1,0 +1,9 @@
+{
+  "name": "glot-bench-judge",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@formatjs/icu-messageformat-parser": "2.11.2"
+  }
+}

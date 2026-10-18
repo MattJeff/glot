@@ -2,12 +2,10 @@ import {
   ArrowRight,
   Bot,
   Maximize2,
-  Undo2,
   Wand2,
   Languages,
   BookOpenText,
   Check,
-  CircleAlert,
   Eye,
   GitPullRequest,
   KeyRound,
@@ -32,9 +30,9 @@ import {
   MatrixTile,
   OnDeviceTile,
   OverlayVisual,
+  RefusalDemo,
   ReviewTile,
   Showcase,
-  Terminal,
 } from "@/components/landing";
 import { DEMO, GITHUB_URL, INSTALL_CARGO, INSTALL_NPX, mcpJson } from "@/lib/snippets";
 import { cn } from "@/lib/utils";
@@ -61,8 +59,8 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
   const workflow = [
     { key: "i18nize", icon: Wand2, cmd: COMMANDS.i18nize },
     { key: "translate", icon: Languages, cmd: COMMANDS.translate },
+    { key: "check", icon: ShieldCheck, cmd: COMMANDS.check },
     { key: "fit", icon: Maximize2, cmd: COMMANDS.fit },
-    { key: "review", icon: Undo2, cmd: COMMANDS.review },
   ] as const;
 
   type Cell = "yes" | "no" | "partial" | string;
@@ -95,6 +93,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
           <nav className="hidden items-center gap-5 text-sm text-muted-foreground md:flex">
             <a href="#workflow" className="hover:text-foreground">{t("nav.workflow")}</a>
             <a href="#features" className="hover:text-foreground">{t("nav.features")}</a>
+            <a href="#labs" className="hover:text-foreground">{t("nav.labs")}</a>
             <a href="#compare" className="hover:text-foreground">{t("nav.compare")}</a>
             <a href="#install" className="hover:text-foreground">{t("nav.install")}</a>
           </nav>
@@ -115,17 +114,17 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
         {/* Hero */}
         <section className="relative overflow-hidden border-b">
           <div aria-hidden className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)] opacity-60" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-16 pb-16 sm:pt-24 lg:grid-cols-[1.1fr_1fr]">
-            <div className="text-center lg:text-start">
+          <div className="relative mx-auto grid max-w-5xl gap-12 px-4 pt-16 pb-16 sm:pt-24">
+            <div className="text-center">
               <Badge variant="outline" className="mb-6 gap-1.5 rounded-full bg-background px-3 py-1 text-xs font-normal">
                 <span className="size-1.5 rounded-full bg-brand" />
                 {t("hero.badge")}
               </Badge>
               <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{t("hero.title")}</h1>
-              <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg lg:mx-0">
+              <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
                 {t("hero.subtitle")}
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button size="lg" asChild className="h-11 px-5">
                   <Link href="/signup">
                     {t("hero.primary")} <ArrowRight className="rtl:rotate-180" />
@@ -138,7 +137,7 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
                 </Button>
               </div>
             </div>
-            <Terminal label={t("hero.terminal")} />
+            <RefusalDemo label={t("hero.demoAlt")} caption={t("hero.demoCaption")} />
           </div>
 
           {/* Flow demo: agent -> MCP -> validation -> PR */}
@@ -157,14 +156,11 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
               </FlowStep>
               <FlowStep n={3} icon={ShieldCheck} label={t("flow.validate.label")} caption={t("flow.validate.caption")}>
                 <ul className="space-y-1.5 text-xs">
-                  {(["placeholders", "plurals", "glossary"] as const).map((k) => (
+                  {(["placeholders", "plurals", "glossary", "length"] as const).map((k) => (
                     <li key={k} className="flex items-center gap-2">
                       <Check className="size-3.5 shrink-0 text-success" /> {t(`flow.checks.${k}`)}
                     </li>
                   ))}
-                  <li className="flex items-center gap-2">
-                    <CircleAlert className="size-3.5 shrink-0 text-warning" /> {t("flow.checks.length")}
-                  </li>
                 </ul>
               </FlowStep>
               <FlowStep n={4} icon={GitPullRequest} label={t("flow.pr.label")} caption={t("flow.pr.caption")}>
@@ -172,10 +168,10 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
                   <div className="border-b bg-muted/60 px-2 py-1 text-muted-foreground">{DEMO.file}</div>
                   {DEMO.diff.map((d) => (
                     <div
-                      key={d.text}
+                      key={d.code}
                       className={cn("truncate px-2 py-0.5", d.sign === "+" ? "bg-success/10 text-success" : "text-muted-foreground")}
                     >
-                      {d.sign} {d.text}
+                      {d.sign} {d.code}
                     </div>
                   ))}
                 </div>
@@ -205,6 +201,21 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
           </ol>
         </section>
 
+        {/* Guarantees: the deterministic core */}
+        <section className="mx-auto max-w-6xl px-4 py-20">
+          <h2 className="text-3xl font-semibold tracking-tight">{t("core.title")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("core.subtitle")}</p>
+          <div className="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            {features.map(({ icon: Icon, key, ...f }) => (
+              <div key={key} className={cn("bg-background p-6", "wide" in f && f.wide && "lg:col-span-2")}>
+                <Icon className="size-5 text-brand" />
+                <h3 className="mt-4 font-medium">{t(`features.${key}.title`)}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{t(`features.${key}.body`)}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Showcases */}
         <section id="features" className="scroll-mt-16 border-t">
           <div className="mx-auto max-w-6xl space-y-24 px-4 py-20">
@@ -223,8 +234,10 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section className="border-t bg-muted/30">
+        {/* Labs: younger features, after the core */}
+        <section id="labs" className="scroll-mt-16 border-t bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-20">
+            <Badge variant="outline" className="mb-3 rounded-full bg-background text-xs font-normal">{t("more.badge")}</Badge>
             <h2 className="text-3xl font-semibold tracking-tight text-balance">{t("more.title")}</h2>
             <p className="mt-2 text-muted-foreground">{t("more.subtitle")}</p>
             <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -233,21 +246,6 @@ export default async function Landing({ params }: PageProps<"/[locale]">) {
               <InsightsTile />
               <OnDeviceTile />
             </div>
-          </div>
-        </section>
-
-        {/* Deterministic core */}
-        <section className="mx-auto max-w-6xl px-4 py-20">
-          <h2 className="text-3xl font-semibold tracking-tight">{t("core.title")}</h2>
-          <p className="mt-2 text-muted-foreground">{t("core.subtitle")}</p>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
-            {features.map(({ icon: Icon, key, ...f }) => (
-              <div key={key} className={cn("bg-background p-6", "wide" in f && f.wide && "lg:col-span-2")}>
-                <Icon className="size-5 text-brand" />
-                <h3 className="mt-4 font-medium">{t(`features.${key}.title`)}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{t(`features.${key}.body`)}</p>
-              </div>
-            ))}
           </div>
         </section>
 

@@ -1,7 +1,7 @@
 // Cloudflare Worker in front of a static / marketing site (route it on your zone; `fetch(req)` reaches the origin).
 // `/de/pricing` = the origin's `/pricing` with every `data-glot="key"` element filled from glot's `de` catalog,
 // asked on demand: while glot translates (first visit), the source page is served uncached.
-//   wrangler.toml: main = "node_modules/@glot/edge/src/worker.ts"
+//   wrangler.toml: main = "node_modules/@glot/edge/dist/worker.js"
 //   [vars] GLOT_SERVER = "https://glot.example.com"  GLOT_PROJECT = "site"  LOCALES = "de,it,ja"  SOURCE_LOCALE = "en"
 // ponytail: plain strings only (no ICU formatting) and links inside the page are not rewritten to `/de/…`.
 import { createOnDemandLoader } from "@glot/runtime/ondemand";

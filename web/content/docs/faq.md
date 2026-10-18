@@ -29,6 +29,21 @@ The estimate uses the real prompts, the expected output (plural forms of each ta
 
 `provider = "anthropic" | "openai" | "openai-compatible" | "mock"`. `openai-compatible` takes a `base_url`, so local models through Ollama work (`base_url = "http://localhost:11434/v1"`). `mock` returns fake translations (`⟦fr⟧ …`) for tests and demos, no key needed. Environment variables: `ANTHROPIC_API_KEY` (or another name via `llm.api_key_env`), `ANTHROPIC_WORKSPACE_ID` for organization-level keys, `OPENAI_API_KEY`.
 
+## Which environment variables does glot read?
+
+| Variable | Used by | |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | `translate`, `review`, `i18nize`, MCP | Key for `provider = "anthropic"` (name configurable with `llm.api_key_env`) |
+| `OPENAI_API_KEY` | same | Key for `openai` / `openai-compatible` (optional for local servers) |
+| `ANTHROPIC_WORKSPACE_ID` | same | Sent as `anthropic-workspace-id`; required by organization-level user keys (`sk-ant-usr-…`) |
+| `GLOT_TOKEN` | `push`, `pull` | Server API token (name configurable with `server.token_env`) |
+| `GLOT_DEV_TOKEN` | `dev` | Fixed token for the overlay server (else `--token`, else random) |
+| `GLOT_VISUAL_QA` | `fit`, `measure`, `coverage --render`, `translate --visual` | Path to a `visual-qa` CLI to use instead of `npx -y @glot/visual-qa` |
+| `GLOT_AGENT_QA` | `parity` | Same for `agent-qa` |
+| `DATABASE_URL` | `db` | Postgres URL when `--database-url` is not given |
+
+Server variables (`GLOT_SECRET_KEY`, `GLOT_BIND`, `GLOT_WEB_ORIGIN`, rate limits…) are listed in [Self-hosting](self-hosting.md). The installer reads `GLOT_VERSION`, `GLOT_INSTALL_DIR` and `GLOT_DOWNLOAD_BASE`.
+
 ## Does my code leave my machine?
 
 The CLI sends to your LLM provider the strings to translate and their context: key, neighbors, notes, glossary terms, UI role, component name and file path. Not your source files. With `--visual`, screenshot crops of your running app are sent too. Nothing goes to glot's authors; there is no telemetry.

@@ -513,7 +513,7 @@ impl GlotServer {
     }
 
     #[tool(
-        description = "Find user-visible string literals not wrapped in a translation call, each with file:line, UI role, component and a suggested key. Use it to internationalize code yourself: propose_string -> add_string -> replace the literal with the t() call."
+        description = "Find user-visible string literals not wrapped in a translation call, each with file:line, UI role, component and a suggested key; items with a `reason` are UI copy inside config/data objects (arrays of plans, metadata, props) that must be translated where they render. Use it to internationalize code yourself: propose_string -> add_string -> replace the literal with the t() call."
     )]
     async fn find_hardcoded(
         &self,
@@ -525,18 +525,19 @@ impl GlotServer {
                 .as_deref()
                 .map(norm_path)
                 .map(|s| s.trim_end_matches('/').to_string());
-            let mut hard = match &filter {
+            let report = match &filter {
                 Some(f) if ws.root.join(f).is_file() => {
                     let src = std::fs::read_to_string(ws.root.join(f))
                         .map_err(|e| format!("cannot read `{f}`: {e}"))?;
-                    glot_extract::extract_source(f, &src, &ws.config.extract).hardcoded
+                    glot_extract::extract_source(f, &src, &ws.config.extract)
                 }
-                _ => {
-                    ws.extract()
-                        .map_err(|e| format!("extraction failed: {e}"))?
-                        .hardcoded
-                }
+                _ => ws
+                    .extract()
+                    .map_err(|e| format!("extraction failed: {e}"))?,
             };
+            // Config/data copy (object literals) carries a `reason`; it is still user-visible.
+            let mut hard = report.hardcoded;
+            hard.extend(report.config);
             if let Some(f) = &filter {
                 hard.retain(|h| norm_path(&h.at.path).starts_with(f.as_str()));
             }

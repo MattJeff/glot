@@ -24,6 +24,13 @@ export interface View {
 function scan(): View {
   const els: El[] = [];
   const q = "a[href], button, input:not([type=hidden]), select, textarea, summary, [role=button], [role=tab], [role=link], [role=menuitem], [role=checkbox], [role=radio], [role=switch], [role=option]";
+  // Accessible name: aria-hidden decorations (icons, emoji) are not part of a link's label.
+  const text = (e: HTMLElement) => {
+    if (!e.querySelector("[aria-hidden=true]")) return e.innerText;
+    const c = e.cloneNode(true) as HTMLElement;
+    c.querySelectorAll("[aria-hidden=true]").forEach((x) => x.remove());
+    return c.textContent ?? "";
+  };
   let ref = 0;
   for (const el of Array.from(document.querySelectorAll<HTMLElement>(q))) {
     el.removeAttribute("data-glot-ref");
@@ -32,7 +39,7 @@ function scan(): View {
     if (r.width < 2 || r.height < 2 || cs.visibility === "hidden" || el.closest("[aria-hidden=true], [inert]")) continue;
     const input = el as HTMLInputElement;
     const label = input.labels?.[0]?.innerText;
-    const name = (el.getAttribute("aria-label") || el.innerText || label || input.placeholder || (input.type === "submit" ? input.value : "") || el.title || "").replace(/\s+/g, " ").trim();
+    const name = (el.getAttribute("aria-label") || text(el) || label || input.placeholder || (input.type === "submit" ? input.value : "") || el.title || "").replace(/\s+/g, " ").trim();
     const tag = el.tagName.toLowerCase();
     const role = el.getAttribute("role") || (tag === "a" ? "link" : tag === "select" ? "combobox" : tag === "textarea" ? "textbox" : tag === "input" ? (["checkbox", "radio", "submit", "button"].includes(input.type) ? input.type : "textbox") : tag);
     const clipped = /hidden|clip/.test(cs.overflowX + cs.overflowY) || cs.textOverflow === "ellipsis";
@@ -71,6 +78,7 @@ export type Action =
 
 /** `selector` (scripted steps) overrides the ref. */
 export async function act(page: Page, a: Action, selector?: string): Promise<void> {
+  const before = page.url();
   if (a.action === "scroll") {
     await page.mouse.wheel(0, a.direction === "down" ? 600 : -600);
   } else {
@@ -80,7 +88,9 @@ export async function act(page: Page, a: Action, selector?: string): Promise<voi
     else if (a.action === "type") await el.fill(a.text, { timeout: 3000 });
     else await el.selectOption({ label: a.value }, { timeout: 3000 }).catch(() => el.selectOption(a.value, { timeout: 3000 }));
   }
-  // Client-side navigations don't fire "load": give fetches a moment to settle (dev servers never fully idle).
+  // A client-side navigation (Next <Link>, router.push) starts after the click returns and fires no
+  // "load": wait for the URL to change, then for fetches to settle (dev servers never fully idle).
+  if (a.action === "click") await page.waitForURL((u) => u.href !== before, { timeout: 1500, waitUntil: "commit" }).catch(() => {});
   await page.waitForLoadState("networkidle", { timeout: 1500 }).catch(() => {});
 }
 

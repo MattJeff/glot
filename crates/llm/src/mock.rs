@@ -32,6 +32,111 @@ impl Provider for MockProvider {
     }
 }
 
+/// `mock-noisy` (glot-bench): the mock, but a seeded share of answers is broken the way real models
+/// break ICU (lost/invented placeholder, dropped plural branch, translated keyword, broken tag or
+/// brace). Items sent back with `issues_to_fix` break 4x less often, so retries can recover.
+/// Seed: `GLOT_MOCK_SEED` (default 42); rate: `GLOT_MOCK_NOISE` (default 0.15).
+pub struct NoisyMock {
+    pub seed: u64,
+    pub rate: f64,
+}
+
+impl NoisyMock {
+    pub fn from_env() -> Self {
+        let env = |k: &str| std::env::var(k).ok().and_then(|v| v.parse().ok());
+        Self {
+            seed: env("GLOT_MOCK_SEED").unwrap_or(42.0) as u64,
+            rate: env("GLOT_MOCK_NOISE").unwrap_or(0.15),
+        }
+    }
+}
+
+#[async_trait]
+impl Provider for NoisyMock {
+    fn name(&self) -> &str {
+        "mock-noisy"
+    }
+
+    async fn complete(&self, req: CompletionRequest) -> Result<Completion> {
+        use std::hash::{Hash, Hasher};
+        let payload = crate::translate::extract_payload(&req.user).unwrap_or(Value::Null);
+        let model = req.model.clone();
+        let mut c = MockProvider.complete(req).await?;
+        let Ok(mut v) = serde_json::from_str::<Value>(&c.text) else {
+            return Ok(c);
+        };
+        let Some(tr) = v.get_mut("translations").and_then(Value::as_object_mut) else {
+            return Ok(c);
+        };
+        for item in payload["items"].as_array().into_iter().flatten() {
+            let Some(key) = item["key"].as_str() else {
+                continue;
+            };
+            let Some(Value::String(s)) = tr.get_mut(key) else {
+                continue;
+            };
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            (self.seed, &model, key, item.get("issues_to_fix").is_some()).hash(&mut h);
+            let h = h.finish();
+            let rate = if item.get("issues_to_fix").is_some() {
+                self.rate / 4.0
+            } else {
+                self.rate
+            };
+            if (h % 10_000) as f64 / 10_000.0 < rate {
+                *s = corrupt(s, h >> 16);
+            }
+        }
+        c.text = v.to_string();
+        Ok(c)
+    }
+}
+
+/// One realistic breakage, picked by `h` among those that apply to `s`.
+pub fn corrupt(s: &str, h: u64) -> String {
+    let drop_arg = |s: &str| {
+        let a = s.find('{')?;
+        let b = a + s[a..].find('}')?;
+        let inner = &s[a + 1..b];
+        (!inner.is_empty() && inner.chars().all(|c| c.is_alphanumeric() || c == '_'))
+            .then(|| format!("{}{}", &s[..a], &s[b + 1..]))
+    };
+    let drop_branch = |s: &str| {
+        let i = [" one {", " few {", " many {", " two {", " zero {"]
+            .iter()
+            .find_map(|p| s.find(p))?;
+        let open = i + s[i..].find('{')?;
+        let close = matching(s, open)?;
+        Some(format!("{}{}", &s[..i], &s[close + 1..]))
+    };
+    let keyword = |s: &str| {
+        ["plural,", "select,", "selectordinal,", "other {"]
+            .iter()
+            .find(|k| s.contains(**k))
+            .map(|k| {
+                s.replacen(
+                    k,
+                    &k.replace("plural", "pluriel")
+                        .replace("select", "choix")
+                        .replace("other", "autre"),
+                    1,
+                )
+            })
+    };
+    let tag = |s: &str| {
+        let a = s.find("</")?;
+        let b = a + s[a..].find('>')?;
+        Some(format!("{}{}", &s[..a], &s[b + 1..]))
+    };
+    let brace = |s: &str| s.rfind('}').map(|i| format!("{}{}", &s[..i], &s[i + 1..]));
+    let invent = |s: &str| Some(format!("{s} {{count}}"));
+    type Breaker<'a> = &'a dyn Fn(&str) -> Option<String>;
+    let all: [Breaker; 6] = [&drop_arg, &drop_branch, &keyword, &tag, &brace, &invent];
+    (0..all.len())
+        .find_map(|k| all[(h as usize + k) % all.len()](s))
+        .unwrap_or_else(|| s.to_string())
+}
+
 /// Glossary lines of the translation system prompt: `- "term" => "translation" …`.
 fn system_glossary(system: &str, locale: Option<&str>) -> Value {
     let terms: Vec<Value> = system
@@ -202,6 +307,15 @@ fn rewrite_arg(inner: &str, cats: &[&str]) -> String {
 #[cfg(test)]
 mod tests {
     use super::rewrite;
+
+    #[test]
+    fn noisy_breaks() {
+        let s = "Hi <b>{name}</b>, {n, plural, one {# file} other {# files}}";
+        for h in 0..6 {
+            assert_ne!(super::corrupt(s, h), s, "{h}");
+        }
+        assert_eq!(super::corrupt("Save", 0), "Save {count}");
+    }
 
     #[test]
     fn rewrites_plural_categories() {

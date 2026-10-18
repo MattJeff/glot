@@ -25,6 +25,11 @@
 | `packages/agent-qa` | Parité de tâche (`glot parity`, `crates/cli/src/parity.rs`) : agent Claude vision ou mock scripté, `glot.tasks.yaml`, rapport local `.glot/parity/` (pas d'upload) |
 | `action/` | GitHub Action (`glot check` + `glot translate` + commentaire de PR) |
 
+Helpers Node (`crates/cli/src/fit.rs::node_tool`) : `$GLOT_VISUAL_QA` / `$GLOT_AGENT_QA` (cli.js ou exécutable), sinon
+(build debug seulement) `packages/*/src/cli.ts` du repo, sinon `glot-visual-qa` / `glot-agent-qa` dans le PATH, sinon
+`npx -y --package=@glot-i18n/<nom>@<major.minor du binaire>` (scope changeable au build : `GLOT_NPM_SCOPE=@glot`).
+Les packages sont compilés en `dist/` (esbuild, Node ≥ 20) et publiés par `scripts/publish-packages.sh` (`SCOPE`, `DRY_RUN=1`).
+
 Ports dev : API `8790`, web `3100`, Postgres docker `5433` (`postgres://glot:glot@localhost:5433/glot`).
 
 ## Coûts LLM
@@ -42,14 +47,31 @@ Ports dev : API `8790`, web `3100`, Postgres docker `5433` (`postgres://glot:glo
   l'ancien calcul ne comptait qu'une marge de 10 % pour les retries, alors que chaque retry renvoie le system prompt et
   que l'escalade Sonnet coûte 20× Haiku.
 
+- **Structured outputs** : les lots de traduction (payload `"task": "translate"`) envoient le schéma strict
+  `{"translations": {<clé>: string}}` (clés du lot en `required`, `additionalProperties: false`) via `output_config.format`
+  (Anthropic, Message Batches compris) ou `response_format: json_schema` strict (OpenAI / compatible). 400 qui cite le
+  schéma => renvoi en mode JSON simple ; le parse tolérant reste le repli. > 200 clés : pas de schéma.
+- **Paliers de prix par requête** (`pricing::LONG_PROMPT`) : Claude Haiku 5.5 au-delà de 100K tokens de prompt
+  (non caché + écritures + lectures de cache) passe de 0,10/0,50 $ à 0,50/2,50 $ ; Gemini 3.1 Pro au-delà de 200K.
+  `translate::split` découpe les lots pour rester sous le seuil (heuristique ÷ 1,3) ; même découpe pour l'estimation,
+  le pipeline et les custom ids `--batch`. Gemini (3 Flash, 3.1 Pro, 2.5 Flash) : provider `openai-compatible`,
+  `base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"`, `api_key_env = "GEMINI_API_KEY"`.
+
+## Provenance (AI Act art. 50)
+`LockEntry` porte `translated_at` / `reviewed_at` / `reviewed_by` (optionnels, RFC 3339 UTC), posés par
+`Lockfile::record` (machine => `translated_at`, human => `reviewed_at` + `GLOT_REVIEWER`), conservés tant que la cible ne
+change pas. `glot provenance export --format json|csv|html` (sans les textes), `glot provenance catalog` =>
+`{locale}.provenance.json` lu par `@glot/runtime/provenance` (libellé « Translated by AI · reviewed on … »). Informer,
+pas conclure : la doc ne tranche aucune question juridique.
+
 ## Fichiers projet (côté utilisateur)
 `glot.toml` :
 ```toml
 source_locale = "en"
 target_locales = ["fr", "es", "de", "ja", "ar"]
 files = ["messages/{locale}.json"]   # {locale} remplacé
-format = "auto"                      # auto | json-nested | json-flat
-syntax = "icu"                       # icu | i18next | mf2
+format = "auto"                      # auto | json-nested | json-flat | xcstrings | strings | android | arb | po | yaml (auto = by extension, see glot_core::formats)
+syntax = "icu"                       # icu | i18next | mf2 | printf (%@ %1$s %(name)s) | rails (%{name})
 
 [llm]
 provider = "anthropic"               # anthropic | openai | openai-compatible | mock
@@ -73,6 +95,17 @@ url = "http://localhost:8790"
 project = "my-saas"
 token_env = "GLOT_TOKEN"
 ```
+
+Qualité & coût (`glot_llm::{routing,tm}`, `crates/cli/src/queue.rs`, doc `web/content/docs/quality.md`) :
+- Score écrit dans `glot.lock` `score` = juge (ou 100) − 15 par warning restant. `[qa] review_threshold` + `[qa.risk] <tag> = [globs de clés]`
+  + note `risk: <tag>` → entrée écrite mais `needs_review: "<raison>"` (champ additif du lock) ; `glot queue` (list/approve/edit/
+  export csv|xliff/import) l'efface ; `check` la signale en warning (toutes sorties, `github` inclus).
+- TM `.glot/tm.json` (traductions validées non routées, `set`, approbations ; contexte = note) : exact → écrit sans LLM
+  (`origin machine model "tm"`, pas sur `--force`) ; fuzzy ≥ 85 % (Levenshtein normalisé) → exemple dans `description`.
+  `glot tm export|import` (TMX 1.4). `TranslateReport.{tm_reused,tm_saved,needs_review}`.
+- `provider = "local"` (OpenAI-compatible, défaut `http://localhost:11434/v1`) : complétions taguées `local:<model>` → 0 $.
+  `fallback_provider` (+ `fallback_base_url`, `fallback_api_key_env`) : escalade cross-provider (validateur après retries, ou
+  score juge < `score_threshold`, valeur gardée seulement si elle valide).
 
 `glossary.toml` :
 ```toml
@@ -263,10 +296,22 @@ Webfonts are converted to TTF in `.glot/fonts/`. `glot_core::measure` shapes tex
 fallbacks per script) so `validate` can raise `too_wide` **without a browser**; the translation prompt carries the
 budget ("must fit in 110px at Inter 14px/500 ≈ 16 Latin chars") and the retry loop fixes it before writing.
 When a budget exists for a key it replaces the noisy length-ratio warning.
+- **Exact keys (dev mode)** : text matching is ambiguous when two keys share a text (two « Save » → the first key gets
+  both boxes; `glot measure` flags it as `ambiguous`). One line in `i18n/request.ts` :
+  `messages: getGlotMessages(messages)` (`@glot/runtime/dev`), then run the app with `GLOT_DEV_KEYS=1`. Each message is
+  prefixed with an invisible marker (U+2063, key UTF-8 bytes as variation selectors U+FE00–FE0F/U+E0100–E01EF, U+2063);
+  visual-qa strips the markers before measuring (page renders like production) and sets `data-glot-key` on their element.
+  Marker > text match. Off by default: messages are returned untouched. `createGlotDevTranslator(t, ns)` for a bare `t`.
+- **Per occurrence** : each rendering (route × viewport × element) is kept in `occurrences: [{route, viewport, selector,
+  max_width_px, max_lines, by: "marker"|"text"}]`; the key's budget is the tightest one (width × lines).
+- Shaping passes `kern`, `liga`, `clig`, `calt` explicitly. Line fitting: CJK breaks between chars without a space,
+  minimal kinsoku (no line starts with `、。，．」』）】〉》〕！？・…`, none ends with `「『（【〈《〔`; small kana may start
+  a line, like Chromium's `line-break: normal`). Fixture `crates/core/tests/fixtures/browser-lines-ja.json` (macOS):
+  never fewer lines than Chromium, ≤ 5 % off by one (`text-spacing-trim` not modelled).
 
 ## Framework setup (`glot i18nize`)
 `glot i18nize` wires the runtime it detects, idempotently (a second run changes nothing), and every edit shows up in `--dry-run`:
-- **Next App Router** → next-intl (`i18n/request.ts`, `proxy.ts`/`middleware.ts`, plugin, provider; cookie routing by default, `--routing prefix`).
+- **Next App Router** → next-intl (`i18n/request.ts`, `proxy.ts`/`middleware.ts`, plugin, provider; cookie routing by default, `--routing prefix`). With `cacheComponents: true` (create-next-app ≥ 16.4 default) headers can't be read outside `<Suspense>`: `app/*` moves to `app/[locale]/*` (except `api/`, favicon/robots/sitemap/manifest, global-error; `../` imports and `LayoutProps<"/…">` fixed), `generateStaticParams` per locale, `request.ts` reads `next/root-params`, and the proxy rewrites unprefixed URLs to `/{cookie|default}/…`: same URLs, static pages per locale (`cargo test -p glot-cli --test first_contact`).
 - **Next Pages Router** → built-in `i18n` + provider wrapping the whole `_app` tree.
 - **React Router 7/8 (Remix)** → remix-i18next middleware: one i18next instance per request (`?lng` → cookie `glot-locale` → `Accept-Language`), `entry.server.tsx` with `I18nextProvider`, dynamic `<html lang>`. SSR renders the requested locale.
 - **Astro (React islands)** → native i18n routing with `fallbackType: "rewrite"` (`/fr/...` reuses pages), `src/middleware.ts` sets the locale before islands render. Shared instance: safe for static builds, not for concurrent on-demand rendering.
@@ -316,7 +361,7 @@ Une locale non livrée devient une vraie page traduite côté serveur sans actio
 ## Branch coverage (`glot coverage`, `glot_core::branches`)
 `branches::enumerate(msg, locale, syntax)` (child module of `validate`, walks its AST) : produit cartésien des cas de chaque
 variable de sélection — `plural` : catégories CLDR de la locale avec un témoin (`witness`, ex. pl few=3 many=11 other=1.5,
-ar 0/1/2/3/11/100) + chaque `=N` ; `selectordinal` : `ordinal_witnesses` (en, langues one/other, sinon `other`) + clés du
+ar 0/1/2/3/11/100) + chaque `=N` ; `selectordinal` : `ordinal_witnesses` (catégories ordinales CLDR de la locale, ICU4X) + clés du
 message ; `select` : chaque clé + `other`. Variables non atteintes ignorées (dédup), plafond `MAX_BRANCHES`. Texte rendu :
 `=N` > catégorie > `other`, `#` = témoin, autres placeholders = `render_sample`, balises retirées. MF2 : `.match` à un
 sélecteur exact ; multi-sélecteurs → texte du 1er sélecteur. i18next non couvert (pluriels = clés `_few`).
@@ -325,6 +370,10 @@ CLI (`crates/cli/src/coverage.rs`) : mesure chaque branche (`measure::check`) ; 
 `glot-visual-qa --harness` (le fragment remplace le body de la page `--base-url` + 1re route : CSS/polices de l'app).
 `.glot/coverage.json` : `{locale: {key: {branch_id: {text_hash, issue|null}}}}` ; une branche n'est « vue » que si son texte
 a le même hash. Rapport par locale × catégorie (branches, vues, en échec, trop larges) ; exit 1 si échec.
+Pluriels : `glot_core::plural` = ICU4X (`icu_plurals`, données CLDR compilées) pour `categories` (cardinaux),
+`ordinal_categories` et `category(locale, n, ordinal)`, toutes locales CLDR ; langue inconnue de CLDR → `[one, other]`.
+`validate` exige les catégories ordinales de la locale pour `selectordinal` ; un sélecteur traduit (`un`, `autre`) donne
+« `un` is a translated keyword, use `one` » au lieu d'une catégorie manquante.
 
 ## Register variants (`[variants]`, `glot_core::variants`)
 `glot.toml` : `[variants] fr = ["formal", "informal"]` → locales `fr-x-formal`, `fr-x-informal` (extension privée BCP 47),
@@ -396,3 +445,20 @@ auto-init ; `labels` à passer traduits. Dashboard : `/app/{slug}/feedback`.
 - **check** : `Workspace::check` sur les clés des assets + liens identiques à la source, sujet ≤ 60 / preheader ≤ 100,
   `<Html dir>` absent pour une locale RTL (warning), largeur réellement rendue par resvg (bbox usvg) > budget, OG plus
   haut que l'image. Exit 1 si erreur.
+
+## MCP distant (`crates/server/src/mcp_remote.rs` + `mcp_remote/oauth.rs`, migration `0060_mcp_remote.sql`, doc `web/content/docs/mcp-remote.md`)
+- `POST /mcp` : rmcp Streamable HTTP **stateless** (`NeverSessionManager`, réponses JSON), 1 projet par connexion. Outils =
+  appels directs des handlers REST (`keys::*`, `jobs::*`, `review::*`, `sync::pull`…) → mêmes rôles/validation/historique.
+  `translate` = job serveur + attente ≤ 50 s ; `translate_repo` = PR GitHub (catalogues source+cibles + `glot.lock`) via
+  `feedback_settings` (repo/token chiffré) ; pas d'i18nize/extraction côté serveur.
+- Auth (`guard`) : `Bearer glot_…` (API token, `?project=slug` ou `X-Glot-Project`, tous scopes) ou `Bearer glot_at_…` (OAuth,
+  projet + scopes fixés au consentement, audience RFC 8707). 401 → `WWW-Authenticate: Bearer resource_metadata=…` ;
+  `tools/call` hors scope → 403 `insufficient_scope` (le guard lit le corps JSON-RPC) ; `tools/list` filtré par scopes.
+  Scopes : `read` / `translate` (`translate`, `review`) / `write` (`add_string`, `set_translation`, `glossary_upsert`, `translate_repo`).
+- OAuth 2.1 : `/.well-known/oauth-protected-resource` (RFC 9728), `/.well-known/oauth-authorization-server` (RFC 8414), DCR
+  `/oauth/register` (clients publics), `/oauth/authorize` → redirige vers `{GLOT_WEB_ORIGIN}/oauth/authorize` (consentement
+  `web/app/[locale]/oauth/authorize`, API session `GET|POST /api/oauth/authorize`), code 5 min usage unique + PKCE S256, `iss`
+  (RFC 9207), `/oauth/token` (access 1 h, refresh 30 j avec rotation), `/oauth/revoke` (RFC 7009, supprime le grant). Secrets
+  stockés en sha256 (`oauth_codes`, `oauth_grants`).
+- Sécurité : Origin validé par rmcp (`GLOT_WEB_ORIGIN` + `GLOT_MCP_ALLOWED_ORIGINS`), Host = `GLOT_PUBLIC_URL` si défini ;
+  rate limit `mcp_rate` par token (`GLOT_MCP_RATE_PER_MIN`, défaut 120) ; audit `mcp_audit` (outil, ok, ms, client ; jamais les arguments).

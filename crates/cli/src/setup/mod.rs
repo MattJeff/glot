@@ -183,6 +183,8 @@ pub struct SetupPlan {
     pub notes: Vec<String>,
     /// Source strings the generated code needs (locale switcher label).
     pub keys: Vec<(String, String, String)>,
+    /// `(from, to)` renames, done before `changes` (which may edit `to`).
+    pub moves: Vec<(String, String)>,
 }
 
 impl SetupPlan {
@@ -213,7 +215,9 @@ impl SetupPlan {
         let pending = self.changes.iter().position(|c| c.path == rel);
         let cur = match pending {
             Some(i) => self.changes[i].new.clone(),
-            None => match std::fs::read_to_string(root.join(rel)) {
+            None => match std::fs::read_to_string(
+                root.join(self.moved_from(rel).as_deref().unwrap_or(rel)),
+            ) {
                 Ok(s) => s,
                 Err(_) => return,
             },
@@ -230,6 +234,14 @@ impl SetupPlan {
             Ok(_) => {}
             Err(note) => self.notes.push(format!("{rel}: {note}")),
         }
+    }
+
+    /// Where `rel` is now, before the planned moves.
+    pub(crate) fn moved_from(&self, rel: &str) -> Option<String> {
+        self.moves.iter().find_map(|(f, t)| {
+            let rest = rel.strip_prefix(t.as_str())?;
+            (rest.is_empty() || rest.starts_with('/')).then(|| format!("{f}{rest}"))
+        })
     }
 
     pub fn install_cmd(&self) -> Option<String> {
@@ -326,6 +338,13 @@ fn empty_catalogs(root: &Path, o: &Opts, plan: &mut SetupPlan) {
 }
 
 pub fn write(root: &Path, plan: &SetupPlan) -> Result<()> {
+    for (from, to) in &plan.moves {
+        let to = root.join(to);
+        if let Some(dir) = to.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
+        std::fs::rename(root.join(from), &to).with_context(|| format!("moving {from}"))?;
+    }
     for c in &plan.changes {
         let path = root.join(&c.path);
         if let Some(dir) = path.parent() {

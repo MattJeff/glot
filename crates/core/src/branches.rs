@@ -60,15 +60,20 @@ pub fn witnesses(locale: &str) -> Vec<(PluralCategory, &'static str)> {
         .collect()
 }
 
-/// Ordinal categories (`selectordinal`, MF2 `:number select=ordinal`) with witnesses.
-// ponytail: en and the one/other languages only; others fall back to `other` plus the message's own keys.
+/// Ordinal categories (`selectordinal`, MF2 `:number select=ordinal`) with witnesses, any CLDR locale (ICU4X).
 pub fn ordinal_witnesses(locale: &str) -> Vec<(PluralCategory, &'static str)> {
-    use PluralCategory::*;
-    match language(locale).as_str() {
-        "en" => vec![(One, "1"), (Two, "2"), (Few, "3"), (Other, "4")],
-        "fr" | "ms" | "vi" | "fil" | "tl" | "ro" | "hy" => vec![(One, "1"), (Other, "2")],
-        _ => vec![(Other, "5")],
-    }
+    const N: [&str; 22] = [
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "20", "21", "22",
+        "23", "80", "100", "800", "1000", "0",
+    ];
+    crate::plural::ordinal_categories(locale)
+        .into_iter()
+        .filter_map(|c| {
+            N.iter()
+                .find(|n| crate::plural::category(locale, n, true) == Some(c))
+                .map(|n| (c, *n))
+        })
+        .collect()
 }
 
 /// Every branch of `message` for `locale`. A message without selectors has one branch, id `""`.

@@ -1,0 +1,3017 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "zh",
+  "condition": "raw",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "⟦zh⟧ {count, plural, other {# files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.002",
+      "target": "⟦zh⟧ {count, plural, =0 {No files yet} other {# files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.003",
+      "target": "⟦zh⟧ {count, plural, other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.004",
+      "target": "⟦zh⟧ {count, plural, =0 {No comments yet} other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.005",
+      "target": "⟦zh⟧ {count, plural, other {# members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.006",
+      "target": "⟦zh⟧ {count, plural, =0 {No members yet} other {# members}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.007",
+      "target": "⟦zh⟧ {count, plural, other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.008",
+      "target": "⟦zh⟧ {count, plural, =0 {No tasks yet} other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.009",
+      "target": "⟦zh⟧ {count, plural, other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.010",
+      "target": "⟦zh⟧ {count, plural, =0 {No messages yet} other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.011",
+      "target": "⟦zh⟧ {count, plural, other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.012",
+      "target": "⟦zh⟧ {count, plural, =0 {No seats yet} other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "⟦zh⟧ {count, plural, other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.014",
+      "target": "⟦zh⟧ {count, plural, =0 {No reviews yet} other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.015",
+      "target": "⟦zh⟧ {count, plural, other {# downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.016",
+      "target": "⟦zh⟧ {count, plural, =0 {No downloads yet} other {# downloads}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.017",
+      "target": "⟦zh⟧ {count, plural, other {# notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.018",
+      "target": "⟦zh⟧ {count, plural, =0 {No notifications yet} other {# notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.019",
+      "target": "⟦zh⟧ {count, plural, other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.020",
+      "target": "⟦zh⟧ {count, plural, =0 {No invitations yet} other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.021",
+      "target": "⟦zh⟧ {count, plural, other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.022",
+      "target": "⟦zh⟧ {count, plural, =0 {No errors yet} other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.023",
+      "target": "⟦zh⟧ {count, plural, other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.024",
+      "target": "⟦zh⟧ {count, plural, =0 {No warnings yet} other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.025",
+      "target": "⟦zh⟧ {count, plural, other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "⟦zh⟧ {count, plural, =0 {No results yet} other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.027",
+      "target": "⟦zh⟧ {count, plural, other {# attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.028",
+      "target": "⟦zh⟧ {count, plural, =0 {No attachments yet} other {# attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.029",
+      "target": "⟦zh⟧ {count, plural, other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.030",
+      "target": "⟦zh⟧ {count, plural, =0 {No subscribers yet} other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.031",
+      "target": "⟦zh⟧ {count, plural, other {# days}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.032",
+      "target": "⟦zh⟧ {count, pluriel, =0 {No days yet} other {# days}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.033",
+      "target": "⟦zh⟧ {count, plural, other {# hours}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.034",
+      "target": "⟦zh⟧ {count, plural, =0 {No hours yet} other {# hours}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.035",
+      "target": "⟦zh⟧ {count, plural, other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.036",
+      "target": "⟦zh⟧ {count, plural, =0 {No minutes yet} other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.037",
+      "target": "⟦zh⟧ {count, plural, other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "⟦zh⟧ {count, plural, =0 {No steps yet} other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.039",
+      "target": "⟦zh⟧ {count, plural, other {# credits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.040",
+      "target": "⟦zh⟧ {count, plural, =0 {No credits yet} other {# credits}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.041",
+      "target": "⟦zh⟧ {count, plural, other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.042",
+      "target": "⟦zh⟧ {count, plural, =0 {No photos yet} other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.043",
+      "target": "⟦zh⟧ {count, plural, other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.044",
+      "target": "⟦zh⟧ {count, plural, =0 {No deployments yet} other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.045",
+      "target": "⟦zh⟧ {count, plural, other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.046",
+      "target": "⟦zh⟧ {count, plural, =0 {No keys yet} other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.047",
+      "target": "⟦zh⟧ {count, pluriel, other {# drafts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.048",
+      "target": "⟦zh⟧ {count, plural, =0 {No drafts yet} other {# drafts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.049",
+      "target": "⟦zh⟧ {count, plural, other {# replies}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.050",
+      "target": "⟦zh⟧ {count, pluriel, =0 {No replies yet} other {# replies}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "⟦zh⟧ {count, plural, other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.052",
+      "target": "⟦zh⟧ {count, plural, =0 {No votes yet} other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.053",
+      "target": "⟦zh⟧ {count, plural, other {# followers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.054",
+      "target": "⟦zh⟧ {count, plural, =0 {No followers yet} other {# followers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.055",
+      "target": "⟦zh⟧ {count, plural, other {# items}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.056",
+      "target": "⟦zh⟧ {count, pluriel, =0 {No items yet} other {# items}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.057",
+      "target": "⟦zh⟧ {count, plural, other {# tickets}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.058",
+      "target": "⟦zh⟧ {count, plural, =0 {No tickets yet} other {# tickets}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.059",
+      "target": "⟦zh⟧ {count, plural, other {# events}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.060",
+      "target": "⟦zh⟧ {count, plural, =0 {No events yet} other {# events}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.061",
+      "target": "⟦zh⟧ {count, plural, other {# pages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.062",
+      "target": "⟦zh⟧ {count, plural, =0 {No pages yet} other {# pages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "⟦zh⟧ {count, plural, other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.064",
+      "target": "⟦zh⟧ {count, plural, =0 {No tags yet} other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.065",
+      "target": "⟦zh⟧ {count, plural, other {# branches}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.066",
+      "target": "⟦zh⟧ {count, plural, =0 {No branches yet} other {# branches}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.067",
+      "target": "⟦zh⟧ {count, plural, other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.068",
+      "target": "⟦zh⟧ {count, plural, =0 {No commits yet} other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.069",
+      "target": "⟦zh⟧ {count, plural, other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.070",
+      "target": "⟦zh⟧ {count, plural, =0 {No contacts yet} other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.071",
+      "target": "⟦zh⟧ {count, pluriel, other {# orders}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.072",
+      "target": "⟦zh⟧ {count, plural, =0 {No orders yet} other {# orders}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.073",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new files} other {# new files}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.074",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new comments} other {# new comments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.075",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new members} other {# new members}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new tasks} other {# new tasks}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.077",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new messages} other {# new messages}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.078",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new seats} other {# new seats}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.079",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new reviews} other {# new reviews}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.080",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new downloads} other {# new downloads}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.081",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new notifications} other {# new notifications}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.082",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new invitations} other {# new invitations}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.083",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new errors} other {# new errors}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.084",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new warnings} other {# new warnings}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.085",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new results} other {# new results}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.086",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new attachments} other {# new attachments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.087",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new subscribers} other {# new subscribers}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "⟦zh⟧ You have {count, plural, =0 {no new days} other {# new days}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.001",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a file} =1 {{name} added a file} other {{name} and # others added files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.002",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a comment} =1 {{name} added a comment} other {{name} and # others added comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.003",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a member} =1 {{name} added a member} other {{name} and # others added members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.004",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a task} =1 {{name} added a task} other {{name} and # others added tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.005",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a message} =1 {{name} added a message} other {{name} and # others added messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.006",
+      "target": "⟦zh⟧ {count, pluriel, offset:1 =0 {Nobody added a seat} =1 {{name} added a seat} other {{name} and # others added seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.007",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a review} =1 {{name} added a review} other {{name} and # others added reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.008",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a download} =1 {{name} added a download} other {{name} and # others added downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.009",
+      "target": "⟦zh⟧ {count, pluriel, offset:1 =0 {Nobody added a notification} =1 {{name} added a notification} other {{name} and # others added notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.010",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a invitation} =1 {{name} added a invitation} other {{name} and # others added invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.011",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a error} =1 {{name} added a error} other {{name} and # others added errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.012",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a warning} =1 {{name} added a warning} other {{name} and # others added warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a result} =1 {{name} added a result} other {{name} and # others added results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.014",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a attachment} =1 {{name} added a attachment} other {{name} and # others added attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.015",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a subscriber} =1 {{name} added a subscriber} other {{name} and # others added subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.016",
+      "target": "⟦zh⟧ {count, plural, offset:1 =0 {Nobody added a day} =1 {{name} added a day} other {{name} and # others added days}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.001",
+      "target": "⟦zh⟧ {gender, select, female {She replied to your comment} male {He replied to your comment} other {They replied to your comment}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.002",
+      "target": "⟦zh⟧ {gender, select, female {{name} updated her profile} male {{name} updated his profile} other {{name} updated their profile}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.003",
+      "target": "⟦zh⟧ {gender, select, female {Invite her to the team} male {Invite him to the team} other {Invite them to the team}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.004",
+      "target": "⟦zh⟧ {gender, select, female {{name} is now an admin. She can manage billing.} male {{name} is now an admin. He can manage billing.} other {{name} is now an admin. They can manage billing.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.005",
+      "target": "⟦zh⟧ {role, select, owner {Owner} admin {Admin} member {Member} guest {Guest} other {Unknown role}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.006",
+      "target": "⟦zh⟧ {status, select, open {Open} closed {Closed} merged {Merged} draft {Draft} other {Unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.007",
+      "target": "⟦zh⟧ {status, select, paid {Paid} due {Due} overdue {Overdue} void {Void} other {Pending}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.008",
+      "target": "⟦zh⟧ {plan, select, free {Free plan} pro {Pro plan} team {Team plan} enterprise {Enterprise plan} other {Custom plan}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "⟦zh⟧ {platform, choix, ios {Open the iPhone app} android {Open the Android app} other {Open the web app}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.010",
+      "target": "⟦zh⟧ {device, select, mobile {Scan this code with your phone} desktop {Click the link below} other {Follow the instructions}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.011",
+      "target": "⟦zh⟧ {visibility, select, public {Anyone with the link can view} private {Only invited people can view} other {Visibility unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.012",
+      "target": "⟦zh⟧ {state, select, running {Running} queued {Queued} failed {Failed} success {Passed} other {Skipped}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.013",
+      "target": "⟦zh⟧ {type, select, bug {Bug report} feature {Feature request} question {Question} other {Issue}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.014",
+      "target": "⟦zh⟧ {gender, select, female {Welcome back, {name}! She who returns gets a gift.} other {Welcome back, {name}!}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.015",
+      "target": "⟦zh⟧ {reason, select, expired {Your session expired. Sign in again.} revoked {Your access was revoked by an admin.} other {You were signed out.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.016",
+      "target": "⟦zh⟧ {method, choix, card {Pay by card} sepa {Pay by SEPA debit} paypal {Pay with PayPal} other {Choose a payment method}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.017",
+      "target": "⟦zh⟧ {gender, select, female {Your friend {name} invited you. Join her on the team.} male {Your friend {name} invited you. Join him on the team.} other {Your friend {name} invited you. Join them on the team.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.018",
+      "target": "⟦zh⟧ {tone, select, success {Saved} error {Could not save} other {Saving…}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.019",
+      "target": "⟦zh⟧ {priority, choix, urgent {Urgent} high {High} medium {Medium} low {Low} other {None}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.020",
+      "target": "⟦zh⟧ {theme, select, light {Light} dark {Dark} other {System}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.021",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a file with you} male {{name} shared a file with you} other {{name} shared a file with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "⟦zh⟧ {gender, choix, female {{name} shared a comment with you} male {{name} shared a comment with you} other {{name} shared a comment with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.023",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a member with you} male {{name} shared a member with you} other {{name} shared a member with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.024",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a task with you} male {{name} shared a task with you} other {{name} shared a task with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.025",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a message with you} male {{name} shared a message with you} other {{name} shared a message with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.026",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a seat with you} male {{name} shared a seat with you} other {{name} shared a seat with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.027",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a review with you} male {{name} shared a review with you} other {{name} shared a review with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.028",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a download with you} male {{name} shared a download with you} other {{name} shared a download with you}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.029",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a notification with you} male {{name} shared a notification with you} other {{name} shared a notification with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.030",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a invitation with you} male {{name} shared a invitation with you} other {{name} shared a invitation with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.031",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a error with you} male {{name} shared a error with you} other {{name} shared a error with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.032",
+      "target": "⟦zh⟧ {gender, select, female {{name} shared a warning with you} male {{name} shared a warning with you} other {{name} shared a warning with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.001",
+      "target": "⟦zh⟧ You finished {rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "⟦zh⟧ This is your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} visit this week",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.003",
+      "target": "⟦zh⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} attempt failed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.004",
+      "target": "⟦zh⟧ Renews on the {day, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of each month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.005",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} anniversary with {company}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.006",
+      "target": "⟦zh⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.007",
+      "target": "⟦zh⟧ Reminder: the {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} payment is due",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.008",
+      "target": "⟦zh⟧ Step {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of the setup",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.009",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} file this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.010",
+      "target": "⟦zh⟧ Your {n, choixordinal, one {#st} two {#nd} few {#rd} other {#th}} comment this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.011",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} member this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.012",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} task this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.013",
+      "target": "⟦zh⟧ Your {n, selectordinal, two {#nd} few {#rd} other {#th}} message this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.014",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} seat this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} review this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.016",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} download this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.017",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} notification this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.018",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} invitation this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.019",
+      "target": "⟦zh⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} error this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.001",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# files}} to her list} male {{name} added {count, plural, other {# files}} to his list} other {{name} added {count, plural, other {# files}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.002",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# comments}} to her list} male {{name} added {count, plural, other {# comments}} to his list} other {{name} added {count, plural, other {# comments}} to their list}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.003",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# members}} to her list} male {{name} added {count, plural, other {# members}} to his list} other {{name} added {count, plural, other {# members}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.004",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# tasks}} to her list} male {{name} added {count, plural, other {# tasks}} to his list} other {{name} added {count, plural, other {# tasks}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.005",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# messages}} to her list} male {{name} added {count, plural, other {# messages}} to his list} other {{name} added {count, plural, other {# messages}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.006",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# seats}} to her list} male {{name} added {count, plural, other {# seats}} to his list} other {{name} added {count, plural, other {# seats}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.007",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# reviews}} to her list} male {{name} added {count, plural, other {# reviews}} to his list} other {{name} added {count, plural, other {# reviews}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# downloads}} to her list} male {{name} added {count, plural, other {# downloads}} to his list} other {{name} added {count, plural, other {# downloads}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.009",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# notifications}} to her list} male {{name} added {count, plural, other {# notifications}} to his list} other {{name} added {count, plural, other {# notifications}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.010",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# invitations}} to her list} male {{name} added {count, plural, other {# invitations}} to his list} other {{name} added {count, plural, other {# invitations}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.011",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# errors}} to her list} male {{name} added {count, plural, other {# errors}} to his list} other {{name} added {count, plural, other {# errors}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.012",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# warnings}} to her list} male {{name} added {count, plural, other {# warnings}} to his list} other {{name} added {count, plural, other {# warnings}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.013",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# results}} to her list} male {{name} added {count, plural, other {# results}} to his list} other {{name} added {count, plural, other {# results}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.014",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# attachments}} to her list} male {{name} added {count, plural, other {# attachments}} to his list} other {{name} added {count, plural, other {# attachments}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.015",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# subscribers}} to her list} male {{name} added {count, plural, other {# subscribers}} to his list} other {{name} added {count, plural, other {# subscribers}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.016",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# days}} to her list} male {{name} added {count, plural, other {# days}} to his list} other {{name} added {count, plural, other {# days}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.017",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# hours}} to her list} male {{name} added {count, plural, other {# hours}} to his list} other {{name} added {count, plural, other {# hours}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.018",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# minutes}} to her list} male {{name} added {count, plural, other {# minutes}} to his list} other {{name} added {count, plural, other {# minutes}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.019",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# steps}} to her list} male {{name} added {count, plural, other {# steps}} to his list} other {{name} added {count, plural, other {# steps}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.020",
+      "target": "⟦zh⟧ {gender, select, female {{name} added {count, plural, other {# credits}} to her list} male {{name} added {count, plural, other {# credits}} to his list} other {{name} added {count, plural, other {# credits}} to their list}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "⟦zh⟧ {count, plural, =0 {No files selected} other {<b>#</b> files selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.022",
+      "target": "⟦zh⟧ {count, pluriel, =0 {No comments selected} other {<b>#</b> comments selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.023",
+      "target": "⟦zh⟧ {count, plural, =0 {No members selected} other {<b>#</b> members selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.024",
+      "target": "⟦zh⟧ {count, plural, =0 {No tasks selected} other {<b>#</b> tasks selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.025",
+      "target": "⟦zh⟧ {count, plural, =0 {No messages selected} other {<b>#</b> messages selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.026",
+      "target": "⟦zh⟧ {count, plural, =0 {No seats selected} other {<b>#</b> seats selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.027",
+      "target": "⟦zh⟧ {count, plural, =0 {No reviews selected} other {<b>#</b> reviews selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.028",
+      "target": "⟦zh⟧ {count, plural, =0 {No downloads selected} other {<b>#</b> downloads selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.029",
+      "target": "⟦zh⟧ {count, plural, =0 {No notifications selected} other {<b>#</b> notifications selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.030",
+      "target": "⟦zh⟧ {count, plural, =0 {No invitations selected} other {<b>#</b> invitations selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.031",
+      "target": "⟦zh⟧ {count, plural, =0 {No errors selected} other {<b>#</b> errors selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.032",
+      "target": "⟦zh⟧ {count, plural, =0 {No warnings selected} other {<b>#</b> warnings selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.033",
+      "target": "⟦zh⟧ {count, plural, =0 {No results selected} other {<b>#</b> results selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.034",
+      "target": "⟦zh⟧ {count, plural, =0 {No attachments selected} other {<b>#</b> attachments selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.035",
+      "target": "⟦zh⟧ {count, plural, =0 {No subscribers selected} other {<b># subscribers selected. <link>Clear</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.036",
+      "target": "⟦zh⟧ {count, plural, =0 {No days selected} other {<b>#</b> days selected. <link>Clear</link>}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.001",
+      "target": "⟦zh⟧ {actor} moved {item} from {from} to {to}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.002",
+      "target": "⟦zh⟧ {name} invited {email} to {team}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.003",
+      "target": "⟦zh⟧ {user} changed the due date of {task} to {date}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.004",
+      "target": "⟦zh⟧ Showing {start}–{end} of {total} results",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.005",
+      "target": "⟦zh⟧ {name} commented on {title}: “{excerpt}”",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.006",
+      "target": "⟦zh⟧ {author} merged {count, number} commits into {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.007",
+      "target": "⟦zh⟧ Uploaded {fileName} ({size}) to {folder}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.008",
+      "target": "⟦zh⟧ {name} and {other} are typing…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.009",
+      "target": "⟦zh⟧ Signed in as {email} on {device}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "⟦zh⟧ {percent, number, percent} of {quota used",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.011",
+      "target": "⟦zh⟧ Last synced {time} by {name}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.012",
+      "target": "⟦zh⟧ {user} renamed {oldName} to {newName} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.013",
+      "target": "⟦zh⟧ {used} of {limit} GB used — upgrade to get {extra} GB more",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.014",
+      "target": "⟦zh⟧ {count, number} views since {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.015",
+      "target": "⟦zh⟧ {name} assigned {task} to {assignee}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.016",
+      "target": "⟦zh⟧ {sender} sent you {amount, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.017",
+      "target": "⟦zh⟧ 发票 {number} for {amount} is due on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.018",
+      "target": "⟦zh⟧ {app} wants to access your {resource}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.019",
+      "target": "⟦zh⟧ From {start, time, short} to {end, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.020",
+      "target": "⟦zh⟧ {name} replied in {channel} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.021",
+      "target": "⟦zh⟧ Order {id} ships to {city}, {country",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "⟦zh⟧ {owner}/{repo} · {stars} stars · updated {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.023",
+      "target": "⟦zh⟧ Hello {firstName}, your trial ends in {days} days",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.024",
+      "target": "⟦zh⟧ {author} wrote {words, number} words in {minutes} minutes",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.025",
+      "target": "⟦zh⟧ {a} vs {b}: {delta, number, percent} difference",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.026",
+      "target": "⟦zh⟧ {name} joined {team} via {method}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.027",
+      "target": "⟦zh⟧ Transfer {amount} from {source} to {target}? {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.028",
+      "target": "⟦zh⟧ {count} of {total} checks passed on {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.029",
+      "target": "⟦zh⟧ Rated {score} out of {max} by {reviewer}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.030",
+      "target": "⟦zh⟧ {city} · {temp}° · feels like {feels}°",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.031",
+      "target": "⟦zh⟧ {name} ({role}) left {team}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.032",
+      "target": "⟦zh⟧ Moved {count} items to {folder} — {undo}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.033",
+      "target": "⟦zh⟧ Reset link sent to . It expires in {minutes} minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.034",
+      "target": "⟦zh⟧ {name} reacted {emoji} to your message in {channel}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "⟦zh⟧ Your export of {rows, number} rows is ready: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.036",
+      "target": "⟦zh⟧  × {y} px, {size} KB",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.037",
+      "target": "⟦zh⟧ Version {version} released on {date, date, short} by {author}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.038",
+      "target": "⟦zh⟧ Paid {amount} with card ending in {last4",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.039",
+      "target": "⟦zh⟧ {seconds, plural, other {# seconds}} until {action}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.040",
+      "target": "⟦zh⟧ Between  and {max} characters, currently {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.041",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# files}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.042",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# comments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.043",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# members}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.044",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# tasks}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.045",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# messages}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.046",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# seats}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# reviews}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.048",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# downloads}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.049",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# notifications}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.050",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# invitations}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.051",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# errors}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.052",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# warnings}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.053",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# results}} from {location} on {date, date, medium",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.054",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# attachments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.055",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# subscribers}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.056",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# days}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.057",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# hours}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.058",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# minutes}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.059",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# steps}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "⟦zh⟧ {name} deleted {count, plural, other {# credits}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.001",
+      "target": "⟦zh⟧ By continuing you accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.002",
+      "target": "⟦zh⟧ <b>Heads up:</b> this action cannot be undone.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.003",
+      "target": "⟦zh⟧ Need help? <link>Contact support</link> or read the <docs>docs</docs>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.004",
+      "target": "⟦zh⟧ Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.005",
+      "target": "⟦zh⟧ Your trial ends in <b>{days} days</b>. <link>Upgrade now</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.006",
+      "target": "⟦zh⟧ Signed in as <b>{email}</b>. <link>Not you?</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.007",
+      "target": "⟦zh⟧ <b>{name}</b> mentioned you in <link>{title}</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.008",
+      "target": "⟦zh⟧ Drag files here or <link>browse</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.009",
+      "target": "⟦zh⟧ We sent a code to <b>{phone}</b>.<br/>It expires in 10 minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.010",
+      "target": "⟦zh⟧ <i>Optional</i> — leave empty to use the default",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.011",
+      "target": "⟦zh⟧ Read our <link>guide</link> to <b>get started</b> in minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "⟦zh⟧ This repository is <b>archived</b>. It is <i>read-only</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.013",
+      "target": "⟦zh⟧ <b>Tip:</b> type <code>/</code> to open the command menu.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.014",
+      "target": "⟦zh⟧ Your card was declined. <link>Update payment details</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.015",
+      "target": "⟦zh⟧ <b></b> people viewed this <link>post</link> today",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.016",
+      "target": "⟦zh⟧ Already have an account? <link>Sign in</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.017",
+      "target": "⟦zh⟧ Don't have an account? <link>Create one</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.018",
+      "target": "⟦zh⟧ Forgot your password? <link>Reset it</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.019",
+      "target": "⟦zh⟧ <strong>Warning:</strong> deleting <b>{name}</b> also deletes its data.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.020",
+      "target": "⟦zh⟧ Learn more about <link>keyboard shortcuts</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.021",
+      "target": "⟦zh⟧ Built with <heart>love</heart> by the community",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.022",
+      "target": "⟦zh⟧ Reply to <b>{name}</b> in <channel>#{channel}</channel>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.023",
+      "target": "⟦zh⟧ Your changes are saved <b>automatically</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.024",
+      "target": "⟦zh⟧ <b>New:</b> try the redesigned editor. <link>Learn more</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "⟦zh⟧ Click <b>Publish</b> when you are ready. {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.026",
+      "target": "⟦zh⟧ Use at least <b>8 characters</b> with a <b>number</b> and a <b>symbol</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.027",
+      "target": "⟦zh⟧ Questions? Email us at <link>{email}</link>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.028",
+      "target": "⟦zh⟧ <b>{percent}%</b> complete — <link>see details</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.029",
+      "target": "⟦zh⟧ You are viewing an <b>older version</b>. <link>Go to latest</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.030",
+      "target": "⟦zh⟧ Invite people with this link: <code>{url}</code>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.031",
+      "target": "⟦zh⟧ <b>{count, plural, other {# files}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.032",
+      "target": "⟦zh⟧ <b>{count, plural, other {# comments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.033",
+      "target": "⟦zh⟧ <b>{count, plural, other {# members}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.034",
+      "target": "⟦zh⟧ <b>{count, plural, other {# tasks}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.035",
+      "target": "⟦zh⟧ <b>{count, plural, other {# messages}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.036",
+      "target": "⟦zh⟧ <b>{count, plural, other {# seats}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "⟦zh⟧ <b>{count, plural, other {# reviews}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.038",
+      "target": "⟦zh⟧ <b>{count, plural, other {# downloads}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.039",
+      "target": "⟦zh⟧ <b>{count, plural, other {# notifications}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.040",
+      "target": "⟦zh⟧ <b>{count, plural, other {# invitations}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.041",
+      "target": "⟦zh⟧ <b>{count, plural, other {# errors}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.042",
+      "target": "⟦zh⟧ <b>{count, plural, other {# warnings}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.043",
+      "target": "⟦zh⟧ <b>{count, plural, other {# results}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.044",
+      "target": "⟦zh⟧ <b>{count, plural, other {# attachments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.045",
+      "target": "⟦zh⟧ <b>{count, plural, other {# subscribers}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.046",
+      "target": "⟦zh⟧ <b>{count, plural, other {# days}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.047",
+      "target": "⟦zh⟧ <b>{count, plural, other {# hours}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.048",
+      "target": "⟦zh⟧ <b>{count, plural, other {# minutes}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.049",
+      "target": "⟦zh⟧ <b>{count, plural, other {# steps}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "⟦zh⟧ <b>{count, plural, other {# credits}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.001",
+      "target": "⟦zh⟧ Don''t show this again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.002",
+      "target": "⟦zh⟧ It''s {name}''s turn",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.003",
+      "target": "⟦zh⟧ You haven''t saved your changes",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.004",
+      "target": "⟦zh⟧ Type '{'name'}' to insert the user''s name",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.005",
+      "target": "⟦zh⟧ Use '{'curly braces'}' for variables",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.006",
+      "target": "⟦zh⟧ We couldn''t find that page",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.007",
+      "target": "⟦zh⟧ Can''t connect to the server",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.008",
+      "target": "⟦zh⟧ {name}''s workspace",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.009",
+      "target": "⟦zh⟧ That''s all for today!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.010",
+      "target": "⟦zh⟧ Let''s get started {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.011",
+      "target": "⟦zh⟧ You''re all caught up",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "⟦zh⟧ Isn''t working? Try again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.013",
+      "target": "⟦zh⟧ Shouldn''t take long…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.014",
+      "target": "⟦zh⟧ The file ''{file}'' was renamed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.015",
+      "target": "⟦zh⟧ Here''s what''s new in {version}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.016",
+      "target": "⟦zh⟧ {count, plural, other {# people haven''t replied}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.017",
+      "target": "⟦zh⟧ I''m not a robot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.018",
+      "target": "⟦zh⟧ What''s on your mind, {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.019",
+      "target": "⟦zh⟧ Today''s schedule",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.020",
+      "target": "⟦zh⟧ Write '#' to mention a channel {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.021",
+      "target": "⟦zh⟧ {name}''s birthday is today",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.022",
+      "target": "⟦zh⟧ Haven''t received the email?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.023",
+      "target": "⟦zh⟧ Wasn''t me — secure my account",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.024",
+      "target": "⟦zh⟧ You''ll lose access on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "⟦zh⟧ Who''s online",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.026",
+      "target": "⟦zh⟧ Aren''t you forgetting something?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.027",
+      "target": "⟦zh⟧ O''Brien & Partners invoice",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.028",
+      "target": "⟦zh⟧ Here''s your receipt",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.029",
+      "target": "⟦zh⟧ Didn''t get a code? Resend in {seconds}s",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.030",
+      "target": "⟦zh⟧ We''ve updated our terms",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.001",
+      "target": "⟦zh⟧ Create 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.002",
+      "target": "⟦zh⟧ 工作区 settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.003",
+      "target": "⟦zh⟧ Leave 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.004",
+      "target": "⟦zh⟧ Switch 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.005",
+      "target": "⟦zh⟧ Your 工作区 is ready",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.006",
+      "target": "⟦zh⟧ {name} invited you to the {workspace} 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "⟦zh⟧ Delete this 工作区?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.008",
+      "target": "⟦zh⟧ Download 发票",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.009",
+      "target": "⟦zh⟧ 发票 {number}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.010",
+      "target": "⟦zh⟧ Send 发票 to {email}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.011",
+      "target": "⟦zh⟧ This 发票 is overdue",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.012",
+      "target": "⟦zh⟧ Void 发票 {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.013",
+      "target": "⟦zh⟧ New 项目",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.014",
+      "target": "⟦zh⟧ Archive 项目",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.015",
+      "target": "⟦zh⟧ 项目 settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.016",
+      "target": "⟦zh⟧ {name} created the 项目 {project",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.017",
+      "target": "⟦zh⟧ Rename 项目",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.018",
+      "target": "⟦zh⟧ Back to 仪表板",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.019",
+      "target": "⟦zh⟧ Open 仪表板 {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "⟦zh⟧ 仪表板 is loading… {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.021",
+      "target": "⟦zh⟧ Customize your 仪表板",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.022",
+      "target": "⟦zh⟧ 账单",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.023",
+      "target": "⟦zh⟧ Manage 账单",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.024",
+      "target": "⟦zh⟧ 账单 email",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.025",
+      "target": "⟦zh⟧ 账单 is handled by the 工作区 owner",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.026",
+      "target": "⟦zh⟧ Each 项目 belongs to one 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.027",
+      "target": "⟦zh⟧ Add the 发票 to the 项目",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.028",
+      "target": "⟦zh⟧ Pin this 项目 to your 仪表板",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.029",
+      "target": "⟦zh⟧ 账单 history for this 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.030",
+      "target": "⟦zh⟧ {count, plural, other {# 发票s}} in this 工作区",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.031",
+      "target": "⟦zh⟧ Moving a 项目 to another 工作区 keeps its 发票 history",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "⟦zh⟧ The 仪表板 shows every 项目 you can access",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.033",
+      "target": "⟦zh⟧ Your 账单 details appear on every 发票",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.001",
+      "target": "⟦zh⟧ Sign in with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.002",
+      "target": "⟦zh⟧ Connect Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.003",
+      "target": "⟦zh⟧ Pay with Stripe",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.004",
+      "target": "⟦zh⟧ Powered by glot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.005",
+      "target": "⟦zh⟧ Import from GitHub {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.006",
+      "target": "⟦zh⟧ Post updates to Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.007",
+      "target": "⟦zh⟧ Your Stripe account is connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.008",
+      "target": "⟦zh⟧ Acme Cloud keeps your data in the EU {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.009",
+      "target": "⟦zh⟧ Sign in with OAuth",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.010",
+      "target": "⟦zh⟧ Create API key",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.011",
+      "target": "⟦zh⟧ API rate limit reached",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "⟦zh⟧ Markdown is supported",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.013",
+      "target": "⟦zh⟧ Paste Markdown here {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.014",
+      "target": "⟦zh⟧ Revoke the API key {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.015",
+      "target": "⟦zh⟧ glot translates your app on every pull request",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.016",
+      "target": "⟦zh⟧ Disconnect GitHub {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.017",
+      "target": "⟦zh⟧ {count, plural, other {# Slack channels}} connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.018",
+      "target": "⟦zh⟧ Stripe will email the receipt to {email}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.019",
+      "target": "⟦zh⟧ Acme uses cookies to keep you signed in",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.020",
+      "target": "⟦zh⟧ Export to Markdown",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.021",
+      "target": "⟦zh⟧ Your OAuth token expired",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.022",
+      "target": "⟦zh⟧ Read the API docs {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.023",
+      "target": "⟦zh⟧ Welcome to Acme, {name}!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "⟦zh⟧ Sync issues with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.025",
+      "target": "⟦zh⟧ Slack notifications are paused",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.026",
+      "target": "⟦zh⟧ Manage your Stripe subscription",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.027",
+      "target": "⟦zh⟧ glot found {count} untranslated keys",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.028",
+      "target": "⟦zh⟧ Copy the API URL",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.029",
+      "target": "⟦zh⟧ Install the Acme GitHub app",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.030",
+      "target": "⟦zh⟧ Send a test message to Slack {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.001",
+      "target": "⟦zh⟧ Save",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.002",
+      "target": "⟦zh⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.003",
+      "target": "⟦zh⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.004",
+      "target": "⟦zh⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.005",
+      "target": "⟦zh⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.006",
+      "target": "⟦zh⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "⟦zh⟧ Share",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.008",
+      "target": "⟦zh⟧ Order",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.009",
+      "target": "⟦zh⟧ Order",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.010",
+      "target": "⟦zh⟧ Free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.011",
+      "target": "⟦zh⟧ Clear",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.012",
+      "target": "⟦zh⟧ Back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.013",
+      "target": "⟦zh⟧ Run",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.014",
+      "target": "⟦zh⟧ Draft {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.015",
+      "target": "⟦zh⟧ Match case",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.016",
+      "target": "⟦zh⟧ Apply",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.017",
+      "target": "⟦zh⟧ Book",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.018",
+      "target": "⟦zh⟧ Track",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "⟦zh⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.020",
+      "target": "⟦zh⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.021",
+      "target": "⟦zh⟧ Left",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.022",
+      "target": "⟦zh⟧ Second",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.023",
+      "target": "⟦zh⟧ Second",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.024",
+      "target": "⟦zh⟧ Bill",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.025",
+      "target": "⟦zh⟧ Fine",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.026",
+      "target": "⟦zh⟧ Mute",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.027",
+      "target": "⟦zh⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.028",
+      "target": "⟦zh⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.029",
+      "target": "⟦zh⟧ Follow",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.030",
+      "target": "⟦zh⟧ Feed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.031",
+      "target": "⟦zh⟧ Kind",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "⟦zh⟧ Present",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.033",
+      "target": "⟦zh⟧ Present {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.034",
+      "target": "⟦zh⟧ Export",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.035",
+      "target": "⟦zh⟧ Lead",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.036",
+      "target": "⟦zh⟧ Board",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.037",
+      "target": "⟦zh⟧ Ship",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.038",
+      "target": "⟦zh⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.039",
+      "target": "⟦zh⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.040",
+      "target": "⟦zh⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.001",
+      "target": "⟦zh⟧ Save changes {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.002",
+      "target": "⟦zh⟧ Sign up free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.003",
+      "target": "⟦zh⟧ Start trial",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "⟦zh⟧ Upgrade {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.005",
+      "target": "⟦zh⟧ Invite team {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.006",
+      "target": "⟦zh⟧ Add member",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.007",
+      "target": "⟦zh⟧ Log out",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.008",
+      "target": "⟦zh⟧ Try again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.009",
+      "target": "⟦zh⟧ Get started",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.010",
+      "target": "⟦zh⟧ Learn more",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.011",
+      "target": "⟦zh⟧ Continue",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.012",
+      "target": "⟦zh⟧ Cancel",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.013",
+      "target": "⟦zh⟧ Confirm",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.014",
+      "target": "⟦zh⟧ Download",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.015",
+      "target": "⟦zh⟧ Delete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.016",
+      "target": "⟦zh⟧ Resend code",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "⟦zh⟧ Show more",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.018",
+      "target": "⟦zh⟧ Mark as read",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.019",
+      "target": "⟦zh⟧ Go back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.020",
+      "target": "⟦zh⟧ Subscribe",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.021",
+      "target": "⟦zh⟧ Unsubscribe",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.022",
+      "target": "⟦zh⟧ Book a demo",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.023",
+      "target": "⟦zh⟧ Copy link",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.024",
+      "target": "⟦zh⟧ Edit profile",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.025",
+      "target": "⟦zh⟧ New folder",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.026",
+      "target": "⟦zh⟧ Select all",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.027",
+      "target": "⟦zh⟧ Sort by date",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.028",
+      "target": "⟦zh⟧ View all {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "⟦zh⟧ Retry",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.030",
+      "target": "⟦zh⟧ Accept",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.031",
+      "target": "⟦zh⟧ Decline",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.032",
+      "target": "⟦zh⟧ Submit",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.033",
+      "target": "⟦zh⟧ Next step",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.034",
+      "target": "⟦zh⟧ Skip",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.035",
+      "target": "⟦zh⟧ Finish",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.036",
+      "target": "⟦zh⟧ Overview",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.037",
+      "target": "⟦zh⟧ Settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.038",
+      "target": "⟦zh⟧ Activity",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.039",
+      "target": "⟦zh⟧ Members",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.040",
+      "target": "⟦zh⟧ Security",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.041",
+      "target": "⟦zh⟧ Integrations",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "⟦zh⟧ Usage",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.043",
+      "target": "⟦zh⟧ Logs",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.044",
+      "target": "⟦zh⟧ Your plan renews automatically every month.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.045",
+      "target": "⟦zh⟧ Invite teammates to collaborate in real time.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.046",
+      "target": "⟦zh⟧ Connect your bank to get paid faster.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.001",
+      "target": "⟦zh⟧ Updated {date, date, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.002",
+      "target": "⟦zh⟧ Due {date, date, full",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.003",
+      "target": "⟦zh⟧ Starts at {time, time, short",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.004",
+      "target": "⟦zh⟧ {amount, number, ::currency/USD per month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.005",
+      "target": "⟦zh⟧ {n, number, integer} people",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.006",
+      "target": "⟦zh⟧ {ratio, number, percent} complete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.007",
+      "target": "⟦zh⟧ Joined {date, date, ::yyyyMMMM}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "⟦zh⟧ Total: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.009",
+      "target": "⟦zh⟧ {size, number, ::compact-short} downloads",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.010",
+      "target": "⟦zh⟧ {bytes, number, ::unit/megabyte} free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.011",
+      "target": "⟦zh⟧ Next charge on {date, date, medium} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.012",
+      "target": "⟦zh⟧ {count, plural, other {Billed every # years: {price, number, ::currency/USD}}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.013",
+      "target": "⟦zh⟧ {temp, number, ::unit/celsius} outside",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.014",
+      "target": "⟦zh⟧ Average: {avg, number, ::precision-integer} ms {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.015",
+      "target": "⟦zh⟧ {distance, number, ::unit/kilometer} away",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.016",
+      "target": "⟦zh⟧ Expires {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.017",
+      "target": "⟦zh⟧ Created {date, date} at {time, time}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.018",
+      "target": "⟦zh⟧ Discount: {off, number, percent}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.019",
+      "target": "⟦zh⟧ {rating, number, ::precision-integer stars",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.020",
+      "target": "⟦zh⟧ Balance: {balance, number, ::currency/GBP}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 26826,
+    "output_tokens": 10485,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0
+  },
+  "calls": 13,
+  "call_ms": 17,
+  "wall_ms": 34
+}

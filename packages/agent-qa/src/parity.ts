@@ -1,11 +1,11 @@
 // Task parity: run the same tasks in every locale, compare success with the source locale, blame labels.
-import { chromium, type Page } from "playwright";
+import type { Page } from "playwright";
 import Anthropic from "@anthropic-ai/sdk";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse } from "yaml";
-import { buildUrl } from "../../visual-qa/src/qa.ts";
+import { buildUrl, launch } from "../../visual-qa/src/qa.ts";
 import { buildIndex, flatten, match, norm, type Index } from "../../visual-qa/src/keys.ts";
 import { act, ClaudeAgent, find, MODEL, observe, translateGoal, type Action, type Decision, type View } from "./agent.ts";
 
@@ -63,7 +63,7 @@ export interface Options {
   maxSteps: number;
   viewport: string;
   out: string;
-  /** Cookie set to the locale before each run (e.g. NEXT_LOCALE), so in-app links keep the language. */
+  /** Cookies (comma separated) set to the locale before each run, so in-app links keep the language. */
   localeCookie?: string;
 }
 
@@ -204,6 +204,15 @@ function resolve(ctx: Ctx, locale: string, v: View, step: Step, findings: Findin
   return { action, key: t.key, label, selector: ref === undefined ? t.selector : undefined };
 }
 
+/** Polls `ok` every 250 ms for up to 5 s. */
+async function settle(ok: () => Promise<boolean>): Promise<boolean> {
+  for (let w = 0; w < 20; w++) {
+    await new Promise((r) => setTimeout(r, 250));
+    if (await ok()) return true;
+  }
+  return false;
+}
+
 const slug = (s: string) => s.replace(/[^\w-]+/g, "_");
 
 async function runOne(page: Page, o: Options, ctx: Ctx, task: Task, locale: string, goal: string, client?: Anthropic): Promise<Run> {
@@ -211,7 +220,8 @@ async function runOne(page: Page, o: Options, ctx: Ctx, task: Task, locale: stri
   const run: Run = { task: task.id, locale, goal, success: false, steps: 0, ms: 0, findings: [], trace: [] };
   const max = task.max_steps ?? o.maxSteps;
   await page.context().clearCookies();
-  if (o.localeCookie) await page.context().addCookies([{ name: o.localeCookie, value: locale, url: o.baseUrl }]);
+  const cookies = (o.localeCookie ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (cookies.length) await page.context().addCookies(cookies.map((name) => ({ name, value: locale, url: o.baseUrl })));
   await page.goto(buildUrl(o, locale, task.start ?? "/"), { waitUntil: "load" });
   await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {});
   const shot = async (i: number) => {
@@ -231,6 +241,8 @@ async function runOne(page: Page, o: Options, ctx: Ctx, task: Task, locale: stri
   try {
     for (let i = 0; ; i++) {
       if (await check(page, ctx, locale, task.success, run.findings)) { run.success = true; break; }
+      // The last step may have started a client-side navigation: give the page 5 s, like a user would.
+      if (!agent && i >= script.length && (await settle(() => check(page, ctx, locale, task.success, run.findings)))) { run.success = true; break; }
       if (!agent && i >= script.length) { fail = { kind: "check_failed", key: task.success.text_visible_key, detail: "script finished, success condition not met" }; break; }
       if (i >= max) { fail = { kind: "max_steps", detail: `no success after ${max} steps` }; break; }
       const v = await observe(page);
@@ -337,7 +349,7 @@ export async function run(o: Options, client?: Anthropic): Promise<Report> {
   }) : undefined;
   const goal = await goals(o, tasks, client);
   const [width, height] = o.viewport.split("x").map(Number);
-  const browser = await chromium.launch();
+  const browser = await launch();
   const runs: Run[] = [];
   try {
     const page = await browser.newPage({ viewport: { width, height } });

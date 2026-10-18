@@ -1,0 +1,9 @@
+source_locale = "en"
+target_locales = ["fr", "pt-BR"]
+files = ["app/src/main/res/values-{locale}/strings.xml"]
+format = "android"
+syntax = "printf"
+
+[llm]
+provider = "mock"   # swap for "anthropic" + api_key_env
+model = "mock"

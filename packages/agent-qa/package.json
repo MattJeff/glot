@@ -1,12 +1,25 @@
 {
   "name": "@glot/agent-qa",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Task parity QA: an agent (Claude vision or a scripted mock) runs the same tasks in every locale of your app and measures who succeeds.",
   "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/agent-qa"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
   "type": "module",
-  "bin": { "glot-agent-qa": "src/cli.ts" },
-  "engines": { "node": ">=25" },
+  "bin": {
+    "glot-agent-qa": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "build": "rm -rf dist && esbuild src/cli.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=dist/cli.js",
+    "prepack": "npm run build",
     "typecheck": "tsc --noEmit",
     "test": "node --test 'test/*.test.ts'",
     "parity": "node src/cli.ts"
@@ -18,7 +31,22 @@
   },
   "devDependencies": {
     "@types/node": "^25",
+    "esbuild": "^0.25",
     "typescript": "^5.9"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.18.3",
+  "keywords": [
+    "i18n",
+    "l10n",
+    "qa",
+    "playwright",
+    "agent",
+    "glot"
+  ],
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

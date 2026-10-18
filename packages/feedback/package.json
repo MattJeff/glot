@@ -1,20 +1,41 @@
 {
   "name": "@glot/feedback",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Let native speakers flag a wrong, awkward or unclear translation in production (< 4 kB, Shadow DOM, accessible). Feeds glot's feedback loop.",
   "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/feedback"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": true,
   "scripts": {
-    "build": "esbuild src/index.ts --format=esm --minify --target=es2020 --outfile=dist/index.js && esbuild src/index.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/feedback.global.js && tsc",
+    "build": "rm -rf dist && esbuild src/index.ts --format=esm --minify --target=es2020 --outfile=dist/index.js && esbuild src/index.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/feedback.global.js && tsc",
     "size": "node -e \"const n=require('fs').statSync('dist/feedback.global.js').size;console.log(n+' B');if(n>4096)process.exit(1)\"",
-    "test": "node --test 'test/*.test.ts'"
+    "test": "node --test 'test/*.test.ts'",
+    "prepack": "npm run build"
   },
-  "devDependencies": { "@types/node": "^25", "esbuild": "^0.25", "playwright": "1.64.1", "typescript": "^5.9" }
+  "devDependencies": {
+    "@types/node": "^25",
+    "esbuild": "^0.25",
+    "playwright": "1.64.1",
+    "typescript": "^5.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

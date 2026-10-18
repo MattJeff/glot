@@ -1,8 +1,8 @@
 //! `glot parity`: can a user finish the same tasks in every locale? Drives `packages/agent-qa`
 //! (Playwright + a Claude vision agent, or a scripted mock) and prints its report.
 use anyhow::{Context, Result, bail};
-use std::path::{Path, PathBuf};
-use std::process::{Command, ExitCode};
+use std::path::PathBuf;
+use std::process::ExitCode;
 
 use crate::style::*;
 
@@ -19,7 +19,8 @@ pub struct ParityArgs {
     /// URL layout; the source locale gets no prefix. E.g. "{route}?lang={locale}".
     #[arg(long, default_value = "/{locale}{route}")]
     pub url_pattern: String,
-    /// Cookie set to the locale before each run (e.g. NEXT_LOCALE), so in-app links keep the language.
+    /// Cookies (comma separated) set to the locale before each run, so in-app links keep the language.
+    /// Default: NEXT_LOCALE,glot-locale (what `glot i18nize` generates); "" sets none.
     #[arg(long)]
     pub locale_cookie: Option<String>,
     /// anthropic (Claude vision agent) | mock (follows each task's `script`, no tokens).
@@ -37,26 +38,6 @@ pub struct ParityArgs {
     /// Exit 1 if a locale's parity (success rate vs source, %) is below this.
     #[arg(long, default_value_t = 0)]
     pub min_parity: u32,
-}
-
-/// agent-qa entry point: $GLOT_AGENT_QA, else this repo's package, else the npm bin.
-fn agent_qa() -> Command {
-    let script = std::env::var("GLOT_AGENT_QA")
-        .map(PathBuf::from)
-        .ok()
-        .or_else(|| {
-            let p =
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packages/agent-qa/src/cli.ts");
-            p.exists().then_some(p)
-        });
-    match script {
-        Some(s) => {
-            let mut c = Command::new("node");
-            c.arg(s);
-            c
-        }
-        None => Command::new("glot-agent-qa"),
-    }
 }
 
 pub fn run(a: ParityArgs) -> Result<ExitCode> {
@@ -83,7 +64,7 @@ pub fn run(a: ParityArgs) -> Result<ExitCode> {
             "--provider must be anthropic or mock (the parity agent drives Claude's vision + tool use)"
         );
     }
-    let mut c = agent_qa();
+    let mut c = crate::fit::node_tool("agent-qa");
     c.current_dir(&ws.root)
         .args(["--locales", &locales.join(",")])
         .args(["--source-locale", &cfg.source_locale])
@@ -120,7 +101,7 @@ pub fn run(a: ParityArgs) -> Result<ExitCode> {
     );
     let status = c
         .status()
-        .context("cannot run agent-qa (node >= 25 and packages/agent-qa deps installed?)")?;
+        .with_context(|| crate::fit::tool_missing("agent-qa"))?;
     // 0: parity ok, 1: below --min-parity, anything else: it could not run (no fresh report).
     let code = match status.code() {
         Some(c @ (0 | 1)) => c as u8,

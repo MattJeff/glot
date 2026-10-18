@@ -381,3 +381,60 @@ fn translate_no_opts_out() {
     let texts: Vec<_> = r.hardcoded.iter().map(|h| h.text.as_str()).collect();
     assert_eq!(texts, ["Real copy here"]);
 }
+
+#[test]
+fn config_objects_are_reported() {
+    let r = scan(
+        "app/pricing/page.tsx",
+        r#"import { useTranslations } from "next-intl";
+export const metadata = { title: "Pricing", description: "Simple plans for every team" };
+const plans = [{ name: "Pro", description: "For individuals and small teams", variant: "primary" }];
+const field = { name: "email", type: "email" };
+export default function P() {
+  const t = useTranslations();
+  return <p>{t("hello", { name: "Bob Smith" })}</p>;
+}"#,
+    );
+    assert!(r.hardcoded.is_empty(), "{:?}", r.hardcoded);
+    let texts: Vec<_> = r.config.iter().map(|h| h.text.as_str()).collect();
+    assert_eq!(
+        texts,
+        [
+            "Pricing",
+            "Simple plans for every team",
+            "Pro",
+            "For individuals and small teams"
+        ]
+    );
+    assert!(
+        r.config[1]
+            .reason
+            .as_deref()
+            .unwrap()
+            .contains("`description`")
+    );
+    assert_eq!(r.config[1].at.line, 2);
+}
+
+#[test]
+fn initials_and_css_classes_are_not_copy() {
+    let r = scan(
+        "app/page.tsx",
+        r#"import { cn } from "@/lib/utils";
+export default function P({ open }) {
+  return <div className={cn("flex items-center", open && "Hidden Panel")}>
+    <span>AL</span>
+    <button>OK</button>
+    <p>{"text-sm font-medium"}</p>
+    <p>Real copy</p>
+  </div>;
+}"#,
+    );
+    let texts: Vec<_> = r.hardcoded.iter().map(|h| h.text.as_str()).collect();
+    assert_eq!(texts, ["OK", "Real copy"]);
+    assert!(looks_like_css_classes("flex items-center gap-2 md:hidden"));
+    assert!(looks_like_css_classes("hidden"));
+    assert!(!looks_like_css_classes("Hello world"));
+    assert!(!looks_like_css_classes("in progress"));
+    assert!(!looks_like_css_classes("well-known issue"));
+}

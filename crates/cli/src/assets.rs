@@ -280,6 +280,7 @@ fn chars_fit(n: usize) -> Fit {
         font,
         text: None,
         text_px: None,
+        occurrences: vec![],
     }
 }
 

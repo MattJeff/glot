@@ -58,6 +58,9 @@ pub fn from_config_with(
     if cfg.provider == "mock" {
         return Ok(Box::new(crate::mock::MockProvider));
     }
+    if cfg.provider == "mock-noisy" {
+        return Ok(Box::new(crate::mock::NoisyMock::from_env()));
+    }
     Ok(Box::new(http(cfg, api_key, headers)?))
 }
 
@@ -119,9 +122,20 @@ fn http(
             })?;
             Http::new(Kind::Compatible, base, key)
         }
+        "local" => {
+            // Ollama / vLLM / LM Studio (OpenAI-compatible). Key only if `api_key_env` names one (vLLM --api-key).
+            let (_, key) = env_key("GLOT_LOCAL_API_KEY");
+            let base = cfg
+                .base_url
+                .clone()
+                .unwrap_or_else(|| "http://localhost:11434/v1".into());
+            let mut h = Http::new(Kind::Compatible, base, key);
+            h.local = true;
+            h
+        }
         other => {
             return Err(Error::Other(format!(
-                "unknown llm provider \"{other}\" (expected anthropic | openai | openai-compatible | mock)"
+                "unknown llm provider \"{other}\" (expected anthropic | openai | openai-compatible | local | mock)"
             )));
         }
     };
@@ -154,6 +168,8 @@ struct Http {
     api_key: Option<String>,
     headers: Vec<(String, String)>,
     client: reqwest::Client,
+    /// `provider = "local"`: completions are tagged `local:<model>` so they cost $0.
+    local: bool,
 }
 
 const ATTEMPTS: u32 = 3;
@@ -171,6 +187,7 @@ impl Http {
             api_key,
             headers: vec![],
             client,
+            local: false,
         }
     }
 
@@ -183,20 +200,25 @@ impl Http {
 
     /// Messages API body. The system prompt (rules + glossary, identical for every batch of a locale)
     /// is the stable prefix, marked `cache_control`; the per-batch payload comes after it.
-    fn anthropic_body(req: &CompletionRequest) -> Value {
+    fn anthropic_body(req: &CompletionRequest, structured: bool) -> Value {
         let mut content: Vec<Value> = req
             .images
             .iter()
             .map(|b64| json!({"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": b64}}))
             .collect();
         content.push(json!({"type": "text", "text": req.user}));
-        // No assistant prefill: rejected by current Claude models. JSON is enforced by the prompt + robust parsing.
-        json!({
+        // No assistant prefill: rejected by current Claude models. Translation batches get a structured
+        // output schema; everything else relies on the prompt + robust parsing.
+        let mut body = json!({
             "model": req.model,
             "max_tokens": req.max_tokens,
             "system": [{"type": "text", "text": req.system, "cache_control": {"type": "ephemeral"}}],
             "messages": [{"role": "user", "content": content}],
-        })
+        });
+        if structured && let Some(schema) = translations_schema(req) {
+            body["output_config"] = json!({"format": {"type": "json_schema", "schema": schema}});
+        }
+        body
     }
 
     fn with_headers(&self, mut rb: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
@@ -213,12 +235,12 @@ impl Http {
         rb
     }
 
-    fn build(&self, req: &CompletionRequest) -> reqwest::RequestBuilder {
+    fn build(&self, req: &CompletionRequest, structured: bool) -> reqwest::RequestBuilder {
         match self.kind {
             Kind::Anthropic => self.with_headers(
                 self.client
                     .post(format!("{}/v1/messages", self.base_url))
-                    .json(&Self::anthropic_body(req)),
+                    .json(&Self::anthropic_body(req, structured)),
             ),
             Kind::OpenAi | Kind::Compatible => {
                 let user: Value = if req.images.is_empty() {
@@ -240,7 +262,9 @@ impl Http {
                     "max_tokens"
                 };
                 body[field] = json!(req.max_tokens);
-                if req.json {
+                if let Some(schema) = translations_schema(req).filter(|_| structured) {
+                    body["response_format"] = json!({"type": "json_schema", "json_schema": {"name": "translations", "strict": true, "schema": schema}});
+                } else if req.json {
                     body["response_format"] = json!({"type": "json_object"});
                 }
                 self.with_headers(
@@ -296,6 +320,11 @@ impl Http {
             }
         };
         let model = v["model"].as_str().unwrap_or(model).to_string();
+        let model = if self.local {
+            format!("local:{model}")
+        } else {
+            model
+        };
         Ok(Completion {
             text,
             model,
@@ -368,9 +397,74 @@ impl Provider for Http {
     }
 
     async fn complete(&self, req: CompletionRequest) -> Result<Completion> {
-        let body = self.send(|| self.build(&req)).await?;
+        let structured = translations_schema(&req).is_some();
+        let body = match self.send(|| self.build(&req, structured)).await {
+            // Model/server without structured outputs (older Claude, Ollama, proxies): plain JSON mode.
+            Err(Error::Provider { message, .. })
+                if structured && message.starts_with("HTTP 400") && schema_rejected(&message) =>
+            {
+                tracing::warn!(
+                    provider = self.name(),
+                    "structured output refused, falling back to JSON mode: {message}"
+                );
+                self.send(|| self.build(&req, false)).await?
+            }
+            r => r?,
+        };
         self.parse(&req.model, &self.json(&body)?)
     }
+}
+
+/// Above this many keys a batch is sent without a schema (compiled-grammar size limits).
+const MAX_SCHEMA_KEYS: usize = 200;
+
+/// Strict JSON schema `{"translations": {<key>: string, …}}` for a translation batch (keys read from the
+/// prompt payload), so Anthropic (`output_config.format`) and OpenAI (`response_format: json_schema`)
+/// constrain decoding and parse retries go away. `None` for other calls; the lenient parser stays as fallback.
+pub fn translations_schema(req: &CompletionRequest) -> Option<Value> {
+    if !req.json {
+        return None;
+    }
+    let payload = crate::translate::extract_payload(&req.user)?;
+    if payload["task"] != "translate" {
+        return None;
+    }
+    let keys: Vec<&str> = payload["items"]
+        .as_array()?
+        .iter()
+        .filter_map(|i| i["key"].as_str())
+        .collect();
+    if keys.is_empty() || keys.len() > MAX_SCHEMA_KEYS {
+        return None;
+    }
+    let props: serde_json::Map<String, Value> = keys
+        .iter()
+        .map(|k| (k.to_string(), json!({"type": "string"})))
+        .collect();
+    Some(json!({
+        "type": "object",
+        "properties": {"translations": {
+            "type": "object",
+            "properties": props,
+            "required": keys,
+            "additionalProperties": false,
+        }},
+        "required": ["translations"],
+        "additionalProperties": false,
+    }))
+}
+
+fn schema_rejected(message: &str) -> bool {
+    let m = message.to_ascii_lowercase();
+    [
+        "output_config",
+        "json_schema",
+        "response_format",
+        "schema",
+        "structured",
+    ]
+    .iter()
+    .any(|w| m.contains(w))
 }
 
 /// Anthropic Message Batches API: submit, poll, fetch results (billed at 50 %).
@@ -398,7 +492,7 @@ impl BatchClient {
     pub async fn submit(&self, requests: &[(String, CompletionRequest)]) -> Result<BatchStatus> {
         let h = &self.0;
         let body = json!({
-            "requests": requests.iter().map(|(id, r)| json!({"custom_id": id, "params": Http::anthropic_body(r)})).collect::<Vec<_>>(),
+            "requests": requests.iter().map(|(id, r)| json!({"custom_id": id, "params": Http::anthropic_body(r, true)})).collect::<Vec<_>>(),
         });
         let url = format!("{}/v1/messages/batches", h.base_url);
         let text = h
@@ -449,5 +543,75 @@ impl BatchClient {
             }
         }
         Ok(out)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tr_req() -> CompletionRequest {
+        CompletionRequest {
+            model: "claude-haiku-5-5".into(),
+            system: "sys".into(),
+            user: "Translate.\n\n<payload>\n{\"task\": \"translate\", \"items\": [{\"key\": \"a.b\", \"source\": \"Hi\"}, {\"key\": \"c\", \"source\": \"Yo\"}]}\n</payload>".into(),
+            max_tokens: 100,
+            json: true,
+            images: vec![],
+        }
+    }
+
+    #[test]
+    fn schema_for_translation_batches_only() {
+        let s = translations_schema(&tr_req()).unwrap();
+        let t = &s["properties"]["translations"];
+        assert_eq!(t["required"], json!(["a.b", "c"]));
+        assert_eq!(t["additionalProperties"], false);
+        assert_eq!(t["properties"]["a.b"]["type"], "string");
+        let mut judge = tr_req();
+        judge.user = "<payload>{\"task\": \"judge\", \"items\": []}</payload>".into();
+        assert!(translations_schema(&judge).is_none());
+        let mut plain = tr_req();
+        plain.json = false;
+        assert!(translations_schema(&plain).is_none());
+    }
+
+    #[test]
+    fn request_bodies_carry_schema() {
+        let a = Http::anthropic_body(&tr_req(), true);
+        assert_eq!(a["output_config"]["format"]["type"], "json_schema");
+        assert!(
+            Http::anthropic_body(&tr_req(), false)
+                .get("output_config")
+                .is_none()
+        );
+        let h = Http::new(Kind::OpenAi, "http://x".into(), Some("k".into()));
+        let body: Value = serde_json::from_slice(
+            h.build(&tr_req(), true)
+                .build()
+                .unwrap()
+                .body()
+                .unwrap()
+                .as_bytes()
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(body["response_format"]["type"], "json_schema");
+        assert_eq!(body["response_format"]["json_schema"]["strict"], true);
+        let body: Value = serde_json::from_slice(
+            h.build(&tr_req(), false)
+                .build()
+                .unwrap()
+                .body()
+                .unwrap()
+                .as_bytes()
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(body["response_format"]["type"], "json_object");
+        assert!(schema_rejected(
+            "HTTP 400: output_config.format: unsupported for this model"
+        ));
+        assert!(!schema_rejected("HTTP 400: max_tokens too large"));
     }
 }

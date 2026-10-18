@@ -5,12 +5,17 @@ use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "glot_server=info,tower_http=info".into()),
-        )
-        .init();
+    let filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| "glot_server=info,tower_http=info".into());
+    // GLOT_LOG_FORMAT=json in production: one JSON object per line, no ANSI colors.
+    if env::var("GLOT_LOG_FORMAT").is_ok_and(|v| v == "json") {
+        tracing_subscriber::fmt()
+            .json()
+            .with_env_filter(filter)
+            .init();
+    } else {
+        tracing_subscriber::fmt().with_env_filter(filter).init();
+    }
 
     let database_url = env::var("DATABASE_URL")
         .unwrap_or_else(|_| "postgres://glot:glot@localhost:5433/glot".into());
@@ -34,9 +39,22 @@ async fn main() -> anyhow::Result<()> {
     let listener = tokio::net::TcpListener::bind(&bind).await?;
     tracing::info!("glot-server listening on http://{bind}");
     axum::serve(listener, router(state, &web_origin))
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
+        .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())
+}
+
+/// Ctrl-C locally, SIGTERM from `docker stop` / systemd in production.
+async fn shutdown_signal() {
+    #[cfg(unix)]
+    {
+        let mut term = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("install SIGTERM handler");
+        tokio::select! {
+            _ = tokio::signal::ctrl_c() => {}
+            _ = term.recv() => {}
+        }
+    }
+    #[cfg(not(unix))]
+    let _ = tokio::signal::ctrl_c().await;
 }

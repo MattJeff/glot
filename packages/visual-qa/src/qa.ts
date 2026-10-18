@@ -57,6 +57,18 @@ export interface Fit {
   /** Source text as rendered and its width: calibrates glot's browser-free measure. */
   text?: string;
   text_px?: number;
+  /** Every place the key rendered (route × viewport × element); the budget above is the tightest of them. */
+  occurrences?: Occurrence[];
+}
+
+export interface Occurrence {
+  route: string;
+  viewport: string;
+  selector: string;
+  max_width_px: number;
+  max_lines: number | null;
+  /** How the element was mapped to the key: dev marker (`GLOT_DEV_KEYS=1`, exact) or rendered text (ambiguous for duplicates). */
+  by: "marker" | "text";
 }
 
 export interface Mapped {
@@ -80,6 +92,14 @@ export interface Report {
 const VISUAL: Kind[] = ["overflow", "clamp", "overlap"];
 
 /** Source locale gets no prefix (next-intl `as-needed`). */
+/** Chromium, or an error that says how to get it (a fresh `npx` install has no browser yet). */
+export async function launch() {
+  return chromium.launch().catch((e: Error) => {
+    if (/Executable doesn't exist/.test(e.message)) throw new Error(`Playwright's Chromium is missing: run \`npx playwright install chromium\`\n${e.message.split("\n")[0]}`);
+    throw e;
+  });
+}
+
 export function buildUrl(o: Pick<Options, "baseUrl" | "urlPattern" | "sourceLocale">, locale: string, route: string): string {
   const pattern = locale === o.sourceLocale ? o.urlPattern.replace(/\/?\{locale\}/, "") : o.urlPattern;
   let path = pattern.replace("{locale}", locale).replace("{route}", route).replace(/\/{2,}/g, "/");
@@ -200,7 +220,35 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
 }
 
 
-type Probe = Omit<Fit, "font"> & { text: string; ownText: string; font: Fit["font"] & { css: string } };
+/**
+ * Runs inside the page. Dev key markers (`@glot/runtime/dev`, `GLOT_DEV_KEYS=1`) become `data-glot-key` on the
+ * element of the marked text, and are removed so the page renders exactly like production. Self-contained
+ * copy of `decodeKeys` (keys.ts).
+ */
+function unmark(): number {
+  const re = /\u2063([\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+)\u2063/gu;
+  const decode = (bytes: string) =>
+    new TextDecoder().decode(new Uint8Array(Array.from(bytes, (c) => { const p = c.codePointAt(0)!; return p < 0xe0100 ? p - 0xfe00 : p - 0xe0100 + 16; })));
+  let n = 0;
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let t = w.nextNode() as Text | null; t; t = w.nextNode() as Text | null) {
+    if (!t.data.includes("\u2063")) continue;
+    let first: string | undefined;
+    t.data = t.data.replace(re, (_, b: string) => { first ??= decode(b); return ""; });
+    const el = t.parentElement;
+    if (first !== undefined && el && !el.hasAttribute("data-glot-key")) { el.setAttribute("data-glot-key", first); n++; }
+  }
+  for (const el of Array.from(document.querySelectorAll("[title], [placeholder], [aria-label], [alt], [value]"))) {
+    for (const a of ["title", "placeholder", "aria-label", "alt", "value"]) {
+      const v = el.getAttribute(a);
+      if (v?.includes("\u2063")) el.setAttribute(a, v.replace(re, ""));
+    }
+  }
+  if (document.title.includes("\u2063")) document.title = document.title.replace(re, "");
+  return n;
+}
+
+type Probe = Omit<Fit, "font"> & { text: string; ownText: string; font: Fit["font"] & { css: string }; key?: string; selector: string };
 
 /**
  * Runs inside the page. For each element with its own text: the room its text has before it overflows.
@@ -211,6 +259,17 @@ type Probe = Omit<Fit, "font"> & { text: string; ownText: string; font: Fit["fon
 function probe(): Probe[] {
   const out: Probe[] = [];
   const px = (v: string) => parseFloat(v) || 0;
+  // Same as `detect`'s selector (functions run in the page cannot share helpers).
+  const sel = (el: Element): string => {
+    const parts: string[] = [];
+    for (let e: Element | null = el; e && e !== document.body && parts.length < 5; e = e.parentElement) {
+      if (e.id) { parts.unshift("#" + CSS.escape(e.id)); break; }
+      const tag = e.tagName.toLowerCase();
+      const sibs = e.parentElement ? Array.from(e.parentElement.children).filter((s) => s.tagName === e!.tagName) : [];
+      parts.unshift(sibs.length > 1 ? `${tag}:nth-of-type(${sibs.indexOf(e) + 1})` : tag);
+    }
+    return parts.join(" > ");
+  };
   for (const e of Array.from(document.querySelectorAll("[data-glot-m]"))) e.removeAttribute("data-glot-m");
   const els = Array.from(document.body.querySelectorAll("*")).filter(
     (el) => !["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(el.tagName),
@@ -271,6 +330,8 @@ function probe(): Probe[] {
       text: (el as HTMLElement).innerText?.trim() || el.textContent!.trim(),
       ownText: own.map((n) => n.data).join(" ").replace(/\s+/g, " ").trim(),
       text_px: lines0 <= 1 ? Math.round(textW * 100) / 100 : undefined,
+      key: el.getAttribute("data-glot-key") ?? undefined,
+      selector: sel(el),
     });
   }
   return out;
@@ -349,7 +410,7 @@ export async function run(o: Options): Promise<Report> {
   if (o.harness) return runHarness(o);
   const shots = join(o.out, "screenshots");
   await mkdir(shots, { recursive: true });
-  const browser = await chromium.launch();
+  const browser = await launch();
   const report: Report = { generated_at: new Date().toISOString(), options: o, pages: [], issues: [] };
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (o.suggest && !apiKey) console.warn("--suggest: ANTHROPIC_API_KEY not set, skipping suggestions");
@@ -359,12 +420,13 @@ export async function run(o: Options): Promise<Report> {
   const pad = 8;
   const fontsDir = o.fontsDir ?? join(o.out, "fonts");
   const fontSaves: Promise<void>[] = [];
-  const measureKeys = async (page: Page) => {
+  const measureKeys = async (page: Page, route: string, viewport: string) => {
     const probes = await page.evaluate(probe);
     const fonts = await platformFonts(page);
     report.layout ??= {};
     for (const [i, p] of probes.entries()) {
-      const key = match(indexes[o.sourceLocale], p.text);
+      // Dev marker (exact) first, else the rendered text (the first key with that text wins).
+      const key = p.key ?? match(indexes[o.sourceLocale], p.text);
       if (!key || (o.map && wanted && !wanted.has(key))) continue;
       const f = fonts[i];
       const fit: Fit = {
@@ -379,8 +441,10 @@ export async function run(o: Options): Promise<Report> {
         text: p.ownText,
         ...(p.text_px !== undefined ? { text_px: p.text_px } : {}),
       };
+      const occ: Occurrence = { route, viewport, selector: p.selector, max_width_px: p.max_width_px, max_lines: p.max_lines, by: p.key ? "marker" : "text" };
       const prev = report.layout[key];
-      if (!prev || capacity(fit) < capacity(prev)) report.layout[key] = fit;
+      const occurrences = [...(prev?.occurrences ?? []), occ];
+      report.layout[key] = !prev || capacity(fit) < capacity(prev) ? { ...fit, occurrences } : { ...prev, occurrences };
     }
   };
   const clipOf = (r: Rect, p = pad) => ({ x: Math.max(0, r.x - p), y: Math.max(0, r.y - p), width: r.width + 2 * p, height: r.height + 2 * p });
@@ -416,14 +480,16 @@ export async function run(o: Options): Promise<Report> {
         // Locale-prefixed visits leave a locale cookie (next-intl NEXT_LOCALE) that would turn the source page into the last locale.
         await page.context().clearCookies();
         await grab(page, buildUrl(o, o.sourceLocale, route));
+        await page.evaluate(unmark);
         const src = await page.evaluate(detect, { sourceTexts: null, checkRtl: false });
         const sourceTexts = src.texts;
         await mapKeys(page, src.els, o.sourceLocale, route, vp, `${o.sourceLocale}_${slugOf(route)}_${vp}`);
-        if (o.measure) await measureKeys(page);
+        if (o.measure) await measureKeys(page, route, vp);
 
         for (const locale of o.locales) {
           const url = buildUrl(o, locale, route);
           await grab(page, url);
+          await page.evaluate(unmark);
           const { found, els } = await page.evaluate(detect, { sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
           const slug = `${locale}_${slugOf(route)}_${vp}`;
           const screenshot = join("screenshots", `${slug}.png`);
@@ -469,7 +535,7 @@ async function runHarness(o: Options): Promise<Report> {
   const shots = join(o.out, "screenshots");
   await mkdir(shots, { recursive: true });
   const report: Report = { generated_at: new Date().toISOString(), options: { ...o, locales: Object.keys(fragments) }, pages: [], issues: [] };
-  const browser = await chromium.launch();
+  const browser = await launch();
   try {
     for (const vp of o.viewports) {
       const [width, height] = vp.split("x").map(Number);

@@ -1,14 +1,28 @@
 {
   "name": "@glot/visual-qa",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Visual QA for localized UIs: detects overflowing, truncated, untranslated and tofu text per locale with Playwright.",
   "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/visual-qa"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
   "type": "module",
-  "bin": { "glot-visual-qa": "dist/cli.js" },
-  "files": ["dist"],
-  "engines": { "node": ">=25" },
+  "bin": {
+    "glot-visual-qa": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && esbuild src/cli.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=dist/cli.js",
+    "prepack": "npm run build",
     "typecheck": "tsc --noEmit",
     "test": "node --test 'test/*.test.ts'",
     "qa": "node src/cli.ts"
@@ -18,7 +32,18 @@
   },
   "devDependencies": {
     "@types/node": "^25",
+    "esbuild": "^0.25",
     "typescript": "^5.9"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.18.3",
+  "keywords": [
+    "i18n",
+    "l10n",
+    "visual-qa",
+    "playwright",
+    "glot"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

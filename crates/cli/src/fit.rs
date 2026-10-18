@@ -47,24 +47,91 @@ pub struct FitArgs {
     pub reload_ms: u64,
 }
 
-/// visual-qa entry point: $GLOT_VISUAL_QA, else this repo's package, else the npm bin.
-pub(crate) fn qa_command() -> Command {
-    let script = std::env::var("GLOT_VISUAL_QA")
-        .map(PathBuf::from)
-        .ok()
-        .or_else(|| {
-            let p =
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packages/visual-qa/src/cli.ts");
-            p.exists().then_some(p)
-        });
-    match script {
-        Some(s) => {
-            let mut c = Command::new("node");
-            c.arg(s);
-            c
-        }
-        None => Command::new("glot-visual-qa"),
+/// npm scope the Node helpers are published under (`scripts/publish-packages.sh`). `@glot` on npm
+/// belongs to someone else; a build can switch with `GLOT_NPM_SCOPE=@glot cargo build`.
+const NPM_SCOPE: &str = match option_env!("GLOT_NPM_SCOPE") {
+    Some(s) => s,
+    None => "@glot-i18n",
+};
+
+/// A Node helper (`visual-qa`, `agent-qa`): `$GLOT_VISUAL_QA` / `$GLOT_AGENT_QA` (a cli.js, or any
+/// executable), else (debug builds only) this repo's sources, else `glot-<name>` on PATH, else
+/// `npx -y <scope>/<name>@<major.minor of this glot>`.
+pub(crate) fn node_tool(name: &str) -> Command {
+    let node = |p: PathBuf| {
+        let mut c = Command::new("node");
+        c.arg(p);
+        c
+    };
+    if let Some(p) = std::env::var_os(tool_env(name)).filter(|v| !v.is_empty()) {
+        let p = PathBuf::from(p);
+        return match p.extension().and_then(|e| e.to_str()) {
+            Some("js" | "mjs" | "cjs" | "ts") => node(p),
+            _ => Command::new(p),
+        };
     }
+    #[cfg(debug_assertions)]
+    {
+        let p =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("../../packages/{name}/src/cli.ts"));
+        if p.exists() {
+            return node(p);
+        }
+    }
+    let bin = format!("glot-{name}");
+    let exe = if cfg!(windows) {
+        format!("{bin}.cmd")
+    } else {
+        bin.clone()
+    };
+    if let Some(found) = std::env::var_os("PATH")
+        .iter()
+        .flat_map(std::env::split_paths)
+        .map(|d| d.join(&exe))
+        .find(|p| p.is_file())
+    {
+        return Command::new(found);
+    }
+    let mut c = Command::new(if cfg!(windows) { "npx.cmd" } else { "npx" });
+    c.args([
+        "-y",
+        &format!("--package={}", tool_package(name)),
+        "--",
+        &bin,
+    ]);
+    c
+}
+
+fn tool_env(name: &str) -> String {
+    format!("GLOT_{}", name.to_uppercase().replace('-', "_"))
+}
+
+fn tool_package(name: &str) -> String {
+    format!(
+        "{NPM_SCOPE}/{name}@{}.{}",
+        env!("CARGO_PKG_VERSION_MAJOR"),
+        env!("CARGO_PKG_VERSION_MINOR")
+    )
+}
+
+/// A helper that ran and failed; npx not finding the package means it must be installed by hand.
+pub(crate) fn tool_failed(name: &str, stderr: &[u8]) -> anyhow::Error {
+    let err = String::from_utf8_lossy(stderr);
+    if err.contains("npm error") || err.contains("npm ERR!") {
+        anyhow::anyhow!("{}\n{err}", tool_missing(name))
+    } else {
+        anyhow::anyhow!("{name} failed: {err}")
+    }
+}
+
+/// What to install when a Node helper cannot be started at all.
+pub(crate) fn tool_missing(name: &str) -> String {
+    format!(
+        "cannot run glot-{name}: install Node.js >= 20 (glot runs it with `npx {pkg}`), or \
+         `npm i -g {pkg} && npx playwright install chromium`, or set {env}=/path/to/cli.js",
+        pkg = tool_package(name),
+        env = tool_env(name),
+    )
 }
 
 fn run_qa(
@@ -74,7 +141,7 @@ fn run_qa(
     out: &Path,
     map: Option<&str>,
 ) -> Result<Value> {
-    let mut c = qa_command();
+    let mut c = node_tool("visual-qa");
     c.current_dir(&ws.root).args([
         "--base-url",
         &qa.base_url,
@@ -97,11 +164,9 @@ fn run_qa(
     if let Some(m) = map {
         c.args(["--map", m]);
     }
-    let o = c
-        .output()
-        .context("cannot run visual-qa (node >= 25 and packages/visual-qa deps installed?)")?;
+    let o = c.output().with_context(|| tool_missing("visual-qa"))?;
     if !o.status.success() {
-        bail!("visual-qa failed: {}", String::from_utf8_lossy(&o.stderr));
+        return Err(tool_failed("visual-qa", &o.stderr));
     }
     let report = std::fs::read_to_string(out.join("report.json"))
         .context("visual-qa wrote no report.json")?;

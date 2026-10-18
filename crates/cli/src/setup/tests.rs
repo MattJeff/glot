@@ -426,3 +426,78 @@ fn html_lang_rewrite() {
     );
     assert_eq!(react::html_lang("<div>", "x"), None);
 }
+
+#[test]
+fn next_cache_components_moves_app_under_locale_segment() {
+    let dir = fixture(&[
+        ("package.json", r#"{"dependencies":{"next":"16.4.2"}}"#),
+        (
+            "app/layout.tsx",
+            "import \"./globals.css\";\n\nexport default function RootLayout({ children }: LayoutProps<\"/\">) {\n  return (\n    <html lang=\"en\">\n      <body>{children}</body>\n    </html>\n  );\n}\n",
+        ),
+        ("app/globals.css", "body {}\n"),
+        (
+            "app/blog/page.tsx",
+            "import { x } from \"../../lib/x\";\nimport { y } from \"../y\";\n\nexport default function Blog(p: PageProps<\"/blog\">) {\n  return null;\n}\n",
+        ),
+        (
+            "app/api/hello/route.ts",
+            "export const GET = () => new Response(\"hi\");\n",
+        ),
+        ("app/favicon.ico", "ico"),
+        (
+            "next.config.ts",
+            "const nextConfig = {\n  cacheComponents: true,\n};\n\nexport default nextConfig;\n",
+        ),
+    ]);
+    let root = dir.path();
+    let p = detect(root).unwrap();
+    let plan = super::plan(root, &p, &opts(Routing::Cookie));
+    let moves: Vec<_> = plan.moves.iter().map(|(f, t)| format!("{f}>{t}")).collect();
+    assert_eq!(
+        moves,
+        [
+            "app/blog>app/[locale]/blog",
+            "app/globals.css>app/[locale]/globals.css",
+            "app/layout.tsx>app/[locale]/layout.tsx"
+        ]
+    );
+    let blog = get(&plan, "app/[locale]/blog/page.tsx");
+    assert!(
+        blog.contains("from \"../../../lib/x\"") && blog.contains("from \"../y\""),
+        "{blog}"
+    );
+    assert!(blog.contains("PageProps<\"/[locale]/blog\">"), "{blog}");
+    let layout = get(&plan, "app/[locale]/layout.tsx");
+    assert!(layout.contains("LayoutProps<\"/[locale]\">"), "{layout}");
+    assert!(
+        layout.contains("import { routing } from \"../../i18n/routing\";"),
+        "{layout}"
+    );
+    assert!(
+        layout.contains("export function generateStaticParams()"),
+        "{layout}"
+    );
+    assert!(layout.contains("<NextIntlClientProvider>"), "{layout}");
+    let request = get(&plan, "i18n/request.ts");
+    assert!(
+        request.contains("next/root-params") && !request.contains("headers()"),
+        "{request}"
+    );
+    assert!(get(&plan, "i18n/proxy.ts").contains("NextResponse.rewrite(url)"));
+
+    // Written to disk: moves first, then the edits on the moved files.
+    super::write(root, &plan).unwrap();
+    assert!(root.join("app/[locale]/blog/page.tsx").is_file() && !root.join("app/blog").exists());
+    assert!(
+        root.join("app/api/hello/route.ts").is_file() && root.join("app/favicon.ico").is_file()
+    );
+    // Idempotent: the segment exists, nothing moves again and the layout is already wired.
+    let again = super::plan(root, &p, &opts(Routing::Cookie));
+    assert!(again.moves.is_empty());
+    assert!(
+        !paths(&again).contains(&"app/[locale]/layout.tsx"),
+        "{:?}",
+        paths(&again)
+    );
+}

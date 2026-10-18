@@ -104,6 +104,17 @@ import { GlotFallbackBackend } from "@glot/runtime/i18next";
 // chain after your normal backend; use `react: { bindI18nStore: "added" }` to re-render after a click-to-download
 ```
 
+## Exact keys for `glot measure` (dev only)
+
+```ts
+// i18n/request.ts — then run the app with GLOT_DEV_KEYS=1 and `glot measure`
+import { getGlotMessages } from "@glot/runtime/dev";
+return { locale, messages: getGlotMessages((await import(`../messages/${locale}.json`)).default) };
+```
+
+Each message gets an invisible key marker, so two identical texts ("Save" in a toolbar and in a dialog) get their own
+pixel budget. Without `GLOT_DEV_KEYS=1` the messages are returned untouched.
+
 ## Development
 
 ```sh

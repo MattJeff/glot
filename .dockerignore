@@ -1,0 +1,12 @@
+# Keep the Docker build context small: Rust/Node build outputs and local state never go in images.
+target
+**/node_modules
+**/.next
+**/dist
+.git
+.glot
+**/.env
+**/.env.*
+!**/.env.example
+bench/cache
+examples/**/node_modules

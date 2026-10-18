@@ -18,6 +18,7 @@ pub mod glossary;
 pub mod insights;
 pub mod jobs;
 pub mod keys;
+pub mod mcp_remote;
 pub mod ondemand;
 pub mod openapi;
 pub mod projects;
@@ -132,6 +133,7 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(api)
         .merge(insights::public_routes())
         .merge(feedback::public_routes())
+        .merge(mcp_remote::routes(state.clone(), web_origin))
         .route("/cdn/{slug}/{file}", get(cdn::serve))
         .route("/healthz", get(|| async { "ok" }))
         .fallback(|| async { AppError::not_found("route not found") })

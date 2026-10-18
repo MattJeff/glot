@@ -294,6 +294,10 @@ pub async fn pull(
                 origin,
                 score: score.map(|s| s.clamp(0, 100) as u8),
                 reviewed: status == "reviewed",
+                translated_at: None,
+                reviewed_at: None,
+                reviewed_by: None,
+                needs_review: None,
             },
         );
         catalogs.entry(locale).or_default().insert(key, value);

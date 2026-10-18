@@ -1,0 +1,1265 @@
+{
+  "generated_by": "packages/visual-qa/test/measure.test.ts",
+  "cases": [
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 48,
+      "lines": 11,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 61,
+      "lines": 11,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 74,
+      "lines": 8,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 87,
+      "lines": 6,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 100,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 113,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 126,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 139,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 152,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 165,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 178,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 191,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 204,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 217,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 230,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 243,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 256,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 269,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 282,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 295,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "設定を保存しました。変更は次回のログインから有効になります。",
+      "width": 308,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 48,
+      "lines": 9,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 61,
+      "lines": 9,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 74,
+      "lines": 6,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 87,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 100,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 113,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 126,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 139,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 152,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 165,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 178,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 191,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 204,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 217,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 230,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 243,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 256,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 269,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 282,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 295,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "「請求書」を作成、送信、そして支払いを確認します。",
+      "width": 308,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 48,
+      "lines": 10,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 61,
+      "lines": 9,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 74,
+      "lines": 7,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 87,
+      "lines": 6,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 100,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 113,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 126,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 139,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 152,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 165,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 178,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 191,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 204,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 217,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 230,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 243,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 256,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 269,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 282,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 295,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "メンバーを招待する（最大五人）、または後で追加する。",
+      "width": 308,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 48,
+      "lines": 9,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 61,
+      "lines": 9,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 74,
+      "lines": 7,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 87,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 100,
+      "lines": 5,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 113,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 126,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 139,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 152,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 165,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 178,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 191,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 204,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 217,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 230,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 243,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 256,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 269,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 282,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 295,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "ファイルが見つかりません！もう一度お試しください？",
+      "width": 308,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 48,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 61,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 74,
+      "lines": 4,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 87,
+      "lines": 3,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 100,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 113,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 126,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 139,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 152,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 165,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 178,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 191,
+      "lines": 2,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 204,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 217,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 230,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 243,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 256,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 269,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 282,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 295,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "保存、キャンセル、削除。",
+      "width": 308,
+      "lines": 1,
+      "font": {
+        "family": "Hiragino Sans",
+        "postscript": "HiraginoSans-W3",
+        "size_px": 16,
+        "weight": 400,
+        "letter_spacing_px": 0
+      }
+    }
+  ]
+}

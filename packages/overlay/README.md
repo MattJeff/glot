@@ -6,9 +6,9 @@ Dev only, ~14 kB minified (~6 kB gzip), zero runtime dependencies, styles isolat
 
 | Alt+click → popover (light) | AI “Shorten” on the French page (dark) |
 |---|---|
-| ![popover](docs/popover-light.png) | ![AI suggestions](docs/popover-dark-ai.png) |
+| ![popover](https://raw.githubusercontent.com/MattJeff/glot/main/packages/overlay/docs/popover-light.png) | ![AI suggestions](https://raw.githubusercontent.com/MattJeff/glot/main/packages/overlay/docs/popover-dark-ai.png) |
 
-![inspect mode](docs/inspect.png)
+![inspect mode](https://raw.githubusercontent.com/MattJeff/glot/main/packages/overlay/docs/inspect.png)
 
 <sub>Captured on a copy of the glot dashboard (next-intl, 6 locales) running `next dev` + `glot dev` with the mock provider — the `⟦fr⟧` prefix is the mock's fake output.</sub>
 

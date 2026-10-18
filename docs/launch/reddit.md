@@ -4,39 +4,34 @@ Read each subreddit's self-promotion rules the day you post. Post from an accoun
 
 ## r/nextjs
 
-**Title**: I built an open-source CLI that converts a hardcoded Next.js app to next-intl and validates every AI translation
+**Title**: Open-source CLI: your coding agent localizes your Next.js app, and code refuses translations that break plurals, placeholders or the button width
 
 **Body**:
 
-I kept doing the same chore on Next.js projects: move every string into `messages/en.json`, wire next-intl, then translate and fix the plurals the LLM got wrong. So I wrote glot (MIT, Rust CLI).
+I kept doing the same chore on Next.js projects: move every string into `messages/en.json`, wire next-intl, translate, then fix what the LLM got wrong (Polish plurals, renamed placeholders, German labels that overflow). glot (MIT, Rust CLI + MCP server, young project) automates that and refuses to write what it can't verify.
 
-What it does on an App Router project:
+- `glot i18nize` rewrites hardcoded strings to `useTranslations`/`getTranslations`, turns `"You have " + n + " invoices"` into an ICU plural and wires next-intl (cookie routing by default, `--routing prefix` for `/fr/...`). `--dry-run` shows the diff first.
+- `glot translate` translates only what changed with your own key. Every output goes through a validator: ICU syntax, placeholders, CLDR plural categories, glossary, and width against the box `glot measure` recorded from your running app. A refused string is retried with the exact reason; nothing invalid is written. The README GIF shows three refusals (LLM scripted to fail on cue; the binary and messages are real).
+- `glot.lock` keeps hand edits from being overwritten. `glot mcp` lets Claude Code or Cursor add strings through the same checks.
 
-- `glot extract` lists hardcoded strings with file:line and a suggested key (117 on the demo app in the repo).
-- `glot i18nize` rewrites them to `useTranslations`/`getTranslations` calls, turns `"You have " + n + " invoices"` into an ICU plural, moves module-level config arrays (nav, plans, FAQ) into hooks so their copy can be translated, and writes `i18n/request.ts`, `proxy.ts`, the plugin and the provider. Cookie routing by default (no `app/[locale]` move), `--routing prefix` if you want `/fr/...` URLs. `--dry-run` shows the whole diff first.
-- `glot translate` fills `messages/{locale}.json` with your own key. Every output is validated (ICU syntax, CLDR plural categories, placeholders, tags, glossary) and `glot.lock` keeps hand edits from being overwritten.
-
-Pages Router is supported too (built-in `i18n` + provider). For locales you don't ship, there is an optional `@glot/runtime` that translates on-device with Chrome's Translator API and works with Server Components via a `getGlotTranslations` drop-in.
-
-Limits: JS/TS/JSX only; key names come from one LLM call, so review them in the diff.
+Limits: JS/TS/JSX only; key names come from one LLM call, so review them in the diff; the self-hosted dashboard is experimental.
 
 Repo: https://github.com/MattJeff/glot. I'd like to know what breaks on your codebase.
 
 ## r/webdev
 
-**Title**: Open-source tool to internationalize a web app with an LLM, with a validator so it can't break your plurals and placeholders
+**Title**: I made LLM translations go through a validator that refuses broken plurals, placeholders and text too wide for its button
 
 **Body**:
 
-glot is a CLI (MIT) for adding languages to a React-based web app without trusting the model blindly.
+glot is an open-source CLI (MIT) for adding languages to a React-based web app without trusting the model blindly. It's young; here is what it does today:
 
-- Finds hardcoded strings and rewrites them to translation calls (Next.js, React Router 7/8, Astro with React islands, Vite + React).
-- Translates only what changed, with your own Anthropic/OpenAI key or a local model through Ollama.
-- Checks every translation before writing it: syntax, plural forms per language, placeholders, glossary terms, and whether it fits the button it's in (measured from your running app).
-- Alt+click any text in your dev server to edit it in every language.
+- Your coding agent or the CLI moves hardcoded strings to keys (Next.js, React Router 7/8, Astro with React islands, Vite + React).
+- Each LLM translation is checked by code before it is written: syntax, plural forms per language, placeholders, glossary terms, and the rendered width against the box measured in your running app. Failures go back to the model with the reason, then to a fallback model; anything still invalid is not written.
+- Only changed strings are translated; hand edits are protected by a lockfile.
 
-Cost example: 850 strings in batch mode on Claude Haiku came to $0.035. Catalogs stay plain JSON in your repo; there's no hosted service or account.
+Bring your own Anthropic/OpenAI key or a local model through any OpenAI-compatible endpoint. Catalogs stay plain JSON in your repo; no account.
 
-Demo GIFs and docs: https://github.com/MattJeff/glot
+Demo GIF and docs: https://github.com/MattJeff/glot
 
 Happy to answer questions about how the validation works.

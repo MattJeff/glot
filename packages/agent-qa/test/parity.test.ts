@@ -13,10 +13,10 @@ import { Ctx, attribute, run, score, type Options } from "../src/parity.ts";
 // de: the reminder button has no translation (falls back to English): a German-only reader can't find it.
 // ar: no dir="rtl".
 const cat: Record<string, Record<string, string>> = {
-  en: { "inv.title": "Invoices", "inv.new": "New invoice", "inv.create": "Create invoice", "inv.save": "Save", "inv.created": "Invoice for {customer} created", "inv.remind": "Send reminder", "inv.reminded": "Reminder sent" },
-  fr: { "inv.title": "Factures", "inv.new": "Nouvelle facture", "inv.create": "Nouvelle facture", "inv.save": "Enregistrer", "inv.created": "Facture pour {customer} créée", "inv.remind": "Envoyer un rappel au client" },
-  de: { "inv.title": "Rechnungen", "inv.new": "Neue Rechnung", "inv.create": "Rechnung erstellen", "inv.save": "Speichern", "inv.created": "Rechnung für {customer} erstellt", "inv.reminded": "Erinnerung gesendet" },
-  ar: { "inv.title": "الفواتير", "inv.new": "فاتورة جديدة", "inv.create": "إنشاء فاتورة", "inv.save": "حفظ", "inv.created": "تم إنشاء فاتورة {customer}", "inv.remind": "إرسال تذكير", "inv.reminded": "تم إرسال التذكير" },
+  en: { "inv.billing": "Billing", "inv.title": "Invoices", "inv.new": "New invoice", "inv.create": "Create invoice", "inv.save": "Save", "inv.created": "Invoice for {customer} created", "inv.remind": "Send reminder", "inv.reminded": "Reminder sent" },
+  fr: { "inv.billing": "Facturation", "inv.title": "Factures", "inv.new": "Nouvelle facture", "inv.create": "Nouvelle facture", "inv.save": "Enregistrer", "inv.created": "Facture pour {customer} créée", "inv.remind": "Envoyer un rappel au client" },
+  de: { "inv.billing": "Abrechnung", "inv.title": "Rechnungen", "inv.new": "Neue Rechnung", "inv.create": "Rechnung erstellen", "inv.save": "Speichern", "inv.created": "Rechnung für {customer} erstellt", "inv.reminded": "Erinnerung gesendet" },
+  ar: { "inv.billing": "الفوترة", "inv.title": "الفواتير", "inv.new": "فاتورة جديدة", "inv.create": "إنشاء فاتورة", "inv.save": "حفظ", "inv.created": "تم إنشاء فاتورة {customer}", "inv.remind": "إرسال تذكير", "inv.reminded": "تم إرسال التذكير" },
 };
 
 const page = (l: string) => {
@@ -32,6 +32,7 @@ const page = (l: string) => {
   <button type="submit">${t("inv.save")}</button>
 </form>
 <button style="width:120px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" onclick="toast(${js("inv.reminded")})">${t("inv.remind")}</button>
+<a href="/billing" onclick="event.preventDefault();setTimeout(()=>history.pushState({},'','/billing'+location.search),400)"><span aria-hidden="true">$</span> ${t("inv.billing")}</a>
 <div aria-live="polite" id="toast"></div>
 <script>function toast(m){document.getElementById('toast').innerHTML='<p>'+m+'</p>'}</script>
 </body></html>`;
@@ -163,6 +164,22 @@ test("Claude agent loop (stubbed client): request shape, goal cache, attribution
     assert.equal(translations, 2);
     await run(opts(["fr", "de"], "anthropic"), stub);
     assert.equal(translations, 2, "goals are translated once and cached");
+  } finally {
+    await close();
+  }
+});
+
+test("mock agent: client-side navigation (Next <Link>) is awaited, aria-hidden icons are not part of the label", async () => {
+  const { opts, close } = await fixture(`
+- id: billing
+  goal: Open billing
+  start: /
+  success: { url_matches: "^/billing" }
+  script: [{ click: inv.billing }]
+`);
+  try {
+    const report = await run(opts(["fr", "de"], "mock"));
+    assert.deepEqual(report.runs.map((r) => [r.locale, r.success, r.reason]), [["en", true, undefined], ["fr", true, undefined], ["de", true, undefined]]);
   } finally {
     await close();
   }

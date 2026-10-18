@@ -300,6 +300,12 @@ pub async fn review_workspace(
         }
     }
     save_cache(&ws.root, &cache)?;
+    // Worst first: `different`, then `nuance`, then `same` (stable within each group).
+    rows.sort_by_key(|r| match r.verdict {
+        Fidelity::Different => 0,
+        Fidelity::Nuance => 1,
+        Fidelity::Same => 2,
+    });
     Ok((rows, usage))
 }
 
@@ -467,14 +473,15 @@ pub(crate) mod tests {
         let (_d, ws) = workspace(r#"{"a": "⟦fr⟧ Open the Workspace", "b": "⟦fr⟧ Remove it"}"#);
         let (rows, _) = review_workspace(&ws, None, None, false).await.unwrap();
         assert_eq!(rows.len(), 2);
-        assert_eq!(rows[0].back_translation, "Open the Workspace");
-        assert_eq!(rows[0].verdict, Fidelity::Same);
-        assert_eq!(rows[1].verdict, Fidelity::Different);
+        // Worst first, though `b` sorts after `a`.
+        assert_eq!(rows[0].verdict, Fidelity::Different);
         assert_eq!(
-            rows[1].suggestion.as_deref(),
+            rows[0].suggestion.as_deref(),
             Some("⟦fr⟧ Delete the Workspace")
         );
-        assert!(!rows[0].cached);
+        assert_eq!(rows[1].back_translation, "Open the Workspace");
+        assert_eq!(rows[1].verdict, Fidelity::Same);
+        assert!(!rows[1].cached);
         let (rows, u) = review_workspace(&ws, Some(&["fr".into()]), Some(&["a".into()]), false)
             .await
             .unwrap();

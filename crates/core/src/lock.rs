@@ -35,6 +35,47 @@ pub struct LockEntry {
     pub score: Option<u8>,
     #[serde(default)]
     pub reviewed: bool,
+    /// Provenance (AI Act art. 50, `glot provenance`): UTC RFC 3339 time of the machine translation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub translated_at: Option<String>,
+    /// UTC RFC 3339 time a human wrote/approved the target.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed_at: Option<String>,
+    /// Reviewer (env `GLOT_REVIEWER` when recorded locally, server author on sync), when known.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed_by: Option<String>,
+    /// Why this entry waits for a human (`glot queue`): low quality score or risk tag. Cleared on approval.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub needs_review: Option<String>,
+}
+
+/// Current UTC time, RFC 3339 to the second (no chrono in glot-core).
+pub fn utc_now() -> String {
+    let s = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
+    rfc3339(s)
+}
+
+/// Unix seconds -> `YYYY-MM-DDTHH:MM:SSZ` (Howard Hinnant's civil_from_days).
+pub fn rfc3339(secs: i64) -> String {
+    let (days, rem) = (secs.div_euclid(86_400), secs.rem_euclid(86_400));
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    let y = yoe + era * 400 + i64::from(m <= 2);
+    format!(
+        "{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z",
+        rem / 3600,
+        rem % 3600 / 60,
+        rem % 60
+    )
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -58,6 +99,13 @@ pub struct Plan {
     pub manual_edits: Vec<(Locale, Key)>,
     /// Present in target but no lock entry (pre-existing translation) — record as Imported.
     pub untracked: Vec<(Locale, Key)>,
+    /// Existing machine/imported translation failing validation (`glot check` error): retranslate.
+    /// Filled by the workspace (needs the validator), not by `Lockfile::plan`.
+    #[serde(default)]
+    pub invalid: Vec<(Locale, Key)>,
+    /// Same, but human-edited or reviewed: never overwritten, fix with `glot set`.
+    #[serde(default)]
+    pub invalid_human: Vec<(Locale, Key)>,
 }
 
 impl Lockfile {
@@ -137,12 +185,42 @@ impl Lockfile {
         score: Option<u8>,
     ) {
         let reviewed = origin == Origin::Human;
+        let target_hash = hash(target);
+        // Provenance stamps: kept while the target is unchanged, refreshed when it changes.
+        let prev = self
+            .entries
+            .get(locale)
+            .and_then(|m| m.get(key))
+            .filter(|e| e.target_hash == target_hash && e.origin == origin);
+        let (translated_at, reviewed_at, reviewed_by) = match &origin {
+            Origin::Machine { .. } => (
+                prev.and_then(|e| e.translated_at.clone())
+                    .or_else(|| Some(utc_now())),
+                None,
+                None,
+            ),
+            Origin::Human => (
+                None,
+                prev.and_then(|e| e.reviewed_at.clone())
+                    .or_else(|| Some(utc_now())),
+                prev.and_then(|e| e.reviewed_by.clone()).or_else(|| {
+                    std::env::var("GLOT_REVIEWER")
+                        .ok()
+                        .filter(|r| !r.is_empty())
+                }),
+            ),
+            Origin::Imported => (None, None, None),
+        };
         let entry = LockEntry {
             source_hash: hash(source),
-            target_hash: hash(target),
+            target_hash,
             origin,
             score,
             reviewed,
+            translated_at,
+            reviewed_at,
+            reviewed_by,
+            needs_review: None,
         };
         self.entries
             .entry(locale.to_string())
@@ -242,6 +320,36 @@ mod tests {
         assert_eq!(Lockfile::load(&dir).unwrap(), lock);
         lock.remove("fr", "a");
         assert!(lock.entries.is_empty());
+        // Old lockfiles (no provenance fields) still load.
+        let old: LockEntry = serde_json::from_str(
+            r#"{"source_hash":"a","target_hash":"b","origin":{"kind":"human"}}"#,
+        )
+        .unwrap();
+        assert_eq!(old.translated_at, None);
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn provenance_stamps() {
+        assert_eq!(rfc3339(0), "1970-01-01T00:00:00Z");
+        assert_eq!(rfc3339(1_785_628_800), "2026-08-02T00:00:00Z");
+        assert_eq!(rfc3339(951_782_400 + 3_661), "2000-02-29T01:01:01Z");
+        let mut lock = Lockfile::default();
+        let m = || Origin::Machine { model: "m".into() };
+        lock.record("fr", "a", "Hi", "Salut", m(), None);
+        let e = lock.entries["fr"]["a"].clone();
+        assert!(e.translated_at.is_some() && e.reviewed_at.is_none());
+        // Same target re-recorded: stamp kept.
+        lock.entries
+            .get_mut("fr")
+            .unwrap()
+            .get_mut("a")
+            .unwrap()
+            .translated_at = Some("T0".into());
+        lock.record("fr", "a", "Hi", "Salut", m(), None);
+        assert_eq!(lock.entries["fr"]["a"].translated_at.as_deref(), Some("T0"));
+        lock.record("fr", "a", "Hi", "Coucou", Origin::Human, None);
+        let e = &lock.entries["fr"]["a"];
+        assert!(e.reviewed && e.reviewed_at.is_some() && e.translated_at.is_none());
     }
 }

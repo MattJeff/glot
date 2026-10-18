@@ -1,0 +1,3017 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "ru",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "⟦ru⟧ {count, plural, one {# file} few {# files} many {# files} other {# files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.002",
+      "target": "⟦ru⟧ {count, plural, =0 {No files yet} one {# file} few {# files} many {# files} other {# files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.003",
+      "target": "⟦ru⟧ {count, plural, one {# comment} few {# comments} many {# comments} other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.004",
+      "target": "⟦ru⟧ {count, plural, =0 {No comments yet} one {# comment} few {# comments} many {# comments} other {# comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.005",
+      "target": "⟦ru⟧ {count, plural, one {# member} few {# members} many {# members} other {# members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.006",
+      "target": "⟦ru⟧ {count, plural, =0 {No members yet} one {# member} few {# members} many {# members} other {# members}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.007",
+      "target": "⟦ru⟧ {count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.008",
+      "target": "⟦ru⟧ {count, plural, =0 {No tasks yet} one {# task} few {# tasks} many {# tasks} other {# tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.009",
+      "target": "⟦ru⟧ {count, plural, one {# message} few {# messages} many {# messages} other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.010",
+      "target": "⟦ru⟧ {count, plural, =0 {No messages yet} one {# message} few {# messages} many {# messages} other {# messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.011",
+      "target": "⟦ru⟧ {count, plural, one {# seat} few {# seats} many {# seats} other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.012",
+      "target": "⟦ru⟧ {count, plural, =0 {No seats yet} one {# seat} few {# seats} many {# seats} other {# seats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "⟦ru⟧ {count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.014",
+      "target": "⟦ru⟧ {count, plural, =0 {No reviews yet} one {# review} few {# reviews} many {# reviews} other {# reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.015",
+      "target": "⟦ru⟧ {count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.016",
+      "target": "⟦ru⟧ {count, plural, =0 {No downloads yet} one {# download} few {# downloads} many {# downloads} other {# downloads}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.017",
+      "target": "⟦ru⟧ {count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.018",
+      "target": "⟦ru⟧ {count, plural, =0 {No notifications yet} one {# notification} few {# notifications} many {# notifications} other {# notifications}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.019",
+      "target": "⟦ru⟧ {count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.020",
+      "target": "⟦ru⟧ {count, plural, =0 {No invitations yet} one {# invitation} few {# invitations} many {# invitations} other {# invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.021",
+      "target": "⟦ru⟧ {count, plural, one {# error} few {# errors} many {# errors} other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.022",
+      "target": "⟦ru⟧ {count, plural, =0 {No errors yet} one {# error} few {# errors} many {# errors} other {# errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.023",
+      "target": "⟦ru⟧ {count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.024",
+      "target": "⟦ru⟧ {count, plural, =0 {No warnings yet} one {# warning} few {# warnings} many {# warnings} other {# warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.025",
+      "target": "⟦ru⟧ {count, plural, one {# result} few {# results} many {# results} other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "⟦ru⟧ {count, plural, =0 {No results yet} one {# result} few {# results} many {# results} other {# results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.027",
+      "target": "⟦ru⟧ {count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.028",
+      "target": "⟦ru⟧ {count, plural, =0 {No attachments yet} one {# attachment} few {# attachments} many {# attachments} other {# attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.029",
+      "target": "⟦ru⟧ {count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.030",
+      "target": "⟦ru⟧ {count, plural, =0 {No subscribers yet} one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.031",
+      "target": "⟦ru⟧ {count, plural, one {# day} few {# days} many {# days} other {# days}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.032",
+      "target": "⟦ru⟧ {count, plural, =0 {No days yet} one {# day} few {# days} many {# days} other {# days}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.033",
+      "target": "⟦ru⟧ {count, plural, one {# hour} few {# hours} many {# hours} other {# hours}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.034",
+      "target": "⟦ru⟧ {count, plural, =0 {No hours yet} one {# hour} few {# hours} many {# hours} other {# hours}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.035",
+      "target": "⟦ru⟧ {count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.036",
+      "target": "⟦ru⟧ {count, plural, =0 {No minutes yet} one {# minute} few {# minutes} many {# minutes} other {# minutes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.037",
+      "target": "⟦ru⟧ {count, plural, one {# step} few {# steps} many {# steps} other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "⟦ru⟧ {count, plural, =0 {No steps yet} one {# step} few {# steps} many {# steps} other {# steps}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.039",
+      "target": "⟦ru⟧ {count, plural, one {# credit} few {# credits} many {# credits} other {# credits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.040",
+      "target": "⟦ru⟧ {count, plural, =0 {No credits yet} one {# credit} few {# credits} many {# credits} other {# credits}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.041",
+      "target": "⟦ru⟧ {count, plural, one {# photo} few {# photos} many {# photos} other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.042",
+      "target": "⟦ru⟧ {count, plural, =0 {No photos yet} one {# photo} few {# photos} many {# photos} other {# photos}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.043",
+      "target": "⟦ru⟧ {count, plural, one {# deployment} few {# deployments} many {# deployments} other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.044",
+      "target": "⟦ru⟧ {count, plural, =0 {No deployments yet} one {# deployment} few {# deployments} many {# deployments} other {# deployments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.045",
+      "target": "⟦ru⟧ {count, plural, one {# key} few {# keys} many {# keys} other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.046",
+      "target": "⟦ru⟧ {count, plural, =0 {No keys yet} one {# key} few {# keys} many {# keys} other {# keys}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.047",
+      "target": "⟦ru⟧ {count, plural, one {# draft} few {# drafts} many {# drafts} other {# drafts}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.048",
+      "target": "⟦ru⟧ {count, plural, =0 {No drafts yet} one {# draft} few {# drafts} many {# drafts} other {# drafts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.049",
+      "target": "⟦ru⟧ {count, plural, one {# reply} few {# replies} many {# replies} other {# replies}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.050",
+      "target": "⟦ru⟧ {count, plural, =0 {No replies yet} one {# reply} few {# replies} many {# replies} other {# replies}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.051",
+      "target": "⟦ru⟧ {count, plural, one {# vote} few {# votes} many {# votes} other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.052",
+      "target": "⟦ru⟧ {count, plural, =0 {No votes yet} one {# vote} few {# votes} many {# votes} other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.053",
+      "target": "⟦ru⟧ {count, plural, one {# follower} few {# followers} many {# followers} other {# followers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.054",
+      "target": "⟦ru⟧ {count, plural, =0 {No followers yet} one {# follower} few {# followers} many {# followers} other {# followers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.055",
+      "target": "⟦ru⟧ {count, plural, one {# item} few {# items} many {# items} other {# items}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.056",
+      "target": "⟦ru⟧ {count, plural, =0 {No items yet} one {# item} few {# items} many {# items} other {# items}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.057",
+      "target": "⟦ru⟧ {count, plural, one {# ticket} few {# tickets} many {# tickets} other {# tickets}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.058",
+      "target": "⟦ru⟧ {count, plural, =0 {No tickets yet} one {# ticket} few {# tickets} many {# tickets} other {# tickets}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.059",
+      "target": "⟦ru⟧ {count, plural, one {# event} few {# events} many {# events} other {# events}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.060",
+      "target": "⟦ru⟧ {count, plural, =0 {No events yet} one {# event} few {# events} many {# events} other {# events}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.061",
+      "target": "⟦ru⟧ {count, plural, one {# page} few {# pages} many {# pages} other {# pages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.062",
+      "target": "⟦ru⟧ {count, plural, =0 {No pages yet} one {# page} few {# pages} many {# pages} other {# pages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "⟦ru⟧ {count, plural, one {# tag} few {# tags} many {# tags} other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.064",
+      "target": "⟦ru⟧ {count, plural, =0 {No tags yet} one {# tag} few {# tags} many {# tags} other {# tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.065",
+      "target": "⟦ru⟧ {count, plural, one {# branch} few {# branches} many {# branches} other {# branches}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.066",
+      "target": "⟦ru⟧ {count, plural, =0 {No branches yet} one {# branch} few {# branches} many {# branches} other {# branches}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.067",
+      "target": "⟦ru⟧ {count, plural, one {# commit} few {# commits} many {# commits} other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.068",
+      "target": "⟦ru⟧ {count, plural, =0 {No commits yet} one {# commit} few {# commits} many {# commits} other {# commits}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.069",
+      "target": "⟦ru⟧ {count, plural, one {# contact} few {# contacts} many {# contacts} other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.070",
+      "target": "⟦ru⟧ {count, plural, =0 {No contacts yet} one {# contact} few {# contacts} many {# contacts} other {# contacts}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.071",
+      "target": "⟦ru⟧ {count, plural, one {# order} few {# orders} many {# orders} other {# orders}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.072",
+      "target": "⟦ru⟧ {count, plural, =0 {No orders yet} one {# order} few {# orders} many {# orders} other {# orders}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.073",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new files} one {one new file} few {# new files} many {# new files} other {# new files}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.074",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new comments} one {one new comment} few {# new comments} many {# new comments} other {# new comments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.075",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new members} one {one new member} few {# new members} many {# new members} other {# new members}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new tasks} one {one new task} few {# new tasks} many {# new tasks} other {# new tasks}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.077",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new messages} one {one new message} few {# new messages} many {# new messages} other {# new messages}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.078",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new seats} one {one new seat} few {# new seats} many {# new seats} other {# new seats}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.079",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new reviews} one {one new review} few {# new reviews} many {# new reviews} other {# new reviews}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.080",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new downloads} one {one new download} few {# new downloads} many {# new downloads} other {# new downloads}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.081",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new notifications} one {one new notification} few {# new notifications} many {# new notifications} other {# new notifications}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.082",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new invitations} one {one new invitation} few {# new invitations} many {# new invitations} other {# new invitations}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.083",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new errors} one {one new error} few {# new errors} many {# new errors} other {# new errors}}.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural.084",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new warnings} one {one new warning} few {# new warnings} many {# new warnings} other {# new warnings}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.085",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new results} one {one new result} few {# new results} many {# new results} other {# new results}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.086",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new attachments} one {one new attachment} few {# new attachments} many {# new attachments} other {# new attachments}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.087",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new subscribers} one {one new subscriber} few {# new subscribers} many {# new subscribers} other {# new subscribers}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "⟦ru⟧ You have {count, plural, =0 {no new days} one {one new day} few {# new days} many {# new days} other {# new days}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.001",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a file} =1 {{name} added a file} one {{name} and # other added files} few {{name} and # others added files} many {{name} and # others added files} other {{name} and # others added files}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.002",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a comment} =1 {{name} added a comment} one {{name} and # other added comments} few {{name} and # others added comments} many {{name} and # others added comments} other {{name} and # others added comments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.003",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a member} =1 {{name} added a member} one {{name} and # other added members} few {{name} and # others added members} many {{name} and # others added members} other {{name} and # others added members}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.004",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a task} =1 {{name} added a task} one {{name} and # other added tasks} few {{name} and # others added tasks} many {{name} and # others added tasks} other {{name} and # others added tasks}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.005",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a message} =1 {{name} added a message} one {{name} and # other added messages} few {{name} and # others added messages} many {{name} and # others added messages} other {{name} and # others added messages}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.006",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a seat} =1 {{name} added a seat} one {{name} and # other added seats} few {{name} and # others added seats} many {{name} and # others added seats} other {{name} and # others added seats}}",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "plural_offset.007",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a review} =1 {{name} added a review} one {{name} and # other added reviews} few {{name} and # others added reviews} many {{name} and # others added reviews} other {{name} and # others added reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.008",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a download} =1 {{name} added a download} one {{name} and # other added downloads} few {{name} and # others added downloads} many {{name} and # others added downloads} other {{name} and # others added downloads}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.009",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a notification} =1 {{name} added a notification} one {{name} and # other added notifications} few {{name} and # others added notifications} many {{name} and # others added notifications} other {{name} and # others added notifications}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "plural_offset.010",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a invitation} =1 {{name} added a invitation} one {{name} and # other added invitations} few {{name} and # others added invitations} many {{name} and # others added invitations} other {{name} and # others added invitations}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.011",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a error} =1 {{name} added a error} one {{name} and # other added errors} few {{name} and # others added errors} many {{name} and # others added errors} other {{name} and # others added errors}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.012",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a warning} =1 {{name} added a warning} one {{name} and # other added warnings} few {{name} and # others added warnings} many {{name} and # others added warnings} other {{name} and # others added warnings}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a result} =1 {{name} added a result} one {{name} and # other added results} few {{name} and # others added results} many {{name} and # others added results} other {{name} and # others added results}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.014",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a attachment} =1 {{name} added a attachment} one {{name} and # other added attachments} few {{name} and # others added attachments} many {{name} and # others added attachments} other {{name} and # others added attachments}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.015",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a subscriber} =1 {{name} added a subscriber} one {{name} and # other added subscribers} few {{name} and # others added subscribers} many {{name} and # others added subscribers} other {{name} and # others added subscribers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.016",
+      "target": "⟦ru⟧ {count, plural, offset:1 =0 {Nobody added a day} =1 {{name} added a day} one {{name} and # other added days} few {{name} and # others added days} many {{name} and # others added days} other {{name} and # others added days}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.001",
+      "target": "⟦ru⟧ {gender, select, female {She replied to your comment} male {He replied to your comment} other {They replied to your comment}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.002",
+      "target": "⟦ru⟧ {gender, select, female {{name} updated her profile} male {{name} updated his profile} other {{name} updated their profile}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.003",
+      "target": "⟦ru⟧ {gender, select, female {Invite her to the team} male {Invite him to the team} other {Invite them to the team}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.004",
+      "target": "⟦ru⟧ {gender, select, female {{name} is now an admin. She can manage billing.} male {{name} is now an admin. He can manage billing.} other {{name} is now an admin. They can manage billing.}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "select.005",
+      "target": "⟦ru⟧ {role, select, owner {Owner} admin {Admin} member {Member} guest {Guest} other {Unknown role}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.006",
+      "target": "⟦ru⟧ {status, select, open {Open} closed {Closed} merged {Merged} draft {Draft} other {Unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.007",
+      "target": "⟦ru⟧ {status, select, paid {Paid} due {Due} overdue {Overdue} void {Void} other {Pending}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.008",
+      "target": "⟦ru⟧ {plan, select, free {Free plan} pro {Pro plan} team {Team plan} enterprise {Enterprise plan} other {Custom plan}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "⟦ru⟧ {platform, select, ios {Open the iPhone app} android {Open the Android app} other {Open the web app}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.010",
+      "target": "⟦ru⟧ {device, select, mobile {Scan this code with your phone} desktop {Click the link below} other {Follow the instructions}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.011",
+      "target": "⟦ru⟧ {visibility, select, public {Anyone with the link can view} private {Only invited people can view} other {Visibility unknown}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.012",
+      "target": "⟦ru⟧ {state, select, running {Running} queued {Queued} failed {Failed} success {Passed} other {Skipped}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.013",
+      "target": "⟦ru⟧ {type, select, bug {Bug report} feature {Feature request} question {Question} other {Issue}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.014",
+      "target": "⟦ru⟧ {gender, select, female {Welcome back, {name}! She who returns gets a gift.} other {Welcome back, {name}!}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.015",
+      "target": "⟦ru⟧ {reason, select, expired {Your session expired. Sign in again.} revoked {Your access was revoked by an admin.} other {You were signed out.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.016",
+      "target": "⟦ru⟧ {method, select, card {Pay by card} sepa {Pay by SEPA debit} paypal {Pay with PayPal} other {Choose a payment method}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.017",
+      "target": "⟦ru⟧ {gender, select, female {Your friend {name} invited you. Join her on the team.} male {Your friend {name} invited you. Join him on the team.} other {Your friend {name} invited you. Join them on the team.}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.018",
+      "target": "⟦ru⟧ {tone, select, success {Saved} error {Could not save} other {Saving…}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.019",
+      "target": "⟦ru⟧ {priority, select, urgent {Urgent} high {High} medium {Medium} low {Low} other {None}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.020",
+      "target": "⟦ru⟧ {theme, select, light {Light} dark {Dark} other {System}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.021",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a file with you} male {{name} shared a file with you} other {{name} shared a file with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a comment with you} male {{name} shared a comment with you} other {{name} shared a comment with you}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.023",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a member with you} male {{name} shared a member with you} other {{name} shared a member with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.024",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a task with you} male {{name} shared a task with you} other {{name} shared a task with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.025",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a message with you} male {{name} shared a message with you} other {{name} shared a message with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.026",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a seat with you} male {{name} shared a seat with you} other {{name} shared a seat with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.027",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a review with you} male {{name} shared a review with you} other {{name} shared a review with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.028",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a download with you} male {{name} shared a download with you} other {{name} shared a download with you}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "select.029",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a notification with you} male {{name} shared a notification with you} other {{name} shared a notification with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.030",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a invitation with you} male {{name} shared a invitation with you} other {{name} shared a invitation with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.031",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a error with you} male {{name} shared a error with you} other {{name} shared a error with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.032",
+      "target": "⟦ru⟧ {gender, select, female {{name} shared a warning with you} male {{name} shared a warning with you} other {{name} shared a warning with you}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.001",
+      "target": "⟦ru⟧ You finished {rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "⟦ru⟧ This is your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} visit this week",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.003",
+      "target": "⟦ru⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} attempt failed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.004",
+      "target": "⟦ru⟧ Renews on the {day, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of each month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.005",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} anniversary with {company}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.006",
+      "target": "⟦ru⟧ {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.007",
+      "target": "⟦ru⟧ Reminder: the {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} payment is due",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.008",
+      "target": "⟦ru⟧ Step {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of the setup",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.009",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} file this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.010",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} comment this month",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "selectordinal.011",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} member this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.012",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} task this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.013",
+      "target": "⟦ru⟧ Your {n, selectordinal, two {#nd} few {#rd} other {#th}} message this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.014",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} seat this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} review this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.016",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} download this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.017",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} notification this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.018",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} invitation this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.019",
+      "target": "⟦ru⟧ Your {n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} error this month",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.001",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# file} few {# files} many {# files} other {# files}} to her list} male {{name} added {count, plural, one {# file} few {# files} many {# files} other {# files}} to his list} other {{name} added {count, plural, one {# file} few {# files} many {# files} other {# files}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.002",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# comment} few {# comments} many {# comments} other {# comments}} to her list} male {{name} added {count, plural, one {# comment} few {# comments} many {# comments} other {# comments}} to his list} other {{name} added {count, plural, one {# comment} few {# comments} many {# comments} other {# comments}} to their list}}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "nested.003",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# member} few {# members} many {# members} other {# members}} to her list} male {{name} added {count, plural, one {# member} few {# members} many {# members} other {# members}} to his list} other {{name} added {count, plural, one {# member} few {# members} many {# members} other {# members}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.004",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}} to her list} male {{name} added {count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}} to his list} other {{name} added {count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.005",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# message} few {# messages} many {# messages} other {# messages}} to her list} male {{name} added {count, plural, one {# message} few {# messages} many {# messages} other {# messages}} to his list} other {{name} added {count, plural, one {# message} few {# messages} many {# messages} other {# messages}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.006",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# seat} few {# seats} many {# seats} other {# seats}} to her list} male {{name} added {count, plural, one {# seat} few {# seats} many {# seats} other {# seats}} to his list} other {{name} added {count, plural, one {# seat} few {# seats} many {# seats} other {# seats}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.007",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}} to her list} male {{name} added {count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}} to his list} other {{name} added {count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}} to her list} male {{name} added {count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}} to his list} other {{name} added {count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.009",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}} to her list} male {{name} added {count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}} to his list} other {{name} added {count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.010",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}} to her list} male {{name} added {count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}} to his list} other {{name} added {count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.011",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# error} few {# errors} many {# errors} other {# errors}} to her list} male {{name} added {count, plural, one {# error} few {# errors} many {# errors} other {# errors}} to his list} other {{name} added {count, plural, one {# error} few {# errors} many {# errors} other {# errors}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.012",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}} to her list} male {{name} added {count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}} to his list} other {{name} added {count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.013",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# result} few {# results} many {# results} other {# results}} to her list} male {{name} added {count, plural, one {# result} few {# results} many {# results} other {# results}} to his list} other {{name} added {count, plural, one {# result} few {# results} many {# results} other {# results}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.014",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}} to her list} male {{name} added {count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}} to his list} other {{name} added {count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.015",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}} to her list} male {{name} added {count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}} to his list} other {{name} added {count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.016",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# day} few {# days} many {# days} other {# days}} to her list} male {{name} added {count, plural, one {# day} few {# days} many {# days} other {# days}} to his list} other {{name} added {count, plural, one {# day} few {# days} many {# days} other {# days}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.017",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# hour} few {# hours} many {# hours} other {# hours}} to her list} male {{name} added {count, plural, one {# hour} few {# hours} many {# hours} other {# hours}} to his list} other {{name} added {count, plural, one {# hour} few {# hours} many {# hours} other {# hours}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.018",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}} to her list} male {{name} added {count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}} to his list} other {{name} added {count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.019",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# step} few {# steps} many {# steps} other {# steps}} to her list} male {{name} added {count, plural, one {# step} few {# steps} many {# steps} other {# steps}} to his list} other {{name} added {count, plural, one {# step} few {# steps} many {# steps} other {# steps}} to their list}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.020",
+      "target": "⟦ru⟧ {gender, select, female {{name} added {count, plural, one {# credit} few {# credits} many {# credits} other {# credits}} to her list} male {{name} added {count, plural, one {# credit} few {# credits} many {# credits} other {# credits}} to his list} other {{name} added {count, plural, one {# credit} few {# credits} many {# credits} other {# credits}} to their list}} {count}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "⟦ru⟧ {count, plural, =0 {No files selected} one {<b>#</b> file selected. <link>Clear</link>} few {<b>#</b> files selected. <link>Clear</link>} many {<b>#</b> files selected. <link>Clear</link>} other {<b>#</b> files selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.022",
+      "target": "⟦ru⟧ {count, plural, =0 {No comments selected} one {<b>#</b> comment selected. <link>Clear</link>} few {<b>#</b> comments selected. <link>Clear</link>} many {<b>#</b> comments selected. <link>Clear</link>} other {<b>#</b> comments selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.023",
+      "target": "⟦ru⟧ {count, plural, =0 {No members selected} one {<b>#</b> member selected. <link>Clear</link>} few {<b>#</b> members selected. <link>Clear</link>} many {<b>#</b> members selected. <link>Clear</link>} other {<b>#</b> members selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.024",
+      "target": "⟦ru⟧ {count, plural, =0 {No tasks selected} one {<b>#</b> task selected. <link>Clear</link>} few {<b>#</b> tasks selected. <link>Clear</link>} many {<b>#</b> tasks selected. <link>Clear</link>} other {<b>#</b> tasks selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.025",
+      "target": "⟦ru⟧ {count, plural, =0 {No messages selected} one {<b>#</b> message selected. <link>Clear</link>} few {<b>#</b> messages selected. <link>Clear</link>} many {<b>#</b> messages selected. <link>Clear</link>} other {<b>#</b> messages selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.026",
+      "target": "⟦ru⟧ {count, plural, =0 {No seats selected} one {<b>#</b> seat selected. <link>Clear</link>} few {<b>#</b> seats selected. <link>Clear</link>} many {<b>#</b> seats selected. <link>Clear</link>} other {<b>#</b> seats selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.027",
+      "target": "⟦ru⟧ {count, plural, =0 {No reviews selected} one {<b>#</b> review selected. <link>Clear</link>} few {<b>#</b> reviews selected. <link>Clear</link>} many {<b>#</b> reviews selected. <link>Clear</link>} other {<b>#</b> reviews selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.028",
+      "target": "⟦ru⟧ {count, plural, =0 {No downloads selected} one {<b>#</b> download selected. <link>Clear</link>} few {<b>#</b> downloads selected. <link>Clear</link>} many {<b>#</b> downloads selected. <link>Clear</link>} other {<b>#</b> downloads selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.029",
+      "target": "⟦ru⟧ {count, plural, =0 {No notifications selected} one {<b>#</b> notification selected. <link>Clear</link>} few {<b>#</b> notifications selected. <link>Clear</link>} many {<b>#</b> notifications selected. <link>Clear</link>} other {<b>#</b> notifications selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.030",
+      "target": "⟦ru⟧ {count, plural, =0 {No invitations selected} one {<b>#</b> invitation selected. <link>Clear</link>} few {<b>#</b> invitations selected. <link>Clear</link>} many {<b>#</b> invitations selected. <link>Clear</link>} other {<b>#</b> invitations selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.031",
+      "target": "⟦ru⟧ {count, plural, =0 {No errors selected} one {<b>#</b> error selected. <link>Clear</link>} few {<b>#</b> errors selected. <link>Clear</link>} many {<b>#</b> errors selected. <link>Clear</link>} other {<b>#</b> errors selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.032",
+      "target": "⟦ru⟧ {count, plural, =0 {No warnings selected} one {<b>#</b> warning selected. <link>Clear</link>} few {<b>#</b> warnings selected. <link>Clear</link>} many {<b>#</b> warnings selected. <link>Clear</link>} other {<b>#</b> warnings selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.033",
+      "target": "⟦ru⟧ {count, plural, =0 {No results selected} one {<b>#</b> result selected. <link>Clear</link>} few {<b>#</b> results selected. <link>Clear</link>} many {<b>#</b> results selected. <link>Clear</link>} other {<b>#</b> results selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.034",
+      "target": "⟦ru⟧ {count, plural, =0 {No attachments selected} one {<b>#</b> attachment selected. <link>Clear</link>} few {<b>#</b> attachments selected. <link>Clear</link>} many {<b>#</b> attachments selected. <link>Clear</link>} other {<b>#</b> attachments selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.035",
+      "target": "⟦ru⟧ {count, plural, =0 {No subscribers selected} one {<b>#</b> subscriber selected. <link>Clear</link>} few {<b>#</b> subscribers selected. <link>Clear</link>} many {<b>#</b> subscribers selected. <link>Clear</link>} other {<b>#</b> subscribers selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.036",
+      "target": "⟦ru⟧ {count, plural, =0 {No days selected} one {<b>#</b> day selected. <link>Clear</link>} few {<b>#</b> days selected. <link>Clear</link>} many {<b>#</b> days selected. <link>Clear</link>} other {<b>#</b> days selected. <link>Clear</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "placeholders.001",
+      "target": "⟦ru⟧ {actor} moved {item} from {from} to {to}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.002",
+      "target": "⟦ru⟧ {name} invited {email} to {team}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.003",
+      "target": "⟦ru⟧ {user} changed the due date of {task} to {date}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.004",
+      "target": "⟦ru⟧ Showing {start}–{end} of {total} results",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.005",
+      "target": "⟦ru⟧ {name} commented on {title}: “{excerpt}”",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.006",
+      "target": "⟦ru⟧ {author} merged {count, number} commits into {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.007",
+      "target": "⟦ru⟧ Uploaded {fileName} ({size}) to {folder}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.008",
+      "target": "⟦ru⟧ {name} and {other} are typing…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.009",
+      "target": "⟦ru⟧ Signed in as {email} on {device}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "⟦ru⟧ {percent, number, percent} of {quota} used",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.011",
+      "target": "⟦ru⟧ Last synced {time} by {name}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.012",
+      "target": "⟦ru⟧ {user} renamed {oldName} to {newName}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.013",
+      "target": "⟦ru⟧ {used} of {limit} GB used — upgrade to get {extra} GB more",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.014",
+      "target": "⟦ru⟧ {count, number} views since {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.015",
+      "target": "⟦ru⟧ {name} assigned {task} to {assignee}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.016",
+      "target": "⟦ru⟧ {sender} sent you {amount, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.017",
+      "target": "⟦ru⟧ счет {number} for {amount} is due on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.018",
+      "target": "⟦ru⟧ {app} wants to access your {resource}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.019",
+      "target": "⟦ru⟧ From {start, time, short} to {end, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.020",
+      "target": "⟦ru⟧ {name} replied in {channel} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.021",
+      "target": "⟦ru⟧ Order {id} ships to {city}, {country}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.022",
+      "target": "⟦ru⟧ {owner}/{repo} · {stars} stars · updated {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.023",
+      "target": "⟦ru⟧ Hello {firstName}, your trial ends in {days} days",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.024",
+      "target": "⟦ru⟧ {author} wrote {words, number} words in {minutes} minutes",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.025",
+      "target": "⟦ru⟧ {a} vs {b}: {delta, number, percent} difference",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.026",
+      "target": "⟦ru⟧ {name} joined {team} via {method}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.027",
+      "target": "⟦ru⟧ Transfer {amount} from {source} to {target}?",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "placeholders.028",
+      "target": "⟦ru⟧ {count} of {total} checks passed on {branch}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.029",
+      "target": "⟦ru⟧ Rated {score} out of {max} by {reviewer}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.030",
+      "target": "⟦ru⟧ {city} · {temp}° · feels like {feels}°",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.031",
+      "target": "⟦ru⟧ {name} ({role}) left {team}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.032",
+      "target": "⟦ru⟧ Moved {count} items to {folder} — {undo}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.033",
+      "target": "⟦ru⟧ Reset link sent to {email}. It expires in {minutes} minutes.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.034",
+      "target": "⟦ru⟧ {name} reacted {emoji} to your message in {channel}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "⟦ru⟧ Your export of {rows, number} rows is ready: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.036",
+      "target": "⟦ru⟧ {x} × {y} px, {size} KB",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.037",
+      "target": "⟦ru⟧ Version {version} released on {date, date, short} by {author}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.038",
+      "target": "⟦ru⟧ Paid {amount} with card ending in {last4}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.039",
+      "target": "⟦ru⟧ {seconds, plural, one {# second} few {# seconds} many {# seconds} other {# seconds}} until {action}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.040",
+      "target": "⟦ru⟧ Between {min} and {max} characters, currently {count}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.041",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# file} few {# files} many {# files} other {# files}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.042",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# comment} few {# comments} many {# comments} other {# comments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.043",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# member} few {# members} many {# members} other {# members}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.044",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.045",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# message} few {# messages} many {# messages} other {# messages}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.046",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# seat} few {# seats} many {# seats} other {# seats}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.048",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.049",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.050",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.051",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# error} few {# errors} many {# errors} other {# errors}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.052",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.053",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# result} few {# results} many {# results} other {# results}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "placeholders.054",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.055",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.056",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# day} few {# days} many {# days} other {# days}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.057",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# hour} few {# hours} many {# hours} other {# hours}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.058",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.059",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# step} few {# steps} many {# steps} other {# steps}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "⟦ru⟧ {name} deleted {count, plural, one {# credit} few {# credits} many {# credits} other {# credits}} from {location} on {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.001",
+      "target": "⟦ru⟧ By continuing you accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.002",
+      "target": "⟦ru⟧ <b>Heads up:</b> this action cannot be undone.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.003",
+      "target": "⟦ru⟧ Need help? <link>Contact support</link> or read the <docs>docs</docs>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.004",
+      "target": "⟦ru⟧ Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.005",
+      "target": "⟦ru⟧ Your trial ends in <b>{days} days</b>. <link>Upgrade now</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.006",
+      "target": "⟦ru⟧ Signed in as <b>{email}</b>. <link>Not you?</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.007",
+      "target": "⟦ru⟧ <b>{name}</b> mentioned you in <link>{title}</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.008",
+      "target": "⟦ru⟧ Drag files here or <link>browse</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.009",
+      "target": "⟦ru⟧ We sent a code to <b>{phone}</b>.<br/>It expires in 10 minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.010",
+      "target": "⟦ru⟧ <i>Optional</i> — leave empty to use the default",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.011",
+      "target": "⟦ru⟧ Read our <link>guide</link> to <b>get started</b> in minutes.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "⟦ru⟧ This repository is <b>archived</b>. It is <i>read-only</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.013",
+      "target": "⟦ru⟧ <b>Tip:</b> type <code>/</code> to open the command menu.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.014",
+      "target": "⟦ru⟧ Your card was declined. <link>Update payment details</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.015",
+      "target": "⟦ru⟧ <b>{count}</b> people viewed this <link>post</link> today",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.016",
+      "target": "⟦ru⟧ Already have an account? <link>Sign in</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.017",
+      "target": "⟦ru⟧ Don't have an account? <link>Create one</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.018",
+      "target": "⟦ru⟧ Forgot your password? <link>Reset it</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.019",
+      "target": "⟦ru⟧ <strong>Warning:</strong> deleting <b>{name}</b> also deletes its data.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.020",
+      "target": "⟦ru⟧ Learn more about <link>keyboard shortcuts</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.021",
+      "target": "⟦ru⟧ Built with <heart>love</heart> by the community",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.022",
+      "target": "⟦ru⟧ Reply to <b>{name}</b> in <channel>#{channel}</channel>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.023",
+      "target": "⟦ru⟧ Your changes are saved <b>automatically</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.024",
+      "target": "⟦ru⟧ <b>New:</b> try the redesigned editor. <link>Learn more</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "⟦ru⟧ Click <b>Publish</b> when you are ready.",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "tags.026",
+      "target": "⟦ru⟧ Use at least <b>8 characters</b> with a <b>number</b> and a <b>symbol</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.027",
+      "target": "⟦ru⟧ Questions? Email us at <link>{email}</link>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.028",
+      "target": "⟦ru⟧ <b>{percent}%</b> complete — <link>see details</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.029",
+      "target": "⟦ru⟧ You are viewing an <b>older version</b>. <link>Go to latest</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.030",
+      "target": "⟦ru⟧ Invite people with this link: <code>{url}</code>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.031",
+      "target": "⟦ru⟧ <b>{count, plural, one {# file} few {# files} many {# files} other {# files}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.032",
+      "target": "⟦ru⟧ <b>{count, plural, one {# comment} few {# comments} many {# comments} other {# comments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.033",
+      "target": "⟦ru⟧ <b>{count, plural, one {# member} few {# members} many {# members} other {# members}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.034",
+      "target": "⟦ru⟧ <b>{count, plural, one {# task} few {# tasks} many {# tasks} other {# tasks}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.035",
+      "target": "⟦ru⟧ <b>{count, plural, one {# message} few {# messages} many {# messages} other {# messages}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.036",
+      "target": "⟦ru⟧ <b>{count, plural, one {# seat} few {# seats} many {# seats} other {# seats}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "⟦ru⟧ <b>{count, plural, one {# review} few {# reviews} many {# reviews} other {# reviews}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.038",
+      "target": "⟦ru⟧ <b>{count, plural, one {# download} few {# downloads} many {# downloads} other {# downloads}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.039",
+      "target": "⟦ru⟧ <b>{count, plural, one {# notification} few {# notifications} many {# notifications} other {# notifications}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.040",
+      "target": "⟦ru⟧ <b>{count, plural, one {# invitation} few {# invitations} many {# invitations} other {# invitations}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.041",
+      "target": "⟦ru⟧ <b>{count, plural, one {# error} few {# errors} many {# errors} other {# errors}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.042",
+      "target": "⟦ru⟧ <b>{count, plural, one {# warning} few {# warnings} many {# warnings} other {# warnings}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.043",
+      "target": "⟦ru⟧ <b>{count, plural, one {# result} few {# results} many {# results} other {# results}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.044",
+      "target": "⟦ru⟧ <b>{count, plural, one {# attachment} few {# attachments} many {# attachments} other {# attachments}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.045",
+      "target": "⟦ru⟧ <b>{count, plural, one {# subscriber} few {# subscribers} many {# subscribers} other {# subscribers}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.046",
+      "target": "⟦ru⟧ <b>{count, plural, one {# day} few {# days} many {# days} other {# days}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.047",
+      "target": "⟦ru⟧ <b>{count, plural, one {# hour} few {# hours} many {# hours} other {# hours}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.048",
+      "target": "⟦ru⟧ <b>{count, plural, one {# minute} few {# minutes} many {# minutes} other {# minutes}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.049",
+      "target": "⟦ru⟧ <b>{count, plural, one {# step} few {# steps} many {# steps} other {# steps}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "⟦ru⟧ <b>{count, plural, one {# credit} few {# credits} many {# credits} other {# credits}}</b> need your attention. <link>Review</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.001",
+      "target": "⟦ru⟧ Don''t show this again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.002",
+      "target": "⟦ru⟧ It''s {name}''s turn",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.003",
+      "target": "⟦ru⟧ You haven''t saved your changes",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.004",
+      "target": "⟦ru⟧ Type '{'name'}' to insert the user''s name",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.005",
+      "target": "⟦ru⟧ Use '{'curly braces'}' for variables",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.006",
+      "target": "⟦ru⟧ We couldn''t find that page",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.007",
+      "target": "⟦ru⟧ Can''t connect to the server",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.008",
+      "target": "⟦ru⟧ {name}''s workspace",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "apostrophe.009",
+      "target": "⟦ru⟧ That''s all for today!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.010",
+      "target": "⟦ru⟧ Let''s get started",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.011",
+      "target": "⟦ru⟧ You''re all caught up",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "⟦ru⟧ Isn''t working? Try again",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.013",
+      "target": "⟦ru⟧ Shouldn''t take long…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.014",
+      "target": "⟦ru⟧ The file ''{file}'' was renamed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.015",
+      "target": "⟦ru⟧ Here''s what''s new in {version}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.016",
+      "target": "⟦ru⟧ {count, plural, one {# person hasn''t replied} few {# people haven''t replied} many {# people haven''t replied} other {# people haven''t replied}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.017",
+      "target": "⟦ru⟧ I''m not a robot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.018",
+      "target": "⟦ru⟧ What''s on your mind, {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.019",
+      "target": "⟦ru⟧ Today''s schedule",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.020",
+      "target": "⟦ru⟧ Write '#' to mention a channel",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "apostrophe.021",
+      "target": "⟦ru⟧ {name}''s birthday is today",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.022",
+      "target": "⟦ru⟧ Haven''t received the email?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.023",
+      "target": "⟦ru⟧ Wasn''t me — secure my account",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.024",
+      "target": "⟦ru⟧ You''ll lose access on {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "⟦ru⟧ Who''s online",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.026",
+      "target": "⟦ru⟧ Aren''t you forgetting something?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.027",
+      "target": "⟦ru⟧ O''Brien & Partners invoice",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "apostrophe.028",
+      "target": "⟦ru⟧ Here''s your receipt",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.029",
+      "target": "⟦ru⟧ Didn''t get a code? Resend in {seconds}s",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.030",
+      "target": "⟦ru⟧ We''ve updated our terms",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.001",
+      "target": "⟦ru⟧ Create рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.002",
+      "target": "⟦ru⟧ рабочее пространство settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.003",
+      "target": "⟦ru⟧ Leave рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.004",
+      "target": "⟦ru⟧ Switch рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.005",
+      "target": "⟦ru⟧ Your рабочее пространство is ready",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.006",
+      "target": "⟦ru⟧ {name} invited you to the {workspace} рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "⟦ru⟧ Delete this рабочее пространство?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.008",
+      "target": "⟦ru⟧ Download счет",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.009",
+      "target": "⟦ru⟧ счет {number}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.010",
+      "target": "⟦ru⟧ Send счет to {email}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.011",
+      "target": "⟦ru⟧ This счет is overdue",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.012",
+      "target": "⟦ru⟧ Void счет",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "glossary.013",
+      "target": "⟦ru⟧ New проект",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.014",
+      "target": "⟦ru⟧ Archive проект",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.015",
+      "target": "⟦ru⟧ проект settings",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.016",
+      "target": "⟦ru⟧ {name} created the проект {project}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.017",
+      "target": "⟦ru⟧ Rename проект",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.018",
+      "target": "⟦ru⟧ Back to панель",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.019",
+      "target": "⟦ru⟧ Open панель",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.020",
+      "target": "⟦ru⟧ панель is loading…",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "glossary.021",
+      "target": "⟦ru⟧ Customize your панель",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.022",
+      "target": "⟦ru⟧ оплата",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.023",
+      "target": "⟦ru⟧ Manage оплата",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.024",
+      "target": "⟦ru⟧ оплата email",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.025",
+      "target": "⟦ru⟧ оплата is handled by the рабочее пространство owner",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.026",
+      "target": "⟦ru⟧ Each проект belongs to one рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.027",
+      "target": "⟦ru⟧ Add the счет to the проект",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.028",
+      "target": "⟦ru⟧ Pin this проект to your панель",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.029",
+      "target": "⟦ru⟧ оплата history for this рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.030",
+      "target": "⟦ru⟧ {count, plural, one {# счет} few {# счетs} many {# счетs} other {# счетs}} in this рабочее пространство",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.031",
+      "target": "⟦ru⟧ Moving a проект to another рабочее пространство keeps its счет history",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "⟦ru⟧ The панель shows every проект you can access",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.033",
+      "target": "⟦ru⟧ Your оплата details appear on every счет",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.001",
+      "target": "⟦ru⟧ Sign in with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.002",
+      "target": "⟦ru⟧ Connect Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.003",
+      "target": "⟦ru⟧ Pay with Stripe",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.004",
+      "target": "⟦ru⟧ Powered by glot",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.005",
+      "target": "⟦ru⟧ Import from GitHub",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.006",
+      "target": "⟦ru⟧ Post updates to Slack",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.007",
+      "target": "⟦ru⟧ Your Stripe account is connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.008",
+      "target": "⟦ru⟧ Acme Cloud keeps your data in the EU",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.009",
+      "target": "⟦ru⟧ Sign in with OAuth",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.010",
+      "target": "⟦ru⟧ Create API key",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.011",
+      "target": "⟦ru⟧ API rate limit reached",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "⟦ru⟧ Markdown is supported",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.013",
+      "target": "⟦ru⟧ Paste Markdown here",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.014",
+      "target": "⟦ru⟧ Revoke the API key {name}?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.015",
+      "target": "⟦ru⟧ glot translates your app on every pull request",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.016",
+      "target": "⟦ru⟧ Disconnect GitHub",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.017",
+      "target": "⟦ru⟧ {count, plural, one {# Slack channel} few {# Slack channels} many {# Slack channels} other {# Slack channels}} connected",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.018",
+      "target": "⟦ru⟧ Stripe will email the receipt to {email}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.019",
+      "target": "⟦ru⟧ Acme uses cookies to keep you signed in",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.020",
+      "target": "⟦ru⟧ Export to Markdown",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.021",
+      "target": "⟦ru⟧ Your OAuth token expired",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.022",
+      "target": "⟦ru⟧ Read the API docs",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "dnt.023",
+      "target": "⟦ru⟧ Welcome to Acme, {name}!",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "⟦ru⟧ Sync issues with GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.025",
+      "target": "⟦ru⟧ Slack notifications are paused",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.026",
+      "target": "⟦ru⟧ Manage your Stripe subscription",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.027",
+      "target": "⟦ru⟧ glot found {count} untranslated keys",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.028",
+      "target": "⟦ru⟧ Copy the API URL",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.029",
+      "target": "⟦ru⟧ Install the Acme GitHub app",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.030",
+      "target": "⟦ru⟧ Send a test message to Slack",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.001",
+      "target": "⟦ru⟧ Save",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.002",
+      "target": "⟦ru⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.003",
+      "target": "⟦ru⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.004",
+      "target": "⟦ru⟧ Archive",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.005",
+      "target": "⟦ru⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.006",
+      "target": "⟦ru⟧ Post",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "⟦ru⟧ Share",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.008",
+      "target": "⟦ru⟧ Order",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.009",
+      "target": "⟦ru⟧ Order",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.010",
+      "target": "⟦ru⟧ Free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.011",
+      "target": "⟦ru⟧ Clear",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.012",
+      "target": "⟦ru⟧ Back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.013",
+      "target": "⟦ru⟧ Run",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.014",
+      "target": "⟦ru⟧ Draft",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.015",
+      "target": "⟦ru⟧ Match case",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.016",
+      "target": "⟦ru⟧ Apply",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.017",
+      "target": "⟦ru⟧ Book",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.018",
+      "target": "⟦ru⟧ Track",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "⟦ru⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.020",
+      "target": "⟦ru⟧ Charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.021",
+      "target": "⟦ru⟧ Left",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.022",
+      "target": "⟦ru⟧ Second",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.023",
+      "target": "⟦ru⟧ Second",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.024",
+      "target": "⟦ru⟧ Bill",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.025",
+      "target": "⟦ru⟧ Fine",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.026",
+      "target": "⟦ru⟧ Mute",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.027",
+      "target": "⟦ru⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.028",
+      "target": "⟦ru⟧ Pin",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.029",
+      "target": "⟦ru⟧ Follow",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.030",
+      "target": "⟦ru⟧ Feed",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.031",
+      "target": "⟦ru⟧ Kind",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "⟦ru⟧ Present",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.033",
+      "target": "⟦ru⟧ Present",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "ambiguous.034",
+      "target": "⟦ru⟧ Export",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.035",
+      "target": "⟦ru⟧ Lead",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.036",
+      "target": "⟦ru⟧ Board",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.037",
+      "target": "⟦ru⟧ Ship",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.038",
+      "target": "⟦ru⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.039",
+      "target": "⟦ru⟧ Report",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.040",
+      "target": "⟦ru⟧ Close",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.001",
+      "target": "⟦ru⟧ Save",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "width.002",
+      "target": "⟦ru⟧ Sign up",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.003",
+      "target": "⟦ru⟧ Start trial",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "width.004",
+      "target": "⟦ru⟧ Upgrade",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "width.005",
+      "target": "⟦ru⟧ Invite",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "width.006",
+      "target": "⟦ru⟧ Add",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.007",
+      "target": "⟦ru⟧ Log out",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.008",
+      "target": "⟦ru⟧ Try",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.009",
+      "target": "⟦ru⟧ Get",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.010",
+      "target": "⟦ru⟧ Learn",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.011",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.012",
+      "target": "⟦ru⟧ Cancel",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.013",
+      "target": "⟦ru⟧ Confirm",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.014",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.015",
+      "target": "⟦ru⟧ Delete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.016",
+      "target": "⟦ru⟧ Resend",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.017",
+      "target": "⟦ru⟧ Show",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.018",
+      "target": "⟦ru⟧ Mark as",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.019",
+      "target": "⟦ru⟧ Go back",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.020",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.021",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.022",
+      "target": "⟦ru⟧ Book a",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.023",
+      "target": "⟦ru⟧ Copy",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.024",
+      "target": "⟦ru⟧ Edit",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.025",
+      "target": "⟦ru⟧ New",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.026",
+      "target": "⟦ru⟧ Select",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.027",
+      "target": "⟦ru⟧ Sort by",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.028",
+      "target": "⟦ru⟧ View all",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "width.029",
+      "target": "⟦ru⟧ Retry",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.030",
+      "target": "⟦ru⟧ Accept",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.031",
+      "target": "⟦ru⟧ Decline",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.032",
+      "target": "⟦ru⟧ Submit",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.033",
+      "target": "⟦ru⟧ Next",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.034",
+      "target": "⟦ru⟧ Skip",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.035",
+      "target": "⟦ru⟧ Finish",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.036",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.037",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.038",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.039",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.040",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.041",
+      "target": "⟦ru⟧",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.042",
+      "target": "⟦ru⟧ Usage",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.043",
+      "target": "⟦ru⟧ Logs",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.044",
+      "target": "⟦ru⟧ Your plan renews automatically",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.045",
+      "target": "⟦ru⟧ Invite teammates to collaborate in",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.046",
+      "target": "⟦ru⟧ Connect your bank to get paid faster.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.001",
+      "target": "⟦ru⟧ Updated {date, date, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.002",
+      "target": "⟦ru⟧ Due {date, date, full}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.003",
+      "target": "⟦ru⟧ Starts at {time, time, short}",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.004",
+      "target": "⟦ru⟧ {amount, number, ::currency/USD} per month",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.005",
+      "target": "⟦ru⟧ {n, number, integer} people",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.006",
+      "target": "⟦ru⟧ {ratio, number, percent} complete",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.007",
+      "target": "⟦ru⟧ Joined {date, date, ::yyyyMMMM}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "⟦ru⟧ Total: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.009",
+      "target": "⟦ru⟧ {size, number, ::compact-short} downloads",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.010",
+      "target": "⟦ru⟧ {bytes, number, ::unit/megabyte} free",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.011",
+      "target": "⟦ru⟧ Next charge on {date, date, medium} at {time, time, short}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.012",
+      "target": "⟦ru⟧ {count, plural, one {Billed yearly: {price, number, ::currency/USD}} few {Billed every # years: {price, number, ::currency/USD}} many {Billed every # years: {price, number, ::currency/USD}} other {Billed every # years: {price, number, ::currency/USD}}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.013",
+      "target": "⟦ru⟧ {temp, number, ::unit/celsius} outside",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.014",
+      "target": "⟦ru⟧ Average: {avg, number, ::precision-integer} ms",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.015",
+      "target": "⟦ru⟧ {distance, number, ::unit/kilometer} away",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.016",
+      "target": "⟦ru⟧ Expires {date, date, long}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.017",
+      "target": "⟦ru⟧ Created {date, date} at {time, time}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.018",
+      "target": "⟦ru⟧ Discount: {off, number, percent}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.019",
+      "target": "⟦ru⟧ {rating, number, ::precision-integer} stars",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.020",
+      "target": "⟦ru⟧ Balance: {balance, number, ::currency/GBP}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 81527,
+    "output_tokens": 19666,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0
+  },
+  "calls": 39,
+  "call_ms": 64,
+  "wall_ms": 888
+}

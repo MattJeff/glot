@@ -212,8 +212,8 @@
       "yes": "Yes"
     },
     "core": {
-      "subtitle": "The LLM is always surrounded by code that can say no.",
-      "title": "The deterministic core"
+      "subtitle": "The LLM proposes. Code decides what gets written.",
+      "title": "The guarantees"
     },
     "cta": {
       "button": "Create your workspace",
@@ -272,7 +272,7 @@
       },
       "checks": {
         "glossary": "Glossary terms respected",
-        "length": "Length ratio 1.3× (under 1.6×)",
+        "length": "Fits its button: 96 of 120 px",
         "placeholders": "Placeholders preserved",
         "plurals": "CLDR plural categories"
       },
@@ -298,9 +298,10 @@
       "badge": "Open source · MIT · Bring your own LLM key",
       "primary": "Start for free",
       "secondary": "Star on GitHub",
-      "subtitle": "Point glot at a codebase full of hardcoded strings. One command moves them to keys and rewrites your components; your LLM translates, deterministic code checks every string, and the result lands in Git.",
-      "terminal": "From hardcoded English to four languages",
-      "title": "i18n your AI agent can't break."
+      "subtitle": "Your coding agent moves hardcoded strings to keys and translates them. Deterministic code checks every LLM output (placeholders, CLDR plurals, glossary, pixel width) and refuses anything broken or too long, with the exact reason, until the retry is valid. Nothing invalid reaches your catalogs.",
+      "title": "Your agent localizes. Code guarantees.",
+      "demoAlt": "Terminal: glot translate refuses a Polish plural missing few and many, a French placeholder renamed to {nom} and a German label 276 px wide for a 120 px button, sends the reasons back to the LLM, then writes the corrected versions; glot check passes.",
+      "demoCaption": "Real glot binary. The LLM in this recording is scripted to get three strings wrong on the first pass; the refusals and their messages are glot's."
     },
     "insights": {
       "body": "An anonymous beacon counts visitors by preferred language and the locale you served them, then compares conversion. No cookie, no visitor id.",
@@ -325,12 +326,13 @@
       "title": "Locale matrix"
     },
     "meta": {
-      "description": "Open-source localization for SaaS built for coding agents. Deterministic validation, a lockfile, glossary-as-code and an MCP server.",
-      "title": "glot: i18n that AI can't break"
+      "description": "Open-source localization for coding agents. Every LLM translation is checked by deterministic code (placeholders, CLDR plurals, glossary, pixel width) and refused until it is valid.",
+      "title": "glot: your agent localizes, code guarantees"
     },
     "more": {
-      "subtitle": "Quality you can check without speaking the language, and data on which language to add next.",
-      "title": "See what your users see"
+      "subtitle": "They work and are tested, but they are newer than the core loop and may change. Some need the experimental self-hosted server.",
+      "title": "Labs: younger features on the same guardrails",
+      "badge": "Labs (experimental)"
     },
     "nav": {
       "compare": "Compare",
@@ -338,7 +340,8 @@
       "getStarted": "Get started",
       "install": "Install",
       "signIn": "Sign in",
-      "workflow": "How it works"
+      "workflow": "How it works",
+      "labs": "Labs"
     },
     "ondevice": {
       "body": "For languages you don't ship yet, @glot/runtime translates in the browser with the built-in Translator API, then runs glot's validator compiled to WebAssembly.",
@@ -374,13 +377,13 @@
           "body": "Finds hardcoded UI strings, proposes keys from context and rewrites the code for next-intl or react-i18next.",
           "title": "Extract"
         },
-        "review": {
-          "body": "Back-translates each string into your language and explains what changed, so you can trust languages you don't speak.",
-          "title": "Review"
-        },
         "translate": {
           "body": "Only the delta, with your glossary, file:line context and UI role. Every string validated, retried, then escalated.",
           "title": "Translate"
+        },
+        "check": {
+          "title": "Check",
+          "body": "Validates every catalog in CI: syntax, placeholders, plural categories, glossary and pixel width. Exit 1 on any error, annotations on the PR."
         }
       },
       "subtitle": "Each step is a CLI command your coding agent can run too, through the MCP server.",
@@ -592,7 +595,9 @@
     "visual": "Visual QA",
     "insights": "Insights",
     "feedback": "Feedback",
-    "experiments": "Experiments"
+    "experiments": "Experiments",
+    "labs": "Labs",
+    "experimental": "The self-hosted server and dashboard are experimental: expect rough edges and breaking changes. The CLI and MCP server are the stable core. <docs>Read more</docs>"
   },
   "status": {
     "machine": "Machine",
@@ -794,15 +799,28 @@
   "feedback": {
     "title": "Feedback",
     "subtitle": "Translations native speakers flag in production, with an AI correction for you to review.",
-    "tabs": { "live": "To review", "accepted": "Accepted", "rejected": "Rejected" },
+    "tabs": {
+      "live": "To review",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
     "empty": {
       "title": "No feedback yet",
       "body": "Add the feedback widget to your app: visitors select a text, say what is wrong and suggest better wording."
     },
     "none": "Nothing here.",
     "reports": "{count, plural, one {# report} other {# reports}}",
-    "status": { "open": "Open", "proposed": "Proposal ready", "accepted": "Accepted", "rejected": "Rejected" },
-    "kind": { "wrong": "Wrong", "awkward": "Awkward", "unclear": "Unclear" },
+    "status": {
+      "open": "Open",
+      "proposed": "Proposal ready",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "kind": {
+      "wrong": "Wrong",
+      "awkward": "Awkward",
+      "unclear": "Unclear"
+    },
     "source": "Source",
     "current": "Current translation",
     "userReports": "What users said",
@@ -855,7 +873,8 @@
       "start": "Getting started",
       "agents": "AI agents",
       "guides": "Guides",
-      "reference": "Reference"
+      "reference": "Reference",
+      "labs": "Labs (experimental)"
     },
     "pages": {
       "getting-started": "Install & quickstart",
@@ -864,10 +883,17 @@
       "integrations": "Integrations",
       "frameworks": "Frameworks",
       "runtime": "Runtime fallback",
+      "quality": "Quality & review",
       "insights": "Insights",
-      "self-hosting": "Self-hosting",
+      "self-hosting": "Self-hosted server",
       "cli": "CLI reference",
-      "faq": "FAQ & costs"
+      "faq": "FAQ & costs",
+      "labs": "Labs overview",
+      "mcp-remote": "Remote MCP (OAuth)",
+      "skills": "Agent skills",
+      "provenance": "AI provenance (EU AI Act)",
+      "deploy-hetzner": "Deploy on a VPS",
+      "benchmark": "Benchmark"
     }
   },
   "experiments": {
@@ -951,5 +977,30 @@
       "submit": "Generate & start",
       "created": "{n, plural, one {# variant} other {# variants}} validated and live{rejected, plural, =0 {} other {, # rejected}}"
     }
+  },
+  "oauth": {
+    "title": "Connect {client} to glot",
+    "subtitle": "This app will use glot's MCP tools on one project, as you.",
+    "project": "Project",
+    "noProjects": "You have no project yet. Create one in the dashboard first.",
+    "scopes": "Permissions",
+    "scope": {
+      "read": {
+        "title": "Read",
+        "body": "Status, keys and their context, issues, glossary."
+      },
+      "translate": {
+        "title": "Translate",
+        "body": "Run translation jobs and AI reviews (uses the project's LLM budget)."
+      },
+      "write": {
+        "title": "Write",
+        "body": "Add source strings, edit translations and the glossary, open GitHub pull requests."
+      }
+    },
+    "redirect": "You will be sent back to {host}.",
+    "allow": "Allow",
+    "deny": "Deny",
+    "invalid": "Invalid authorization request"
   }
 }

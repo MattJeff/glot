@@ -91,6 +91,15 @@ pub struct TranslateReport {
     /// Keys selected for translation per locale (filled for dry runs too).
     #[serde(default)]
     pub planned: BTreeMap<Locale, Vec<Key>>,
+    /// Keys filled from the translation memory (exact match, no LLM call), per locale.
+    #[serde(default)]
+    pub tm_reused: BTreeMap<Locale, Vec<Key>>,
+    /// What the TM hits would have cost through the LLM (dry-run estimate of the same prompts).
+    #[serde(default)]
+    pub tm_saved: Usage,
+    /// Written keys routed to human review (`glot queue`), per locale.
+    #[serde(default)]
+    pub needs_review: BTreeMap<Locale, Vec<Key>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -121,12 +130,14 @@ impl Workspace {
         })?;
         let config = Config::load(&root)?;
         let glossary = Glossary::load(&root.join(GLOSSARY_FILE))?;
-        let lock = Lockfile::load(&root)?;
+        let mut lock = Lockfile::load(&root)?;
         let mut catalogs = BTreeMap::new();
         for loc in config.all_locales() {
             let cat = Catalog::read_all(&config.catalog_paths(&root, &loc), &loc, config.format)?;
             catalogs.insert(loc, cat);
         }
+        // Mobile/gettext/YAML catalogs: file notes, fuzzy/needs_review flags, msgid as source.
+        glot_core::formats::load_meta(&config, &root, &mut catalogs, &mut lock)?;
         Ok(Self {
             root,
             config,
@@ -155,7 +166,7 @@ impl Workspace {
             .unwrap_or_else(|| Catalog::new(locale))
     }
 
-    /// Lock plan over every target locale.
+    /// Lock plan over every target locale, plus existing translations failing validation.
     pub fn plan(&self) -> Plan {
         let targets: Vec<Catalog> = self
             .config
@@ -163,13 +174,50 @@ impl Workspace {
             .iter()
             .map(|l| self.target(l))
             .collect();
-        self.lock.plan(self.source(), &targets)
+        let mut plan = self.lock.plan(self.source(), &targets);
+        self.add_invalid(&mut plan, &self.check());
+        plan
+    }
+
+    /// Error findings not already queued go to `invalid`, or `invalid_human` when a human owns the value.
+    fn add_invalid(&self, plan: &mut Plan, findings: &[Finding]) {
+        for f in findings
+            .iter()
+            .filter(|f| f.issue.severity == Severity::Error)
+        {
+            let item = (f.locale.clone(), f.key.clone());
+            if plan.missing.contains(&item) || plan.stale.contains(&item) {
+                continue;
+            }
+            let human = plan.manual_edits.contains(&item)
+                || self
+                    .lock
+                    .entries
+                    .get(&f.locale)
+                    .and_then(|e| e.get(&f.key))
+                    .is_some_and(|e| e.reviewed || e.origin == Origin::Human);
+            let list = if human {
+                &mut plan.invalid_human
+            } else {
+                &mut plan.invalid
+            };
+            if !list.contains(&item) {
+                list.push(item);
+            }
+        }
     }
 
     /// Plan + per-locale counts (validation run over every existing target).
     pub fn status(&self) -> Status {
-        let plan = self.plan();
+        let targets: Vec<Catalog> = self
+            .config
+            .target_locales
+            .iter()
+            .map(|l| self.target(l))
+            .collect();
+        let mut plan = self.lock.plan(self.source(), &targets);
         let findings = self.check();
+        self.add_invalid(&mut plan, &findings);
         let source = self.source();
         let count =
             |list: &[(Locale, Key)], loc: &str| list.iter().filter(|(l, _)| l == loc).count();
@@ -277,6 +325,22 @@ impl Workspace {
                     });
                     issues.extend(glot_core::measure::check(value, self.config.syntax, f));
                 }
+                // Routed to human review (`glot queue`): pending until approved.
+                if let Some(r) = self
+                    .lock
+                    .entries
+                    .get(loc)
+                    .and_then(|e| e.get(key))
+                    .and_then(|e| e.needs_review.as_ref())
+                {
+                    issues.push(Issue {
+                        code: glot_core::validate::IssueCode::LowScore,
+                        severity: Severity::Warning,
+                        message: format!(
+                            "pending human review ({r}): glot queue approve {loc} {key}"
+                        ),
+                    });
+                }
                 for issue in issues.into_iter().filter(|i| {
                     !(decided && i.code == glot_core::validate::IssueCode::Untranslated)
                 }) {
@@ -295,13 +359,14 @@ impl Workspace {
         let mut report = glot_extract::extract(&self.root, &self.config.extract)
             .map_err(|e| Error::Other(e.to_string()))?;
         // Proper nouns marked do_not_translate in the glossary are not hardcoded-string misses.
-        report.hardcoded.retain(|h| {
-            !self
-                .glossary
+        let dnt = |h: &glot_extract::Hardcoded| {
+            self.glossary
                 .terms
                 .iter()
                 .any(|t| t.do_not_translate && t.term.eq_ignore_ascii_case(h.text.trim()))
-        });
+        };
+        report.hardcoded.retain(|h| !dnt(h));
+        report.config.retain(|h| !dnt(h));
         Ok(report)
     }
 
@@ -338,6 +403,12 @@ impl Workspace {
         };
 
         let mut jobs: Vec<Request> = vec![];
+        let mut tm = crate::tm::Tm::load(&self.root).unwrap_or_else(|e| {
+            tracing::warn!("ignoring the translation memory: {e}");
+            Default::default()
+        });
+        let mut tm_hits: BTreeMap<Locale, Vec<(Key, String)>> = BTreeMap::new();
+        let mut tm_saved = Usage::default();
         let mut contexts: Option<BTreeMap<Key, KeyContext>> = None;
         // Pixel budgets from `glot measure`: the validator rejects too-wide translations before writing.
         let layout = glot_core::measure::load_layout(&self.root).unwrap_or_else(|e| {
@@ -346,11 +417,13 @@ impl Workspace {
         });
         for loc in &locales {
             let manual = of(&plan.manual_edits, loc);
+            let invalid = of(&plan.invalid, loc);
             let keys: Vec<Key> = if opts.force {
                 source.entries.keys().cloned().collect()
             } else {
                 let mut k = of(&plan.missing, loc);
                 k.extend(of(&plan.stale, loc));
+                k.extend(of(&plan.invalid, loc));
                 k.into_iter().filter(|k| !manual.contains(k)).collect()
             };
             let keys: Vec<Key> = keys
@@ -358,6 +431,46 @@ impl Workspace {
                 .filter(|k| opts.keys.as_ref().is_none_or(|w| w.contains(k)))
                 .filter(|k| source.entries.get(k).is_some_and(|v| !v.is_empty()))
                 .collect();
+            // Translation memory: an exact, still-valid match costs nothing (not on --force: fresh output asked).
+            let src_loc = &self.config.source_locale;
+            let (hits, keys): (Vec<_>, Vec<_>) = keys
+                .into_iter()
+                .map(|k| {
+                    let s = &source.entries[&k];
+                    let note = self.lock.notes.get(&k).map(String::as_str);
+                    let hit = (!opts.force)
+                        .then(|| tm.exact(src_loc, loc, s, note))
+                        .flatten()
+                        .map(|u| u.target.clone())
+                        .filter(|t| !validate::has_errors(&self.validate(loc, s, t, None)));
+                    (k, hit)
+                })
+                .partition(|(_, h)| h.is_some());
+            let keys: Vec<Key> = keys.into_iter().map(|(k, _)| k).collect();
+            if !hits.is_empty() {
+                let hits: Vec<(Key, String)> = hits
+                    .into_iter()
+                    .map(|(k, h)| (k, h.unwrap_or_default()))
+                    .collect();
+                let saved = Request {
+                    source_locale: src_loc.clone(),
+                    target_locale: loc.clone(),
+                    items: hits
+                        .iter()
+                        .map(|(k, _)| Item {
+                            key: k.clone(),
+                            source: source.entries[k].clone(),
+                            context: KeyContext::default(),
+                            previous: None,
+                        })
+                        .collect(),
+                    glossary: vec![],
+                    syntax: self.config.syntax,
+                    style: self.config.llm.style.clone(),
+                };
+                tm_saved.add(&translate::estimate(&self.config, &saved));
+                tm_hits.insert(loc.clone(), hits);
+            }
             if keys.is_empty() {
                 continue;
             }
@@ -381,8 +494,29 @@ impl Workspace {
                             ..Default::default()
                         })
                     },
-                    previous: target.entries.get(&k).filter(|v| !v.is_empty()).cloned(),
+                    // A value failing validation is not a draft to edit minimally.
+                    previous: target
+                        .entries
+                        .get(&k)
+                        .filter(|v| !v.is_empty() && !invalid.contains(&k))
+                        .cloned(),
                     key: k,
+                })
+                .map(|mut i| {
+                    // ponytail: the fuzzy TM match rides in `description` (few-shot example), not a new prompt field.
+                    if let Some((u, sim)) = tm.fuzzy(src_loc, loc, &i.source) {
+                        let ex = format!(
+                            "Similar approved translation (TM {:.0} %), reuse its wording: {:?} => {:?}",
+                            sim * 100.0,
+                            u.source,
+                            u.target
+                        );
+                        i.context.description = Some(match i.context.description.take() {
+                            Some(d) => format!("{d}\n{ex}"),
+                            None => ex,
+                        });
+                    }
+                    i
                 })
                 .collect();
             let mut glossary: Vec<glot_core::glossary::Term> = vec![];
@@ -403,7 +537,14 @@ impl Workspace {
             });
         }
 
-        let mut report = TranslateReport::default();
+        let mut report = TranslateReport {
+            tm_reused: tm_hits
+                .iter()
+                .map(|(l, h)| (l.clone(), h.iter().map(|(k, _)| k.clone()).collect()))
+                .collect(),
+            tm_saved,
+            ..Default::default()
+        };
         for req in &jobs {
             report.planned.insert(
                 req.target_locale.clone(),
@@ -451,11 +592,35 @@ impl Workspace {
             }
         }
 
+        for (loc, hits) in &tm_hits {
+            let changes: Vec<(Key, Option<String>)> = hits
+                .iter()
+                .map(|(k, v)| (k.clone(), Some(v.clone())))
+                .collect();
+            self.write_entries(loc, &changes)?;
+            for (k, v) in hits {
+                let origin = Origin::Machine { model: "tm".into() };
+                self.record_routed(
+                    &mut report,
+                    loc,
+                    k,
+                    &source.entries[k],
+                    v,
+                    origin,
+                    None,
+                    &[],
+                );
+            }
+        }
+
         if !jobs.is_empty() {
+            let fallback = crate::routing::fallback_provider(&self.config.llm)?
+                .map(|p| crate::visual::wrap(p, &self.visual));
             let translator = Translator::new(
                 &self.config,
                 crate::visual::wrap(provider::from_config(&self.config.llm, None)?, &self.visual),
-            );
+            )
+            .with_fallback_provider(fallback);
             let firsts = if self.batch {
                 self.run_batch(&translator, &jobs).await?
             } else {
@@ -481,16 +646,23 @@ impl Workspace {
                     .collect();
                 self.write_entries(&loc, &changes)?;
                 for t in &ok {
-                    self.lock.record(
+                    let origin = Origin::Machine {
+                        model: t.model.clone(),
+                    };
+                    let added = self.record_routed(
+                        &mut report,
                         &loc,
                         &t.key,
                         &source.entries[&t.key],
                         &t.value,
-                        Origin::Machine {
-                            model: t.model.clone(),
-                        },
+                        origin,
                         t.score,
+                        &t.issues,
                     );
+                    tm.units.extend(added);
+                }
+                if let Err(e) = tm.save(&self.root) {
+                    tracing::warn!("{e}");
                 }
                 self.lock.save(&self.root)?;
                 if !ok.is_empty() {
@@ -506,6 +678,84 @@ impl Workspace {
         }
         self.lock.save(&self.root)?;
         Ok(report)
+    }
+
+    /// Record a written translation with its quality score; route it to the review queue (glot.lock
+    /// `needs_review`) or, when validated, return the TM unit to remember.
+    #[allow(clippy::too_many_arguments)]
+    fn record_routed(
+        &mut self,
+        report: &mut TranslateReport,
+        loc: &str,
+        key: &str,
+        source: &str,
+        value: &str,
+        origin: Origin,
+        judge: Option<u8>,
+        issues: &[Issue],
+    ) -> Option<crate::tm::Unit> {
+        let score = crate::routing::score(judge, issues);
+        self.lock
+            .record(loc, key, source, value, origin, Some(score));
+        let note = self.lock.notes.get(key).cloned();
+        let reason = crate::routing::route(&self.config.qa, key, note.as_deref(), score);
+        if let Some(e) = self.lock.entries.get_mut(loc).and_then(|m| m.get_mut(key)) {
+            e.needs_review = reason.clone();
+        }
+        if reason.is_some() {
+            report
+                .needs_review
+                .entry(loc.to_string())
+                .or_default()
+                .push(key.to_string());
+            return None;
+        }
+        Some(crate::tm::Unit {
+            source_locale: self.config.source_locale.clone(),
+            target_locale: loc.to_string(),
+            source: source.to_string(),
+            target: value.to_string(),
+            context: note,
+        })
+    }
+
+    /// Clear a review-queue entry: reviewed, out of the queue, into the translation memory.
+    pub fn approve(&mut self, locale: &str, key: &str) -> Result<()> {
+        let value = self
+            .catalogs
+            .get(locale)
+            .and_then(|c| c.entries.get(key))
+            .cloned();
+        let source = self.source().entries.get(key).cloned();
+        let entry = self
+            .lock
+            .entries
+            .get_mut(locale)
+            .and_then(|m| m.get_mut(key));
+        let (Some(e), Some(value), Some(source)) = (entry, value, source) else {
+            return Err(Error::Other(format!("no translation for {locale} {key}")));
+        };
+        e.needs_review = None;
+        e.reviewed = true;
+        e.reviewed_at = Some(glot_core::lock::utc_now());
+        e.reviewed_by = std::env::var("GLOT_REVIEWER")
+            .ok()
+            .filter(|r| !r.is_empty());
+        self.lock.save(&self.root)?;
+        self.remember(locale, key, &source, &value)
+    }
+
+    fn remember(&self, locale: &str, key: &str, source: &str, value: &str) -> Result<()> {
+        crate::tm::Tm::remember(
+            &self.root,
+            crate::tm::Unit {
+                source_locale: self.config.source_locale.clone(),
+                target_locale: locale.to_string(),
+                source: source.to_string(),
+                target: value.to_string(),
+                context: self.lock.notes.get(key).cloned(),
+            },
+        )
     }
 
     /// Submit (or resume, from `BATCH_FILE`) the first pass of every job as one Message Batch, poll
@@ -633,6 +883,18 @@ impl Workspace {
             let fmt = self.file_format(p);
             files.push((p.clone(), Catalog::read(p, locale, fmt)?, fmt, false));
         }
+        // A key new to this locale goes to the file holding it in the source locale (same pattern
+        // index): `.stringsdict` plurals, i18next namespaces.
+        let src = &self.config.source_locale;
+        let src_files: Vec<Catalog> = if paths.len() > 1 && locale != src {
+            self.config
+                .catalog_paths(&self.root, src)
+                .iter()
+                .map(|p| Catalog::read(p, src, self.file_format(p)).unwrap_or_default())
+                .collect()
+        } else {
+            vec![]
+        };
         let mem = self
             .catalogs
             .entry(locale.to_string())
@@ -643,6 +905,12 @@ impl Workspace {
                     let i = files
                         .iter()
                         .position(|f| f.1.entries.contains_key(key))
+                        .or_else(|| {
+                            src_files
+                                .iter()
+                                .position(|c| c.entries.contains_key(key))
+                                .filter(|&i| i < files.len())
+                        })
                         .unwrap_or(0);
                     files[i].1.entries.insert(key.clone(), v.clone());
                     files[i].3 = true;
@@ -703,6 +971,7 @@ impl Workspace {
         self.lock
             .record(locale, key, &source, value, Origin::Human, None);
         self.lock.save(&self.root)?;
+        self.remember(locale, key, &source, value)?;
         Ok(issues)
     }
 

@@ -47,6 +47,7 @@ async fn too_wide_translation_is_rejected_then_shortened() {
             font: font.clone(),
             text: Some("Mark as paid".into()),
             text_px: Some(source_px),
+            occurrences: vec![],
         },
     )]);
     save_layout(root, &layout).unwrap();

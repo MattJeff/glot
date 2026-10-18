@@ -332,6 +332,39 @@
       }
     },
     {
+      "text": "Office waffle fluffy fjord",
+      "px": 150.34,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "AVATAR Yoga WAVE Typo",
+      "px": 157.78,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Tâche effectuée",
+      "px": 101.41,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 14,
+        "letter_spacing_px": 0
+      }
+    },
+    {
       "text": "Save",
       "px": 35.97,
       "font": {
@@ -662,6 +695,39 @@
       }
     },
     {
+      "text": "Office waffle fluffy fjord",
+      "px": 171.81,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "AVATAR Yoga WAVE Typo",
+      "px": 180.31,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
+      "text": "Tâche effectuée",
+      "px": 115.89,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 16,
+        "letter_spacing_px": 0
+      }
+    },
+    {
       "text": "Save",
       "px": 28.98,
       "font": {
@@ -983,6 +1049,39 @@
     {
       "text": "Abonnement kündigen",
       "px": 133.28,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Office waffle fluffy fjord",
+      "px": 143.7,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "AVATAR Yoga WAVE Typo",
+      "px": 145.73,
+      "font": {
+        "family": "Geist",
+        "postscript": "Geist-Regular",
+        "weight": 400,
+        "size_px": 12,
+        "letter_spacing_px": 0.5
+      }
+    },
+    {
+      "text": "Tâche effectuée",
+      "px": 95.03,
       "font": {
         "family": "Geist",
         "postscript": "Geist-Regular",

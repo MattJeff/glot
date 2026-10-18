@@ -1,7 +1,7 @@
 // Regenerates content/docs/cli.md from the binary's own help. Rerun at every release:
 //   node scripts/gen-cli-docs.ts [path/to/glot]   (default: GLOT env, else ../target/integ/debug/glot, else `glot` on PATH)
 import { execFileSync } from "node:child_process";
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -10,13 +10,22 @@ const bin = process.argv[2] ?? process.env.GLOT ?? (existsSync(local) ? local : 
 
 const help = (args: string[]) => execFileSync(bin, [...args, "--help"], { encoding: "utf8" }).trimEnd();
 
-/** Names listed under "Commands:" in a clap help text (minus `help`). */
+/** Names listed under "Commands:" in a clap help text (minus `help`); the top-level help is grouped by hand
+ * (see HELP in crates/cli/src/main.rs): there, every 2-space-indented `name   description` line, `push, pull` too. */
 function subcommands(text: string): string[] {
-  const block = text.split(/^Commands:$/m)[1]?.split(/^\S/m)[0] ?? "";
-  return [...block.matchAll(/^ {2}([a-z][\w-]*)/gm)].map((m) => m[1]).filter((c) => c !== "help");
+  const block = text.includes("\nCommands:\n") ? (text.split(/^Commands:$/m)[1]?.split(/^\S/m)[0] ?? "") : text;
+  return [...block.matchAll(/^ {2}([a-z][\w-]*(?:, [a-z][\w-]*)*)(?: {2,}|$)/gm)]
+    .flatMap((m) => m[1].split(", "))
+    .filter((c) => c !== "help");
 }
 
 const version = execFileSync(bin, ["--version"], { encoding: "utf8" }).trim();
+// A stale binary would publish the wrong version: refuse unless it matches the workspace Cargo.toml.
+const want = readFileSync(path.resolve(root, "../Cargo.toml"), "utf8").match(/^version = "(.+)"/m)?.[1];
+if (want && version !== `glot ${want}`) {
+  console.error(`${bin} is \`${version}\` but Cargo.toml says ${want}: rebuild it (CARGO_TARGET_DIR=target/integ cargo build -p glot-cli)`);
+  process.exit(1);
+}
 const sections: string[] = [];
 function walk(args: string[]) {
   const text = help(args);

@@ -39,6 +39,13 @@ pub struct LlmConfig {
     pub style: Option<String>,
     /// Max keys per LLM call.
     pub batch_size: usize,
+    /// Provider of `fallback_model` when it differs from `provider` (e.g. `local` first pass, `anthropic` escalation).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback_provider: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback_base_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback_api_key_env: Option<String>,
 }
 
 impl Default for LlmConfig {
@@ -53,6 +60,9 @@ impl Default for LlmConfig {
             budget_usd: None,
             style: None,
             batch_size: 40,
+            fallback_provider: None,
+            fallback_base_url: None,
+            fallback_api_key_env: None,
         }
     }
 }
@@ -62,6 +72,12 @@ impl Default for LlmConfig {
 pub struct QaConfig {
     pub score_threshold: u8,
     pub max_length_ratio: f32,
+    /// Written translations whose quality score is below this go to the review queue (`glot queue`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub review_threshold: Option<u8>,
+    /// Risk tag -> key glob patterns always routed to human review, e.g. `legal = ["legal.*", "terms.*"]`.
+    #[serde(skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub risk: std::collections::BTreeMap<String, Vec<String>>,
 }
 
 impl Default for QaConfig {
@@ -69,6 +85,8 @@ impl Default for QaConfig {
         Self {
             score_threshold: 80,
             max_length_ratio: 1.6,
+            review_threshold: None,
+            risk: Default::default(),
         }
     }
 }
@@ -153,6 +171,7 @@ impl Config {
     pub fn catalog_paths(&self, root: &Path, locale: &str) -> Vec<PathBuf> {
         let mut out = Vec::new();
         for pattern in &self.files {
+            let pattern = android_values(pattern, locale, &self.source_locale);
             let path = root.join(pattern.replace("{locale}", locale));
             let s = path.to_string_lossy();
             if s.contains(['*', '?', '[']) {
@@ -173,6 +192,32 @@ impl Config {
             .chain(&self.target_locales)
             .cloned()
             .collect()
+    }
+}
+
+/// Android resource folders: `values-{locale}` is `values` for the source locale and a resource
+/// qualifier otherwise (`pt-BR` => `values-pt-rBR`, `sr-Latn` => `values-b+sr+Latn`).
+fn android_values(pattern: &str, locale: &str, source: &str) -> String {
+    if !pattern.contains("values-{locale}") {
+        return pattern.to_string();
+    }
+    let dir = if locale == source {
+        "values".to_string()
+    } else {
+        format!("values-{}", android_qualifier(locale))
+    };
+    pattern.replace("values-{locale}", &dir)
+}
+
+/// BCP 47 tag => Android resource qualifier (`fr`, `pt-rBR`, `b+sr+Latn`).
+pub fn android_qualifier(locale: &str) -> String {
+    let parts: Vec<&str> = locale.split(['-', '_']).collect();
+    match parts.as_slice() {
+        [l] => l.to_string(),
+        [l, r] if r.len() == 2 || (r.len() == 3 && r.chars().all(|c| c.is_ascii_digit())) => {
+            format!("{l}-r{}", r.to_uppercase())
+        }
+        _ => format!("b+{}", parts.join("+")),
     }
 }
 

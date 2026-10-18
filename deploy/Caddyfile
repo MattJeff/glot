@@ -1,0 +1,44 @@
+# glot: three hosts on one VPS. GLOT_DOMAIN / ACME_EMAIL come from deploy/.env.
+# Let's Encrypt is automatic; for GLOT_DOMAIN=localhost Caddy uses its internal CA instead.
+{
+	email {$ACME_EMAIL}
+}
+
+(common) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+	log {
+		output stdout
+		format json
+	}
+}
+
+# Landing + docs. Dashboard paths (optionally locale-prefixed) live on app.<domain>,
+# so the session cookie has a single home.
+{$GLOT_DOMAIN} {
+	import common
+	@dashboard path_regexp ^(/(en|fr|es|de|ja|ar))?/(app|login|signup|oauth)(/|$)
+	redir @dashboard https://app.{http.request.hostport}{uri}
+	reverse_proxy web:3100
+}
+
+# Dashboard: same Next app; Next proxies /api and /cdn to glot-server (same origin => cookie just works).
+app.{$GLOT_DOMAIN} {
+	import common
+	redir / /app
+	reverse_proxy web:3100
+}
+
+# API for machines: /mcp, /oauth/*, /.well-known/*, /cdn/*, /api/insights|feedback/*, CLI (Bearer tokens), /healthz.
+# ponytail: the whole server is exposed; the session cookie is host-only on app.<domain>, so nothing leaks here.
+api.{$GLOT_DOMAIN} {
+	import common
+	reverse_proxy server:8790
+}

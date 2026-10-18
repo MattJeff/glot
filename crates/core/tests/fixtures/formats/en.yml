@@ -1,0 +1,19 @@
+# Acme Rails locale
+en:
+  # Navigation
+  nav:
+    home: Home
+    settings: "Settings"
+  # Shown after login
+  greeting: "Hello %{name}!"
+  inbox:
+    messages:
+      one: "%{count} message"
+      other: "%{count} messages"
+  quote: 'It''s fine'
+  legal: |
+    Line one.
+    Line two.
+  flags:
+    - a
+    - b
