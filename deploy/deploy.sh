@@ -39,6 +39,9 @@ remote 'test -f .env || { echo "missing glot/deploy/.env on the server: cp .env.
     docker compose -f compose.prod.yml build
   fi
   docker compose -f compose.prod.yml up -d --wait   # glot-server runs migrations at startup
+  # rsync replaces the Caddyfile (new inode): the single-file bind mount keeps the old one until a restart.
+  docker compose -f compose.prod.yml exec -T caddy cat /etc/caddy/Caddyfile | cmp -s - Caddyfile \
+    || docker compose -f compose.prod.yml restart caddy
   docker image prune -f >/dev/null
   mkdir -p ~/backups
   ( crontab -l 2>/dev/null | grep -v "# glot-backup" || true
