@@ -46,6 +46,11 @@ fn fit_shortens_overflowing_button_until_it_fits() {
         eprintln!("skipped: node not installed");
         return;
     }
+    let vqa = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packages/visual-qa/node_modules/playwright");
+    if !vqa.exists() {
+        eprintln!("skipped: run `pnpm install` in packages/visual-qa to enable this test");
+        return;
+    }
     let dir = tempfile::tempdir().unwrap();
     let r = dir.path();
     fs::create_dir(r.join("messages")).unwrap();
