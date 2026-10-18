@@ -31,6 +31,15 @@ impl Provider for MockProvider {
 fn respond(p: &Value) -> Value {
     let locale = p["target_locale"].as_str().unwrap_or("xx");
     let items = p["items"].as_array().cloned().unwrap_or_default();
+    if p["task"] == "keys" {
+        return crate::i18nize::mock_keys(p);
+    }
+    if p["task"] == "shorten" {
+        return crate::visual::mock_shorten(p);
+    }
+    if p["task"] == "review" || p["task"] == "mine" {
+        return crate::review::mock(p);
+    }
     if p["task"] == "judge" {
         let verdicts: Map<String, Value> = items
             .iter()

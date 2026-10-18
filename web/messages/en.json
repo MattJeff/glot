@@ -64,6 +64,7 @@
       "toggle": "Toggle details",
       "translations": "Translations"
     },
+    "differentMeaning": "Different meaning",
     "editPlaceholder": "Translation for {locale}",
     "empty": "No keys match these filters.",
     "emptyValue": "Not translated yet",
@@ -76,6 +77,9 @@
       "machine": "Machine"
     },
     "results": "{count, plural, =0 {No keys} one {# key} other {# keys}}",
+    "reviewDone": "{count, plural, one {# translation reviewed} other {# translations reviewed}} · {different, plural, =0 {no meaning drift} other {# with a different meaning}}",
+    "reviewLocale": "Review {locale}",
+    "reviewLocaleHint": "Back-translate every translation of this locale and flag meaning drift",
     "saved": "Saved",
     "savedWithIssues": "Saved with {count, plural, one {# issue} other {# issues}}",
     "score": "Score {score}",
@@ -119,6 +123,37 @@
     "title": "Glossary",
     "translations": "Translations"
   },
+  "health": {
+    "detail": {
+      "coverage": "{translated} of {total} keys translated",
+      "errors": "{issues} of {translated} translations have validation issues",
+      "meaning": "{reviewed} reviewed · {different} with a different meaning",
+      "visual": "{clean} of {pages} screens without visual issues"
+    },
+    "dims": {
+      "coverage": "Coverage",
+      "errors": "Validation",
+      "meaning": "Meaning",
+      "visual": "Visual"
+    },
+    "empty": {
+      "coverage": "No keys yet",
+      "errors": "Nothing translated yet",
+      "meaning": "No translations to review",
+      "visual": "No visual QA report covers this locale"
+    },
+    "locale": "Locale",
+    "na": "n/a",
+    "overall": "Score",
+    "runReview": "Review",
+    "status": {
+      "fair": "Needs work",
+      "good": "Healthy",
+      "poor": "At risk"
+    },
+    "subtitle": "Coverage, validation, meaning (back-translation) and visual QA, scored 0–100.",
+    "title": "Locale health"
+  },
   "jobStatus": {
     "done": "Done",
     "failed": "Failed",
@@ -138,6 +173,17 @@
     "progress": "{done} / {total}",
     "subtitle": "Background translation runs, updated live.",
     "title": "Jobs"
+  },
+  "keySheet": {
+    "notFound": "No matching key",
+    "notFoundHint": "Tag elements with data-glot-key in your app to link issues to keys precisely.",
+    "openInEditor": "Open in editor",
+    "pick": "Several keys match this text. Pick one:",
+    "saved": "Translation saved",
+    "savedWithIssues": "Saved with {count, plural, one {# issue} other {# issues}}",
+    "source": "Source",
+    "title": "Edit key",
+    "translation": "Translation"
   },
   "landing": {
     "compare": {
@@ -255,6 +301,41 @@
   "localeSwitcher": {
     "label": "Language"
   },
+  "matrix": {
+    "bridge": {
+      "body": "Add this script to your app (development only) for exact frame heights and pseudo-locale rendering. The glot dashboard already ships it.",
+      "title": "Preview bridge"
+    },
+    "desktop": "Desktop",
+    "frameTitle": "Preview in {locale}",
+    "issueAt": "{kind} issue: {key}",
+    "kinds": {
+      "clamp": "Clamped",
+      "overflow": "Overflow",
+      "overlap": "Overlap",
+      "rtl": "RTL direction",
+      "tofu": "Missing glyphs",
+      "untranslated": "Untranslated"
+    },
+    "mobile": "Mobile",
+    "noBase": {
+      "body": "Set the base URL of your app (for example http://localhost:3000) to see every locale side by side.",
+      "cta": "Configure preview",
+      "title": "Point glot at your running app"
+    },
+    "openTab": "Open in a new tab",
+    "overlay": "QA overlay",
+    "pseudo": "Pseudo-locale",
+    "pseudoColumn": "Pseudo-locale",
+    "reload": "Reload all frames",
+    "reportFrom": "Visual QA report from {date} · {count, plural, =0 {no issues on this screen} one {# issue on this screen} other {# issues on this screen}}",
+    "route": "Route",
+    "routePlaceholder": "/pricing",
+    "source": "source",
+    "title": "Locale matrix",
+    "viewport": "Viewport",
+    "zoom": "Zoom"
+  },
   "notFound": {
     "back": "Back home",
     "title": "Page not found"
@@ -317,6 +398,20 @@
     "subtitle": "Each project maps to a glot.toml in one of your repositories.",
     "title": "Projects"
   },
+  "review": {
+    "applied": "Suggestion applied",
+    "apply": "Apply suggestion",
+    "backTranslate": "Back-translate",
+    "backTranslation": "Back-translation ({locale})",
+    "refresh": "Run the review again",
+    "running": "Back-translating…",
+    "suggestion": "Suggested translation",
+    "verdict": {
+      "different": "Different meaning",
+      "nuance": "Nuance",
+      "same": "Same meaning"
+    }
+  },
   "settings": {
     "cdn": {
       "description": "Serve catalogs over the air as JSON, with ETag and cache headers.",
@@ -371,6 +466,18 @@
       "targets": "Target locales",
       "title": "Locales"
     },
+    "preview": {
+      "baseUrl": "Base URL",
+      "baseUrlHint": "Your app's development or staging URL. Leave empty to reuse the last visual QA run.",
+      "description": "Where glot finds your running app for the locale matrix.",
+      "pattern": "URL pattern",
+      "patternHint": "'{locale}' and '{route}' are replaced; the source locale drops its /'{locale}' segment.",
+      "routes": "Routes",
+      "routesHint": "One per line, offered in the matrix route picker.",
+      "save": "Save preview settings",
+      "saved": "Preview settings saved",
+      "title": "Preview"
+    },
     "saved": "Settings saved",
     "title": "Settings"
   },
@@ -383,11 +490,13 @@
     "newProject": "New project",
     "noProjects": "No projects yet",
     "overview": "Overview",
+    "preview": "Locale matrix",
     "projects": "Projects",
     "search": "Search…",
     "settings": "Settings",
     "toggleSidebar": "Toggle navigation",
-    "userMenu": "Account menu"
+    "userMenu": "Account menu",
+    "visual": "Visual QA"
   },
   "status": {
     "machine": "Machine",
@@ -430,5 +539,37 @@
     },
     "subtitle": "Tokens authenticate the glot CLI, the MCP server and CI.",
     "title": "API tokens"
+  },
+  "visual": {
+    "after": "After",
+    "allLocales": "All locales",
+    "allViewports": "All viewports",
+    "before": "Before",
+    "clean": "No issues",
+    "clearKinds": "Clear type filter",
+    "compareWith": "Compare with",
+    "empty": {
+      "body": "Run glot-visual-qa with --upload to send its report and screenshots here.",
+      "command": "Upload from your machine or CI",
+      "title": "No visual QA report yet"
+    },
+    "issueAt": "{kind} issue: {key}",
+    "issues": "{count, plural, one {# issue} other {# issues}}",
+    "kinds": {
+      "clamp": "Clamped",
+      "overflow": "Overflow",
+      "overlap": "Overlap",
+      "rtl": "RTL direction",
+      "tofu": "Missing glyphs",
+      "untranslated": "Untranslated"
+    },
+    "locale": "Locale",
+    "noCompare": "No comparison",
+    "notInReport": "This screen is not in the compared report.",
+    "report": "Report",
+    "screenshotAlt": "Screenshot of {route} in {locale}",
+    "subtitle": "Screenshots and layout issues per locale, uploaded by glot-visual-qa.",
+    "title": "Visual QA",
+    "viewport": "Viewport"
   }
 }

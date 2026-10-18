@@ -64,6 +64,7 @@
       "toggle": "詳細を切り替え",
       "translations": "翻訳"
     },
+    "differentMeaning": "意味の相違",
     "editPlaceholder": "ロケール {locale} の翻訳",
     "empty": "このフィルターに一致するキーはありません。",
     "emptyValue": "まだ翻訳されていません",
@@ -76,6 +77,9 @@
       "machine": "機械翻訳"
     },
     "results": "{count, plural, =0 {キーなし} other {# 件のキー}}",
+    "reviewDone": "{count, plural, other {# 件の翻訳をレビュー済み}} · {different, plural, =0 {意味のずれなし} other {# 件で意味が異なる}}",
+    "reviewLocale": "ロケール{locale}をレビュー",
+    "reviewLocaleHint": "このロケールのすべての翻訳を逆翻訳し、意味のずれを検出",
     "saved": "保存しました",
     "savedWithIssues": "{count, plural, other {保存しました（# 件の問題あり）}}",
     "score": "スコア {score}",
@@ -119,6 +123,37 @@
     "title": "用語集",
     "translations": "翻訳"
   },
+  "health": {
+    "detail": {
+      "coverage": "{total}件のキーのうち{translated}件を翻訳済み",
+      "errors": "{translated}件の翻訳のうち{issues}件に検証の問題あり",
+      "meaning": "{reviewed}件をレビュー済み · {different}件で意味が異なる",
+      "visual": "{pages}画面のうち{clean}画面に視覚的な問題なし"
+    },
+    "dims": {
+      "coverage": "カバレッジ",
+      "errors": "検証",
+      "meaning": "意味",
+      "visual": "ビジュアル"
+    },
+    "empty": {
+      "coverage": "キーがありません",
+      "errors": "まだ翻訳されていません",
+      "meaning": "レビューする翻訳がありません",
+      "visual": "このロケールを対象にした視覚QAレポートはありません"
+    },
+    "locale": "ロケール",
+    "na": "該当なし",
+    "overall": "スコア",
+    "runReview": "レビュー",
+    "status": {
+      "fair": "要改善",
+      "good": "良好",
+      "poor": "リスクあり"
+    },
+    "subtitle": "カバレッジ、検証、意味（逆翻訳）、視覚QAを0〜100で採点。",
+    "title": "ロケールの健全性"
+  },
   "jobStatus": {
     "done": "完了",
     "failed": "失敗",
@@ -138,6 +173,17 @@
     "progress": "{done} / {total}",
     "subtitle": "バックグラウンドの翻訳実行をリアルタイムで更新します。",
     "title": "ジョブ"
+  },
+  "keySheet": {
+    "notFound": "一致するキーがありません",
+    "notFoundHint": "問題をキーに正確に紐付けるには、アプリの要素に data-glot-key を付けてください。",
+    "openInEditor": "エディターで開く",
+    "pick": "このテキストに一致するキーが複数あります。1つ選んでください：",
+    "saved": "翻訳を保存しました",
+    "savedWithIssues": "{count, plural, other {#件の問題を含めて保存しました}}",
+    "source": "原文",
+    "title": "キーを編集",
+    "translation": "翻訳"
   },
   "landing": {
     "compare": {
@@ -255,6 +301,41 @@
   "localeSwitcher": {
     "label": "言語"
   },
+  "matrix": {
+    "bridge": {
+      "body": "正確なフレームの高さと疑似ロケールの描画のため、このスクリプトをアプリに追加してください（開発環境のみ）。glotのダッシュボードには既に含まれています。",
+      "title": "プレビューブリッジ"
+    },
+    "desktop": "デスクトップ",
+    "frameTitle": "ロケール{locale}でプレビュー",
+    "issueAt": "{kind}の問題（キー：{key}）",
+    "kinds": {
+      "clamp": "切り詰め",
+      "overflow": "オーバーフロー",
+      "overlap": "重なり",
+      "rtl": "RTL方向",
+      "tofu": "欠落グリフ",
+      "untranslated": "未翻訳"
+    },
+    "mobile": "モバイル",
+    "noBase": {
+      "body": "アプリのベースURL（例：http://localhost:3000）を設定すると、すべてのロケールを並べて確認できます。",
+      "cta": "プレビューを設定",
+      "title": "実行中のアプリを glot の接続先に指定"
+    },
+    "openTab": "新しいタブで開く",
+    "overlay": "QAオーバーレイ",
+    "pseudo": "疑似ロケール",
+    "pseudoColumn": "疑似ロケール",
+    "reload": "すべてのフレームを再読み込み",
+    "reportFrom": "{date} のビジュアルQAレポート · {count, plural, =0 {この画面に問題はありません} other {この画面に#件の問題}}",
+    "route": "ルート",
+    "routePlaceholder": "/pricing",
+    "source": "ソース",
+    "title": "ロケールマトリクス",
+    "viewport": "ビューポート",
+    "zoom": "ズーム"
+  },
   "notFound": {
     "back": "ホームに戻る",
     "title": "ページが見つかりません"
@@ -317,6 +398,20 @@
     "subtitle": "各プロジェクトは、リポジトリのいずれかにある glot.toml に対応します。",
     "title": "プロジェクト"
   },
+  "review": {
+    "applied": "提案を適用しました",
+    "apply": "提案を適用",
+    "backTranslate": "逆翻訳",
+    "backTranslation": "逆翻訳（ロケール：{locale}）",
+    "refresh": "レビューを再実行",
+    "running": "逆翻訳中…",
+    "suggestion": "提案された翻訳",
+    "verdict": {
+      "different": "意味が異なる",
+      "nuance": "ニュアンスが異なる",
+      "same": "意味は同じ"
+    }
+  },
   "settings": {
     "cdn": {
       "description": "カタログを ETag とキャッシュヘッダー付きの JSON で配信します。",
@@ -371,6 +466,18 @@
       "targets": "ターゲットロケール",
       "title": "ロケール"
     },
+    "preview": {
+      "baseUrl": "ベースURL",
+      "baseUrlHint": "アプリの開発環境またはステージング環境のURL。空欄の場合は、前回のビジュアルQA実行で使用したURLを再利用します。",
+      "description": "ロケールマトリクス用に、glot が実行中のアプリを探す場所です。",
+      "pattern": "URLパターン",
+      "patternHint": "'{locale}' と '{route}' は置換されます。ソースロケールでは /'{locale}' セグメントを削除します。",
+      "routes": "ルート",
+      "routesHint": "1行に1つずつ入力すると、マトリクスのルート選択に表示されます。",
+      "save": "プレビュー設定を保存",
+      "saved": "プレビュー設定を保存しました",
+      "title": "プレビュー"
+    },
     "saved": "設定を保存しました",
     "title": "設定"
   },
@@ -383,11 +490,13 @@
     "newProject": "新規プロジェクト",
     "noProjects": "プロジェクトはまだありません",
     "overview": "概要",
+    "preview": "ロケールマトリクス",
     "projects": "プロジェクト",
     "search": "検索…",
     "settings": "設定",
     "toggleSidebar": "ナビゲーションを切り替え",
-    "userMenu": "アカウントメニュー"
+    "userMenu": "アカウントメニュー",
+    "visual": "ビジュアルQA"
   },
   "status": {
     "machine": "機械翻訳",
@@ -430,5 +539,37 @@
     },
     "subtitle": "トークンは glot CLI、MCP サーバー、CI の認証に使用されます。",
     "title": "APIトークン"
+  },
+  "visual": {
+    "after": "変更後",
+    "allLocales": "すべてのロケール",
+    "allViewports": "すべてのビューポート",
+    "before": "変更前",
+    "clean": "問題なし",
+    "clearKinds": "種類のフィルターを解除",
+    "compareWith": "比較対象",
+    "empty": {
+      "body": "glot-visual-qa を --upload 付きで実行すると、レポートとスクリーンショットがここに送信されます。",
+      "command": "マシンまたはCIからアップロード",
+      "title": "ビジュアルQAレポートはまだありません"
+    },
+    "issueAt": "{kind}の問題（キー：{key}）",
+    "issues": "{count, plural, other {# 件の問題}}",
+    "kinds": {
+      "clamp": "切り詰め",
+      "overflow": "オーバーフロー",
+      "overlap": "重なり",
+      "rtl": "RTL方向",
+      "tofu": "グリフ欠落",
+      "untranslated": "未翻訳"
+    },
+    "locale": "ロケール",
+    "noCompare": "比較なし",
+    "notInReport": "この画面は比較対象のレポートに含まれていません。",
+    "report": "レポート",
+    "screenshotAlt": "{route}のスクリーンショット（ロケール：{locale}）",
+    "subtitle": "ロケールごとのスクリーンショットとレイアウトの問題。glot-visual-qa によってアップロードされます。",
+    "title": "ビジュアルQA",
+    "viewport": "ビューポート"
   }
 }

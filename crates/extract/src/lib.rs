@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
+pub mod i18nize;
 mod scan;
 #[cfg(test)]
 mod tests;

@@ -64,6 +64,7 @@
       "toggle": "Afficher/masquer les détails",
       "translations": "Traductions"
     },
+    "differentMeaning": "Sens différent",
     "editPlaceholder": "Traduction pour la langue {locale}",
     "empty": "Aucune clé ne correspond à ces filtres.",
     "emptyValue": "Pas encore traduit",
@@ -76,6 +77,9 @@
       "machine": "Automatique"
     },
     "results": "{count, plural, =0 {Aucune clé} one {# clé} many {# clés} other {# clés}}",
+    "reviewDone": "{count, plural, one {# traduction relue} many {# de traductions relues} other {# traductions relues}} · {different, plural, =0 {aucune dérive de sens} one {# avec un sens différent} many {# avec un sens différent} other {# avec un sens différent}}",
+    "reviewLocale": "Relire la langue {locale}",
+    "reviewLocaleHint": "Rétrotraduire chaque traduction de cette langue et signaler les dérives de sens",
     "saved": "Enregistré",
     "savedWithIssues": "Enregistré avec {count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
     "score": "Score {score}",
@@ -119,6 +123,37 @@
     "title": "Glossaire",
     "translations": "Traductions"
   },
+  "health": {
+    "detail": {
+      "coverage": "{translated} sur {total} clés traduites",
+      "errors": "{issues} sur {translated} traductions présentent des problèmes de validation",
+      "meaning": "{reviewed} relues · {different} avec un sens différent",
+      "visual": "{clean} sur {pages} écrans sans problème visuel"
+    },
+    "dims": {
+      "coverage": "Couverture",
+      "errors": "Validation",
+      "meaning": "Sens",
+      "visual": "Visuel"
+    },
+    "empty": {
+      "coverage": "Aucune clé pour l’instant",
+      "errors": "Rien de traduit pour l’instant",
+      "meaning": "Aucune traduction à relire",
+      "visual": "Aucun rapport de contrôle visuel ne couvre cette langue"
+    },
+    "locale": "Langue",
+    "na": "n/a",
+    "overall": "Score",
+    "runReview": "Relire",
+    "status": {
+      "fair": "À améliorer",
+      "good": "En bonne santé",
+      "poor": "À risque"
+    },
+    "subtitle": "Couverture, validation, sens (rétrotraduction) et contrôle visuel, notés de 0 à 100.",
+    "title": "Santé de la langue"
+  },
   "jobStatus": {
     "done": "Terminée",
     "failed": "Échouée",
@@ -138,6 +173,17 @@
     "progress": "{done} / {total}",
     "subtitle": "Exécutions de traduction en arrière-plan, mises à jour en direct.",
     "title": "Tâches"
+  },
+  "keySheet": {
+    "notFound": "Aucune clé correspondante",
+    "notFoundHint": "Ajoutez l’attribut data-glot-key aux éléments de votre application pour relier précisément les problèmes aux clés.",
+    "openInEditor": "Ouvrir dans l’éditeur",
+    "pick": "Plusieurs clés correspondent à ce texte. Choisissez-en une :",
+    "saved": "Traduction enregistrée",
+    "savedWithIssues": "Enregistrée avec {count, plural, one {# problème} many {# de problèmes} other {# problèmes}}",
+    "source": "Source",
+    "title": "Modifier la clé",
+    "translation": "Traduction"
   },
   "landing": {
     "compare": {
@@ -255,6 +301,41 @@
   "localeSwitcher": {
     "label": "Langue"
   },
+  "matrix": {
+    "bridge": {
+      "body": "Ajoutez ce script à votre application (en développement uniquement) pour des hauteurs de cadre exactes et le rendu de la pseudo-langue. Le tableau de bord glot l’inclut déjà.",
+      "title": "Pont d’aperçu"
+    },
+    "desktop": "Ordinateur",
+    "frameTitle": "Aperçu de la langue {locale}",
+    "issueAt": "Problème {kind} : clé {key}",
+    "kinds": {
+      "clamp": "Tronqué",
+      "overflow": "Dépassement",
+      "overlap": "Chevauchement",
+      "rtl": "Sens RTL",
+      "tofu": "Glyphes manquants",
+      "untranslated": "Non traduit"
+    },
+    "mobile": "Mobile",
+    "noBase": {
+      "body": "Définissez l'URL de base de votre application (par exemple http://localhost:3000) pour voir toutes les langues côte à côte.",
+      "cta": "Configurer l'aperçu",
+      "title": "Indiquez à glot votre application en cours d'exécution"
+    },
+    "openTab": "Ouvrir dans un nouvel onglet",
+    "overlay": "Superposition QA",
+    "pseudo": "Pseudo-langue",
+    "pseudoColumn": "Pseudo-langue",
+    "reload": "Recharger tous les cadres",
+    "reportFrom": "Rapport de QA visuel du {date} · {count, plural, =0 {aucun problème sur cet écran} one {# problème sur cet écran} many {# problèmes sur cet écran} other {# problèmes sur cet écran}}",
+    "route": "Route",
+    "routePlaceholder": "/pricing",
+    "source": "source",
+    "title": "Matrice des langues",
+    "viewport": "Fenêtre d'affichage",
+    "zoom": "Zoom"
+  },
   "notFound": {
     "back": "Retour à l'accueil",
     "title": "Page introuvable"
@@ -317,6 +398,20 @@
     "subtitle": "Chaque projet correspond à un glot.toml dans l'un de vos dépôts.",
     "title": "Projets"
   },
+  "review": {
+    "applied": "Suggestion appliquée",
+    "apply": "Appliquer la suggestion",
+    "backTranslate": "Rétrotraduire",
+    "backTranslation": "Rétrotraduction (langue : {locale})",
+    "refresh": "Relancer la révision",
+    "running": "Rétrotraduction…",
+    "suggestion": "Traduction suggérée",
+    "verdict": {
+      "different": "Sens différent",
+      "nuance": "Nuance",
+      "same": "Même sens"
+    }
+  },
   "settings": {
     "cdn": {
       "description": "Diffusez vos catalogues en JSON, avec les en-têtes ETag et de cache.",
@@ -371,6 +466,18 @@
       "targets": "Langues cibles",
       "title": "Langues"
     },
+    "preview": {
+      "baseUrl": "URL de base",
+      "baseUrlHint": "L'URL de développement ou de préproduction de votre application. Laissez vide pour réutiliser la dernière exécution de QA visuel.",
+      "description": "Indique à glot où trouver votre application en cours d'exécution pour la matrice des langues.",
+      "pattern": "Modèle d'URL",
+      "patternHint": "'{locale}' et '{route}' sont remplacés ; la langue source supprime son segment /'{locale}'.",
+      "routes": "Routes",
+      "routesHint": "Une par ligne, proposées dans le sélecteur de route de la matrice.",
+      "save": "Enregistrer les paramètres d'aperçu",
+      "saved": "Paramètres d'aperçu enregistrés",
+      "title": "Aperçu"
+    },
     "saved": "Paramètres enregistrés",
     "title": "Paramètres"
   },
@@ -383,11 +490,13 @@
     "newProject": "Nouveau projet",
     "noProjects": "Aucun projet pour l'instant",
     "overview": "Vue d'ensemble",
+    "preview": "Matrice des langues",
     "projects": "Projets",
     "search": "Rechercher…",
     "settings": "Paramètres",
     "toggleSidebar": "Afficher/masquer la navigation",
-    "userMenu": "Menu du compte"
+    "userMenu": "Menu du compte",
+    "visual": "QA visuelle"
   },
   "status": {
     "machine": "Automatique",
@@ -430,5 +539,37 @@
     },
     "subtitle": "Les jetons authentifient la CLI glot, le serveur MCP et la CI.",
     "title": "Jetons d’API"
+  },
+  "visual": {
+    "after": "Après",
+    "allLocales": "Toutes les langues",
+    "allViewports": "Tous les viewports",
+    "before": "Avant",
+    "clean": "Aucun problème",
+    "clearKinds": "Effacer le filtre de type",
+    "compareWith": "Comparer avec",
+    "empty": {
+      "body": "Exécutez glot-visual-qa avec --upload pour envoyer ici son rapport et ses captures d’écran.",
+      "command": "Envoyer depuis votre machine ou la CI",
+      "title": "Aucun rapport de QA visuelle pour l’instant"
+    },
+    "issueAt": "Problème {kind} sur la clé : {key}",
+    "issues": "{count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
+    "kinds": {
+      "clamp": "Tronqué",
+      "overflow": "Débordement",
+      "overlap": "Chevauchement",
+      "rtl": "Direction RTL",
+      "tofu": "Glyphes manquants",
+      "untranslated": "Non traduit"
+    },
+    "locale": "Langue",
+    "noCompare": "Aucune comparaison",
+    "notInReport": "Cet écran ne figure pas dans le rapport comparé.",
+    "report": "Rapport",
+    "screenshotAlt": "Capture d’écran de {route} dans la langue {locale}",
+    "subtitle": "Captures d’écran et problèmes de mise en page par langue, envoyés par glot-visual-qa.",
+    "title": "QA visuelle",
+    "viewport": "Fenêtre d’affichage"
   }
 }

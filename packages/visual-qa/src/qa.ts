@@ -1,6 +1,7 @@
 import { chromium, type Page } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { loadIndexes, match, type Index } from "./keys.ts";
 
 export type Kind = "overflow" | "clamp" | "overlap" | "untranslated" | "tofu" | "rtl";
 
@@ -14,6 +15,10 @@ export interface Issue {
   key?: string;
   rect?: { x: number; y: number; width: number; height: number };
   crop?: string;
+  /** Crop of the surrounding component (section, form, card…), for multimodal fixes. */
+  context_crop?: string;
+  /** Overflow geometry: box size vs size the text needs, plus the computed font. */
+  fit?: { width: number; height: number; need_width: number; need_height: number; font: string };
   suggestion?: string;
   command?: string;
 }
@@ -27,6 +32,19 @@ export interface Options {
   viewports: string[];
   out: string;
   suggest: boolean;
+  /** Catalog paths with `{locale}` (comma separated): maps rendered text back to keys. */
+  catalogs?: string;
+  /** Crop every element mapped to a key ("*") or to these keys, into `report.keys`. */
+  map?: string;
+}
+
+export interface Mapped {
+  locale: string;
+  route: string;
+  viewport: string;
+  key: string;
+  text: string;
+  crop: string;
 }
 
 export interface Report {
@@ -34,6 +52,7 @@ export interface Report {
   options: Options;
   pages: { locale: string; route: string; viewport: string; url: string; screenshot: string }[];
   issues: Issue[];
+  keys?: Mapped[];
 }
 
 const VISUAL: Kind[] = ["overflow", "clamp", "overlap"];
@@ -46,10 +65,12 @@ export function buildUrl(o: Pick<Options, "baseUrl" | "urlPattern" | "sourceLoca
   return o.baseUrl.replace(/\/$/, "") + (path.startsWith("/") ? path : "/" + path);
 }
 
-type Found = Omit<Issue, "locale" | "route" | "viewport" | "crop">;
+type Rect = { x: number; y: number; width: number; height: number };
+type Found = Omit<Issue, "locale" | "route" | "viewport" | "crop" | "context_crop"> & { ctx?: Rect };
+type El = { text: string; key?: string; rect: Rect };
 
 /** Runs inside the page. Must stay self-contained (serialized by Playwright). */
-function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { found: Found[]; texts: string[] } {
+function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { found: Found[]; texts: string[]; els: El[] } {
   const found: Found[] = [];
   const sel = (el: Element): string => {
     const parts: string[] = [];
@@ -63,6 +84,11 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
   };
   const key = (el: Element) => el.closest("[data-glot-key]")?.getAttribute("data-glot-key") ?? undefined;
   const box = (r: DOMRect) => ({ x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height });
+  // Surrounding component: nearest semantic container, else the grandparent.
+  const ctx = (el: Element) =>
+    box((el.parentElement?.closest("section, form, nav, header, footer, aside, article, dialog, [role=dialog], li, tr, fieldset")
+      ?? el.parentElement?.parentElement ?? el).getBoundingClientRect());
+  const shown: El[] = [];
 
   const texts: string[] = [];
   const seenTofu = new Set<string>();
@@ -79,6 +105,10 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
     const text = (el as HTMLElement).innerText?.trim() || el.textContent!.trim();
     const cs = getComputedStyle(el);
     for (const n of own) texts.push(n.textContent!.trim());
+    // Visually hidden (sr-only): a 1px clipped box by design, never a layout bug, nothing to show.
+    const hidden = r.width <= 2 || r.height <= 2;
+    if (!hidden) shown.push({ text, key: key(el), rect: box(r) });
+    const geo = (w: number, h: number) => ({ width: Math.round(el.clientWidth || r.width), height: Math.round(el.clientHeight || r.height), need_width: Math.round(w), need_height: Math.round(h), font: cs.font || `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}` });
 
     const clipped = /hidden|clip/.test(cs.overflowX + cs.overflowY) || cs.textOverflow === "ellipsis";
     const hOver = el.scrollWidth > el.clientWidth + 1;
@@ -86,10 +116,12 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
     const vTol = parseFloat(cs.fontSize) / 2 || 4;
     const vOver = el.scrollHeight > el.clientHeight + vTol;
     const clamp = cs.getPropertyValue("-webkit-line-clamp");
-    if (clamp && clamp !== "none" && vOver) {
-      found.push({ kind: "clamp", selector: sel(el), text, key: key(el), rect: box(r) });
+    if (hidden) {
+      // skip
+    } else if (clamp && clamp !== "none" && vOver) {
+      found.push({ kind: "clamp", selector: sel(el), text, key: key(el), rect: box(r), ctx: ctx(el), fit: geo(el.scrollWidth, el.scrollHeight) });
     } else if (clipped && (hOver || vOver)) {
-      found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(r) });
+      found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(r), ctx: ctx(el), fit: geo(el.scrollWidth, el.scrollHeight) });
     } else {
       // Visible overflow: the text itself spills out of its box.
       const range = document.createRange();
@@ -97,7 +129,7 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
       const t = range.getBoundingClientRect();
       if (t.right > r.right + 1 || t.left < r.left - 1 || t.bottom > r.bottom + vTol) {
         const u = new DOMRect(Math.min(r.x, t.x), Math.min(r.y, t.y), Math.max(r.right, t.right) - Math.min(r.x, t.x), Math.max(r.bottom, t.bottom) - Math.min(r.y, t.y));
-        found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(u) });
+        found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(u), ctx: ctx(el), fit: geo(Math.max(t.right, r.right) - Math.min(t.left, r.left), Math.max(t.bottom, r.bottom) - Math.min(t.top, r.top)) });
       }
     }
 
@@ -142,13 +174,24 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
     const dir = document.documentElement.getAttribute("dir") || document.body.getAttribute("dir");
     if (dir !== "rtl") found.push({ kind: "rtl", selector: "html", text: `dir="${dir ?? ""}" (expected "rtl")` });
   }
-  return { found, texts };
+  return { found, texts, els: shown };
 }
+
+const slugOf = (route: string) => route.replace(/[^\w]+/g, "_").replace(/^_|_$/g, "") || "index";
 
 const RTL = new Set(["ar", "he", "fa", "ur"]);
 
 async function grab(page: Page, url: string) {
-  await page.goto(url, { waitUntil: "networkidle" });
+  let res = await page.goto(url, { waitUntil: "load" });
+  // Dev servers 500 transiently while compiling: one retry.
+  if (res && res.status() >= 500) {
+    await page.waitForTimeout(1500);
+    res = await page.goto(url, { waitUntil: "load" });
+  }
+  // An error page has no overflow: reporting "0 issues" for it would be a lie.
+  if (res && res.status() >= 400) throw new Error(`${url} → HTTP ${res.status()}`);
+  // Dev servers keep HMR sockets/polls open: networkidle is best effort.
+  await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {});
   await page.evaluate(() => document.fonts.ready);
 }
 
@@ -188,6 +231,24 @@ export async function run(o: Options): Promise<Report> {
   const report: Report = { generated_at: new Date().toISOString(), options: o, pages: [], issues: [] };
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (o.suggest && !apiKey) console.warn("--suggest: ANTHROPIC_API_KEY not set, skipping suggestions");
+  const indexes: Record<string, Index> = o.catalogs ? await loadIndexes(o.catalogs, [o.sourceLocale, ...o.locales]) : {};
+  const wanted = o.map === "*" ? null : new Set((o.map ?? "").split(",").map((k) => k.trim()).filter(Boolean));
+  const seen = new Set<string>();
+  const pad = 8;
+  const clipOf = (r: Rect, p = pad) => ({ x: Math.max(0, r.x - p), y: Math.max(0, r.y - p), width: r.width + 2 * p, height: r.height + 2 * p });
+  // One crop per (locale, key): the first place it renders.
+  const mapKeys = async (page: Page, els: El[], locale: string, route: string, vp: string, slug: string) => {
+    if (!o.map) return;
+    report.keys ??= [];
+    for (const [i, e] of els.entries()) {
+      const key = e.key ?? match(indexes[locale], e.text);
+      if (!key || (wanted && !wanted.has(key)) || seen.has(locale + "\0" + key)) continue;
+      seen.add(locale + "\0" + key);
+      const crop = join("screenshots", `${slug}_key${i}.png`);
+      await page.screenshot({ path: join(o.out, crop), clip: clipOf(e.rect, 24), fullPage: true });
+      report.keys.push({ locale, route, viewport: vp, key, text: e.text, crop });
+    }
+  };
 
   try {
     for (const vp of o.viewports) {
@@ -197,24 +258,32 @@ export async function run(o: Options): Promise<Report> {
         // Locale-prefixed visits leave a locale cookie (next-intl NEXT_LOCALE) that would turn the source page into the last locale.
         await page.context().clearCookies();
         await grab(page, buildUrl(o, o.sourceLocale, route));
-        const sourceTexts = (await page.evaluate(detect, { sourceTexts: null, checkRtl: false })).texts;
+        const src = await page.evaluate(detect, { sourceTexts: null, checkRtl: false });
+        const sourceTexts = src.texts;
+        await mapKeys(page, src.els, o.sourceLocale, route, vp, `${o.sourceLocale}_${slugOf(route)}_${vp}`);
 
         for (const locale of o.locales) {
           const url = buildUrl(o, locale, route);
           await grab(page, url);
-          const { found } = await page.evaluate(detect, { sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
-          const slug = `${locale}_${route.replace(/[^\w]+/g, "_").replace(/^_|_$/g, "") || "index"}_${vp}`;
+          const { found, els } = await page.evaluate(detect, { sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
+          const slug = `${locale}_${slugOf(route)}_${vp}`;
           const screenshot = join("screenshots", `${slug}.png`);
           await page.screenshot({ path: join(o.out, screenshot), fullPage: true });
           report.pages.push({ locale, route, viewport: vp, url, screenshot });
 
-          for (const [i, f] of found.entries()) {
+          await mapKeys(page, els, locale, route, vp, slug);
+
+          for (const [i, { ctx, ...f }] of found.entries()) {
             const issue: Issue = { ...f, locale, route, viewport: vp };
+            // Untranslated text is still in the source locale; overlaps carry "a ⨯ b".
+            issue.key ??= match(indexes[f.kind === "untranslated" ? o.sourceLocale : locale], f.text.split(" ⨯ ")[0]);
             if (VISUAL.includes(f.kind) && f.rect) {
-              const pad = 8;
-              const clip = { x: Math.max(0, f.rect.x - pad), y: Math.max(0, f.rect.y - pad), width: f.rect.width + 2 * pad, height: f.rect.height + 2 * pad };
               issue.crop = join("screenshots", `${slug}_${i}_${f.kind}.png`);
-              const png = await page.screenshot({ path: join(o.out, issue.crop), clip, fullPage: true });
+              const png = await page.screenshot({ path: join(o.out, issue.crop), clip: clipOf(f.rect), fullPage: true });
+              if (ctx) {
+                issue.context_crop = join("screenshots", `${slug}_${i}_context.png`);
+                await page.screenshot({ path: join(o.out, issue.context_crop), clip: clipOf(ctx), fullPage: true });
+              }
               if (o.suggest && apiKey && f.kind !== "overlap") {
                 issue.suggestion = await suggest(issue, png, apiKey);
                 if (issue.suggestion && issue.key) issue.command = `glot set ${locale} ${issue.key} ${JSON.stringify(issue.suggestion)}`;

@@ -99,6 +99,58 @@ export type Job = {
   finished_at: string | null;
 };
 
+export type Verdict = "same" | "nuance" | "different";
+export type Review = {
+  key: string;
+  locale: string;
+  source: string;
+  target: string;
+  back_translation: string;
+  verdict: Verdict;
+  explanation: string;
+  suggestion: string | null;
+  cached: boolean;
+  created_at: string;
+};
+
+export type VisualKind = "overflow" | "clamp" | "overlap" | "untranslated" | "tofu" | "rtl";
+export const VISUAL_KINDS: VisualKind[] = ["overflow", "clamp", "overlap", "untranslated", "tofu", "rtl"];
+export type Rect = { x: number; y: number; width: number; height: number };
+export type VisualIssue = {
+  kind: VisualKind;
+  locale: string;
+  route: string;
+  viewport: string;
+  selector: string;
+  text: string;
+  key?: string;
+  rect?: Rect;
+  crop?: string;
+  suggestion?: string;
+  command?: string;
+};
+export type VisualPage = { locale: string; route: string; viewport: string; url: string; screenshot: string };
+export type VisualSummary = {
+  pages: number;
+  issues: number;
+  locales: string[];
+  routes: string[];
+  viewports: string[];
+  by_kind: Partial<Record<VisualKind, number>>;
+  by_locale: Record<string, number>;
+  pages_by_locale: Record<string, number>;
+};
+export type VisualReportMeta = { id: string; label: string | null; created_at: string; summary: VisualSummary };
+export type VisualReport = VisualReportMeta & {
+  report: {
+    generated_at: string;
+    options: { baseUrl: string; routes: string[]; locales: string[]; sourceLocale: string; urlPattern: string; viewports: string[] };
+    pages: VisualPage[];
+    issues: VisualIssue[];
+  };
+};
+export type PreviewSettings = { base_url: string | null; url_pattern: string; routes: string[] };
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -177,6 +229,17 @@ export const api = {
     request<Job>("POST", `${p(slug)}/jobs`, b),
   job: (id: string) => request<Job>("GET", `/api/jobs/${enc(id)}`),
   jobEventsUrl: (id: string) => `/api/jobs/${enc(id)}/events`,
+  reviewLocale: (slug: string, b: { locale: string; keys?: string[]; refresh?: boolean }) =>
+    request<Review[]>("POST", `${p(slug)}/review`, b),
+  reviewKey: (slug: string, key: string, locale: string) =>
+    request<Review>("GET", `${p(slug)}/keys/${enc(key)}/review${qs({ locale })}`),
+
+  visualReports: (slug: string) => request<VisualReportMeta[]>("GET", `${p(slug)}/visual-reports`),
+  visualReport: (slug: string, id: string | "latest") => request<VisualReport>("GET", `${p(slug)}/visual-reports/${enc(id)}`),
+  visualFileUrl: (slug: string, id: string, path: string) =>
+    `${p(slug)}/visual-reports/${enc(id)}/files/${path.split("/").map(enc).join("/")}`,
+  preview: (slug: string) => request<PreviewSettings>("GET", `${p(slug)}/preview`),
+  updatePreview: (slug: string, b: PreviewSettings) => request<PreviewSettings>("PUT", `${p(slug)}/preview`, b),
 };
 
 export const qk = {
@@ -189,4 +252,8 @@ export const qk = {
   glossary: (slug: string) => ["glossary", slug] as const,
   issues: (slug: string) => ["issues", slug] as const,
   jobs: (slug: string) => ["jobs", slug] as const,
+  review: (slug: string, key: string, locale: string) => ["review", slug, key, locale] as const,
+  visualReports: (slug: string) => ["visual-reports", slug] as const,
+  visualReport: (slug: string, id: string) => ["visual-reports", slug, id] as const,
+  preview: (slug: string) => ["preview", slug] as const,
 };

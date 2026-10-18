@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CircleAlert, CircleX, Inbox, Languages, Loader2, Sparkles, TableProperties, Wallet } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { EmptyState, ErrorState, PageHeader, ProgressBar, useLocaleName } from "@/components/common";
+import { HealthScore } from "@/components/health-score";
 import { isActive, JobRow } from "@/components/job-row";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,6 +58,8 @@ export default function OverviewPage() {
         />
         <Stat icon={Sparkles} label={t("model")} value={p.llm.model} hint={p.llm.fallback_model ?? undefined} mono />
       </div>
+
+      {p.stats.keys > 0 && p.target_locales.length > 0 && <HealthScore project={p} />}
 
       {p.stats.keys === 0 ? (
         <div className="mt-6">

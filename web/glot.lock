@@ -457,6 +457,15 @@
         },
         "reviewed": false
       },
+      "editor.differentMeaning": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "e1ee73db008948f3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "editor.editPlaceholder": {
         "source_hash": "c89ef11a1f8b7f60",
         "target_hash": "c813bf23ab9126f3",
@@ -541,6 +550,33 @@
       "editor.results": {
         "source_hash": "b6cc46e10e049b1e",
         "target_hash": "6febb816177e3f2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewDone": {
+        "source_hash": "fc579ef40c3d7c0c",
+        "target_hash": "d7f3118211002e50",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocale": {
+        "source_hash": "155c59bd33604fae",
+        "target_hash": "1a4225a644636398",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocaleHint": {
+        "source_hash": "c709f8ec585af53b",
+        "target_hash": "59839b7c8d387223",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -835,6 +871,195 @@
         },
         "reviewed": false
       },
+      "health.detail.coverage": {
+        "source_hash": "86694f000e3f92e4",
+        "target_hash": "7b9d75ca6180671e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.errors": {
+        "source_hash": "b78bef073bc3c105",
+        "target_hash": "4385c9b80123f55a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.meaning": {
+        "source_hash": "473b3eeafcd987a8",
+        "target_hash": "b3d93443ccee28bc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.visual": {
+        "source_hash": "2df9795f75a478ca",
+        "target_hash": "95d3f7c3aab36268",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.coverage": {
+        "source_hash": "523487a5de21adb5",
+        "target_hash": "08900dff05c1d85e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.errors": {
+        "source_hash": "68e1ca575295bb56",
+        "target_hash": "c71e850f44f5dabc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.meaning": {
+        "source_hash": "1f5d64b92820f823",
+        "target_hash": "768639c317a0cc8a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.visual": {
+        "source_hash": "ba3033214fe41dad",
+        "target_hash": "c7c4e782b433c1d3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.coverage": {
+        "source_hash": "3e5039d12acddb2e",
+        "target_hash": "6d926e8d6c7039dc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.errors": {
+        "source_hash": "39b368a33c02a92b",
+        "target_hash": "a6936f30c2825dd2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.meaning": {
+        "source_hash": "c850114928cfbf33",
+        "target_hash": "ad7831b98aae82b3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.visual": {
+        "source_hash": "7f3af3d96fccdcfc",
+        "target_hash": "003e4aff4ecafca6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "6520b21edd4d2913",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.na": {
+        "source_hash": "a683c5c5349f6f7f",
+        "target_hash": "82963d4deab8251e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.overall": {
+        "source_hash": "38e5a46cbc5ad328",
+        "target_hash": "3c64ba0afab6c4a8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.runReview": {
+        "source_hash": "aff0766a5290e117",
+        "target_hash": "c18e0d550ebebb1a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.fair": {
+        "source_hash": "738a3278e945747c",
+        "target_hash": "2dcfe566ae2f8aaf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.good": {
+        "source_hash": "7f1e323b6272c620",
+        "target_hash": "970dd58a0500ed64",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.poor": {
+        "source_hash": "490c67a211d27a57",
+        "target_hash": "d1c465111a804057",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.subtitle": {
+        "source_hash": "1b3baa1d375c6f79",
+        "target_hash": "2fb5aa13ac605008",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.title": {
+        "source_hash": "24126dc45a9d9934",
+        "target_hash": "684aa0d6689d608a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "jobStatus.done": {
         "source_hash": "11a6767d5674c7e4",
         "target_hash": "c2da5684d63bfcc4",
@@ -937,6 +1162,87 @@
       "jobs.title": {
         "source_hash": "2f17a0f8d518e491",
         "target_hash": "001eea528d3c451f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFound": {
+        "source_hash": "d2998feef02d1779",
+        "target_hash": "872408f302b03e0d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFoundHint": {
+        "source_hash": "97d26aa2755c2246",
+        "target_hash": "25724642c6f1d096",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.openInEditor": {
+        "source_hash": "ea1d0f038bbdb9e9",
+        "target_hash": "7fd7dc82d7cd8d03",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.pick": {
+        "source_hash": "efc1aa88ad0cbfca",
+        "target_hash": "318d030d891ffac5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.saved": {
+        "source_hash": "87880ba6a81558c4",
+        "target_hash": "1d2df5e958fd0034",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.savedWithIssues": {
+        "source_hash": "e7f8fb8e2d1703ee",
+        "target_hash": "a15612fba57557d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "64660bb87d8972be",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.title": {
+        "source_hash": "3418de588f7f71c9",
+        "target_hash": "dee92947422de764",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.translation": {
+        "source_hash": "6fbd766b1a71cc4d",
+        "target_hash": "d88673aeea346ebe",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -1555,6 +1861,249 @@
         },
         "reviewed": false
       },
+      "matrix.bridge.body": {
+        "source_hash": "8637d6dcae1d9a17",
+        "target_hash": "b729b9157ac18885",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.bridge.title": {
+        "source_hash": "e741a541c22edd49",
+        "target_hash": "e99a74f86e59fabe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.desktop": {
+        "source_hash": "9bd88f2485acbb94",
+        "target_hash": "a43d1d5cdf991707",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.frameTitle": {
+        "source_hash": "44a887b1a4872d18",
+        "target_hash": "dd4775fa11e26435",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "00b0de392e7615a7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "83ab475c0c57e2fd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "0cccd660d7d66694",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "c67225f8bee2dd46",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "2a1a5c1bd7952d9e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "0c760aa184f5d387",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "a06abd7895b0e161",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.mobile": {
+        "source_hash": "cbaad3cf4a6507e5",
+        "target_hash": "0b6aa9453dfb08ba",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.body": {
+        "source_hash": "54b471c7b4aa40e7",
+        "target_hash": "a46daf9c4630fd25",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.cta": {
+        "source_hash": "d717eac86beba5ff",
+        "target_hash": "757bc7c0a365334e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.title": {
+        "source_hash": "abac9d89525d7176",
+        "target_hash": "ca648ccc0fa9a8af",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.openTab": {
+        "source_hash": "306ef19c8ac3d276",
+        "target_hash": "65748425fda52690",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.overlay": {
+        "source_hash": "b403759e1f275618",
+        "target_hash": "496a5521a12e62b9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudo": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "65a9568b6ad53f55",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudoColumn": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "65a9568b6ad53f55",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reload": {
+        "source_hash": "7b20422752245bc6",
+        "target_hash": "12447ee966acb655",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reportFrom": {
+        "source_hash": "8b069a5e7f60326f",
+        "target_hash": "0b65324d7583a504",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.route": {
+        "source_hash": "adc74704d65d5cc9",
+        "target_hash": "d31165f301357253",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.routePlaceholder": {
+        "source_hash": "7394a2bb766646ca",
+        "target_hash": "7394a2bb766646ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.source": {
+        "source_hash": "41cf6794ba4200b8",
+        "target_hash": "64660bb87d8972be",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.title": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "c35628814522a9e4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "84ecf12ee3f775f4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.zoom": {
+        "source_hash": "509c517ede79fef0",
+        "target_hash": "15f1283d366580df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "notFound.back": {
         "source_hash": "49f1436be6615c6f",
         "target_hash": "004b49c90edbdb41",
@@ -1987,6 +2536,96 @@
         },
         "reviewed": false
       },
+      "review.applied": {
+        "source_hash": "0b88198cd880fedb",
+        "target_hash": "9f3c9d439ea9ad62",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.apply": {
+        "source_hash": "2ca103b50a0203ec",
+        "target_hash": "3f87ece3cfecfbe7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslate": {
+        "source_hash": "c5e75dbb3f9a4f72",
+        "target_hash": "4c503709cf6ba832",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslation": {
+        "source_hash": "42001e97a9416a5e",
+        "target_hash": "23f821f570fc0bee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.refresh": {
+        "source_hash": "04b10aa8879bcc32",
+        "target_hash": "982e418f3beef2fd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.running": {
+        "source_hash": "3c65eea22777acbb",
+        "target_hash": "71958b02281c1819",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.suggestion": {
+        "source_hash": "43fe22870a292aca",
+        "target_hash": "2ef750829c1dd42c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.different": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "e1ee73db008948f3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.nuance": {
+        "source_hash": "cd802ca85cacdf89",
+        "target_hash": "3547f3dab2b83651",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.same": {
+        "source_hash": "fd88cb1c100f64b1",
+        "target_hash": "47dcbb29156165b2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.cdn.description": {
         "source_hash": "19c8411a4ddea7d1",
         "target_hash": "fe1e9170129bc8a5",
@@ -2356,6 +2995,96 @@
         },
         "reviewed": false
       },
+      "settings.preview.baseUrl": {
+        "source_hash": "70589413a3c97933",
+        "target_hash": "5fde0ad7c86365a9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.baseUrlHint": {
+        "source_hash": "4733238e3f450440",
+        "target_hash": "31eb8bdce252b47e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.description": {
+        "source_hash": "c73c7c80fc336a75",
+        "target_hash": "45d4512ad1b7e6bf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.pattern": {
+        "source_hash": "236ff89591a82f7c",
+        "target_hash": "aa408797d284afef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.patternHint": {
+        "source_hash": "6b51358d3e8b3bd1",
+        "target_hash": "a3774e95811ed4bb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routes": {
+        "source_hash": "2c5b669bcdeb51bf",
+        "target_hash": "53be1a1f3c5a8371",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routesHint": {
+        "source_hash": "17168f3888f7cd39",
+        "target_hash": "fefc302aadeff237",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.save": {
+        "source_hash": "d929ea899b8d731a",
+        "target_hash": "0233b89817e934e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.saved": {
+        "source_hash": "4018f3aaebe7ef67",
+        "target_hash": "dda1c30ebfe626c4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.title": {
+        "source_hash": "324b134f57c70c72",
+        "target_hash": "0a40c58ac7c3f5c9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.saved": {
         "source_hash": "74a7f53bad399973",
         "target_hash": "a55c3d476bdcccda",
@@ -2446,6 +3175,15 @@
         },
         "reviewed": false
       },
+      "shell.preview": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "c35628814522a9e4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.projects": {
         "source_hash": "04e2a9728af75840",
         "target_hash": "5818066ebd9fa3a2",
@@ -2485,6 +3223,15 @@
       "shell.userMenu": {
         "source_hash": "7fb5995bca43a6a3",
         "target_hash": "31323d8f9d218fef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.visual": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "7529f5252537eefb",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -2737,6 +3484,240 @@
       "tokens.title": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "6ca66d652a1545d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.after": {
+        "source_hash": "7b68fe5510851da3",
+        "target_hash": "3dc3397bee390bea",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allLocales": {
+        "source_hash": "a9f854d579b6a752",
+        "target_hash": "3f3af3610b1e4f5e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allViewports": {
+        "source_hash": "1fae986d289edbe5",
+        "target_hash": "76ca09c9059ec65f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.before": {
+        "source_hash": "9bb725005055412c",
+        "target_hash": "52e897d4df3af46a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clean": {
+        "source_hash": "eb8c56e2be8a7d16",
+        "target_hash": "5923f9b11bf17617",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clearKinds": {
+        "source_hash": "454de97f24850535",
+        "target_hash": "c9912987cb3c898a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.compareWith": {
+        "source_hash": "4007acd502c2f984",
+        "target_hash": "0955f5fed691c00b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.body": {
+        "source_hash": "638954777aec9a53",
+        "target_hash": "848ff04d156f6879",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.command": {
+        "source_hash": "3bb4cb5762a4c075",
+        "target_hash": "7494b28a99f3f086",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.title": {
+        "source_hash": "d78e66cfffc5b927",
+        "target_hash": "0eb27cd2db6bdf9c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "a1bca59f72988e6b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issues": {
+        "source_hash": "af2851fc530f8585",
+        "target_hash": "a5dd8017acd28bfa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "83ab475c0c57e2fd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "bf0d3030b2cc1ba6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "c67225f8bee2dd46",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "2a1a5c1bd7952d9e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "5ce0fffb38defdb9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "a06abd7895b0e161",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "ed7a1a043c02154c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.noCompare": {
+        "source_hash": "158264e28e396c00",
+        "target_hash": "63d1ae351dcf8aa9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.notInReport": {
+        "source_hash": "4c5a1c3e14f9a577",
+        "target_hash": "f323bd252e951beb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.report": {
+        "source_hash": "b6ce788d9786917c",
+        "target_hash": "a92dbae49f8a8d98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.screenshotAlt": {
+        "source_hash": "d84ec0c5b9e23a44",
+        "target_hash": "db9e3e0f172c2108",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.subtitle": {
+        "source_hash": "cc0b2118430f7b08",
+        "target_hash": "ad111829b4660d01",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.title": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "7529f5252537eefb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "84ecf12ee3f775f4",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -3195,6 +4176,15 @@
         },
         "reviewed": false
       },
+      "editor.differentMeaning": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "c2691718839a7c50",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "editor.editPlaceholder": {
         "source_hash": "c89ef11a1f8b7f60",
         "target_hash": "4305cd221fa2ffde",
@@ -3279,6 +4269,33 @@
       "editor.results": {
         "source_hash": "b6cc46e10e049b1e",
         "target_hash": "d55533a5ac255dc3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewDone": {
+        "source_hash": "fc579ef40c3d7c0c",
+        "target_hash": "d973ab2d7af5992d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocale": {
+        "source_hash": "155c59bd33604fae",
+        "target_hash": "5dcc7608d162d9fb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocaleHint": {
+        "source_hash": "c709f8ec585af53b",
+        "target_hash": "e8e5404f934877eb",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -3573,6 +4590,195 @@
         },
         "reviewed": false
       },
+      "health.detail.coverage": {
+        "source_hash": "86694f000e3f92e4",
+        "target_hash": "e71b0facad07d7e7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.errors": {
+        "source_hash": "b78bef073bc3c105",
+        "target_hash": "2035058c03b562c4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.meaning": {
+        "source_hash": "473b3eeafcd987a8",
+        "target_hash": "62d7d0a2da7276c2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.visual": {
+        "source_hash": "2df9795f75a478ca",
+        "target_hash": "38a859e7582c726e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.coverage": {
+        "source_hash": "523487a5de21adb5",
+        "target_hash": "622db13f38cd8ac7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.errors": {
+        "source_hash": "68e1ca575295bb56",
+        "target_hash": "d4bf21bfca9dd08b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.meaning": {
+        "source_hash": "1f5d64b92820f823",
+        "target_hash": "7519afc89b2686da",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.visual": {
+        "source_hash": "ba3033214fe41dad",
+        "target_hash": "cfd2eeef702eb448",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.coverage": {
+        "source_hash": "3e5039d12acddb2e",
+        "target_hash": "1c8d9af18bb27683",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.errors": {
+        "source_hash": "39b368a33c02a92b",
+        "target_hash": "0943e03ac90a6cdb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.meaning": {
+        "source_hash": "c850114928cfbf33",
+        "target_hash": "2341c6704f259127",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.visual": {
+        "source_hash": "7f3af3d96fccdcfc",
+        "target_hash": "2c9e0765eb6354f5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "f2a1cc71fa59a04b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.na": {
+        "source_hash": "a683c5c5349f6f7f",
+        "target_hash": "a683c5c5349f6f7f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.overall": {
+        "source_hash": "38e5a46cbc5ad328",
+        "target_hash": "163182e7e7d627c6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.runReview": {
+        "source_hash": "aff0766a5290e117",
+        "target_hash": "a1ca1357598782f7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.fair": {
+        "source_hash": "738a3278e945747c",
+        "target_hash": "cbc9c0dce1543e36",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.good": {
+        "source_hash": "7f1e323b6272c620",
+        "target_hash": "1de177d39fa90d51",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.poor": {
+        "source_hash": "490c67a211d27a57",
+        "target_hash": "8b31255d2b2e0196",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.subtitle": {
+        "source_hash": "1b3baa1d375c6f79",
+        "target_hash": "b23fa1bf11523399",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.title": {
+        "source_hash": "24126dc45a9d9934",
+        "target_hash": "cc6a4df37452828c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "jobStatus.done": {
         "source_hash": "11a6767d5674c7e4",
         "target_hash": "25d52d7e86650364",
@@ -3675,6 +4881,87 @@
       "jobs.title": {
         "source_hash": "2f17a0f8d518e491",
         "target_hash": "2f17a0f8d518e491",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFound": {
+        "source_hash": "d2998feef02d1779",
+        "target_hash": "af9b4b36812cf7e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFoundHint": {
+        "source_hash": "97d26aa2755c2246",
+        "target_hash": "735e0e299306660e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.openInEditor": {
+        "source_hash": "ea1d0f038bbdb9e9",
+        "target_hash": "3f6c192b1da10a12",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.pick": {
+        "source_hash": "efc1aa88ad0cbfca",
+        "target_hash": "d6a26ec99460888e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.saved": {
+        "source_hash": "87880ba6a81558c4",
+        "target_hash": "8a97fb55f32e898a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.savedWithIssues": {
+        "source_hash": "e7f8fb8e2d1703ee",
+        "target_hash": "b01cc7dee4c7d855",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0378894a522e5f07",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.title": {
+        "source_hash": "3418de588f7f71c9",
+        "target_hash": "76fba87a89159b26",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.translation": {
+        "source_hash": "6fbd766b1a71cc4d",
+        "target_hash": "08145060a96d1a5e",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -4293,6 +5580,249 @@
         },
         "reviewed": false
       },
+      "matrix.bridge.body": {
+        "source_hash": "8637d6dcae1d9a17",
+        "target_hash": "db15ff187a380738",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.bridge.title": {
+        "source_hash": "e741a541c22edd49",
+        "target_hash": "e4cdbaf7071f9d37",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.desktop": {
+        "source_hash": "9bd88f2485acbb94",
+        "target_hash": "9bd88f2485acbb94",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.frameTitle": {
+        "source_hash": "44a887b1a4872d18",
+        "target_hash": "b4b8cb8b3680878a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "711914371612d47d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "c922288f387b25ec",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "10f022f958f6825e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "95bb41eef5fc23b0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "50e8eed39fb6590a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "86db80caac0c12ba",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "cd3f15a2afe75fc4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.mobile": {
+        "source_hash": "cbaad3cf4a6507e5",
+        "target_hash": "b4964e6e81352bb2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.body": {
+        "source_hash": "54b471c7b4aa40e7",
+        "target_hash": "462999c8d23ae2b7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.cta": {
+        "source_hash": "d717eac86beba5ff",
+        "target_hash": "3faaee9338ca9bef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.title": {
+        "source_hash": "abac9d89525d7176",
+        "target_hash": "c113aef9fa76a32a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.openTab": {
+        "source_hash": "306ef19c8ac3d276",
+        "target_hash": "7555ddcff54605eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.overlay": {
+        "source_hash": "b403759e1f275618",
+        "target_hash": "39946bbf6c8d46f8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudo": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "e6fc4567ded2c10c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudoColumn": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "e6fc4567ded2c10c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reload": {
+        "source_hash": "7b20422752245bc6",
+        "target_hash": "b608926d2f0ca8d3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reportFrom": {
+        "source_hash": "8b069a5e7f60326f",
+        "target_hash": "49a5ec0007a2d5b0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.route": {
+        "source_hash": "adc74704d65d5cc9",
+        "target_hash": "adc74704d65d5cc9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.routePlaceholder": {
+        "source_hash": "7394a2bb766646ca",
+        "target_hash": "7394a2bb766646ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.source": {
+        "source_hash": "41cf6794ba4200b8",
+        "target_hash": "0378894a522e5f07",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.title": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "d5df24feb5c9ca75",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "89c0a9c2c336547a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.zoom": {
+        "source_hash": "509c517ede79fef0",
+        "target_hash": "509c517ede79fef0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "notFound.back": {
         "source_hash": "49f1436be6615c6f",
         "target_hash": "e2998007714df41b",
@@ -4725,6 +6255,96 @@
         },
         "reviewed": false
       },
+      "review.applied": {
+        "source_hash": "0b88198cd880fedb",
+        "target_hash": "bec8ee071bbdd07b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.apply": {
+        "source_hash": "2ca103b50a0203ec",
+        "target_hash": "41ddfc0bdd19beaf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslate": {
+        "source_hash": "c5e75dbb3f9a4f72",
+        "target_hash": "a5a4612b0fda5774",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslation": {
+        "source_hash": "42001e97a9416a5e",
+        "target_hash": "9a31fcaa8467173e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.refresh": {
+        "source_hash": "04b10aa8879bcc32",
+        "target_hash": "ba72cdf7cf7bd8af",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.running": {
+        "source_hash": "3c65eea22777acbb",
+        "target_hash": "c3ff12ce935d72ed",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.suggestion": {
+        "source_hash": "43fe22870a292aca",
+        "target_hash": "eeae0ccef4640c7e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.different": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "8e56ba9b42a6e251",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.nuance": {
+        "source_hash": "cd802ca85cacdf89",
+        "target_hash": "cd802ca85cacdf89",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.same": {
+        "source_hash": "fd88cb1c100f64b1",
+        "target_hash": "d2e8fb322cf8817a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.cdn.description": {
         "source_hash": "19c8411a4ddea7d1",
         "target_hash": "35ea738ff8c87e43",
@@ -5094,6 +6714,96 @@
         },
         "reviewed": false
       },
+      "settings.preview.baseUrl": {
+        "source_hash": "70589413a3c97933",
+        "target_hash": "5fd0ed49a53bf8b7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.baseUrlHint": {
+        "source_hash": "4733238e3f450440",
+        "target_hash": "ad635afc3598a697",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.description": {
+        "source_hash": "c73c7c80fc336a75",
+        "target_hash": "4b826d25f63aee4e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.pattern": {
+        "source_hash": "236ff89591a82f7c",
+        "target_hash": "cc3d8f5a0ef8476f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.patternHint": {
+        "source_hash": "6b51358d3e8b3bd1",
+        "target_hash": "ab2d4d0a0505a8da",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routes": {
+        "source_hash": "2c5b669bcdeb51bf",
+        "target_hash": "55ab31747e51c693",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routesHint": {
+        "source_hash": "17168f3888f7cd39",
+        "target_hash": "4ef0e4be326566e7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.save": {
+        "source_hash": "d929ea899b8d731a",
+        "target_hash": "c9436f4dc8d8cb10",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.saved": {
+        "source_hash": "4018f3aaebe7ef67",
+        "target_hash": "ca5a944f645ccf85",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.title": {
+        "source_hash": "324b134f57c70c72",
+        "target_hash": "69337f6de91475ad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.saved": {
         "source_hash": "74a7f53bad399973",
         "target_hash": "8352e27413cde6be",
@@ -5184,6 +6894,15 @@
         },
         "reviewed": false
       },
+      "shell.preview": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "c583a651154a582a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.projects": {
         "source_hash": "04e2a9728af75840",
         "target_hash": "df87bfa7519bb406",
@@ -5223,6 +6942,15 @@
       "shell.userMenu": {
         "source_hash": "7fb5995bca43a6a3",
         "target_hash": "f4e6cce51478b95c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.visual": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "ab1ac819c795709c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -5475,6 +7203,240 @@
       "tokens.title": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "d1c44881b4a598ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.after": {
+        "source_hash": "7b68fe5510851da3",
+        "target_hash": "8a28e290218847df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allLocales": {
+        "source_hash": "a9f854d579b6a752",
+        "target_hash": "fd4f0b09277f7b7b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allViewports": {
+        "source_hash": "1fae986d289edbe5",
+        "target_hash": "55ade64e101ddc09",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.before": {
+        "source_hash": "9bb725005055412c",
+        "target_hash": "c8727e2064b7a72d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clean": {
+        "source_hash": "eb8c56e2be8a7d16",
+        "target_hash": "1b72965fcc816222",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clearKinds": {
+        "source_hash": "454de97f24850535",
+        "target_hash": "f4fb1b6afc317ee7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.compareWith": {
+        "source_hash": "4007acd502c2f984",
+        "target_hash": "8f986e8dd6f9a2fa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.body": {
+        "source_hash": "638954777aec9a53",
+        "target_hash": "633f34453680e1f4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.command": {
+        "source_hash": "3bb4cb5762a4c075",
+        "target_hash": "ad03bc689780fe84",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.title": {
+        "source_hash": "d78e66cfffc5b927",
+        "target_hash": "1dc8a649b834a26b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "c50a753942610e20",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issues": {
+        "source_hash": "af2851fc530f8585",
+        "target_hash": "fa76e5cff927498e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "ede7f1a1da3be5d4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "10f022f958f6825e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "95bb41eef5fc23b0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "50e8eed39fb6590a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "86db80caac0c12ba",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "cd3f15a2afe75fc4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "f2a1cc71fa59a04b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.noCompare": {
+        "source_hash": "158264e28e396c00",
+        "target_hash": "4dacb2b9b9d873a7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.notInReport": {
+        "source_hash": "4c5a1c3e14f9a577",
+        "target_hash": "b28595252c63a984",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.report": {
+        "source_hash": "b6ce788d9786917c",
+        "target_hash": "7632057bd8405563",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.screenshotAlt": {
+        "source_hash": "d84ec0c5b9e23a44",
+        "target_hash": "a373b995a23aa1df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.subtitle": {
+        "source_hash": "cc0b2118430f7b08",
+        "target_hash": "6ab49bb79fed3ffc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.title": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "2017149d803add28",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "91e53b9065718a3c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -5933,6 +7895,15 @@
         },
         "reviewed": false
       },
+      "editor.differentMeaning": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "ae26179718ce8460",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "editor.editPlaceholder": {
         "source_hash": "c89ef11a1f8b7f60",
         "target_hash": "85ffa3f000bfeb4c",
@@ -6017,6 +7988,33 @@
       "editor.results": {
         "source_hash": "b6cc46e10e049b1e",
         "target_hash": "d31f2ab996360ca5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewDone": {
+        "source_hash": "fc579ef40c3d7c0c",
+        "target_hash": "224dcdbf79d68135",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocale": {
+        "source_hash": "155c59bd33604fae",
+        "target_hash": "e54eb7d369338f14",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocaleHint": {
+        "source_hash": "c709f8ec585af53b",
+        "target_hash": "71f59cbea2628658",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -6311,6 +8309,195 @@
         },
         "reviewed": false
       },
+      "health.detail.coverage": {
+        "source_hash": "86694f000e3f92e4",
+        "target_hash": "3e4d312bc47b4911",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.errors": {
+        "source_hash": "b78bef073bc3c105",
+        "target_hash": "31b91932e060329d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.meaning": {
+        "source_hash": "473b3eeafcd987a8",
+        "target_hash": "b8a7dffcaf4d3bc7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.visual": {
+        "source_hash": "2df9795f75a478ca",
+        "target_hash": "66679d1638c2a026",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.coverage": {
+        "source_hash": "523487a5de21adb5",
+        "target_hash": "93d536a329af3da7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.errors": {
+        "source_hash": "68e1ca575295bb56",
+        "target_hash": "c1e3865f37da0097",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.meaning": {
+        "source_hash": "1f5d64b92820f823",
+        "target_hash": "54ad9824222058b7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.visual": {
+        "source_hash": "ba3033214fe41dad",
+        "target_hash": "ba3033214fe41dad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.coverage": {
+        "source_hash": "3e5039d12acddb2e",
+        "target_hash": "cfce81cfa30ea2eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.errors": {
+        "source_hash": "39b368a33c02a92b",
+        "target_hash": "262dafdc15645a79",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.meaning": {
+        "source_hash": "c850114928cfbf33",
+        "target_hash": "85937ea642809dac",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.visual": {
+        "source_hash": "7f3af3d96fccdcfc",
+        "target_hash": "839fd2615692b9ab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "7ae9d418353b399f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.na": {
+        "source_hash": "a683c5c5349f6f7f",
+        "target_hash": "bb57ee1e247a851b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.overall": {
+        "source_hash": "38e5a46cbc5ad328",
+        "target_hash": "f5f03ac15d19e8c0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.runReview": {
+        "source_hash": "aff0766a5290e117",
+        "target_hash": "52fadddb772ffbdf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.fair": {
+        "source_hash": "738a3278e945747c",
+        "target_hash": "5d265f2433957c4d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.good": {
+        "source_hash": "7f1e323b6272c620",
+        "target_hash": "3824a2711a8d3b6d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.poor": {
+        "source_hash": "490c67a211d27a57",
+        "target_hash": "8fce38aa0ebf2e5f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.subtitle": {
+        "source_hash": "1b3baa1d375c6f79",
+        "target_hash": "2382a3e13e189c45",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.title": {
+        "source_hash": "24126dc45a9d9934",
+        "target_hash": "8f92abe7277d4a76",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "jobStatus.done": {
         "source_hash": "11a6767d5674c7e4",
         "target_hash": "b148590c0b0b8fd9",
@@ -6413,6 +8600,87 @@
       "jobs.title": {
         "source_hash": "2f17a0f8d518e491",
         "target_hash": "ab434464d1900142",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFound": {
+        "source_hash": "d2998feef02d1779",
+        "target_hash": "ce4105958dff3775",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFoundHint": {
+        "source_hash": "97d26aa2755c2246",
+        "target_hash": "9fe80f904fb12f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.openInEditor": {
+        "source_hash": "ea1d0f038bbdb9e9",
+        "target_hash": "85bed6be259e89c0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.pick": {
+        "source_hash": "efc1aa88ad0cbfca",
+        "target_hash": "1615912c232fabf7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.saved": {
+        "source_hash": "87880ba6a81558c4",
+        "target_hash": "1a882032b3c3f211",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.savedWithIssues": {
+        "source_hash": "e7f8fb8e2d1703ee",
+        "target_hash": "6c096de1315309c8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "167a940c62788a7a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.title": {
+        "source_hash": "3418de588f7f71c9",
+        "target_hash": "3660b0c7ce1596d8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.translation": {
+        "source_hash": "6fbd766b1a71cc4d",
+        "target_hash": "f36e5b259bc91585",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -7031,6 +9299,249 @@
         },
         "reviewed": false
       },
+      "matrix.bridge.body": {
+        "source_hash": "8637d6dcae1d9a17",
+        "target_hash": "ff0afc1ab001473e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.bridge.title": {
+        "source_hash": "e741a541c22edd49",
+        "target_hash": "8b2896ad10e33f73",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.desktop": {
+        "source_hash": "9bd88f2485acbb94",
+        "target_hash": "557fb176483405b5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.frameTitle": {
+        "source_hash": "44a887b1a4872d18",
+        "target_hash": "b26054eb1ee8c24e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "a62db7e13954f5e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "3836d47d7534b763",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "70f95fba3986dea4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "2f6095400d22166b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "162e58fb3ec70ed9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "d74f52c5005b4bd9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "90a51fcebd9ee690",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.mobile": {
+        "source_hash": "cbaad3cf4a6507e5",
+        "target_hash": "cac5d3230b6884a2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.body": {
+        "source_hash": "54b471c7b4aa40e7",
+        "target_hash": "af77ad21857d919e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.cta": {
+        "source_hash": "d717eac86beba5ff",
+        "target_hash": "35449f61b8858088",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.title": {
+        "source_hash": "abac9d89525d7176",
+        "target_hash": "7fba96494c199766",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.openTab": {
+        "source_hash": "306ef19c8ac3d276",
+        "target_hash": "47777846c0b5b14a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.overlay": {
+        "source_hash": "b403759e1f275618",
+        "target_hash": "856ce1798c3a33e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudo": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "acc3e2821629658c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudoColumn": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "acc3e2821629658c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reload": {
+        "source_hash": "7b20422752245bc6",
+        "target_hash": "e8d33bd1bd4bce67",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reportFrom": {
+        "source_hash": "8b069a5e7f60326f",
+        "target_hash": "4f0fa4b8a9510dfc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.route": {
+        "source_hash": "adc74704d65d5cc9",
+        "target_hash": "9ff9bd1106683bb9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.routePlaceholder": {
+        "source_hash": "7394a2bb766646ca",
+        "target_hash": "bf3a9562a286e92a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.source": {
+        "source_hash": "41cf6794ba4200b8",
+        "target_hash": "6b41bc41dfa8196e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.title": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "7002e89d81d2f941",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "6f15d07ddc7ea1df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.zoom": {
+        "source_hash": "509c517ede79fef0",
+        "target_hash": "509c517ede79fef0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "notFound.back": {
         "source_hash": "49f1436be6615c6f",
         "target_hash": "3906c387259fafc4",
@@ -7463,6 +9974,96 @@
         },
         "reviewed": false
       },
+      "review.applied": {
+        "source_hash": "0b88198cd880fedb",
+        "target_hash": "e2b24b7462fb0862",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.apply": {
+        "source_hash": "2ca103b50a0203ec",
+        "target_hash": "9efe3433e1362989",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslate": {
+        "source_hash": "c5e75dbb3f9a4f72",
+        "target_hash": "df3f96ea0ea81d3f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslation": {
+        "source_hash": "42001e97a9416a5e",
+        "target_hash": "f2a2f88695027fff",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.refresh": {
+        "source_hash": "04b10aa8879bcc32",
+        "target_hash": "e2e088a3a981c7ef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.running": {
+        "source_hash": "3c65eea22777acbb",
+        "target_hash": "3afedeec09b01dd4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.suggestion": {
+        "source_hash": "43fe22870a292aca",
+        "target_hash": "3d52f38255cee616",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.different": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "ae26179718ce8460",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.nuance": {
+        "source_hash": "cd802ca85cacdf89",
+        "target_hash": "6483cc8f29f0e98f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.same": {
+        "source_hash": "fd88cb1c100f64b1",
+        "target_hash": "f07722d5ec4d6370",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.cdn.description": {
         "source_hash": "19c8411a4ddea7d1",
         "target_hash": "8c970ba0a6c34524",
@@ -7832,6 +10433,96 @@
         },
         "reviewed": false
       },
+      "settings.preview.baseUrl": {
+        "source_hash": "70589413a3c97933",
+        "target_hash": "f1a52d70f8c5d169",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.baseUrlHint": {
+        "source_hash": "4733238e3f450440",
+        "target_hash": "125d9a440f34e120",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.description": {
+        "source_hash": "c73c7c80fc336a75",
+        "target_hash": "2bdf4f6cbf7505a9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.pattern": {
+        "source_hash": "236ff89591a82f7c",
+        "target_hash": "1f1092cf3762b38f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.patternHint": {
+        "source_hash": "6b51358d3e8b3bd1",
+        "target_hash": "28deebffde60eebc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routes": {
+        "source_hash": "2c5b669bcdeb51bf",
+        "target_hash": "2f6b91a34921c444",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routesHint": {
+        "source_hash": "17168f3888f7cd39",
+        "target_hash": "3e1409ba386432b4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.save": {
+        "source_hash": "d929ea899b8d731a",
+        "target_hash": "6a9a6492d5c7e831",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.saved": {
+        "source_hash": "4018f3aaebe7ef67",
+        "target_hash": "2e26fb5bb292d927",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.title": {
+        "source_hash": "324b134f57c70c72",
+        "target_hash": "c5341f198fc2f4f8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.saved": {
         "source_hash": "74a7f53bad399973",
         "target_hash": "ac6cc61772f7fdb6",
@@ -7922,6 +10613,15 @@
         },
         "reviewed": false
       },
+      "shell.preview": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "7002e89d81d2f941",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.projects": {
         "source_hash": "04e2a9728af75840",
         "target_hash": "3c83b0107d0ecb99",
@@ -7961,6 +10661,15 @@
       "shell.userMenu": {
         "source_hash": "7fb5995bca43a6a3",
         "target_hash": "8ae666b92687a511",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.visual": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "9388598ae190e449",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -8213,6 +10922,240 @@
       "tokens.title": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fc205e3e22fa3758",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.after": {
+        "source_hash": "7b68fe5510851da3",
+        "target_hash": "f1d31778f7ec5cd0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allLocales": {
+        "source_hash": "a9f854d579b6a752",
+        "target_hash": "9dc0bf86c4505ebc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allViewports": {
+        "source_hash": "1fae986d289edbe5",
+        "target_hash": "60847033bfd4cc2f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.before": {
+        "source_hash": "9bb725005055412c",
+        "target_hash": "8159db18b7756a9f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clean": {
+        "source_hash": "eb8c56e2be8a7d16",
+        "target_hash": "1ae0e051565ae0ed",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clearKinds": {
+        "source_hash": "454de97f24850535",
+        "target_hash": "4820653eb1ea5abf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.compareWith": {
+        "source_hash": "4007acd502c2f984",
+        "target_hash": "c8865d47143df602",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.body": {
+        "source_hash": "638954777aec9a53",
+        "target_hash": "a4cff501cfbe9054",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.command": {
+        "source_hash": "3bb4cb5762a4c075",
+        "target_hash": "349409e04ce8818e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.title": {
+        "source_hash": "d78e66cfffc5b927",
+        "target_hash": "684ad0ed1cf4d237",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "a62db7e13954f5e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issues": {
+        "source_hash": "af2851fc530f8585",
+        "target_hash": "b2cedf62d55acf9c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "3836d47d7534b763",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "70f95fba3986dea4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "2f6095400d22166b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "162e58fb3ec70ed9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "930784756f613c03",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "90a51fcebd9ee690",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "7ae9d418353b399f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.noCompare": {
+        "source_hash": "158264e28e396c00",
+        "target_hash": "43d967114caa55b2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.notInReport": {
+        "source_hash": "4c5a1c3e14f9a577",
+        "target_hash": "23fb32768b2253c5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.report": {
+        "source_hash": "b6ce788d9786917c",
+        "target_hash": "e6c308a66dd78ad1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.screenshotAlt": {
+        "source_hash": "d84ec0c5b9e23a44",
+        "target_hash": "b1c54ea2cbf8e753",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.subtitle": {
+        "source_hash": "cc0b2118430f7b08",
+        "target_hash": "29932bed32535f0b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.title": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "9388598ae190e449",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "6f15d07ddc7ea1df",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -8671,6 +11614,15 @@
         },
         "reviewed": false
       },
+      "editor.differentMeaning": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "c4c4294ab270e561",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "editor.editPlaceholder": {
         "source_hash": "c89ef11a1f8b7f60",
         "target_hash": "5e31be882d679aed",
@@ -8755,6 +11707,33 @@
       "editor.results": {
         "source_hash": "b6cc46e10e049b1e",
         "target_hash": "3d9305ed63dde45e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewDone": {
+        "source_hash": "fc579ef40c3d7c0c",
+        "target_hash": "bfbdbf71cf02f2ce",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocale": {
+        "source_hash": "155c59bd33604fae",
+        "target_hash": "85ea9d81515b1ca8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocaleHint": {
+        "source_hash": "c709f8ec585af53b",
+        "target_hash": "1c1d0490a195045f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -9049,6 +12028,195 @@
         },
         "reviewed": false
       },
+      "health.detail.coverage": {
+        "source_hash": "86694f000e3f92e4",
+        "target_hash": "5a1963a4b7169358",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.errors": {
+        "source_hash": "b78bef073bc3c105",
+        "target_hash": "10fdc251a379e84d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.meaning": {
+        "source_hash": "473b3eeafcd987a8",
+        "target_hash": "d186ff362634ebc9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.visual": {
+        "source_hash": "2df9795f75a478ca",
+        "target_hash": "13e8fce701de76c2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.coverage": {
+        "source_hash": "523487a5de21adb5",
+        "target_hash": "3e78d201ade830ad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.errors": {
+        "source_hash": "68e1ca575295bb56",
+        "target_hash": "68e1ca575295bb56",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.meaning": {
+        "source_hash": "1f5d64b92820f823",
+        "target_hash": "741e8c5450cd04da",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.visual": {
+        "source_hash": "ba3033214fe41dad",
+        "target_hash": "5f785789869d5d60",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.coverage": {
+        "source_hash": "3e5039d12acddb2e",
+        "target_hash": "daa186c8f65601d8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.errors": {
+        "source_hash": "39b368a33c02a92b",
+        "target_hash": "bdc9a18223dcc6df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.meaning": {
+        "source_hash": "c850114928cfbf33",
+        "target_hash": "959b911ee86df7bf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.visual": {
+        "source_hash": "7f3af3d96fccdcfc",
+        "target_hash": "e451939119eb223b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "5f6baab4dbe152fc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.na": {
+        "source_hash": "a683c5c5349f6f7f",
+        "target_hash": "a683c5c5349f6f7f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.overall": {
+        "source_hash": "38e5a46cbc5ad328",
+        "target_hash": "38e5a46cbc5ad328",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.runReview": {
+        "source_hash": "aff0766a5290e117",
+        "target_hash": "1025e4ed0dabd8ad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.fair": {
+        "source_hash": "738a3278e945747c",
+        "target_hash": "5ac225b414c198a5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.good": {
+        "source_hash": "7f1e323b6272c620",
+        "target_hash": "77c4e96b485bf222",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.poor": {
+        "source_hash": "490c67a211d27a57",
+        "target_hash": "1eafe53a2c215f90",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.subtitle": {
+        "source_hash": "1b3baa1d375c6f79",
+        "target_hash": "3391444115392cf4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.title": {
+        "source_hash": "24126dc45a9d9934",
+        "target_hash": "abe8b2ed50460723",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "jobStatus.done": {
         "source_hash": "11a6767d5674c7e4",
         "target_hash": "13ecee2c319141f6",
@@ -9151,6 +12319,87 @@
       "jobs.title": {
         "source_hash": "2f17a0f8d518e491",
         "target_hash": "8c7e07ce9d89c682",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFound": {
+        "source_hash": "d2998feef02d1779",
+        "target_hash": "ddfbbeef0cc992fa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFoundHint": {
+        "source_hash": "97d26aa2755c2246",
+        "target_hash": "e4e791b241c93c15",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.openInEditor": {
+        "source_hash": "ea1d0f038bbdb9e9",
+        "target_hash": "b7c52c781564d8dc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.pick": {
+        "source_hash": "efc1aa88ad0cbfca",
+        "target_hash": "e88cfdbdead00447",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.saved": {
+        "source_hash": "87880ba6a81558c4",
+        "target_hash": "bd0e87a23d94f4f5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.savedWithIssues": {
+        "source_hash": "e7f8fb8e2d1703ee",
+        "target_hash": "e9c582425ec3117e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0e570ca6fabe24f9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.title": {
+        "source_hash": "3418de588f7f71c9",
+        "target_hash": "7475baaf58cf54db",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.translation": {
+        "source_hash": "6fbd766b1a71cc4d",
+        "target_hash": "e6646d00094878b4",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -9769,6 +13018,249 @@
         },
         "reviewed": false
       },
+      "matrix.bridge.body": {
+        "source_hash": "8637d6dcae1d9a17",
+        "target_hash": "c07ec84b6c2944dc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.bridge.title": {
+        "source_hash": "e741a541c22edd49",
+        "target_hash": "903f97d57f243496",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.desktop": {
+        "source_hash": "9bd88f2485acbb94",
+        "target_hash": "6874c58b391f6d4d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.frameTitle": {
+        "source_hash": "44a887b1a4872d18",
+        "target_hash": "200c246f85e0b253",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "43de783a02795689",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "954e7f3104c06f9f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "d13427348972efd6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "ef53dae174075e3d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "1fbaefca7ef899ee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "b7a1438fd7e938df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "e0a0a53180a1938a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.mobile": {
+        "source_hash": "cbaad3cf4a6507e5",
+        "target_hash": "cbaad3cf4a6507e5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.body": {
+        "source_hash": "54b471c7b4aa40e7",
+        "target_hash": "a72385fc0061a4ff",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.cta": {
+        "source_hash": "d717eac86beba5ff",
+        "target_hash": "57a992d7bf6f15f8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.title": {
+        "source_hash": "abac9d89525d7176",
+        "target_hash": "151844bdfbfdd340",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.openTab": {
+        "source_hash": "306ef19c8ac3d276",
+        "target_hash": "0c0b4e2ba9726ff6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.overlay": {
+        "source_hash": "b403759e1f275618",
+        "target_hash": "68917c533fd42530",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudo": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "d60821cd95542991",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudoColumn": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "d60821cd95542991",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reload": {
+        "source_hash": "7b20422752245bc6",
+        "target_hash": "3ac32d45d6531535",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reportFrom": {
+        "source_hash": "8b069a5e7f60326f",
+        "target_hash": "607b61e83546e831",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.route": {
+        "source_hash": "adc74704d65d5cc9",
+        "target_hash": "adc74704d65d5cc9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.routePlaceholder": {
+        "source_hash": "7394a2bb766646ca",
+        "target_hash": "7394a2bb766646ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.source": {
+        "source_hash": "41cf6794ba4200b8",
+        "target_hash": "41cf6794ba4200b8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.title": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "1e23bbe3d78143eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "323713cad1e3aad2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.zoom": {
+        "source_hash": "509c517ede79fef0",
+        "target_hash": "509c517ede79fef0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "notFound.back": {
         "source_hash": "49f1436be6615c6f",
         "target_hash": "8f9f9b08ec0d1a6a",
@@ -10201,6 +13693,96 @@
         },
         "reviewed": false
       },
+      "review.applied": {
+        "source_hash": "0b88198cd880fedb",
+        "target_hash": "37e64483edb625e8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.apply": {
+        "source_hash": "2ca103b50a0203ec",
+        "target_hash": "747a9e05e2cc4edb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslate": {
+        "source_hash": "c5e75dbb3f9a4f72",
+        "target_hash": "01f5831c71f1a612",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslation": {
+        "source_hash": "42001e97a9416a5e",
+        "target_hash": "ca1f39bd9a62a7b9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.refresh": {
+        "source_hash": "04b10aa8879bcc32",
+        "target_hash": "c1d36eae8ce77608",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.running": {
+        "source_hash": "3c65eea22777acbb",
+        "target_hash": "50c95ad2e2d7f5c8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.suggestion": {
+        "source_hash": "43fe22870a292aca",
+        "target_hash": "f2da63c4ad8cd750",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.different": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "c4c4294ab270e561",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.nuance": {
+        "source_hash": "cd802ca85cacdf89",
+        "target_hash": "cd802ca85cacdf89",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.same": {
+        "source_hash": "fd88cb1c100f64b1",
+        "target_hash": "831e8dfbddef8d18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.cdn.description": {
         "source_hash": "19c8411a4ddea7d1",
         "target_hash": "4dcf29e949e45261",
@@ -10570,6 +14152,96 @@
         },
         "reviewed": false
       },
+      "settings.preview.baseUrl": {
+        "source_hash": "70589413a3c97933",
+        "target_hash": "58270721c3ec7aa2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.baseUrlHint": {
+        "source_hash": "4733238e3f450440",
+        "target_hash": "bc615ee31dc17142",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.description": {
+        "source_hash": "c73c7c80fc336a75",
+        "target_hash": "6764c1bc909aee47",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.pattern": {
+        "source_hash": "236ff89591a82f7c",
+        "target_hash": "6049fe15c642bcc4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.patternHint": {
+        "source_hash": "6b51358d3e8b3bd1",
+        "target_hash": "8065f36e47510038",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routes": {
+        "source_hash": "2c5b669bcdeb51bf",
+        "target_hash": "2c5b669bcdeb51bf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routesHint": {
+        "source_hash": "17168f3888f7cd39",
+        "target_hash": "969a316fbb768f91",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.save": {
+        "source_hash": "d929ea899b8d731a",
+        "target_hash": "12e766c788cef445",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.saved": {
+        "source_hash": "4018f3aaebe7ef67",
+        "target_hash": "755ad0db26d9a24d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.title": {
+        "source_hash": "324b134f57c70c72",
+        "target_hash": "bb28a9f4a4e34fac",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.saved": {
         "source_hash": "74a7f53bad399973",
         "target_hash": "043ef8e976d7d109",
@@ -10660,6 +14332,15 @@
         },
         "reviewed": false
       },
+      "shell.preview": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "1e23bbe3d78143eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.projects": {
         "source_hash": "04e2a9728af75840",
         "target_hash": "0dad61b6318ac60d",
@@ -10699,6 +14380,15 @@
       "shell.userMenu": {
         "source_hash": "7fb5995bca43a6a3",
         "target_hash": "d674260557d67c54",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.visual": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "655a464ea0991720",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -10951,6 +14641,240 @@
       "tokens.title": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fd07f89506b0e9ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.after": {
+        "source_hash": "7b68fe5510851da3",
+        "target_hash": "6f0f4bbdb64a336b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allLocales": {
+        "source_hash": "a9f854d579b6a752",
+        "target_hash": "2fef1615b2ec3a02",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allViewports": {
+        "source_hash": "1fae986d289edbe5",
+        "target_hash": "32c5c818c01dd5b6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.before": {
+        "source_hash": "9bb725005055412c",
+        "target_hash": "a6594f80458a068c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clean": {
+        "source_hash": "eb8c56e2be8a7d16",
+        "target_hash": "4d83f631a5dcdb98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clearKinds": {
+        "source_hash": "454de97f24850535",
+        "target_hash": "cf3daf8c836e0c87",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.compareWith": {
+        "source_hash": "4007acd502c2f984",
+        "target_hash": "697eba3af662d9f1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.body": {
+        "source_hash": "638954777aec9a53",
+        "target_hash": "f644e0955df7d62e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.command": {
+        "source_hash": "3bb4cb5762a4c075",
+        "target_hash": "375737aa7f93b8aa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.title": {
+        "source_hash": "d78e66cfffc5b927",
+        "target_hash": "f05dce7a85f1abd2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "ec8eb252b4ca1485",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issues": {
+        "source_hash": "af2851fc530f8585",
+        "target_hash": "3d0a0d44fb23d1ae",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "954e7f3104c06f9f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "277aadbeea5efee6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "ef53dae174075e3d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "111531bf91fdcb5d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "b7a1438fd7e938df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "e0a0a53180a1938a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "5f6baab4dbe152fc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.noCompare": {
+        "source_hash": "158264e28e396c00",
+        "target_hash": "2e720ca0f7de24c1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.notInReport": {
+        "source_hash": "4c5a1c3e14f9a577",
+        "target_hash": "9088f1402223e734",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.report": {
+        "source_hash": "b6ce788d9786917c",
+        "target_hash": "f549d69c49edeaa3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.screenshotAlt": {
+        "source_hash": "d84ec0c5b9e23a44",
+        "target_hash": "e5a32bfc284056ad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.subtitle": {
+        "source_hash": "cc0b2118430f7b08",
+        "target_hash": "67d742a513f6223d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.title": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "655a464ea0991720",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "e3a217072c12ee69",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -11409,6 +15333,15 @@
         },
         "reviewed": false
       },
+      "editor.differentMeaning": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "96a627f4058ea7d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "editor.editPlaceholder": {
         "source_hash": "c89ef11a1f8b7f60",
         "target_hash": "c814d9631760470b",
@@ -11493,6 +15426,33 @@
       "editor.results": {
         "source_hash": "b6cc46e10e049b1e",
         "target_hash": "f451dca0e6a30bb2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewDone": {
+        "source_hash": "fc579ef40c3d7c0c",
+        "target_hash": "315409830c7f9566",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocale": {
+        "source_hash": "155c59bd33604fae",
+        "target_hash": "e7a01b37e70cf272",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "editor.reviewLocaleHint": {
+        "source_hash": "c709f8ec585af53b",
+        "target_hash": "3059e235304f7dbc",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -11787,6 +15747,195 @@
         },
         "reviewed": false
       },
+      "health.detail.coverage": {
+        "source_hash": "86694f000e3f92e4",
+        "target_hash": "1b9a55abe1756eeb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.errors": {
+        "source_hash": "b78bef073bc3c105",
+        "target_hash": "d155c2b60a6b58fc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.meaning": {
+        "source_hash": "473b3eeafcd987a8",
+        "target_hash": "d696bcc1339df23e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.detail.visual": {
+        "source_hash": "2df9795f75a478ca",
+        "target_hash": "f062636875d5e190",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.coverage": {
+        "source_hash": "523487a5de21adb5",
+        "target_hash": "a07220a2901c0778",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.errors": {
+        "source_hash": "68e1ca575295bb56",
+        "target_hash": "30f9a0e7b1d39419",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.meaning": {
+        "source_hash": "1f5d64b92820f823",
+        "target_hash": "80c9b3e4254a9813",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.dims.visual": {
+        "source_hash": "ba3033214fe41dad",
+        "target_hash": "6076ab55ef3dc264",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.coverage": {
+        "source_hash": "3e5039d12acddb2e",
+        "target_hash": "0db1ff9a0aa84217",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.errors": {
+        "source_hash": "39b368a33c02a92b",
+        "target_hash": "501cd6edbe00d31d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.meaning": {
+        "source_hash": "c850114928cfbf33",
+        "target_hash": "40d3ca3cdd39ccce",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.empty.visual": {
+        "source_hash": "7f3af3d96fccdcfc",
+        "target_hash": "ceffbdea6f184c00",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "8b8a2adf0016811e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.na": {
+        "source_hash": "a683c5c5349f6f7f",
+        "target_hash": "0bd28dfc6fbb990d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.overall": {
+        "source_hash": "38e5a46cbc5ad328",
+        "target_hash": "05a76b2eb609fb57",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.runReview": {
+        "source_hash": "aff0766a5290e117",
+        "target_hash": "99bc96b037349895",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.fair": {
+        "source_hash": "738a3278e945747c",
+        "target_hash": "f155621d521a4e22",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.good": {
+        "source_hash": "7f1e323b6272c620",
+        "target_hash": "cfea0dce5c5d6d72",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.status.poor": {
+        "source_hash": "490c67a211d27a57",
+        "target_hash": "794c525d65661022",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.subtitle": {
+        "source_hash": "1b3baa1d375c6f79",
+        "target_hash": "f7ec589e5321d5e4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "health.title": {
+        "source_hash": "24126dc45a9d9934",
+        "target_hash": "a31ab8551a408f68",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "jobStatus.done": {
         "source_hash": "11a6767d5674c7e4",
         "target_hash": "1031639454032f27",
@@ -11889,6 +16038,87 @@
       "jobs.title": {
         "source_hash": "2f17a0f8d518e491",
         "target_hash": "c13cea1c9a7b4283",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFound": {
+        "source_hash": "d2998feef02d1779",
+        "target_hash": "05e6d563d7ac9c82",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.notFoundHint": {
+        "source_hash": "97d26aa2755c2246",
+        "target_hash": "db959875f172100d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.openInEditor": {
+        "source_hash": "ea1d0f038bbdb9e9",
+        "target_hash": "b689d63525ca9316",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.pick": {
+        "source_hash": "efc1aa88ad0cbfca",
+        "target_hash": "b2d8ad93c69f3b48",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.saved": {
+        "source_hash": "87880ba6a81558c4",
+        "target_hash": "d08f415bce3692aa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.savedWithIssues": {
+        "source_hash": "e7f8fb8e2d1703ee",
+        "target_hash": "a9f815d933dd4fd0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "354b28c853334568",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.title": {
+        "source_hash": "3418de588f7f71c9",
+        "target_hash": "d00dcb05dac45a4d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "keySheet.translation": {
+        "source_hash": "6fbd766b1a71cc4d",
+        "target_hash": "a22140a73d011048",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -12507,6 +16737,249 @@
         },
         "reviewed": false
       },
+      "matrix.bridge.body": {
+        "source_hash": "8637d6dcae1d9a17",
+        "target_hash": "14b5e7933e525e5e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.bridge.title": {
+        "source_hash": "e741a541c22edd49",
+        "target_hash": "7e9cff67b2ad3879",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.desktop": {
+        "source_hash": "9bd88f2485acbb94",
+        "target_hash": "b0b3bce8ce97076f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.frameTitle": {
+        "source_hash": "44a887b1a4872d18",
+        "target_hash": "9f178f5f66bcd925",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "8e99f4d26855e652",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "f91acc57aa7b702f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "51db22c8a0036972",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "675edb12378e506f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "04421af21cb465b6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "eb59041b70b7aa72",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "6b8e4ae7ec149dde",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.mobile": {
+        "source_hash": "cbaad3cf4a6507e5",
+        "target_hash": "7e3d153d0111758b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.body": {
+        "source_hash": "54b471c7b4aa40e7",
+        "target_hash": "727311d94455e98c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.cta": {
+        "source_hash": "d717eac86beba5ff",
+        "target_hash": "52cbff7176457c45",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.noBase.title": {
+        "source_hash": "abac9d89525d7176",
+        "target_hash": "8ea6a2c540f58847",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.openTab": {
+        "source_hash": "306ef19c8ac3d276",
+        "target_hash": "5f233e0d14cb6d82",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.overlay": {
+        "source_hash": "b403759e1f275618",
+        "target_hash": "2aecf7d02bebdde2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudo": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "956914e696c69d2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.pseudoColumn": {
+        "source_hash": "31e8ed38602fd7e9",
+        "target_hash": "956914e696c69d2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reload": {
+        "source_hash": "7b20422752245bc6",
+        "target_hash": "3b17f09cfd653d13",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.reportFrom": {
+        "source_hash": "8b069a5e7f60326f",
+        "target_hash": "e943ff834daf2d81",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.route": {
+        "source_hash": "adc74704d65d5cc9",
+        "target_hash": "1bfbc8de312268ea",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.routePlaceholder": {
+        "source_hash": "7394a2bb766646ca",
+        "target_hash": "7394a2bb766646ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.source": {
+        "source_hash": "41cf6794ba4200b8",
+        "target_hash": "003741059728c399",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.title": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "3f42095efe16a15f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "feaa9b4e8a4a32c9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "matrix.zoom": {
+        "source_hash": "509c517ede79fef0",
+        "target_hash": "200008b92a21bd0b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "notFound.back": {
         "source_hash": "49f1436be6615c6f",
         "target_hash": "112c06a32d0cf90f",
@@ -12939,6 +17412,96 @@
         },
         "reviewed": false
       },
+      "review.applied": {
+        "source_hash": "0b88198cd880fedb",
+        "target_hash": "b7b44745b9420f26",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.apply": {
+        "source_hash": "2ca103b50a0203ec",
+        "target_hash": "cf383a9f1dcc9776",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslate": {
+        "source_hash": "c5e75dbb3f9a4f72",
+        "target_hash": "58bb29a287a55792",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.backTranslation": {
+        "source_hash": "42001e97a9416a5e",
+        "target_hash": "270ccc24801c642a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.refresh": {
+        "source_hash": "04b10aa8879bcc32",
+        "target_hash": "435151b64e60d4f0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.running": {
+        "source_hash": "3c65eea22777acbb",
+        "target_hash": "dfe11460e6d58abd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.suggestion": {
+        "source_hash": "43fe22870a292aca",
+        "target_hash": "b90a2727daa62d89",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.different": {
+        "source_hash": "df69aaa4bae18075",
+        "target_hash": "1b3e35a4562dfa58",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.nuance": {
+        "source_hash": "cd802ca85cacdf89",
+        "target_hash": "38e26ba9ff41a1d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "review.verdict.same": {
+        "source_hash": "fd88cb1c100f64b1",
+        "target_hash": "022dedd2146b22a9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.cdn.description": {
         "source_hash": "19c8411a4ddea7d1",
         "target_hash": "55d45e8975cf40c0",
@@ -13308,6 +17871,96 @@
         },
         "reviewed": false
       },
+      "settings.preview.baseUrl": {
+        "source_hash": "70589413a3c97933",
+        "target_hash": "2dabbc900a6593bd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.baseUrlHint": {
+        "source_hash": "4733238e3f450440",
+        "target_hash": "b92801df1003ce82",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.description": {
+        "source_hash": "c73c7c80fc336a75",
+        "target_hash": "58ebb3ba02c31199",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.pattern": {
+        "source_hash": "236ff89591a82f7c",
+        "target_hash": "3705dcc315cb18c7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.patternHint": {
+        "source_hash": "6b51358d3e8b3bd1",
+        "target_hash": "25e9e0002d86e2e8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routes": {
+        "source_hash": "2c5b669bcdeb51bf",
+        "target_hash": "1bfbc8de312268ea",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.routesHint": {
+        "source_hash": "17168f3888f7cd39",
+        "target_hash": "3dd5f561f305f0cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.save": {
+        "source_hash": "d929ea899b8d731a",
+        "target_hash": "b552af0164f729a6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.saved": {
+        "source_hash": "4018f3aaebe7ef67",
+        "target_hash": "e9e11944adcb6033",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "settings.preview.title": {
+        "source_hash": "324b134f57c70c72",
+        "target_hash": "03607b4fd09b6bc6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "settings.saved": {
         "source_hash": "74a7f53bad399973",
         "target_hash": "e13eb5d078550eb0",
@@ -13398,6 +18051,15 @@
         },
         "reviewed": false
       },
+      "shell.preview": {
+        "source_hash": "09705a508fb2bde0",
+        "target_hash": "3f42095efe16a15f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.projects": {
         "source_hash": "04e2a9728af75840",
         "target_hash": "61bc332bf3a689db",
@@ -13437,6 +18099,15 @@
       "shell.userMenu": {
         "source_hash": "7fb5995bca43a6a3",
         "target_hash": "4fa3c4bbc6fc4f78",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.visual": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "4fb902923b6d10b1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -13689,6 +18360,240 @@
       "tokens.title": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "f4ab047617ad8e5f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.after": {
+        "source_hash": "7b68fe5510851da3",
+        "target_hash": "fc54efa9eb55e81b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allLocales": {
+        "source_hash": "a9f854d579b6a752",
+        "target_hash": "d3813d147848aaf6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.allViewports": {
+        "source_hash": "1fae986d289edbe5",
+        "target_hash": "c7d3b178078dd13f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.before": {
+        "source_hash": "9bb725005055412c",
+        "target_hash": "bf99ae2848a01b0d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clean": {
+        "source_hash": "eb8c56e2be8a7d16",
+        "target_hash": "e03fb12772f6ce04",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.clearKinds": {
+        "source_hash": "454de97f24850535",
+        "target_hash": "185bcd33ea19e602",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.compareWith": {
+        "source_hash": "4007acd502c2f984",
+        "target_hash": "c64b7b050ccb4c48",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.body": {
+        "source_hash": "638954777aec9a53",
+        "target_hash": "b7e4dcb373f918e9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.command": {
+        "source_hash": "3bb4cb5762a4c075",
+        "target_hash": "2e46b4ba73adc925",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.empty.title": {
+        "source_hash": "d78e66cfffc5b927",
+        "target_hash": "91226d7777738745",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issueAt": {
+        "source_hash": "0f1d4fb4d977c60a",
+        "target_hash": "8e99f4d26855e652",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.issues": {
+        "source_hash": "af2851fc530f8585",
+        "target_hash": "e78de86d891f18db",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.clamp": {
+        "source_hash": "f166890270e3f11a",
+        "target_hash": "f91acc57aa7b702f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overflow": {
+        "source_hash": "17b8dcf53e4ba045",
+        "target_hash": "51db22c8a0036972",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.overlap": {
+        "source_hash": "38b163f9be7c4f3b",
+        "target_hash": "675edb12378e506f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.rtl": {
+        "source_hash": "10e226e05a017979",
+        "target_hash": "04421af21cb465b6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.tofu": {
+        "source_hash": "0bce9760a7e39489",
+        "target_hash": "23076ae81cb022a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.kinds.untranslated": {
+        "source_hash": "d41ef2ce8711fb1f",
+        "target_hash": "6b8e4ae7ec149dde",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.locale": {
+        "source_hash": "ca3dc612f47e3913",
+        "target_hash": "8b8a2adf0016811e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.noCompare": {
+        "source_hash": "158264e28e396c00",
+        "target_hash": "4b95ced3ee366da6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.notInReport": {
+        "source_hash": "4c5a1c3e14f9a577",
+        "target_hash": "9a927abd717eb389",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.report": {
+        "source_hash": "b6ce788d9786917c",
+        "target_hash": "e284560950ccd7a7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.screenshotAlt": {
+        "source_hash": "d84ec0c5b9e23a44",
+        "target_hash": "2ae8d787f1e36cf2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.subtitle": {
+        "source_hash": "cc0b2118430f7b08",
+        "target_hash": "33fc0a965fc46efc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.title": {
+        "source_hash": "2017149d803add28",
+        "target_hash": "4fb902923b6d10b1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "visual.viewport": {
+        "source_hash": "91e53b9065718a3c",
+        "target_hash": "feaa9b4e8a4a32c9",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"

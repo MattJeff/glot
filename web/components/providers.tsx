@@ -3,11 +3,12 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ApiError } from "@/lib/api";
+import { installBridge } from "@/lib/preview-bridge";
 import { useErrorMessage } from "@/lib/use-error-message";
 
 function goToLogin() {
@@ -23,6 +24,8 @@ function goToLogin() {
 export function Providers({ children }: { children: React.ReactNode }) {
   const t = useTranslations("errors");
   const errorMessage = useErrorMessage();
+  // No-op unless the dashboard is itself shown inside glot's locale matrix (dogfooding).
+  useEffect(installBridge, []);
   const [client] = useState(() => {
     const onError = (err: Error) => {
       if (err instanceof ApiError && err.status === 401) {

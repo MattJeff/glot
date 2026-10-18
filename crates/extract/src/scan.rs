@@ -19,7 +19,7 @@ const HOOKS: &[&str] = &[
     "useI18n",
 ];
 /// Elements whose text content is code or a translation default, never UI copy to extract.
-const SKIP_TEXT_IN: &[&str] = &[
+pub(crate) const SKIP_TEXT_IN: &[&str] = &[
     "code",
     "pre",
     "kbd",
@@ -378,7 +378,7 @@ impl<'a> Visit<'a> for Scanner<'_> {
     }
 }
 
-fn callee_name(e: &Expression) -> Option<String> {
+pub(crate) fn callee_name(e: &Expression) -> Option<String> {
     match e.get_inner_expression() {
         Expression::Identifier(id) => Some(id.name.to_string()),
         Expression::ThisExpression(_) => Some("this".into()),
@@ -448,7 +448,7 @@ fn attr_str(a: &JSXAttribute) -> Option<(String, u32)> {
     }
 }
 
-fn elem_name(n: &JSXElementName) -> String {
+pub(crate) fn elem_name(n: &JSXElementName) -> String {
     match n {
         JSXElementName::Identifier(id) => id.name.to_string(),
         JSXElementName::IdentifierReference(r) => r.name.to_string(),
@@ -458,7 +458,7 @@ fn elem_name(n: &JSXElementName) -> String {
     }
 }
 
-fn tag_role(tag: &str) -> Option<&'static str> {
+pub(crate) fn tag_role(tag: &str) -> Option<&'static str> {
     let t = tag.to_ascii_lowercase();
     let b = t.as_bytes();
     Some(match t.as_str() {
@@ -473,7 +473,7 @@ fn tag_role(tag: &str) -> Option<&'static str> {
     })
 }
 
-fn attr_role(name: &str) -> Option<&'static str> {
+pub(crate) fn attr_role(name: &str) -> Option<&'static str> {
     Some(match name {
         "placeholder" => "placeholder",
         "title" => "title",
@@ -574,7 +574,7 @@ pub(crate) fn suggest_key(path: &str, text: &str, role: &str) -> String {
 }
 
 /// `app/(app)/settings/billing/page.tsx` -> `settings.billing`, `components/Navbar.tsx` -> `navbar`.
-fn path_prefix(path: &str) -> String {
+pub(crate) fn path_prefix(path: &str) -> String {
     let path = path.rsplit_once('.').map_or(path, |(p, _)| p);
     let mut segs: Vec<&str> = path.split('/').collect();
     if let Some(last) = segs.last()
@@ -607,7 +607,7 @@ fn path_prefix(path: &str) -> String {
         .join(".")
 }
 
-fn snake(s: &str) -> String {
+pub(crate) fn snake(s: &str) -> String {
     let mut out = String::new();
     let mut prev_lower = false;
     for c in fold_ascii(s).chars() {

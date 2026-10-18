@@ -17,6 +17,8 @@ import {
   Columns3,
   FileCode,
   FilterX,
+  Languages,
+  Loader2,
   PanelRight,
   Search,
   SearchX,
@@ -26,6 +28,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, StatusBadge, useLocaleName } from "@/components/common";
+import { ReviewBlock, seedReviews, useCachedReview, VerdictBadge } from "@/components/review";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -43,6 +46,7 @@ import {
   type KeyRow,
   type Project,
   qk,
+  type Review,
   STATUSES,
   type Translation,
   type TranslationStatus,
@@ -99,6 +103,7 @@ export function KeysEditor({ project }: { project: Project }) {
     (STATUSES as string[]).includes(params.get("status") ?? "") ? (params.get("status") as TranslationStatus) : "all",
   );
   const [withIssues, setWithIssues] = useState(params.get("issues") === "1");
+  const [different, setDifferent] = useState(params.get("meaning") === "different");
   const [visible, setVisible] = useState<string[]>(() =>
     locale !== "all" ? [locale] : project.target_locales.slice(0, 3),
   );
@@ -114,9 +119,20 @@ export function KeysEditor({ project }: { project: Project }) {
     if (locale !== "all") s.set("locale", locale);
     if (status !== "all") s.set("status", status);
     if (withIssues) s.set("issues", "1");
+    if (different) s.set("meaning", "different");
     const qs = s.toString();
     window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
-  }, [debouncedQ, locale, status, withIssues]);
+  }, [debouncedQ, locale, status, withIssues, different]);
+
+  // Reviews live in the query cache (one entry per key × locale); re-filter when one lands.
+  const [reviewTick, setReviewTick] = useState(0);
+  useEffect(
+    () =>
+      qc.getQueryCache().subscribe((e) => {
+        if (e.type === "updated" && e.query.queryKey[0] === "review") setReviewTick((n) => n + 1);
+      }),
+    [qc],
+  );
 
   const filters = { q: debouncedQ, locale: locale === "all" ? undefined : locale, status: status === "all" ? undefined : status };
   const keys = useInfiniteQuery({
@@ -129,9 +145,15 @@ export function KeysEditor({ project }: { project: Project }) {
 
   const rows = useMemo(() => {
     const all = keys.data?.pages.flatMap((p) => p.items) ?? [];
-    // ponytail: "with issues" filters loaded pages client-side; the API has no issues filter yet.
-    return withIssues ? all.filter((r) => visible.some((l) => tr(r, l).issues.length > 0)) : all;
-  }, [keys.data, withIssues, visible]);
+    // ponytail: "with issues" / "different meaning" filter loaded pages client-side; the API has no such filters.
+    const verdict = (r: KeyRow, l: string) => qc.getQueryData<Review>(qk.review(slug, r.key, l))?.verdict;
+    return all.filter(
+      (r) =>
+        (!withIssues || visible.some((l) => tr(r, l).issues.length > 0)) &&
+        (!different || visible.some((l) => verdict(r, l) === "different")),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reviewTick: the cache changed.
+  }, [keys.data, withIssues, different, visible, qc, slug, reviewTick]);
 
   // Selection / editing
   const [active, setActive] = useState({ row: 0, col: 0 });
@@ -149,6 +171,17 @@ export function KeysEditor({ project }: { project: Project }) {
       setEditing(null);
       if (next.issues.length) toast.warning(t("savedWithIssues", { count: next.issues.length }));
       else toast.success(t("saved"));
+    },
+  });
+  const reviewTarget = locale !== "all" ? locale : activeLocale;
+  const reviewLocale = useMutation({
+    mutationFn: (l: string) => api.reviewLocale(slug, { locale: l }),
+    onSuccess: (reviews, l) => {
+      seedReviews(qc, slug, reviews);
+      if (!visible.includes(l)) setVisible((cur) => project.target_locales.filter((x) => x === l || cur.includes(x)));
+      const diff = reviews.filter((r) => r.verdict === "different").length;
+      toast.success(t("reviewDone", { count: reviews.length, different: diff }));
+      if (diff) setDifferent(true);
     },
   });
   const review = useMutation({
@@ -220,6 +253,8 @@ export function KeysEditor({ project }: { project: Project }) {
     count: tableRows.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 72,
+    // Cache measured heights per key, not per index: filters reshuffle rows under the same indices.
+    getItemKey: (i) => tableRows[i]?.id ?? i,
     overscan: 8,
   });
   const items = virtualizer.getVirtualItems();
@@ -262,12 +297,13 @@ export function KeysEditor({ project }: { project: Project }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [rows.length, visible.length, activeRow, activeLocale, review, startEdit, virtualizer]);
 
-  const hasFilters = !!q || locale !== "all" || status !== "all" || withIssues;
+  const hasFilters = !!q || locale !== "all" || status !== "all" || withIssues || different;
   const clearFilters = () => {
     setQ("");
     setLocale("all");
     setStatus("all");
     setWithIssues(false);
+    setDifferent(false);
   };
 
   return (
@@ -325,6 +361,12 @@ export function KeysEditor({ project }: { project: Project }) {
             {t("withIssues")}
           </Label>
         </div>
+        <div className="flex items-center gap-2 px-1">
+          <Switch id="different-meaning" checked={different} onCheckedChange={setDifferent} size="sm" />
+          <Label htmlFor="different-meaning" className="text-sm font-normal">
+            {t("differentMeaning")}
+          </Label>
+        </div>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm">
@@ -352,6 +394,18 @@ export function KeysEditor({ project }: { project: Project }) {
         </Popover>
         <div className="ms-auto flex items-center gap-2">
           <span className="text-xs text-muted-foreground tabular-nums">{t("results", { count: total })}</span>
+          {reviewTarget && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={reviewLocale.isPending}
+              onClick={() => reviewLocale.mutate(reviewTarget)}
+              title={t("reviewLocaleHint")}
+            >
+              {reviewLocale.isPending ? <Loader2 className="animate-spin" /> : <Languages />}
+              {t("reviewLocale", { locale: reviewTarget })}
+            </Button>
+          )}
           <Button
             variant={detailOpen ? "secondary" : "ghost"}
             size="icon-sm"
@@ -442,6 +496,8 @@ export function KeysEditor({ project }: { project: Project }) {
                         return (
                           <TranslationCell
                             key={cell.id}
+                            slug={slug}
+                            rowKey={row.original.key}
                             locale={loc}
                             translation={tr(row.original, loc)}
                             active={isActiveRow && col === active.col}
@@ -513,6 +569,8 @@ function IssuesIcon({ issues }: { issues: Issue[] }) {
 }
 
 function TranslationCell(props: {
+  slug: string;
+  rowKey: string;
   locale: string;
   translation: Translation;
   active: boolean;
@@ -528,6 +586,7 @@ function TranslationCell(props: {
 }) {
   const t = useTranslations("editor");
   const { translation: tr, locale } = props;
+  const review = useCachedReview(props.slug, props.rowKey, locale);
 
   if (props.editing) {
     return (
@@ -568,6 +627,7 @@ function TranslationCell(props: {
         "group/cell relative min-w-0 cursor-text px-3 py-2.5",
         props.active && "ring-2 ring-ring/60 ring-inset",
         tr.status === "missing" && "bg-destructive/[0.03]",
+        review?.verdict === "different" && "bg-destructive/[0.04]",
       )}
     >
       {tr.value ? (
@@ -586,6 +646,7 @@ function TranslationCell(props: {
           </span>
         )}
         <IssuesIcon issues={tr.issues} />
+        {review && review.target === tr.value && <VerdictBadge verdict={review.verdict} />}
         {(tr.status === "machine" || tr.status === "stale") && tr.value && (
           <Button
             variant="ghost"
@@ -601,6 +662,11 @@ function TranslationCell(props: {
           </Button>
         )}
       </div>
+      {review && review.target === tr.value && (
+        <p dir="auto" className="mt-1 line-clamp-2 text-xs text-muted-foreground italic" title={review.explanation}>
+          ↩ {review.back_translation}
+        </p>
+      )}
     </div>
   );
 }
@@ -685,6 +751,15 @@ function DetailPanel({ slug, project, row, onClose }: { slug: string; project: P
                         {i.message}
                       </p>
                     ))}
+                    <div className="mt-2">
+                      <ReviewBlock
+                        slug={slug}
+                        keyName={row.key}
+                        locale={l}
+                        sourceLocale={project.source_locale}
+                        hasTranslation={!!x.value}
+                      />
+                    </div>
                   </li>
                 );
               })}

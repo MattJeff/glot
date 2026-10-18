@@ -64,6 +64,7 @@
       "toggle": "Details ein-/ausblenden",
       "translations": "Übersetzungen"
     },
+    "differentMeaning": "Abweichende Bedeutung",
     "editPlaceholder": "Übersetzung für Sprache {locale}",
     "empty": "Keine Schlüssel entsprechen diesen Filtern.",
     "emptyValue": "Noch nicht übersetzt",
@@ -76,6 +77,9 @@
       "machine": "Maschinell"
     },
     "results": "{count, plural, =0 {Keine Schlüssel} one {# Schlüssel} other {# Schlüssel}}",
+    "reviewDone": "{count, plural, one {# Übersetzung geprüft} other {# Übersetzungen geprüft}} · {different, plural, =0 {keine Bedeutungsabweichung} one {# mit abweichender Bedeutung} other {# mit abweichender Bedeutung}}",
+    "reviewLocale": "Sprache {locale} prüfen",
+    "reviewLocaleHint": "Jede Übersetzung dieser Sprache zurückübersetzen und Bedeutungsabweichungen markieren",
     "saved": "Gespeichert",
     "savedWithIssues": "Gespeichert mit {count, plural, one {# Problem} other {# Problemen}}",
     "score": "Score {score}",
@@ -119,6 +123,37 @@
     "title": "Glossar",
     "translations": "Übersetzungen"
   },
+  "health": {
+    "detail": {
+      "coverage": "{translated} von {total} Schlüsseln übersetzt",
+      "errors": "{issues} von {translated} Übersetzungen haben Validierungsprobleme",
+      "meaning": "{reviewed} geprüft · {different} mit abweichender Bedeutung",
+      "visual": "{clean} von {pages} Screens ohne visuelle Probleme"
+    },
+    "dims": {
+      "coverage": "Abdeckung",
+      "errors": "Validierung",
+      "meaning": "Bedeutung",
+      "visual": "Visuell"
+    },
+    "empty": {
+      "coverage": "Noch keine Schlüssel",
+      "errors": "Noch nichts übersetzt",
+      "meaning": "Keine Übersetzungen zu prüfen",
+      "visual": "Kein visueller QA-Bericht für diese Sprache"
+    },
+    "locale": "Sprache",
+    "na": "n/a",
+    "overall": "Punktzahl",
+    "runReview": "Prüfen",
+    "status": {
+      "fair": "Verbesserung nötig",
+      "good": "Gesund",
+      "poor": "Gefährdet"
+    },
+    "subtitle": "Abdeckung, Validierung, Bedeutung (Rückübersetzung) und visuelle QA, bewertet von 0–100.",
+    "title": "Zustand der Sprache"
+  },
   "jobStatus": {
     "done": "Fertig",
     "failed": "Fehlgeschlagen",
@@ -138,6 +173,17 @@
     "progress": "{done} / {total}",
     "subtitle": "Hintergrund-Übersetzungsläufe, live aktualisiert.",
     "title": "Jobs"
+  },
+  "keySheet": {
+    "notFound": "Kein passender Schlüssel",
+    "notFoundHint": "Markieren Sie Elemente in Ihrer App mit data-glot-key, um Probleme genau mit Schlüsseln zu verknüpfen.",
+    "openInEditor": "Im Editor öffnen",
+    "pick": "Mehrere Schlüssel passen zu diesem Text. Wählen Sie einen aus:",
+    "saved": "Übersetzung gespeichert",
+    "savedWithIssues": "Gespeichert mit {count, plural, one {# Problem} other {# Problemen}}",
+    "source": "Quelle",
+    "title": "Schlüssel bearbeiten",
+    "translation": "Übersetzung"
   },
   "landing": {
     "compare": {
@@ -255,6 +301,41 @@
   "localeSwitcher": {
     "label": "Sprache"
   },
+  "matrix": {
+    "bridge": {
+      "body": "Fügen Sie dieses Skript in Ihre App ein (nur in der Entwicklung), um exakte Frame-Höhen und die Darstellung der Pseudo-Sprache zu erhalten. Das glot-Dashboard enthält es bereits.",
+      "title": "Vorschau-Brücke"
+    },
+    "desktop": "Desktop",
+    "frameTitle": "Vorschau in Sprache {locale}",
+    "issueAt": "{kind}-Problem bei Schlüssel {key}",
+    "kinds": {
+      "clamp": "Abgeschnitten",
+      "overflow": "Überlauf",
+      "overlap": "Überlappung",
+      "rtl": "RTL-Richtung",
+      "tofu": "Fehlende Glyphen",
+      "untranslated": "Nicht übersetzt"
+    },
+    "mobile": "Mobil",
+    "noBase": {
+      "body": "Legen Sie die Basis-URL Ihrer App fest (zum Beispiel http://localhost:3000), um alle Sprachen nebeneinander anzuzeigen.",
+      "cta": "Vorschau konfigurieren",
+      "title": "Verbinden Sie glot mit Ihrer laufenden App"
+    },
+    "openTab": "In neuem Tab öffnen",
+    "overlay": "QA-Overlay",
+    "pseudo": "Pseudo-Sprache",
+    "pseudoColumn": "Pseudo-Sprache",
+    "reload": "Alle Frames neu laden",
+    "reportFrom": "Visueller QA-Bericht vom {date} · {count, plural, =0 {keine Probleme auf diesem Bildschirm} one {# Problem auf diesem Bildschirm} other {# Probleme auf diesem Bildschirm}}",
+    "route": "Route",
+    "routePlaceholder": "/pricing",
+    "source": "Quelle",
+    "title": "Matrix der Sprache",
+    "viewport": "Ansichtsfenster",
+    "zoom": "Zoom"
+  },
   "notFound": {
     "back": "Zur Startseite",
     "title": "Seite nicht gefunden"
@@ -317,6 +398,20 @@
     "subtitle": "Jedes Projekt entspricht einer glot.toml in einem Ihrer Repositories.",
     "title": "Projekte"
   },
+  "review": {
+    "applied": "Vorschlag übernommen",
+    "apply": "Vorschlag übernehmen",
+    "backTranslate": "Rückübersetzen",
+    "backTranslation": "Rückübersetzung (Sprache: {locale})",
+    "refresh": "Überprüfung erneut ausführen",
+    "running": "Wird rückübersetzt…",
+    "suggestion": "Übersetzungsvorschlag",
+    "verdict": {
+      "different": "Andere Bedeutung",
+      "nuance": "Nuance",
+      "same": "Gleiche Bedeutung"
+    }
+  },
   "settings": {
     "cdn": {
       "description": "Kataloge als JSON bereitstellen, mit ETag- und Cache-Headern.",
@@ -371,6 +466,18 @@
       "targets": "Zielsprachen",
       "title": "Sprachen"
     },
+    "preview": {
+      "baseUrl": "Basis-URL",
+      "baseUrlHint": "Die Entwicklungs- oder Staging-URL Ihrer App. Leer lassen, um den letzten visuellen QA-Lauf wiederzuverwenden.",
+      "description": "Hier findet glot Ihre laufende App für die Matrix der Sprache.",
+      "pattern": "URL-Muster",
+      "patternHint": "'{locale}' und '{route}' werden ersetzt; die Quellsprache lässt ihr /'{locale}'-Segment weg.",
+      "routes": "Routen",
+      "routesHint": "Eine pro Zeile, wird in der Routenauswahl der Matrix angeboten.",
+      "save": "Vorschau-Einstellungen speichern",
+      "saved": "Vorschau-Einstellungen gespeichert",
+      "title": "Vorschau"
+    },
     "saved": "Einstellungen gespeichert",
     "title": "Einstellungen"
   },
@@ -383,11 +490,13 @@
     "newProject": "Neues Projekt",
     "noProjects": "Noch keine Projekte",
     "overview": "Übersicht",
+    "preview": "Sprachenmatrix",
     "projects": "Projekte",
     "search": "Suchen…",
     "settings": "Einstellungen",
     "toggleSidebar": "Navigation umschalten",
-    "userMenu": "Kontomenü"
+    "userMenu": "Kontomenü",
+    "visual": "Visuelle QA"
   },
   "status": {
     "machine": "Maschinell",
@@ -430,5 +539,37 @@
     },
     "subtitle": "Tokens authentifizieren die glot CLI, den MCP-Server und CI.",
     "title": "API-Tokens"
+  },
+  "visual": {
+    "after": "Nachher",
+    "allLocales": "Alle Sprachen",
+    "allViewports": "Alle Viewports",
+    "before": "Vorher",
+    "clean": "Keine Probleme",
+    "clearKinds": "Typfilter zurücksetzen",
+    "compareWith": "Vergleichen mit",
+    "empty": {
+      "body": "Führen Sie glot-visual-qa mit --upload aus, um Bericht und Screenshots hierher zu senden.",
+      "command": "Von Ihrem Rechner oder aus der CI hochladen",
+      "title": "Noch kein Visual-QA-Bericht"
+    },
+    "issueAt": "{kind}-Problem für Schlüssel: {key}",
+    "issues": "{count, plural, one {# Problem} other {# Probleme}}",
+    "kinds": {
+      "clamp": "Gekürzt",
+      "overflow": "Überlauf",
+      "overlap": "Überlappung",
+      "rtl": "RTL-Richtung",
+      "tofu": "Fehlende Glyphen",
+      "untranslated": "Nicht übersetzt"
+    },
+    "locale": "Sprache",
+    "noCompare": "Kein Vergleich",
+    "notInReport": "Dieser Bildschirm ist im verglichenen Bericht nicht enthalten.",
+    "report": "Bericht",
+    "screenshotAlt": "Screenshot von {route} in der Sprache {locale}",
+    "subtitle": "Screenshots und Layoutprobleme pro Sprache, hochgeladen von glot-visual-qa.",
+    "title": "Visual QA",
+    "viewport": "Viewport"
   }
 }

@@ -142,3 +142,43 @@ GET    /cdn/{slug}/{locale}.json       (OTA, public si public_cdn, ETag + Cache-
 GET    /api/openapi.json
 GET    /healthz
 ```
+
+## Review API (rétro-traduction, `crates/server/src/review.rs`)
+« Faire confiance à une langue qu'on ne parle pas » : le LLM rétro-traduit littéralement la cible vers la langue source,
+explique ses choix et donne un verdict de fidélité. Résultat mis en cache par (key, locale) et invalidé dès que la source
+ou la cible change (hashes). Rôle minimal : translator.
+```
+POST   /api/projects/{slug}/review       {locale, keys?:[key], refresh?:bool} -> [Review]
+         keys absent = toutes les clés traduites de la locale (max 200, les plus récentes d'abord) ; clés sans traduction ignorées.
+         Réponses en cache renvoyées sans appel LLM sauf refresh=true. Erreurs : 400 locale inconnue, 422 si le provider LLM échoue (code "llm_error").
+GET    /api/projects/{slug}/keys/{key}/review?locale=fr        -> Review  (calcule + met en cache si absent/périmé ; 404 si pas de traduction)
+Review = {key, locale, source, target,
+          back_translation,          // rétro-traduction littérale en source_locale
+          verdict: "same"|"nuance"|"different",
+          explanation,               // registre, termes du glossaire, pluriels, adaptations culturelles (langue source, 1-3 phrases)
+          suggestion: string|null,   // meilleure cible proposée si verdict != "same"
+          cached: bool, created_at}
+```
+UI : surligner `verdict="different"` (rouge) et `"nuance"` (orange) ; « Appliquer la suggestion » = `PUT …/translations/{locale}` {value: suggestion}.
+
+CLI (local, cache `.glot/review.json`, pas de changement de glot.lock) :
+`glot review [--locale fr] [--keys a,b] [--json] [--refresh] [--fix]` · `glot review --stale [--yes]` (garder = rafraîchir le hash du lock si la
+cible reste fidèle à la nouvelle source, sinon retraduire) · `glot glossary mine [--apply] [--json]`.
+MCP : `review_translation {locale?, keys?}`, `mine_glossary {apply?}`.
+
+## Visual QA & locale matrix (`crates/server/src/visual.rs`, migration `0010_visual_reports.sql`)
+```
+POST   /api/projects/{slug}/visual-reports   {report: <visual-qa report.json>, files: {"<path du report>": "<base64>"}, label?}
+         -> VisualReportMeta (201). Corps ≤ 128 Mo ; chemins relatifs .png/.jpg/.webp uniquement ; 20 derniers rapports conservés.
+GET    /api/projects/{slug}/visual-reports                 -> [VisualReportMeta]   (plus récent d'abord)
+GET    /api/projects/{slug}/visual-reports/latest          -> VisualReport          (404 si aucun)
+GET    /api/projects/{slug}/visual-reports/{id}            -> VisualReport
+GET    /api/projects/{slug}/visual-reports/{id}/files/{*path}  -> image (privée, immutable)
+VisualReportMeta = {id, label, created_at, summary: {pages, issues, locales[], routes[], viewports[],
+                    by_kind:{<kind>:n}, by_locale:{<loc>:n}, pages_by_locale:{<loc>:n}}}
+VisualReport = VisualReportMeta + {report}
+GET|PUT /api/projects/{slug}/preview   PreviewSettings {base_url|null, url_pattern ("/{locale}{route}"), routes[]}   (PUT : admin)
+```
+CLI : `glot-visual-qa … --upload <server-url> --project <slug> [--label x]` (token `GLOT_TOKEN`, `packages/visual-qa/src/upload.ts`).
+Dashboard : `/app/{slug}/preview` (matrice de locales en iframes) et `/app/{slug}/visual` (galerie, avant/après).
+Bridge optionnel côté app (`web/lib/preview-bridge.ts`, snippet affiché dans la matrice) : `postMessage` `glot:height` / `glot:ready` vers le parent, reçoit `glot:pseudo {on}`.

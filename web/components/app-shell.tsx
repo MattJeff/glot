@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenText,
   FolderKanban,
+  Grid3x3,
   KeyRound,
   LayoutDashboard,
   ListChecks,
@@ -11,6 +12,7 @@ import {
   Menu,
   Moon,
   Plus,
+  ScanEye,
   Search,
   Settings,
   TableProperties,
@@ -50,6 +52,8 @@ import { cn } from "@/lib/utils";
 const PROJECT_PAGES = [
   { seg: "", icon: LayoutDashboard, label: "overview" },
   { seg: "/keys", icon: TableProperties, label: "keys" },
+  { seg: "/preview", icon: Grid3x3, label: "preview" },
+  { seg: "/visual", icon: ScanEye, label: "visual" },
   { seg: "/glossary", icon: BookOpenText, label: "glossary" },
   { seg: "/jobs", icon: ListChecks, label: "jobs" },
   { seg: "/settings", icon: Settings, label: "settings" },

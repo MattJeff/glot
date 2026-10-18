@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -25,7 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { api, type LlmSettings, type Project, type Provider, qk } from "@/lib/api";
+import { api, type LlmSettings, type PreviewSettings, type Project, type Provider, qk } from "@/lib/api";
 import { useOrigin, useProject, useSlug } from "@/lib/hooks";
 
 const PROVIDERS: Provider[] = ["anthropic", "openai", "openai-compatible", "mock"];
@@ -265,6 +265,8 @@ function SettingsForm({ project: p }: { project: Project }) {
         {cdn && <CodeBlock label={t("cdn.example")} code={`curl ${cdnUrl}`} />}
       </Section>
 
+      <PreviewSection slug={p.slug} />
+
       <div className="sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t bg-background/90 px-4 py-3 backdrop-blur">
         <Button type="submit" disabled={save.isPending}>
           {save.isPending && <Loader2 className="animate-spin" />}
@@ -305,5 +307,49 @@ function SettingsForm({ project: p }: { project: Project }) {
         </AlertDialog>
       </section>
     </form>
+  );
+}
+
+function PreviewSection({ slug }: { slug: string }) {
+  const t = useTranslations("settings.preview");
+  const preview = useQuery({ queryKey: qk.preview(slug), queryFn: () => api.preview(slug) });
+  return (
+    <Section title={t("title")} description={t("description")}>
+      {preview.data ? <PreviewFields key={JSON.stringify(preview.data)} slug={slug} initial={preview.data} /> : <Skeleton className="h-40" />}
+    </Section>
+  );
+}
+
+function PreviewFields({ slug, initial }: { slug: string; initial: PreviewSettings }) {
+  const t = useTranslations("settings.preview");
+  const tc = useTranslations("common");
+  const qc = useQueryClient();
+  const [base, setBase] = useState(initial.base_url ?? "");
+  const [pattern, setPattern] = useState(initial.url_pattern);
+  const [routes, setRoutes] = useState(initial.routes.join("\n"));
+  const save = useMutation({
+    mutationFn: () =>
+      api.updatePreview(slug, { base_url: base || null, url_pattern: pattern, routes: routes.split(/[\n,]/) }),
+    onSuccess: (next) => {
+      qc.setQueryData(qk.preview(slug), next);
+      toast.success(t("saved"));
+    },
+  });
+  return (
+    <div id="preview" className="scroll-mt-20 space-y-4">
+      <Field id="s-preview-base" label={t("baseUrl")} hint={t("baseUrlHint")}>
+        <Input id="s-preview-base" type="url" value={base} onChange={(e) => setBase(e.target.value)} placeholder="http://localhost:3000" dir="ltr" className="font-mono" />
+      </Field>
+      <Field id="s-preview-pattern" label={t("pattern")} hint={t("patternHint")}>
+        <Input id="s-preview-pattern" value={pattern} onChange={(e) => setPattern(e.target.value)} required dir="ltr" className="font-mono" />
+      </Field>
+      <Field id="s-preview-routes" label={t("routes")} hint={t("routesHint")}>
+        <Textarea id="s-preview-routes" rows={3} value={routes} onChange={(e) => setRoutes(e.target.value)} dir="ltr" className="font-mono" />
+      </Field>
+      <Button type="button" variant="outline" disabled={save.isPending} onClick={() => save.mutate()}>
+        {save.isPending && <Loader2 className="animate-spin" />}
+        {save.isPending ? tc("saving") : t("save")}
+      </Button>
+    </div>
   );
 }

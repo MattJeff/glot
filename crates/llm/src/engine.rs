@@ -26,6 +26,8 @@ pub struct Workspace {
     pub lock: Lockfile,
     /// locale -> catalog (source + targets), loaded from disk.
     pub catalogs: BTreeMap<Locale, Catalog>,
+    /// key -> base64 PNG crop of where it renders; attached to translation calls (`glot translate --visual`).
+    pub visual: BTreeMap<Key, String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -123,6 +125,7 @@ impl Workspace {
             glossary,
             lock,
             catalogs,
+            visual: BTreeMap::new(),
         })
     }
 
@@ -245,7 +248,21 @@ impl Workspace {
                 if value.is_empty() {
                     continue;
                 }
-                for issue in self.validate(loc, src, value, None) {
+                // An identical target that glot produced (the LLM saw the source and kept it) or a human
+                // reviewed is a decision, not a miss: don't re-flag it as untranslated.
+                let decided = self
+                    .lock
+                    .entries
+                    .get(loc)
+                    .and_then(|e| e.get(key))
+                    .is_some_and(|e| e.target_hash == glot_core::hash::hash(value));
+                for issue in self
+                    .validate(loc, src, value, None)
+                    .into_iter()
+                    .filter(|i| {
+                        !(decided && i.code == glot_core::validate::IssueCode::Untranslated)
+                    })
+                {
                     out.push(Finding {
                         locale: loc.clone(),
                         key: key.clone(),
@@ -403,8 +420,10 @@ impl Workspace {
         }
 
         if !jobs.is_empty() {
-            let translator =
-                Translator::new(&self.config, provider::from_config(&self.config.llm, None)?);
+            let translator = Translator::new(
+                &self.config,
+                crate::visual::wrap(provider::from_config(&self.config.llm, None)?, &self.visual),
+            );
             for req in jobs {
                 let loc = req.target_locale.clone();
                 if let Some(b) = budget.filter(|b| report.usage.cost_usd >= *b) {

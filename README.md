@@ -61,6 +61,19 @@ node src/cli.ts --base-url http://localhost:3100 --routes /,/login --locales fr,
 
 Writes `.glot/visual-qa/report.{json,md}` and screenshots; exits 1 on overflow (`--fail-on`). `report.md` is ready to post as a PR comment. Add `data-glot-key="auth.login.cta"` to elements to get ready-to-run `glot set` fixes.
 
+## Demo
+
+[`examples/demo-saas`](examples/demo-saas) is "Acme Invoices", a small Next.js SaaS with every string hardcoded in English (plurals by concatenation, copy in config objects, fixed-width buttons, ambiguous "Save"/"Archive" labels). [`examples/demo.sh`](examples/demo.sh) takes a throwaway copy from hardcoded English to validated catalogs, with commentary at each step:
+
+```sh
+examples/demo.sh                                       # mock LLM, no key needed
+DEMO_PAUSE=1 examples/demo.sh                          # pause between steps for a live demo
+GLOT_REAL=1 ANTHROPIC_API_KEY=... examples/demo.sh     # real translations
+KEEP=1 examples/demo.sh                                # keep the copy, then `pnpm install && pnpm dev` (port 3200)
+```
+
+Steps: `init` → `extract` (117 hardcoded strings) → `i18nize` (24 files rewritten to next-intl, 132 keys) → minimal next-intl wiring + `next dev` → `translate --visual` → `check` → `fit` (German overflow fixed in the running app) → `review` → `glossary mine`. `NO_APP=1` skips the dev server (and thus `--visual`/`fit`). Commands missing from your build are skipped with a notice.
+
 ## Architecture
 
 Rust workspace (`crates/core`, `extract`, `llm`, `mcp`, `cli`, `server`), Next.js dashboard in `web/`, Playwright QA in `packages/visual-qa`, GitHub Action in `action/`. Details, file formats and the HTTP API: [ARCHITECTURE.md](ARCHITECTURE.md).

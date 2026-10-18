@@ -1,10 +1,14 @@
 //! glot-llm: LLM providers, guarded translation pipeline, judge, pricing, and the local `engine::Workspace`.
 pub mod engine;
+pub mod i18nize;
 pub mod judge;
+pub mod mine;
 pub mod mock;
 pub mod pricing;
 pub mod provider;
+pub mod review;
 pub mod translate;
+pub mod visual;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

@@ -28,6 +28,8 @@ use glot_llm::engine::{TranslateOptions, Workspace};
 
 const MAX_ITEMS: usize = 100;
 
+mod review;
+
 /// Serve MCP over stdio for the workspace found from `start`. Logs go to stderr only.
 pub async fn serve_stdio(start: PathBuf) -> anyhow::Result<()> {
     let _ = tracing_subscriber::fmt()
@@ -66,7 +68,7 @@ impl GlotServer {
     pub fn new(ws: Workspace) -> Self {
         Self {
             ws: Arc::new(Mutex::new(ws)),
-            tool_router: Self::tool_router(),
+            tool_router: Self::tool_router() + Self::review_router(),
             prompt_router: Self::prompt_router(),
         }
     }
@@ -228,6 +230,14 @@ pub struct GlossaryUpsertParams {
 pub struct RemoveKeysParams {
     /// Keys to delete from every catalog and from glot.lock.
     pub keys: Vec<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct I18nizeFileParams {
+    /// Source file relative to the project root (e.g. `app/invoices/page.tsx`).
+    pub path: String,
+    /// Only return the diff and the keys; write nothing. Default true.
+    pub dry_run: Option<bool>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -602,6 +612,32 @@ impl GlotServer {
             let unknown: Vec<String> = unknown.into_iter().cloned().collect();
             ws.remove_keys(&p.keys).map_err(|e| format!("could not remove keys: {e}"))?;
             Ok(json!({ "removed": p.keys.len() - unknown.len(), "not_found": unknown, "still_used_in_code": still_used }))
+        })
+        .await
+    }
+
+    #[tool(
+        description = "Internationalize a whole source file in one step: finds hardcoded UI copy (JSX text with {expressions} and inline tags, attributes, concatenations/template literals, plurals), names semantic keys (LLM, one call), and rewrites the code to t(\"key\") with the right hook/import (next-intl or react-i18next). dry_run (default true) returns the unified diff, the keys + notes it would create and the strings it skipped with reasons; apply the diff yourself, or call again with dry_run: false to let glot write the file and the source catalog. Then call translate."
+    )]
+    async fn i18nize_file(&self, Parameters(p): Parameters<I18nizeFileParams>) -> CallToolResult {
+        self.run(move |mut ws| async move {
+            use glot_llm::i18nize;
+            let lib = i18nize::detect_lib(&ws.root).ok_or("cannot detect next-intl / react-i18next from package.json")?;
+            let path = norm_path(&p.path).to_string();
+            if !ws.root.join(&path).is_file() {
+                return Err(format!("`{path}` is not a file under {}", ws.root.display()));
+            }
+            let plan = i18nize::plan(&ws, &[path], lib).await.map_err(|e| format!("i18nize failed: {e}"))?;
+            let dry_run = p.dry_run.unwrap_or(true);
+            if !dry_run {
+                i18nize::apply(&mut ws, &plan).map_err(|e| format!("could not apply: {e}"))?;
+            }
+            let f = &plan.files[0];
+            Ok(json!({
+                "dry_run": dry_run, "lib": plan.lib, "key_namer": plan.namer, "converted": f.converted,
+                "diff": f.diff, "keys": f.keys, "skipped": f.skipped, "error": f.error, "warnings": plan.warnings,
+                "next": if dry_run { "apply the diff and add_string each key (or call i18nize_file with dry_run: false), then translate" } else { "call translate" },
+            }))
         })
         .await
     }

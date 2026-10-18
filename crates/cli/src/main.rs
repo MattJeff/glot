@@ -1,5 +1,9 @@
 //! `glot` CLI: thin layer over `glot_llm::engine::Workspace`.
+mod dev;
+mod fit;
+mod i18nize;
 mod init;
+mod review;
 mod sync;
 
 use anyhow::{Context, Result, bail};
@@ -59,7 +63,14 @@ enum Cmd {
         /// Do not ask for confirmation.
         #[arg(short, long)]
         yes: bool,
+        /// Capture the running app and show the LLM where each key renders (`--base-url`, `--routes`).
+        #[arg(long)]
+        visual: bool,
+        #[command(flatten)]
+        qa: fit::QaArgs,
     },
+    /// Shorten translations that overflow in the running app, re-render, repeat until they fit.
+    Fit(fit::FitArgs),
     /// Hardcoded strings in code, plus missing and unused keys.
     Extract {
         #[arg(long)]
@@ -90,12 +101,18 @@ enum Cmd {
     /// Manage glossary.toml.
     #[command(subcommand)]
     Glossary(GlossaryCmd),
+    /// Back-translate translations and explain them; `--stale` sorts cosmetic vs real source changes.
+    Review(review::ReviewArgs),
     /// Upload catalogs, lock and glossary to the glot server.
     Push,
     /// Download catalogs, lock and glossary from the glot server.
     Pull,
     /// Run the MCP server on stdio.
     Mcp,
+    /// Convert hardcoded UI strings to translation keys and rewrite the code (next-intl / react-i18next).
+    I18nize(i18nize::I18nizeArgs),
+    /// Local server for the in-app editing overlay (@glot/overlay).
+    Dev(dev::DevArgs),
 }
 
 #[derive(Subcommand)]
@@ -116,6 +133,8 @@ enum GlossaryCmd {
         rest: Vec<String>,
     },
     /// Frequent capitalized terms translated inconsistently.
+    /// Mine glossary terms with the LLM and list inconsistent translations (`--apply` fixes them).
+    Mine(review::MineArgs),
     Suggest {
         #[arg(long)]
         json: bool,
@@ -168,7 +187,10 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
             force,
             dry_run,
             yes,
-        } => translate(locale, key, force, dry_run, yes).await?,
+            visual,
+            qa,
+        } => translate(locale, key, force, dry_run, yes, visual.then_some(qa)).await?,
+        Cmd::Fit(a) => return fit::fit(a).await,
         Cmd::Extract { json } => extract(json)?,
         Cmd::Unused { prune, json } => unused(prune, json)?,
         Cmd::Add { key, value, note } => {
@@ -193,10 +215,14 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
             }
             anstream::println!("{GREEN}set{GREEN:#} {locale} {key} = {value:?}");
         }
+        Cmd::Glossary(GlossaryCmd::Mine(a)) => review::mine(a).await?,
         Cmd::Glossary(g) => glossary(g)?,
+        Cmd::Review(a) => return review::run(a).await,
         Cmd::Push => return sync::push().await,
         Cmd::Pull => return sync::pull().await,
         Cmd::Mcp => glot_mcp::serve_stdio(std::env::current_dir()?).await?,
+        Cmd::I18nize(args) => i18nize::run(args).await?,
+        Cmd::Dev(args) => dev::run(args).await?,
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -435,6 +461,7 @@ async fn translate(
     force: bool,
     dry_run: bool,
     yes: bool,
+    visual: Option<fit::QaArgs>,
 ) -> Result<()> {
     let mut ws = open()?;
     let opts = TranslateOptions {
@@ -480,6 +507,10 @@ async fn translate(
         ))?
     {
         bail!("aborted");
+    }
+    if let Some(qa) = &visual {
+        let keys: Vec<String> = dry.planned.values().flatten().cloned().collect();
+        ws.visual = fit::capture(&ws, qa, &keys)?;
     }
     anstream::eprintln!("{DIM}Translating…{DIM:#}");
     let report = ws
@@ -689,6 +720,7 @@ fn glossary(cmd: GlossaryCmd) -> Result<()> {
             ws.glossary.upsert(t);
             ws.save_glossary()?;
         }
+        GlossaryCmd::Mine(_) => unreachable!("handled in run"),
         GlossaryCmd::Suggest { json } => {
             let s = suggest(&ws);
             if json {

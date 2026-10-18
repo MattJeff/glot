@@ -18,7 +18,9 @@ pub mod jobs;
 pub mod keys;
 pub mod openapi;
 pub mod projects;
+pub mod review;
 pub mod sync;
+pub mod visual;
 
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 
@@ -112,7 +114,10 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/jobs/{id}/events", get(jobs::events))
         .route(&format!("{p}/sync/push"), post(sync::push))
         .route(&format!("{p}/sync/pull"), get(sync::pull))
+        .route(&format!("{p}/review"), post(review::review_many))
+        .route(&format!("{p}/keys/{{key}}/review"), get(review::review_one))
         .route("/api/openapi.json", get(openapi::spec))
+        .merge(visual::routes())
         .layer(cors);
 
     Router::new()
