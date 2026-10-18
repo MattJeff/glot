@@ -1,0 +1,257 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "zh",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, other {# 个文件}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, other {# 条评审}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {暂无结果} other {# 个结果}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {暂无步骤} other {# 个步骤}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, other {# 票}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, other {# 个标签}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "你有{count, plural, =0 {没有新任务} other {# 个新任务}}。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "你有{count, plural, =0 {没有新天数} other {# 个新天数}}。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {没有人添加结果} =1 {{name} 添加了一个结果} other {{name} 和其他 # 人添加了结果}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {打开 iPhone 应用} android {打开 Android 应用} other {打开网页应用}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name} 与你分享了一条评论} male {{name} 与你分享了一条评论} other {{name} 与你分享了一条评论}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "这是你本周第{n, selectordinal, other {#}}次访问",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "你本月的第{n, selectordinal, other {#}}次评审",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} 将 {count, plural, other {# 个下载}} 添加到她的列表} male {{name} 将 {count, plural, other {# 个下载}} 添加到他的列表} other {{name} 将 {count, plural, other {# 个下载}} 添加到其列表}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {已选择 <b>0</b> 个文件。<link>清除</link>} other {已选择 <b>#</b> 个文件。<link>清除</link>}}",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {已选择 <b>0</b> 个结果。<link>清除</link>} other {已选择 <b>#</b> 个结果。<link>清除</link>}}",
+      "written": true,
+      "attempts": 4
+    },
+    {
+      "id": "placeholders.010",
+      "target": "已使用 {quota} 中的 {percent, number, percent}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} 星标 · 更新于 {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "你的 {rows, number} 行导出已准备就绪：{link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name} 于 {date, date, medium} 从 {location} 删除了 {count, plural, other {# 条评审}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name} 于 {date, date, medium} 从 {location} 删除了 {count, plural, other {# 个积分}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "此仓库已<b>归档</b>。它为<i>只读</i>。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "准备好后点击<b>发布</b>。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, other {# 条评审}}</b>需要你关注。<link>查看</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, other {# 个积分}}</b>需要你关注。<link>查看</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "无法正常工作？请重试",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "在线成员",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "删除此工作区？",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "仪表板正在加载…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "仪表板显示你可访问的所有项目",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "支持 Markdown",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "将问题与 GitHub 同步",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "分享",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "扣费",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "演示",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "升级",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "显示更多",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "重试",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "用量",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "总计：{total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 5291,
+    "output_tokens": 6298,
+    "cache_creation_tokens": 5656,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.017086125
+  },
+  "calls": 4,
+  "call_ms": 30987,
+  "wall_ms": 27540
+}

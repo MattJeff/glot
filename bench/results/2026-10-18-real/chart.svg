@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="188" font-family="Inter, system-ui, sans-serif" font-size="13">
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="12" y="22" font-weight="600">Broken messages written to the catalog (lower is better)</text>
+<text x="12" y="56">claude-haiku-5-5 · glot</text><rect x="220" y="40" width="0.0" height="22" rx="3" fill="#16a34a"/><text x="226.0" y="56">0.0 %</text>
+<text x="12" y="88">claude-haiku-5-5 · raw</text><rect x="220" y="72" width="350.0" height="22" rx="3" fill="#dc2626"/><text x="576.0" y="88">14.1 %</text>
+<text x="12" y="120">claude-sonnet-5-5 · glot</text><rect x="220" y="104" width="0.0" height="22" rx="3" fill="#16a34a"/><text x="226.0" y="120">0.0 %</text>
+<text x="12" y="152">claude-sonnet-5-5 · raw</text><rect x="220" y="136" width="217.8" height="22" rx="3" fill="#dc2626"/><text x="443.8" y="152">8.8 %</text>
+</svg>

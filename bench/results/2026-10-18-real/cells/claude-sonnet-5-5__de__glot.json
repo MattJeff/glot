@@ -1,0 +1,257 @@
+{
+  "model": "claude-sonnet-5-5",
+  "locale": "de",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, one {# Datei} other {# Dateien}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, one {# Review} other {# Reviews}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {Noch keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {Noch keine Schritte} one {# Schritt} other {# Schritte}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, one {# Stimme} other {# Stimmen}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, one {# Tag} other {# Tags}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "Du hast {count, plural, =0 {keine neuen Aufgaben} one {eine neue Aufgabe} other {# neue Aufgaben}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "Du hast {count, plural, =0 {keine neuen Tage} one {einen neuen Tag} other {# neue Tage}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {Niemand hat ein Ergebnis hinzugefügt} =1 {{name} hat ein Ergebnis hinzugefügt} one {{name} und # weitere Person haben Ergebnisse hinzugefügt} other {{name} und # weitere Personen haben Ergebnisse hinzugefügt}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {iPhone-App öffnen} android {Android-App öffnen} other {Web-App öffnen}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name} hat einen Kommentar mit dir geteilt} male {{name} hat einen Kommentar mit dir geteilt} other {{name} hat einen Kommentar mit dir geteilt}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "Das ist dein {n, selectordinal, one {#.} other {#.}} Besuch diese Woche",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "Dein {n, selectordinal, one {#.} other {#.}} Review diesen Monat",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} hat {count, plural, one {# Download} other {# Downloads}} zu ihrer Liste hinzugefügt} male {{name} hat {count, plural, one {# Download} other {# Downloads}} zu seiner Liste hinzugefügt} other {{name} hat {count, plural, one {# Download} other {# Downloads}} zur Liste hinzugefügt}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {Keine Dateien ausgewählt} one {<b>#</b> Datei ausgewählt. <link>Aufheben</link>} other {<b>#</b> Dateien ausgewählt. <link>Aufheben</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {Keine Ergebnisse ausgewählt} one {<b>#</b> Ergebnis ausgewählt. <link>Aufheben</link>} other {<b>#</b> Ergebnisse ausgewählt. <link>Aufheben</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "{percent, number, percent} von {quota} verwendet",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} Sterne · aktualisiert {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "Dein Export mit {rows, number} Zeilen ist bereit: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name} hat am {date, date, medium} {count, plural, one {# Review} other {# Reviews}} aus {location} gelöscht",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name} hat am {date, date, medium} {count, plural, one {# Guthabeneinheit} other {# Guthabeneinheiten}} aus {location} gelöscht",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "Dieses Repository ist <b>archiviert</b>. Es ist <i>schreibgeschützt</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "Klicke auf <b>Veröffentlichen</b>, wenn du bereit bist.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, one {# Review benötigt} other {# Reviews benötigen}}</b> deine Aufmerksamkeit. <link>Prüfen</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, one {# Guthabeneinheit benötigt} other {# Guthabeneinheiten benötigen}}</b> deine Aufmerksamkeit. <link>Prüfen</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "Funktioniert es nicht? Versuche es erneut",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "Wer ist online",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "Diesen Arbeitsbereich löschen?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "Dashboard wird geladen…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "Das Dashboard zeigt alle Projekte, auf die du Zugriff hast",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown wird unterstützt",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "Issues mit GitHub synchronisieren",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "Teilen",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "Belasten",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "Präsentieren",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "Upgrade",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "Mehr",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.029",
+      "target": "Wiederholen",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "Nutzung",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "Gesamt: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 3938,
+    "output_tokens": 1788,
+    "cache_creation_tokens": 3380,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.034206
+  },
+  "calls": 2,
+  "call_ms": 11822,
+  "wall_ms": 11843
+}

@@ -1,0 +1,257 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "ar",
+  "condition": "raw",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, one {# ملف} other {# ملفات}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, one {# مراجعة} other {# مراجعات}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {لا توجد نتائج بعد} one {# نتيجة} other {# نتائج}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {لا توجد خطوات بعد} one {# خطوة} other {# خطوات}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, one {# صوت} other {# أصوات}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, one {# وسم} other {# وسوم}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "لديك {count, plural, =0 {لا توجد مهام جديدة} one {مهمة جديدة واحدة} other {# مهام جديدة}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "لديك {count, plural, =0 {لا توجد أيام جديدة} one {يوم جديد واحد} other {# أيام جديدة}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {لم يُضف أحد نتيجة} =1 {أضاف {name} نتيجة} one {أضاف {name} وشخصًا آخر نتائج} other {أضاف {name} و# آخرين نتائج}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {افتح تطبيق iPhone} android {افتح تطبيق Android} other {افتح تطبيق الويب}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {شاركت {name} تعليقًا معك} male {شارك {name} تعليقًا معك} other {شارك {name} تعليقًا معك}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "هذه هي زيارتك {n, selectordinal, other {رقم #}} هذا الأسبوع",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "مراجعتك {n, selectordinal, other {رقم #}} هذا الشهر",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {أضافت {name} {count, plural, one {تنزيلًا واحدًا} other {# تنزيلات}} إلى قائمتها} male {أضاف {name} {count, plural, one {تنزيلًا واحدًا} other {# تنزيلات}} إلى قائمته} other {أضاف {name} {count, plural, one {تنزيلًا واحدًا} other {# تنزيلات}} إلى قائمتهم}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {لم يتم تحديد أي ملفات} one {تم تحديد <b>#</b> ملف. <link>مسح</link>} other {تم تحديد <b>#</b> ملفات. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {لم يتم تحديد أي نتائج} one {تم تحديد <b>#</b> نتيجة. <link>مسح</link>} other {تم تحديد <b>#</b> نتائج. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "{percent, number, percent} من {quota} مستخدم",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} نجمة · آخر تحديث {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "تصديرك لـ {rows, number} صف جاهز: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "حذف {name} {count, plural, one {مراجعة واحدة} other {# مراجعات}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "حذف {name} {count, plural, one {رصيدًا واحدًا} other {# رصيدًا}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "هذا المستودع <b>مؤرشف</b>. وهو <i>للقراءة فقط</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "انقر على <b>نشر</b> عندما تكون جاهزًا.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, one {# مراجعة} other {# مراجعات}}</b> تحتاج إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, one {# رصيد} other {# أرصدة}}</b> تحتاج إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "لا يعمل؟ حاول مرة أخرى",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "من المتصلون الآن",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "هل تريد حذف مساحة العمل هذه؟",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "لوحة التحكم قيد التحميل…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "تعرض لوحة التحكم كل مشروع يمكنك الوصول إليه",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown مدعوم",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "مزامنة المشكلات مع GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "مشاركة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "تحصيل",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "بدء العرض",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "ترقية",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "عرض المزيد",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "إعادة المحاولة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "الاستخدام",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "الإجمالي: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 2910,
+    "output_tokens": 4246,
+    "cache_creation_tokens": 1579,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.002611375
+  },
+  "calls": 1,
+  "call_ms": 14488,
+  "wall_ms": 14491
+}

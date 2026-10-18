@@ -1,0 +1,257 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "ar",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, zero {# ملف} one {# ملف} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, zero {# مراجعة} one {# مراجعة} two {مراجعتان} few {# مراجعات} many {# مراجعة} other {# مراجعة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {لا توجد نتائج بعد} zero {# نتيجة} one {# نتيجة} two {نتيجتان} few {# نتائج} many {# نتيجة} other {# نتيجة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {لا توجد خطوات بعد} zero {# خطوة} one {# خطوة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, zero {# صوت} one {# صوت} two {صوتان} few {# أصوات} many {# صوتًا} other {# صوت}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, zero {# وسم} one {# وسم} two {وسمان} few {# وسوم} many {# وسمًا} other {# وسم}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "لديك {count, plural, =0 {لا مهام جديدة} zero {# مهمة جديدة} one {مهمة جديدة واحدة} two {مهمتان جديدتان} few {# مهام جديدة} many {# مهمة جديدة} other {# مهمة جديدة}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "لديك {count, plural, =0 {لا أيام جديدة} zero {# يوم جديد} one {يوم جديد واحد} two {يومان جديدان} few {# أيام جديدة} many {# يومًا جديدًا} other {# يوم جديد}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {لم يُضِف أحد نتيجة} =1 {أضاف {name} نتيجة} zero {{name} وآخرون أضافوا نتائج} one {{name} وشخص آخر أضافوا نتائج} two {{name} و# آخرَين أضافا نتيجتين} few {{name} و# آخرين أضافوا نتائج} many {{name} و# آخرًا أضافوا نتائج} other {{name} و# آخرين أضافوا نتائج}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {افتح تطبيق iPhone} android {افتح تطبيق Android} other {افتح تطبيق الويب}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {شاركتْ {name} تعليقًا معك} male {شاركَ {name} تعليقًا معك} other {شارك {name} تعليقًا معك}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "هذه هي زيارتك {n, selectordinal, zero {الـ#} one {الأولى} two {الثانية} few {الثالثة} many {الـ#} other {الـ#}} هذا الأسبوع",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "مراجعتك {n, selectordinal, zero {الـ#} one {الأولى} two {الثانية} few {الثالثة} many {الـ#} other {الـ#}} هذا الشهر",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} أضافت {count, plural, zero {# تنزيل} one {تنزيل واحد} two {تنزيلان} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمتها} male {{name} أضاف {count, plural, zero {# تنزيل} one {تنزيل واحد} two {تنزيلان} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمته} other {{name} أضاف {count, plural, zero {# تنزيل} one {تنزيل واحد} two {تنزيلان} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمتهم}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {لم يتم تحديد أي ملفات} zero {لم يتم تحديد أي ملفات} one {<b>#</b> ملف محدد. <link>مسح</link>} two {ملفان محددان} few {# ملفات محددة} many {# ملفًا محددًا} other {<b>#</b> ملف محدد. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {لم يتم تحديد أي نتائج} zero {لم يتم تحديد أي نتائج} one {<b>#</b> نتيجة محددة. <link>مسح</link>} two {نتيجتان محددتان} few {# نتائج محددة} many {# نتيجةً محددةً} other {<b>#</b> نتيجة محددة. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 3
+    },
+    {
+      "id": "placeholders.010",
+      "target": "تم استخدام {percent, number, percent} من {quota}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} نجمة · تم التحديث {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "تصديرك لـ {rows, number} صف جاهز: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "حذف {name} {count, plural, zero {# مراجعة} one {مراجعة واحدة} two {مراجعتان} few {# مراجعات} many {# مراجعة} other {# مراجعة}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "حذف {name} {count, plural, zero {# رصيد} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "هذا المستودع <b>مؤرشف</b>. وهو <i>للقراءة فقط</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "انقر على <b>نشر</b> عندما تكون جاهزًا.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, zero {# مراجعة} one {مراجعة واحدة} two {مراجعتان} few {# مراجعات} many {# مراجعة} other {# مراجعة}}</b> تحتاج إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, zero {# رصيد} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}</b> تحتاج إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "لا يعمل؟ حاول مرة أخرى",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "المتصلون حاليًا",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "هل تريد حذف مساحة العمل هذه؟",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "جارٍ تحميل لوحة التحكم…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "تعرض لوحة التحكم كل مشروع يمكنك الوصول إليه",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown مدعوم",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "مزامنة المشكلات مع GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "مشاركة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "تحصيل",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "عرض",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "ترقية",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "عرض المزيد",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "أعد المحاولة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "الاستخدام",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "الإجمالي: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 5345,
+    "output_tokens": 13683,
+    "cache_creation_tokens": 3436,
+    "cache_read_tokens": 1152,
+    "cost_usd": 0.007817020000000001
+  },
+  "calls": 3,
+  "call_ms": 58289,
+  "wall_ms": 58360
+}

@@ -1,0 +1,257 @@
+{
+  "model": "claude-sonnet-5-5",
+  "locale": "ar",
+  "condition": "raw",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, zero {# ملف} one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, zero {# مراجعة} one {مراجعة واحدة} two {مراجعتان} few {# مراجعات} many {# مراجعة} other {# مراجعة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {لا توجد نتائج بعد} one {نتيجة واحدة} two {نتيجتان} few {# نتائج} many {# نتيجة} other {# نتيجة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {لا توجد خطوات بعد} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, zero {# صوت} one {صوت واحد} two {صوتان} few {# أصوات} many {# صوتًا} other {# صوت}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, zero {# وسم} one {وسم واحد} two {وسمان} few {# وسوم} many {# وسمًا} other {# وسم}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "لديك {count, plural, =0 {لا مهام جديدة} one {مهمة جديدة واحدة} two {مهمتان جديدتان} few {# مهام جديدة} many {# مهمة جديدة} other {# مهمة جديدة}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "لديك {count, plural, =0 {لا أيام جديدة} one {يوم جديد واحد} two {يومان جديدان} few {# أيام جديدة} many {# يومًا جديدًا} other {# يوم جديد}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {لم يضف أحد نتيجة} =1 {أضاف {name} نتيجة} one {أضاف {name} وشخص آخر نتائج} two {أضاف {name} وشخصان آخران نتائج} few {أضاف {name} و# أشخاص آخرون نتائج} many {أضاف {name} و# شخصًا آخر نتائج} other {أضاف {name} و# شخص آخر نتائج}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {افتح تطبيق iPhone} android {افتح تطبيق Android} other {افتح تطبيق الويب}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {شاركتك {name} تعليقًا} male {شاركك {name} تعليقًا} other {شاركك {name} تعليقًا}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "هذه زيارتك رقم {n, selectordinal, other {#}} هذا الأسبوع",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "مراجعتك رقم {n, selectordinal, other {#}} هذا الشهر",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {أضافت {name} {count, plural, one {تنزيلًا واحدًا} two {تنزيلين} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمتها} male {أضاف {name} {count, plural, one {تنزيلًا واحدًا} two {تنزيلين} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمته} other {أضاف {name} {count, plural, one {تنزيلًا واحدًا} two {تنزيلين} few {# تنزيلات} many {# تنزيلًا} other {# تنزيل}} إلى قائمته}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {لم يتم تحديد أي ملفات} one {تم تحديد <b>#</b> ملف. <link>مسح</link>} two {تم تحديد <b>#</b> ملفين. <link>مسح</link>} few {تم تحديد <b>#</b> ملفات. <link>مسح</link>} many {تم تحديد <b>#</b> ملفًا. <link>مسح</link>} other {تم تحديد <b>#</b> ملف. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {لم يتم تحديد أي نتائج} one {تم تحديد <b>#</b> نتيجة. <link>مسح</link>} two {تم تحديد <b>#</b> نتيجتين. <link>مسح</link>} few {تم تحديد <b>#</b> نتائج. <link>مسح</link>} many {تم تحديد <b>#</b> نتيجة. <link>مسح</link>} other {تم تحديد <b>#</b> نتيجة. <link>مسح</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "تم استخدام {percent, number, percent} من {quota}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} نجمة · آخر تحديث {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "ملف التصدير الذي يضم {rows, number} صف جاهز: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "حذف {name} {count, plural, one {مراجعة واحدة} two {مراجعتين} few {# مراجعات} many {# مراجعة} other {# مراجعة}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "حذف {name} {count, plural, one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} من {location} في {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "هذا المستودع <b>مؤرشف</b>. وهو <i>للقراءة فقط</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "انقر على <b>نشر</b> عندما تكون جاهزًا.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, one {مراجعة واحدة} two {مراجعتان} few {# مراجعات} many {# مراجعة} other {# مراجعة}}</b> بحاجة إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}</b> بحاجة إلى انتباهك. <link>مراجعة</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "لا يعمل؟ جرّب مرة أخرى",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "من المتصل الآن",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "هل تريد حذف مساحة العمل هذه؟",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "جارٍ تحميل لوحة التحكم…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "تعرض لوحة التحكم كل مشروع يمكنك الوصول إليه",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown مدعوم",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "مزامنة المشكلات مع GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "مشاركة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "تحصيل",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "تقديم",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "ترقية",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "عرض المزيد",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "إعادة المحاولة",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "الاستخدام",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "الإجمالي: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 2910,
+    "output_tokens": 5328,
+    "cache_creation_tokens": 1579,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0630475
+  },
+  "calls": 1,
+  "call_ms": 29222,
+  "wall_ms": 29227
+}

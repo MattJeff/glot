@@ -1,0 +1,257 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "fr",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, one {# fichier} many {# fichiers} other {# fichiers}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, one {# revue} many {# revues} other {# revues}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {Aucun résultat pour l’instant} one {# résultat} many {# résultats} other {# résultats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {Aucune étape pour l’instant} one {# étape} many {# étapes} other {# étapes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, one {# vote} many {# votes} other {# votes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, one {# étiquette} many {# étiquettes} other {# étiquettes}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "Vous avez {count, plural, =0 {aucune nouvelle tâche} one {une nouvelle tâche} many {# nouvelles tâches} other {# nouvelles tâches}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "Vous avez {count, plural, =0 {aucun nouveau jour} one {un nouveau jour} many {# nouveaux jours} other {# nouveaux jours}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {Personne n’a ajouté de résultat} =1 {{name} a ajouté un résultat} one {{name} et # autre a ajouté des résultats} many {{name} et # autres ont ajouté des résultats} other {{name} et # autres ont ajouté des résultats}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {Ouvrir l’application iPhone} android {Ouvrir l’application Android} other {Ouvrir l’application web}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name} a partagé un commentaire avec vous} male {{name} a partagé un commentaire avec vous} other {{name} a partagé un commentaire avec vous}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "Voici votre {n, selectordinal, one {#er} many {#e} other {#e}} visite cette semaine",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "Votre {n, selectordinal, one {#re} many {#e} other {#e}} revue ce mois-ci",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} a ajouté {count, plural, one {# téléchargement} many {# téléchargements} other {# téléchargements}} à sa liste} male {{name} a ajouté {count, plural, one {# téléchargement} many {# téléchargements} other {# téléchargements}} à sa liste} other {{name} a ajouté {count, plural, one {# téléchargement} many {# téléchargements} other {# téléchargements}} à leur liste}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {Aucun fichier sélectionné} one {<b>#</b> fichier sélectionné. <link>Effacer</link>} many {<b>#</b> de fichiers sélectionnés. <link>Effacer</link>} other {<b>#</b> fichiers sélectionnés. <link>Effacer</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {Aucun résultat sélectionné} one {<b>#</b> résultat sélectionné. <link>Effacer</link>} many {<b>#</b> de résultats sélectionnés. <link>Effacer</link>} other {<b>#</b> résultats sélectionnés. <link>Effacer</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "placeholders.010",
+      "target": "{percent, number, percent} de {quota} utilisé",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} étoiles · mis à jour {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "Votre export de {rows, number} lignes est prêt\\u00a0: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name} a supprimé {count, plural, one {# revue} many {# revues} other {# revues}} de {location} le {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name} a supprimé {count, plural, one {# crédit} many {# crédits} other {# crédits}} de {location} le {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "Ce dépôt est <b>archivé</b>. Il est <i>en lecture seule</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "Cliquez sur <b>Publier</b> lorsque vous êtes prêt.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, one {# revue} many {# revues} other {# revues}}</b> {count, plural, one {nécessite} many {nécessitent} other {nécessitent}} votre attention. <link>Examiner</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, one {# crédit} many {# crédits} other {# crédits}}</b> {count, plural, one {nécessite} many {nécessitent} other {nécessitent}} votre attention. <link>Examiner</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "Ça ne fonctionne pas\\u00a0? Réessayer",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "Qui est en ligne",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "Supprimer cet espace de travail\\u00a0?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "Chargement du tableau de bord…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "Le tableau de bord affiche chaque projet auquel vous avez accès",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown est pris en charge",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "Synchroniser les problèmes avec GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "Partager",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "Débiter",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "Présenter",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "Améliorer",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "Voir plus",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "Réessayer",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "Usage",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "datenum.008",
+      "target": "Total\\u00a0: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 5954,
+    "output_tokens": 9138,
+    "cache_creation_tokens": 5758,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0166809
+  },
+  "calls": 4,
+  "call_ms": 42368,
+  "wall_ms": 42407
+}

@@ -1,0 +1,257 @@
+{
+  "model": "claude-sonnet-5-5",
+  "locale": "ru",
+  "condition": "raw",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, one {# проверка} few {# проверки} many {# проверок} other {# проверки}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {Результатов пока нет} one {# результат} few {# результата} many {# результатов} other {# результата}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {Шагов пока нет} one {# шаг} few {# шага} many {# шагов} other {# шага}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, one {# голос} few {# голоса} many {# голосов} other {# голоса}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, one {# тег} few {# тега} many {# тегов} other {# тега}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "У вас {count, plural, =0 {нет новых задач} one {# новая задача} few {# новые задачи} many {# новых задач} other {# новой задачи}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "У вас {count, plural, =0 {нет новых дней} one {# новый день} few {# новых дня} many {# новых дней} other {# нового дня}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {Никто не добавил результат} =1 {{name} добавил(а) результат} one {{name} и ещё # пользователь добавили результаты} few {{name} и ещё # пользователя добавили результаты} many {{name} и ещё # пользователей добавили результаты} other {{name} и ещё # пользователя добавили результаты}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {Откройте приложение для iPhone} android {Откройте приложение для Android} other {Откройте веб-приложение}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name} поделилась с вами комментарием} male {{name} поделился с вами комментарием} other {{name} поделился(-ась) с вами комментарием}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "Это ваш {n, selectordinal, other {#-й}} визит на этой неделе",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "Ваша {n, selectordinal, other {#-я}} проверка в этом месяце",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} добавила в свой список {count, plural, one {# загрузку} few {# загрузки} many {# загрузок} other {# загрузки}}} male {{name} добавил в свой список {count, plural, one {# загрузку} few {# загрузки} many {# загрузок} other {# загрузки}}} other {{name} добавил(а) в свой список {count, plural, one {# загрузку} few {# загрузки} many {# загрузок} other {# загрузки}}}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {Файлы не выбраны} one {Выбран <b>#</b> файл. <link>Сбросить</link>} few {Выбрано <b>#</b> файла. <link>Сбросить</link>} many {Выбрано <b>#</b> файлов. <link>Сбросить</link>} other {Выбрано <b>#</b> файла. <link>Сбросить</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {Результаты не выбраны} one {Выбран <b>#</b> результат. <link>Сбросить</link>} few {Выбрано <b>#</b> результата. <link>Сбросить</link>} many {Выбрано <b>#</b> результатов. <link>Сбросить</link>} other {Выбрано <b>#</b> результата. <link>Сбросить</link>}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.010",
+      "target": "Использовано {percent, number, percent} из {quota}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · звёзд: {stars} · обновлено {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "Экспорт {rows, number} строк готов: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name} удалил(а) {count, plural, one {# проверку} few {# проверки} many {# проверок} other {# проверки}} из {location}, {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name} удалил(а) {count, plural, one {# кредит} few {# кредита} many {# кредитов} other {# кредита}} из {location}, {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "Этот репозиторий <b>архивирован</b>. Он доступен <i>только для чтения</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "Нажмите <b>Опубликовать</b>, когда будете готовы.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, one {# проверка требует} few {# проверки требуют} many {# проверок требуют} other {# проверки требуют}}</b> вашего внимания. <link>Проверить</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, one {# кредит требует} few {# кредита требуют} many {# кредитов требуют} other {# кредита требуют}}</b> вашего внимания. <link>Проверить</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "Не работает? Попробуйте ещё раз",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "Кто в сети",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "Удалить это рабочее пространство?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "Панель загружается…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "Панель показывает все проекты, к которым у вас есть доступ",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Поддерживается Markdown",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "Синхронизация задач с GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "Поделиться",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "Списать",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "Презентовать",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "Улучшить",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "Показать ещё",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "Повторить",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "Использование",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "Итого: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 2910,
+    "output_tokens": 4088,
+    "cache_creation_tokens": 1571,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.0506275
+  },
+  "calls": 1,
+  "call_ms": 23757,
+  "wall_ms": 23761
+}

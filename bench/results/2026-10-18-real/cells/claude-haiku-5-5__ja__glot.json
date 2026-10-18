@@ -1,0 +1,257 @@
+{
+  "model": "claude-haiku-5-5",
+  "locale": "ja",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, other {# 件のファイル}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, other {# 件のレビュー}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {まだ結果はありません} other {# 件の結果}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {まだステップはありません} other {# 個のステップ}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, other {# 票}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, other {# 件のタグ}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "新しいタスクが{count, plural, =0 {ありません} other {# 件あります}}。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "新しい日数が{count, plural, =0 {ありません} other {# 日あります}}。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {まだ誰も結果を追加していません} =1 {{name}が結果を追加しました} other {{name}ほか # 人が結果を追加しました}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {iPhone アプリを開く} android {Android アプリを開く} other {Web アプリを開く}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name}がコメントを共有しました} male {{name}がコメントを共有しました} other {{name}がコメントを共有しました}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "今週の{n, selectordinal, other {#回目}}の訪問です",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "今月の{n, selectordinal, other {#回目}}のレビューです",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name}が{count, plural, other {# 件のダウンロード}}を彼女のリストに追加しました} male {{name}が{count, plural, other {# 件のダウンロード}}を彼のリストに追加しました} other {{name}が{count, plural, other {# 件のダウンロード}}をそのリストに追加しました}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {選択中のファイルはありません} other {<b>#</b>件のファイルを選択中。<link>クリア</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {選択中の結果はありません} other {<b>#</b>件の結果を選択中。<link>クリア</link>}}",
+      "written": false,
+      "attempts": 4
+    },
+    {
+      "id": "placeholders.010",
+      "target": "{quota}のうち{percent, number, percent}を使用済み",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} スター · {ago}に更新",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "{rows, number} 行のエクスポートの準備ができました: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name}が{date, date, medium}に{location}から{count, plural, other {# 件のレビュー}}を削除しました",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name}が{date, date, medium}に{location}から{count, plural, other {# 件のクレジット}}を削除しました",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "このリポジトリは<b>アーカイブ済み</b>です。<i>読み取り専用</i>になっています。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "準備ができたら<b>公開</b>をクリックしてください。",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "<b>{count, plural, other {# 件のレビュー}}</b>の確認が必要です。<link>レビュー</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "<b>{count, plural, other {# 件のクレジット}}</b>の確認が必要です。<link>レビュー</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "うまく動作しませんか？もう一度お試しください",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "オンラインのユーザー",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "このワークスペースを削除しますか？",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "ダッシュボードを読み込んでいます…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "ダッシュボードには、アクセス可能なすべてのプロジェクトが表示されます",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown に対応しています",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "GitHub との同期の問題",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "共有",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "請求する",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "プレゼン開始",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "アップグレード",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "もっと見る",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.029",
+      "target": "再試行",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "使用量",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "合計：{total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 5333,
+    "output_tokens": 7776,
+    "cache_creation_tokens": 5696,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.010113675
+  },
+  "calls": 4,
+  "call_ms": 37251,
+  "wall_ms": 31463
+}

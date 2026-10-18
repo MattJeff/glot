@@ -1,0 +1,257 @@
+{
+  "model": "claude-sonnet-5-5",
+  "locale": "pl",
+  "condition": "glot",
+  "outputs": [
+    {
+      "id": "plural.001",
+      "target": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.013",
+      "target": "{count, plural, one {# recenzja} few {# recenzje} many {# recenzji} other {# recenzji}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.026",
+      "target": "{count, plural, =0 {Brak wyników} one {# wynik} few {# wyniki} many {# wyników} other {# wyniku}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.038",
+      "target": "{count, plural, =0 {Brak kroków} one {# krok} few {# kroki} many {# kroków} other {# kroku}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.051",
+      "target": "{count, plural, one {# głos} few {# głosy} many {# głosów} other {# głosu}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.063",
+      "target": "{count, plural, one {# tag} few {# tagi} many {# tagów} other {# tagu}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.076",
+      "target": "Masz {count, plural, =0 {0 nowych zadań} one {jedno nowe zadanie} few {# nowe zadania} many {# nowych zadań} other {# nowego zadania}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural.088",
+      "target": "Masz {count, plural, =0 {0 nowych dni} one {jeden nowy dzień} few {# nowe dni} many {# nowych dni} other {# nowego dnia}}.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "plural_offset.013",
+      "target": "{count, plural, offset:1 =0 {Nikt nie dodał wyniku} =1 {{name} dodał(a) wynik} one {{name} i # inna osoba dodali wyniki} few {{name} i # inne osoby dodali wyniki} many {{name} i # innych osób dodali wyniki} other {{name} i # innej osoby dodali wyniki}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.009",
+      "target": "{platform, select, ios {Otwórz aplikację na iPhonie} android {Otwórz aplikację na Androidzie} other {Otwórz aplikację internetową}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "select.022",
+      "target": "{gender, select, female {{name} udostępniła Ci komentarz} male {{name} udostępnił Ci komentarz} other {{name} udostępnił(a) Ci komentarz}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.002",
+      "target": "To Twoja {n, selectordinal, other {#.}} wizyta w tym tygodniu",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "selectordinal.015",
+      "target": "Twoja {n, selectordinal, other {#.}} recenzja w tym miesiącu",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.008",
+      "target": "{gender, select, female {{name} dodała {count, plural, one {# pobranie} few {# pobrania} many {# pobrań} other {# pobrania}} do swojej listy} male {{name} dodał {count, plural, one {# pobranie} few {# pobrania} many {# pobrań} other {# pobrania}} do swojej listy} other {{name} dodał(a) {count, plural, one {# pobranie} few {# pobrania} many {# pobrań} other {# pobrania}} do swojej listy}}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "nested.021",
+      "target": "{count, plural, =0 {Nie wybrano plików} one {Wybrano <b>#</b> plik. <link>Wyczyść</link>} few {Wybrano <b>#</b> pliki. <link>Wyczyść</link>} many {Wybrano <b>#</b> plików. <link>Wyczyść</link>} other {Wybrano <b>#</b> pliku. <link>Wyczyść</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "nested.033",
+      "target": "{count, plural, =0 {Nie wybrano wyników} one {Wybrano <b>#</b> wynik. <link>Wyczyść</link>} few {Wybrano <b>#</b> wyniki. <link>Wyczyść</link>} many {Wybrano <b>#</b> wyników. <link>Wyczyść</link>} other {Wybrano <b>#</b> wyniku. <link>Wyczyść</link>}}",
+      "written": false,
+      "attempts": 3
+    },
+    {
+      "id": "placeholders.010",
+      "target": "Wykorzystano {percent, number, percent} z {quota}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.022",
+      "target": "{owner}/{repo} · {stars} gwiazdek · zaktualizowano {ago}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.035",
+      "target": "Twój eksport {rows, number} wierszy jest gotowy: {link}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.047",
+      "target": "{name} usunął(a) {count, plural, one {# recenzję} few {# recenzje} many {# recenzji} other {# recenzji}} z {location} dnia {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "placeholders.060",
+      "target": "{name} usunął(a) {count, plural, one {# kredyt} few {# kredyty} many {# kredytów} other {# kredytu}} z {location} dnia {date, date, medium}",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.012",
+      "target": "To repozytorium jest <b>zarchiwizowane</b>. Jest <i>tylko do odczytu</i>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.025",
+      "target": "Gdy wszystko będzie gotowe, kliknij <b>Opublikuj</b>.",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.037",
+      "target": "Do sprawdzenia: <b>{count, plural, one {# recenzja} few {# recenzje} many {# recenzji} other {# recenzji}}</b>. <link>Sprawdź</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "tags.050",
+      "target": "Do sprawdzenia: <b>{count, plural, one {# kredyt} few {# kredyty} many {# kredytów} other {# kredytu}}</b>. <link>Sprawdź</link>",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.012",
+      "target": "Nie działa? Spróbuj ponownie",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "apostrophe.025",
+      "target": "Kto jest online",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.007",
+      "target": "Usunąć ten obszar roboczy?",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.020",
+      "target": "Ładowanie pulpitu…",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "glossary.032",
+      "target": "Pulpit pokazuje każdy projekt, do którego masz dostęp",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.012",
+      "target": "Markdown jest obsługiwany",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "dnt.024",
+      "target": "Synchronizuj zgłoszenia z GitHub",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.007",
+      "target": "Udostępnij",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.019",
+      "target": "Obciąż",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "ambiguous.032",
+      "target": "Prezentuj",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.004",
+      "target": "Ulepsz plan",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.017",
+      "target": "Więcej",
+      "written": true,
+      "attempts": 2
+    },
+    {
+      "id": "width.029",
+      "target": "Ponów",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "width.042",
+      "target": "Użycie",
+      "written": true,
+      "attempts": 1
+    },
+    {
+      "id": "datenum.008",
+      "target": "Razem: {total, number, ::currency/EUR}",
+      "written": true,
+      "attempts": 1
+    }
+  ],
+  "usage": {
+    "input_tokens": 5388,
+    "output_tokens": 6636,
+    "cache_creation_tokens": 4584,
+    "cache_read_tokens": 0,
+    "cost_usd": 0.08859600000000001
+  },
+  "calls": 3,
+  "call_ms": 47711,
+  "wall_ms": 47741
+}
