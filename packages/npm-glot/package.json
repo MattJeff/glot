@@ -1,6 +1,6 @@
 {
   "name": "glot-i18n",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AI-native i18n for SaaS: glot CLI + MCP server (prebuilt binary, SHA-256 verified).",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",
