@@ -220,7 +220,7 @@ async fn verification_reset_retries_idempotency() {
     assert_eq!(body["from"], "glot <noreply@mail.example.com>");
     assert_eq!(body["to"], json!(["ada@example.com"]));
     assert_eq!(body["reply_to"], "support@example.com");
-    assert_eq!(body["subject"], "Confirm your email address"); // fr catalog empty => English
+    assert_eq!(body["subject"], "Confirmez votre adresse e-mail"); // fr catalog
     let html = body["html"].as_str().unwrap();
     assert!(html.contains("lang=\"fr\"") && html.contains("Ada &lt;3") && !html.contains("Ada <3"));
     assert!(
@@ -351,7 +351,10 @@ async fn verification_reset_retries_idempotency() {
         .await;
     assert_eq!(s, StatusCode::BAD_REQUEST, "single use");
     let seen = ctx.wait_requests(5).await;
-    assert_eq!(seen[4].2["subject"], "Your glot password was changed");
+    assert_eq!(
+        seen[4].2["subject"],
+        "Votre mot de passe glot a été modifié"
+    );
 
     // Expired token is refused.
     sqlx::query(
