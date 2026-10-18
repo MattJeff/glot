@@ -1,6 +1,6 @@
 {
   "name": "glot",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Internationalize and translate your app with glot (CLI + MCP, deterministic validator).",
   "author": {
     "name": "MattJeff"

@@ -41,8 +41,8 @@ jobs:
 
       - name: Install glot
         # The npm package verifies the binary against the SHA-256 checksums pinned in its version.
-        # Needs a glot release that ships `i18nize` (after v0.1.0); pin it, e.g. glot-i18n@0.2.1
-        run: npm install -g glot-i18n@0.2.1
+        # Needs a glot release that ships `i18nize` (after v0.1.0); pin it, e.g. glot-i18n@0.3.0
+        run: npm install -g glot-i18n@0.3.0
 
       - name: Add an i18n library if missing
         id: lib
