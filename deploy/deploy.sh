@@ -9,7 +9,7 @@ set -euo pipefail
 : "${GLOT_HOST:?set GLOT_HOST (server IP or name)}"
 H="${GLOT_SSH_USER:-glot}@$GLOT_HOST"
 SSH=(ssh); [ -n "${GLOT_SSH_KEY:-}" ] && SSH=(ssh -i "$GLOT_SSH_KEY")
-ssh() { "${SSH[@]}" "$@"; }
+ssh() { command "${SSH[@]}" "$@"; }
 REGISTRY="${GLOT_REGISTRY:-ghcr.io/mattjeff}"
 cd "$(dirname "$0")/.."
 remote() { ssh "$H" "set -e; cd glot/deploy; $1"; }
