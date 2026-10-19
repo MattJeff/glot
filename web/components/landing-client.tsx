@@ -118,8 +118,10 @@ async function loadValidator(): Promise<Validate> {
 
 const PLURAL_EN = "{count, plural, one {# unread message} other {# unread messages}}";
 // Challenges are product data (ICU messages in their own languages), not UI copy.
-const CHALLENGES = [
-  { id: "placeholder", tag: "{name}", source: "Welcome back, {name}!", locale: "fr", target: "Bon retour, {nom} !" },
+function useChallenges() {
+  const t = useTranslations("landing.hero");
+  return [
+  { id: "placeholder", tag: "{name}", source: t("greeting.welcome_back"), locale: "fr", target: "Bon retour, {nom} !" },
   {
     id: "plural",
     tag: "plurals",
@@ -128,12 +130,14 @@ const CHALLENGES = [
     target: "{count, plural, one {# nieprzeczytana wiadomość} other {# nieprzeczytanych wiadomości}}",
   },
   { id: "tag", tag: "<b>", source: "Read the <b>docs</b> first", locale: "de", target: "Lies zuerst die Doku" },
-  { id: "syntax", tag: "ICU syntax", source: "{count, plural, other {# files}}", locale: "ja", target: "{count, plural, other {# 個のファイル}" },
+  { id: "syntax", tag: t("syntax.icu_label"), source: t("file_count.plural"), locale: "ja", target: "{count, plural, other {# 個のファイル}" },
   { id: "arabic", tag: "plurals", source: PLURAL_EN, locale: "ar", target: "{count, plural, one {رسالة واحدة غير مقروءة} other {# رسائل غير مقروءة}}" },
 ] as const;
+}
 const LOCALES = ["fr", "de", "es", "pl", "ru", "ja", "zh", "ar"];
 
 export function Playground() {
+  const CHALLENGES = useChallenges();
   const t = useTranslations("landing.play");
   const root = useRef<HTMLDivElement>(null);
   const [validate, setValidate] = useState<Validate | null>(null);
@@ -179,7 +183,7 @@ export function Playground() {
     return () => clearTimeout(id);
   }, [typed, errors.length, input]);
 
-  const pick = (c: (typeof CHALLENGES)[number]) => {
+  const pick = (c: (ReturnType<typeof useChallenges>)[number]) => {
     setSource(c.source);
     setLocale(c.locale);
     setTarget(c.target);

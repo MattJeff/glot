@@ -157,7 +157,7 @@ function Matrix({ project: p }: { project: Project }) {
             <SelectContent>
               {columns.map((c) => (
                 <SelectItem key={c} value={c}>
-                  <span className="font-mono text-xs">{c === PSEUDO ? "qps" : c}</span>{" "}
+                  <span className="font-mono text-xs">{c === PSEUDO ? t("pseudo_locale.code") : c}</span>{" "}
                   {c === PSEUDO ? t("pseudoColumn") : <span className="capitalize">{localeName(c)}</span>}
                 </SelectItem>
               ))}
@@ -318,7 +318,7 @@ function ColumnHeader({
   const localeName = useLocaleName();
   return (
     <div className="sticky top-0 z-10 -mx-1 mb-2 flex items-center gap-2 bg-muted/80 px-1 py-1.5 text-sm backdrop-blur">
-      <span className="rounded border bg-background px-1.5 font-mono text-xs">{locale === PSEUDO ? "qps" : locale}</span>
+      <span className="rounded border bg-background px-1.5 font-mono text-xs">{locale === PSEUDO ? t("pseudo_locale.code") : locale}</span>
       <span className={cn("truncate text-muted-foreground", locale !== PSEUDO && "capitalize")}>
         {locale === PSEUDO ? t("pseudoColumn") : localeName(locale)}
         {locale === sourceLocale && ` · ${t("source")}`}

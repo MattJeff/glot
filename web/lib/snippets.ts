@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 // Code samples shown in the UI. Code is not translated, so it lives outside the message catalogs.
 
 // ponytail: placeholder repo URL, update when the GitHub org is final.
@@ -18,17 +20,16 @@ export function cliLogin(url = "http://localhost:8790") {
   return `glot login --server ${url}`;
 }
 
-export const DEMO = {
-  toolCall: `glot.translate({
-  keys: ["checkout.items"],
-  locales: ["fr", "ja", "ar"]
-})`,
-  source: `"checkout.items": "{count, plural,
-  one {# item} other {# items}}"`,
+export function useDemo() {
+  const t = useTranslations("lib.snippets");
+  return {
+  toolCall: t("demo.translate_call"),
+  source: t("plurals.checkout_items"),
   diff: [
-    { sign: "+", code: `"items": "{count, plural, one {# article} other {# articles}}"` },
-    { sign: "+", code: `"pay": "Payer {amount}"` },
-    { sign: "~", code: "glot.lock  2 entries" },
+    { sign: "+", code: t("plurals.items") },
+    { sign: "+", code: t("actions.pay_button") },
+    { sign: "~", code: t("status.lock_entries") },
   ],
   file: "messages/fr.json",
 };
+}

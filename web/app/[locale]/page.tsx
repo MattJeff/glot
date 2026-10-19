@@ -359,7 +359,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               </div>
             </div>
             <div className="reveal space-y-4 rounded-xl border bg-card p-5 shadow-xs sm:p-6">
-              <CopyCommand command="npx glot-i18n localize --yes --targets fr,de" className="max-w-full" />
+              <CopyCommand command={t("cta.localize_command")} className="max-w-full" />
               <p className="text-sm leading-relaxed">{t("foundation.proof")}</p>
               <p className="text-sm leading-relaxed text-muted-foreground">{t("foundation.cost")}</p>
               <Link href="/docs/benchmark" className="inline-flex min-h-6 items-center gap-1 text-sm font-medium underline underline-offset-2 hover:text-brand">

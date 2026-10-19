@@ -1,9 +1,49 @@
 {
   "version": 1,
   "notes": {
+    "editor.code_block.add_command": "Literal example CLI command in a CodeBlock showing how to add a key with a note; keep `glot`, `add`, the key name, and the flag unchanged, and translate only the quoted value \"Billing\" and the note \"sidebar link\" if the locale needs it.",
+    "editor.code_block.push_command": "Literal CLI command shown in a CodeBlock in the keys editor empty/help area; do not translate the command or its flags.",
     "errors.network": "Toast when the API is unreachable",
+    "githubAdmin.aria.glot_link": "Accessible label (aria-label) on the Link at line 143 pointing to the Glot product; screen-reader only, not visible. Keep the brand name 'glot' as-is.",
+    "githubAdmin.permissions_contents_write": "Used in usePermissions (line 22) as a GitHub App permission label for repository contents; shown in the permissions list. This is a GitHub scope identifier, so keep 'contents' and 'write' as the API names and do not translate them.",
+    "githubAdmin.permissions_metadata_read": "Used in usePermissions (line 22) as a GitHub App permission label for repository metadata; shown in the permissions list. This is a GitHub scope identifier, so keep 'metadata' and 'read' as the API names and do not translate them.",
+    "githubAdmin.permissions_pull_requests_write": "Used in usePermissions (line 22) as a GitHub App permission label for pull requests; shown in the permissions list. This is a GitHub scope identifier, so keep 'pull_requests' and 'write' as the API names and do not translate them.",
+    "home.cta.localize_command": "Shown in the CopyCommand box on the home page as a copy-to-clipboard CLI example; this is a literal shell command, so do not translate it, including flags (--yes, --targets) and locale codes (fr,de).",
+    "home.demo.official_ar.headline": "Arabic variant of the official-config headline (useOfficialConfig), same meaning as the English headline; render right-to-left.",
+    "home.demo.official_de.headline": "German variant of the official-config headline (useOfficialConfig), same meaning as the English headline; keep it about the same length.",
+    "home.demo.official_en.headline": "English headline in the official-config demo block (useOfficialConfig); a short marketing line shown as the main heading, so keep it brief.",
+    "home.demo.out.de_width": "Debug label for the German width check in the output panel (useOut), developer-facing; do not localize.",
+    "home.demo.out.en_fake_urgency": "Debug label for the English urgency check in the output panel (useOut), developer-facing; do not localize.",
+    "home.demo.out.retry_passed": "Debug status line shown after a retry succeeds (useOut), developer-facing; keep the arrow prefix.",
+    "home.demo.ship.messages_path": "File path template showing where locale messages live (Ship paragraph), with {l} as a placeholder; not user-facing, do not translate.",
+    "home.demo.ship.minus_fragment": "Markup fragment with a minus sign in a span followed by a quote mark (Ship paragraph); looks like a code artifact, confirm before translating.",
+    "home.demo.ship.plus_fragment": "Markup fragment with a plus sign in a span followed by a quote mark (Ship paragraph); looks like a code artifact, confirm before translating.",
+    "home.demo.ship.quote_mark": "A lone quote mark rendered in the Ship paragraph; punctuation only, usually not translated, and shares its key with id 19.",
+    "home.demo.versions.ar.headline": "Arabic variant of the versions headline (useVersions), same meaning as the English headline; render right-to-left.",
+    "home.demo.versions.ar.tagline": "Arabic tagline in the versions demo (useVersions), same meaning as the English tagline; render right-to-left.",
+    "home.demo.versions.de.headline": "German variant of the versions headline (useVersions), same meaning as the English headline; allow for longer German wrapping.",
+    "home.demo.versions.de.tagline": "German tagline in the versions demo (useVersions), same meaning as the English tagline; keep it on one line.",
+    "home.demo.versions.en.headline": "English two-sentence headline in the versions demo (useVersions); the main heading, so allow room for wrapping.",
+    "home.demo.versions.en.tagline": "English tagline in the versions demo (useVersions), shown under a headline; a short descriptive phrase, no line break intended.",
+    "home.demo.versions.en.urgency_banner": "English promo banner in the versions demo (useVersions) with a time-limited claim; flagged as unsupported urgency, so do not translate it as a real offer without a stated deadline.",
+    "home.demo.versions.layout_note": "Developer note about a layout overflow (useVersions), not user-facing; should be kept out of the translation catalog.",
+    "home.demo.versions.urgency_note": "Reviewer comment about unsupported urgency wording (useVersions), not user-facing; should be kept out of the translation catalog.",
+    "insights.exp.sample_size": "Stat value in the insights page (InsightsPage, line 171) showing sample size as '{locale} · n = {format}'; keep both placeholders and the '·' separator, and keep 'n' as the statistical symbol for sample size. Short inline label.",
+    "landing.compare.columns.crowdin": "Column header in the comparison table on the i18n landing page, naming the competitor Crowdin. Brand name: keep as \"Crowdin\" in every locale and do not translate or inflect it.",
+    "landing.compare.columns.lokalise": "Column header in the comparison table on the i18n landing page, naming the competitor Lokalise. Brand name: keep as \"Lokalise\" in every locale and do not translate or inflect it.",
+    "landing.compare.columns.tolgee": "Column header in the comparison table on the i18n landing page, naming the competitor Tolgee. Brand name: keep as \"Tolgee\" in every locale and do not translate or inflect it.",
     "landing.flow.agent.prompt": "Example prompt a developer gives their coding agent",
-    "overview.jobStarted": "Toast after clicking Translate missing"
+    "landing.hero.file_count.plural": "ICU plural message shown as a file count; keep the {count, plural, ...} structure and the # placeholder, translate only the word 'files', and provide every plural category your language needs.",
+    "landing.hero.greeting.welcome_back": "Greeting shown in the hero for a signed-in user; {name} is replaced with the user's display name, so keep the placeholder unchanged and keep the sentence short.",
+    "landing.hero.syntax.icu_label": "Short label naming the ICU message format in a code/syntax example; 'ICU' is a technical term and usually stays as-is.",
+    "lib.snippets.actions.pay_button": "Payment button label with an {amount} placeholder; keep it short so it fits the button, and keep {amount} unchanged.",
+    "lib.snippets.demo.translate_call": "Code sample of a glot.translate() call shown in the demo panel; it is source code, not user-facing copy, so keep it untranslated.",
+    "lib.snippets.plurals.checkout_items": "ICU plural message for the checkout item count (one/other, # placeholder); translators must provide every plural category for each locale.",
+    "lib.snippets.plurals.items": "ICU plural message for a generic article count (one/other, # placeholder) used in the demo; translators must provide all plural categories for each locale.",
+    "lib.snippets.status.lock_entries": "Status line in the demo showing the number of lock-file entries; short label, and the count may need plural handling in some languages.",
+    "matrix.pseudo_locale.code": "Shown as a span inside the Matrix component. It is the literal pseudo-locale code \"qps\" (Quick Pseudo-Localization), not prose. Keep it unchanged in every locale.",
+    "overview.jobStarted": "Toast after clicking Translate missing",
+    "settings.cdn.example_2": "Code sample in the CDN section showing a curl request to the CDN URL. Shown in a code block, so do not translate the command. Keep the {cdn_url} placeholder unchanged."
   },
   "entries": {
     "ar": {
@@ -1353,6 +1393,28 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "editor.code_block.add_command": {
+        "source_hash": "b727f45902487af6",
+        "target_hash": "c7974affd4889ffe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "editor.code_block.push_command": {
+        "source_hash": "0fa10739ab1c1013",
+        "target_hash": "0fa10739ab1c1013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
       },
       "editor.columns": {
         "source_hash": "83b2852a3ee176ad",
@@ -4704,6 +4766,14 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "github.linked.badKey": {
+        "source_hash": "05bbcc7a65d3cec5",
+        "target_hash": "1cc87113dec0562f",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "eb82c1b04eb75725",
@@ -5254,6 +5324,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "githubAdmin.aria.glot_link": {
+        "source_hash": "bb1261932f543f1b",
+        "target_hash": "bb1261932f543f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "githubAdmin.back": {
         "source_hash": "898d877022f97688",
         "target_hash": "959187971d8b68aa",
@@ -5396,6 +5477,39 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
+      },
+      "githubAdmin.permissions_contents_write": {
+        "source_hash": "6a8fda84c85cd5fe",
+        "target_hash": "6a8fda84c85cd5fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "githubAdmin.permissions_metadata_read": {
+        "source_hash": "c40c9e9e844fe897",
+        "target_hash": "c40c9e9e844fe897",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "githubAdmin.permissions_pull_requests_write": {
+        "source_hash": "6f3a9a72e14f4f18",
+        "target_hash": "6f3a9a72e14f4f18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
       },
       "githubAdmin.recreate": {
         "source_hash": "d4446e4bbf4b4362",
@@ -5911,6 +6025,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "home.cta.localize_command": {
+        "source_hash": "76e300ee7a342c98",
+        "target_hash": "76e300ee7a342c98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "home.cta.title": {
         "source_hash": "8a6571526223f6e6",
         "target_hash": "fec94cb3576dad3d",
@@ -6337,6 +6462,72 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "home.demo.official_ar.headline": {
+        "source_hash": "b5c447f9d962dad7",
+        "target_hash": "b5c447f9d962dad7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.official_de.headline": {
+        "source_hash": "c42c9f25591f4a5f",
+        "target_hash": "b5c447f9d962dad7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.official_en.headline": {
+        "source_hash": "6141b19620f4bf39",
+        "target_hash": "b5c447f9d962dad7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.out.de_width": {
+        "source_hash": "33c42af90e724c3c",
+        "target_hash": "33c42af90e724c3c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.out.en_fake_urgency": {
+        "source_hash": "a53769a6556ee8a4",
+        "target_hash": "a53769a6556ee8a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.out.retry_passed": {
+        "source_hash": "7c1a18e568cc59f8",
+        "target_hash": "6c6599d2f9a07ffb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "home.demo.pass": {
         "source_hash": "436fe71bb9561f05",
         "target_hash": "a273e01a875457cf",
@@ -6480,6 +6671,50 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "home.demo.ship.messages_path": {
+        "source_hash": "ed70b0dc7b657746",
+        "target_hash": "ed70b0dc7b657746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.ship.minus_fragment": {
+        "source_hash": "e062b722a0adebab",
+        "target_hash": "e062b722a0adebab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.ship.plus_fragment": {
+        "source_hash": "033094f3443546d6",
+        "target_hash": "033094f3443546d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.ship.quote_mark": {
+        "source_hash": "8a331fdde7032f33",
+        "target_hash": "8a331fdde7032f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "home.demo.ship.title": {
         "source_hash": "121fd8aa620dc6d6",
         "target_hash": "c322820320438f47",
@@ -6545,6 +6780,105 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
+      },
+      "home.demo.versions.ar.headline": {
+        "source_hash": "2aa9ff6e74230f2d",
+        "target_hash": "2aa9ff6e74230f2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.ar.tagline": {
+        "source_hash": "1a2381b84e9e32f2",
+        "target_hash": "1a2381b84e9e32f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.de.headline": {
+        "source_hash": "39d9638765224ede",
+        "target_hash": "9ed9768eccb9648a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.de.tagline": {
+        "source_hash": "8f44dcfa57e02d62",
+        "target_hash": "8a6387c15b2a1ee9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.en.headline": {
+        "source_hash": "5a9e20c8c168fb24",
+        "target_hash": "9ed9768eccb9648a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.en.tagline": {
+        "source_hash": "b393e9daf815c6e6",
+        "target_hash": "1a2381b84e9e32f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.en.urgency_banner": {
+        "source_hash": "a128b3fae36840d6",
+        "target_hash": "37ed4c52326ebf58",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.layout_note": {
+        "source_hash": "1fba484392ff45cd",
+        "target_hash": "1fba484392ff45cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "home.demo.versions.urgency_note": {
+        "source_hash": "59151348318d5a04",
+        "target_hash": "59151348318d5a04",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
       },
       "home.demo.visitors": {
         "source_hash": "97a243c336302306",
@@ -8814,6 +9148,17 @@
         },
         "reviewed": false
       },
+      "insights.exp.sample_size": {
+        "source_hash": "5a3ffcee84f4c910",
+        "target_hash": "f79d98b2c77d1e1d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "insights.exp.start": {
         "source_hash": "52d4c3f7f540bb2b",
         "target_hash": "b3e683c310b59672",
@@ -9939,6 +10284,39 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "landing.compare.columns.crowdin": {
+        "source_hash": "dae45f8c8e6ba56d",
+        "target_hash": "dae45f8c8e6ba56d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "landing.compare.columns.lokalise": {
+        "source_hash": "fb1348af289b041f",
+        "target_hash": "fb1348af289b041f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "landing.compare.columns.tolgee": {
+        "source_hash": "1411bbf01425c96d",
+        "target_hash": "1411bbf01425c96d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "landing.compare.crowdinPrice": {
         "source_hash": "8440d95831f5a5b8",
         "target_hash": "b18ff20d35f711b9",
@@ -11014,6 +11392,28 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
       },
+      "landing.hero.file_count.plural": {
+        "source_hash": "59a1875a23fd85b8",
+        "target_hash": "d964cae2756c08e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "landing.hero.greeting.welcome_back": {
+        "source_hash": "86791c9b9a355d49",
+        "target_hash": "56b59bab9e54bc37",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "landing.hero.openApp": {
         "source_hash": "688daef45886595d",
         "target_hash": "ec8e36f7cc3ec342",
@@ -11119,6 +11519,17 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:30:41Z"
+      },
+      "landing.hero.syntax.icu_label": {
+        "source_hash": "7e50f73946ba32d8",
+        "target_hash": "a1e16011518b7044",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
       },
       "landing.hero.title": {
         "source_hash": "a73fa0fff1c0b979",
@@ -12042,6 +12453,61 @@
         },
         "reviewed": false
       },
+      "lib.snippets.actions.pay_button": {
+        "source_hash": "b7efd22af6f7deac",
+        "target_hash": "bd1ea0b578930b51",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "lib.snippets.demo.translate_call": {
+        "source_hash": "3ac02f660bafbc98",
+        "target_hash": "3ac02f660bafbc98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "lib.snippets.plurals.checkout_items": {
+        "source_hash": "7e2ac84d7a901bb0",
+        "target_hash": "05d73adbdd16ca57",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "lib.snippets.plurals.items": {
+        "source_hash": "8a3aa549156dace5",
+        "target_hash": "32606596ded6d3c5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
+      "lib.snippets.status.lock_entries": {
+        "source_hash": "5fa80d098a1d2c91",
+        "target_hash": "773823c2eed6d39a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "localeSwitcher.label": {
         "source_hash": "a4fe65264ef7dbb3",
         "target_hash": "6520b21edd4d2913",
@@ -12397,6 +12863,17 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "matrix.pseudo_locale.code": {
+        "source_hash": "deb6220f2c8f8746",
+        "target_hash": "deb6220f2c8f8746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
       },
       "matrix.reload": {
         "source_hash": "7b20422752245bc6",
@@ -16155,15 +16632,21 @@
         "translated_at": "2026-10-18T23:30:41Z"
       },
       "reviewPage.frame.unreachable.body": {
-        "source_hash": "ae4fe74f5072b4fe",
-        "target_hash": "7f506bbe5f403eb2",
+        "source_hash": "ace30cd3c41704c0",
+        "target_hash": "857c1828eebe1a78",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:30:41Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "reviewPage.frame.unreachable.fix": {
+        "source_hash": "097501093f019e81",
+        "target_hash": "6a740c9d53bc288c",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
         "source_hash": "1a212e383a216962",
@@ -17534,6 +18017,17 @@
         },
         "reviewed": false
       },
+      "settings.cdn.example_2": {
+        "source_hash": "b2eae446937a379e",
+        "target_hash": "b2eae446937a379e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:43Z"
+      },
       "settings.cdn.title": {
         "source_hash": "39ac5b16bbb5c862",
         "target_hash": "81f0b5476ba3e31d",
@@ -17957,31 +18451,31 @@
         "reviewed": false
       },
       "settings.preview.baseUrl": {
-        "source_hash": "70589413a3c97933",
-        "target_hash": "5fde0ad7c86365a9",
+        "source_hash": "0f2d62a92588cf66",
+        "target_hash": "41542329e94960a3",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.baseUrlHint": {
-        "source_hash": "4733238e3f450440",
-        "target_hash": "31eb8bdce252b47e",
+        "source_hash": "d31566ea100a931f",
+        "target_hash": "42869682c0e4672d",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.description": {
-        "source_hash": "c73c7c80fc336a75",
-        "target_hash": "45d4512ad1b7e6bf",
+        "source_hash": "d31ef31db2d63425",
+        "target_hash": "89ff1e63a69e9716",
         "origin": {
-          "kind": "machine",
-          "model": "claude-sonnet-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.pattern": {
         "source_hash": "236ff89591a82f7c",
@@ -18038,11 +18532,19 @@
         "reviewed": false
       },
       "settings.preview.title": {
-        "source_hash": "324b134f57c70c72",
-        "target_hash": "0a40c58ac7c3f5c9",
+        "source_hash": "5af93124b370fbaf",
+        "target_hash": "2ccc25bc48ecee1a",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
+        },
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "settings.preview.usedBy": {
+        "source_hash": "cfd7ed4c785b52c2",
+        "target_hash": "7c5d6ac565604f26",
+        "origin": {
+          "kind": "imported"
         },
         "reviewed": false
       },
@@ -21990,6 +22492,28 @@
         },
         "reviewed": false
       },
+      "editor.code_block.add_command": {
+        "source_hash": "b727f45902487af6",
+        "target_hash": "cd64ad96e30e2fd4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "editor.code_block.push_command": {
+        "source_hash": "0fa10739ab1c1013",
+        "target_hash": "0fa10739ab1c1013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "editor.columns": {
         "source_hash": "83b2852a3ee176ad",
         "target_hash": "17d630275f4395eb",
@@ -25340,6 +25864,14 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "github.linked.badKey": {
+        "source_hash": "05bbcc7a65d3cec5",
+        "target_hash": "6de1839735fc5853",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "b5184302b76ed042",
@@ -25890,6 +26422,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "githubAdmin.aria.glot_link": {
+        "source_hash": "bb1261932f543f1b",
+        "target_hash": "bb1261932f543f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "githubAdmin.back": {
         "source_hash": "898d877022f97688",
         "target_hash": "1536a21358b0947c",
@@ -26032,6 +26575,39 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
+      },
+      "githubAdmin.permissions_contents_write": {
+        "source_hash": "6a8fda84c85cd5fe",
+        "target_hash": "6a8fda84c85cd5fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "githubAdmin.permissions_metadata_read": {
+        "source_hash": "c40c9e9e844fe897",
+        "target_hash": "c40c9e9e844fe897",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "githubAdmin.permissions_pull_requests_write": {
+        "source_hash": "6f3a9a72e14f4f18",
+        "target_hash": "6f3a9a72e14f4f18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
       },
       "githubAdmin.recreate": {
         "source_hash": "d4446e4bbf4b4362",
@@ -26547,6 +27123,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "home.cta.localize_command": {
+        "source_hash": "76e300ee7a342c98",
+        "target_hash": "76e300ee7a342c98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "home.cta.title": {
         "source_hash": "8a6571526223f6e6",
         "target_hash": "fef4ff0e59a37050",
@@ -26973,6 +27560,72 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "home.demo.official_ar.headline": {
+        "source_hash": "b5c447f9d962dad7",
+        "target_hash": "b5c447f9d962dad7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.official_de.headline": {
+        "source_hash": "c42c9f25591f4a5f",
+        "target_hash": "c42c9f25591f4a5f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.official_en.headline": {
+        "source_hash": "6141b19620f4bf39",
+        "target_hash": "c42c9f25591f4a5f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.out.de_width": {
+        "source_hash": "33c42af90e724c3c",
+        "target_hash": "33c42af90e724c3c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.out.en_fake_urgency": {
+        "source_hash": "a53769a6556ee8a4",
+        "target_hash": "a53769a6556ee8a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.out.retry_passed": {
+        "source_hash": "7c1a18e568cc59f8",
+        "target_hash": "a7a496083cc2b81e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "home.demo.pass": {
         "source_hash": "436fe71bb9561f05",
         "target_hash": "6067a9a877375a28",
@@ -27116,6 +27769,50 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "home.demo.ship.messages_path": {
+        "source_hash": "ed70b0dc7b657746",
+        "target_hash": "ed70b0dc7b657746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.ship.minus_fragment": {
+        "source_hash": "e062b722a0adebab",
+        "target_hash": "e062b722a0adebab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.ship.plus_fragment": {
+        "source_hash": "033094f3443546d6",
+        "target_hash": "033094f3443546d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.ship.quote_mark": {
+        "source_hash": "8a331fdde7032f33",
+        "target_hash": "8a331fdde7032f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "home.demo.ship.title": {
         "source_hash": "121fd8aa620dc6d6",
         "target_hash": "88a7f0e28d394a4b",
@@ -27181,6 +27878,105 @@
         "score": 85,
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
+      },
+      "home.demo.versions.ar.headline": {
+        "source_hash": "2aa9ff6e74230f2d",
+        "target_hash": "2aa9ff6e74230f2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.ar.tagline": {
+        "source_hash": "1a2381b84e9e32f2",
+        "target_hash": "1a2381b84e9e32f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.de.headline": {
+        "source_hash": "39d9638765224ede",
+        "target_hash": "39d9638765224ede",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.de.tagline": {
+        "source_hash": "8f44dcfa57e02d62",
+        "target_hash": "8f44dcfa57e02d62",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.en.headline": {
+        "source_hash": "5a9e20c8c168fb24",
+        "target_hash": "39d9638765224ede",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.en.tagline": {
+        "source_hash": "b393e9daf815c6e6",
+        "target_hash": "8f44dcfa57e02d62",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.en.urgency_banner": {
+        "source_hash": "a128b3fae36840d6",
+        "target_hash": "9740e18afb53b4bb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.layout_note": {
+        "source_hash": "1fba484392ff45cd",
+        "target_hash": "27811861a27e18ca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "home.demo.versions.urgency_note": {
+        "source_hash": "59151348318d5a04",
+        "target_hash": "54347442274be808",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
       },
       "home.demo.visitors": {
         "source_hash": "97a243c336302306",
@@ -29450,6 +30246,17 @@
         },
         "reviewed": false
       },
+      "insights.exp.sample_size": {
+        "source_hash": "5a3ffcee84f4c910",
+        "target_hash": "6bb9ce08806d9e29",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "insights.exp.start": {
         "source_hash": "52d4c3f7f540bb2b",
         "target_hash": "967f1d409d7f32b7",
@@ -30575,6 +31382,39 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "landing.compare.columns.crowdin": {
+        "source_hash": "dae45f8c8e6ba56d",
+        "target_hash": "dae45f8c8e6ba56d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "landing.compare.columns.lokalise": {
+        "source_hash": "fb1348af289b041f",
+        "target_hash": "fb1348af289b041f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "landing.compare.columns.tolgee": {
+        "source_hash": "1411bbf01425c96d",
+        "target_hash": "1411bbf01425c96d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "landing.compare.crowdinPrice": {
         "source_hash": "8440d95831f5a5b8",
         "target_hash": "f6258e66288c3c95",
@@ -31650,6 +32490,28 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
       },
+      "landing.hero.file_count.plural": {
+        "source_hash": "59a1875a23fd85b8",
+        "target_hash": "6e19527afbf65715",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "landing.hero.greeting.welcome_back": {
+        "source_hash": "86791c9b9a355d49",
+        "target_hash": "f89d82ade41b057b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "landing.hero.openApp": {
         "source_hash": "688daef45886595d",
         "target_hash": "a4625d865d69b726",
@@ -31755,6 +32617,17 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:25:34Z"
+      },
+      "landing.hero.syntax.icu_label": {
+        "source_hash": "7e50f73946ba32d8",
+        "target_hash": "942dc22cb3c9dc61",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
       },
       "landing.hero.title": {
         "source_hash": "a73fa0fff1c0b979",
@@ -32678,6 +33551,61 @@
         },
         "reviewed": false
       },
+      "lib.snippets.actions.pay_button": {
+        "source_hash": "b7efd22af6f7deac",
+        "target_hash": "9d111409c23f1b2a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "lib.snippets.demo.translate_call": {
+        "source_hash": "3ac02f660bafbc98",
+        "target_hash": "3ac02f660bafbc98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "lib.snippets.plurals.checkout_items": {
+        "source_hash": "7e2ac84d7a901bb0",
+        "target_hash": "590ad122b9c0146f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "lib.snippets.plurals.items": {
+        "source_hash": "8a3aa549156dace5",
+        "target_hash": "1bdd1ce3a3d01d34",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
+      "lib.snippets.status.lock_entries": {
+        "source_hash": "5fa80d098a1d2c91",
+        "target_hash": "655c4713b2772f50",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "localeSwitcher.label": {
         "source_hash": "a4fe65264ef7dbb3",
         "target_hash": "f2a1cc71fa59a04b",
@@ -33033,6 +33961,17 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "matrix.pseudo_locale.code": {
+        "source_hash": "deb6220f2c8f8746",
+        "target_hash": "deb6220f2c8f8746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
       },
       "matrix.reload": {
         "source_hash": "7b20422752245bc6",
@@ -36791,15 +37730,21 @@
         "translated_at": "2026-10-18T23:25:34Z"
       },
       "reviewPage.frame.unreachable.body": {
-        "source_hash": "ae4fe74f5072b4fe",
-        "target_hash": "f4f2c5ca069b0165",
+        "source_hash": "ace30cd3c41704c0",
+        "target_hash": "3d170f35c1a41d34",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:25:34Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "reviewPage.frame.unreachable.fix": {
+        "source_hash": "097501093f019e81",
+        "target_hash": "dc8f11b1717bdd46",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
         "source_hash": "1a212e383a216962",
@@ -38170,6 +39115,17 @@
         },
         "reviewed": false
       },
+      "settings.cdn.example_2": {
+        "source_hash": "b2eae446937a379e",
+        "target_hash": "b2eae446937a379e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:45Z"
+      },
       "settings.cdn.title": {
         "source_hash": "39ac5b16bbb5c862",
         "target_hash": "5782a327a969ff88",
@@ -38593,31 +39549,31 @@
         "reviewed": false
       },
       "settings.preview.baseUrl": {
-        "source_hash": "70589413a3c97933",
-        "target_hash": "5fd0ed49a53bf8b7",
+        "source_hash": "0f2d62a92588cf66",
+        "target_hash": "cfeafffe11751ef1",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.baseUrlHint": {
-        "source_hash": "4733238e3f450440",
-        "target_hash": "ad635afc3598a697",
+        "source_hash": "d31566ea100a931f",
+        "target_hash": "768b2e665902deae",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.description": {
-        "source_hash": "c73c7c80fc336a75",
-        "target_hash": "4b826d25f63aee4e",
+        "source_hash": "d31ef31db2d63425",
+        "target_hash": "6da23ae4f1e1de8c",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.pattern": {
         "source_hash": "236ff89591a82f7c",
@@ -38674,11 +39630,19 @@
         "reviewed": false
       },
       "settings.preview.title": {
-        "source_hash": "324b134f57c70c72",
-        "target_hash": "69337f6de91475ad",
+        "source_hash": "5af93124b370fbaf",
+        "target_hash": "855fc9b7217fe696",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
+        },
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "settings.preview.usedBy": {
+        "source_hash": "cfd7ed4c785b52c2",
+        "target_hash": "dd253804e6e78351",
+        "origin": {
+          "kind": "imported"
         },
         "reviewed": false
       },
@@ -42626,6 +43590,28 @@
         },
         "reviewed": false
       },
+      "editor.code_block.add_command": {
+        "source_hash": "b727f45902487af6",
+        "target_hash": "e76f3a62edd611b4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "editor.code_block.push_command": {
+        "source_hash": "0fa10739ab1c1013",
+        "target_hash": "0fa10739ab1c1013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "editor.columns": {
         "source_hash": "83b2852a3ee176ad",
         "target_hash": "dfee336770735631",
@@ -45976,6 +46962,14 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "github.linked.badKey": {
+        "source_hash": "05bbcc7a65d3cec5",
+        "target_hash": "f6260e889a4bca23",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "8cb28ca416cc2d7a",
@@ -46526,6 +47520,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "githubAdmin.aria.glot_link": {
+        "source_hash": "bb1261932f543f1b",
+        "target_hash": "bb1261932f543f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "githubAdmin.back": {
         "source_hash": "898d877022f97688",
         "target_hash": "834f03046a7776ec",
@@ -46668,6 +47673,39 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
+      },
+      "githubAdmin.permissions_contents_write": {
+        "source_hash": "6a8fda84c85cd5fe",
+        "target_hash": "6a8fda84c85cd5fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "githubAdmin.permissions_metadata_read": {
+        "source_hash": "c40c9e9e844fe897",
+        "target_hash": "c40c9e9e844fe897",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "githubAdmin.permissions_pull_requests_write": {
+        "source_hash": "6f3a9a72e14f4f18",
+        "target_hash": "6f3a9a72e14f4f18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
       },
       "githubAdmin.recreate": {
         "source_hash": "d4446e4bbf4b4362",
@@ -47183,6 +48221,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "home.cta.localize_command": {
+        "source_hash": "76e300ee7a342c98",
+        "target_hash": "76e300ee7a342c98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "home.cta.title": {
         "source_hash": "8a6571526223f6e6",
         "target_hash": "da1d17bc46b34c87",
@@ -47609,6 +48658,72 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "home.demo.official_ar.headline": {
+        "source_hash": "b5c447f9d962dad7",
+        "target_hash": "b5c447f9d962dad7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.official_de.headline": {
+        "source_hash": "c42c9f25591f4a5f",
+        "target_hash": "bd4d697d22011539",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.official_en.headline": {
+        "source_hash": "6141b19620f4bf39",
+        "target_hash": "bd4d697d22011539",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.out.de_width": {
+        "source_hash": "33c42af90e724c3c",
+        "target_hash": "33c42af90e724c3c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.out.en_fake_urgency": {
+        "source_hash": "a53769a6556ee8a4",
+        "target_hash": "a53769a6556ee8a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.out.retry_passed": {
+        "source_hash": "7c1a18e568cc59f8",
+        "target_hash": "6e0d4864642ffa59",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "home.demo.pass": {
         "source_hash": "436fe71bb9561f05",
         "target_hash": "80bc95cabf88f745",
@@ -47752,6 +48867,50 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "home.demo.ship.messages_path": {
+        "source_hash": "ed70b0dc7b657746",
+        "target_hash": "ed70b0dc7b657746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.ship.minus_fragment": {
+        "source_hash": "e062b722a0adebab",
+        "target_hash": "e062b722a0adebab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.ship.plus_fragment": {
+        "source_hash": "033094f3443546d6",
+        "target_hash": "033094f3443546d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.ship.quote_mark": {
+        "source_hash": "8a331fdde7032f33",
+        "target_hash": "8a331fdde7032f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "home.demo.ship.title": {
         "source_hash": "121fd8aa620dc6d6",
         "target_hash": "6ad70aeaf2a83210",
@@ -47817,6 +48976,105 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
+      },
+      "home.demo.versions.ar.headline": {
+        "source_hash": "2aa9ff6e74230f2d",
+        "target_hash": "2aa9ff6e74230f2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.ar.tagline": {
+        "source_hash": "1a2381b84e9e32f2",
+        "target_hash": "1a2381b84e9e32f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.de.headline": {
+        "source_hash": "39d9638765224ede",
+        "target_hash": "adb3d69c3e386fe0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.de.tagline": {
+        "source_hash": "8f44dcfa57e02d62",
+        "target_hash": "567ec5ad53207ecf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.en.headline": {
+        "source_hash": "5a9e20c8c168fb24",
+        "target_hash": "adb3d69c3e386fe0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.en.tagline": {
+        "source_hash": "b393e9daf815c6e6",
+        "target_hash": "86cbc930424b2237",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.en.urgency_banner": {
+        "source_hash": "a128b3fae36840d6",
+        "target_hash": "c0f92542793e6192",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.layout_note": {
+        "source_hash": "1fba484392ff45cd",
+        "target_hash": "17beccf3dee6fe93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "home.demo.versions.urgency_note": {
+        "source_hash": "59151348318d5a04",
+        "target_hash": "21b04b263dcdce2e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
       },
       "home.demo.visitors": {
         "source_hash": "97a243c336302306",
@@ -50086,6 +51344,17 @@
         },
         "reviewed": false
       },
+      "insights.exp.sample_size": {
+        "source_hash": "5a3ffcee84f4c910",
+        "target_hash": "86ead2aefd23de04",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "insights.exp.start": {
         "source_hash": "52d4c3f7f540bb2b",
         "target_hash": "417ec6f04d2d92a1",
@@ -51211,6 +52480,39 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "landing.compare.columns.crowdin": {
+        "source_hash": "dae45f8c8e6ba56d",
+        "target_hash": "dae45f8c8e6ba56d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "landing.compare.columns.lokalise": {
+        "source_hash": "fb1348af289b041f",
+        "target_hash": "fb1348af289b041f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "landing.compare.columns.tolgee": {
+        "source_hash": "1411bbf01425c96d",
+        "target_hash": "1411bbf01425c96d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "landing.compare.crowdinPrice": {
         "source_hash": "8440d95831f5a5b8",
         "target_hash": "625454ffcd20b8f1",
@@ -52286,6 +53588,28 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
       },
+      "landing.hero.file_count.plural": {
+        "source_hash": "59a1875a23fd85b8",
+        "target_hash": "d91d4156d189cee7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "landing.hero.greeting.welcome_back": {
+        "source_hash": "86791c9b9a355d49",
+        "target_hash": "9b6fa4ebec29b44f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "landing.hero.openApp": {
         "source_hash": "688daef45886595d",
         "target_hash": "49df3c772a08fc16",
@@ -52391,6 +53715,17 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:23:21Z"
+      },
+      "landing.hero.syntax.icu_label": {
+        "source_hash": "7e50f73946ba32d8",
+        "target_hash": "60553ca1aa6230cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
       },
       "landing.hero.title": {
         "source_hash": "a73fa0fff1c0b979",
@@ -53314,6 +54649,61 @@
         },
         "reviewed": false
       },
+      "lib.snippets.actions.pay_button": {
+        "source_hash": "b7efd22af6f7deac",
+        "target_hash": "6266504a1237db46",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "lib.snippets.demo.translate_call": {
+        "source_hash": "3ac02f660bafbc98",
+        "target_hash": "3ac02f660bafbc98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "lib.snippets.plurals.checkout_items": {
+        "source_hash": "7e2ac84d7a901bb0",
+        "target_hash": "b405a9c38fc6012e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "lib.snippets.plurals.items": {
+        "source_hash": "8a3aa549156dace5",
+        "target_hash": "33b743fa909fdf4b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
+      "lib.snippets.status.lock_entries": {
+        "source_hash": "5fa80d098a1d2c91",
+        "target_hash": "b358d9d6ddc68ce7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "localeSwitcher.label": {
         "source_hash": "a4fe65264ef7dbb3",
         "target_hash": "7ae9d418353b399f",
@@ -53669,6 +55059,17 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "matrix.pseudo_locale.code": {
+        "source_hash": "deb6220f2c8f8746",
+        "target_hash": "deb6220f2c8f8746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
       },
       "matrix.reload": {
         "source_hash": "7b20422752245bc6",
@@ -57427,15 +58828,21 @@
         "translated_at": "2026-10-18T23:23:21Z"
       },
       "reviewPage.frame.unreachable.body": {
-        "source_hash": "ae4fe74f5072b4fe",
-        "target_hash": "d09c3284ddbb4b96",
+        "source_hash": "ace30cd3c41704c0",
+        "target_hash": "69485094dbfbb571",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:23:21Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "reviewPage.frame.unreachable.fix": {
+        "source_hash": "097501093f019e81",
+        "target_hash": "b6c8f3d567d65993",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
         "source_hash": "1a212e383a216962",
@@ -58806,6 +60213,17 @@
         },
         "reviewed": false
       },
+      "settings.cdn.example_2": {
+        "source_hash": "b2eae446937a379e",
+        "target_hash": "b2eae446937a379e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:06:16Z"
+      },
       "settings.cdn.title": {
         "source_hash": "39ac5b16bbb5c862",
         "target_hash": "772dc71efdf974fa",
@@ -59229,31 +60647,31 @@
         "reviewed": false
       },
       "settings.preview.baseUrl": {
-        "source_hash": "70589413a3c97933",
-        "target_hash": "f1a52d70f8c5d169",
+        "source_hash": "0f2d62a92588cf66",
+        "target_hash": "273d8df6a5770964",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.baseUrlHint": {
-        "source_hash": "4733238e3f450440",
-        "target_hash": "125d9a440f34e120",
+        "source_hash": "d31566ea100a931f",
+        "target_hash": "7f31f579197c2f47",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.description": {
-        "source_hash": "c73c7c80fc336a75",
-        "target_hash": "2bdf4f6cbf7505a9",
+        "source_hash": "d31ef31db2d63425",
+        "target_hash": "256e4f9dccc16c7a",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.pattern": {
         "source_hash": "236ff89591a82f7c",
@@ -59310,11 +60728,19 @@
         "reviewed": false
       },
       "settings.preview.title": {
-        "source_hash": "324b134f57c70c72",
-        "target_hash": "c5341f198fc2f4f8",
+        "source_hash": "5af93124b370fbaf",
+        "target_hash": "1a12bdb8ddc13dc5",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
+        },
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "settings.preview.usedBy": {
+        "source_hash": "cfd7ed4c785b52c2",
+        "target_hash": "6e70fb6b0b42e558",
+        "origin": {
+          "kind": "imported"
         },
         "reviewed": false
       },
@@ -62104,14 +63530,12 @@
       },
       "account.preferences.celebrationsHint": {
         "source_hash": "80d73fe2c3408440",
-        "target_hash": "5e05f9c106ef6b79",
+        "target_hash": "c67f4068455c41e4",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "account.preferences.title": {
         "source_hash": "66962f72a0888373",
@@ -62202,14 +63626,12 @@
       },
       "auth.login.forgot": {
         "source_hash": "30c1d8d3e9128893",
-        "target_hash": "3ea4c88a2e3525d0",
+        "target_hash": "cccdcc1a0d8a1f82",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "auth.login.submit": {
         "source_hash": "bfd402b2f6f38125",
@@ -63262,6 +64684,28 @@
         },
         "reviewed": false
       },
+      "editor.code_block.add_command": {
+        "source_hash": "b727f45902487af6",
+        "target_hash": "f7a020a95787bdef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "editor.code_block.push_command": {
+        "source_hash": "0fa10739ab1c1013",
+        "target_hash": "0fa10739ab1c1013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "editor.columns": {
         "source_hash": "83b2852a3ee176ad",
         "target_hash": "2d259f09bf53e3d2",
@@ -64247,14 +65691,12 @@
       },
       "experimentResults.confirmPropagate.title": {
         "source_hash": "af2eb358f9312502",
-        "target_hash": "1ec978d8780aadc7",
+        "target_hash": "14dc70fc8aa3e022",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "experimentResults.confirmSegment.after": {
         "source_hash": "f5263aeaf6b54cfd",
@@ -64291,14 +65733,12 @@
       },
       "experimentResults.confirmSegment.title": {
         "source_hash": "4903497a8195aa94",
-        "target_hash": "67b1c129b12eefaf",
+        "target_hash": "9b43e43eb73824ae",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 85,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "experimentResults.confirmStop.body": {
         "source_hash": "191712e64be5fbb1",
@@ -64324,14 +65764,12 @@
       },
       "experimentResults.confirmStop.title": {
         "source_hash": "e4a791d24dc47a24",
-        "target_hash": "30272b1df6ea3f02",
+        "target_hash": "eea78e9d55186467",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 85,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "experimentResults.everyone": {
         "source_hash": "da2e5dc515b188dc",
@@ -64423,14 +65861,12 @@
       },
       "experimentResults.milestones.winnerBody": {
         "source_hash": "2a405bc706725943",
-        "target_hash": "dbf266b254f4e133",
+        "target_hash": "4ed7a34dce63cd0a",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "experimentResults.official": {
         "source_hash": "c409c66f71f2750e",
@@ -66449,14 +67885,12 @@
       },
       "gamification.ringLabel": {
         "source_hash": "be680237ea2060c7",
-        "target_hash": "aaa0d59d2cf04555",
+        "target_hash": "0f73be9bb8739995",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "gamification.ringTooltip": {
         "source_hash": "975417f79a8bf9d1",
@@ -66559,14 +67993,12 @@
       },
       "github.install.already": {
         "source_hash": "7704ed44f5c5d823",
-        "target_hash": "24fb1733d93a6be6",
+        "target_hash": "6b329cf58afd1152",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "github.install.cta": {
         "source_hash": "4027e5b24418520f",
@@ -66592,14 +68024,12 @@
       },
       "github.job.announce": {
         "source_hash": "cbdf1303d308233b",
-        "target_hash": "042c41b6f0cf94c4",
+        "target_hash": "54879cffcea110b6",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "github.job.progress": {
         "source_hash": "e8c271da2dfe7e5f",
@@ -66611,6 +68041,14 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
+      },
+      "github.linked.badKey": {
+        "source_hash": "05bbcc7a65d3cec5",
+        "target_hash": "4535d30869be60b3",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
@@ -66779,25 +68217,21 @@
       },
       "github.page.disconnectBody": {
         "source_hash": "bc25fc2c2b767cfb",
-        "target_hash": "9c8dfc163fe46bff",
+        "target_hash": "5144e003063db04a",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "github.page.disconnectTitle": {
         "source_hash": "9035500c41ad310e",
-        "target_hash": "a14bf829f13b460d",
+        "target_hash": "5c60a3b42e6e5985",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "github.page.disconnected": {
         "source_hash": "6aebbe39b2b5b8be",
@@ -66823,14 +68257,12 @@
       },
       "github.page.subtitle": {
         "source_hash": "5cd8c36e0e3d8409",
-        "target_hash": "a29e43d2bd9bb252",
+        "target_hash": "97943f4c341665e2",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "github.page.title": {
         "source_hash": "f911e414cf6bdfc5",
@@ -67162,6 +68594,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "githubAdmin.aria.glot_link": {
+        "source_hash": "bb1261932f543f1b",
+        "target_hash": "bb1261932f543f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "githubAdmin.back": {
         "source_hash": "898d877022f97688",
         "target_hash": "2d485dd162738b5d",
@@ -67304,6 +68747,39 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
+      },
+      "githubAdmin.permissions_contents_write": {
+        "source_hash": "6a8fda84c85cd5fe",
+        "target_hash": "6a8fda84c85cd5fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "githubAdmin.permissions_metadata_read": {
+        "source_hash": "c40c9e9e844fe897",
+        "target_hash": "c40c9e9e844fe897",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "githubAdmin.permissions_pull_requests_write": {
+        "source_hash": "6f3a9a72e14f4f18",
+        "target_hash": "6f3a9a72e14f4f18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
       },
       "githubAdmin.recreate": {
         "source_hash": "d4446e4bbf4b4362",
@@ -67819,6 +69295,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "home.cta.localize_command": {
+        "source_hash": "76e300ee7a342c98",
+        "target_hash": "76e300ee7a342c98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "home.cta.title": {
         "source_hash": "8a6571526223f6e6",
         "target_hash": "5c2f021f44e33121",
@@ -68245,6 +69732,72 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "home.demo.official_ar.headline": {
+        "source_hash": "b5c447f9d962dad7",
+        "target_hash": "2912e62c6c522374",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.official_de.headline": {
+        "source_hash": "c42c9f25591f4a5f",
+        "target_hash": "2912e62c6c522374",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.official_en.headline": {
+        "source_hash": "6141b19620f4bf39",
+        "target_hash": "3df3d3b388fe0612",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.out.de_width": {
+        "source_hash": "33c42af90e724c3c",
+        "target_hash": "33c42af90e724c3c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.out.en_fake_urgency": {
+        "source_hash": "a53769a6556ee8a4",
+        "target_hash": "a53769a6556ee8a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.out.retry_passed": {
+        "source_hash": "7c1a18e568cc59f8",
+        "target_hash": "1a15b5c90cad05bc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "home.demo.pass": {
         "source_hash": "436fe71bb9561f05",
         "target_hash": "06f2825af70d64fd",
@@ -68388,6 +69941,50 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "home.demo.ship.messages_path": {
+        "source_hash": "ed70b0dc7b657746",
+        "target_hash": "ed70b0dc7b657746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.ship.minus_fragment": {
+        "source_hash": "e062b722a0adebab",
+        "target_hash": "e062b722a0adebab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.ship.plus_fragment": {
+        "source_hash": "033094f3443546d6",
+        "target_hash": "033094f3443546d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.ship.quote_mark": {
+        "source_hash": "8a331fdde7032f33",
+        "target_hash": "8a331fdde7032f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "home.demo.ship.title": {
         "source_hash": "121fd8aa620dc6d6",
         "target_hash": "d815a402c5c461d6",
@@ -68454,6 +70051,105 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "home.demo.versions.ar.headline": {
+        "source_hash": "2aa9ff6e74230f2d",
+        "target_hash": "ec14ed3c5f1f2508",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.ar.tagline": {
+        "source_hash": "1a2381b84e9e32f2",
+        "target_hash": "324d280a0868d6c0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.de.headline": {
+        "source_hash": "39d9638765224ede",
+        "target_hash": "ec14ed3c5f1f2508",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.de.tagline": {
+        "source_hash": "8f44dcfa57e02d62",
+        "target_hash": "b71770fec6840812",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.en.headline": {
+        "source_hash": "5a9e20c8c168fb24",
+        "target_hash": "ec14ed3c5f1f2508",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.en.tagline": {
+        "source_hash": "b393e9daf815c6e6",
+        "target_hash": "87870553d8d561ee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.en.urgency_banner": {
+        "source_hash": "a128b3fae36840d6",
+        "target_hash": "9a9a1105b22226ab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.layout_note": {
+        "source_hash": "1fba484392ff45cd",
+        "target_hash": "5303b06f43119d95",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "home.demo.versions.urgency_note": {
+        "source_hash": "59151348318d5a04",
+        "target_hash": "c10bfe31ed70cb8b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "home.demo.visitors": {
         "source_hash": "97a243c336302306",
         "target_hash": "aea90be1b36dba60",
@@ -68467,14 +70163,12 @@
       },
       "home.demo.win": {
         "source_hash": "2ff3fc0ed7327602",
-        "target_hash": "794fae2655de0e57",
+        "target_hash": "bf23d6673193dacf",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "home.demo.write.body": {
         "source_hash": "88f12cda79f18881",
@@ -68530,14 +70224,12 @@
       },
       "home.faq.agents.q": {
         "source_hash": "579d06133a17c688",
-        "target_hash": "3000ba96f9752235",
+        "target_hash": "0d9e1e84fe22a433",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "home.faq.ai.a": {
         "source_hash": "0668da144cb78fd4",
@@ -68552,14 +70244,12 @@
       },
       "home.faq.ai.q": {
         "source_hash": "26078712641df1d0",
-        "target_hash": "36bb3c3e363e50be",
+        "target_hash": "e595230f5bbd371c",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 85,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "home.faq.audiences.a": {
         "source_hash": "3872666d8e72832b",
@@ -70722,6 +72412,17 @@
         },
         "reviewed": false
       },
+      "insights.exp.sample_size": {
+        "source_hash": "5a3ffcee84f4c910",
+        "target_hash": "c1a15d638e00a745",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "insights.exp.start": {
         "source_hash": "52d4c3f7f540bb2b",
         "target_hash": "e51e7f4b6f7b0e04",
@@ -71847,6 +73548,39 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "landing.compare.columns.crowdin": {
+        "source_hash": "dae45f8c8e6ba56d",
+        "target_hash": "dae45f8c8e6ba56d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "landing.compare.columns.lokalise": {
+        "source_hash": "fb1348af289b041f",
+        "target_hash": "fb1348af289b041f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "landing.compare.columns.tolgee": {
+        "source_hash": "1411bbf01425c96d",
+        "target_hash": "1411bbf01425c96d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "landing.compare.crowdinPrice": {
         "source_hash": "8440d95831f5a5b8",
         "target_hash": "47496750a47fa8f6",
@@ -72922,6 +74656,28 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
       },
+      "landing.hero.file_count.plural": {
+        "source_hash": "59a1875a23fd85b8",
+        "target_hash": "7aeb070c96b995f7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "landing.hero.greeting.welcome_back": {
+        "source_hash": "86791c9b9a355d49",
+        "target_hash": "49a70c15964e2c5b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "landing.hero.openApp": {
         "source_hash": "688daef45886595d",
         "target_hash": "1dfa69aec672047b",
@@ -73027,6 +74783,17 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:21:04Z"
+      },
+      "landing.hero.syntax.icu_label": {
+        "source_hash": "7e50f73946ba32d8",
+        "target_hash": "37420da3cf70dac0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
       },
       "landing.hero.title": {
         "source_hash": "a73fa0fff1c0b979",
@@ -73950,6 +75717,61 @@
         },
         "reviewed": false
       },
+      "lib.snippets.actions.pay_button": {
+        "source_hash": "b7efd22af6f7deac",
+        "target_hash": "b7efd22af6f7deac",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "lib.snippets.demo.translate_call": {
+        "source_hash": "3ac02f660bafbc98",
+        "target_hash": "3ac02f660bafbc98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "lib.snippets.plurals.checkout_items": {
+        "source_hash": "7e2ac84d7a901bb0",
+        "target_hash": "58feabf05ddf55f6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "lib.snippets.plurals.items": {
+        "source_hash": "8a3aa549156dace5",
+        "target_hash": "3c5e2ac3988f9013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
+      "lib.snippets.status.lock_entries": {
+        "source_hash": "5fa80d098a1d2c91",
+        "target_hash": "1b84490f81e386e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "localeSwitcher.label": {
         "source_hash": "a4fe65264ef7dbb3",
         "target_hash": "5f6baab4dbe152fc",
@@ -74305,6 +76127,17 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "matrix.pseudo_locale.code": {
+        "source_hash": "deb6220f2c8f8746",
+        "target_hash": "deb6220f2c8f8746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
       },
       "matrix.reload": {
         "source_hash": "7b20422752245bc6",
@@ -77855,14 +79688,12 @@
       },
       "reviewPage.editor.source": {
         "source_hash": "499046b1e1bdd1b4",
-        "target_hash": "9fad425505a6eb99",
+        "target_hash": "a9ba817c6de258ca",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 85,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "reviewPage.editor.title": {
         "source_hash": "7967d94489951619",
@@ -78063,15 +79894,21 @@
         "translated_at": "2026-10-18T23:21:04Z"
       },
       "reviewPage.frame.unreachable.body": {
-        "source_hash": "ae4fe74f5072b4fe",
-        "target_hash": "8f04bb534b9a0cd5",
+        "source_hash": "ace30cd3c41704c0",
+        "target_hash": "961b03a4ef8f63f1",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "reviewPage.frame.unreachable.fix": {
+        "source_hash": "097501093f019e81",
+        "target_hash": "69fac4e15d11b010",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
         "source_hash": "1a212e383a216962",
@@ -79442,6 +81279,17 @@
         },
         "reviewed": false
       },
+      "settings.cdn.example_2": {
+        "source_hash": "b2eae446937a379e",
+        "target_hash": "b2eae446937a379e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:05:49Z"
+      },
       "settings.cdn.title": {
         "source_hash": "39ac5b16bbb5c862",
         "target_hash": "c2f5ed8e83ae0bfc",
@@ -79745,14 +81593,12 @@
       },
       "settings.llm.styleHint": {
         "source_hash": "21e1019bd8ce6851",
-        "target_hash": "a88ac77ab128fb8a",
+        "target_hash": "2cb5733c561f95d8",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.llm.stylePlaceholder": {
         "source_hash": "fc1aae75ae5f7e90",
@@ -79865,31 +81711,31 @@
         "reviewed": false
       },
       "settings.preview.baseUrl": {
-        "source_hash": "70589413a3c97933",
-        "target_hash": "58270721c3ec7aa2",
+        "source_hash": "0f2d62a92588cf66",
+        "target_hash": "7d5aca98cc22eee6",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.baseUrlHint": {
-        "source_hash": "4733238e3f450440",
-        "target_hash": "bc615ee31dc17142",
+        "source_hash": "d31566ea100a931f",
+        "target_hash": "8f4887c96d4cf14a",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.description": {
-        "source_hash": "c73c7c80fc336a75",
-        "target_hash": "6764c1bc909aee47",
+        "source_hash": "d31ef31db2d63425",
+        "target_hash": "051da269267a7e0f",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.pattern": {
         "source_hash": "236ff89591a82f7c",
@@ -79946,11 +81792,19 @@
         "reviewed": false
       },
       "settings.preview.title": {
-        "source_hash": "324b134f57c70c72",
-        "target_hash": "bb28a9f4a4e34fac",
+        "source_hash": "5af93124b370fbaf",
+        "target_hash": "72ec71d24efc08a8",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
+        },
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "settings.preview.usedBy": {
+        "source_hash": "cfd7ed4c785b52c2",
+        "target_hash": "47f6424055e2a4a6",
+        "origin": {
+          "kind": "imported"
         },
         "reviewed": false
       },
@@ -80791,14 +82645,12 @@
       },
       "xpWizard.audience.countryBad": {
         "source_hash": "5a0b003596acc7e5",
-        "target_hash": "908a5cda95eec03c",
+        "target_hash": "8d3d035a14e8207f",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:21:04Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "xpWizard.audience.countryHint": {
         "source_hash": "693051d6c7fdfae5",
@@ -83897,6 +85749,28 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "editor.code_block.add_command": {
+        "source_hash": "b727f45902487af6",
+        "target_hash": "96e8654e6a36b437",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "editor.code_block.push_command": {
+        "source_hash": "0fa10739ab1c1013",
+        "target_hash": "0fa10739ab1c1013",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
       },
       "editor.columns": {
         "source_hash": "83b2852a3ee176ad",
@@ -87248,6 +89122,14 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "github.linked.badKey": {
+        "source_hash": "05bbcc7a65d3cec5",
+        "target_hash": "c71312476e87cb60",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "3b944c972b98974d",
@@ -87798,6 +89680,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "githubAdmin.aria.glot_link": {
+        "source_hash": "bb1261932f543f1b",
+        "target_hash": "bb1261932f543f1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "githubAdmin.back": {
         "source_hash": "898d877022f97688",
         "target_hash": "f6d4818a3d8f2f00",
@@ -87940,6 +89833,39 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
+      },
+      "githubAdmin.permissions_contents_write": {
+        "source_hash": "6a8fda84c85cd5fe",
+        "target_hash": "6a8fda84c85cd5fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "githubAdmin.permissions_metadata_read": {
+        "source_hash": "c40c9e9e844fe897",
+        "target_hash": "c40c9e9e844fe897",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "githubAdmin.permissions_pull_requests_write": {
+        "source_hash": "6f3a9a72e14f4f18",
+        "target_hash": "6f3a9a72e14f4f18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
       },
       "githubAdmin.recreate": {
         "source_hash": "d4446e4bbf4b4362",
@@ -88455,6 +90381,17 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "home.cta.localize_command": {
+        "source_hash": "76e300ee7a342c98",
+        "target_hash": "76e300ee7a342c98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "home.cta.title": {
         "source_hash": "8a6571526223f6e6",
         "target_hash": "f7eefe256d969b7f",
@@ -88881,6 +90818,72 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "home.demo.official_ar.headline": {
+        "source_hash": "b5c447f9d962dad7",
+        "target_hash": "aaf93377778b7ccb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.official_de.headline": {
+        "source_hash": "c42c9f25591f4a5f",
+        "target_hash": "aaf93377778b7ccb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.official_en.headline": {
+        "source_hash": "6141b19620f4bf39",
+        "target_hash": "fae7391619c6ab1f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.out.de_width": {
+        "source_hash": "33c42af90e724c3c",
+        "target_hash": "33c42af90e724c3c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.out.en_fake_urgency": {
+        "source_hash": "a53769a6556ee8a4",
+        "target_hash": "a53769a6556ee8a4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.out.retry_passed": {
+        "source_hash": "7c1a18e568cc59f8",
+        "target_hash": "e6e218c5967cbd91",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "home.demo.pass": {
         "source_hash": "436fe71bb9561f05",
         "target_hash": "c84ad61b176d11ef",
@@ -89024,6 +91027,50 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "home.demo.ship.messages_path": {
+        "source_hash": "ed70b0dc7b657746",
+        "target_hash": "ed70b0dc7b657746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.ship.minus_fragment": {
+        "source_hash": "e062b722a0adebab",
+        "target_hash": "e062b722a0adebab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.ship.plus_fragment": {
+        "source_hash": "033094f3443546d6",
+        "target_hash": "033094f3443546d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.ship.quote_mark": {
+        "source_hash": "8a331fdde7032f33",
+        "target_hash": "8a331fdde7032f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "home.demo.ship.title": {
         "source_hash": "121fd8aa620dc6d6",
         "target_hash": "337df40f6301d78b",
@@ -89089,6 +91136,105 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
+      },
+      "home.demo.versions.ar.headline": {
+        "source_hash": "2aa9ff6e74230f2d",
+        "target_hash": "c02e577fd7fd720f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.ar.tagline": {
+        "source_hash": "1a2381b84e9e32f2",
+        "target_hash": "b7940b2e294e4874",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.de.headline": {
+        "source_hash": "39d9638765224ede",
+        "target_hash": "c02e577fd7fd720f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.de.tagline": {
+        "source_hash": "8f44dcfa57e02d62",
+        "target_hash": "b7940b2e294e4874",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.en.headline": {
+        "source_hash": "5a9e20c8c168fb24",
+        "target_hash": "fe56378980291123",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.en.tagline": {
+        "source_hash": "b393e9daf815c6e6",
+        "target_hash": "b7940b2e294e4874",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.en.urgency_banner": {
+        "source_hash": "a128b3fae36840d6",
+        "target_hash": "179fb203a576c388",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.layout_note": {
+        "source_hash": "1fba484392ff45cd",
+        "target_hash": "039cabddfb7d84a3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "home.demo.versions.urgency_note": {
+        "source_hash": "59151348318d5a04",
+        "target_hash": "0ad635d440c0ee32",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
       },
       "home.demo.visitors": {
         "source_hash": "97a243c336302306",
@@ -91358,6 +93504,17 @@
         },
         "reviewed": false
       },
+      "insights.exp.sample_size": {
+        "source_hash": "5a3ffcee84f4c910",
+        "target_hash": "ba032508da7975c6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-sonnet-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "insights.exp.start": {
         "source_hash": "52d4c3f7f540bb2b",
         "target_hash": "1b4634d863fe5ff2",
@@ -92483,6 +94640,39 @@
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
       },
+      "landing.compare.columns.crowdin": {
+        "source_hash": "dae45f8c8e6ba56d",
+        "target_hash": "dae45f8c8e6ba56d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "landing.compare.columns.lokalise": {
+        "source_hash": "fb1348af289b041f",
+        "target_hash": "fb1348af289b041f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "landing.compare.columns.tolgee": {
+        "source_hash": "1411bbf01425c96d",
+        "target_hash": "1411bbf01425c96d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "landing.compare.crowdinPrice": {
         "source_hash": "8440d95831f5a5b8",
         "target_hash": "3cbd46b8f6a2f70f",
@@ -93558,6 +95748,28 @@
         "reviewed": false,
         "translated_at": "2026-10-18T17:45:57Z"
       },
+      "landing.hero.file_count.plural": {
+        "source_hash": "59a1875a23fd85b8",
+        "target_hash": "f6ab31f5ba7bd472",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "landing.hero.greeting.welcome_back": {
+        "source_hash": "86791c9b9a355d49",
+        "target_hash": "8efedd873e3747c4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "landing.hero.openApp": {
         "source_hash": "688daef45886595d",
         "target_hash": "3f80aab76f3b4e6f",
@@ -93663,6 +95875,17 @@
         "score": 100,
         "reviewed": false,
         "translated_at": "2026-10-18T23:27:49Z"
+      },
+      "landing.hero.syntax.icu_label": {
+        "source_hash": "7e50f73946ba32d8",
+        "target_hash": "2f973971742caaaa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
       },
       "landing.hero.title": {
         "source_hash": "a73fa0fff1c0b979",
@@ -94586,6 +96809,61 @@
         },
         "reviewed": false
       },
+      "lib.snippets.actions.pay_button": {
+        "source_hash": "b7efd22af6f7deac",
+        "target_hash": "3bae7760e7c32f88",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "lib.snippets.demo.translate_call": {
+        "source_hash": "3ac02f660bafbc98",
+        "target_hash": "3ac02f660bafbc98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "lib.snippets.plurals.checkout_items": {
+        "source_hash": "7e2ac84d7a901bb0",
+        "target_hash": "9d3ba7be4fd3fdf5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "lib.snippets.plurals.items": {
+        "source_hash": "8a3aa549156dace5",
+        "target_hash": "6e551d924b8a5947",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
+      "lib.snippets.status.lock_entries": {
+        "source_hash": "5fa80d098a1d2c91",
+        "target_hash": "f55ca5267e22973a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 100,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "localeSwitcher.label": {
         "source_hash": "a4fe65264ef7dbb3",
         "target_hash": "9682ba3b92f7a961",
@@ -94941,6 +97219,17 @@
           "model": "claude-haiku-5-5"
         },
         "reviewed": false
+      },
+      "matrix.pseudo_locale.code": {
+        "source_hash": "deb6220f2c8f8746",
+        "target_hash": "deb6220f2c8f8746",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
       },
       "matrix.reload": {
         "source_hash": "7b20422752245bc6",
@@ -98699,15 +100988,21 @@
         "translated_at": "2026-10-18T23:27:49Z"
       },
       "reviewPage.frame.unreachable.body": {
-        "source_hash": "ae4fe74f5072b4fe",
-        "target_hash": "c9efca114af2f1e2",
+        "source_hash": "ace30cd3c41704c0",
+        "target_hash": "8050530951caded6",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "score": 100,
-        "reviewed": false,
-        "translated_at": "2026-10-18T23:27:49Z"
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "reviewPage.frame.unreachable.fix": {
+        "source_hash": "097501093f019e81",
+        "target_hash": "9ba1e75026decc60",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
         "source_hash": "1a212e383a216962",
@@ -100078,6 +102373,17 @@
         },
         "reviewed": false
       },
+      "settings.cdn.example_2": {
+        "source_hash": "b2eae446937a379e",
+        "target_hash": "b2eae446937a379e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "score": 85,
+        "reviewed": false,
+        "translated_at": "2026-10-19T07:07:13Z"
+      },
       "settings.cdn.title": {
         "source_hash": "39ac5b16bbb5c862",
         "target_hash": "0227dd823f9afd00",
@@ -100501,31 +102807,31 @@
         "reviewed": false
       },
       "settings.preview.baseUrl": {
-        "source_hash": "70589413a3c97933",
-        "target_hash": "2dabbc900a6593bd",
+        "source_hash": "0f2d62a92588cf66",
+        "target_hash": "5d1526fe5b6fd334",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.baseUrlHint": {
-        "source_hash": "4733238e3f450440",
-        "target_hash": "b92801df1003ce82",
+        "source_hash": "d31566ea100a931f",
+        "target_hash": "1b91303554710a7d",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.description": {
-        "source_hash": "c73c7c80fc336a75",
-        "target_hash": "58ebb3ba02c31199",
+        "source_hash": "d31ef31db2d63425",
+        "target_hash": "708b8a64ba89bae2",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
         },
-        "reviewed": false
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
       },
       "settings.preview.pattern": {
         "source_hash": "236ff89591a82f7c",
@@ -100582,11 +102888,19 @@
         "reviewed": false
       },
       "settings.preview.title": {
-        "source_hash": "324b134f57c70c72",
-        "target_hash": "03607b4fd09b6bc6",
+        "source_hash": "5af93124b370fbaf",
+        "target_hash": "d23316d458a22329",
         "origin": {
-          "kind": "machine",
-          "model": "claude-haiku-5-5"
+          "kind": "human"
+        },
+        "reviewed": true,
+        "reviewed_at": "2026-10-19T07:05:15Z"
+      },
+      "settings.preview.usedBy": {
+        "source_hash": "cfd7ed4c785b52c2",
+        "target_hash": "9aacdf9e89009c37",
+        "origin": {
+          "kind": "imported"
         },
         "reviewed": false
       },

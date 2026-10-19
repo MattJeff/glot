@@ -173,7 +173,11 @@
     },
     "saveFailed": "保存に失敗しました。編集内容はセルに戻っています。修正するか、Escape キーを押して破棄してください。",
     "saving": "保存中…",
-    "subtitle": "翻訳をキーごとに編集、レビュー、承認します。"
+    "subtitle": "翻訳をキーごとに編集、レビュー、承認します。",
+    "code_block": {
+      "add_command": "glot add nav.billing \"請求\" --note \"サイドバーのリンク\"",
+      "push_command": "glot push"
+    }
   },
   "errors": {
     "generic": "問題が発生しました。もう一度お試しください。",
@@ -468,7 +472,8 @@
         "remove": "削除"
       },
       "removeBody": "実験が終了し、{language}はターゲット言語から外れます。その言語の訪問者には、再びソース言語が表示されます。",
-      "removeTitle": "{language}をターゲットから削除しますか？"
+      "removeTitle": "{language}をターゲットから削除しますか？",
+      "sample_size": "ロケール {locale} · n = {format}"
     },
     "funnel": {
       "ciTitle": "95% CI: {low} – {high}",
@@ -606,7 +611,12 @@
       "subtitle": "glot が、ホスト型翻訳プラットフォームや他の開発者向けツールとどう異なるか。",
       "title": "比較",
       "tolgeePrice": "無料プランとセルフホストは無料、クラウドは月額 €58 から",
-      "yes": "対応"
+      "yes": "対応",
+      "columns": {
+        "crowdin": "Crowdin",
+        "lokalise": "Lokalise",
+        "tolgee": "Tolgee"
+      }
     },
     "cta": {
       "title": "リリースのたびに、すべての言語を出荷。",
@@ -648,7 +658,16 @@
       "proofLabel": "プロジェクト情報",
       "proofNpm": "npm v{version}",
       "proofOss": "MIT ライセンス",
-      "proofStars": "{count, plural, =0 {GitHub でスター} other {GitHub でスター # 件}}"
+      "proofStars": "{count, plural, =0 {GitHub でスター} other {GitHub でスター # 件}}",
+      "file_count": {
+        "plural": "'{'count, plural, other '{'# ファイル'}''}'"
+      },
+      "greeting": {
+        "welcome_back": "おかえりなさい、'{'name'}'さん！"
+      },
+      "syntax": {
+        "icu_label": "ICU 構文"
+      }
     },
     "meta": {
       "description": "コーディングエージェント向けのオープンソースのローカライズ基盤。LLM の翻訳はすべて決定論的なコードで検証され（プレースホルダー、CLDR の複数形、用語集、ピクセル幅）、有効になるまで拒否されます。ベンチマークで壊れた文字列は 0%（glot なしでは 14.1%）。",
@@ -827,7 +846,10 @@
     "zoom": "ズーム",
     "bySegment": "セグメント別",
     "locale": "ロケール",
-    "subtitle": "アプリをすべてのロケールで並べて表示し、レイアウトの崩れを一目で確認できます。"
+    "subtitle": "アプリをすべてのロケールで並べて表示し、レイアウトの崩れを一目で確認できます。",
+    "pseudo_locale": {
+      "code": "qps"
+    }
   },
   "notFound": {
     "back": "ホームに戻る",
@@ -944,7 +966,8 @@
       "description": "カタログを ETag とキャッシュヘッダー付きの JSON で配信します。",
       "enable": "公開CDNを有効にする",
       "example": "URLの例",
-      "title": "公開CDN"
+      "title": "公開CDN",
+      "example_2": "curl {cdn_url}"
     },
     "danger": {
       "confirmBody": "この操作は取り消せません。確認のため {slug} と入力してください。",
@@ -1201,7 +1224,11 @@
       "ship": {
         "body": "「すべてに反映」で、すべてのロケールの勝者テキストを含むプルリクエストを開きます。",
         "label": "リリース",
-        "title": "勝者が Git に取り込まれます"
+        "title": "勝者が Git に取り込まれます",
+        "messages_path": "messages/{l}.json",
+        "minus_fragment": "<span>−</span>\"",
+        "plus_fragment": "<span>+</span>\"",
+        "quote_mark": "\""
       },
       "steps": "デモの手順",
       "subtitle": "1つのキーに、AIが書いた3バージョン。すべてのロケールをコードで検証し、オーディエンスごとに勝者を配信して、結果を Git に戻します。",
@@ -1210,7 +1237,38 @@
       "version": "バージョン",
       "visitors": "{count, plural, other {訪問者 #人}}",
       "win": "{variant}: 登録数 {lift} 増（おそらく {low} ～ {high}）、最良である確率 {probability}。",
-      "writing": "作成中…"
+      "writing": "作成中…",
+      "official_ar": {
+        "headline": "数分で請求書を送信。"
+      },
+      "official_de": {
+        "headline": "数分で請求書を送信。"
+      },
+      "official_en": {
+        "headline": "数分で請求書を送信しましょう。"
+      },
+      "out": {
+        "de_width": "de · width",
+        "en_fake_urgency": "en · fake_urgency",
+        "retry_passed": "→ リトライ成功"
+      },
+      "versions": {
+        "ar": {
+          "headline": "入金を早く。請求書を数分で送信。",
+          "tagline": "数クリックで請求書を発行。"
+        },
+        "de": {
+          "headline": "入金を早く。請求書を数分で送信。",
+          "tagline": "数クリックで請求書を発行。"
+        },
+        "en": {
+          "headline": "入金を早く。請求書は数分で送信。",
+          "tagline": "数クリックで請求書を発行。",
+          "urgency_banner": "本日限定：請求書を無制限に送信。"
+        },
+        "layout_note": "アプリでボックスに対して幅が広すぎます：Geist 40px/600 で1行480pxのところ、702pxで描画されます。",
+        "urgency_note": "「Today only」：根拠のない緊急性や希少性の表現です。実際の期限や在庫を事実として明記する（例：「10月31日終了」）か、表現を削除してください。"
+      }
     },
     "footer": {
       "benchmark": "ベンチマーク",
@@ -1270,7 +1328,8 @@
     "cta": {
       "body": "まずは見出しを一つ用意してください。文章チェック、計算、プルリクエストは glot が行います。",
       "docs": "実験ドキュメントを読む",
-      "title": "効果のある言葉を、あらゆる言語で届けましょう。"
+      "title": "効果のある言葉を、あらゆる言語で届けましょう。",
+      "localize_command": "npx glot-i18n localize --yes --targets fr,de"
     },
     "delivery": {
       "cookie": {
@@ -1903,7 +1962,13 @@
     "slug": "スラッグ",
     "subtitle": "このサーバー用の glot GitHub App を作成します。GitHub で確認後、認証情報が glot に返されます。",
     "title": "GitHub App",
-    "webhook": "Webhook URL"
+    "webhook": "Webhook URL",
+    "aria": {
+      "glot_link": "glot"
+    },
+    "permissions_contents_write": "contents: write",
+    "permissions_metadata_read": "metadata: read",
+    "permissions_pull_requests_write": "pull_requests: write"
   },
   "markets": {
     "add": "{language} を追加",
@@ -2647,6 +2712,23 @@
         "saveError": "最後の編集を保存できませんでした。接続を確認してください。次に入力したときに再試行します。"
       },
       "variantName": "バリアント {letter}"
+    }
+  },
+  "lib": {
+    "snippets": {
+      "actions": {
+        "pay_button": "\"pay\": \"'{'amount'}'を支払う\""
+      },
+      "demo": {
+        "translate_call": "glot.translate('{' keys: [\"checkout.items\"], locales: [\"fr\", \"ja\", \"ar\"] '}')"
+      },
+      "plurals": {
+        "checkout_items": "\"checkout.items\": \"'{'count, plural, other '{'# 件の商品'}''}'\"",
+        "items": "\"items\": \"'{'count, plural, other '{'# 件の記事'}''}'\""
+      },
+      "status": {
+        "lock_entries": "glot.lock に 2 件のエントリ"
+      }
     }
   }
 }

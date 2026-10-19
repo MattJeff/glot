@@ -173,7 +173,11 @@
     },
     "saveFailed": "Error al guardar. Tu edición vuelve a la celda; corrígela o pulsa Escape para descartarla.",
     "saving": "Guardando…",
-    "subtitle": "Edita, revisa y aprueba cada traducción, clave por clave."
+    "subtitle": "Edita, revisa y aprueba cada traducción, clave por clave.",
+    "code_block": {
+      "add_command": "glot add nav.billing \"Facturación\" --note \"enlace de la barra lateral\"",
+      "push_command": "glot push"
+    }
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",
@@ -468,7 +472,8 @@
         "remove": "Eliminar"
       },
       "removeBody": "El experimento termina y {language} sale de tus idiomas de destino: sus visitantes vuelven a recibir el idioma de origen.",
-      "removeTitle": "¿Quitar {language} de tus idiomas de destino?"
+      "removeTitle": "¿Quitar {language} de tus idiomas de destino?",
+      "sample_size": "Idioma {locale} · n = {format}"
     },
     "funnel": {
       "ciTitle": "IC 95 %: {low} – {high}",
@@ -606,7 +611,12 @@
       "subtitle": "En qué se diferencia glot de las plataformas de traducción alojadas y de otras herramientas para desarrolladores.",
       "title": "Comparar",
       "tolgeePrice": "Plan gratuito y autoalojamiento gratis, nube desde €58/mes",
-      "yes": "Sí"
+      "yes": "Sí",
+      "columns": {
+        "crowdin": "Crowdin",
+        "lokalise": "Lokalise",
+        "tolgee": "Tolgee"
+      }
     },
     "cta": {
       "title": "Publica cada idioma con cada versión.",
@@ -648,7 +658,16 @@
       "proofLabel": "Datos del proyecto",
       "proofNpm": "npm v{version}",
       "proofOss": "Licencia MIT",
-      "proofStars": "{count, plural, =0 {Dale una estrella en GitHub} one {# estrella en GitHub} many {# estrellas en GitHub} other {# estrellas en GitHub}}"
+      "proofStars": "{count, plural, =0 {Dale una estrella en GitHub} one {# estrella en GitHub} many {# estrellas en GitHub} other {# estrellas en GitHub}}",
+      "file_count": {
+        "plural": "'{'count, plural, one '{'# archivo'}' many '{'# archivos'}' other '{'# archivos'}''}'"
+      },
+      "greeting": {
+        "welcome_back": "Bienvenido de nuevo, '{'name'}'!"
+      },
+      "syntax": {
+        "icu_label": "Sintaxis ICU"
+      }
     },
     "meta": {
       "description": "Localización de código abierto para agentes de programación. Cada traducción del LLM la verifica un código determinista (placeholders, plurales CLDR, glosario, ancho en píxeles) y se rechaza hasta que sea válida. 0% de cadenas rotas en nuestro benchmark, frente al 14,1% sin glot.",
@@ -827,7 +846,10 @@
     "zoom": "Zoom",
     "bySegment": "Por segmento",
     "locale": "Idioma",
-    "subtitle": "Tu app renderizada en todos los idiomas, lado a lado, para detectar roturas de diseño de un vistazo."
+    "subtitle": "Tu app renderizada en todos los idiomas, lado a lado, para detectar roturas de diseño de un vistazo.",
+    "pseudo_locale": {
+      "code": "qps"
+    }
   },
   "notFound": {
     "back": "Volver al inicio",
@@ -944,7 +966,8 @@
       "description": "Sirve los catálogos de forma remota en JSON, con ETag y cabeceras de caché.",
       "enable": "Habilitar CDN pública",
       "example": "URL de ejemplo",
-      "title": "CDN pública"
+      "title": "CDN pública",
+      "example_2": "curl {cdn_url}"
     },
     "danger": {
       "confirmBody": "Esta acción no se puede deshacer. Escribe {slug} para confirmar.",
@@ -1201,7 +1224,11 @@
       "ship": {
         "body": "Promover abre un pull request con el texto ganador en todos los idiomas.",
         "label": "Enviar",
-        "title": "El ganador llega a Git"
+        "title": "El ganador llega a Git",
+        "messages_path": "messages/{l}.json",
+        "minus_fragment": "<span>−</span>\"",
+        "plus_fragment": "<span>+</span>\"",
+        "quote_mark": "\""
       },
       "steps": "Pasos de la demo",
       "subtitle": "Una clave, tres versiones escritas por IA, cada idioma verificado por código, cada audiencia atendida con su propio ganador y el resultado de vuelta en Git.",
@@ -1210,7 +1237,38 @@
       "version": "Versión",
       "visitors": "{count, plural, one {# visitante} many {# visitantes} other {# visitantes}}",
       "win": "{variant}: {lift} registros (probablemente entre {low} y {high}), {probability} de probabilidad de ser la mejor.",
-      "writing": "Escribiendo…"
+      "writing": "Escribiendo…",
+      "official_ar": {
+        "headline": "أرسل فواتيرك في دقائق."
+      },
+      "official_de": {
+        "headline": "Envía tus facturas en minutos."
+      },
+      "official_en": {
+        "headline": "Envía tus facturas en minutos."
+      },
+      "out": {
+        "de_width": "de · width",
+        "en_fake_urgency": "en · fake_urgency",
+        "retry_passed": "→ reintento superado"
+      },
+      "versions": {
+        "ar": {
+          "headline": "احصل على أموالك أسرع. فواتيرك في دقائق.",
+          "tagline": "فواتيرك ببضع نقرات."
+        },
+        "de": {
+          "headline": "Cobra más rápido. Envía facturas en minutos.",
+          "tagline": "Facturas con unos pocos clics."
+        },
+        "en": {
+          "headline": "Cobra más rápido. Envía facturas en minutos.",
+          "tagline": "Facturas en unos pocos clics.",
+          "urgency_banner": "Solo hoy: envía facturas ilimitadas."
+        },
+        "layout_note": "Demasiado ancho para su contenedor en la app: una línea de 480px en Geist 40px/600; se renderiza con 702px de ancho.",
+        "urgency_note": "\"Solo hoy\": urgencia o escasez sin fuente. Indique la fecha límite o el stock real como un hecho (p. ej., \"la oferta termina el 31 oct\") o elimine el texto."
+      }
     },
     "footer": {
       "benchmark": "Benchmark",
@@ -1270,7 +1328,8 @@
     "cta": {
       "body": "Empieza con un titular. glot hace las comprobaciones de redacción, los cálculos y el pull request.",
       "docs": "Consulta la documentación de experimentos",
-      "title": "Publica las palabras que funcionan, en todos los idiomas."
+      "title": "Publica las palabras que funcionan, en todos los idiomas.",
+      "localize_command": "npx glot-i18n localize --yes --targets fr,de"
     },
     "delivery": {
       "cookie": {
@@ -1903,7 +1962,13 @@
     "slug": "Slug",
     "subtitle": "Crea la app de GitHub de glot para este servidor. GitHub pide confirmación y luego envía las credenciales a glot.",
     "title": "App de GitHub",
-    "webhook": "URL del webhook"
+    "webhook": "URL del webhook",
+    "aria": {
+      "glot_link": "glot"
+    },
+    "permissions_contents_write": "contents: write",
+    "permissions_metadata_read": "metadata: read",
+    "permissions_pull_requests_write": "pull_requests: write"
   },
   "markets": {
     "add": "Añadir {language}",
@@ -2647,6 +2712,23 @@
         "saveError": "No se pudieron guardar tus últimos cambios. Comprueba la conexión; volveremos a intentarlo cuando vuelvas a escribir."
       },
       "variantName": "Variante {letter}"
+    }
+  },
+  "lib": {
+    "snippets": {
+      "actions": {
+        "pay_button": "\"pay\": \"Pagar '{'amount'}'\""
+      },
+      "demo": {
+        "translate_call": "glot.translate('{' keys: [\"checkout.items\"], locales: [\"fr\", \"ja\", \"ar\"] '}')"
+      },
+      "plurals": {
+        "checkout_items": "\"checkout.items\": \"'{'count, plural, one '{'# producto'}' many '{'# productos'}' other '{'# productos'}''}'\"",
+        "items": "\"items\": \"'{'count, plural, one '{'# artículo'}' many '{'# artículos'}' other '{'# artículos'}''}'\""
+      },
+      "status": {
+        "lock_entries": "glot.lock 2 entradas"
+      }
     }
   }
 }

@@ -173,7 +173,11 @@
     },
     "saveFailed": "فشل الحفظ. عادت تعديلك إلى الخلية؛ عدّله أو اضغط Escape للتراجع.",
     "saving": "جارٍ الحفظ…",
-    "subtitle": "حرّر كل ترجمة وراجعها ووافق عليها، مفتاحًا تلو الآخر."
+    "subtitle": "حرّر كل ترجمة وراجعها ووافق عليها، مفتاحًا تلو الآخر.",
+    "code_block": {
+      "add_command": "glot add nav.billing \"الفوترة\" --note \"رابط الشريط الجانبي\"",
+      "push_command": "glot push"
+    }
   },
   "errors": {
     "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
@@ -468,7 +472,8 @@
         "remove": "إزالة"
       },
       "removeBody": "تنتهي التجربة ويغادر {language} لغاتك المستهدفة: يحصل زوارها على لغة المصدر مجددًا.",
-      "removeTitle": "هل تزيل {language} من اللغات المستهدفة؟"
+      "removeTitle": "هل تزيل {language} من اللغات المستهدفة؟",
+      "sample_size": "لغة {locale} · n = {format}"
     },
     "funnel": {
       "ciTitle": "فاصل الثقة 95%: {low} – {high}",
@@ -606,7 +611,12 @@
       "subtitle": "أوجه اختلاف glot عن منصات الترجمة المستضافة والأدوات الأخرى الموجهة للمطورين.",
       "title": "مقارنة",
       "tolgeePrice": "خطة مجانية واستضافة ذاتية مجانية، والسحابية من 58 €/شهر",
-      "yes": "نعم"
+      "yes": "نعم",
+      "columns": {
+        "crowdin": "Crowdin",
+        "lokalise": "Lokalise",
+        "tolgee": "Tolgee"
+      }
     },
     "cta": {
       "title": "انشر كل لغة مع كل إصدار.",
@@ -648,7 +658,16 @@
       "proofLabel": "حقائق عن المشروع",
       "proofNpm": "npm v{version}",
       "proofOss": "مرخّص بموجب MIT",
-      "proofStars": "{count, plural, =0 {ضع نجمة على GitHub} zero {ضع نجمة على GitHub} one {# نجمة على GitHub} two {نجمتان على GitHub} few {# نجوم على GitHub} many {# نجمة على GitHub} other {# نجمة على GitHub}}"
+      "proofStars": "{count, plural, =0 {ضع نجمة على GitHub} zero {ضع نجمة على GitHub} one {# نجمة على GitHub} two {نجمتان على GitHub} few {# نجوم على GitHub} many {# نجمة على GitHub} other {# نجمة على GitHub}}",
+      "file_count": {
+        "plural": "'{'count, plural, zero '{'# ملفات'}' one '{'ملف واحد'}' two '{'ملفان'}' few '{'# ملفات'}' many '{'# ملفًا'}' other '{'# ملف'}''}'"
+      },
+      "greeting": {
+        "welcome_back": "مرحبًا بعودتك، '{'name'}'!"
+      },
+      "syntax": {
+        "icu_label": "صيغة ICU"
+      }
     },
     "meta": {
       "description": "توطين مفتوح المصدر لوكلاء البرمجة. يتحقق كود حتمي من كل ترجمة LLM (العناصر النائبة، فئات الجمع في CLDR، المسرد، عرض البكسل) ويرفضها حتى تصبح صالحة. 0% من السلاسل المعطوبة في اختبار المقارنة لدينا، مقابل 14.1% دون glot.",
@@ -827,7 +846,10 @@
     "zoom": "تكبير",
     "bySegment": "حسب الشريحة",
     "locale": "اللغة",
-    "subtitle": "يظهر تطبيقك في كل لغة جنبًا إلى جنب، لاكتشاف أخطاء التخطيط بنظرة واحدة."
+    "subtitle": "يظهر تطبيقك في كل لغة جنبًا إلى جنب، لاكتشاف أخطاء التخطيط بنظرة واحدة.",
+    "pseudo_locale": {
+      "code": "qps"
+    }
   },
   "notFound": {
     "back": "العودة إلى الرئيسية",
@@ -944,7 +966,8 @@
       "description": "قدّم الكتالوجات بصيغة JSON عبر الشبكة مع ترويسات ETag والتخزين المؤقت.",
       "enable": "تفعيل CDN العام",
       "example": "مثال على عنوان URL",
-      "title": "CDN العام"
+      "title": "CDN العام",
+      "example_2": "curl {cdn_url}"
     },
     "danger": {
       "confirmBody": "لا يمكن التراجع عن هذا الإجراء. اكتب {slug} للتأكيد.",
@@ -1201,7 +1224,11 @@
       "ship": {
         "body": "ينشئ نشر طلب سحب يحمل النص الفائز في كل لغة.",
         "label": "الإطلاق",
-        "title": "الفائز يصل إلى Git"
+        "title": "الفائز يصل إلى Git",
+        "messages_path": "messages/{l}.json",
+        "minus_fragment": "<span>−</span>\"",
+        "plus_fragment": "<span>+</span>\"",
+        "quote_mark": "\""
       },
       "steps": "خطوات العرض",
       "subtitle": "مفتاح واحد، وثلاث نسخ كتبها الذكاء الاصطناعي، وكل لغة يفحصها الكود، ولكل جمهور فائزه الخاص، والنتيجة تعود إلى Git.",
@@ -1210,7 +1237,38 @@
       "version": "النسخة",
       "visitors": "{count, plural, zero {# زائر} one {زائر واحد} two {زائران} few {# زوار} many {# زائرًا} other {# زائر}}",
       "win": "{variant}: {lift} عملية تسجيل (على الأرجح بين {low} و{high})، باحتمال {probability} أنه الأفضل.",
-      "writing": "جارٍ الكتابة…"
+      "writing": "جارٍ الكتابة…",
+      "official_ar": {
+        "headline": "أرسل فواتيرك في دقائق."
+      },
+      "official_de": {
+        "headline": "أرسل فواتيرك في دقائق."
+      },
+      "official_en": {
+        "headline": "أرسل فواتيرك في دقائق."
+      },
+      "out": {
+        "de_width": "de · width",
+        "en_fake_urgency": "en · fake_urgency",
+        "retry_passed": "→ نجحت إعادة المحاولة"
+      },
+      "versions": {
+        "ar": {
+          "headline": "احصل على أموالك أسرع. فواتيرك في دقائق.",
+          "tagline": "فواتيرك ببضع نقرات."
+        },
+        "de": {
+          "headline": "احصل على أموالك أسرع. أرسل فواتيرك في دقائق.",
+          "tagline": "فواتيرك بنقرات قليلة."
+        },
+        "en": {
+          "headline": "احصل على أموالك أسرع. أرسل فواتيرك في دقائق.",
+          "tagline": "فواتيرك ببضع نقرات.",
+          "urgency_banner": "اليوم فقط: أرسل فواتيرك بلا حدود."
+        },
+        "layout_note": "Too wide for its box in the app: one line of 480px at Geist 40px/600; it renders 702px wide.",
+        "urgency_note": "\"Today only\": urgency or scarcity with no source. Declare the real deadline or stock as a fact (e.g. \"offer ends 31 Oct\") or remove the wording."
+      }
     },
     "footer": {
       "benchmark": "المقارنة المرجعية",
@@ -1270,7 +1328,8 @@
     "cta": {
       "body": "ابدأ بعنوان واحد. يتولى glot فحوص الكتابة والحسابات وطلب السحب.",
       "docs": "اقرأ وثائق التجارب",
-      "title": "أرسل الكلمات الناجحة بكل اللغات."
+      "title": "أرسل الكلمات الناجحة بكل اللغات.",
+      "localize_command": "npx glot-i18n localize --yes --targets fr,de"
     },
     "delivery": {
       "cookie": {
@@ -1903,7 +1962,13 @@
     "slug": "Slug",
     "subtitle": "أنشئ تطبيق GitHub الخاص بـ glot لهذا الخادم. يطلب منك GitHub التأكيد، ثم يعيد بيانات الاعتماد إلى glot.",
     "title": "تطبيق GitHub",
-    "webhook": "عنوان URL للـ Webhook"
+    "webhook": "عنوان URL للـ Webhook",
+    "aria": {
+      "glot_link": "glot"
+    },
+    "permissions_contents_write": "contents: write",
+    "permissions_metadata_read": "metadata: read",
+    "permissions_pull_requests_write": "pull_requests: write"
   },
   "markets": {
     "add": "إضافة {language}",
@@ -2647,6 +2712,23 @@
         "saveError": "تعذّر حفظ آخر تعديلاتك. تحقّق من اتصالك، وسنعيد المحاولة عند كتابتك مجددًا."
       },
       "variantName": "المتغير {letter}"
+    }
+  },
+  "lib": {
+    "snippets": {
+      "actions": {
+        "pay_button": "\"pay\": \"ادفع '{'amount'}'\""
+      },
+      "demo": {
+        "translate_call": "glot.translate('{' keys: [\"checkout.items\"], locales: [\"fr\", \"ja\", \"ar\"] '}')"
+      },
+      "plurals": {
+        "checkout_items": "\"checkout.items\": \"'{'count, plural, zero '{'# عناصر'}' one '{'عنصر واحد'}' two '{'عنصران'}' few '{'# عناصر'}' many '{'# عنصرًا'}' other '{'# عنصر'}''}'\"",
+        "items": "\"items\": \"'{'count, plural, zero '{'# مقالات'}' one '{'مقال واحد'}' two '{'مقالان'}' few '{'# مقالات'}' many '{'# مقالًا'}' other '{'# مقال'}''}'\""
+      },
+      "status": {
+        "lock_entries": "glot.lock: 2 مدخل"
+      }
     }
   }
 }

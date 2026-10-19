@@ -204,10 +204,10 @@ export default async function I18nLanding({ params }: PageProps<"/[locale]/i18n"
                       <Logo className="justify-center" />
                     </th>
                     {/* Vendor names are proper nouns. */}
-                    <th scope="col" className="px-4 py-3 text-center font-medium">{"Lokalise"}</th>
-                    <th scope="col" className="px-4 py-3 text-center font-medium">{"Crowdin"}</th>
+                    <th scope="col" className="px-4 py-3 text-center font-medium">{t("compare.columns.lokalise")}</th>
+                    <th scope="col" className="px-4 py-3 text-center font-medium">{t("compare.columns.crowdin")}</th>
                     <th scope="col" className="px-4 py-3 text-center font-medium">{"Lingo.dev"}</th>
-                    <th scope="col" className="px-4 py-3 text-center font-medium">{"Tolgee"}</th>
+                    <th scope="col" className="px-4 py-3 text-center font-medium">{t("compare.columns.tolgee")}</th>
                   </tr>
                 </thead>
                 <tbody>

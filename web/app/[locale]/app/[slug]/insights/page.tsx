@@ -168,7 +168,7 @@ export default function InsightsPage() {
               icon={Target}
               label={t("stats.sourceConv", { goal: d.goal })}
               value={source ? pct(source.rate) : "—"}
-              hint={source ? `${name(source.locale)} · n = ${format.number(source.visits)}` : undefined}
+              hint={source ? t("exp.sample_size", { locale: name(source.locale), format: format.number(source.visits) }) : undefined}
             />
             <Stat
               icon={TrendingUp}

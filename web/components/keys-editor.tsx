@@ -526,8 +526,8 @@ export function KeysEditor({ project }: { project: Project }) {
                   />
                 ) : (
                   <EmptyState icon={TableProperties} title={t("noKeys.title")} body={t("noKeys.body")}>
-                    <CodeBlock label={t("noKeys.push")} code={"glot push"} />
-                    <CodeBlock className="mt-3" label={t("noKeys.add")} code={'glot add nav.billing "Billing" --note "sidebar link"'} />
+                    <CodeBlock label={t("noKeys.push")} code={t("code_block.push_command")} />
+                    <CodeBlock className="mt-3" label={t("noKeys.add")} code={t("code_block.add_command")} />
                   </EmptyState>
                 )}
               </div>
