@@ -1,6 +1,6 @@
 {
   "name": "@glot/visual-qa",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Visual QA for localized UIs: detects overflowing, truncated, untranslated and tofu text per locale with Playwright.",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",

@@ -196,6 +196,10 @@ les 15 s. Multi-réplicas : `pg_notify('glot_review', …)` dans la transaction 
 locale}`, `glot:review:selected {annotation_id}`, `glot:review:created {annotation_id}`. Page → widget :
 `glot:review:focus {annotation_id}`, `glot:review:mode {annotate: boolean}`, `glot:review:filter {status?: string[]}`.
 La page Review mint le jeton par `POST M/session` et charge l'iframe `site_url?glot_review=<token>`.
+Si l'appel `context` du widget échoue : `glot:review:error {status}` (401 = jeton, 0 = réseau/CORS).
+Diagnostic côté serveur : `GET M/probe` récupère la `base_url` du projet (IP publiques uniquement, 6 s, 512 Ko) →
+`{status, error, x_frame_options, frame_ancestors, framing: allowed|blocked|unknown, widget, widget_project,
+widget_app_origin, feedback_widget}`.
 
 ## 6. Édition manuelle du texte (sans IA)
 Même préfixes M/W, mêmes jetons. Lecture : tout accès. Écriture : membre (tout rôle) ou lien `edit`.

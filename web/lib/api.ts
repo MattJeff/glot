@@ -122,7 +122,8 @@ export type Review = {
 };
 
 export type VisualKind = "overflow" | "clamp" | "overlap" | "untranslated" | "tofu" | "rtl";
-export const VISUAL_KINDS: VisualKind[] = ["overflow", "clamp", "overlap", "untranslated", "tofu", "rtl"];
+/** Most severe first: broken layout, unreadable glyphs, wrong direction, untranslated, then truncation the CSS asks for. */
+export const VISUAL_KINDS: VisualKind[] = ["overflow", "overlap", "tofu", "rtl", "untranslated", "clamp"];
 export type Rect = { x: number; y: number; width: number; height: number };
 export type VisualIssue = {
   kind: VisualKind;
@@ -230,6 +231,18 @@ export type ReviewLink = {
   revoked_at: string | null;
   last_used_at: string | null;
   created_by: { user_id: string; name: string };
+};
+export type ReviewProbe = {
+  url: string;
+  status: number | null;
+  error: "private" | "unreachable" | "timeout" | null;
+  x_frame_options: string | null;
+  frame_ancestors: string | null;
+  framing: "allowed" | "blocked" | "unknown";
+  widget: boolean;
+  widget_project: string | null;
+  widget_app_origin: string | null;
+  feedback_widget: boolean;
 };
 export type ReviewMember = { user_id: string; name: string };
 /** RV4 (contract changelog v1.2): AI rewordings of an annotated text, each validated in every target locale. */
@@ -694,6 +707,8 @@ export const api = {
   annotationFromFeedback: (slug: string, groupId: string) => request<Annotation>("POST", `${rv(slug)}/from-feedback/${enc(groupId)}`),
   reviewMembers: (slug: string) => request<ReviewMember[]>("GET", `${rv(slug)}/members`),
   reviewSession: (slug: string) => request<{ token: string; expires_at: string }>("POST", `${rv(slug)}/session`),
+  /** Server-side check of the project's site URL: framing headers + review widget tag (Review page setup). */
+  reviewProbe: (slug: string) => request<ReviewProbe>("GET", `${rv(slug)}/probe`),
   reviewEventsUrl: (slug: string) => `${rv(slug)}/events`,
   reviewLinks: (slug: string) => request<ReviewLink[]>("GET", `${rv(slug)}/links`),
   createReviewLink: (slug: string, b: { label?: string; access: ReviewAccess; expires_in_days: number | null }) =>

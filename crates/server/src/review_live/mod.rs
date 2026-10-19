@@ -15,6 +15,7 @@ use crate::AppState;
 pub mod api;
 pub mod github;
 pub mod model;
+pub mod probe;
 pub mod realtime;
 pub mod rewrite;
 
@@ -82,6 +83,7 @@ pub fn routes() -> Router<AppState> {
         .route(&format!("{p}/links"), get(list_links).post(create_link))
         .route(&format!("{p}/links/{{id}}"), delete(revoke_link))
         .route(&format!("{p}/session"), post(session))
+        .route(&format!("{p}/probe"), get(probe::probe))
         .route(
             &format!("{p}/from-feedback/{{group_id}}"),
             post(from_feedback),

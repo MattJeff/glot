@@ -23,12 +23,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { toast } from "sonner";
-import {
-  CodeBlock,
-  EmptyState,
-  ErrorState,
-  useLocaleName,
-} from "@/components/common";
+import { EmptyState, ErrorState, useLocaleName } from "@/components/common";
 import {
   ALL,
   AnnotationList,
@@ -37,7 +32,7 @@ import {
   matches,
   type Filters,
 } from "@/components/review/panel";
-import { Install } from "@/components/review/reports";
+import { diagnose, Setup, type SetupInput } from "@/components/review/setup";
 import { ShareDialog } from "@/components/review/share-dialog";
 import {
   SiteFrame,
@@ -86,7 +81,6 @@ import {
   type Project,
   type ReviewEvent,
 } from "@/lib/api";
-import { BRIDGE_SNIPPET } from "@/lib/preview-bridge";
 import { cn } from "@/lib/utils";
 import { buildUrl, parseViewport, previewTarget } from "@/lib/visual";
 
@@ -161,6 +155,7 @@ export function Workspace({
   initial?: string;
 }) {
   const t = useTranslations("reviewPage");
+  const ts = useTranslations("reviewPage.setup");
   const localeName = useLocaleName();
   const qc = useQueryClient();
   const slug = p.slug;
@@ -195,6 +190,13 @@ export function Workspace({
     queryKey: qk.feedback(slug),
     queryFn: () => api.feedback(slug),
   });
+  const probe = useQuery({
+    queryKey: ["review-probe", slug],
+    queryFn: () => api.reviewProbe(slug),
+    enabled: !!settings.data?.base_url,
+    staleTime: 60_000,
+    retry: false,
+  });
   const session = useQuery({
     queryKey: ["review-session", slug],
     queryFn: () => api.reviewSession(slug),
@@ -221,6 +223,7 @@ export function Workspace({
   const [install, setInstall] = useState(false);
   const [help, setHelp] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const [widgetError, setWidgetError] = useState<number | null>(null);
   const [announce, setAnnounce] = useState("");
 
   // Phones always see the mobile layout, full width (the viewport switcher is hidden there).
@@ -384,6 +387,7 @@ export function Workspace({
     else setView({ kind: "compose", picked });
   };
   const onFrameEvent = (e: FrameEvent) => {
+    if (e.type === "error") return setWidgetError(e.status);
     if (e.type === "navigated") {
       if (e.route !== route) go(e.route);
       if (e.locale && e.locale !== locale && locales.includes(e.locale))
@@ -396,6 +400,15 @@ export function Workspace({
     }
     setView({ kind: "annotation", id: e.id });
     setDrawer(true);
+  };
+
+  const reload = () => {
+    setWidgetError(null);
+    setReloadKey((k) => k + 1);
+  };
+  const recheck = () => {
+    probe.refetch();
+    reload();
   };
 
   // Realtime (contract §4): refetch what an event touches; announce teammates' new annotations.
@@ -486,6 +499,24 @@ export function Workspace({
 
   // Review needs the review widget (pins, threads, frame bridge), served by glot itself: the feedback widget doesn't answer the frame.
   const widgetSnippet = `<script src="${origin}/widget/review.global.js" data-project="${slug}" data-endpoint="${origin}" data-app-origin="${origin}" async></script>`;
+  const setupInput: SetupInput = {
+    slug,
+    origin,
+    probe: probe.data,
+    probing: probe.isFetching,
+    frame: frameState,
+    widgetError,
+  };
+  const diag = diagnose(setupInput);
+  const live = frameState === "widget" || frameState === "bridge";
+  const setup = (
+    <Setup
+      input={setupInput}
+      siteUrl={target.base}
+      snippet={widgetSnippet}
+      onRecheck={recheck}
+    />
+  );
   const canPr =
     !!feedback.data?.settings.github_repo &&
     !!feedback.data?.settings.has_github_token;
@@ -529,7 +560,7 @@ export function Workspace({
           selected={selected}
           onSelect={select}
           resolvedThisWeek={resolvedThisWeek}
-          emptySnippet={widgetSnippet}
+          emptySetup={live ? null : setup}
           emptyAction={
             <Button onClick={startAnnotate}>
               <MessageSquarePlus /> {t("toolbar.comment")}
@@ -664,6 +695,26 @@ export function Workspace({
             );
           })}
         </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-8 gap-1.5 px-2 text-xs"
+          onClick={() => setInstall(true)}
+          aria-haspopup="dialog"
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "size-2 rounded-full",
+              live
+                ? "bg-success"
+                : frameState === "loading"
+                  ? "animate-pulse bg-muted-foreground"
+                  : "bg-destructive",
+            )}
+          />
+          {ts(`chip.${frameState}`)}
+        </Button>
         <div className="ms-auto flex flex-wrap items-center gap-1.5">
           <Button
             size="sm"
@@ -701,6 +752,7 @@ export function Workspace({
             size="icon-sm"
             variant="ghost"
             aria-label={t("toolbar.shortcuts")}
+            title={`${t("toolbar.shortcuts")} (?)`}
             onClick={() => setHelp(true)}
             className="max-sm:hidden"
           >
@@ -710,7 +762,8 @@ export function Workspace({
             size="icon-sm"
             variant="ghost"
             aria-label={t("toolbar.reload")}
-            onClick={() => setReloadKey((k) => k + 1)}
+            title={t("toolbar.reload")}
+            onClick={reload}
           >
             <RotateCw />
           </Button>
@@ -734,7 +787,8 @@ export function Workspace({
             onEvent={onFrameEvent}
             onState={setFrameState}
             onInstall={() => setInstall(true)}
-            onReload={() => setReloadKey((k) => k + 1)}
+            onReload={reload}
+            reason={diag.reason && ts(diag.reason.msg, diag.reason.values)}
           />
           {!isLg && (
             <Button
@@ -782,25 +836,11 @@ export function Workspace({
       />
       <Dialog open={install} onOpenChange={setInstall}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t("installDialog.title")}</DialogTitle>
-            <DialogDescription>{t("installDialog.body")}</DialogDescription>
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t("setup.title")}</DialogTitle>
+            <DialogDescription>{t("setup.body")}</DialogDescription>
           </DialogHeader>
-          {feedback.data && (
-            <Install publicKey={feedback.data.settings.public_key} />
-          )}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">
-              {t("installDialog.frameTitle")}
-            </h3>
-            <p className="text-xs text-pretty text-muted-foreground">
-              {t("installDialog.frameBody")}
-            </p>
-            <CodeBlock
-              code={BRIDGE_SNIPPET}
-              className="max-h-32 overflow-y-auto"
-            />
-          </div>
+          {setup}
         </DialogContent>
       </Dialog>
       <Dialog open={help} onOpenChange={setHelp}>
@@ -810,14 +850,14 @@ export function Workspace({
             <DialogDescription>{t("help.body")}</DialogDescription>
           </DialogHeader>
           <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 text-sm">
-            {(["c", "e", "j", "k", "r", "esc"] as const).map((k) => (
+            {(["c", "e", "j", "k", "r", "esc", "?"] as const).map((k) => (
               <div key={k} className="contents">
                 <dt>
                   <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs uppercase">
                     {k}
                   </kbd>
                 </dt>
-                <dd>{t(`help.${k}`)}</dd>
+                <dd>{t(`help.${k === "?" ? "help" : k}`)}</dd>
               </div>
             ))}
           </dl>

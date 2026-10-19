@@ -73,7 +73,7 @@ impl Glossary {
         locale: &str,
         inflected: bool,
     ) -> Vec<(&Term, Issue)> {
-        let mut masked = source.to_string();
+        let mut masked = mask_placeholders(source);
         for t in self.terms.iter().filter(|t| t.do_not_translate) {
             for r in spans(source, &t.term, t.case_sensitive) {
                 masked.replace_range(r.clone(), &" ".repeat(r.len()));
@@ -228,6 +228,28 @@ pub fn same_lemma(a: &str, b: &str) -> bool {
     a == b || (p >= 4 && l - p <= 3 && s - p <= 2 && (s >= 6 || p == s))
 }
 
+/// Blanks simple placeholders (`{key}`, `{{name}}`, `%{count}`) so a variable named like a glossary
+/// term is not taken for the term. ICU arguments with text inside (`{n, plural, one {# key}}`) are kept.
+fn mask_placeholders(s: &str) -> String {
+    let mut out = s.to_string();
+    let b = s.as_bytes();
+    let mut i = 0;
+    while i < b.len() {
+        if b[i] == b'{' {
+            let end = b[i + 1..]
+                .iter()
+                .position(|&c| !(c.is_ascii_alphanumeric() || c == b'_' || c == b'.'));
+            if let Some(n) = end.filter(|&n| n > 0 && b[i + 1 + n] == b'}') {
+                out.replace_range(i + 1..i + 1 + n, &" ".repeat(n));
+                i += n + 2;
+                continue;
+            }
+        }
+        i += 1;
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -250,6 +272,17 @@ case_sensitive = true
 "#,
         )
         .unwrap()
+    }
+
+    #[test]
+    fn placeholder_named_like_a_term_is_not_the_term() {
+        let g: Glossary =
+            toml::from_str("[[term]]\nterm = \"key\"\ntranslations = { fr = \"clé\" }").unwrap();
+        assert!(
+            g.check("Close-up of {key}", "Gros plan sur {key}", "fr")
+                .is_empty()
+        );
+        assert!(!g.check("Copy the key", "Copiez le jeton", "fr").is_empty());
     }
 
     #[test]

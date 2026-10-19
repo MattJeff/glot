@@ -792,6 +792,27 @@
     "label": "Sprache"
   },
   "matrix": {
+    "howTo": "Jede Spalte zeigt dieselbe Seite Ihrer echten Website in einer Sprache. Einmal scrollen, alle Spalten folgen; rote Rahmen sind Probleme der visuellen QA, klicken Sie darauf, um den Text zu korrigieren.",
+    "fit": "Einpassen",
+    "overlayHint": "Markiert die Probleme der letzten visuellen QA (abgeschnittener, überlappender oder unübersetzter Text).",
+    "overlayNone": "Noch kein Bericht der visuellen QA: Starten Sie einen auf der Seite Visuelle QA, um Probleme hier markiert zu sehen.",
+    "pseudoHint": "Fügt eine Spalte mit längerem Text mit Akzenten hinzu, um fest codierte Texte und Layouts aufzudecken, die bei längeren Sprachen brechen.",
+    "pseudoTag": "längerer Text mit Akzenten",
+    "focus": "Nur diese Sprache anzeigen",
+    "unfocus": "Alle Sprachen anzeigen",
+    "knownRoutes": "Seiten Ihrer Website",
+    "openReport": "Bericht öffnen",
+    "loading": "Wird geladen…",
+    "missing": "{count, plural, one {# Schlüssel fehlt} other {# Schlüssel fehlen}}",
+    "missingHint": "Fehlende Schlüssel in {language} übersetzen",
+    "complete": "Alle Schlüssel übersetzt",
+    "issues": "{count, plural, one {# Problem} other {# Probleme}}",
+    "blank": {
+      "summary": "Ein Frame bleibt leer oder zeigt einen Fehler?",
+      "body": "Ihre Website verbietet vermutlich die Anzeige in einem Frame (X-Frame-Options oder CSP frame-ancestors). Um nur glot zu erlauben, entfernen Sie X-Frame-Options und senden Sie:",
+      "other": "Wenn sich die Seite in einem neuen Tab korrekt öffnet, aber die falsche Sprache oder einen 404-Fehler zeigt, prüfen Sie das URL-Muster pro Sprache unter",
+      "settings": "Einstellungen → Ihre Website"
+    },
     "bridge": {
       "body": "Fügen Sie dieses Skript in Ihre App ein (nur in der Entwicklung), um exakte Frame-Höhen und die Darstellung der Pseudo-Sprache zu erhalten. Das glot-Dashboard enthält es bereits.",
       "title": "Vorschau-Brücke"
@@ -809,9 +830,12 @@
     },
     "mobile": "Mobil",
     "noBase": {
-      "body": "Legen Sie die Basis-URL Ihrer App fest (zum Beispiel http://localhost:3000), um alle Sprachen nebeneinander anzuzeigen.",
-      "cta": "Vorschau konfigurieren",
-      "title": "Verbinden Sie glot mit Ihrer laufenden App"
+      "body": "Die Matrix öffnet Ihre echte Website in allen Sprachen nebeneinander, damit Sie abgeschnittene, überlappende oder unübersetzte Texte vor Ihren Nutzern entdecken.",
+      "cta": "URL meiner Website hinzufügen",
+      "title": "Fügen Sie Ihre Website hinzu, um alle Sprachen zu vergleichen",
+      "step1": "Geben Sie unter Einstellungen → Ihre Website die Adresse Ihrer Website ein (Produktion, Staging oder http://localhost:3000).",
+      "step2": "Prüfen Sie, wie die Sprach-URLs aufgebaut sind (zum Beispiel /fr/preise), und listen Sie die zu vergleichenden Seiten auf.",
+      "step3": "Erlauben Sie glot, Ihre Website in einem Frame anzuzeigen (Header CSP frame-ancestors)."
     },
     "openTab": "In neuem Tab öffnen",
     "overlay": "QA-Overlay",
@@ -819,10 +843,10 @@
     "pseudoColumn": "Pseudo-Sprache",
     "reload": "Alle Frames neu laden",
     "reportFrom": "Visueller QA-Bericht vom {date} · {count, plural, =0 {keine Probleme auf diesem Bildschirm} one {# Problem auf diesem Bildschirm} other {# Probleme auf diesem Bildschirm}}",
-    "route": "Route",
+    "route": "Seite",
     "routePlaceholder": "/pricing",
     "source": "Quelle",
-    "title": "Matrix der Sprache",
+    "title": "Sprachenmatrix",
     "viewport": "Ansichtsfenster",
     "zoom": "Zoom",
     "bySegment": "Nach Segment",
@@ -1033,6 +1057,8 @@
     "search": "Suchen…",
     "settings": "Einstellungen",
     "toggleSidebar": "Navigation umschalten",
+    "collapseSidebar": "Seitenleiste einklappen",
+    "expandSidebar": "Seitenleiste ausklappen",
     "userMenu": "Kontomenü",
     "visual": "Visuelle QA",
     "experimental": "Der Self-Hosted-Server und das Dashboard sind experimentell: Rechnen Sie mit Ecken und Kanten sowie Breaking Changes. Die CLI und der MCP-Server bilden den stabilen Kern. <docs>Mehr erfahren</docs>",
@@ -1088,18 +1114,32 @@
   "visual": {
     "after": "Nachher",
     "allLocales": "Alle Sprachen",
+    "allRoutes": "Alle Seiten",
     "allViewports": "Alle Viewports",
     "before": "Vorher",
     "clean": "Keine Probleme",
-    "clearKinds": "Typfilter zurücksetzen",
-    "compareWith": "Vergleichen mit",
-    "empty": {
-      "body": "Führen Sie glot-visual-qa mit --upload aus, um Bericht und Screenshots hierher zu senden.",
-      "command": "Von Ihrem Rechner oder aus der CI hochladen",
-      "title": "Noch kein Visual-QA-Bericht"
+    "clear": {
+      "body": "{count, plural, one {# Bildschirm geprüft} other {# Bildschirme geprüft}}, kein Layoutproblem gefunden.",
+      "title": "Alles in Ordnung"
     },
-    "issueAt": "{kind}-Problem für Schlüssel: {key}",
+    "clearFilters": "Filter zurücksetzen",
+    "compareWith": "Vergleichen mit",
+    "cropAlt": "Nahaufnahme von {key}",
+    "empty": {
+      "body": "Noch wurde nichts geprüft. Führen Sie den Befehl unten aus: Er öffnet Ihre Website in jeder Sprache, erstellt Screenshots jeder Seite und zeigt hier, was kaputtgeht.",
+      "title": "Noch keine visuelle Prüfung"
+    },
+    "fixedCount": "{count, plural, one {# behoben} other {# behoben}}",
+    "issueAt": "{kind}: {key}",
     "issues": "{count, plural, one {# Problem} other {# Probleme}}",
+    "kindHelp": {
+      "clamp": "Absichtlich per CSS gekürzt (Auslassungspunkte), meist in Ordnung",
+      "overflow": "Text ragt aus seinem Rahmen",
+      "overlap": "Zwei Texte übereinander",
+      "rtl": "Seite nicht von rechts nach links dargestellt",
+      "tofu": "Zeichen, die die Schrift nicht darstellen kann",
+      "untranslated": "Noch in der Ausgangssprache"
+    },
     "kinds": {
       "clamp": "Gekürzt",
       "overflow": "Überlauf",
@@ -1109,12 +1149,37 @@
       "untranslated": "Nicht übersetzt"
     },
     "locale": "Sprache",
+    "new": "Neu",
+    "newCount": "{count, plural, one {# neu} other {# neu}}",
     "noCompare": "Kein Vergleich",
+    "noMatch": "Kein Problem entspricht diesen Filtern",
     "notInReport": "Dieser Bildschirm ist im verglichenen Bericht nicht enthalten.",
+    "onlyNew": "Nur neue",
+    "openKey": "Schlüssel öffnen",
     "report": "Bericht",
+    "route": "Seite",
+    "run": {
+      "body": "Die Prüfung läuft auf Ihrem Rechner oder in der CI, nicht auf den Servern von glot: Sie öffnet Ihre Website in einem Headless-Browser, erstellt Screenshots jeder Seite in jeder Sprache und lädt den Bericht hier hoch.",
+      "browser": "Erster Lauf? Installieren Sie den Browser einmalig mit npx playwright install chromium.",
+      "button": "Prüfung starten",
+      "noSite": "Keine Website-URL hinterlegt, daher nutzt der Befehl http://localhost:3000. Tragen Sie sie in den <link>Einstellungen</link> ein, um sie vorauszufüllen.",
+      "paste": "Ersetzen Sie glot_… durch Ihr Token und führen Sie diesen Befehl in einem Terminal oder CI-Job aus:",
+      "title": "Visuelle Prüfung starten",
+      "token": "Erstellen Sie ein Token unter <link>API-Tokens</link>."
+    },
+    "scope": "{pages, plural, one {# Bildschirm} other {# Bildschirme}}: {routes, plural, one {# Seite} other {# Seiten}} × {locales, plural, one {# Sprache} other {# Sprachen}} × {viewports, plural, one {# Viewport} other {# Viewports}}",
     "screenshotAlt": "Screenshot von {route} in der Sprache {locale}",
-    "subtitle": "Screenshots aller Sprachen mit den Layoutproblemen, die glot-visual-qa gefunden hat: Überlauf, abgeschnittener Text, fehlende Glyphen. Jedes Problem verweist auf den Schlüssel und sein <term>Pixel-Budget</term>.",
+    "showExpected": "Erwartete Kürzungen und Rauschen anzeigen ({count})",
+    "showOnScreen": "Auf dem Bildschirm zeigen",
+    "since": "seit {date}",
+    "stale": "Dieser Bericht nutzte „{used}“ als Ausgangssprache, die des Projekts ist aber „{source}“: Die meisten seiner Probleme sind Rauschen.",
+    "subtitle": "Finden Sie Texte, die Ihr Layout in anderen Sprachen sprengen. Jedes Problem zeigt das Element, seine Position auf der Seite und den zu korrigierenden Schlüssel mit seinem <term>Pixel-Budget</term>.",
+    "tabs": {
+      "issues": "Probleme ({count})",
+      "screens": "Bildschirme ({count})"
+    },
     "title": "Visual QA",
+    "toReview": "{count, plural, =0 {Nichts zu beheben} one {# Problem zu prüfen} other {# Probleme zu prüfen}}",
     "viewport": "Viewport",
     "budgetTip": "Die Breite, die ein String in Ihrer UI haben darf, gemessen in der laufenden App mit glot measure. Übersetzungen, die breiter als ihr Budget sind, werden markiert, und glot fit kürzt sie."
   },
@@ -2264,7 +2329,7 @@
       "annotating": "Klicken Sie auf einen Text auf Ihrer Website, um einen Kommentar zu hinterlassen. Mit Esc abbrechen.",
       "cancel": "Abbrechen",
       "connecting": "Verbindung zu Ihrer Website wird hergestellt…",
-      "install": "Widget installieren",
+      "install": "Verbindung reparieren",
       "pickHere": "Anmerkung hier platzieren",
       "picking": "Klicken Sie auf den gewünschten Text. Drücken Sie Esc zum Abbrechen.",
       "pickingBlind": "Die Website kann noch keine Klicks melden. Installieren Sie das Widget oder wechseln Sie zum letzten Screenshot und klicken Sie dort.",
@@ -2275,8 +2340,7 @@
       "title": "Ihre Website: {url}",
       "unreachable": {
         "body": "Ihre Website hat im Rahmen nicht geantwortet: Das glot-Widget ist nicht auf dieser Seite, oder Ihre Website verbietet die Einbettung (X-Frame-Options oder CSP frame-ancestors).",
-        "title": "Live-Anmerkungen nicht verfügbar.",
-        "fix": "Um nur glot zu erlauben, entfernen Sie X-Frame-Options und senden Sie:"
+        "title": "Live-Anmerkungen nicht verfügbar."
       }
     },
     "help": {
@@ -2285,16 +2349,65 @@
       "e": "Ausgewählten Text bearbeiten",
       "enabled": "Einzelschlüssel-Kürzel aktivieren",
       "esc": "Auswahl abbrechen",
+      "help": "Diese Hilfe anzeigen",
       "j": "Nächste Anmerkung",
       "k": "Vorherige Anmerkung",
       "r": "Ausgewählte Anmerkung als erledigt markieren",
       "title": "Tastenkürzel"
     },
-    "installDialog": {
-      "body": "Eine Zeile im HTML Ihrer Website. Sie ermöglicht Ihrem Team, direkt auf der Seite zu annotieren, und lässt Review Pins präzise platzieren.",
-      "frameBody": "Wenn Sie das Widget nicht einbinden können, reicht dieses kleinere Skript aus, damit Review Pins platzieren und Änderungen vorschauen kann. Ihre Website muss zusätzlich die Anzeige in einem Frame erlauben (kein X-Frame-Options DENY, und CSP frame-ancestors muss dieses Dashboard enthalten).",
-      "frameTitle": "Nur Pins auf dieser Seite gewünscht?",
-      "title": "Das glot-Widget installieren"
+    "setup": {
+      "title": "Website verbinden",
+      "body": "Review zeigt Ihre Website in einem Frame an und kommuniziert mit dem glot-Review-Widget darin. Diese Prüfungen laufen gegen Ihre Live-Website.",
+      "recheck": "Erneut prüfen",
+      "status": {
+        "ok": "Erledigt",
+        "fail": "Handlung nötig",
+        "unknown": "Nicht prüfbar",
+        "pending": "Wird geprüft"
+      },
+      "site": {
+        "title": "Website-URL ist eingerichtet",
+        "ok": "Review öffnet diese Adresse.",
+        "change": "Ändern"
+      },
+      "framing": {
+        "title": "Ihre Website erlaubt die Anzeige in glot",
+        "ok": "Nichts blockiert den Frame.",
+        "unchecked": "Noch nicht geprüft.",
+        "private": "Das ist eine lokale oder private Adresse, die die glot-Server nicht prüfen können. Der eigentliche Test ist die Live-Verbindung (Schritt 4).",
+        "unreachable": "Die glot-Server konnten Ihre Website nicht laden. Prüfen Sie, ob die URL öffentlich und erreichbar ist.",
+        "blocked": "Ihre Website verbietet die Einbettung in einen Frame. Sie sendet: {header}",
+        "fix": "Senden Sie stattdessen diesen Antwort-Header (moderne Browser ignorieren dann X-Frame-Options):"
+      },
+      "widget": {
+        "title": "Das Review-Widget ist auf Ihren Seiten",
+        "ok": "Das Review-Widget ist installiert.",
+        "bridge": "Die Vorschau-Bridge hat geantwortet, Pins funktionieren also. Fügen Sie das Review-Widget hinzu, damit Prüfer auch direkt auf Ihrer Website annotieren können.",
+        "unchecked": "Der HTML-Code Ihrer Seite konnte nicht gelesen werden. Falls noch nicht geschehen, fügen Sie das Review-Widget hinzu.",
+        "missing": "Kein Review-Widget im HTML-Code Ihrer Seite gefunden. Wenn Sie es über Ihr JavaScript-Bundle laden, ignorieren Sie diesen Hinweis.",
+        "feedback": "Ihre Seite enthält das Feedback-Widget (Meldungen von Nutzern), nicht das Review-Widget. Review benötigt das Review-Widget.",
+        "wrongProject": "Das Widget ist für das Projekt „{found}“ eingerichtet, dieses Projekt ist aber „{expected}“.",
+        "wrongOrigin": "data-app-origin des Widgets muss {origin} sein, sonst antwortet es dieser Seite nicht.",
+        "denied": "Das Widget wurde geladen, aber glot hat seine Review-Sitzung abgelehnt. Klicken Sie auf „Erneut prüfen“; falls es weiterhin auftritt, melden Sie sich ab und wieder an.",
+        "network": "Das Widget wurde geladen, konnte glot aber nicht erreichen (Netzwerk oder CORS). Prüfen Sie, ob die Website-URL in den Einstellungen die echte Adresse Ihrer Website ist.",
+        "paste": "Fügen Sie dies in den HTML-Code Ihrer Website ein, direkt vor dem schließenden body-Tag:"
+      },
+      "connected": {
+        "title": "Ihre Website antwortet in Review",
+        "ok": "Verbunden: Pins und Live-Vorschauen funktionieren.",
+        "pending": "Warten auf Antwort Ihrer Website…",
+        "fail": "Ihre Website hat im Frame nicht geantwortet."
+      },
+      "advanced": {
+        "title": "Sie können das Widget nicht einbinden?",
+        "body": "Dieses kleinere Skript genügt, damit Review Pins platziert und Änderungen in der Vorschau zeigt; Prüfer können dann nur nicht direkt auf Ihrer Website annotieren. Ihre Website muss trotzdem die Anzeige im Frame erlauben (Schritt 2)."
+      },
+      "chip": {
+        "widget": "Verbunden",
+        "bridge": "Verbunden (Bridge)",
+        "loading": "Verbinde…",
+        "unreachable": "Nicht verbunden"
+      }
     },
     "list": {
       "allAuthors": "Alle Autoren",
@@ -2305,9 +2418,7 @@
       "count": "{count, plural, =0 {Keine Annotationen gefunden} one {# Annotation} other {# Annotationen}}",
       "empty": {
         "body": "Drücken Sie C oder klicken Sie auf Kommentieren und dann auf einen beliebigen Text auf Ihrer Website, um eine Diskussion zu starten.",
-        "title": "Noch keine Annotationen",
-        "widgetBody": "Fügen Sie dies in den HTML-Code Ihrer Website ein, damit Ihr Team und Prüfer, die Sie per Link einladen, direkt auf der Seite annotieren können.",
-        "widgetTitle": "Widget in einer Zeile installieren"
+        "title": "Noch keine Annotationen"
       },
       "filters": "Filter",
       "label": "Annotationen",

@@ -17,6 +17,8 @@ import {
   Menu,
   MessageSquareWarning,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Radar,
   ScanEye,
@@ -53,6 +55,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, RTL_LOCALES } from "@/i18n/routing";
 import { api, qk } from "@/lib/api";
@@ -74,10 +77,21 @@ const PROJECT_PAGES = [
   { seg: "/feedback", icon: MessageSquareWarning, label: "feedback" },
 ] as const;
 
-function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreate: () => void }) {
+function SidebarNav({
+  onNavigate,
+  onCreate,
+  collapsed = false,
+  onToggle,
+}: {
+  onNavigate?: () => void;
+  onCreate: () => void;
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   const t = useTranslations("shell");
   const slug = useSlug();
   const pathname = usePathname();
+  const locale = useLocale();
   const qc = useQueryClient();
   const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
   // Warm the project query on hover/focus so the overview renders without a skeleton.
@@ -90,55 +104,98 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
         "bg-accent font-medium text-foreground before:absolute before:inset-y-1.5 before:-start-2 before:w-0.5 before:rounded-full before:bg-brand",
     );
   const current = (active: boolean) => (active ? ("page" as const) : undefined);
+  // Collapsed rail: icon only; the label stays for screen readers and shows as a tooltip.
+  const label = (text: string) => <span className={collapsed ? "sr-only" : "truncate"}>{text}</span>;
+  const tip = (text: string, node: React.ReactElement) =>
+    collapsed ? (
+      <Tooltip>
+        <TooltipTrigger asChild>{node}</TooltipTrigger>
+        <TooltipContent side={RTL_LOCALES.includes(locale) ? "left" : "right"}>{text}</TooltipContent>
+      </Tooltip>
+    ) : (
+      node
+    );
 
   return (
     <nav
       aria-label={t("mainNav")}
-      className="flex h-full flex-col gap-6 overflow-y-auto p-3"
+      className="flex h-full flex-col gap-6 overflow-x-hidden overflow-y-auto p-3"
       onClick={(e) => (e.target as HTMLElement).closest("a") && onNavigate?.()}
     >
-      <Link href="/app" className="px-2 pt-1">
-        <Logo />
-      </Link>
+      <div className={cn("flex items-center justify-between", !collapsed && "ps-2")}>
+        {!collapsed && (
+          <Link href="/app" className="pt-1">
+            <Logo />
+          </Link>
+        )}
+        {onToggle &&
+          tip(
+            t("expandSidebar"),
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground"
+              aria-label={collapsed ? t("expandSidebar") : t("collapseSidebar")}
+              aria-expanded={!collapsed}
+              aria-keyshortcuts="Meta+B Control+B"
+              onClick={onToggle}
+            >
+              {collapsed ? <PanelLeftOpen className="rtl:-scale-x-100" /> : <PanelLeftClose className="rtl:-scale-x-100" />}
+            </Button>,
+          )}
+      </div>
 
       <div>
-        <div className="mb-1 flex items-center justify-between px-2">
-          <span className="text-xs font-medium text-muted-foreground">{t("projects")}</span>
-          <Button variant="ghost" size="icon-xs" aria-label={t("newProject")} onClick={onCreate}>
-            <Plus />
-          </Button>
+        <div className={cn("mb-1 flex items-center justify-between", !collapsed && "px-2")}>
+          {!collapsed && <span className="text-xs font-medium text-muted-foreground">{t("projects")}</span>}
+          {tip(
+            t("newProject"),
+            <Button variant="ghost" size="icon-xs" aria-label={t("newProject")} onClick={onCreate} className={cn(collapsed && "mx-auto")}>
+              <Plus />
+            </Button>,
+          )}
         </div>
         <div className="space-y-0.5">
           {projects.isPending &&
             Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="mx-2 my-1.5 h-5" />)}
           {projects.data?.length === 0 && <p className="px-2 py-1 text-xs text-muted-foreground">{t("noProjects")}</p>}
-          {projects.data?.map((p) => (
+          {/* ponytail: the rail keeps only the open project; switching goes through ⌘K or expanding. */}
+          {projects.data?.filter((p) => !collapsed || !slug || p.slug === slug).map((p) => (
             <div key={p.id}>
-              <Link
-                href={`/app/${p.slug}`}
-                className={item(`/app/${p.slug}`, p.slug === slug && pathname === `/app/${p.slug}`)}
-                aria-current={current(p.slug === slug && pathname === `/app/${p.slug}`)}
-                onMouseEnter={() => prefetch(p.slug)}
-                onFocus={() => prefetch(p.slug)}
-              >
-                <FolderKanban className="size-4" />
-                <span className="truncate">{p.name}</span>
-              </Link>
-              {p.slug === slug && <SidebarProjectProgress slug={p.slug} />}
+              {tip(
+                p.name,
+                <Link
+                  href={`/app/${p.slug}`}
+                  className={item(`/app/${p.slug}`, p.slug === slug && pathname === `/app/${p.slug}`)}
+                  aria-current={current(p.slug === slug && pathname === `/app/${p.slug}`)}
+                  onMouseEnter={() => prefetch(p.slug)}
+                  onFocus={() => prefetch(p.slug)}
+                >
+                  <FolderKanban className="size-4" />
+                  {label(p.name)}
+                </Link>,
+              )}
+              {p.slug === slug && !collapsed && <SidebarProjectProgress slug={p.slug} />}
               {p.slug === slug && (
-                <div className="ms-4 mt-2 space-y-0.5 border-s ps-2">
+                <div className={cn("mt-2 space-y-0.5", collapsed ? "border-t pt-2" : "ms-4 border-s ps-2")}>
                   {PROJECT_PAGES.slice(1).map((page) => {
-                    const { seg, icon: Icon, label } = page;
+                    const { seg, icon: Icon, label: name } = page;
                     const href = `/app/${p.slug}${seg}`;
                     return (
                       <div key={seg}>
-                        {seg === "/insights" && (
-                          <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
+                        {seg === "/insights" &&
+                          (collapsed ? (
+                            <div role="separator" aria-label={t("labs")} className="my-2 border-t" />
+                          ) : (
+                            <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
+                          ))}
+                        {tip(
+                          t(name),
+                          <Link href={href} className={item(href, pathname === href)} aria-current={current(pathname === href)}>
+                            <Icon className="size-4" />
+                            {label(t(name))}
+                          </Link>,
                         )}
-                        <Link href={href} className={item(href, pathname === href)} aria-current={current(pathname === href)}>
-                          <Icon className="size-4" />
-                          {t(label)}
-                        </Link>
                       </div>
                     );
                   })}
@@ -150,18 +207,27 @@ function SidebarNav({ onNavigate, onCreate }: { onNavigate?: () => void; onCreat
       </div>
 
       <div className="mt-auto">
-        <Link href="/app/settings/account" className={item("", pathname === "/app/settings/account")} aria-current={current(pathname === "/app/settings/account")}>
-          <UserRound className="size-4" />
-          {t("account")}
-        </Link>
-        <Link href="/app/settings/tokens" className={item("", pathname === "/app/settings/tokens")} aria-current={current(pathname === "/app/settings/tokens")}>
-          <KeyRound className="size-4" />
-          {t("apiTokens")}
-        </Link>
-        <Link href="/app/settings/billing" className={item("", pathname === "/app/settings/billing")} aria-current={current(pathname === "/app/settings/billing")}>
-          <CreditCard className="size-4" />
-          {t("billing")}
-        </Link>
+        {tip(
+          t("account"),
+          <Link href="/app/settings/account" className={item("", pathname === "/app/settings/account")} aria-current={current(pathname === "/app/settings/account")}>
+            <UserRound className="size-4" />
+            {label(t("account"))}
+          </Link>,
+        )}
+        {tip(
+          t("apiTokens"),
+          <Link href="/app/settings/tokens" className={item("", pathname === "/app/settings/tokens")} aria-current={current(pathname === "/app/settings/tokens")}>
+            <KeyRound className="size-4" />
+            {label(t("apiTokens"))}
+          </Link>,
+        )}
+        {tip(
+          t("billing"),
+          <Link href="/app/settings/billing" className={item("", pathname === "/app/settings/billing")} aria-current={current(pathname === "/app/settings/billing")}>
+            <CreditCard className="size-4" />
+            {label(t("billing"))}
+          </Link>,
+        )}
       </div>
     </nav>
   );
@@ -370,6 +436,32 @@ function useNoteDismissed() {
   return [dismissed, dismiss] as const;
 }
 
+// Desktop sidebar folded to an icon rail: remembered per browser, same pattern as the notice above.
+const RAIL = "glot:sidebar-collapsed";
+const railListeners = new Set<() => void>();
+function useSidebarCollapsed() {
+  const collapsed = useSyncExternalStore(
+    (cb) => (railListeners.add(cb), () => railListeners.delete(cb)),
+    () => {
+      try {
+        return localStorage.getItem(RAIL) === "1";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const toggle = () => {
+    try {
+      localStorage.setItem(RAIL, collapsed ? "0" : "1");
+    } catch {
+      /* ignore */
+    }
+    railListeners.forEach((l) => l());
+  };
+  return [collapsed, toggle] as const;
+}
+
 // Full-bleed tools manage their own height; no banners above them.
 const FULL_BLEED = /^\/app\/[^/]+\/(keys|preview)$/;
 
@@ -384,6 +476,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [collapsed, toggleCollapsed] = useSidebarCollapsed();
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable;
+      if (e.key.toLowerCase() === "b" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && !typing) {
+        e.preventDefault();
+        toggleCollapsed();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [toggleCollapsed]);
   // Validates the session early: a 401 here redirects to /login (see Providers).
   useQuery({ queryKey: qk.me, queryFn: api.me });
 
@@ -395,8 +500,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         {t("skipToContent")}
       </a>
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-e bg-sidebar lg:block">
-        <SidebarNav onCreate={() => setCreateOpen(true)} />
+      <aside
+        className={cn(
+          "sticky top-0 hidden h-screen shrink-0 border-e bg-sidebar motion-safe:transition-[width] motion-safe:duration-200 lg:block",
+          collapsed ? "w-14" : "w-60",
+        )}
+      >
+        <SidebarNav collapsed={collapsed} onToggle={toggleCollapsed} onCreate={() => setCreateOpen(true)} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         {/* The drawer opens from the reading-start edge (right in Arabic), like the desktop sidebar. */}

@@ -40,7 +40,9 @@ export type FrameMode = "idle" | "pick" | "annotate";
 export type BridgeState = "loading" | "widget" | "bridge" | "unreachable";
 export type FrameEvent =
   | { type: "created" | "selected"; id: string }
-  | { type: "navigated"; route: string; locale: string };
+  | { type: "navigated"; route: string; locale: string }
+  /** The widget loaded but its API call failed (401 = review token, 0 = network/CORS). */
+  | { type: "error"; status: number };
 
 const BRIDGE_TIMEOUT_MS = 6000;
 const GUTTER = 16;
@@ -66,6 +68,7 @@ export function SiteFrame({
   onState,
   onInstall,
   onReload,
+  reason,
 }: {
   url: string;
   viewport: { w: number; h: number };
@@ -82,6 +85,8 @@ export function SiteFrame({
   onState: (s: BridgeState) => void;
   onInstall: () => void;
   onReload: () => void;
+  /** Why the site doesn't connect (from the setup checks), shown in the banner. */
+  reason?: string;
 }) {
   const t = useTranslations("reviewPage.frame");
   const box = useRef<HTMLDivElement>(null);
@@ -222,6 +227,10 @@ export function SiteFrame({
           }
           break;
         }
+        case "glot:review:error":
+          cb.current.setState("unreachable");
+          cb.current.onEvent({ type: "error", status: Number(d.status) || 0 });
+          break;
         case "glot:pick-cancel":
           cb.current.onCancelPick();
           break;
@@ -309,14 +318,7 @@ export function SiteFrame({
           />
           <p className="min-w-0 flex-1 text-pretty">
             <span className="font-medium">{t("unreachable.title")}</span>{" "}
-            {t("unreachable.body")} {t("unreachable.fix")}{" "}
-            <code
-              dir="ltr"
-              className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs break-all select-all"
-            >
-              Content-Security-Policy: frame-ancestors &apos;self&apos;{" "}
-              {typeof window === "undefined" ? "" : window.location.origin}
-            </code>
+            {reason ?? t("unreachable.body")}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={onInstall}>

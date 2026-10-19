@@ -792,6 +792,27 @@
     "label": "Idioma"
   },
   "matrix": {
+    "howTo": "Cada columna muestra la misma página de tu sitio real en un idioma. Desplázate una vez y todas las columnas te siguen; los recuadros rojos son problemas de QA visual, haz clic en uno para corregir el texto.",
+    "fit": "Ajustar",
+    "overlayHint": "Marca los problemas encontrados en la última QA visual (texto cortado, superpuesto o sin traducir).",
+    "overlayNone": "Todavía no hay informe de QA visual: lanza uno desde la página QA visual para ver aquí los problemas marcados.",
+    "pseudoHint": "Añade una columna con texto más largo y acentuado para revelar cadenas fijas en el código y diseños que se rompen con idiomas más largos.",
+    "pseudoTag": "texto largo y acentuado",
+    "focus": "Mostrar solo este idioma",
+    "unfocus": "Mostrar todos los idiomas",
+    "knownRoutes": "Páginas de tu sitio",
+    "openReport": "Abrir el informe",
+    "loading": "Cargando…",
+    "missing": "{count, plural, one {# clave sin traducir} many {# claves sin traducir} other {# claves sin traducir}}",
+    "missingHint": "Traducir las claves que faltan en {language}",
+    "complete": "Todas las claves traducidas",
+    "issues": "{count, plural, one {# problema} many {# problemas} other {# problemas}}",
+    "blank": {
+      "summary": "¿Un marco se queda en blanco o muestra un error?",
+      "body": "Probablemente tu sitio prohíbe mostrarse en un marco (X-Frame-Options o CSP frame-ancestors). Para permitir solo a glot, elimina X-Frame-Options y envía:",
+      "other": "Si la página se abre bien en una pestaña nueva pero muestra el idioma equivocado o un 404, revisa el patrón de URL por idioma en",
+      "settings": "Configuración → Tu sitio"
+    },
     "bridge": {
       "body": "Añade este script a la aplicación (solo en desarrollo) para alturas de marco exactas y renderizado de pseudoidioma. El panel de glot ya lo incluye.",
       "title": "Puente de vista previa"
@@ -809,9 +830,12 @@
     },
     "mobile": "Móvil",
     "noBase": {
-      "body": "Define la URL base de tu aplicación (por ejemplo, http://localhost:3000) para ver todos los idiomas lado a lado.",
-      "cta": "Configurar vista previa",
-      "title": "Conecta glot con tu aplicación en ejecución"
+      "body": "La matriz abre tu sitio real en todos los idiomas lado a lado, para detectar textos cortados, superpuestos o sin traducir antes que tus usuarios.",
+      "cta": "Añadir la URL de mi sitio",
+      "title": "Añade tu sitio para comparar todos los idiomas",
+      "step1": "En Configuración → Tu sitio, introduce la dirección de tu sitio (producción, staging o http://localhost:3000).",
+      "step2": "Comprueba cómo se forman las URL por idioma (por ejemplo /fr/precios) y enumera las páginas que quieres comparar.",
+      "step3": "Permite que glot muestre tu sitio en un marco (cabecera CSP frame-ancestors)."
     },
     "openTab": "Abrir en una pestaña nueva",
     "overlay": "Superposición de QA",
@@ -819,7 +843,7 @@
     "pseudoColumn": "Pseudoidioma",
     "reload": "Recargar todos los marcos",
     "reportFrom": "Informe de QA visual del {date} · {count, plural, =0 {ningún problema en esta pantalla} one {# problema en esta pantalla} many {# problemas en esta pantalla} other {# problemas en esta pantalla}}",
-    "route": "Ruta",
+    "route": "Página",
     "routePlaceholder": "/precios",
     "source": "origen",
     "title": "Matriz de idiomas",
@@ -1033,6 +1057,8 @@
     "search": "Buscar…",
     "settings": "Configuración",
     "toggleSidebar": "Alternar navegación",
+    "collapseSidebar": "Contraer la barra lateral",
+    "expandSidebar": "Expandir la barra lateral",
     "userMenu": "Menú de la cuenta",
     "visual": "QA visual",
     "experimental": "El servidor autoalojado y el panel son experimentales: espera fallos y cambios incompatibles. La CLI y el servidor MCP son el núcleo estable. <docs>Leer más</docs>",
@@ -1088,18 +1114,32 @@
   "visual": {
     "after": "Después",
     "allLocales": "Todos los idiomas",
+    "allRoutes": "Todas las páginas",
     "allViewports": "Todas las resoluciones",
     "before": "Antes",
     "clean": "Sin problemas",
-    "clearKinds": "Quitar filtro de tipo",
-    "compareWith": "Comparar con",
-    "empty": {
-      "body": "Ejecuta glot-visual-qa con --upload para enviar aquí su informe y capturas.",
-      "command": "Sube desde tu equipo o CI",
-      "title": "Aún no hay informe de QA visual"
+    "clear": {
+      "body": "{count, plural, one {# pantalla revisada} many {# pantallas revisadas} other {# pantallas revisadas}}, ningún problema de maquetación.",
+      "title": "Todo en orden"
     },
-    "issueAt": "Problema de {kind}: clave {key}",
+    "clearFilters": "Quitar filtros",
+    "compareWith": "Comparar con",
+    "cropAlt": "Primer plano de {key}",
+    "empty": {
+      "body": "Todavía no se ha revisado nada. Ejecuta el comando de abajo: abre tu sitio en cada idioma, captura cada página y muestra aquí lo que se rompe.",
+      "title": "Aún no hay ninguna revisión visual"
+    },
+    "fixedCount": "{count, plural, one {# corregido} many {# corregidos} other {# corregidos}}",
+    "issueAt": "{kind}: {key}",
     "issues": "{count, plural, one {# problema} many {# problemas} other {# problemas}}",
+    "kindHelp": {
+      "clamp": "Cortado a propósito por el CSS (puntos suspensivos), normalmente correcto",
+      "overflow": "El texto se sale de su caja",
+      "overlap": "Dos textos superpuestos",
+      "rtl": "La página no se muestra de derecha a izquierda",
+      "tofu": "Caracteres que la fuente no puede mostrar",
+      "untranslated": "Sigue en el idioma de origen"
+    },
     "kinds": {
       "clamp": "Recortado",
       "overflow": "Desbordamiento",
@@ -1109,12 +1149,37 @@
       "untranslated": "Sin traducir"
     },
     "locale": "Idioma",
+    "new": "Nuevo",
+    "newCount": "{count, plural, one {# nuevo} many {# nuevos} other {# nuevos}}",
     "noCompare": "Sin comparación",
+    "noMatch": "Ningún problema coincide con estos filtros",
     "notInReport": "Esta pantalla no está en el informe comparado.",
+    "onlyNew": "Solo nuevos",
+    "openKey": "Abrir clave",
     "report": "Informe",
+    "route": "Página",
+    "run": {
+      "body": "La revisión se ejecuta en tu equipo o en CI, no en los servidores de glot: abre tu sitio en un navegador sin interfaz, captura cada página en cada idioma y envía el informe aquí.",
+      "browser": "¿Primera ejecución? Instala el navegador una vez con npx playwright install chromium.",
+      "button": "Lanzar una revisión",
+      "noSite": "No hay URL del sitio, así que el comando usa http://localhost:3000. Añádela en <link>Ajustes</link> para rellenarla.",
+      "paste": "Sustituye glot_… por tu token y ejecuta este comando en una terminal o en CI:",
+      "title": "Lanzar una revisión visual",
+      "token": "Crea un token en <link>Tokens de API</link>."
+    },
+    "scope": "{pages, plural, one {# pantalla} many {# pantallas} other {# pantallas}}: {routes, plural, one {# página} many {# páginas} other {# páginas}} × {locales, plural, one {# idioma} many {# idiomas} other {# idiomas}} × {viewports, plural, one {# resolución} many {# resoluciones} other {# resoluciones}}",
     "screenshotAlt": "Captura de {route} en el idioma {locale}",
-    "subtitle": "Capturas de todos los idiomas con los problemas de maquetación detectados por glot-visual-qa: desbordamiento, texto recortado, glifos que faltan. Cada incidencia apunta a la clave y a su <term>presupuesto de píxeles</term>.",
+    "showExpected": "Mostrar recortes previstos y ruido ({count})",
+    "showOnScreen": "Ver en pantalla",
+    "since": "desde el {date}",
+    "stale": "Este informe usó «{used}» como idioma de origen, pero el del proyecto es «{source}»: la mayoría de sus problemas son ruido.",
+    "subtitle": "Encuentra los textos que rompen tu maquetación en otros idiomas. Cada problema muestra el elemento, dónde está en la página y la clave que corregir, con su <term>presupuesto de píxeles</term>.",
+    "tabs": {
+      "issues": "Problemas ({count})",
+      "screens": "Pantallas ({count})"
+    },
     "title": "QA visual",
+    "toReview": "{count, plural, =0 {Nada que corregir} one {# problema por revisar} many {# problemas por revisar} other {# problemas por revisar}}",
     "viewport": "Ventana gráfica",
     "budgetTip": "Ancho que puede ocupar un texto en su interfaz, medido en la aplicación en ejecución con glot measure. Las traducciones más anchas que su presupuesto se marcan, y glot fit las acorta."
   },
@@ -2264,7 +2329,7 @@
       "annotating": "Haz clic en un texto de tu sitio para dejar un comentario. Pulsa Esc para cancelar.",
       "cancel": "Cancelar",
       "connecting": "Conectando con tu sitio…",
-      "install": "Instalar el widget",
+      "install": "Arreglar la conexión",
       "pickHere": "Colocar la anotación aquí",
       "picking": "Haz clic en el texto que quieras. Pulsa Esc para cancelar.",
       "pickingBlind": "El sitio todavía no puede informar de los clics. Instala el widget o cambia a la última captura de pantalla y haz clic ahí.",
@@ -2275,8 +2340,7 @@
       "title": "Tu sitio: {url}",
       "unreachable": {
         "body": "Tu sitio no respondió dentro del marco: el widget de glot no está en esta página, o tu sitio prohíbe mostrarse en un marco (X-Frame-Options o CSP frame-ancestors).",
-        "title": "Anotaciones en vivo no disponibles.",
-        "fix": "Para permitir solo glot, elimina X-Frame-Options y envía:"
+        "title": "Anotaciones en vivo no disponibles."
       }
     },
     "help": {
@@ -2285,16 +2349,65 @@
       "e": "Editar el texto seleccionado",
       "enabled": "Activar atajos de una sola clave",
       "esc": "Cancelar selección",
+      "help": "Mostrar esta ayuda",
       "j": "Anotación siguiente",
       "k": "Anotación anterior",
       "r": "Resolver la anotación seleccionada",
       "title": "Atajos de teclado"
     },
-    "installDialog": {
-      "body": "Una línea en el HTML de tu sitio. Permite anotar a tu equipo directamente en la página y que Review coloque los marcadores con precisión.",
-      "frameBody": "Si no puedes añadir el widget, este script más pequeño basta para que Review coloque los marcadores y previsualice las ediciones. Tu sitio también debe permitir mostrarse en un marco (sin X-Frame-Options DENY, y CSP frame-ancestors debe incluir este panel).",
-      "frameTitle": "¿Solo quieres marcadores en esta página?",
-      "title": "Instalar el widget de glot"
+    "setup": {
+      "title": "Conecta tu sitio",
+      "body": "Review muestra tu sitio en un marco y se comunica con el widget de revisión de glot que contiene. Estas comprobaciones se hacen sobre tu sitio en línea.",
+      "recheck": "Comprobar de nuevo",
+      "status": {
+        "ok": "Hecho",
+        "fail": "Requiere acción",
+        "unknown": "No se pudo comprobar",
+        "pending": "Comprobando"
+      },
+      "site": {
+        "title": "La URL del sitio está configurada",
+        "ok": "Review abre esta dirección.",
+        "change": "Cambiar"
+      },
+      "framing": {
+        "title": "Tu sitio permite mostrarse en glot",
+        "ok": "Nada bloquea el marco.",
+        "unchecked": "Aún no comprobado.",
+        "private": "Es una dirección local o privada, así que los servidores de glot no pueden comprobarla. La conexión en vivo (paso 4) es la prueba real.",
+        "unreachable": "Los servidores de glot no pudieron cargar tu sitio. Comprueba que la URL sea pública y esté en línea.",
+        "blocked": "Tu sitio prohíbe mostrarse en un marco. Envía: {header}",
+        "fix": "Envía en su lugar este encabezado de respuesta (los navegadores modernos ignoran entonces X-Frame-Options):"
+      },
+      "widget": {
+        "title": "El widget de revisión está en tus páginas",
+        "ok": "El widget de revisión está instalado.",
+        "bridge": "El puente de vista previa respondió, así que los marcadores funcionan. Añade el widget de revisión para que los revisores también puedan anotar desde tu sitio.",
+        "unchecked": "No se pudo leer el HTML de tu página. Si aún no lo has hecho, añade el widget de revisión.",
+        "missing": "No se encontró el widget de revisión en el HTML de tu página. Si lo cargas desde tu bundle de JavaScript, ignora este aviso.",
+        "feedback": "Tu página tiene el widget de feedback (reportes de usuarios), no el widget de revisión. Review necesita el widget de revisión.",
+        "wrongProject": "El widget está configurado para el proyecto «{found}», pero este proyecto es «{expected}».",
+        "wrongOrigin": "El atributo data-app-origin del widget debe ser {origin}; si no, no responderá a esta página.",
+        "denied": "El widget se cargó, pero glot rechazó su sesión de revisión. Haz clic en Comprobar de nuevo; si persiste, cierra sesión y vuelve a entrar.",
+        "network": "El widget se cargó pero no pudo conectar con glot (red o CORS). Comprueba que la URL del sitio en Ajustes sea la dirección real de tu sitio.",
+        "paste": "Pega esto en el HTML de tu sitio, justo antes de la etiqueta de cierre de body:"
+      },
+      "connected": {
+        "title": "Tu sitio responde en Review",
+        "ok": "Conectado: los marcadores y las vistas previas en vivo funcionan.",
+        "pending": "Esperando la respuesta de tu sitio…",
+        "fail": "Tu sitio no respondió en el marco."
+      },
+      "advanced": {
+        "title": "¿No puedes añadir el widget?",
+        "body": "Este script más pequeño basta para que Review coloque marcadores y previsualice ediciones; los revisores simplemente no podrán anotar desde tu sitio. Tu sitio debe permitir igualmente mostrarse en un marco (paso 2)."
+      },
+      "chip": {
+        "widget": "Conectado",
+        "bridge": "Conectado (puente)",
+        "loading": "Conectando…",
+        "unreachable": "Sin conexión"
+      }
     },
     "list": {
       "allAuthors": "Todos los autores",
@@ -2305,9 +2418,7 @@
       "count": "{count, plural, =0 {No hay anotaciones que coincidan} one {# anotación} many {# anotaciones} other {# anotaciones}}",
       "empty": {
         "body": "Pulsa C o haz clic en Comentar y, después, en cualquier texto de tu sitio para iniciar un debate.",
-        "title": "Aún no hay anotaciones",
-        "widgetBody": "Pega esto en el HTML de tu sitio para que tu equipo y los revisores a los que invites por enlace puedan anotar directamente en la página.",
-        "widgetTitle": "Instala el widget en una línea"
+        "title": "Aún no hay anotaciones"
       },
       "filters": "Filtros",
       "label": "Anotaciones",

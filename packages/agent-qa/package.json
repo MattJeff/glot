@@ -1,6 +1,6 @@
 {
   "name": "@glot/agent-qa",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Task parity QA: an agent (Claude vision or a scripted mock) runs the same tasks in every locale of your app and measures who succeeds.",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",

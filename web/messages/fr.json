@@ -792,6 +792,27 @@
     "label": "Langue"
   },
   "matrix": {
+    "howTo": "Chaque colonne affiche la même page de votre vrai site dans une langue. Faites défiler une fois, toutes les colonnes suivent ; les cadres rouges sont des problèmes de QA visuelle, cliquez dessus pour corriger le texte.",
+    "fit": "Ajuster",
+    "overlayHint": "Entoure les problèmes trouvés par la dernière QA visuelle (texte coupé, qui se chevauche ou non traduit).",
+    "overlayNone": "Pas encore de rapport de QA visuelle : lancez-en un depuis la page QA visuelle pour voir les problèmes entourés ici.",
+    "pseudoHint": "Ajoute une colonne au texte allongé et accentué pour révéler les chaînes codées en dur et les mises en page qui cassent avec des langues plus longues.",
+    "pseudoTag": "texte allongé et accentué",
+    "focus": "Afficher uniquement cette langue",
+    "unfocus": "Afficher toutes les langues",
+    "knownRoutes": "Pages de votre site",
+    "openReport": "Ouvrir le rapport",
+    "loading": "Chargement…",
+    "missing": "{count, plural, one {# clé manquante} many {# clés manquantes} other {# clés manquantes}}",
+    "missingHint": "Traduire les clés manquantes en {language}",
+    "complete": "Toutes les clés sont traduites",
+    "issues": "{count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
+    "blank": {
+      "summary": "Un cadre reste vide ou affiche une erreur ?",
+      "body": "Votre site interdit probablement son affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors). Pour n’autoriser que glot, retirez X-Frame-Options et envoyez :",
+      "other": "Si la page s’ouvre bien dans un nouvel onglet mais affiche la mauvaise langue ou une erreur 404, vérifiez le modèle d’URL par langue dans",
+      "settings": "Paramètres → Votre site"
+    },
     "bridge": {
       "body": "Ajoutez ce script à votre application (en développement uniquement) pour des hauteurs de cadre exactes et le rendu de la pseudo-langue. Le tableau de bord glot l’inclut déjà.",
       "title": "Pont d’aperçu"
@@ -809,9 +830,12 @@
     },
     "mobile": "Mobile",
     "noBase": {
-      "body": "Définissez l'URL de base de votre application (par exemple http://localhost:3000) pour voir toutes les langues côte à côte.",
-      "cta": "Configurer l'aperçu",
-      "title": "Indiquez à glot votre application en cours d'exécution"
+      "body": "La matrice ouvre votre vrai site dans toutes les langues côte à côte, pour repérer les textes coupés, qui se chevauchent ou non traduits avant vos utilisateurs.",
+      "cta": "Ajouter l’URL de mon site",
+      "title": "Ajoutez votre site pour comparer toutes les langues",
+      "step1": "Dans Paramètres → Votre site, saisissez l’adresse de votre site (production, préproduction ou http://localhost:3000).",
+      "step2": "Vérifiez comment sont construites les URL par langue (par exemple /en/tarifs) et listez les pages à comparer.",
+      "step3": "Autorisez glot à afficher votre site dans un cadre (en-tête CSP frame-ancestors)."
     },
     "openTab": "Ouvrir dans un nouvel onglet",
     "overlay": "Superposition QA",
@@ -819,7 +843,7 @@
     "pseudoColumn": "Pseudo-langue",
     "reload": "Recharger tous les cadres",
     "reportFrom": "Rapport de QA visuel du {date} · {count, plural, =0 {aucun problème sur cet écran} one {# problème sur cet écran} many {# problèmes sur cet écran} other {# problèmes sur cet écran}}",
-    "route": "Route",
+    "route": "Page",
     "routePlaceholder": "/pricing",
     "source": "source",
     "title": "Matrice des langues",
@@ -1033,6 +1057,8 @@
     "search": "Rechercher…",
     "settings": "Paramètres",
     "toggleSidebar": "Afficher/masquer la navigation",
+    "collapseSidebar": "Réduire la barre latérale",
+    "expandSidebar": "Déplier la barre latérale",
     "userMenu": "Menu du compte",
     "visual": "QA visuelle",
     "experimental": "Le serveur auto-hébergé et le tableau de bord sont expérimentaux : attendez-vous à des aspérités et à des changements incompatibles. La CLI et le serveur MCP constituent le socle stable. <docs>En savoir plus</docs>",
@@ -1088,18 +1114,32 @@
   "visual": {
     "after": "Après",
     "allLocales": "Toutes les langues",
+    "allRoutes": "Toutes les pages",
     "allViewports": "Tous les viewports",
     "before": "Avant",
     "clean": "Aucun problème",
-    "clearKinds": "Effacer le filtre de type",
-    "compareWith": "Comparer avec",
-    "empty": {
-      "body": "Exécutez glot-visual-qa avec --upload pour envoyer ici son rapport et ses captures d’écran.",
-      "command": "Envoyer depuis votre machine ou la CI",
-      "title": "Aucun rapport de QA visuelle pour l’instant"
+    "clear": {
+      "body": "{count, plural, one {# écran vérifié} many {# écrans vérifiés} other {# écrans vérifiés}}, aucun problème de mise en page.",
+      "title": "Tout est en ordre"
     },
-    "issueAt": "Problème {kind} sur la clé : {key}",
+    "clearFilters": "Effacer les filtres",
+    "compareWith": "Comparer avec",
+    "cropAlt": "Gros plan sur {key}",
+    "empty": {
+      "body": "Rien n’a encore été vérifié. Lancez la commande ci-dessous : elle ouvre votre site dans chaque langue, capture chaque page et affiche ici ce qui casse.",
+      "title": "Aucune vérification visuelle pour l’instant"
+    },
+    "fixedCount": "{count, plural, one {# corrigé} many {# corrigés} other {# corrigés}}",
+    "issueAt": "{kind} : {key}",
     "issues": "{count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
+    "kindHelp": {
+      "clamp": "Coupé volontairement par le CSS (points de suspension), en général normal",
+      "overflow": "Le texte déborde de son cadre",
+      "overlap": "Deux textes l’un sur l’autre",
+      "rtl": "Page non affichée de droite à gauche",
+      "tofu": "Caractères que la police ne sait pas afficher",
+      "untranslated": "Encore dans la langue source"
+    },
     "kinds": {
       "clamp": "Tronqué",
       "overflow": "Débordement",
@@ -1109,12 +1149,37 @@
       "untranslated": "Non traduit"
     },
     "locale": "Langue",
+    "new": "Nouveau",
+    "newCount": "{count, plural, one {# nouveau} many {# nouveaux} other {# nouveaux}}",
     "noCompare": "Aucune comparaison",
+    "noMatch": "Aucun problème ne correspond à ces filtres",
     "notInReport": "Cet écran ne figure pas dans le rapport comparé.",
+    "onlyNew": "Nouveaux uniquement",
+    "openKey": "Ouvrir la clé",
     "report": "Rapport",
+    "route": "Page",
+    "run": {
+      "body": "La vérification tourne sur votre machine ou en CI, pas sur les serveurs de glot : elle ouvre votre site dans un navigateur sans interface, capture chaque page dans chaque langue et envoie le rapport ici.",
+      "browser": "Premier lancement ? Installez le navigateur une fois avec npx playwright install chromium.",
+      "button": "Lancer une vérification",
+      "noSite": "Aucune URL de site renseignée, la commande utilise donc http://localhost:3000. Ajoutez-la dans les <link>Paramètres</link> pour la préremplir.",
+      "paste": "Remplacez glot_… par votre jeton et lancez cette commande dans un terminal ou en CI :",
+      "title": "Lancer une vérification visuelle",
+      "token": "Créez un jeton dans <link>Jetons d’API</link>."
+    },
+    "scope": "{pages, plural, one {# écran} many {# écrans} other {# écrans}} : {routes, plural, one {# page} many {# pages} other {# pages}} × {locales, plural, one {# langue} many {# langues} other {# langues}} × {viewports, plural, one {# viewport} many {# viewports} other {# viewports}}",
     "screenshotAlt": "Capture d’écran de {route} dans la langue {locale}",
-    "subtitle": "Captures d’écran de chaque langue avec les problèmes de mise en page détectés par glot-visual-qa : débordement, texte tronqué, glyphes manquants. Chaque problème renvoie à la clé et à son <term>budget en pixels</term>.",
+    "showExpected": "Afficher les troncatures prévues et le bruit ({count})",
+    "showOnScreen": "Voir sur l’écran",
+    "since": "depuis le {date}",
+    "stale": "Ce rapport a utilisé « {used} » comme langue source, alors que celle du projet est « {source} » : la plupart de ses problèmes sont du bruit.",
+    "subtitle": "Repérez les textes qui cassent votre mise en page dans les autres langues. Chaque problème montre l’élément, sa place sur la page et la clé à corriger, avec son <term>budget en pixels</term>.",
+    "tabs": {
+      "issues": "Problèmes ({count})",
+      "screens": "Écrans ({count})"
+    },
     "title": "QA visuelle",
+    "toReview": "{count, plural, =0 {Rien à corriger} one {# problème à examiner} many {# problèmes à examiner} other {# problèmes à examiner}}",
     "viewport": "Fenêtre d’affichage",
     "budgetTip": "La largeur qu’un texte peut occuper dans votre interface, mesurée dans l’application en cours d’exécution avec glot measure. Les traductions plus larges que leur budget sont signalées, et glot fit les raccourcit."
   },
@@ -2264,7 +2329,7 @@
       "annotating": "Cliquez sur un texte de votre site pour laisser un commentaire. Appuyez sur Échap pour annuler.",
       "cancel": "Annuler",
       "connecting": "Connexion à votre site…",
-      "install": "Installer le widget",
+      "install": "Réparer la connexion",
       "pickHere": "Placer l'annotation ici",
       "picking": "Cliquez sur le texte voulu. Appuyez sur Échap pour annuler.",
       "pickingBlind": "Le site ne peut pas encore signaler les clics. Installez le widget, ou affichez la dernière capture d'écran et cliquez dessus.",
@@ -2275,8 +2340,7 @@
       "title": "Votre site : {url}",
       "unreachable": {
         "body": "Votre site n'a pas répondu dans le cadre : le widget glot n'est pas sur cette page, ou votre site interdit l'affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
-        "title": "Épingles en direct indisponibles.",
-        "fix": "Pour n'autoriser que glot, retirez X-Frame-Options et envoyez :"
+        "title": "Épingles en direct indisponibles."
       }
     },
     "help": {
@@ -2285,16 +2349,65 @@
       "e": "Modifier le texte sélectionné",
       "enabled": "Activer les raccourcis à une seule clé",
       "esc": "Annuler la sélection",
+      "help": "Afficher cette aide",
       "j": "Annotation suivante",
       "k": "Annotation précédente",
       "r": "Résoudre l'annotation sélectionnée",
       "title": "Raccourcis clavier"
     },
-    "installDialog": {
-      "body": "Une ligne dans le HTML de votre site. Elle permet à votre équipe d'annoter directement sur la page et à Review de placer les épingles avec précision.",
-      "frameBody": "Si vous ne pouvez pas ajouter le widget, ce script plus léger suffit à Review pour placer les épingles et prévisualiser les modifications. Votre site doit aussi autoriser son affichage dans un cadre (pas de X-Frame-Options DENY, et CSP frame-ancestors doit inclure ce tableau de bord).",
-      "frameTitle": "Vous voulez seulement des épingles sur cette page\föu00a0?",
-      "title": "Installer le widget glot"
+    "setup": {
+      "title": "Connecter votre site",
+      "body": "Review affiche votre site dans un cadre et dialogue avec le widget de revue glot qui s'y trouve. Ces vérifications portent sur votre site en ligne.",
+      "recheck": "Vérifier à nouveau",
+      "status": {
+        "ok": "Fait",
+        "fail": "Action requise",
+        "unknown": "Vérification impossible",
+        "pending": "Vérification en cours"
+      },
+      "site": {
+        "title": "L'URL du site est renseignée",
+        "ok": "Review ouvre cette adresse.",
+        "change": "Modifier"
+      },
+      "framing": {
+        "title": "Votre site accepte d'être affiché dans glot",
+        "ok": "Rien ne bloque le cadre.",
+        "unchecked": "Pas encore vérifié.",
+        "private": "C'est une adresse locale ou privée : les serveurs de glot ne peuvent pas la vérifier. La connexion en direct (étape 4) fait foi.",
+        "unreachable": "Les serveurs de glot n'ont pas pu charger votre site. Vérifiez que l'URL est publique et en ligne.",
+        "blocked": "Votre site interdit l'affichage dans un cadre. Il envoie : {header}",
+        "fix": "Envoyez plutôt cet en-tête de réponse (les navigateurs récents ignorent alors X-Frame-Options) :"
+      },
+      "widget": {
+        "title": "Le widget de revue est sur vos pages",
+        "ok": "Le widget de revue est installé.",
+        "bridge": "Le pont d'aperçu a répondu : les épingles fonctionnent. Ajoutez le widget de revue pour que les relecteurs puissent aussi annoter depuis votre site.",
+        "unchecked": "Impossible de lire le HTML de votre page. Si ce n'est pas déjà fait, ajoutez le widget de revue.",
+        "missing": "Aucun widget de revue trouvé dans le HTML de votre page. Si vous le chargez depuis votre bundle JavaScript, ignorez ce message.",
+        "feedback": "Votre page contient le widget de signalement (retours des utilisateurs), pas le widget de revue. Review a besoin du widget de revue.",
+        "wrongProject": "Le widget est configuré pour le projet « {found} », mais ce projet est « {expected} ».",
+        "wrongOrigin": "L'attribut data-app-origin du widget doit valoir {origin}, sinon il ne répond pas à cette page.",
+        "denied": "Le widget s'est chargé, mais glot a refusé sa session de revue. Cliquez sur Vérifier à nouveau ; si le problème persiste, déconnectez-vous puis reconnectez-vous.",
+        "network": "Le widget s'est chargé mais n'a pas pu joindre glot (réseau ou CORS). Vérifiez que l'URL du site dans les Paramètres est bien l'adresse réelle de votre site.",
+        "paste": "Collez ceci dans le HTML de votre site, juste avant la balise body fermante :"
+      },
+      "connected": {
+        "title": "Votre site répond dans Review",
+        "ok": "Connecté : les épingles et les aperçus en direct fonctionnent.",
+        "pending": "En attente de la réponse de votre site…",
+        "fail": "Votre site n'a pas répondu dans le cadre."
+      },
+      "advanced": {
+        "title": "Impossible d'ajouter le widget ?",
+        "body": "Ce script plus léger suffit à Review pour placer les épingles et prévisualiser les modifications ; les relecteurs ne pourront simplement pas annoter depuis votre site. Votre site doit tout de même accepter l'affichage dans un cadre (étape 2)."
+      },
+      "chip": {
+        "widget": "Connecté",
+        "bridge": "Connecté (pont)",
+        "loading": "Connexion…",
+        "unreachable": "Non connecté"
+      }
     },
     "list": {
       "allAuthors": "Tous les auteurs",
@@ -2305,9 +2418,7 @@
       "count": "{count, plural, =0 {Aucune annotation ne correspond} one {# annotation} many {# annotations} other {# annotations}}",
       "empty": {
         "body": "Appuyez sur C ou cliquez sur Commentaire, puis cliquez sur un texte de votre site pour lancer une discussion.",
-        "title": "Aucune annotation pour le moment",
-        "widgetBody": "Collez ceci dans le HTML de votre site afin que votre équipe et les relecteurs que vous invitez par lien puissent annoter directement la page.",
-        "widgetTitle": "Installez le widget en une ligne"
+        "title": "Aucune annotation pour le moment"
       },
       "filters": "Filtres",
       "label": "Annotations",
@@ -2426,7 +2537,7 @@
       "rephrase": "Reformuler",
       "rephrasing": "Reformulation…",
       "showLocales": "Voir {count, plural, one {# langue} many {# langues} other {# langues}}",
-      "source": "Source/u00a0:",
+      "source": "Source :",
       "title": "Corriger le texte",
       "variants": "Choisissez une version, survolez pour prévisualiser"
     }
