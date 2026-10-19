@@ -1118,6 +1118,44 @@ fn tree_size(dir: &Path, max: u64) -> anyhow::Result<u64> {
     Ok(total)
 }
 
+/// `root` when it holds a glot.toml, else the shallowest subdirectory that does (depth <= 3,
+/// skipping vendored, test and example trees), else `root` (`glot init` runs there).
+fn app_dir(root: &Path) -> PathBuf {
+    const SKIP: &[&str] = &[
+        "node_modules",
+        "target",
+        "vendor",
+        "examples",
+        "example",
+        "tests",
+        "test",
+        "fixtures",
+    ];
+    let mut level = vec![root.to_path_buf()];
+    for _ in 0..=3 {
+        let mut found: Vec<PathBuf> = level
+            .iter()
+            .filter(|d| d.join(glot_core::config::CONFIG_FILE).is_file())
+            .cloned()
+            .collect();
+        if !found.is_empty() {
+            found.sort();
+            return found.swap_remove(0);
+        }
+        level = level
+            .iter()
+            .flat_map(|d| std::fs::read_dir(d).into_iter().flatten().flatten())
+            .filter(|e| e.file_type().is_ok_and(|t| t.is_dir()))
+            .filter(|e| {
+                let n = e.file_name().to_string_lossy().to_string();
+                !n.starts_with('.') && !SKIP.contains(&n.as_str())
+            })
+            .map(|e| e.path())
+            .collect();
+    }
+    root.to_path_buf()
+}
+
 /// A repo-provided glot.toml must not make glot read outside the clone (catalog paths, extract globs).
 fn check_config(dir: &Path) -> anyhow::Result<()> {
     let path = dir.join(glot_core::config::CONFIG_FILE);
@@ -1323,16 +1361,18 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     step(state, job, 2).await;
 
     // glot localize (glot.toml checked before and after: it decides which files glot reads).
-    check_config(&dir)?;
-    let keys_before = glot_llm::engine::Workspace::open(&dir)
+    // Monorepo without a root glot.toml: the shallowest configured app (e.g. `web/`).
+    let app_root = app_dir(&dir);
+    check_config(&app_root)?;
+    let keys_before = glot_llm::engine::Workspace::open(&app_root)
         .map(|ws| ws.source().entries.len())
         .unwrap_or(0);
-    let done = localize(&dir, &home, &p, api_key).await?;
-    check_config(&dir)?;
+    let done = localize(&app_root, &home, &p, api_key).await?;
+    check_config(&app_root)?;
     step(state, job, 3).await;
 
     // Sync into the project: same rules as `glot push` (reviewed/human translations on the server win).
-    let ws = glot_llm::engine::Workspace::open(&dir).map_err(|e| anyhow::anyhow!("{e}"))?;
+    let ws = glot_llm::engine::Workspace::open(&app_root).map_err(|e| anyhow::anyhow!("{e}"))?;
     let locales: Vec<&String> = std::iter::once(&p.source_locale)
         .chain(&p.target_locales)
         .collect();
@@ -1646,6 +1686,23 @@ mod tests {
         assert!(!valid_repo("acme/../x") && !valid_repo("acme") && !valid_repo("-x/y z"));
         assert!(valid_branch("main") && valid_branch("release/1.2"));
         assert!(!valid_branch("--upload-pack=x") && !valid_branch("a..b") && !valid_branch("a b"));
+    }
+
+    #[test]
+    fn app_dir_prefers_root_then_shallowest() {
+        let d = std::env::temp_dir().join(format!("glot-app-{}", Uuid::new_v4()));
+        for f in [
+            "web/glot.toml",
+            "crates/x/emails/glot.toml",
+            "examples/ios/glot.toml",
+        ] {
+            std::fs::create_dir_all(d.join(f).parent().unwrap()).unwrap();
+            std::fs::write(d.join(f), "").unwrap();
+        }
+        assert_eq!(app_dir(&d), d.join("web"));
+        std::fs::write(d.join("glot.toml"), "").unwrap();
+        assert_eq!(app_dir(&d), d);
+        std::fs::remove_dir_all(&d).unwrap();
     }
 
     #[test]

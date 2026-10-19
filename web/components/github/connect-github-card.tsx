@@ -437,6 +437,17 @@ function Linked({ slug, status, onChangeRepo }: { slug: string; status: GithubSt
         <p className="flex items-center gap-2 font-medium">
           <TriangleAlert className="size-4 text-destructive" aria-hidden /> {t("linked.failed")}
         </p>
+        {/HTTP 401|invalid.?api.?key|authentication_error/i.test(job.error ?? "") && (
+          <p>
+            {t.rich("linked.badKey", {
+              link: (c) => (
+                <Link href={`/app/${slug}/settings`} className="font-medium underline underline-offset-4">
+                  {c}
+                </Link>
+              ),
+            })}
+          </p>
+        )}
         <p className="font-mono text-xs break-words text-muted-foreground" dir="ltr">
           {job.error}
         </p>

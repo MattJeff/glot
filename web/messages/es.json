@@ -1818,6 +1818,7 @@
     "linked": {
       "change": "Cambiar repositorio",
       "failed": "La última ejecución falló",
+      "badKey": "Tu proveedor de IA rechazó la clave API. Pega una clave válida en <link>Ajustes</link> y vuelve a ejecutar.",
       "prHint": "Cada push a {branch} actualiza este pull request.",
       "prReady": "El pull request #{n} está listo para fusionarse",
       "rerun": "Ejecutar de nuevo",

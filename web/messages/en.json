@@ -1914,6 +1914,7 @@
       "rerun": "Run again",
       "change": "Change repository",
       "failed": "The last run failed",
+      "badKey": "Your AI provider rejected the API key. Paste a valid key in <link>Settings</link>, then run again.",
       "prReady": "Pull request #{n} is ready to merge",
       "prHint": "Each push to {branch} updates this pull request.",
       "review": "Review pull request",

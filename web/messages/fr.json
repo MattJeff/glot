@@ -16,7 +16,7 @@
       "switch": "Pas encore de compte ?",
       "switchLink": "Créer un compte",
       "title": "Bon retour",
-      "forgot": "Mot de passe oublié\\u00a0?"
+      "forgot": "Mot de passe oublié ?"
     },
     "signup": {
       "submit": "Créer le compte",
@@ -989,7 +989,7 @@
       "workspaceId": "ID de l’espace de travail Anthropic",
       "workspaceIdHint": "Requis avec les clés au niveau de l’organisation (sk-ant-usr-…). Remplace ANTHROPIC_WORKSPACE_ID.",
       "modelHint": "Identifiant du modèle tel que votre fournisseur le nomme, par ex. claude-haiku-5-5.",
-      "styleHint": "Règles de ton et de formulation envoyées avec chaque traduction, par ex. «\\u00a0Informel, libellés courts, noms de produits en anglais\\u00a0»."
+      "styleHint": "Règles de ton et de formulation envoyées avec chaque traduction, par ex. « Informel, libellés courts, noms de produits en anglais »."
     },
     "locales": {
       "add": "Ajouter une langue",
@@ -1210,7 +1210,7 @@
       "traffic": "Part du trafic par version",
       "version": "Version",
       "visitors": "{count, plural, one {# visiteur} many {# visiteurs} other {# visiteurs}}",
-      "win": "{variant}\tu00a0: {lift} inscriptions (probablement entre {low} et {high}), probabilité de {probability} d'être la meilleure.",
+      "win": "{variant} : {lift} inscriptions (probablement entre {low} et {high}), probabilité de {probability} d'être la meilleure.",
       "writing": "Rédaction…"
     },
     "footer": {
@@ -1297,11 +1297,11 @@
     "faq": {
       "agents": {
         "a": "Tout agent compatible MCP, comme Claude Code, Cursor, Codex ou Windsurf, via npx -y glot-i18n mcp. Claude Code dispose aussi d'un plugin et d'une skill glot, et des règles AGENTS.md sont fournies pour les autres agents.",
-        "q": "Quels agents de code fonctionnent avec glot\\u00a0?"
+        "q": "Quels agents de code fonctionnent avec glot ?"
       },
       "ai": {
         "a": "Chaque variante passe par les mêmes contrôles que vos traductions, dans toutes les langues, plus des règles contre l'urgence factice, les chiffres inventés et les affirmations invérifiables. Vous pouvez exiger une validation humaine avant qu'une variante ne soit mise en ligne.",
-        "q": "Le texte rédigé par l'IA risque-t-il de nous embarrasser\\u00a0?"
+        "q": "Le texte rédigé par l'IA risque-t-il de nous embarrasser ?"
       },
       "audiences": {
         "a": "Oui. glot diffuse plusieurs versions d’un titre ou d’un bouton aux audiences que vous choisissez (pays, appareil, source de trafic), dans toutes les langues à la fois, et conserve celle qui convertit. Jusqu’à 4 audiences par expérience, plus tous les autres visiteurs.",
@@ -1539,7 +1539,7 @@
     },
     "preferences": {
       "celebrations": "Célébrer les étapes clés",
-      "celebrationsHint": "Affiche une brève notification et une petite animation lorsqu'une langue atteint 100\\u00a0% ou que les problèmes de validation tombent à zéro. Désactivez pour un tableau de bord plus sobre.",
+      "celebrationsHint": "Affiche une brève notification et une petite animation lorsqu'une langue atteint 100 % ou que les problèmes de validation tombent à zéro. Désactivez pour un tableau de bord plus sobre.",
       "title": "Préférences"
     },
     "subtitle": "Votre adresse e-mail de connexion, mot de passe, notifications et préférences du tableau de bord.",
@@ -1636,18 +1636,18 @@
     "confirmPropagate": {
       "body": "glot ouvre une nouvelle expérience avec l'idée gagnante dans {segment}, à rédiger pour les {n, plural, one {# langue} many {# langues} other {# langues}} que ce test ne couvre pas. Chaque traduction est validée avant d'être diffusée ; cette expérience n'est pas modifiée.",
       "cta": "Lancer le test",
-      "title": "Tester « {arm} » dans les autres langues\\u00a0?"
+      "title": "Tester « {arm} » dans les autres langues ?"
     },
     "confirmSegment": {
       "after": "Le test se termine pour ce segment et ses visiteurs ne sont plus comptabilisés. glot vous rappelle de relancer un test dans 90 jours et rétablit le texte officiel si la source change.",
       "body": "Désormais, tous les visiteurs de {segment} voient cette formulation, dans toutes les {locales, plural, one {# langue} many {# langues} other {# langues}}. Les autres visiteurs conservent le texte officiel.",
       "cta": "Promouvoir pour ce segment",
-      "title": "Afficher « {arm} » à {segment} de façon permanente\\u00a0?"
+      "title": "Afficher « {arm} » à {segment} de façon permanente ?"
     },
     "confirmStop": {
       "body": "Tous les visiteurs revoient le texte officiel. Les résultats sont conservés ; rien ne change dans vos catalogues.",
       "cta": "Arrêter l'expérience",
-      "title": "Arrêter « {name} »\\u00a0?"
+      "title": "Arrêter « {name} » ?"
     },
     "everyone": "Tous",
     "everyoneElse": "Tous les autres",
@@ -1660,7 +1660,7 @@
       "firstBody": "Présenter une formulation à de vrais visiteurs",
       "label": "Jalons de l'expérience",
       "winner": "Premier gagnant",
-      "winnerBody": "Une variante a battu le texte officiel avec un niveau de confiance de 95\\u00a0%"
+      "winnerBody": "Une variante a battu le texte officiel avec un niveau de confiance de 95 %"
     },
     "official": "Officiel",
     "pBestShort": "{p} de chances d'être en tête",
@@ -1784,7 +1784,7 @@
     "healthLabel": "Santé du projet {score} sur 100",
     "localesProgress": "Progression des traductions par langue",
     "notYet": "Pas encore atteint",
-    "ringLabel": "{language}\\u00a0: {percent} traduit",
+    "ringLabel": "{language} : {percent} traduit",
     "ringTooltip": "{language} · {percent} traduit · {issues, plural, =0 {aucun problème} one {# problème} many {# problèmes} other {# problèmes}}"
   },
   "github": {
@@ -1807,17 +1807,18 @@
       }
     },
     "install": {
-      "already": "Déjà installé\\u00a0? Autoriser à la place",
+      "already": "Déjà installé ? Autoriser à la place",
       "cta": "Connecter GitHub",
       "redirecting": "Ouverture de GitHub…"
     },
     "job": {
-      "announce": "Étape {n} sur {total}\\u00a0: {step}",
+      "announce": "Étape {n} sur {total} : {step}",
       "progress": "{done} sur {total} étapes terminées"
     },
     "linked": {
       "change": "Changer de dépôt",
       "failed": "La dernière exécution a échoué",
+      "badKey": "Votre fournisseur d'IA a refusé la clé API. Collez une clé valide dans <link>Paramètres</link>, puis relancez.",
       "prHint": "Chaque push sur {branch} met à jour cette pull request.",
       "prReady": "La pull request #{n} est prête à être fusionnée",
       "rerun": "Relancer",
@@ -1835,11 +1836,11 @@
     "page": {
       "cancel": "Annuler",
       "disconnect": "Déconnecter le dépôt",
-      "disconnectBody": "glot cesse de mettre à jour les traductions de ce dépôt. Les pull requests ouvertes restent sur GitHub\\u00a0; vos traductions restent dans glot.",
-      "disconnectTitle": "Déconnecter {repo}\\u00a0?",
+      "disconnectBody": "glot cesse de mettre à jour les traductions de ce dépôt. Les pull requests ouvertes restent sur GitHub ; vos traductions restent dans glot.",
+      "disconnectTitle": "Déconnecter {repo} ?",
       "disconnected": "Dépôt déconnecté",
       "how": "Fonctionnement",
-      "subtitle": "Localisez un dépôt sans terminal\\u00a0: glot ouvre une pull request et la maintient à jour.",
+      "subtitle": "Localisez un dépôt sans terminal : glot ouvre une pull request et la maintient à jour.",
       "title": "GitHub"
     },
     "pick": {
@@ -2252,7 +2253,7 @@
       "saved": "{count, plural, one {# traduction enregistrée} many {# traductions enregistrées} other {# traductions enregistrées}}",
       "saving": "Enregistrement…",
       "showInFrame": "Afficher sur le site",
-      "source": "Source (langue {locale})\\u00a0:",
+      "source": "Source (langue {locale}) :",
       "title": "Modifier le texte",
       "undo": "Annuler",
       "undoLast": "Annuler la dernière modification",
@@ -2440,7 +2441,7 @@
         "source": "Source du trafic",
         "visitor": "Visiteur"
       },
-      "countryBad": "Code pays non valide\\u00a0: {codes}",
+      "countryBad": "Code pays non valide : {codes}",
       "countryHint": "Codes à deux lettres, séparés par des virgules. Laisser vide pour tous les pays.",
       "days": "{n, plural, one {# jour} many {# jours} other {# jours}}",
       "device": {

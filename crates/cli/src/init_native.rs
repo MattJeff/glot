@@ -17,6 +17,12 @@ const SKIP: &[&str] = &[
     ".gradle",
     "venv",
     ".venv",
+    // Test fixtures and sample apps are not the app being localized.
+    "tests",
+    "test",
+    "__tests__",
+    "fixtures",
+    "examples",
 ];
 
 /// Files under `root` (depth <= 6) matching `pred`, sorted.

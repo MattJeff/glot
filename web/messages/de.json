@@ -1818,6 +1818,7 @@
     "linked": {
       "change": "Repository wechseln",
       "failed": "Der letzte Lauf ist fehlgeschlagen",
+      "badKey": "Ihr KI-Anbieter hat den API-Schlüssel abgelehnt. Fügen Sie in den <link>Einstellungen</link> einen gültigen Schlüssel ein und starten Sie erneut.",
       "prHint": "Jeder Push auf {branch} aktualisiert diesen Pull Request.",
       "prReady": "Pull Request #{n} ist bereit zum Mergen",
       "rerun": "Erneut ausführen",
