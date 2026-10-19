@@ -12,21 +12,27 @@ import { cn } from "@/lib/utils";
 const KEY = "home.hero.title";
 const LOCALES = ["en", "de", "ja", "ar"] as const;
 type L = (typeof LOCALES)[number];
-const OFFICIAL: Record<L, string> = { en: "Send your invoices in minutes.", de: "Rechnungen in Minuten versenden.", ja: "請求書を数分で送信。", ar: "أرسل فواتيرك في دقائق." };
+function useOfficialConfig(): Record<L, string> {
+  const t = useTranslations("home.demo");
+  return { en: t("official_en.headline"), de: t("official_de.headline"), ja: "請求書を数分で送信。", ar: t("official_ar.headline") };
+}
 type Intent = "simplicity" | "benefit" | "urgency";
-const VERSIONS: { id: Intent; text: Record<L, string> | { en: string }; refused?: string; retry?: { locale: L; msg: string } }[] = [
-  { id: "simplicity", text: { en: "Invoices in a few clicks.", de: "Rechnungen mit wenigen Klicks.", ja: "請求書は数クリックで。", ar: "فواتيرك ببضع نقرات." } },
+function useVersions(): { id: Intent; text: Record<L, string> | { en: string }; refused?: string; retry?: { locale: L; msg: string } }[] {
+  const t = useTranslations("home.demo");
+  return [
+  { id: "simplicity", text: { en: t("versions.en.tagline"), de: t("versions.de.tagline"), ja: "請求書は数クリックで。", ar: t("versions.ar.tagline") } },
   {
     id: "benefit",
-    text: { en: "Get paid faster. Send invoices in minutes.", de: "Schneller bezahlt. Rechnungen in Minuten.", ja: "もっと早く入金。請求書は数分で。", ar: "احصل على أموالك أسرع. فواتيرك في دقائق." },
-    retry: { locale: "de", msg: "Too wide for its box in the app: one line of 480px at Geist 40px/600; it renders 702px wide." },
+    text: { en: t("versions.en.headline"), de: t("versions.de.headline"), ja: "もっと早く入金。請求書は数分で。", ar: t("versions.ar.headline") },
+    retry: { locale: "de", msg: t("versions.layout_note") },
   },
   {
     id: "urgency",
-    text: { en: "Today only: send unlimited invoices." },
-    refused: `"Today only": urgency or scarcity with no source. Declare the real deadline or stock as a fact (e.g. "offer ends 31 Oct") or remove the wording.`,
+    text: { en: t("versions.en.urgency_banner") },
+    refused: t("versions.urgency_note"),
   },
 ];
+}
 // Traffic share per audience: official, simplicity, benefit (urgency never went live).
 const AUDIENCES = [
   { id: "de", share: [18, 64, 18], visitors: 4812 },
@@ -38,7 +44,10 @@ const BAR = ["bg-muted-foreground/45", "bg-brand", "bg-info"];
 const STEPS = ["write", "check", "serve", "learn", "ship"] as const;
 const STEP_MS = 5200;
 // CLI-style output lines (product data, shown verbatim like the terminal).
-const OUT = { width: "de · width", urgency: "en · fake_urgency", retryOk: "→ retry passed", promote: "promote:" };
+function useOut() {
+  const t = useTranslations("home.demo");
+  return { width: t("out.de_width"), urgency: t("out.en_fake_urgency"), retryOk: t("out.retry_passed"), promote: "promote:" };
+}
 const DAY = 14;
 
 const dirOf = (l: string) => (l === "ar" ? "rtl" : "ltr");
@@ -66,6 +75,7 @@ function useCount(to: number, run: boolean, ms = 900) {
 }
 
 export function HomeDemo() {
+  const OFFICIAL = useOfficialConfig();
   const t = useTranslations("home.demo");
   const root = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
@@ -207,6 +217,8 @@ function IntentPill({ id }: { id: Intent }) {
 }
 
 function Write() {
+  const OFFICIAL = useOfficialConfig();
+  const VERSIONS = useVersions();
   const t = useTranslations("home.demo");
   return (
     <ul className="grid grid-cols-[minmax(0,1fr)] gap-3">
@@ -241,6 +253,8 @@ function Write() {
 }
 
 function Checks() {
+  const VERSIONS = useVersions();
+  const OUT = useOut();
   const t = useTranslations("home.demo");
   // Cells revealed one by one; the urgency version stops at the source (en), nothing else is translated.
   const cells = VERSIONS.flatMap((v) => (v.refused ? [`${v.id}-en`] : LOCALES.map((l) => `${v.id}-${l}`)));
@@ -445,6 +459,9 @@ function Gauge({ value, delay }: { value: number; delay: number }) {
 }
 
 function Ship() {
+  const VERSIONS = useVersions();
+  const OUT = useOut();
+  const OFFICIAL = useOfficialConfig();
   const t = useTranslations("home.demo");
   const ti = useTranslations("home.demo.intent");
   const [merged, setMerged] = useState(false);
@@ -461,12 +478,12 @@ function Ship() {
       <div dir="ltr" className="space-y-2 p-3.5 font-mono text-[11.5px] leading-relaxed">
         {LOCALES.map((l, i) => (
           <div key={l} className="demo-in overflow-hidden rounded-md border" style={{ animationDelay: `${120 + i * 160}ms` }}>
-            <p className="border-b bg-muted/50 px-2.5 py-1 text-muted-foreground">messages/{l}.json</p>
+            <p className="border-b bg-muted/50 px-2.5 py-1 text-muted-foreground">{t("ship.messages_path", { l })}</p>
             <p className="truncate bg-destructive/8 px-2.5 py-0.5" title={OFFICIAL[l]}>
-              <span aria-hidden className="select-none">− </span>&quot;<bdi lang={l} dir={dirOf(l)}>{OFFICIAL[l]}</bdi>&quot;
+              {t.rich("ship.minus_fragment", { span: (chunks) => <span aria-hidden className="select-none">{chunks}</span> })}<bdi lang={l} dir={dirOf(l)}>{OFFICIAL[l]}</bdi>{t("ship.quote_mark")}
             </p>
             <p className="truncate bg-success/10 px-2.5 py-0.5" title={win[l]}>
-              <span aria-hidden className="select-none">+ </span>&quot;<bdi lang={l} dir={dirOf(l)}>{win[l]}</bdi>&quot;
+              {t.rich("ship.plus_fragment", { span: (chunks) => <span aria-hidden className="select-none">{chunks}</span> })}<bdi lang={l} dir={dirOf(l)}>{win[l]}</bdi>{t("ship.quote_mark")}
             </p>
           </div>
         ))}

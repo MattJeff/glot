@@ -100,6 +100,10 @@
       "body": "Keys come from your repository: push your source catalog with the CLI, or add a single string by hand. They show up here right away.",
       "push": "Push your catalogs (run in your repository)",
       "add": "Or add one string"
+    },
+    "code_block": {
+      "push_command": "glot push",
+      "add_command": "glot add nav.billing \"Billing\" --note \"sidebar link\""
     }
   },
   "errors": {
@@ -243,7 +247,16 @@
       "proofOss": "MIT licensed",
       "proofStars": "{count, plural, =0 {Star on GitHub} one {# star on GitHub} other {# stars on GitHub}}",
       "proofNpm": "npm v{version}",
-      "proofLabel": "Project facts"
+      "proofLabel": "Project facts",
+      "greeting": {
+        "welcome_back": "Welcome back, '{'name'}'!"
+      },
+      "syntax": {
+        "icu_label": "ICU syntax"
+      },
+      "file_count": {
+        "plural": "'{'count, plural, other '{'# files'}''}'"
+      }
     },
     "bench": {
       "eyebrow": "Benchmark, October 18, 2026",
@@ -376,7 +389,12 @@
       "subtitle": "Where glot differs from hosted translation platforms and other developer-first tools.",
       "title": "Compare",
       "tolgeePrice": "Free tier and free self-host, cloud from €58/mo",
-      "yes": "Yes"
+      "yes": "Yes",
+      "columns": {
+        "lokalise": "Lokalise",
+        "crowdin": "Crowdin",
+        "tolgee": "Tolgee"
+      }
     },
     "faq": {
       "title": "Questions",
@@ -486,7 +504,11 @@
       "ship": {
         "label": "Ship",
         "title": "The winner lands in Git",
-        "body": "Promote opens a pull request with the winning text in every locale."
+        "body": "Promote opens a pull request with the winning text in every locale.",
+        "messages_path": "messages/{l}.json",
+        "minus_fragment": "<span>−</span>\"",
+        "quote_mark": "\"",
+        "plus_fragment": "<span>+</span>\""
       },
       "intent": {
         "simplicity": "Simplicity",
@@ -515,7 +537,38 @@
       "promote": "Promote everywhere",
       "merge": "Merge pull request",
       "merged": "Merged. Your catalogs now hold the winner, in every locale.",
-      "files": "{count, plural, one {# file changed} other {# files changed}}"
+      "files": "{count, plural, one {# file changed} other {# files changed}}",
+      "official_en": {
+        "headline": "Send your invoices in minutes."
+      },
+      "official_de": {
+        "headline": "Rechnungen in Minuten versenden."
+      },
+      "official_ar": {
+        "headline": "أرسل فواتيرك في دقائق."
+      },
+      "versions": {
+        "en": {
+          "tagline": "Invoices in a few clicks.",
+          "headline": "Get paid faster. Send invoices in minutes.",
+          "urgency_banner": "Today only: send unlimited invoices."
+        },
+        "de": {
+          "tagline": "Rechnungen mit wenigen Klicks.",
+          "headline": "Schneller bezahlt. Rechnungen in Minuten."
+        },
+        "ar": {
+          "tagline": "فواتيرك ببضع نقرات.",
+          "headline": "احصل على أموالك أسرع. فواتيرك في دقائق."
+        },
+        "layout_note": "Too wide for its box in the app: one line of 480px at Geist 40px/600; it renders 702px wide.",
+        "urgency_note": "\"Today only\": urgency or scarcity with no source. Declare the real deadline or stock as a fact (e.g. \"offer ends 31 Oct\") or remove the wording."
+      },
+      "out": {
+        "de_width": "de · width",
+        "en_fake_urgency": "en · fake_urgency",
+        "retry_passed": "→ retry passed"
+      }
     },
     "problem": {
       "eyebrow": "The problem",
@@ -773,7 +826,8 @@
     "cta": {
       "title": "Ship the words that work, in every language.",
       "body": "Start with one headline. glot does the writing checks, the math and the pull request.",
-      "docs": "Read the experiments docs"
+      "docs": "Read the experiments docs",
+      "localize_command": "npx glot-i18n localize --yes --targets fr,de"
     },
     "footer": {
       "tagline": "Copy experiments and localization that AI can't break.",
@@ -824,7 +878,10 @@
     "zoom": "Zoom",
     "subtitle": "Your app rendered in every locale side by side, to spot layout breaks at a glance.",
     "bySegment": "By segment",
-    "locale": "Locale"
+    "locale": "Locale",
+    "pseudo_locale": {
+      "code": "qps"
+    }
   },
   "notFound": {
     "back": "Back home",
@@ -935,7 +992,8 @@
       "description": "Serve catalogs over the air as JSON, with ETag and cache headers.",
       "enable": "Enable public CDN",
       "example": "Example URL",
-      "title": "Public CDN"
+      "title": "Public CDN",
+      "example_2": "curl {cdn_url}"
     },
     "danger": {
       "confirmBody": "This cannot be undone. Type {slug} to confirm.",
@@ -1253,7 +1311,8 @@
       "start": "Start experiment",
       "started": "Experiment started for {language}",
       "removeTitle": "Remove {language} from your targets?",
-      "removeBody": "The experiment ends and {language} leaves your target languages: its visitors get the source language again."
+      "removeBody": "The experiment ends and {language} leaves your target languages: its visitors get the source language again.",
+      "sample_size": "{locale} · n = {format}"
     },
     "install": {
       "title": "Install the snippet",
@@ -1973,7 +2032,13 @@
       "title": "Only administrators can create the GitHub App",
       "body": "Add your email to GLOT_ADMIN_EMAILS in the server environment, then reload this page."
     },
-    "callbackError": "GitHub did not return the app credentials. Start again: the link is valid for one hour."
+    "callbackError": "GitHub did not return the app credentials. Start again: the link is valid for one hour.",
+    "permissions_contents_write": "contents: write",
+    "permissions_pull_requests_write": "pull_requests: write",
+    "permissions_metadata_read": "metadata: read",
+    "aria": {
+      "glot_link": "glot"
+    }
   },
   "experimentResults": {
     "official": "Official",
@@ -2625,6 +2690,23 @@
       "neverExpires": "Never expires",
       "revoke": "Revoke {label}",
       "revoked": "Link revoked"
+    }
+  },
+  "lib": {
+    "snippets": {
+      "demo": {
+        "translate_call": "glot.translate('{' keys: [\"checkout.items\"], locales: [\"fr\", \"ja\", \"ar\"] '}')"
+      },
+      "plurals": {
+        "checkout_items": "\"checkout.items\": \"'{'count, plural, one '{'# item'}' other '{'# items'}''}'\"",
+        "items": "\"items\": \"'{'count, plural, one '{'# article'}' other '{'# articles'}''}'\""
+      },
+      "actions": {
+        "pay_button": "\"pay\": \"Payer '{'amount'}'\""
+      },
+      "status": {
+        "lock_entries": "glot.lock 2 entries"
+      }
     }
   }
 }

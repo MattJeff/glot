@@ -18,10 +18,14 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { ApiError } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 
-const PERMISSIONS = ["contents: write", "pull_requests: write", "metadata: read"];
+function usePermissions() {
+  const t = useTranslations("githubAdmin");
+  return [t("permissions_contents_write"), t("permissions_pull_requests_write"), t("permissions_metadata_read")];
+}
 const EVENTS = ["push", "pull_request", "installation"];
 
 export function GitHubAppSetup() {
+  const PERMISSIONS = usePermissions();
   const t = useTranslations("githubAdmin");
   const message = useErrorMessage();
   const params = useSearchParams();
@@ -137,7 +141,7 @@ export function GitHubAppSetup() {
   return (
     <div className="min-h-dvh bg-background">
       <header className="mx-auto flex max-w-2xl items-center justify-between px-4 py-6">
-        <Link href="/app" aria-label="glot">
+        <Link href="/app" aria-label={t("aria.glot_link")}>
           <Logo />
         </Link>
         <ThemeToggle />

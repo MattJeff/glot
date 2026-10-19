@@ -484,7 +484,7 @@ function SettingsForm({
         <label className="flex items-center gap-3 text-sm">
           <Switch checked={cdn} onCheckedChange={setCdn} /> {t("cdn.enable")}
         </label>
-        {cdn && <CodeBlock label={t("cdn.example")} code={`curl ${cdnUrl}`} />}
+        {cdn && <CodeBlock label={t("cdn.example")} code={t("cdn.example_2", { cdn_url: cdnUrl })} />}
       </Section>
 
       <Section
