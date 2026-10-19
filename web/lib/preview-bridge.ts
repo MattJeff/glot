@@ -121,8 +121,19 @@ export function installBridge() {
     if (hover) hover.style.outline = hoverOutline;
     hover = null;
   };
+  // The text under the pointer wins over e.target: decorative overlays and wrappers otherwise
+  // pick a whole section instead of the clicked heading.
+  const underPointer = (e: Event): Element | null => {
+    if (!(e instanceof MouseEvent)) return null;
+    const d = document as Document & { caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node } | null };
+    const node = d.caretPositionFromPoint?.(e.clientX, e.clientY)?.offsetNode ?? document.caretRangeFromPoint?.(e.clientX, e.clientY)?.startContainer;
+    const el = node?.nodeType === Node.TEXT_NODE && node.nodeValue?.trim() ? node.parentElement : null;
+    // Only when the pointer is really over that text (caret APIs snap to the nearest text).
+    const r = el?.getBoundingClientRect();
+    return r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom ? el : null;
+  };
   const target = (e: Event) => {
-    const el = e.target instanceof Element ? e.target : null;
+    const el = underPointer(e) ?? (e.target instanceof Element ? e.target : null);
     return el && el !== document.body && el !== document.documentElement ? (el as HTMLElement) : null;
   };
   document.addEventListener(
