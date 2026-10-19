@@ -131,6 +131,15 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
     box((el.parentElement?.closest("section, form, nav, header, footer, aside, article, dialog, [role=dialog], li, tr, fieldset")
       ?? el.parentElement?.parentElement ?? el).getBoundingClientRect());
   const shown: El[] = [];
+  // Ellipsis / line-clamp on the box that clips: truncation by design, reported as "clamp", not "overflow".
+  const truncates = (s: CSSStyleDeclaration) => s.textOverflow === "ellipsis" || !["", "none"].includes(s.getPropertyValue("-webkit-line-clamp"));
+  const clipperTruncates = (el: Element | null) => {
+    for (; el; el = el.parentElement) {
+      const s = getComputedStyle(el);
+      if (/hidden|clip/.test(s.overflowX + s.overflowY)) return truncates(s);
+    }
+    return false;
+  };
 
   const texts: string[] = [];
   const seenTofu = new Set<string>();
@@ -163,7 +172,9 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
     } else if (clamp && clamp !== "none" && vOver) {
       found.push({ kind: "clamp", selector: sel(el), text, key: key(el), rect: box(r), ctx: ctx(el), fit: geo(el.scrollWidth, el.scrollHeight) });
     } else if (clipped && (hOver || vOver)) {
-      found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(r), ctx: ctx(el), fit: geo(el.scrollWidth, el.scrollHeight) });
+      // Ellipsis only covers the inline axis: text cut vertically is still overflow.
+      const byDesign = /hidden|clip/.test(cs.overflowX) && cs.textOverflow === "ellipsis" && !vOver;
+      found.push({ kind: byDesign ? "clamp" : "overflow", selector: sel(el), text, key: key(el), rect: box(r), ctx: ctx(el), fit: geo(el.scrollWidth, el.scrollHeight) });
     } else {
       // Visible overflow: the text itself spills out of its box.
       const range = document.createRange();
@@ -171,7 +182,7 @@ function detect(arg: { sourceTexts: string[] | null; checkRtl: boolean }): { fou
       const t = range.getBoundingClientRect();
       if (t.right > r.right + 1 || t.left < r.left - 1 || t.bottom > r.bottom + vTol) {
         const u = new DOMRect(Math.min(r.x, t.x), Math.min(r.y, t.y), Math.max(r.right, t.right) - Math.min(r.x, t.x), Math.max(r.bottom, t.bottom) - Math.min(r.y, t.y));
-        found.push({ kind: "overflow", selector: sel(el), text, key: key(el), rect: box(u), ctx: ctx(el), fit: geo(Math.max(t.right, r.right) - Math.min(t.left, r.left), Math.max(t.bottom, r.bottom) - Math.min(t.top, r.top)) });
+        found.push({ kind: clipperTruncates(el.parentElement) ? "clamp" : "overflow", selector: sel(el), text, key: key(el), rect: box(u), ctx: ctx(el), fit: geo(Math.max(t.right, r.right) - Math.min(t.left, r.left), Math.max(t.bottom, r.bottom) - Math.min(t.top, r.top)) });
       }
     }
 
@@ -374,6 +385,18 @@ async function grab(page: Page, url: string) {
   if (res && res.status() >= 400) throw new Error(`${url} → HTTP ${res.status()}`);
   // Dev servers keep HMR sockets/polls open: networkidle is best effort.
   await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {});
+  // Scroll-reveal (IntersectionObserver fade-ins) stays blank until seen: walk the page down once, then back up.
+  // ponytail: capped at 20000px / 5s, very long pages keep their bottom unrevealed.
+  await page.evaluate(async () => {
+    const end = Date.now() + 5000;
+    for (let y = innerHeight; y < Math.min(document.documentElement.scrollHeight, 20000) && Date.now() < end; y += innerHeight) {
+      scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    scrollTo(0, 0);
+  });
+  await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(300);
   await page.evaluate(() => document.fonts.ready);
 }
 
@@ -465,7 +488,8 @@ export async function run(o: Options): Promise<Report> {
   try {
     for (const vp of o.viewports) {
       const [width, height] = vp.split("x").map(Number);
-      const page = await browser.newPage({ viewport: { width, height } });
+      // Reduced motion: reveal animations land on their final frame.
+      const page = await browser.newPage({ viewport: { width, height }, reducedMotion: "reduce" });
       if (o.measure) {
         await mkdir(fontsDir, { recursive: true });
         page.on("response", (res) => {
@@ -490,7 +514,8 @@ export async function run(o: Options): Promise<Report> {
           const url = buildUrl(o, locale, route);
           await grab(page, url);
           await page.evaluate(unmark);
-          const { found, els } = await page.evaluate(detect, { sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
+          // The source locale is the reference: never "untranslated" against itself.
+          const { found, els } = await page.evaluate(detect, { sourceTexts: locale === o.sourceLocale ? null : sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
           const slug = `${locale}_${slugOf(route)}_${vp}`;
           const screenshot = join("screenshots", `${slug}.png`);
           await page.screenshot({ path: join(o.out, screenshot), fullPage: true });
@@ -539,7 +564,7 @@ async function runHarness(o: Options): Promise<Report> {
   try {
     for (const vp of o.viewports) {
       const [width, height] = vp.split("x").map(Number);
-      const page = await browser.newPage({ viewport: { width, height } });
+      const page = await browser.newPage({ viewport: { width, height }, reducedMotion: "reduce" });
       const url = buildUrl(o, o.sourceLocale, o.routes[0] ?? "/");
       for (const [locale, html] of Object.entries(fragments)) {
         await grab(page, url);

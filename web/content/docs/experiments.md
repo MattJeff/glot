@@ -12,6 +12,26 @@ Test several versions of the same message (a hero, a call to action) in every la
 - **Goal**: the conversion event that decides (`signup`, `purchase` with a revenue value), plus optional guardrail events that must not go up (`refund`).
 - **Holdout** (optional): a small share of visitors who never see any variant, to measure the combined effect of everything you promoted.
 
+## Any site (one script tag)
+
+No React, no bundler (static HTML, Leptos/WASM, Rails, …). Conversions are counted by the Insights browser build, `dist/insights.global.js` from `@glot-i18n/insights` (about 1.1 kB gzipped), served by your app. It configures itself from its own tag:
+
+```html
+<script src="/insights.global.js" data-key="PUBLIC_KEY" data-endpoint="https://glot.example.com" data-locale="fr" defer></script>
+```
+
+- `data-key` (required): the project's Insights public key. Without it the script does nothing.
+- `data-endpoint`: your glot server origin (default: same origin as the page).
+- `data-locale`: the locale the page is served in. Omitted, it is read from `<html lang>`, else `en`.
+
+Send a conversion from plain JS, wherever the visitor converts:
+
+```js
+window.glot.track("signup");                                  // or window.glot.track("purchase", { value: 49, currency: "EUR" })
+```
+
+The arm itself is chosen at the edge, not by this script: put the Cloudflare Worker template (`@glot-i18n/edge/worker`, with `GLOT_KEY`) in front of the site, mark the tested text with `data-glot="key"`, and use `persistence: "session"` so the `glot_xp` cookie lets `track` credit the arm the visitor saw. A page with no assignment still counts the event, just not for an experiment.
+
 ## Install (3 lines)
 
 With Next.js (App Router) and next-intl:

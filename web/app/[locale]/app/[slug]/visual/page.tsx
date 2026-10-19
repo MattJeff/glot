@@ -78,7 +78,7 @@ function VisualQa({ project: p }: { project: Project }) {
         <CodeBlock
           className="mt-4"
           label={t("empty.command")}
-          code={`GLOT_TOKEN=glot_… npx glot-visual-qa --base-url http://localhost:3000 \\\n  --upload ${origin || "http://localhost:8790"} --project ${p.slug}`}
+          code={`GLOT_TOKEN=glot_… npx @glot-i18n/visual-qa --base-url http://localhost:3000 \\\n  --upload ${origin || "http://localhost:8790"} --project ${p.slug}`}
         />
       </div>
     );

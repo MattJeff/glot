@@ -57,3 +57,64 @@ test("detects overflowing German button, untranslated text and missing rtl", asy
     server.close();
   }
 });
+
+const serve = async (pages: Record<string, string>) => {
+  const server = createServer((req, res) => {
+    const body = pages[req.url!];
+    res.writeHead(body ? 200 : 404, { "content-type": "text/html; charset=utf-8" }).end(body ?? "");
+  });
+  await new Promise<void>((r) => server.listen(0, r));
+  return { server, baseUrl: `http://localhost:${(server.address() as { port: number }).port}` };
+};
+const opts = { routes: ["/"], sourceLocale: "en", urlPattern: "/{locale}{route}", viewports: ["800x600"], suggest: false };
+
+test("source locale listed among locales is never untranslated against itself", async () => {
+  const html = `<!doctype html><html lang="en"><body><h1>Welcome back</h1></body></html>`;
+  const { server, baseUrl } = await serve({ "/": html, "/de": html });
+  try {
+    const r = await run({ ...opts, baseUrl, locales: ["en", "de"], out: await mkdtemp(join(tmpdir(), "glot-vqa-")) });
+    assert.ok(!r.issues.some((i) => i.locale === "en" && i.kind === "untranslated"), JSON.stringify(r.issues));
+    assert.ok(r.issues.some((i) => i.locale === "de" && i.kind === "untranslated"));
+  } finally {
+    server.close();
+  }
+});
+
+test("ellipsis / line-clamp truncation is clamp, plain clipping stays overflow", async () => {
+  const long = "Jetzt kostenlos anmelden und loslegen";
+  const html = `<!doctype html><html lang="de"><body style="font-family: sans-serif">
+    <p id="ell" style="width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${long}</p>
+    <div style="width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span id="anc" style="display:inline-block;width:60px">${long}</span></div>
+    <p id="lc" style="width:80px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden">${long} ${long}</p>
+    <p id="cut" style="width:80px;overflow:hidden;white-space:nowrap">${long}</p>
+    <p id="ellv" style="width:400px;height:5px;overflow:hidden;text-overflow:ellipsis">${long}</p>
+  </body></html>`;
+  const { server, baseUrl } = await serve({ "/": html });
+  try {
+    // Same page as source and target (pattern without {locale}): only the visual checks matter here.
+    const r = await run({ ...opts, baseUrl, sourceLocale: "x", locales: ["de"], urlPattern: "{route}", out: await mkdtemp(join(tmpdir(), "glot-vqa-")) });
+    const k = Object.fromEntries(r.issues.filter((i) => i.kind !== "untranslated").map((i) => [i.selector, i.kind]));
+    assert.deepEqual(k, { "#ell": "clamp", "#anc": "clamp", "#lc": "clamp", "#cut": "overflow", "#ellv": "overflow" });
+  } finally {
+    server.close();
+  }
+});
+
+test("scroll-reveal content is revealed (scrolled, reduced motion) before detection", async () => {
+  // Text appears only once its section has been on screen, worded by prefers-reduced-motion.
+  const html = (lang: string) => `<!doctype html><html lang="${lang}"><body>
+    <h1>${lang === "en" ? "Hello there" : "Hallo zusammen"}</h1>
+    <section id="reveal" style="margin-top:3000px;height:50px"></section>
+    <script>
+      new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting && !e.target.textContent)
+        e.target.textContent = matchMedia("(prefers-reduced-motion: reduce)").matches ? "Revealed calmly" : "Revealed with motion";
+      }).observe(document.getElementById("reveal"));
+    </script></body></html>`;
+  const { server, baseUrl } = await serve({ "/": html("en"), "/de": html("de") });
+  try {
+    const r = await run({ ...opts, baseUrl, locales: ["de"], out: await mkdtemp(join(tmpdir(), "glot-vqa-")) });
+    assert.deepEqual(r.issues.filter((i) => i.kind === "untranslated").map((i) => i.text), ["Revealed calmly"]);
+  } finally {
+    server.close();
+  }
+});

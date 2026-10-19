@@ -28,7 +28,12 @@ export async function upload(o: { server: string; project: string; out: string; 
     headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
     body: JSON.stringify({ report, files, label: o.label }),
   });
-  if (!res.ok) throw new Error(`--upload: HTTP ${res.status} ${await res.text()}`);
+  if (!res.ok) {
+    const text = await res.text();
+    if (res.status === 404 && text.includes("project not found"))
+      throw new Error(`--upload: project "${o.project}" not found on ${o.server}, check the slug in Settings (or the [server] project in glot.toml)`);
+    throw new Error(`--upload: HTTP ${res.status} ${text}`);
+  }
   const { id } = (await res.json()) as { id: string };
   return id;
 }
