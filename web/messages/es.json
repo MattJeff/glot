@@ -2274,8 +2274,9 @@
       "showShot": "Mostrar la última captura de pantalla",
       "title": "Tu sitio: {url}",
       "unreachable": {
-        "body": "Tu sitio no respondió: el widget de glot no está instalado en esta página, o la página bloquea que se muestre en un marco (X-Frame-Options o CSP frame-ancestors).",
-        "title": "Anotaciones en vivo no disponibles."
+        "body": "Tu sitio no respondió dentro del marco: el widget de glot no está en esta página, o tu sitio prohíbe mostrarse en un marco (X-Frame-Options o CSP frame-ancestors).",
+        "title": "Anotaciones en vivo no disponibles.",
+        "fix": "Para permitir solo glot, elimina X-Frame-Options y envía:"
       }
     },
     "help": {

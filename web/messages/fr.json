@@ -2274,8 +2274,9 @@
       "showShot": "Afficher la dernière capture d'écran",
       "title": "Votre site : {url}",
       "unreachable": {
-        "body": "Votre site n'a pas répondu : le widget glot n'est pas installé sur cette page, ou la page bloque son affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
-        "title": "Épingles en direct indisponibles."
+        "body": "Votre site n'a pas répondu dans le cadre : le widget glot n'est pas sur cette page, ou votre site interdit l'affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
+        "title": "Épingles en direct indisponibles.",
+        "fix": "Pour n'autoriser que glot, retirez X-Frame-Options et envoyez :"
       }
     },
     "help": {

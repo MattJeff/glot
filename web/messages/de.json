@@ -2274,8 +2274,9 @@
       "showShot": "Letzten Screenshot anzeigen",
       "title": "Ihre Website: {url}",
       "unreachable": {
-        "body": "Ihre Website hat nicht geantwortet: Das glot-Widget ist auf dieser Seite nicht installiert, oder die Seite blockiert die Anzeige in einem Frame (X-Frame-Options oder CSP frame-ancestors).",
-        "title": "Live-Anmerkungen nicht verfügbar."
+        "body": "Ihre Website hat im Rahmen nicht geantwortet: Das glot-Widget ist nicht auf dieser Seite, oder Ihre Website verbietet die Einbettung (X-Frame-Options oder CSP frame-ancestors).",
+        "title": "Live-Anmerkungen nicht verfügbar.",
+        "fix": "Um nur glot zu erlauben, entfernen Sie X-Frame-Options und senden Sie:"
       }
     },
     "help": {

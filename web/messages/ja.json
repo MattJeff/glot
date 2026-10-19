@@ -2274,8 +2274,9 @@
       "showShot": "最後のスクリーンショットを表示",
       "title": "サイト: {url}",
       "unreachable": {
-        "body": "サイトから応答がありませんでした。このページに glot ウィジェットがインストールされていないか、ページがフレーム内での表示をブロックしています（X-Frame-Options または CSP frame-ancestors）。",
-        "title": "ライブのピンを利用できません。"
+        "body": "フレーム内でサイトが応答しませんでした。このページに glot ウィジェットがないか、サイトがフレーム表示を禁止しています（X-Frame-Options または CSP frame-ancestors）。",
+        "title": "ライブのピンを利用できません。",
+        "fix": "glot だけを許可するには、X-Frame-Options を削除して次を送信してください:"
       }
     },
     "help": {

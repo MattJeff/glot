@@ -2418,7 +2418,8 @@
       "title": "Your site: {url}",
       "unreachable": {
         "title": "Live pins unavailable.",
-        "body": "Your site didn't answer: the glot widget isn't installed on this page, or the page blocks being shown in a frame (X-Frame-Options or CSP frame-ancestors)."
+        "body": "Your site did not answer inside the frame: the glot widget is not on this page, or your site forbids framing (X-Frame-Options or CSP frame-ancestors).",
+        "fix": "To allow glot only, remove X-Frame-Options and send:"
       },
       "install": "Install the widget",
       "showLive": "Show the live site",
