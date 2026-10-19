@@ -105,7 +105,10 @@ pub fn widget_routes(state: &AppState, web_origin: &str) -> Router<AppState> {
             let Ok(o) = origin.to_str() else { return false };
             o == web
                 || sqlx::query_scalar::<_, bool>(
-                    "SELECT EXISTS (SELECT 1 FROM review_settings WHERE $1 = ANY(origins))",
+                    // Declared review origins, or the project's site URL (Settings → Your site).
+                    "SELECT EXISTS (SELECT 1 FROM review_settings WHERE $1 = ANY(origins))
+                         OR EXISTS (SELECT 1 FROM preview_settings
+                                    WHERE base_url = $1 OR starts_with(base_url, $1 || '/'))",
                 )
                 .bind(o)
                 .fetch_one(&db)

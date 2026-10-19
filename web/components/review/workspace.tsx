@@ -1,34 +1,106 @@
 "use client";
 
+import { useOrigin } from "@/lib/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Keyboard, Link2, MessageSquarePlus, Monitor, PanelRight, PenLine, RotateCw, Smartphone, Tablet, Globe } from "lucide-react";
+import {
+  Keyboard,
+  Link2,
+  MessageSquarePlus,
+  Monitor,
+  PanelRight,
+  PenLine,
+  RotateCw,
+  Smartphone,
+  Tablet,
+  Globe,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { toast } from "sonner";
-import { CodeBlock, EmptyState, ErrorState, useLocaleName } from "@/components/common";
-import { ALL, AnnotationList, DEFAULT_FILTERS, isDone, matches, type Filters } from "@/components/review/panel";
+import {
+  CodeBlock,
+  EmptyState,
+  ErrorState,
+  useLocaleName,
+} from "@/components/common";
+import {
+  ALL,
+  AnnotationList,
+  DEFAULT_FILTERS,
+  isDone,
+  matches,
+  type Filters,
+} from "@/components/review/panel";
 import { Install } from "@/components/review/reports";
 import { ShareDialog } from "@/components/review/share-dialog";
-import { SiteFrame, type BridgeState, type FrameEvent, type FrameMode, type LivePreview, type Picked, type Pin } from "@/components/review/site-frame";
+import {
+  SiteFrame,
+  type BridgeState,
+  type FrameEvent,
+  type FrameMode,
+  type LivePreview,
+  type Picked,
+  type Pin,
+} from "@/components/review/site-frame";
 import { type EditTarget, TextEditor } from "@/components/review/text-editor";
 import { AnnotationDetail, Composer } from "@/components/review/thread";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "@/i18n/navigation";
-import { api, ApiError, qk, type Annotation, type NewAnnotation, type Project, type ReviewEvent } from "@/lib/api";
+import {
+  api,
+  ApiError,
+  qk,
+  type Annotation,
+  type NewAnnotation,
+  type Project,
+  type ReviewEvent,
+} from "@/lib/api";
 import { BRIDGE_SNIPPET } from "@/lib/preview-bridge";
 import { cn } from "@/lib/utils";
 import { buildUrl, parseViewport, previewTarget } from "@/lib/visual";
 
-const VIEWPORTS = { desktop: { w: 1280, h: 800 }, tablet: { w: 820, h: 1180 }, mobile: { w: 390, h: 844 } } as const;
+const VIEWPORTS = {
+  desktop: { w: 1280, h: 800 },
+  tablet: { w: 820, h: 1180 },
+  mobile: { w: 390, h: 844 },
+} as const;
 type Device = keyof typeof VIEWPORTS;
-const DEVICE_ICON = { desktop: Monitor, tablet: Tablet, mobile: Smartphone } as const;
+const DEVICE_ICON = {
+  desktop: Monitor,
+  tablet: Tablet,
+  mobile: Smartphone,
+} as const;
 // ponytail: one page of 200, filtered client-side; server-side filters/pagination when projects exceed it.
 const PER_PAGE = 200;
 const WEEK_MS = 7 * 24 * 3600 * 1000;
@@ -75,28 +147,60 @@ function useShortcutsSetting() {
 }
 
 const typing = (el: EventTarget | null) =>
-  el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || !!el.closest("[role=dialog],[role=menu],[role=listbox]"));
+  el instanceof HTMLElement &&
+  (el.isContentEditable ||
+    /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) ||
+    !!el.closest("[role=dialog],[role=menu],[role=listbox]"));
 
 /** "Annotations" tab: the customer's live site on the left, the review panel on the right (a drawer below lg). */
-export function Workspace({ project: p, initial }: { project: Project; initial?: string }) {
+export function Workspace({
+  project: p,
+  initial,
+}: {
+  project: Project;
+  initial?: string;
+}) {
   const t = useTranslations("reviewPage");
   const localeName = useLocaleName();
   const qc = useQueryClient();
   const slug = p.slug;
+  const origin = useOrigin() ?? "";
   const isLg = useMedia("(min-width: 1024px)");
   const isSm = useMedia("(min-width: 640px)");
   const [shortcuts, setShortcuts] = useShortcutsSetting();
 
-  const settings = useQuery({ queryKey: qk.preview(slug), queryFn: () => api.preview(slug) });
+  const settings = useQuery({
+    queryKey: qk.preview(slug),
+    queryFn: () => api.preview(slug),
+  });
   const report = useQuery({
     queryKey: qk.visualReport(slug, "latest"),
-    queryFn: () => api.visualReport(slug, "latest").catch((e) => (e instanceof ApiError && e.status === 404 ? null : Promise.reject(e))),
+    queryFn: () =>
+      api
+        .visualReport(slug, "latest")
+        .catch((e) =>
+          e instanceof ApiError && e.status === 404 ? null : Promise.reject(e),
+        ),
   });
-  const list = useQuery({ queryKey: qk.annotations(slug), queryFn: () => api.annotations(slug, { per_page: PER_PAGE }) });
-  const members = useQuery({ queryKey: qk.reviewMembers(slug), queryFn: () => api.reviewMembers(slug) });
+  const list = useQuery({
+    queryKey: qk.annotations(slug),
+    queryFn: () => api.annotations(slug, { per_page: PER_PAGE }),
+  });
+  const members = useQuery({
+    queryKey: qk.reviewMembers(slug),
+    queryFn: () => api.reviewMembers(slug),
+  });
   const me = useQuery({ queryKey: qk.me, queryFn: api.me });
-  const feedback = useQuery({ queryKey: qk.feedback(slug), queryFn: () => api.feedback(slug) });
-  const session = useQuery({ queryKey: ["review-session", slug], queryFn: () => api.reviewSession(slug), staleTime: 11 * 3600_000, retry: false });
+  const feedback = useQuery({
+    queryKey: qk.feedback(slug),
+    queryFn: () => api.feedback(slug),
+  });
+  const session = useQuery({
+    queryKey: ["review-session", slug],
+    queryFn: () => api.reviewSession(slug),
+    staleTime: 11 * 3600_000,
+    retry: false,
+  });
 
   const target = previewTarget(settings.data, report.data ?? undefined);
   const locales = [p.source_locale, ...p.target_locales];
@@ -107,7 +211,9 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
   const [mode, setMode] = useState<FrameMode>("idle");
   const [pickFor, setPickFor] = useState<"annotate" | "edit">("annotate");
   const [frameState, setFrameState] = useState<BridgeState>("loading");
-  const [view, setView] = useState<View>(initial ? { kind: "annotation", id: initial } : { kind: "list" });
+  const [view, setView] = useState<View>(
+    initial ? { kind: "annotation", id: initial } : { kind: "list" },
+  );
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [preview, setPreview] = useState<LivePreview>(null);
   const [drawer, setDrawer] = useState(false);
@@ -119,28 +225,82 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
 
   // Phones always see the mobile layout, full width (the viewport switcher is hidden there).
   const vp = isSm ? VIEWPORTS[device] : VIEWPORTS.mobile;
-  const siteUrl = target.base ? buildUrl(target.base, target.pattern, locale, p.source_locale, route, true) : "";
+  const siteUrl = target.base
+    ? buildUrl(
+        target.base,
+        target.pattern,
+        locale,
+        p.source_locale,
+        route,
+        true,
+      )
+    : "";
   const token = session.data?.token;
-  const frameUrl = siteUrl && token ? `${siteUrl}${siteUrl.includes("?") ? "&" : "?"}glot_review=${encodeURIComponent(token)}` : siteUrl;
+  const frameUrl =
+    siteUrl && token
+      ? `${siteUrl}${siteUrl.includes("?") ? "&" : "?"}glot_review=${encodeURIComponent(token)}`
+      : siteUrl;
 
   const all = useMemo(() => list.data?.items ?? [], [list.data]);
   // Stable pin numbers: creation order.
-  const numbers = useMemo(() => new Map([...all].sort((a, b) => a.created_at.localeCompare(b.created_at)).map((a, i) => [a.id, i + 1])), [all]);
-  const items = useMemo(() => all.filter((a) => matches(a, filters)), [all, filters]);
+  const numbers = useMemo(
+    () =>
+      new Map(
+        [...all]
+          .sort((a, b) => a.created_at.localeCompare(b.created_at))
+          .map((a, i) => [a.id, i + 1]),
+      ),
+    [all],
+  );
+  const items = useMemo(
+    () => all.filter((a) => matches(a, filters)),
+    [all, filters],
+  );
   const [now] = useState(Date.now);
-  const resolvedThisWeek = all.filter((a) => a.status === "resolved" && a.resolved_at && now - new Date(a.resolved_at).getTime() < WEEK_MS).length;
+  const resolvedThisWeek = all.filter(
+    (a) =>
+      a.status === "resolved" &&
+      a.resolved_at &&
+      now - new Date(a.resolved_at).getTime() < WEEK_MS,
+  ).length;
   const selected = view.kind === "annotation" ? view.id : null;
   const pins: Pin[] = all
-    .filter((a) => a.route === route && a.locale === locale && (matches(a, { ...filters, route: ALL, locale: ALL }) || a.id === selected))
-    .map((a) => ({ id: a.id, n: numbers.get(a.id) ?? 0, anchor: a.anchor, resolved: isDone(a.status), label: t("pinLabel", { n: numbers.get(a.id) ?? 0, body: a.body }) }));
+    .filter(
+      (a) =>
+        a.route === route &&
+        a.locale === locale &&
+        (matches(a, { ...filters, route: ALL, locale: ALL }) ||
+          a.id === selected),
+    )
+    .map((a) => ({
+      id: a.id,
+      n: numbers.get(a.id) ?? 0,
+      anchor: a.anchor,
+      resolved: isDone(a.status),
+      label: t("pinLabel", { n: numbers.get(a.id) ?? 0, body: a.body }),
+    }));
 
   const shotPage = report.data?.report.pages
     .filter((pg) => pg.locale === locale && pg.route === route)
-    .sort((a, b) => Math.abs(parseViewport(a.viewport).w - vp.w) - Math.abs(parseViewport(b.viewport).w - vp.w))[0];
-  const shot = shotPage && report.data ? { src: api.visualFileUrl(slug, report.data.id, shotPage.screenshot), width: parseViewport(shotPage.viewport).w } : null;
+    .sort(
+      (a, b) =>
+        Math.abs(parseViewport(a.viewport).w - vp.w) -
+        Math.abs(parseViewport(b.viewport).w - vp.w),
+    )[0];
+  const shot =
+    shotPage && report.data
+      ? {
+          src: api.visualFileUrl(slug, report.data.id, shotPage.screenshot),
+          width: parseViewport(shotPage.viewport).w,
+        }
+      : null;
 
   const go = (r: string) => {
-    const next = r.trim() ? (r.trim().startsWith("/") ? r.trim() : `/${r.trim()}`) : "/";
+    const next = r.trim()
+      ? r.trim().startsWith("/")
+        ? r.trim()
+        : `/${r.trim()}`
+      : "/";
     setRoute(next);
     setDraftRoute(next);
   };
@@ -149,7 +309,8 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
       const a = all.find((x) => x.id === id);
       if (a) {
         if (a.route !== route) go(a.route);
-        if (a.locale !== locale && locales.includes(a.locale)) setLocale(a.locale);
+        if (a.locale !== locale && locales.includes(a.locale))
+          setLocale(a.locale);
       }
       setMode("idle");
       setView({ kind: "annotation", id });
@@ -174,21 +335,33 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
     setDrawer(false);
   };
   const editFor = (a: Annotation) => {
-    setView({ kind: "edit", target: { key: a.key, text: a.translation?.value ?? a.anchor.text, anchor: a.anchor } });
+    setView({
+      kind: "edit",
+      target: {
+        key: a.key,
+        text: a.translation?.value ?? a.anchor.text,
+        anchor: a.anchor,
+      },
+    });
     setDrawer(true);
   };
 
   const create = useMutation({
     mutationFn: (b: NewAnnotation) => api.createAnnotation(slug, b),
     onSuccess: (a) => {
-      qc.setQueryData(qk.annotations(slug), (old: typeof list.data) => old && { ...old, items: [a, ...old.items], total: old.total + 1 });
+      qc.setQueryData(
+        qk.annotations(slug),
+        (old: typeof list.data) =>
+          old && { ...old, items: [a, ...old.items], total: old.total + 1 },
+      );
       qc.invalidateQueries({ queryKey: qk.annotations(slug) });
       toast.success(t("created"));
       setView({ kind: "annotation", id: a.id });
     },
   });
   const resolve = useMutation({
-    mutationFn: (id: string) => api.updateAnnotation(slug, id, { status: "resolved" }),
+    mutationFn: (id: string) =>
+      api.updateAnnotation(slug, id, { status: "resolved" }),
     onSuccess: (a) => {
       qc.invalidateQueries({ queryKey: qk.annotations(slug) });
       qc.invalidateQueries({ queryKey: qk.annotation(slug, a.id) });
@@ -199,13 +372,22 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
   const onPick = (picked: Picked) => {
     setMode("idle");
     setDrawer(true);
-    if (pickFor === "edit") setView({ kind: "edit", target: { key: picked.key ?? null, text: picked.text, anchor: { ...picked, url: siteUrl, locale, viewport: vp } } });
+    if (pickFor === "edit")
+      setView({
+        kind: "edit",
+        target: {
+          key: picked.key ?? null,
+          text: picked.text,
+          anchor: { ...picked, url: siteUrl, locale, viewport: vp },
+        },
+      });
     else setView({ kind: "compose", picked });
   };
   const onFrameEvent = (e: FrameEvent) => {
     if (e.type === "navigated") {
       if (e.route !== route) go(e.route);
-      if (e.locale && e.locale !== locale && locales.includes(e.locale)) setLocale(e.locale);
+      if (e.locale && e.locale !== locale && locales.includes(e.locale))
+        setLocale(e.locale);
       return;
     }
     if (e.type === "created") {
@@ -228,10 +410,24 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
         return;
       }
       qc.invalidateQueries({ queryKey: qk.annotations(slug), exact: true });
-      if (ev.annotation_id) qc.invalidateQueries({ queryKey: qk.annotation(slug, ev.annotation_id) });
-      if (ev.kind.startsWith("text.") && typeof ev.data.key === "string") qc.invalidateQueries({ queryKey: qk.text(slug, ev.data.key) });
-      if (ev.actor.user_id !== meId && (ev.kind === "annotation.created" || ev.kind === "comment.created"))
-        setAnnounce(t(ev.kind === "annotation.created" ? "live.annotation" : "live.comment", { name: ev.actor.name }));
+      if (ev.annotation_id)
+        qc.invalidateQueries({
+          queryKey: qk.annotation(slug, ev.annotation_id),
+        });
+      if (ev.kind.startsWith("text.") && typeof ev.data.key === "string")
+        qc.invalidateQueries({ queryKey: qk.text(slug, ev.data.key) });
+      if (
+        ev.actor.user_id !== meId &&
+        (ev.kind === "annotation.created" || ev.kind === "comment.created")
+      )
+        setAnnounce(
+          t(
+            ev.kind === "annotation.created"
+              ? "live.annotation"
+              : "live.comment",
+            { name: ev.actor.name },
+          ),
+        );
     });
     return () => es.close();
   }, [slug, meId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -243,16 +439,22 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
         setMode("idle");
         return;
       }
-      if (!shortcuts || e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
+      if (!shortcuts || e.metaKey || e.ctrlKey || e.altKey || typing(e.target))
+        return;
       const k = e.key.toLowerCase();
       if (k === "c") startAnnotate();
       else if (k === "e") startEdit();
       else if (k === "j" || k === "k") {
         if (!items.length) return;
         const i = items.findIndex((a) => a.id === selected);
-        const next = items[i < 0 ? 0 : (i + (k === "j" ? 1 : -1) + items.length) % items.length];
+        const next =
+          items[
+            i < 0 ? 0 : (i + (k === "j" ? 1 : -1) + items.length) % items.length
+          ];
         select(next.id);
-        document.querySelector<HTMLElement>(`[data-annotation="${next.id}"]`)?.scrollIntoView({ block: "nearest" });
+        document
+          .querySelector<HTMLElement>(`[data-annotation="${next.id}"]`)
+          ?.scrollIntoView({ block: "nearest" });
       } else if (k === "r" && selected) resolve.mutate(selected);
       else if (e.key === "?") setHelp(true);
       else return;
@@ -262,7 +464,8 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  if (settings.isPending || report.isPending) return <Skeleton className="m-4 h-[60vh] rounded-xl" />;
+  if (settings.isPending || report.isPending)
+    return <Skeleton className="m-4 h-[60vh] rounded-xl" />;
   if (!target.base)
     return (
       <div className="mx-auto w-full max-w-3xl overflow-y-auto p-4 sm:p-6">
@@ -272,18 +475,34 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
           body={t("noSite.body")}
           action={
             <Button asChild>
-              <Link href={`/app/${slug}/settings#preview`}>{t("noSite.cta")}</Link>
+              <Link href={`/app/${slug}/settings#preview`}>
+                {t("noSite.cta")}
+              </Link>
             </Button>
           }
         />
       </div>
     );
 
-  const widgetSnippet = `<script src="https://unpkg.com/@glot-i18n/feedback/dist/feedback.global.js" data-key="${feedback.data?.settings.public_key ?? "pk_…"}" defer></script>`;
-  const canPr = !!feedback.data?.settings.github_repo && !!feedback.data?.settings.has_github_token;
+  // Review needs the review widget (pins, threads, frame bridge), served by glot itself: the feedback widget doesn't answer the frame.
+  const widgetSnippet = `<script src="${origin}/widget/review.global.js" data-project="${slug}" data-endpoint="${origin}" data-app-origin="${origin}" async></script>`;
+  const canPr =
+    !!feedback.data?.settings.github_repo &&
+    !!feedback.data?.settings.has_github_token;
   const onEditPreview = (key: string, value: string | null) => {
     const tg = view.kind === "edit" ? view.target : null;
-    setPreview(value === null ? null : { anchor: { key, selector: tg?.anchor?.selector ?? "", text: tg?.text ?? "" }, value });
+    setPreview(
+      value === null
+        ? null
+        : {
+            anchor: {
+              key,
+              selector: tg?.anchor?.selector ?? "",
+              text: tg?.text ?? "",
+            },
+            value,
+          },
+    );
   };
 
   const panel = (
@@ -330,7 +549,12 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
           onBack={back}
           onEditText={editFor}
           onPreview={(a, value) => {
-            if (a.locale === locale && a.route === route) setPreview(value === null ? null : { anchor: a.anchor, annotationId: a.id, value });
+            if (a.locale === locale && a.route === route)
+              setPreview(
+                value === null
+                  ? null
+                  : { anchor: a.anchor, annotationId: a.id, value },
+              );
           }}
           onDeleted={back}
         />
@@ -341,7 +565,12 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
           annotationKey={view.picked.key ?? null}
           pending={create.isPending}
           onCancel={back}
-          onSubmit={(b) => create.mutate({ ...b, anchor: { ...view.picked, url: siteUrl, locale, viewport: vp } })}
+          onSubmit={(b) =>
+            create.mutate({
+              ...b,
+              anchor: { ...view.picked, url: siteUrl, locale, viewport: vp },
+            })
+          }
         />
       )}
       {view.kind === "edit" && (
@@ -387,49 +616,102 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
             placeholder="/"
           />
           <datalist id="rv-routes">
-            {[...new Set([...target.routes, ...all.map((a) => a.route)])].map((r) => (
-              <option key={r} value={r} />
-            ))}
+            {[...new Set([...target.routes, ...all.map((a) => a.route)])].map(
+              (r) => (
+                <option key={r} value={r} />
+              ),
+            )}
           </datalist>
         </form>
         <Select value={locale} onValueChange={setLocale}>
-          <SelectTrigger size="sm" className="h-8 w-auto" aria-label={t("toolbar.locale")}>
+          <SelectTrigger
+            size="sm"
+            className="h-8 w-auto"
+            aria-label={t("toolbar.locale")}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {locales.map((l) => (
               <SelectItem key={l} value={l}>
-                {localeName(l)} <span className="font-mono text-xs text-muted-foreground">{l}</span>
+                {localeName(l)}{" "}
+                <span className="font-mono text-xs text-muted-foreground">
+                  {l}
+                </span>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <div role="group" aria-label={t("toolbar.viewport")} className="hidden rounded-lg border p-0.5 sm:flex">
+        <div
+          role="group"
+          aria-label={t("toolbar.viewport")}
+          className="hidden rounded-lg border p-0.5 sm:flex"
+        >
           {(Object.keys(VIEWPORTS) as Device[]).map((d) => {
             const Icon = DEVICE_ICON[d];
             return (
-              <Button key={d} variant={device === d ? "secondary" : "ghost"} size="icon-sm" aria-pressed={device === d} aria-label={t(`toolbar.${d}`)} title={t(`toolbar.${d}`)} onClick={() => setDevice(d)}>
+              <Button
+                key={d}
+                variant={device === d ? "secondary" : "ghost"}
+                size="icon-sm"
+                aria-pressed={device === d}
+                aria-label={t(`toolbar.${d}`)}
+                title={t(`toolbar.${d}`)}
+                onClick={() => setDevice(d)}
+              >
                 <Icon />
               </Button>
             );
           })}
         </div>
         <div className="ms-auto flex flex-wrap items-center gap-1.5">
-          <Button size="sm" variant={mode !== "idle" && pickFor === "annotate" ? "secondary" : "default"} aria-pressed={mode !== "idle" && pickFor === "annotate"} onClick={startAnnotate}>
-            <MessageSquarePlus /> <span className="max-sm:sr-only">{t("toolbar.comment")}</span>
-            <kbd className="hidden rounded border border-current/30 px-1 font-mono text-[10px] opacity-70 md:inline">C</kbd>
+          <Button
+            size="sm"
+            variant={
+              mode !== "idle" && pickFor === "annotate"
+                ? "secondary"
+                : "default"
+            }
+            aria-pressed={mode !== "idle" && pickFor === "annotate"}
+            onClick={startAnnotate}
+          >
+            <MessageSquarePlus />{" "}
+            <span className="max-sm:sr-only">{t("toolbar.comment")}</span>
+            <kbd className="hidden rounded border border-current/30 px-1 font-mono text-[10px] opacity-70 md:inline">
+              C
+            </kbd>
           </Button>
-          <Button size="sm" variant="outline" aria-pressed={mode === "pick" && pickFor === "edit"} onClick={startEdit}>
-            <PenLine /> <span className="max-sm:sr-only">{t("toolbar.edit")}</span>
-            <kbd className="hidden rounded border px-1 font-mono text-[10px] text-muted-foreground md:inline">E</kbd>
+          <Button
+            size="sm"
+            variant="outline"
+            aria-pressed={mode === "pick" && pickFor === "edit"}
+            onClick={startEdit}
+          >
+            <PenLine />{" "}
+            <span className="max-sm:sr-only">{t("toolbar.edit")}</span>
+            <kbd className="hidden rounded border px-1 font-mono text-[10px] text-muted-foreground md:inline">
+              E
+            </kbd>
           </Button>
           <Button size="sm" variant="outline" onClick={() => setShare(true)}>
-            <Link2 /> <span className="max-sm:sr-only">{t("toolbar.share")}</span>
+            <Link2 />{" "}
+            <span className="max-sm:sr-only">{t("toolbar.share")}</span>
           </Button>
-          <Button size="icon-sm" variant="ghost" aria-label={t("toolbar.shortcuts")} onClick={() => setHelp(true)} className="max-sm:hidden">
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            aria-label={t("toolbar.shortcuts")}
+            onClick={() => setHelp(true)}
+            className="max-sm:hidden"
+          >
             <Keyboard />
           </Button>
-          <Button size="icon-sm" variant="ghost" aria-label={t("toolbar.reload")} onClick={() => setReloadKey((k) => k + 1)}>
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            aria-label={t("toolbar.reload")}
+            onClick={() => setReloadKey((k) => k + 1)}
+          >
             <RotateCw />
           </Button>
         </div>
@@ -455,21 +737,36 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
             onReload={() => setReloadKey((k) => k + 1)}
           />
           {!isLg && (
-            <Button className="fixed end-4 bottom-4 z-20 shadow-lg" onClick={() => setDrawer(true)} aria-haspopup="dialog">
+            <Button
+              className="fixed end-4 bottom-4 z-20 shadow-lg"
+              onClick={() => setDrawer(true)}
+              aria-haspopup="dialog"
+            >
               <PanelRight /> {t("openPanel", { count: openCount })}
             </Button>
           )}
         </div>
         {isLg ? (
-          <aside aria-label={t("panel")} className={cn("flex w-[380px] shrink-0 flex-col border-s bg-background", view.kind === "edit" && "xl:w-[480px]")}>
+          <aside
+            aria-label={t("panel")}
+            className={cn(
+              "flex w-[380px] shrink-0 flex-col border-s bg-background",
+              view.kind === "edit" && "xl:w-[480px]",
+            )}
+          >
             {panel}
           </aside>
         ) : (
           <Sheet open={drawer} onOpenChange={setDrawer}>
-            <SheetContent side="right" className="gap-0 p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-md">
+            <SheetContent
+              side="right"
+              className="gap-0 p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-md"
+            >
               <SheetHeader className="border-b p-3">
                 <SheetTitle>{t("panel")}</SheetTitle>
-                <SheetDescription className="sr-only">{t("panelHint")}</SheetDescription>
+                <SheetDescription className="sr-only">
+                  {t("panelHint")}
+                </SheetDescription>
               </SheetHeader>
               <div className="flex min-h-0 flex-1 flex-col">{panel}</div>
             </SheetContent>
@@ -477,18 +774,32 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
         )}
       </div>
 
-      <ShareDialog slug={slug} siteUrl={siteUrl} open={share} onOpenChange={setShare} />
+      <ShareDialog
+        slug={slug}
+        siteUrl={siteUrl}
+        open={share}
+        onOpenChange={setShare}
+      />
       <Dialog open={install} onOpenChange={setInstall}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t("installDialog.title")}</DialogTitle>
             <DialogDescription>{t("installDialog.body")}</DialogDescription>
           </DialogHeader>
-          {feedback.data && <Install publicKey={feedback.data.settings.public_key} />}
+          {feedback.data && (
+            <Install publicKey={feedback.data.settings.public_key} />
+          )}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium">{t("installDialog.frameTitle")}</h3>
-            <p className="text-xs text-pretty text-muted-foreground">{t("installDialog.frameBody")}</p>
-            <CodeBlock code={BRIDGE_SNIPPET} className="max-h-32 overflow-y-auto" />
+            <h3 className="text-sm font-medium">
+              {t("installDialog.frameTitle")}
+            </h3>
+            <p className="text-xs text-pretty text-muted-foreground">
+              {t("installDialog.frameBody")}
+            </p>
+            <CodeBlock
+              code={BRIDGE_SNIPPET}
+              className="max-h-32 overflow-y-auto"
+            />
           </div>
         </DialogContent>
       </Dialog>
@@ -502,7 +813,9 @@ export function Workspace({ project: p, initial }: { project: Project; initial?:
             {(["c", "e", "j", "k", "r", "esc"] as const).map((k) => (
               <div key={k} className="contents">
                 <dt>
-                  <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs uppercase">{k}</kbd>
+                  <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs uppercase">
+                    {k}
+                  </kbd>
                 </dt>
                 <dd>{t(`help.${k}`)}</dd>
               </div>
