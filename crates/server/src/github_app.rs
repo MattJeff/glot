@@ -1403,8 +1403,13 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
                 &format!("{}/repos/{}/pulls/{n}", api_base(), link.repo),
                 None,
             )
-            .await?;
-            (v["state"] == "open").then(|| (n, b.clone()))
+            .await;
+            match v {
+                Ok(v) => (v["state"] == "open").then(|| (n, b.clone())),
+                // The recorded PR is gone (repo recreated or transferred): open a new one.
+                Err(e) if e.to_string().starts_with("GitHub 404") => None,
+                Err(e) => return Err(e),
+            }
         }
         _ => None,
     };
