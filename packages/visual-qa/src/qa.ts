@@ -101,7 +101,10 @@ export async function launch() {
 }
 
 export function buildUrl(o: Pick<Options, "baseUrl" | "urlPattern" | "sourceLocale">, locale: string, route: string): string {
-  const pattern = locale === o.sourceLocale ? o.urlPattern.replace(/\/?\{locale\}/, "") : o.urlPattern;
+  // The source drops its `/{locale}` segment or its `?lang={locale}` param.
+  const pattern = locale === o.sourceLocale
+    ? o.urlPattern.replace(/[?&][^?&=#]+=\{locale\}/, "").replace(/^([^?]*)&/, "$1?").replace(/\/?\{locale\}/, "")
+    : o.urlPattern;
   let path = pattern.replace("{locale}", locale).replace("{route}", route).replace(/\/{2,}/g, "/");
   if (path.length > 1) path = path.replace(/\/$/, "");
   return o.baseUrl.replace(/\/$/, "") + (path.startsWith("/") ? path : "/" + path);

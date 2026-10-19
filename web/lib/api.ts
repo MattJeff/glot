@@ -44,6 +44,7 @@ export type LlmSettings = {
 };
 export type ProjectPatch = {
   name?: string;
+  source_locale?: string;
   target_locales?: string[];
   llm?: LlmSettings;
   style?: string;
@@ -243,6 +244,15 @@ export type ReviewProbe = {
   widget_project: string | null;
   widget_app_origin: string | null;
   feedback_widget: boolean;
+  /** How the site switches language (hreflang alternates); null when the page wasn't fetched. */
+  locale_scheme: {
+    kind: "query" | "prefix" | "subdomain" | "unknown";
+    pattern: string | null;
+    locales: string[];
+    default_locale: string | null;
+    default_unprefixed: boolean;
+    html_lang: string | null;
+  } | null;
 };
 export type ReviewMember = { user_id: string; name: string };
 /** RV4 (contract changelog v1.2): AI rewordings of an annotated text, each validated in every target locale. */

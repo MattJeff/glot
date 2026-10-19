@@ -66,7 +66,7 @@ const ROUTES: &[(&str, &str, &str)] = &[
     (
         "PATCH",
         "/api/projects/{slug}",
-        "Update project {name?,target_locales?,llm?,style?,public_cdn?} -> Project",
+        "Update project {name?,source_locale?,target_locales?,llm?,style?,public_cdn?} -> Project; a new source_locale re-roots keys on its translations (old source becomes a reviewed target, dependent translations go stale)",
     ),
     ("DELETE", "/api/projects/{slug}", "Delete project"),
     (

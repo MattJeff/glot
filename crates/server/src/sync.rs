@@ -31,6 +31,9 @@ pub struct PushBody {
     /// Code context from `glot extract`, per source key. Keys absent here keep their stored context.
     #[serde(default)]
     pub context: HashMap<String, CodeContext>,
+    /// The client's idea of the source locale (`glot.toml`); a mismatch is refused, not merged.
+    #[serde(default)]
+    pub source_locale: Option<String>,
 }
 
 #[derive(Deserialize, Default)]
@@ -59,6 +62,7 @@ pub struct PushResult {
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct PullResult {
+    pub source_locale: String,
     #[schema(value_type = Object)]
     pub catalogs: Catalogs,
     #[schema(value_type = Object)]
@@ -98,6 +102,12 @@ pub async fn apply_push(
     b: PushBody,
     author: &str,
 ) -> ApiResult<PushResult> {
+    if let Some(l) = b.source_locale.as_ref().filter(|l| **l != p.source_locale) {
+        return Err(AppError::bad_request(format!(
+            "this project's source locale is '{}', not '{l}': set source_locale = \"{}\" in glot.toml (and list '{l}' in target_locales)",
+            p.source_locale, p.source_locale
+        )));
+    }
     if let Some(bad) = b
         .catalogs
         .keys()
@@ -317,6 +327,7 @@ pub async fn pull(
     }
     let glossary = crate::glossary::load(&state.db, p.id).await?;
     Ok(Json(PullResult {
+        source_locale: p.source_locale.clone(),
         catalogs,
         lock,
         glossary: glossary.terms,

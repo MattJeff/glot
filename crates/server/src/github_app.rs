@@ -1386,6 +1386,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         lock: ws.lock.clone(),
         glossary: ws.glossary.terms.clone(),
         context: Default::default(),
+        source_locale: None,
     };
     let pushed = crate::sync::apply_push(state, &p, body, "glot[bot]")
         .await

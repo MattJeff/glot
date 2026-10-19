@@ -165,7 +165,24 @@ function SettingsForm({
   const [site, setSite] = useState(preview.base_url ?? "");
   const [pattern, setPattern] = useState(preview.url_pattern);
   const [routes, setRoutes] = useState(preview.routes.join("\n"));
+  // Same query as Review's connection probe: it also reads how the site switches language (hreflang).
+  const probe = useQuery({
+    queryKey: ["review-probe", p.slug],
+    queryFn: () => api.reviewProbe(p.slug),
+    enabled: !!preview.base_url,
+    staleTime: 60_000,
+    retry: false,
+  });
+  const detected = probe.data?.locale_scheme;
+  const detectedHow =
+    detected?.kind === "query"
+      ? `?${detected.pattern?.match(/[?&]([^=]+)=\{locale\}/)?.[1] ?? "lang"}=`
+      : `/${detected?.locales.find((l) => l !== detected.default_locale) ?? "en"}/…`;
+  // ponytail: primary subtags only (fr-FR = fr); pt-BR vs pt-PT goes unflagged.
+  const sameLang = (a: string, b: string) =>
+    a.split("-")[0].toLowerCase() === b.split("-")[0].toLowerCase();
   const [confirm, setConfirm] = useState("");
+  const [nextSource, setNextSource] = useState<string | null>(null);
   const set = <K extends keyof LlmSettings>(k: K, v: LlmSettings[K]) =>
     setLlm((s) => ({ ...s, [k]: v }));
 
@@ -178,6 +195,7 @@ function SettingsForm({
         routes: routes.split(/[\n,]/),
       });
       qc.setQueryData(qk.preview(p.slug), nextPreview);
+      qc.invalidateQueries({ queryKey: ["review-probe", p.slug] });
       setSite(nextPreview.base_url ?? "");
       return api.updateProject(p.slug, {
         name,
@@ -213,6 +231,25 @@ function SettingsForm({
       toast.success(t("saved"));
     },
   });
+
+  const changeSource = useMutation({
+    // Unsaved target edits ride along; the old source stays as a target.
+    mutationFn: (to: string) =>
+      api.updateProject(p.slug, {
+        source_locale: to,
+        target_locales: [...targets.filter((l) => l !== to), p.source_locale],
+      }),
+    onSuccess: (next) => {
+      qc.setQueryData(qk.project(p.slug), next);
+      qc.invalidateQueries({ queryKey: qk.projects });
+      setTargets(next.target_locales);
+      setNextSource(null);
+      toast.success(t("locales.changed"));
+    },
+  });
+  const nextStats = nextSource ? p.stats.locales[nextSource] : undefined;
+  const missing =
+    p.stats.keys - (nextStats ? nextStats.translated + nextStats.stale : 0);
 
   const remove = useMutation({
     mutationFn: () => api.deleteProject(p.slug),
@@ -281,15 +318,73 @@ function SettingsForm({
           label={t("locales.source")}
           hint={t("locales.sourceHint")}
         >
-          <Input
-            id="s-source"
+          <Select
             value={p.source_locale}
-            readOnly
-            disabled
-            dir="ltr"
-            className="w-32 font-mono"
-          />
+            onValueChange={(v) => v !== p.source_locale && setNextSource(v)}
+          >
+            <SelectTrigger id="s-source" className="w-56">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[p.source_locale, ...targets].map((l) => (
+                <SelectItem key={l} value={l}>
+                  <span className="font-mono text-xs">{l}</span>
+                  <span className="text-muted-foreground capitalize">
+                    {localeName(l)}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
+        <AlertDialog
+          open={nextSource !== null}
+          onOpenChange={(open) => !open && setNextSource(null)}
+        >
+          {nextSource && (
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {t("locales.changeTitle", { to: localeName(nextSource) })}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("locales.changeBody", {
+                    to: localeName(nextSource),
+                    from: localeName(p.source_locale),
+                  })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              {missing > 0 && (
+                <p className="text-sm font-medium">
+                  {t("locales.changeMissing", {
+                    count: missing,
+                    to: localeName(nextSource),
+                    from: localeName(p.source_locale),
+                  })}
+                </p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                {t("locales.changeCli", {
+                  toCode: nextSource,
+                  fromCode: p.source_locale,
+                })}
+              </p>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{tc("cancel")}</AlertDialogCancel>
+                <Button
+                  type="button"
+                  disabled={changeSource.isPending}
+                  onClick={() => changeSource.mutate(nextSource)}
+                >
+                  {changeSource.isPending && (
+                    <Loader2 className="animate-spin" />
+                  )}
+                  {t("locales.changeConfirm")}
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          )}
+        </AlertDialog>
         <div className="space-y-1.5">
           <Label htmlFor="s-add-locale">{t("locales.targets")}</Label>
           <div className="flex flex-wrap gap-1.5">
@@ -540,6 +635,31 @@ function SettingsForm({
               className="font-mono"
             />
           </Field>
+          {detected?.pattern && detected.pattern !== pattern && (
+            <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/40 p-3 text-sm">
+              <span>{t("preview.detected", { how: detectedHow })}</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setPattern(detected.pattern!)}
+              >
+                {t("preview.useDetected", { pattern: detected.pattern })}
+              </Button>
+            </div>
+          )}
+          {detected?.kind === "subdomain" && (
+            <p className="text-sm text-warning">{t("preview.subdomain")}</p>
+          )}
+          {detected?.default_locale &&
+            !sameLang(detected.default_locale, p.source_locale) && (
+              <p className="text-sm text-warning">
+                {t("preview.defaultMismatch", {
+                  site: localeName(detected.default_locale),
+                  source: localeName(p.source_locale),
+                })}
+              </p>
+            )}
           <Field
             id="s-preview-routes"
             label={t("preview.routes")}

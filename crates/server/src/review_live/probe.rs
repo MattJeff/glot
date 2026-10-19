@@ -1,6 +1,7 @@
 //! Connection probe for the Review page: fetches the project's own site URL (Settings → Your site) server-side and
 //! reports why the live frame may not connect — framing headers (X-Frame-Options / CSP frame-ancestors) and
-//! whether the review widget script tag is in the HTML. SSRF-safe: only the project's base_url (and up to
+//! whether the review widget script tag is in the HTML, plus how the site switches language (hreflang alternates →
+//! a glot URL pattern, so Settings can suggest it). SSRF-safe: only the project's base_url (and up to
 //! `MAX_HOPS` redirects), public IPs only (resolved once, then pinned), short timeout, capped body.
 use axum::{Json, extract::State};
 use reqwest::{Url, header};
@@ -35,6 +36,23 @@ pub struct Probe {
     pub widget_app_origin: Option<String>,
     /// The feedback widget (end-user reports) is there instead: it never answers the Review frame.
     pub feedback_widget: bool,
+    /// How the site switches language, from its hreflang alternates (HTML or `Link` header). None when not fetched.
+    pub locale_scheme: Option<LocaleScheme>,
+}
+
+#[derive(Serialize, Debug, Default, PartialEq)]
+pub struct LocaleScheme {
+    /// `query` (`?lang=en`), `prefix` (`/en/…`), `subdomain` (`en.example.com`: glot can't build those URLs), `unknown`.
+    pub kind: &'static str,
+    /// glot URL pattern to use; None for `subdomain` / `unknown`.
+    pub pattern: Option<String>,
+    /// hreflang values, x-default excluded.
+    pub locales: Vec<String>,
+    /// The site's apparent default locale: the one without a marker, else x-default's, else `<html lang>`.
+    pub default_locale: Option<String>,
+    /// The default locale has no `?lang=` / `/xx` marker.
+    pub default_unprefixed: bool,
+    pub html_lang: Option<String>,
 }
 
 pub async fn probe(State(state): State<AppState>, ctx: Ctx) -> ApiResult<Json<Probe>> {
@@ -97,7 +115,9 @@ async fn run(mut url: Url, app_origin: &str) -> Probe {
         } else {
             "blocked"
         };
+        let links = link_tags(&all("link"));
         let html = body(resp).await;
+        out.locale_scheme = Some(locale_scheme(&format!("{links}{html}"), &url));
         let w = widget(&html);
         out.widget = w.found;
         out.widget_project = w.project;
@@ -279,21 +299,140 @@ fn widget(html: &str) -> Widget {
     let start = lower[..at].rfind("<script").unwrap_or(at);
     let end = lower[at..].find('>').map_or(lower.len(), |e| at + e);
     let tag = &html[start..end];
-    let attr = |name: &str| {
-        let i = tag.to_ascii_lowercase().find(&format!("{name}="))? + name.len() + 1;
-        let v = &tag[i..];
-        let q = v.chars().next()?;
-        let v = if q == '"' || q == '\'' {
-            v[1..].split(q).next()?
-        } else {
-            v.split(|c: char| c.is_whitespace() || c == '>').next()?
-        };
-        Some(v.to_string())
-    };
     Widget {
         found: true,
-        project: attr("data-project"),
-        app_origin: attr("data-app-origin"),
+        project: attr(tag, "data-project"),
+        app_origin: attr(tag, "data-app-origin"),
+    }
+}
+
+/// An attribute's value in one start tag (`name=` preceded by whitespace; quoted or bare).
+fn attr(tag: &str, name: &str) -> Option<String> {
+    let lower = tag.to_ascii_lowercase();
+    let pat = format!("{name}=");
+    let (i, _) = lower
+        .match_indices(&pat)
+        .find(|(i, _)| *i > 0 && lower.as_bytes()[i - 1].is_ascii_whitespace())?;
+    let v = &tag[i + pat.len()..];
+    let q = v.chars().next()?;
+    let v = if q == '"' || q == '\'' {
+        v[1..].split(q).next()?
+    } else {
+        v.split(|c: char| c.is_whitespace() || c == '>').next()?
+    };
+    Some(v.replace("&amp;", "&"))
+}
+
+/// `Link: <url>; rel="alternate"; hreflang="de"` headers (next-intl sends these) as `<link>` tags.
+fn link_tags(headers: &[String]) -> String {
+    headers
+        .iter()
+        .flat_map(|h| h.split(','))
+        .filter_map(|part| {
+            let (url, params) = part.trim().strip_prefix('<')?.split_once('>')?;
+            Some(format!(
+                "<link {} href=\"{url}\">",
+                params.replace(';', " ")
+            ))
+        })
+        .collect()
+}
+
+/// Infers the site's locale URL scheme from its hreflang alternates and `<html lang>`.
+fn locale_scheme(html: &str, page: &Url) -> LocaleScheme {
+    let lower = html.to_ascii_lowercase();
+    let tag_at = |s: usize| &html[s..lower[s..].find('>').map_or(lower.len(), |e| s + e)];
+    let html_lang = lower
+        .find("<html")
+        .and_then(|s| attr(tag_at(s), "lang"))
+        .filter(|l| !l.is_empty());
+    let mut alts: Vec<(String, Url)> = Vec::new();
+    let mut x_default = None;
+    for (s, _) in lower.match_indices("<link") {
+        let tag = tag_at(s);
+        let alternate = attr(tag, "rel").is_some_and(|r| {
+            r.split_whitespace()
+                .any(|r| r.eq_ignore_ascii_case("alternate"))
+        });
+        let (Some(lang), Some(href)) = (attr(tag, "hreflang"), attr(tag, "href")) else {
+            continue;
+        };
+        let Ok(u) = page.join(&href) else { continue };
+        if !alternate || lang.is_empty() {
+            continue;
+        } else if lang.eq_ignore_ascii_case("x-default") {
+            x_default.get_or_insert(u);
+        } else if !alts.iter().any(|(l, _)| l.eq_ignore_ascii_case(&lang)) {
+            alts.push((lang, u));
+        }
+    }
+    // A marker matches the full tag or its primary subtag (hreflang `en-US` on `/en/`).
+    let is = |v: &str, l: &str| {
+        v.eq_ignore_ascii_case(l)
+            || l.split('-')
+                .next()
+                .is_some_and(|p| v.eq_ignore_ascii_case(p))
+    };
+    let param = |l: &str, u: &Url| {
+        u.query_pairs()
+            .find(|(_, v)| is(v, l))
+            .map(|(k, _)| k.into_owned())
+    };
+    let prefix = |l: &str, u: &Url| {
+        u.path_segments()
+            .and_then(|mut s| s.next())
+            .is_some_and(|s| is(s, l))
+    };
+    let sub = |l: &str, u: &Url| {
+        u.host_str()
+            .and_then(|h| h.split('.').next())
+            .is_some_and(|h| is(h, l))
+    };
+    let count = |f: &dyn Fn(&str, &Url) -> bool| alts.iter().filter(|(l, u)| f(l, u)).count();
+    let counts = [
+        ("query", count(&|l, u| param(l, u).is_some())),
+        ("prefix", count(&prefix)),
+        ("subdomain", count(&sub)),
+    ];
+    // ponytail: majority vote; a site mixing schemes gets the most common one.
+    let (kind, n) = counts
+        .iter()
+        .fold(("unknown", 0), |a, &b| if b.1 > a.1 { b } else { a });
+    let marked = |l: &str, u: &Url| match kind {
+        "query" => param(l, u).is_some(),
+        "prefix" => prefix(l, u),
+        "subdomain" => sub(l, u),
+        _ => false,
+    };
+    let unmarked: Vec<&String> = alts
+        .iter()
+        .filter(|(l, u)| !marked(l, u))
+        .map(|(l, _)| l)
+        .collect();
+    let pattern = match kind {
+        "query" => alts
+            .iter()
+            .find_map(|(l, u)| param(l, u))
+            .map(|k| format!("{{route}}?{k}={{locale}}")),
+        "prefix" => Some("/{locale}{route}".to_string()),
+        _ => None,
+    };
+    let default_locale = match unmarked.as_slice() {
+        [one] if n > 0 => Some((*one).clone()),
+        _ => x_default
+            .as_ref()
+            .and_then(|x| alts.iter().find(|(_, u)| u == x))
+            .map(|(l, _)| l.clone())
+            .or_else(|| html_lang.clone()),
+    };
+    let default_unprefixed = n > 0 && !unmarked.is_empty();
+    LocaleScheme {
+        kind,
+        pattern,
+        locales: alts.into_iter().map(|(l, _)| l).collect(),
+        default_locale,
+        default_unprefixed,
+        html_lang,
     }
 }
 
@@ -343,6 +482,78 @@ mod tests {
         assert_eq!(w.app_origin.as_deref(), Some("https://app.glotlang.com"));
         let w = widget(r#"<script src="/feedback.global.js" data-key="k"></script>"#);
         assert!(!w.found);
+    }
+
+    fn scheme(html: &str, page: &str) -> LocaleScheme {
+        locale_scheme(html, &Url::parse(page).unwrap())
+    }
+
+    #[test]
+    fn locale_query_param() {
+        // cliponit.app: French is bare and canonical, English is `?lang=en`.
+        let s = scheme(
+            r#"<!doctype html><html lang="fr"><head>
+            <link rel="canonical" href="https://cliponit.app/">
+            <link rel="alternate" hreflang="fr" href="https://cliponit.app/">
+            <link rel="alternate" hreflang="en" href="https://cliponit.app/?lang=en">
+            <link rel="alternate" hreflang="x-default" href="https://cliponit.app/">"#,
+            "https://cliponit.app/",
+        );
+        assert_eq!(s.kind, "query");
+        assert_eq!(s.pattern.as_deref(), Some("{route}?lang={locale}"));
+        assert_eq!(s.locales, ["fr", "en"]);
+        assert_eq!(s.default_locale.as_deref(), Some("fr"));
+        assert!(s.default_unprefixed);
+        assert_eq!(s.html_lang.as_deref(), Some("fr"));
+        // Any param name, `&amp;` in the href.
+        let s = scheme(
+            r#"<link href="/?ref=x&amp;hl=de-DE" hreflang="de-DE" rel="alternate"><link rel=alternate hreflang=en href=/>"#,
+            "https://example.com/",
+        );
+        assert_eq!(s.pattern.as_deref(), Some("{route}?hl={locale}"));
+        assert_eq!(s.default_locale.as_deref(), Some("en"));
+    }
+
+    #[test]
+    fn locale_path_prefix() {
+        // next-intl `as-needed`: alternates arrive as a `Link` header, the default locale is unprefixed.
+        let links = link_tags(&[r#"<https://example.com/>; rel="alternate"; hreflang="en", <https://example.com/de>; rel="alternate"; hreflang="de", <https://example.com/>; rel="alternate"; hreflang="x-default""#.to_string()]);
+        let s = scheme(
+            &format!(r#"{links}<html lang="en">"#),
+            "https://example.com/",
+        );
+        assert_eq!(s.kind, "prefix");
+        assert_eq!(s.pattern.as_deref(), Some("/{locale}{route}"));
+        assert_eq!(s.locales, ["en", "de"]);
+        assert_eq!(s.default_locale.as_deref(), Some("en"));
+        assert!(s.default_unprefixed);
+        // `always`: every locale prefixed; the default comes from x-default.
+        let s = scheme(
+            r#"<html lang="de"><link rel="alternate" hreflang="en-US" href="/en/pricing"><link rel="alternate" hreflang="fr" href="/fr/pricing"><link rel="alternate" hreflang="x-default" href="/fr/pricing">"#,
+            "https://example.com/de/pricing",
+        );
+        assert_eq!(s.kind, "prefix");
+        assert!(!s.default_unprefixed);
+        assert_eq!(s.default_locale.as_deref(), Some("fr"));
+    }
+
+    #[test]
+    fn locale_subdomain_and_none() {
+        let s = scheme(
+            r#"<html lang="en"><link rel="alternate" hreflang="en" href="https://en.example.com/"><link rel="alternate" hreflang="de" href="https://de.example.com/">"#,
+            "https://en.example.com/",
+        );
+        assert_eq!(s.kind, "subdomain");
+        assert_eq!(s.pattern, None);
+        assert_eq!(s.default_locale.as_deref(), Some("en"));
+        let s = scheme(
+            r#"<html lang="fr-FR"><head><title>x</title>"#,
+            "https://example.com/",
+        );
+        assert_eq!(s.kind, "unknown");
+        assert_eq!(s.pattern, None);
+        assert!(s.locales.is_empty());
+        assert_eq!(s.default_locale.as_deref(), Some("fr-FR"));
     }
 
     #[test]

@@ -376,6 +376,8 @@ fn clean_headers(h: BTreeMap<String, String>) -> ApiResult<BTreeMap<String, Stri
 #[derive(Deserialize)]
 pub struct UpdateBody {
     name: Option<String>,
+    /// Re-root the project on another locale (see `change_source`).
+    source_locale: Option<String>,
     target_locales: Option<Vec<String>>,
     llm: Option<LlmSettings>,
     style: Option<String>,
@@ -396,7 +398,28 @@ pub async fn update(
         }
         p.name = name;
     }
-    if let Some(t) = b.target_locales {
+    // New source: the old one becomes a target unless an explicit list leaves it out.
+    let old_source = p.source_locale.clone();
+    let new_source = b
+        .source_locale
+        .map(|s| s.trim().to_string())
+        .filter(|s| *s != old_source);
+    if let Some(s) = &new_source {
+        validate_locale(s)?;
+        p.source_locale = s.clone();
+    }
+    let targets = match (b.target_locales, &new_source) {
+        (Some(t), _) => Some(t),
+        (None, Some(_)) => {
+            Some([&p.target_locales[..], std::slice::from_ref(&old_source)].concat())
+        }
+        (None, None) => None,
+    };
+    if let Some(t) = targets {
+        let t = t
+            .into_iter()
+            .filter(|l| l.trim() != p.source_locale)
+            .collect();
         p.target_locales = clean_targets(&p.source_locale, t)?;
     }
     if let Some(style) = b.style {
@@ -454,8 +477,12 @@ pub async fn update(
             extra_headers,
         });
     }
+    let mut tx = state.db.begin().await?;
+    if new_source.is_some() {
+        change_source(&mut tx, p.id, &old_source, &p.source_locale).await?;
+    }
     sqlx::query(
-        "UPDATE projects SET name = $2, target_locales = $3, style = $4, public_cdn = $5, llm = $6, api_key_enc = $7 WHERE id = $1",
+        "UPDATE projects SET name = $2, target_locales = $3, style = $4, public_cdn = $5, llm = $6, api_key_enc = $7, source_locale = $8 WHERE id = $1",
     )
     .bind(p.id)
     .bind(&p.name)
@@ -464,9 +491,71 @@ pub async fn update(
     .bind(p.public_cdn)
     .bind(&p.llm)
     .bind(&p.api_key_enc)
-    .execute(&state.db)
+    .bind(&p.source_locale)
+    .execute(&mut *tx)
     .await?;
+    tx.commit().await?;
     Ok(Json(view(&state, p).await?))
+}
+
+/// Re-root every key on `new`: its `new` translation (stale or not) becomes the source text and the
+/// old source text becomes the `old` translation (human, reviewed). Keys with no `new` translation
+/// keep their old text as source. Translations of a changed source go `stale` (values and history
+/// kept); back-translation reviews self-invalidate through their `source_hash`.
+async fn change_source(
+    conn: &mut sqlx::PgConnection,
+    project: Uuid,
+    old: &str,
+    new: &str,
+) -> ApiResult<()> {
+    let rows: Vec<(Uuid, String, Option<String>)> = sqlx::query_as(
+        "SELECT k.id, k.source, t.value FROM keys k
+         LEFT JOIN translations t ON t.key_id = k.id AND t.locale = $2
+         WHERE k.project_id = $1",
+    )
+    .bind(project)
+    .bind(new)
+    .fetch_all(&mut *conn)
+    .await?;
+    // ponytail: 2-3 queries per key; batch with UNNEST if projects reach ~100k keys.
+    for (id, old_text, new_text) in rows {
+        let source = new_text.as_deref().unwrap_or(&old_text);
+        sqlx::query(
+            "INSERT INTO translations (key_id, locale, value, status, origin, source_hash)
+             VALUES ($1, $2, $3, 'reviewed', 'human', $4)
+             ON CONFLICT (key_id, locale) DO UPDATE SET value = $3, status = 'reviewed', origin = 'human',
+                 model = NULL, score = NULL, issues = '[]', source_hash = $4, updated_at = now()",
+        )
+        .bind(id)
+        .bind(old)
+        .bind(&old_text)
+        .bind(glot_core::hash::hash(source))
+        .execute(&mut *conn)
+        .await?;
+        if let Some(v) = &new_text {
+            sqlx::query("DELETE FROM translations WHERE key_id = $1 AND locale = $2")
+                .bind(id)
+                .bind(new)
+                .execute(&mut *conn)
+                .await?;
+            crate::keys::set_source(conn, id, v).await?;
+        }
+    }
+    // Glossary terms are written in the source language: swap in their `new` rendering when there is
+    // one (and it doesn't collide with another term).
+    sqlx::query(
+        "UPDATE glossary_terms g SET term = g.translations->>$2,
+             translations = (g.translations - $2) || jsonb_build_object($3::text, g.term)
+         WHERE g.project_id = $1 AND NOT g.do_not_translate AND coalesce(g.translations->>$2, '') <> ''
+           AND NOT EXISTS (SELECT 1 FROM glossary_terms o WHERE o.project_id = $1 AND o.id <> g.id
+                           AND lower(o.term) = lower(g.translations->>$2))",
+    )
+    .bind(project)
+    .bind(new)
+    .bind(old)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
 }
 
 pub async fn delete(

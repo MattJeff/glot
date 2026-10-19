@@ -6,7 +6,8 @@ import type {
   VisualReport,
 } from "@/lib/api";
 
-/** Same rule as packages/visual-qa `buildUrl`: the source locale drops its `/{locale}` segment (next-intl `as-needed`). */
+/** Same rule as packages/visual-qa `buildUrl`: the source locale drops its `/{locale}` segment (next-intl `as-needed`)
+ *  or its `?lang={locale}` param (`/pricing?lang=en`, bare `/pricing` for the source). */
 // `keepSourcePrefix`: iframes side by side share one cookie jar, so an unprefixed source URL can render
 // whatever locale another iframe just stored in the locale cookie; an explicit `/en/…` pins it.
 export function buildUrl(
@@ -19,7 +20,10 @@ export function buildUrl(
 ) {
   const pat =
     locale === sourceLocale && !keepSourcePrefix
-      ? pattern.replace(/\/?\{locale\}/, "")
+      ? pattern
+          .replace(/[?&][^?&=#]+=\{locale\}/, "")
+          .replace(/^([^?]*)&/, "$1?")
+          .replace(/\/?\{locale\}/, "")
       : pattern;
   let path = pat
     .replace("{locale}", locale)

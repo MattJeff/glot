@@ -76,6 +76,7 @@ pub async fn push() -> Result<ExitCode> {
     let context = push_context(&ws);
     let body = serde_json::json!({
         "catalogs": catalogs, "lock": ws.lock, "glossary": ws.glossary.terms, "context": context,
+        "source_locale": ws.config.source_locale,
     });
     let res = r
         .client
@@ -133,6 +134,9 @@ fn push_context(ws: &Workspace) -> BTreeMap<Key, serde_json::Value> {
 
 #[derive(Deserialize)]
 struct PullResponse {
+    /// Absent on servers predating source-locale changes.
+    #[serde(default)]
+    source_locale: Option<Locale>,
     catalogs: BTreeMap<Locale, BTreeMap<Key, String>>,
     lock: Lockfile,
     #[serde(default)]
@@ -150,6 +154,17 @@ pub async fn pull() -> Result<ExitCode> {
         .await
         .context("pull failed")?;
     let out: PullResponse = parse(res).await?;
+    if let Some(src) = out
+        .source_locale
+        .as_ref()
+        .filter(|s| **s != ws.config.source_locale)
+    {
+        bail!(
+            "the server's source locale is {src}, glot.toml says {}: set source_locale = \"{src}\" and move \"{}\" to target_locales, then pull again",
+            ws.config.source_locale,
+            ws.config.source_locale
+        );
+    }
     for (locale, entries) in out.catalogs {
         let paths = ws.config.catalog_files(&ws.root, &locale);
         // ponytail: single file per locale; splitting keys back into namespaces needs a key->file map.

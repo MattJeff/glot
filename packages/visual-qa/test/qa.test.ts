@@ -25,6 +25,16 @@ test("buildUrl: source locale has no prefix", () => {
   assert.equal(buildUrl(o, "fr", "/login"), "http://x/fr/login");
 });
 
+test("buildUrl: query-param pattern", () => {
+  const o = { baseUrl: "https://cliponit.app", urlPattern: "{route}?lang={locale}", sourceLocale: "fr" };
+  assert.equal(buildUrl(o, "fr", "/pricing"), "https://cliponit.app/pricing");
+  assert.equal(buildUrl(o, "fr", "/"), "https://cliponit.app/");
+  assert.equal(buildUrl(o, "en", "/pricing"), "https://cliponit.app/pricing?lang=en");
+  assert.equal(buildUrl(o, "en", "/"), "https://cliponit.app/?lang=en");
+  const o2 = { ...o, urlPattern: "{route}?lang={locale}&utm=glot" };
+  assert.equal(buildUrl(o2, "fr", "/a"), "https://cliponit.app/a?utm=glot");
+});
+
 test("detects overflowing German button, untranslated text and missing rtl", async () => {
   const server = createServer((req, res) => {
     const body = pages[req.url!];
