@@ -1002,16 +1002,15 @@
       "sourceHint": "La langue dans laquelle vos développeurs rédigent les textes. Définie à la création du projet."
     },
     "preview": {
-      "baseUrl": "URL de base",
-      "baseUrlHint": "L'URL de développement ou de préproduction de votre application. Laissez vide pour réutiliser la dernière exécution de QA visuel.",
-      "description": "Indique à glot où trouver votre application en cours d'exécution pour la matrice des langues.",
+      "baseUrl": "URL du site",
+      "baseUrlHint": "Production, préproduction ou local, par ex. orizn.app ou localhost:3000. Laissez vide pour réutiliser la dernière exécution de QA visuelle.",
+      "description": "L’adresse où tourne votre application. glot l’ouvre pour afficher vos traductions et vos variantes de texte dans les vraies pages.",
       "pattern": "Modèle d'URL",
       "patternHint": "'{locale}' et '{route}' sont remplacés ; la langue source supprime son segment /'{locale}'.",
       "routes": "Routes",
       "routesHint": "Une par ligne, proposées dans le sélecteur de route de la matrice.",
-      "save": "Enregistrer les paramètres d'aperçu",
-      "saved": "Paramètres d'aperçu enregistrés",
-      "title": "Aperçu"
+      "title": "Votre site",
+      "usedBy": "Affiché dans :"
     },
     "saved": "Paramètres enregistrés",
     "title": "Paramètres",

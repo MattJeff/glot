@@ -993,16 +993,15 @@
       "sourceHint": "The language your developers write strings in. Set when the project was created."
     },
     "preview": {
-      "baseUrl": "Base URL",
-      "baseUrlHint": "Your app's development or staging URL. Leave empty to reuse the last visual QA run.",
-      "description": "Where glot finds your running app for the locale matrix.",
+      "baseUrl": "Site URL",
+      "baseUrlHint": "Production, staging or local, e.g. orizn.app or localhost:3000. Leave empty to reuse the last visual QA run.",
+      "description": "Where your app runs. glot opens it to show your translations and copy variants in the real pages.",
       "pattern": "URL pattern",
       "patternHint": "'{locale}' and '{route}' are replaced; the source locale drops its /'{locale}' segment.",
       "routes": "Routes",
       "routesHint": "One per line, offered in the matrix route picker.",
-      "save": "Save preview settings",
-      "saved": "Preview settings saved",
-      "title": "Preview"
+      "title": "Your site",
+      "usedBy": "Shown in:"
     },
     "saved": "Settings saved",
     "title": "Settings",

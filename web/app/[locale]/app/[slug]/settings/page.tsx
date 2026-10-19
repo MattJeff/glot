@@ -5,7 +5,12 @@ import { Loader2, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cloneElement, useState } from "react";
 import { toast } from "sonner";
-import { CodeBlock, ErrorState, PageHeader, useLocaleName } from "@/components/common";
+import {
+  CodeBlock,
+  ErrorState,
+  PageHeader,
+  useLocaleName,
+} from "@/components/common";
 import { parseLocales } from "@/components/create-project-dialog";
 import {
   AlertDialog,
@@ -20,29 +25,71 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "@/i18n/navigation";
-import { api, type LlmSettings, type PreviewSettings, type Project, type Provider, qk } from "@/lib/api";
+import { Link, useRouter } from "@/i18n/navigation";
+import {
+  api,
+  type LlmSettings,
+  type PreviewSettings,
+  type Project,
+  type Provider,
+  qk,
+} from "@/lib/api";
 import { useOrigin, useProject, useSlug } from "@/lib/hooks";
 
-const PROVIDERS: Provider[] = ["anthropic", "openai", "openai-compatible", "mock"];
+const PROVIDERS: Provider[] = [
+  "anthropic",
+  "openai",
+  "openai-compatible",
+  "mock",
+];
 
 export default function SettingsPage() {
-  const project = useProject(useSlug());
-  if (project.isError) return <ErrorState error={project.error} onRetry={() => project.refetch()} />;
-  if (!project.data) return <Skeleton className="mx-auto h-[70vh] max-w-3xl rounded-xl" />;
-  return <SettingsForm key={project.data.id} project={project.data} />;
+  const slug = useSlug();
+  const project = useProject(slug);
+  const preview = useQuery({
+    queryKey: qk.preview(slug),
+    queryFn: () => api.preview(slug),
+  });
+  const failed = project.isError ? project : preview.isError ? preview : null;
+  if (failed)
+    return <ErrorState error={failed.error} onRetry={() => failed.refetch()} />;
+  if (!project.data || !preview.data)
+    return <Skeleton className="mx-auto h-[70vh] max-w-3xl rounded-xl" />;
+  return (
+    <SettingsForm
+      key={project.data.id}
+      project={project.data}
+      preview={preview.data}
+    />
+  );
 }
 
-function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="grid gap-4 border-b py-8 md:grid-cols-[14rem_1fr] md:gap-10">
       <div>
         <h2 className="font-medium">{title}</h2>
-        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        )}
       </div>
       <div className="min-w-0 space-y-4">{children}</div>
     </section>
@@ -50,13 +97,28 @@ function Section({ title, description, children }: { title: string; description?
 }
 
 /** Label + control + description, wired with aria-describedby so screen readers read the hint. */
-function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactElement<{ "aria-describedby"?: string }> }) {
+function Field({
+  id,
+  label,
+  hint,
+  children,
+}: {
+  id: string;
+  label: string;
+  hint?: string;
+  children: React.ReactElement<{ "aria-describedby"?: string }>;
+}) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      {hint ? cloneElement(children, { "aria-describedby": `${id}-hint` }) : children}
+      {hint
+        ? cloneElement(children, { "aria-describedby": `${id}-hint` })
+        : children}
       {hint && (
-        <p id={`${id}-hint`} className="text-xs text-pretty text-muted-foreground">
+        <p
+          id={`${id}-hint`}
+          className="text-xs text-pretty text-muted-foreground"
+        >
           {hint}
         </p>
       )}
@@ -64,9 +126,16 @@ function Field({ id, label, hint, children }: { id: string; label: string; hint?
   );
 }
 
-function SettingsForm({ project: p }: { project: Project }) {
+function SettingsForm({
+  project: p,
+  preview,
+}: {
+  project: Project;
+  preview: PreviewSettings;
+}) {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
+  const ts = useTranslations("shell");
   const localeName = useLocaleName();
   const qc = useQueryClient();
   const router = useRouter();
@@ -93,12 +162,24 @@ function SettingsForm({ project: p }: { project: Project }) {
       .map(([k, v]) => `${k}: ${v}`)
       .join("\n"),
   );
+  const [site, setSite] = useState(preview.base_url ?? "");
+  const [pattern, setPattern] = useState(preview.url_pattern);
+  const [routes, setRoutes] = useState(preview.routes.join("\n"));
   const [confirm, setConfirm] = useState("");
-  const set = <K extends keyof LlmSettings>(k: K, v: LlmSettings[K]) => setLlm((s) => ({ ...s, [k]: v }));
+  const set = <K extends keyof LlmSettings>(k: K, v: LlmSettings[K]) =>
+    setLlm((s) => ({ ...s, [k]: v }));
 
   const save = useMutation({
-    mutationFn: () =>
-      api.updateProject(p.slug, {
+    mutationFn: async () => {
+      // One save button for the whole page: the site URL used to need its own button, and got lost.
+      const nextPreview = await api.updatePreview(p.slug, {
+        base_url: siteUrl(site),
+        url_pattern: pattern,
+        routes: routes.split(/[\n,]/),
+      });
+      qc.setQueryData(qk.preview(p.slug), nextPreview);
+      setSite(nextPreview.base_url ?? "");
+      return api.updateProject(p.slug, {
         name,
         target_locales: targets,
         style,
@@ -114,13 +195,17 @@ function SettingsForm({ project: p }: { project: Project }) {
             headers
               .split("\n")
               .filter((l) => l.includes(":"))
-              .map((l) => [l.slice(0, l.indexOf(":")).trim(), l.slice(l.indexOf(":") + 1).trim()])
+              .map((l) => [
+                l.slice(0, l.indexOf(":")).trim(),
+                l.slice(l.indexOf(":") + 1).trim(),
+              ])
               .filter(([k]) => k),
           ),
           ...(llm.api_key ? { api_key: llm.api_key } : {}),
           ...(llm.base_url ? { base_url: llm.base_url } : {}),
         },
-      }),
+      });
+    },
     onSuccess: (next) => {
       qc.setQueryData(qk.project(p.slug), next);
       qc.invalidateQueries({ queryKey: qk.projects });
@@ -139,7 +224,9 @@ function SettingsForm({ project: p }: { project: Project }) {
   });
 
   const addLocales = () => {
-    const add = parseLocales(newLocale).filter((l) => l !== p.source_locale && !targets.includes(l));
+    const add = parseLocales(newLocale).filter(
+      (l) => l !== p.source_locale && !targets.includes(l),
+    );
     if (add.length) setTargets([...targets, ...add]);
     setNewLocale("");
   };
@@ -154,28 +241,67 @@ function SettingsForm({ project: p }: { project: Project }) {
         save.mutate();
       }}
     >
-      <PageHeader title={t("title")} eyebrow={<span className="font-mono">{p.slug}</span>} subtitle={t("subtitle")} />
+      <PageHeader
+        title={t("title")}
+        eyebrow={<span className="font-mono">{p.slug}</span>}
+        subtitle={t("subtitle")}
+      />
 
       <Section title={t("general.title")}>
         <Field id="s-name" label={t("general.name")}>
-          <Input id="s-name" value={name} onChange={(e) => setName(e.target.value)} required />
+          <Input
+            id="s-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </Field>
-        <Field id="s-slug" label={t("general.slug")} hint={t("general.slugHint")}>
-          <Input id="s-slug" value={p.slug} readOnly disabled dir="ltr" className="font-mono" />
+        <Field
+          id="s-slug"
+          label={t("general.slug")}
+          hint={t("general.slugHint")}
+        >
+          <Input
+            id="s-slug"
+            value={p.slug}
+            readOnly
+            disabled
+            dir="ltr"
+            className="font-mono"
+          />
         </Field>
       </Section>
 
-      <Section title={t("locales.title")} description={t("locales.description")}>
-        <Field id="s-source" label={t("locales.source")} hint={t("locales.sourceHint")}>
-          <Input id="s-source" value={p.source_locale} readOnly disabled dir="ltr" className="w-32 font-mono" />
+      <Section
+        title={t("locales.title")}
+        description={t("locales.description")}
+      >
+        <Field
+          id="s-source"
+          label={t("locales.source")}
+          hint={t("locales.sourceHint")}
+        >
+          <Input
+            id="s-source"
+            value={p.source_locale}
+            readOnly
+            disabled
+            dir="ltr"
+            className="w-32 font-mono"
+          />
         </Field>
         <div className="space-y-1.5">
           <Label htmlFor="s-add-locale">{t("locales.targets")}</Label>
           <div className="flex flex-wrap gap-1.5">
             {targets.map((l) => (
-              <span key={l} className="inline-flex h-7 items-center gap-1.5 rounded-md border bg-muted/40 ps-2 pe-1 text-sm">
+              <span
+                key={l}
+                className="inline-flex h-7 items-center gap-1.5 rounded-md border bg-muted/40 ps-2 pe-1 text-sm"
+              >
                 <span className="font-mono text-xs">{l}</span>
-                <span className="text-muted-foreground capitalize">{localeName(l)}</span>
+                <span className="text-muted-foreground capitalize">
+                  {localeName(l)}
+                </span>
                 <Button
                   type="button"
                   variant="ghost"
@@ -213,7 +339,10 @@ function SettingsForm({ project: p }: { project: Project }) {
       <Section title={t("llm.title")} description={t("llm.description")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="s-provider" label={t("llm.provider")}>
-            <Select value={llm.provider} onValueChange={(v) => set("provider", v as Provider)}>
+            <Select
+              value={llm.provider}
+              onValueChange={(v) => set("provider", v as Provider)}
+            >
               <SelectTrigger id="s-provider" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -227,16 +356,43 @@ function SettingsForm({ project: p }: { project: Project }) {
             </Select>
           </Field>
           <Field id="s-model" label={t("llm.model")} hint={t("llm.modelHint")}>
-            <Input id="s-model" value={llm.model} onChange={(e) => set("model", e.target.value)} required dir="ltr" className="font-mono" />
+            <Input
+              id="s-model"
+              value={llm.model}
+              onChange={(e) => set("model", e.target.value)}
+              required
+              dir="ltr"
+              className="font-mono"
+            />
           </Field>
-          <Field id="s-fallback" label={t("llm.fallback")} hint={t("llm.fallbackHint")}>
-            <Input id="s-fallback" value={llm.fallback_model ?? ""} onChange={(e) => set("fallback_model", e.target.value)} dir="ltr" className="font-mono" />
+          <Field
+            id="s-fallback"
+            label={t("llm.fallback")}
+            hint={t("llm.fallbackHint")}
+          >
+            <Input
+              id="s-fallback"
+              value={llm.fallback_model ?? ""}
+              onChange={(e) => set("fallback_model", e.target.value)}
+              dir="ltr"
+              className="font-mono"
+            />
           </Field>
           <Field id="s-judge" label={t("llm.judge")} hint={t("llm.judgeHint")}>
-            <Input id="s-judge" value={llm.judge_model ?? ""} onChange={(e) => set("judge_model", e.target.value)} dir="ltr" className="font-mono" />
+            <Input
+              id="s-judge"
+              value={llm.judge_model ?? ""}
+              onChange={(e) => set("judge_model", e.target.value)}
+              dir="ltr"
+              className="font-mono"
+            />
           </Field>
         </div>
-        <Field id="s-key" label={t("llm.apiKey")} hint={p.llm.has_api_key ? t("llm.apiKeySet") : t("llm.apiKeyUnset")}>
+        <Field
+          id="s-key"
+          label={t("llm.apiKey")}
+          hint={p.llm.has_api_key ? t("llm.apiKeySet") : t("llm.apiKeyUnset")}
+        >
           <Input
             id="s-key"
             type="password"
@@ -249,7 +405,11 @@ function SettingsForm({ project: p }: { project: Project }) {
           />
         </Field>
         {llm.provider === "openai-compatible" && (
-          <Field id="s-base" label={t("llm.baseUrl")} hint={t("llm.baseUrlHint")}>
+          <Field
+            id="s-base"
+            label={t("llm.baseUrl")}
+            hint={t("llm.baseUrlHint")}
+          >
             <Input
               id="s-base"
               type="url"
@@ -262,7 +422,11 @@ function SettingsForm({ project: p }: { project: Project }) {
           </Field>
         )}
         {llm.provider === "anthropic" && (
-          <Field id="s-workspace" label={t("llm.workspaceId")} hint={t("llm.workspaceIdHint")}>
+          <Field
+            id="s-workspace"
+            label={t("llm.workspaceId")}
+            hint={t("llm.workspaceIdHint")}
+          >
             <Input
               id="s-workspace"
               value={llm.anthropic_workspace_id ?? ""}
@@ -273,7 +437,11 @@ function SettingsForm({ project: p }: { project: Project }) {
             />
           </Field>
         )}
-        <Field id="s-headers" label={t("llm.extraHeaders")} hint={t("llm.extraHeadersHint")}>
+        <Field
+          id="s-headers"
+          label={t("llm.extraHeaders")}
+          hint={t("llm.extraHeadersHint")}
+        >
           <Textarea
             id="s-headers"
             rows={2}
@@ -292,12 +460,23 @@ function SettingsForm({ project: p }: { project: Project }) {
             min={0}
             step="0.01"
             value={llm.budget_usd ?? ""}
-            onChange={(e) => set("budget_usd", e.target.value === "" ? null : Number(e.target.value))}
+            onChange={(e) =>
+              set(
+                "budget_usd",
+                e.target.value === "" ? null : Number(e.target.value),
+              )
+            }
             className="w-40 font-mono"
           />
         </Field>
         <Field id="s-style" label={t("llm.style")} hint={t("llm.styleHint")}>
-          <Textarea id="s-style" rows={3} value={style} onChange={(e) => setStyle(e.target.value)} placeholder={t("llm.stylePlaceholder")} />
+          <Textarea
+            id="s-style"
+            rows={3}
+            value={style}
+            onChange={(e) => setStyle(e.target.value)}
+            placeholder={t("llm.stylePlaceholder")}
+          />
         </Field>
       </Section>
 
@@ -308,7 +487,75 @@ function SettingsForm({ project: p }: { project: Project }) {
         {cdn && <CodeBlock label={t("cdn.example")} code={`curl ${cdnUrl}`} />}
       </Section>
 
-      <PreviewSection slug={p.slug} />
+      <Section
+        title={t("preview.title")}
+        description={t("preview.description")}
+      >
+        <div id="preview" className="scroll-mt-20 space-y-4">
+          <Field
+            id="s-preview-base"
+            label={t("preview.baseUrl")}
+            hint={t("preview.baseUrlHint")}
+          >
+            <Input
+              id="s-preview-base"
+              inputMode="url"
+              autoComplete="url"
+              value={site}
+              onChange={(e) => setSite(e.target.value)}
+              placeholder="https://example.com"
+              dir="ltr"
+              className="font-mono"
+            />
+          </Field>
+          {preview.base_url && (
+            <p className="text-sm text-muted-foreground">
+              {t("preview.usedBy")}{" "}
+              {(["preview", "visual", "feedback", "experiments"] as const).map(
+                (path, i) => (
+                  <span key={path}>
+                    {i > 0 && " · "}
+                    <Link
+                      href={`/app/${p.slug}/${path}`}
+                      className="font-medium text-foreground underline underline-offset-4"
+                    >
+                      {ts(path)}
+                    </Link>
+                  </span>
+                ),
+              )}
+            </p>
+          )}
+          <Field
+            id="s-preview-pattern"
+            label={t("preview.pattern")}
+            hint={t("preview.patternHint")}
+          >
+            <Input
+              id="s-preview-pattern"
+              value={pattern}
+              onChange={(e) => setPattern(e.target.value)}
+              required
+              dir="ltr"
+              className="font-mono"
+            />
+          </Field>
+          <Field
+            id="s-preview-routes"
+            label={t("preview.routes")}
+            hint={t("preview.routesHint")}
+          >
+            <Textarea
+              id="s-preview-routes"
+              rows={3}
+              value={routes}
+              onChange={(e) => setRoutes(e.target.value)}
+              dir="ltr"
+              className="font-mono"
+            />
+          </Field>
+        </div>
+      </Section>
 
       <div className="sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t bg-background/90 px-4 py-3 backdrop-blur">
         <Button type="submit" disabled={save.isPending}>
@@ -319,7 +566,9 @@ function SettingsForm({ project: p }: { project: Project }) {
 
       <section className="mt-10 rounded-xl border border-destructive/40 p-5">
         <h2 className="font-medium text-destructive">{t("danger.title")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("danger.description")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("danger.description")}
+        </p>
         <AlertDialog onOpenChange={() => setConfirm("")}>
           <AlertDialogTrigger asChild>
             <Button type="button" variant="destructive" className="mt-4">
@@ -328,8 +577,12 @@ function SettingsForm({ project: p }: { project: Project }) {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("danger.confirmTitle", { name: p.name })}</AlertDialogTitle>
-              <AlertDialogDescription>{t("danger.confirmBody", { slug: p.slug })}</AlertDialogDescription>
+              <AlertDialogTitle>
+                {t("danger.confirmTitle", { name: p.name })}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("danger.confirmBody", { slug: p.slug })}
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <Input
               value={confirm}
@@ -341,7 +594,11 @@ function SettingsForm({ project: p }: { project: Project }) {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>{tc("cancel")}</AlertDialogCancel>
-              <Button variant="destructive" disabled={confirm !== p.slug || remove.isPending} onClick={() => remove.mutate()}>
+              <Button
+                variant="destructive"
+                disabled={confirm !== p.slug || remove.isPending}
+                onClick={() => remove.mutate()}
+              >
                 {remove.isPending && <Loader2 className="animate-spin" />}
                 {t("danger.delete")}
               </Button>
@@ -353,46 +610,10 @@ function SettingsForm({ project: p }: { project: Project }) {
   );
 }
 
-function PreviewSection({ slug }: { slug: string }) {
-  const t = useTranslations("settings.preview");
-  const preview = useQuery({ queryKey: qk.preview(slug), queryFn: () => api.preview(slug) });
-  return (
-    <Section title={t("title")} description={t("description")}>
-      {preview.data ? <PreviewFields key={JSON.stringify(preview.data)} slug={slug} initial={preview.data} /> : <Skeleton className="h-40" />}
-    </Section>
-  );
-}
-
-function PreviewFields({ slug, initial }: { slug: string; initial: PreviewSettings }) {
-  const t = useTranslations("settings.preview");
-  const tc = useTranslations("common");
-  const qc = useQueryClient();
-  const [base, setBase] = useState(initial.base_url ?? "");
-  const [pattern, setPattern] = useState(initial.url_pattern);
-  const [routes, setRoutes] = useState(initial.routes.join("\n"));
-  const save = useMutation({
-    mutationFn: () =>
-      api.updatePreview(slug, { base_url: base || null, url_pattern: pattern, routes: routes.split(/[\n,]/) }),
-    onSuccess: (next) => {
-      qc.setQueryData(qk.preview(slug), next);
-      toast.success(t("saved"));
-    },
-  });
-  return (
-    <div id="preview" className="scroll-mt-20 space-y-4">
-      <Field id="s-preview-base" label={t("baseUrl")} hint={t("baseUrlHint")}>
-        <Input id="s-preview-base" type="url" value={base} onChange={(e) => setBase(e.target.value)} placeholder="http://localhost:3000" dir="ltr" className="font-mono" />
-      </Field>
-      <Field id="s-preview-pattern" label={t("pattern")} hint={t("patternHint")}>
-        <Input id="s-preview-pattern" value={pattern} onChange={(e) => setPattern(e.target.value)} required dir="ltr" className="font-mono" />
-      </Field>
-      <Field id="s-preview-routes" label={t("routes")} hint={t("routesHint")}>
-        <Textarea id="s-preview-routes" rows={3} value={routes} onChange={(e) => setRoutes(e.target.value)} dir="ltr" className="font-mono" />
-      </Field>
-      <Button type="button" variant="outline" disabled={save.isPending} onClick={() => save.mutate()}>
-        {save.isPending && <Loader2 className="animate-spin" />}
-        {save.isPending ? tc("saving") : t("save")}
-      </Button>
-    </div>
-  );
+/** `orizn.app` -> `https://orizn.app`, `localhost:3000` -> `http://localhost:3000`, empty -> null. */
+function siteUrl(raw: string): string | null {
+  const v = raw.trim().replace(/\/+$/, "");
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  return `${/^(localhost|127\.|\[::1\])/.test(v) ? "http" : "https"}://${v}`;
 }

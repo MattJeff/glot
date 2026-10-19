@@ -1002,16 +1002,15 @@
       "sourceHint": "Die Sprache, in der Ihre Entwickler Strings schreiben. Wird bei der Projekterstellung festgelegt."
     },
     "preview": {
-      "baseUrl": "Basis-URL",
-      "baseUrlHint": "Die Entwicklungs- oder Staging-URL Ihrer App. Leer lassen, um den letzten visuellen QA-Lauf wiederzuverwenden.",
-      "description": "Hier findet glot Ihre laufende App für die Matrix der Sprache.",
+      "baseUrl": "Website-URL",
+      "baseUrlHint": "Produktion, Staging oder lokal, z. B. orizn.app oder localhost:3000. Leer lassen, um den letzten visuellen QA-Lauf zu verwenden.",
+      "description": "Wo Ihre App läuft. glot öffnet sie, um Ihre Übersetzungen und Textvarianten in den echten Seiten zu zeigen.",
       "pattern": "URL-Muster",
       "patternHint": "'{locale}' und '{route}' werden ersetzt; die Quellsprache lässt ihr /'{locale}'-Segment weg.",
       "routes": "Routen",
       "routesHint": "Eine pro Zeile, wird in der Routenauswahl der Matrix angeboten.",
-      "save": "Vorschau-Einstellungen speichern",
-      "saved": "Vorschau-Einstellungen gespeichert",
-      "title": "Vorschau"
+      "title": "Ihre Website",
+      "usedBy": "Angezeigt in:"
     },
     "saved": "Einstellungen gespeichert",
     "title": "Einstellungen",
