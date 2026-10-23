@@ -15,7 +15,7 @@ SCOPE="${SCOPE:-@glot-i18n}"
 DRY_RUN="${DRY_RUN:-}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # runtime first (edge bundles it), the CLIs last (agent-qa bundles visual-qa's sources).
-PACKAGES=(runtime overlay feedback insights db edge visual-qa agent-qa)
+read -ra PACKAGES <<< "${PACKAGES:-runtime overlay feedback insights db edge visual-qa agent-qa}"  # PACKAGES="visual-qa agent-qa" for a subset
 
 [[ "$SCOPE" == @* ]] || { echo "SCOPE must start with @ (got $SCOPE)" >&2; exit 2; }
 if [[ -z "$DRY_RUN" ]]; then
