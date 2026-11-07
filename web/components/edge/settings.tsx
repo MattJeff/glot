@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useErrorMessage } from "@/lib/use-error-message";
-import { type EdgeSettings, edgeApi, edgeKeys, type Rendering } from "./api";
+import { type AppAction, type EdgeSettings, edgeApi, edgeKeys, type Rendering, SUGGESTED_APP_PATHS } from "./api";
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
-type ListField = "discover_include" | "discover_exclude" | "selectors_include" | "selectors_exclude" | "critical_patterns" | "sensitive_patterns";
+type ListField = "discover_include" | "discover_exclude" | "selectors_include" | "selectors_exclude" | "critical_patterns" | "sensitive_patterns" | "app_paths";
 
 /** Where segments may be discovered, what is never touched, critical/sensitive pages, auto-translation. */
 export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: EdgeSettings }) {
@@ -34,7 +34,9 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
     selectors_exclude: settings.selectors_exclude.join("\n"),
     critical_patterns: settings.critical_patterns.join("\n"),
     sensitive_patterns: settings.sensitive_patterns.join("\n"),
+    app_paths: settings.app_paths.join("\n"),
   }));
+  const [appAction, setAppAction] = useState<AppAction>(settings.app_action);
 
   const save = useMutation({
     // Kill switch state comes from the cache: the header switch may have changed it since this form mounted.
@@ -52,6 +54,8 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
         selectors_exclude: lines(text.selectors_exclude),
         critical_patterns: lines(text.critical_patterns),
         sensitive_patterns: lines(text.sensitive_patterns),
+        app_paths: lines(text.app_paths),
+        app_action: appAction,
       }),
     onSuccess: (r) => {
       qc.setQueryData(edgeKeys.settings(slug), r);
@@ -161,6 +165,40 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
             t("critical.threshold"),
             t("critical.thresholdHint"),
             <Input id="edge-threshold" type="number" min={0} max={100} value={threshold} onChange={(e) => setThreshold(e.target.value)} className="w-28 font-mono" />,
+          )}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-medium">{t("app.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("app.body")}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            {area("app_paths", t("app.rules"), t("app.rulesHint"), SUGGESTED_APP_PATHS.join("\n"))}
+            {!text.app_paths.trim() && (
+              <Button type="button" variant="outline" size="sm" onClick={() => setText({ ...text, app_paths: SUGGESTED_APP_PATHS.join("\n") })}>
+                {t("app.suggest")}
+              </Button>
+            )}
+          </div>
+          {field(
+            "edge-app-action",
+            t("app.action"),
+            t("app.actionHint"),
+            <Select value={appAction} onValueChange={(v) => setAppAction(v as AppAction)}>
+              <SelectTrigger id="edge-app-action" className="w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(["redirect", "proxy"] as const).map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {t(`app.${a}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>,
           )}
         </div>
       </section>

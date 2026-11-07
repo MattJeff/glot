@@ -194,6 +194,17 @@
         "sensitiveHint": "Neue Segmente warten in der Prüfwarteschlange.",
         "threshold": "Schwelle der kritischen Abdeckung (%)",
         "thresholdHint": "Jede kritische Seite muss sie erreichen, bevor die Sprache bereit ist."
+      },
+      "app": {
+        "title": "Anwendungsseiten",
+        "body": "Diese Seiten bleiben auf Ihrer Ursprungsdomain: Anmeldung, Konto, Zahlung, API… Edge übersetzt sie nie, speichert sie nie im Cache und erkennt dort keine Texte.",
+        "rules": "Anwendungspfade",
+        "rulesHint": "Eine Regel pro Zeile. /login = /login und /login/…, /live/ = nur seine Unterseiten, /x* = jeder Pfad, der mit /x beginnt. Beginnen Sie eine Zeile mit proxy, um sie unübersetzt durchzureichen (API, Assets, technische Dateien), mit redirect, um Besucher auf Ihre Domain zurückzuschicken. /sitemap.xml, /robots.txt und der IndexNow-Schlüssel werden weiter von glot erzeugt.",
+        "action": "Standardaktion",
+        "redirect": "Auf Ihre Domain weiterleiten",
+        "proxy": "Unübersetzt durchreichen",
+        "actionHint": "Weiterleiten: 302 (307 für Formulare) zur selben Seite auf Ihrer Domain, mit der Sprache so, wie Ihre Website sie erwartet. Durchreichen: die Antwort Ihres Servers unverändert, Cookies inklusive.",
+        "suggest": "Vorgeschlagene Liste verwenden"
       }
     },
     "seo": {

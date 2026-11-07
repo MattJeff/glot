@@ -35,10 +35,28 @@ pub struct Settings {
     pub monthly_budget_usd: Option<f64>,
     /// origin | prerender | auto
     pub rendering: String,
+    /// Application paths kept on the origin's domain, one rule per element (`/login`, `proxy /api/`; see
+    /// `app_paths`). Missing in a request body = the suggested list.
+    #[serde(default = "suggested_app_paths")]
+    pub app_paths: Vec<String>,
+    /// Action of rules without one: redirect | proxy
+    #[serde(default = "redirect")]
+    pub app_action: String,
+}
+
+fn suggested_app_paths() -> Vec<String> {
+    super::app_paths::SUGGESTED
+        .iter()
+        .map(|s| s.to_string())
+        .collect()
+}
+
+fn redirect() -> String {
+    "redirect".into()
 }
 
 const COLS: &str = "enabled, auto_translate, discover_include, discover_exclude, selectors_include, selectors_exclude,
-    critical_patterns, sensitive_patterns, critical_threshold, daily_cap, monthly_budget_usd, rendering";
+    critical_patterns, sensitive_patterns, critical_threshold, daily_cap, monthly_budget_usd, rendering, app_paths, app_action";
 
 impl Settings {
     /// The project's settings; the column defaults when it never saved any.
@@ -98,6 +116,8 @@ impl Default for Settings {
             daily_cap: 2000,
             monthly_budget_usd: None,
             rendering: "auto".into(),
+            app_paths: suggested_app_paths(),
+            app_action: redirect(),
         }
     }
 }
@@ -182,15 +202,33 @@ async fn put_settings(
             "rendering must be origin|prerender|auto",
         ));
     }
+    let default = match s.app_action.as_str() {
+        "redirect" => super::app_paths::Action::Redirect,
+        "proxy" => super::app_paths::Action::Proxy,
+        _ => return Err(AppError::bad_request("app_action must be redirect|proxy")),
+    };
+    if s.app_paths.len() > 200 {
+        return Err(AppError::bad_request("at most 200 app path rules"));
+    }
+    for l in &s.app_paths {
+        super::app_paths::parse_line(l, default).map_err(AppError::bad_request)?;
+    }
+    let app_paths: Vec<String> = s
+        .app_paths
+        .iter()
+        .map(|l| l.trim().to_string())
+        .filter(|l| !l.is_empty())
+        .collect();
+    let s = Settings { app_paths, ..s };
     sqlx::query(
         "INSERT INTO edge_settings (project_id, enabled, auto_translate, discover_include, discover_exclude,
             selectors_include, selectors_exclude, critical_patterns, sensitive_patterns, critical_threshold,
-            daily_cap, monthly_budget_usd, rendering, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now())
+            daily_cap, monthly_budget_usd, rendering, app_paths, app_action, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, now())
          ON CONFLICT (project_id) DO UPDATE SET enabled = $2, auto_translate = $3, discover_include = $4,
             discover_exclude = $5, selectors_include = $6, selectors_exclude = $7, critical_patterns = $8,
             sensitive_patterns = $9, critical_threshold = $10, daily_cap = $11, monthly_budget_usd = $12,
-            rendering = $13, updated_at = now()",
+            rendering = $13, app_paths = $14, app_action = $15, updated_at = now()",
     )
     .bind(p.id)
     .bind(s.enabled)
@@ -205,6 +243,8 @@ async fn put_settings(
     .bind(s.daily_cap)
     .bind(s.monthly_budget_usd)
     .bind(&s.rendering)
+    .bind(&s.app_paths)
+    .bind(&s.app_action)
     .execute(&state.db)
     .await?;
     Ok(Json(s))

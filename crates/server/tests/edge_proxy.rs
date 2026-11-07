@@ -86,6 +86,39 @@ async fn origin(hits: Arc<AtomicUsize>) -> String {
             }),
         )
         .route(
+            "/login",
+            get(|| async {
+                (
+                    [
+                        (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+                        (header::SET_COOKIE, "sid=1; HttpOnly"),
+                    ],
+                    PAGE,
+                )
+            }),
+        )
+        .route(
+            "/api/me",
+            axum::routing::post(|h: HeaderMap, body: String| async move {
+                (
+                    [
+                        (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+                        (
+                            header::SET_COOKIE,
+                            "session=abc; Path=/; HttpOnly; SameSite=Lax",
+                        ),
+                    ],
+                    format!(
+                        "<p>Save</p> {body} {}",
+                        h.get(header::COOKIE)
+                            .and_then(|v| v.to_str().ok())
+                            .unwrap_or("")
+                    ),
+                )
+            })
+            .get(|| async { ([(header::CONTENT_TYPE, "text/html; charset=utf-8")], PAGE) }),
+        )
+        .route(
             "/form",
             axum::routing::post(|body: String| async move { format!("got {body}") }),
         );
@@ -199,7 +232,13 @@ async fn edge_proxy() {
 
     // es and fr ready for search engines (another page fully translated, no critical page; stays above 95 % with
     // the untranslated segments this test discovers); de is not.
-    sqlx::query("INSERT INTO edge_settings (project_id, critical_patterns) VALUES ($1, '{}')")
+    sqlx::query(r#"INSERT INTO edge_settings (project_id, critical_patterns, app_paths) VALUES ($1, '{}', '{/login,/live/,"proxy /api/"}')"#)
+        .bind(project)
+        .execute(&pool)
+        .await
+        .unwrap();
+    // The site carries the locale as `?lang=es` (application paths redirect with it).
+    sqlx::query("INSERT INTO preview_settings (project_id, url_pattern) VALUES ($1, '{route}?lang={locale}')")
         .bind(project)
         .execute(&pool)
         .await
@@ -587,6 +626,125 @@ async fn edge_proxy() {
     )
     .unwrap();
     assert_eq!(st["off"], json!(["fr.cliponit.test"]));
+
+    // --- Application paths: back to the origin's own domain with the locale, or passed through untouched.
+    let (s, h, _) = call(
+        Method::GET,
+        "es.cliponit.test",
+        "/edge/proxy/login?next=%2Fdashboard&lang=fr",
+        &[("accept", "text/html")],
+        "",
+    )
+    .await;
+    assert_eq!(s, StatusCode::FOUND);
+    assert_eq!(
+        h[header::LOCATION],
+        format!("{origin}/login?next=%2Fdashboard&lang=es")
+    );
+    assert_eq!(h["x-glot-edge"], "app-redirect");
+    assert_eq!(h[header::CACHE_CONTROL], "no-store");
+    assert!(
+        h[header::SET_COOKIE]
+            .to_str()
+            .unwrap()
+            .starts_with("glot_app_hop=/login;")
+    );
+    // Non-GET keeps method and body (307); children-only rule; segment match.
+    let (s, h, _) = call(
+        Method::POST,
+        "es.cliponit.test",
+        "/edge/proxy/live/abc",
+        &[],
+        "x=1",
+    )
+    .await;
+    assert_eq!(s, StatusCode::TEMPORARY_REDIRECT);
+    assert_eq!(h[header::LOCATION], format!("{origin}/live/abc?lang=es"));
+    let (_, h, _) = call(
+        Method::GET,
+        "es.cliponit.test",
+        "/edge/proxy/loginx",
+        &[],
+        "",
+    )
+    .await;
+    assert_ne!(h["x-glot-edge"], "app-redirect");
+    // Open-redirect attempts: always the domain's own origin, normalized path.
+    for (uri, want) in [
+        ("/edge/proxy//evil.com/%2e%2e/login", "/login?lang=es"),
+        ("/edge/proxy/%2F%2Fevil.com/../login", "/login?lang=es"),
+        (
+            "/edge/proxy/x/../login?u=https://evil.com",
+            "/login?u=https://evil.com&lang=es",
+        ),
+    ] {
+        let (s, h, _) = call(
+            Method::GET,
+            "es.cliponit.test",
+            uri,
+            &[("x-forwarded-host", "evil.com")],
+            "",
+        )
+        .await;
+        assert_eq!(s, StatusCode::FOUND, "{uri}");
+        assert_eq!(h[header::LOCATION], format!("{origin}{want}"), "{uri}");
+    }
+    // Loop guard: the origin sent the visitor back (hop cookie for this path) → passed through, not redirected.
+    let (s, h, b) = call(
+        Method::GET,
+        "es.cliponit.test",
+        "/edge/proxy/login?lang=es",
+        &[("accept", "text/html"), ("cookie", "glot_app_hop=/login")],
+        "",
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h["x-glot-edge"], "app");
+    assert!(
+        b.contains("<h1>Simple pricing</h1>"),
+        "never translated: {b}"
+    );
+    assert_eq!(h[header::SET_COOKIE], "sid=1; HttpOnly");
+    // Proxy rule: method, body and cookies through, Set-Cookie untouched, never translated or cached.
+    let (s, h, b) = call(
+        Method::POST,
+        "es.cliponit.test",
+        "/edge/proxy/api/me",
+        &[("cookie", "session=abc")],
+        "payload",
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h["x-glot-edge"], "app");
+    assert_eq!(
+        h[header::SET_COOKIE],
+        "session=abc; Path=/; HttpOnly; SameSite=Lax"
+    );
+    assert_eq!(b, "<p>Save</p> payload session=abc");
+    let (_, h, b) = call(
+        Method::GET,
+        "es.cliponit.test",
+        "/edge/proxy/api/me",
+        &[("accept", "text/html")],
+        "",
+    )
+    .await;
+    assert_eq!(h["x-glot-edge"], "app");
+    assert!(
+        b.contains("<button>Save</button>") && !b.contains("Guardar"),
+        "{b}"
+    );
+    // The JS runtimes read the rules from the status (within their refresh interval).
+    let st: Value = serde_json::from_str(
+        &call(Method::GET, "api", "/edge/v1/clip/status", &[], "")
+            .await
+            .2,
+    )
+    .unwrap();
+    assert_eq!(
+        st["app"],
+        json!({"rules": ["/login", "/live/", "proxy /api/"], "action": "redirect", "locale": "query:lang"})
+    );
 
     // --- Postgres gone: es keeps its last TM (stale-if-error); de (domain known, TM never loaded) fails open.
     let (s, _, _) = call(

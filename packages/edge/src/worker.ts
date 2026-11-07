@@ -74,8 +74,21 @@ export default {
       const own = await getEdge(env, source, locales).own(req, wait);
       if (own) return own;
     }
-    const r = route(url, req.headers, { source, locales });
+    const edgeOn = env.GLOT_EDGE !== "0";
+    let r = route(url, req.headers, { source, locales });
+    // Application paths (login, account, API…) are never sent to a locale URL…
+    if ("redirect" in r && edgeOn && (await getEdge(env, source, locales).isApp(url.pathname, wait))) r = { locale: source, path: url.pathname };
     if ("redirect" in r) return new Response(null, { status: 302, headers: { location: r.redirect, vary: "Accept-Language, Cookie" } });
+    // …and under one: back to the source URL, or the origin's response untouched (no translation, cache, discovery).
+    if (edgeOn && r.locale !== source) {
+      const a = await getEdge(env, source, locales).app(req, r.locale, r.path, wait);
+      if (a === "proxy") {
+        const u = new URL(url);
+        u.pathname = r.path;
+        return fetch(new Request(u, req));
+      }
+      if (a) return a;
+    }
 
     let d: Decision | undefined;
     if (env.GLOT_KEY && req.method === "GET" && req.headers.get("accept")?.includes("text/html")) {
@@ -90,7 +103,7 @@ export default {
       if (d?.header) up.headers.set("x-glot-xp", d.header);
       return fetch(up);
     };
-    const useEdge = env.GLOT_EDGE !== "0" && r.locale !== source;
+    const useEdge = edgeOn && r.locale !== source;
     let page: Response;
     if (useEdge) page = await getEdge(env, source, locales)(req, r.locale, originUrl, origin, wait);
     else page = await origin(originUrl);

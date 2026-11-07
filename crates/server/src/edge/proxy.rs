@@ -19,6 +19,9 @@
 //!   `DOMAIN_TTL` → passthrough in < 1 min.
 //! - Origin headers are kept (CSP, HSTS, cookies…) except hop-by-hop and the ones the body change invalidates.
 //!   `Server-Timing: glot;dur=…, origin;dur=…` exposes glot's cost.
+//! - Application paths (`app_paths`: login, account, OAuth, API…): never translated, cached or discovered;
+//!   `redirect` → 302/307 to the domain's own origin (`x-glot-edge: app-redirect`), `proxy` → the origin
+//!   response untouched (`x-glot-edge: app`). Checked after glot's own routes (sitemap, robots, IndexNow key).
 //! - Discovery: missing segments go to `missing::record` in the background, only for anonymous requests, paths
 //!   without query string, deduplicated per process.
 use axum::{
@@ -46,6 +49,7 @@ use std::{
 };
 use uuid::Uuid;
 
+use super::app_paths;
 use super::ask::clean_host;
 use super::missing;
 use crate::{AppState, projects::ProjectRow, review_live::probe::is_public};
@@ -88,6 +92,13 @@ struct Domain {
     /// origin | prerender | auto (edge_settings.rendering): when to serve the renderer's snapshot.
     #[serde(default)]
     rendering: String,
+    /// Application paths (`app_paths` rules), their default action, how the origin carries the locale.
+    #[serde(default)]
+    app_rules: Vec<String>,
+    #[serde(default)]
+    app_action: String,
+    #[serde(default)]
+    locale_style: String,
 }
 
 #[derive(Clone)]
@@ -397,13 +408,17 @@ async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain
         Vec<String>,
         Vec<String>,
         String,
+        Option<Vec<String>>,
+        String,
+        Option<String>,
     );
     let row: Option<Row> = sqlx::query_as(
         "SELECT d.project_id, p.slug, d.locale, d.origin_url, d.enabled AND coalesce(s.enabled, true),
                 p.source_locale, p.target_locales, coalesce(s.selectors_exclude, '{}'),
-                coalesce(s.rendering, 'auto')
+                coalesce(s.rendering, 'auto'), s.app_paths, coalesce(s.app_action, 'redirect'), v.url_pattern
          FROM edge_domains d JOIN projects p ON p.id = d.project_id
          LEFT JOIN edge_settings s ON s.project_id = d.project_id
+         LEFT JOIN preview_settings v ON v.project_id = d.project_id
          WHERE d.host = $1 AND d.mode = 'subdomain' AND d.verified_at IS NOT NULL",
     )
     .bind(host)
@@ -419,6 +434,9 @@ async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain
         targets,
         skip,
         rendering,
+        app_rules,
+        app_action,
+        url_pattern,
     )) = row
     else {
         return Ok(None);
@@ -457,6 +475,15 @@ async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain
         skip_selectors: skip,
         dnt,
         rendering,
+        // No settings row: the suggested rules (`Settings::default`).
+        app_rules: app_rules.unwrap_or_else(|| {
+            super::app_paths::SUGGESTED
+                .iter()
+                .map(|s| s.to_string())
+                .collect()
+        }),
+        app_action,
+        locale_style: super::app_paths::locale_style(url_pattern.as_deref()),
     }))
 }
 
@@ -561,6 +588,51 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         return plain(StatusCode::BAD_GATEWAY, "bad origin", "origin-error");
     };
     let (path, query) = path_q.split_once('?').unwrap_or((&path_q, ""));
+    // Application paths (login, account, API…): back to the origin's own domain, or passed through untouched.
+    let cookies = parts
+        .headers
+        .get_all(header::COOKIE)
+        .iter()
+        .filter_map(|v| v.to_str().ok())
+        .collect::<Vec<_>>()
+        .join("; ");
+    let app = app_paths::decide(&app_paths::Input {
+        rules: &d.app_rules,
+        action: if d.app_action == "proxy" {
+            app_paths::Action::Proxy
+        } else {
+            app_paths::Action::Redirect
+        },
+        locale_style: &d.locale_style,
+        locale: &d.locale,
+        origin: &d.origin_url,
+        host: &host,
+        req_path: path,
+        path,
+        query,
+        method: parts.method.as_str(),
+        cookie: &cookies,
+    });
+    if let Some(app_paths::Decision::Redirect {
+        status,
+        location,
+        cookie,
+    }) = &app
+        && let (Ok(loc), Ok(c)) = (
+            HeaderValue::from_str(location),
+            HeaderValue::from_str(cookie),
+        )
+    {
+        let mut r = Response::new(Body::empty());
+        *r.status_mut() = StatusCode::from_u16(*status).unwrap_or(StatusCode::FOUND);
+        let h = r.headers_mut();
+        h.insert(header::LOCATION, loc);
+        h.insert(header::SET_COOKIE, c);
+        h.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+        h.insert("x-glot-edge", HeaderValue::from_static("app-redirect"));
+        return r;
+    }
+    let app_proxy = app.is_some();
     origin.set_path(path);
     origin.set_query((!query.is_empty()).then_some(query));
     if let Some(ip) = origin
@@ -578,7 +650,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     let get = parts.method == Method::GET || parts.method == Method::HEAD;
     let anon = !has_session(&parts.headers);
     let over_quota = blocked(d.project_id);
-    let translatable = d.enabled && !over_quota && parts.method == Method::GET;
+    let translatable = d.enabled && !over_quota && !app_proxy && parts.method == Method::GET;
 
     // TM first (cheap when warm): its version keys the page cache.
     let tm = if translatable {
@@ -665,7 +737,9 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         .and_then(|v| v.to_str().ok())
         .is_some_and(|t| t.contains("text/html"));
     let len = resp.content_length().unwrap_or(0) as usize;
-    let mode = if !d.enabled {
+    let mode = if app_proxy {
+        "app"
+    } else if !d.enabled {
         "off"
     } else if over_quota {
         "quota"

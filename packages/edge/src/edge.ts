@@ -11,7 +11,11 @@
 //   project / this host; off → passthrough to the origin in < 1 min, no redeploy.
 // - Discovery: untranslated segments are reported (hash/text/context + URL path, never query string, cookies or
 //   anything about the visitor), only for anonymous requests, deduplicated per isolate, batched in `waitUntil`.
+// - Application paths (status `app`: login, account, API…): never translated, cached or discovered; the runtimes
+//   call `app()` first: a redirect to the source URL (locale as the site expects it) or the origin untouched.
 // - `Server-Timing: glot;dur=…` = time spent in glot code (TM + rewrite), `origin;dur=…` = the origin fetch.
+
+import { classify, decide, type AppRules } from "./app-paths.ts";
 
 /** TM snapshot, wire format of `GET /edge/v1/{project}/{locale}/tm` (glot_core::edge::tm): segment hash →
  * one translation valid in any context, or per context (`<role>|<page template>`, `*` = catalog default). */
@@ -35,6 +39,8 @@ export interface Status {
   selectors?: { include: string[]; exclude: string[] };
   /** Locales ready to be listed (hreflang), from `/cdn/{project}/locales.json`; undefined = unknown (all listed). */
   ready?: string[];
+  /** Application paths (login, account, API…) kept on the origin's own URL (app-paths.ts). */
+  app?: AppRules;
 }
 /** A segment glot has no translation for (from the segmenter); `discoverable: false` ones are never sent. */
 export interface Missing {
@@ -174,7 +180,7 @@ export function createEdge(o: EdgeOptions) {
           .then((r) => (r.ok ? r.json() : undefined))
           .then((m: { locales?: { code: string; ready?: boolean }[] } | undefined) => m?.locales?.filter((l) => l.ready !== false).map((l) => l.code))
           .catch(() => undefined);
-        status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready } };
+        status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready, app: v.app } };
         void o.store?.put("status", JSON.stringify(status.v)).catch(() => {});
         // Prefetch newer TMs of the locales we serve: the next request gets the new version, whole.
         await Promise.all([...tms.values()].filter((t) => (status!.v.versions[t.locale] ?? 0) > t.v).map((t) => loadTm(t.locale, status!.v.versions[t.locale])));
@@ -348,7 +354,38 @@ export function createEdge(o: EdgeOptions) {
     return done;
   }
 
-  return Object.assign(serve, { own });
+  /** Current application-path rules (status, within `statusTtl`; cold: at most `timeout` ms). */
+  async function appRules(wait?: Wait): Promise<AppRules | undefined> {
+    await restore();
+    if (!status || now() - status.at >= statusTtl) {
+      const p = refreshStatus();
+      wait?.(p);
+      if (!status) await race(p, timeout);
+    }
+    return status?.v.app;
+  }
+
+  /** `path` (origin path, no query) is an application path: never routed to a locale. */
+  async function isApp(path: string, wait?: Wait): Promise<boolean> {
+    const a = await appRules(wait);
+    return !!a?.rules?.length && classify(a.rules, a.action ?? "redirect", path) !== undefined;
+  }
+
+  /**
+   * Application path decision for `req` served in `locale` (`path` = origin path, locale prefix removed):
+   * a redirect Response to the source URL with the locale as the site expects it, `"proxy"` (serve the origin
+   * untouched: no translation, cache or discovery), or undefined (a normal page). Fail-open: rules unknown → undefined.
+   */
+  async function app(req: Request, locale: string, path: string, wait?: Wait): Promise<Response | "proxy" | undefined> {
+    const a = await appRules(wait);
+    if (!a?.rules?.length) return undefined;
+    const u = new URL(req.url);
+    const d = decide({ rules: a.rules, action: a.action ?? "redirect", locale_style: a.locale ?? "none", locale, origin: u.origin, host: u.host, req_path: u.pathname, path, query: u.search.slice(1), method: req.method, cookie: req.headers.get("cookie") ?? "" });
+    if (!d || d.kind === "proxy") return d && "proxy";
+    return new Response(null, { status: d.status, headers: { location: d.location, "set-cookie": d.cookie, "cache-control": "no-store", "x-glot-edge": "app-redirect" } });
+  }
+
+  return Object.assign(serve, { own, app, isApp });
 
   async function serve(req: Request, locale: string, originUrl: URL, origin: (u: URL) => Promise<Response>, wait?: Wait): Promise<Response> {
     const url = new URL(req.url);

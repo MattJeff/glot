@@ -60,7 +60,18 @@ export function glotEdge(o: ExpressEdgeOptions) {
         const own = await edge.own(new Request(url, { method: req.method, headers, body }));
         if (own) return void (await send(res, own));
       }
-      const r = route(url, headers, o);
+      let r = route(url, headers, o);
+      // Application paths (login, account, API…): never sent to a locale URL; under one, back to the source URL
+      // or this app's own route untouched (no translation, cache, discovery).
+      if ("redirect" in r && (await edge.isApp(url.pathname))) r = { locale: o.source, path: url.pathname };
+      if (!("redirect" in r) && r.locale !== o.source) {
+        const a = await edge.app(new Request(url, { method: req.method, headers }), r.locale, r.path);
+        if (a === "proxy") {
+          req.url = r.path + url.search;
+          return next();
+        }
+        if (a) return void (await send(res, a));
+      }
       if ("redirect" in r) {
         res.writeHead(302, { location: r.redirect, vary: "Accept-Language, Cookie" }).end();
         return;

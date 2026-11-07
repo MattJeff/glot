@@ -1,4 +1,5 @@
 //! glot Edge on the server (see each module).
+pub mod app_paths;
 pub mod ask;
 pub mod discover;
 pub mod domains;

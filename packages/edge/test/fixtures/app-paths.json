@@ -1,0 +1,159 @@
+{
+  "_": "Shared vectors of application paths: crates/server/src/edge/app_paths.rs and packages/edge/src/app-paths.ts.",
+  "normalize": [
+    ["/login", "/login"],
+    ["", "/"],
+    ["/", "/"],
+    ["//evil.com", "/evil.com"],
+    ["///evil.com/x", "/evil.com/x"],
+    ["/a/./b/../c", "/a/c"],
+    ["/../../etc/passwd", "/etc/passwd"],
+    ["/%2e%2e/%2E/login", "/login"],
+    ["/%6Cogin", "/login"],
+    ["/a%2fb", "/a%2Fb"],
+    ["/\\evil.com", "/evil.com"],
+    ["/live/", "/live/"],
+    ["/live/.", "/live/"],
+    ["/a b", "/a%20b"],
+    ["/café", "/caf%C3%A9"],
+    ["/%zz", "/%25zz"],
+    ["/x?y", "/x%3Fy"]
+  ],
+  "classify": [
+    {
+      "action": "redirect",
+      "rules": [
+        "/login", "/register", "/forgot", "/reset", "/welcome", "/onboarding", "/settings", "/billing", "/affiliate",
+        "/dashboard", "/smartclipper", "/exports", "/videos/", "/clips/", "/explainer", "/montage", "/live/", "/premium",
+        "/promo", "/broll", "/partners", "/extension", "/admin/", "/docs",
+        "proxy /api/", "proxy /mcp", "proxy /oauth/", "proxy /.well-known/", "proxy /hook", "proxy /v/",
+        "proxy /explainer-assets/", "proxy /files/", "proxy /assets/", "proxy /openapi.json", "proxy /llms-api.txt",
+        "proxy /llms.txt", "proxy /llms-full.txt", "proxy /feed.xml", "proxy /favicon.ico"
+      ],
+      "cases": [
+        ["/explainer", "redirect"],
+        ["/explainer/edit", "redirect"],
+        ["/explainer-video", null],
+        ["/explainer-assets/a.png", "proxy"],
+        ["/montage", "redirect"],
+        ["/montage-video", null],
+        ["/extension", "redirect"],
+        ["/extension-chrome", null],
+        ["/affiliate", "redirect"],
+        ["/affiliates", null],
+        ["/partners", "redirect"],
+        ["/partners/x", "redirect"],
+        ["/partenaires", null],
+        ["/live", null],
+        ["/live/", null],
+        ["/live/abc", "redirect"],
+        ["/videos/123", "redirect"],
+        ["/videos", null],
+        ["/", null],
+        ["/pricing", null],
+        ["/Login", "redirect"],
+        ["//login", "redirect"],
+        ["/%6Cogin", "redirect"],
+        ["/blog/../login", "redirect"],
+        ["/login/", "redirect"],
+        ["/loginx", null],
+        ["/api/v1/me", "proxy"],
+        ["/api", null],
+        ["/mcp", "proxy"],
+        ["/.well-known/apple-app-site-association", "proxy"],
+        ["/llms.txt", "proxy"],
+        ["/feed.xml", "proxy"],
+        ["/sitemap.xml", null],
+        ["/robots.txt", null],
+        ["/__glot/tm.json", null]
+      ]
+    },
+    {
+      "action": "proxy",
+      "rules": ["# comment", "", "/x*", "redirect /*/settings", "/app"],
+      "cases": [
+        ["/x", "proxy"],
+        ["/xyz/abc", "proxy"],
+        ["/team/settings", "redirect"],
+        ["/settings", null],
+        ["/app/home", "proxy"],
+        ["/apple", null]
+      ]
+    },
+    {
+      "action": "redirect",
+      "rules": ["/"],
+      "cases": [["/", "redirect"], ["/anything", "redirect"], ["/robots.txt", null]]
+    }
+  ],
+  "locale_style": [
+    ["{route}?lang={locale}", "query:lang"],
+    ["/{route}?ref=x&hl={locale}", "query:hl"],
+    ["/{locale}{route}", "prefix"],
+    ["/{locale}/{route}", "prefix"],
+    ["{route}", "none"],
+    [null, "none"]
+  ],
+  "decide": [
+    {
+      "name": "GET redirect with lang added",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/login", "path": "/login", "query": "next=%2Fdashboard", "method": "GET", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://cliponit.app/login?next=%2Fdashboard&lang=es", "cookie": "glot_app_hop=/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "lang replaced, POST keeps method (307)",
+      "in": { "rules": ["/auth/"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://cliponit.app/some/path", "host": "es.cliponit.app", "req_path": "/auth/callback", "path": "/auth/callback", "query": "lang=fr&code=1", "method": "POST", "cookie": "" },
+      "out": { "kind": "redirect", "status": 307, "location": "https://cliponit.app/auth/callback?code=1&lang=es", "cookie": "glot_app_hop=/auth/callback; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "prefix locale",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "prefix", "locale": "es", "origin": "https://site.example", "host": "es.site.example", "req_path": "/login", "path": "/login", "query": "", "method": "HEAD", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://site.example/es/login", "cookie": "glot_app_hop=/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "no locale",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "none", "locale": "es", "origin": "https://site.example", "host": "es.site.example", "req_path": "/login", "path": "/login", "query": "a=1", "method": "GET", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://site.example/login?a=1", "cookie": "glot_app_hop=/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "open redirect attempt: //evil.com stays on the origin",
+      "in": { "rules": ["/"], "action": "redirect", "locale_style": "none", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "//evil.com/login", "path": "//evil.com/login", "query": "", "method": "GET", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://cliponit.app/evil.com/login", "cookie": "glot_app_hop=/evil.com/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "open redirect attempt: backslash and dots",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "none", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/\\evil.com/../login", "path": "/\\evil.com/../login", "query": "", "method": "GET", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://cliponit.app/login", "cookie": "glot_app_hop=/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "loop guard: the origin sent the visitor back (hop cookie for this path)",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/login", "path": "/login", "query": "lang=es", "method": "GET", "cookie": "a=1; glot_app_hop=/login" },
+      "out": { "kind": "proxy" }
+    },
+    {
+      "name": "hop cookie for another path: still redirected",
+      "in": { "rules": ["/login", "/dashboard"], "action": "redirect", "locale_style": "none", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/dashboard", "path": "/dashboard", "query": "", "method": "GET", "cookie": "glot_app_hop=/login" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://cliponit.app/dashboard", "cookie": "glot_app_hop=/dashboard; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "loop guard: target is this very URL (same host, prefix locale)",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "prefix", "locale": "es", "origin": "https://site.example", "host": "site.example", "req_path": "/es/login", "path": "/login", "query": "", "method": "GET", "cookie": "" },
+      "out": { "kind": "proxy" }
+    },
+    {
+      "name": "same host, query locale: to the unprefixed URL",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://site.example", "host": "site.example", "req_path": "/es/login", "path": "/login", "query": "", "method": "GET", "cookie": "" },
+      "out": { "kind": "redirect", "status": 302, "location": "https://site.example/login?lang=es", "cookie": "glot_app_hop=/login; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax" }
+    },
+    {
+      "name": "proxy rule",
+      "in": { "rules": ["proxy /api/"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/api/me", "path": "/api/me", "query": "", "method": "POST", "cookie": "" },
+      "out": { "kind": "proxy" }
+    },
+    {
+      "name": "public page",
+      "in": { "rules": ["/login"], "action": "redirect", "locale_style": "query:lang", "locale": "es", "origin": "https://cliponit.app", "host": "es.cliponit.app", "req_path": "/pricing", "path": "/pricing", "query": "", "method": "GET", "cookie": "" },
+      "out": { "kind": "none" }
+    }
+  ]
+}

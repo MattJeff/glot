@@ -28,7 +28,20 @@ export function glotProxy(o: RouteOptions & { experiments?: ExperimentsOptions; 
       const own = await edge.own(req, event && ((p) => event.waitUntil(p)));
       if (own) return own;
     }
-    const r = route(req.nextUrl, req.headers, o);
+    const wait = event && ((p: Promise<unknown>) => event.waitUntil(p));
+    let r = route(req.nextUrl, req.headers, o);
+    // Application paths (login, account, API…): never sent to a locale URL; under one, back to the source URL or
+    // the app's own route untouched (no translation, cache, discovery).
+    if (edge && "redirect" in r && (await edge.isApp(req.nextUrl.pathname, wait))) r = { locale: o.source, path: req.nextUrl.pathname };
+    const a = edge && !("redirect" in r) && r.locale !== o.source ? await edge.app(req, r.locale, r.path, wait) : undefined;
+    if (a instanceof Response) return a;
+    if (a === "proxy" && !("redirect" in r)) {
+      const url = req.nextUrl.clone();
+      url.pathname = r.path;
+      const headers = new Headers(req.headers);
+      headers.set("x-glot-locale", r.locale);
+      return NextResponse.rewrite(url, { request: { headers } });
+    }
     if ("redirect" in r) {
       const res = NextResponse.redirect(new URL(r.redirect, req.url));
       res.headers.set("vary", "Accept-Language, Cookie");

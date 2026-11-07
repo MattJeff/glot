@@ -26,7 +26,15 @@ export type EdgeSettings = {
   daily_cap: number;
   monthly_budget_usd: number | null;
   rendering: Rendering;
+  /** Application paths kept on the origin's domain, one rule per element (`/login`, `proxy /api/`). */
+  app_paths: string[];
+  /** Action of rules without one. */
+  app_action: AppAction;
 };
+
+export type AppAction = "redirect" | "proxy";
+/** edge::app_paths::SUGGESTED (column default of new settings rows). */
+export const SUGGESTED_APP_PATHS = ["/login", "/register", "/dashboard", "/auth/", "/oauth/", "/settings", "/account", "/checkout", "/billing", "proxy /api/"];
 
 export type DnsCheck = { ok: boolean; expected: string; found: string[] };
 export type EdgeDomain = {

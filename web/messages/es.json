@@ -194,6 +194,17 @@
         "sensitiveHint": "Los segmentos nuevos esperan en la cola de revisión.",
         "threshold": "Umbral de cobertura crítica (%)",
         "thresholdHint": "Cada página crítica debe alcanzarlo antes de que el idioma esté listo."
+      },
+      "app": {
+        "title": "Páginas de la aplicación",
+        "body": "Estas páginas se quedan en tu dominio de origen: inicio de sesión, cuenta, pago, API… Edge nunca las traduce, ni las guarda en caché, ni descubre texto en ellas.",
+        "rules": "Rutas de la aplicación",
+        "rulesHint": "Una regla por línea. /login = /login y /login/…, /live/ = solo sus subpáginas, /x* = cualquier ruta que empiece por /x. Empieza una línea con proxy para servirla tal cual, sin traducir (API, recursos, archivos técnicos), con redirect para devolver al visitante a tu dominio. /sitemap.xml, /robots.txt y la clave de IndexNow los sigue generando glot.",
+        "action": "Acción por defecto",
+        "redirect": "Redirigir a tu dominio",
+        "proxy": "Servir tal cual, sin traducir",
+        "actionHint": "Redirigir: 302 (307 para formularios) a la misma página en tu dominio, con el idioma como lo espera tu sitio. Tal cual: la respuesta de tu servidor intacta, cookies incluidas.",
+        "suggest": "Usar la lista sugerida"
       }
     },
     "seo": {
