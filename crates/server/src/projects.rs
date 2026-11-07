@@ -75,6 +75,9 @@ pub struct ProjectRow {
     pub llm: DbJson<LlmStored>,
     pub api_key_enc: Option<Vec<u8>>,
     pub created_at: DateTime<Utc>,
+    /// Message syntax of the catalogs (`projects.syntax`, glot.toml `syntax`).
+    #[sqlx(try_from = "String")]
+    pub syntax: glot_core::validate::Syntax,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
@@ -113,11 +116,14 @@ pub struct Project {
     pub style: Option<String>,
     pub public_cdn: bool,
     pub created_at: DateTime<Utc>,
+    /// Message syntax of the catalogs: drives validation and LLM prompts.
+    #[schema(value_type = String)]
+    pub syntax: glot_core::validate::Syntax,
     pub llm: LlmView,
     pub stats: Stats,
 }
 
-const PROJECT_COLS: &str = "p.id, p.slug, p.name, p.source_locale, p.target_locales, p.style, p.public_cdn, p.llm, p.api_key_enc, p.created_at";
+const PROJECT_COLS: &str = "p.id, p.slug, p.name, p.source_locale, p.target_locales, p.style, p.public_cdn, p.llm, p.api_key_enc, p.created_at, p.syntax";
 
 /// Load a project the user is a member of, requiring at least `min` role.
 /// Non-members get 404 (no existence leak).
@@ -201,6 +207,7 @@ async fn view(state: &AppState, p: ProjectRow) -> ApiResult<Project> {
         style: p.style,
         public_cdn: p.public_cdn,
         created_at: p.created_at,
+        syntax: p.syntax,
         llm: LlmView {
             provider: llm.provider,
             model: llm.model,
@@ -382,6 +389,8 @@ pub struct UpdateBody {
     llm: Option<LlmSettings>,
     style: Option<String>,
     public_cdn: Option<bool>,
+    /// Message syntax (`icu`, `plain`…): saved as a dashboard choice and revalidates every translation.
+    syntax: Option<String>,
 }
 
 pub async fn update(
@@ -480,6 +489,9 @@ pub async fn update(
     let mut tx = state.db.begin().await?;
     if new_source.is_some() {
         change_source(&mut tx, p.id, &old_source, &p.source_locale).await?;
+    }
+    if let Some(s) = &b.syntax {
+        p.syntax = crate::keys::set_syntax(&mut tx, p.id, s.trim(), true, true).await?;
     }
     sqlx::query(
         "UPDATE projects SET name = $2, target_locales = $3, style = $4, public_cdn = $5, llm = $6, api_key_enc = $7, source_locale = $8 WHERE id = $1",

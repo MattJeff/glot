@@ -20,7 +20,7 @@ use glot_core::{
     context::KeyContext,
     measure::{self, Fit},
     policy,
-    validate::{Syntax, has_errors},
+    validate::has_errors,
 };
 use glot_llm::translate::{Item, Request, Translator};
 use serde::Deserialize;
@@ -244,7 +244,7 @@ pub async fn propagate(
                         .into_iter()
                         .cloned()
                         .collect(),
-                    syntax: Syntax::Icu,
+                    syntax: p.syntax,
                     style: p.style.clone(),
                 };
                 let (done, _usage) = translator.translate(req).await.map_err(|e| {
@@ -259,11 +259,11 @@ pub async fn propagate(
             let mut issues = if value.trim().is_empty() {
                 vec![]
             } else {
-                keys::check(&r.source, &value, l, &glossary)
+                keys::check(&r.source, &value, l, p.syntax, &glossary)
             };
             issues.extend(
                 fits.get(&r.key)
-                    .and_then(|f| measure::check(&value, Syntax::Icu, f)),
+                    .and_then(|f| measure::check(&value, p.syntax, f)),
             );
             let findings = policy::check(&value, l, &control(&r.key, l), &x.facts, &policy_cfg);
             if value.trim().is_empty() || has_errors(&issues) || policy::has_errors(&findings) {

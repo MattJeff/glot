@@ -2,7 +2,7 @@
 
 ## What does glot cost?
 
-The CLI, the validator and the MCP server are MIT-licensed and free: no seats, no per-word pricing. You pay your LLM provider directly with your own key. glot cloud (dashboard, review, GitHub sync, copy experiments) has a free plan and paid Pro and Team plans: see [pricing](/pricing). Self-hosting the server costs whatever your Postgres and two containers cost, with no limits.
+The CLI, the validator and the MCP server are MIT-licensed and free: no seats, no per-word pricing. You pay your LLM provider directly with your own key. glot cloud (dashboard, review, GitHub sync, copy experiments) has a free plan and paid Pro (reliable localization for teams) and Growth (experiments and language launches measured on revenue) plans: see [pricing](/pricing). Self-hosting the server costs whatever your Postgres and two containers cost, with no limits.
 
 ## How much do translations cost in LLM usage?
 

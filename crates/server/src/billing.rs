@@ -111,7 +111,7 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
             "pro".into(),
             xp(
                 l(5, 3, 1_000_000, 250_000, 20_000, 30, 10_000),
-                Some(5),
+                Some(1),
                 Some(2),
             ),
         ),
@@ -217,21 +217,39 @@ pub fn effective_plan<'a>(
     }
 }
 
+/// Display name: the `team` plan id is sold as Growth.
 fn title(plan: &str) -> String {
+    if plan == "team" {
+        return "Growth".into();
+    }
     let mut c = plan.chars();
     c.next()
         .map(|f| f.to_uppercase().chain(c).collect())
         .unwrap_or_default()
 }
 
+/// " Up to N on Pro." / " Unlimited on Growth.": the cheapest paid plan that lifts `max`, empty if none.
+fn next_plan(cfg: &Config, plan: &str, max: i64, limit: impl Fn(&Limits) -> Option<i64>) -> String {
+    ["pro", "team"]
+        .into_iter()
+        .filter(|p| *p != plan)
+        .find_map(|p| match limit(cfg.plans.get(p)?) {
+            None => Some(format!(" Unlimited on {}.", title(p))),
+            Some(n) if n > max => Some(format!(" Up to {n} on {}.", title(p))),
+            _ => None,
+        })
+        .unwrap_or_default()
+}
+
 fn quota_error(cfg: &Config, plan: &str, kind: &str, max: i64, hint: &str) -> AppError {
     let up = cfg.upgrade_url();
+    let next = next_plan(cfg, plan, max, |l| l.get(kind));
     if max == 0 {
         return AppError::new(
             StatusCode::PAYMENT_REQUIRED,
             "plan_required",
             format!(
-                "{} are not included in the {} plan.{hint} Upgrade: {up}",
+                "{} are not included in the {} plan.{next}{hint} Upgrade: {up}",
                 label(kind),
                 title(plan)
             ),
@@ -241,7 +259,7 @@ fn quota_error(cfg: &Config, plan: &str, kind: &str, max: i64, hint: &str) -> Ap
         StatusCode::PAYMENT_REQUIRED,
         "quota_exceeded",
         format!(
-            "{} quota of the {} plan reached ({max} per month).{hint} Upgrade: {up}",
+            "{} quota of the {} plan reached ({max} per month).{next}{hint} Upgrade: {up}",
             label(kind),
             title(plan)
         ),
@@ -363,13 +381,14 @@ pub async fn check_experiment(
     let acct = account(&state.db, user).await?;
     let plan = acct.effective();
     let limits = cfg.limits(plan);
-    let refuse = |what: &str, max: i64| {
+    let refuse = |what: &str, max: i64, limit: fn(&Limits) -> Option<i64>| {
         let up = cfg.upgrade_url();
+        let next = next_plan(cfg, plan, max, limit);
         let (code, msg) = if max == 0 {
             (
                 "plan_required",
                 format!(
-                    "{what} are not included in the {} plan. Upgrade: {up}",
+                    "{what} are not included in the {} plan.{next} Upgrade: {up}",
                     title(plan)
                 ),
             )
@@ -377,7 +396,7 @@ pub async fn check_experiment(
             (
                 "quota_exceeded",
                 format!(
-                    "{what}: the {} plan allows {max}. Upgrade: {up}",
+                    "{what}: the {} plan allows {max}.{next} Upgrade: {up}",
                     title(plan)
                 ),
             )
@@ -385,8 +404,8 @@ pub async fn check_experiment(
         Err(AppError::new(StatusCode::PAYMENT_REQUIRED, code, msg))
     };
     match (limits.experiments, limits.xp_cells) {
-        (Some(max), _) if live > max => refuse("Live experiments", max),
-        (_, Some(max)) if cells > max => refuse("Experiment segments", max),
+        (Some(max), _) if live > max => refuse("Live experiments", max, |l| l.experiments),
+        (_, Some(max)) if cells > max => refuse("Experiment segments", max, |l| l.xp_cells),
         _ => Ok(()),
     }
 }
@@ -412,8 +431,9 @@ pub async fn check_new_project(state: &AppState, user: Uuid) -> ApiResult<()> {
             StatusCode::PAYMENT_REQUIRED,
             "plan_limit",
             format!(
-                "The {} plan includes {max} cloud project(s). The CLI and local MCP server stay free and unlimited. Upgrade: {}",
+                "The {} plan includes {max} cloud project(s).{} The CLI and local MCP server stay free and unlimited. Upgrade: {}",
                 title(plan),
+                next_plan(cfg, plan, max, |l| l.projects),
                 cfg.upgrade_url()
             ),
         ));
@@ -474,7 +494,7 @@ async fn report_llm(state: &AppState, project: Uuid, job: Uuid, strings: i64) ->
         return Ok(());
     }
     let p: ProjectRow = sqlx::query_as(
-        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at
+        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax
          FROM projects WHERE id = $1",
     )
     .bind(project)
@@ -1170,5 +1190,20 @@ mod tests {
             plan_of(&json!({"metadata": {"glot_plan": "pro"}})),
             Some("pro")
         );
+    }
+
+    #[test]
+    fn upgrade_hint_names_the_plan_that_lifts_the_limit() {
+        let cfg = Config::new("sk", "wh", "http://x", "http://w");
+        let xp = |l: &Limits| l.experiments;
+        // Free and Pro both allow 1 live experiment: only Growth lifts it.
+        assert_eq!(next_plan(&cfg, "free", 1, xp), " Unlimited on Growth.");
+        assert_eq!(next_plan(&cfg, "pro", 1, xp), " Unlimited on Growth.");
+        assert_eq!(next_plan(&cfg, "team", 1, xp), "");
+        assert_eq!(
+            next_plan(&cfg, "free", 1, |l| l.projects),
+            " Up to 5 on Pro."
+        );
+        assert_eq!(title("team"), "Growth");
     }
 }

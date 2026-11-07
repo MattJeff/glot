@@ -22,6 +22,7 @@ pub mod glossary;
 pub mod insights;
 pub mod jobs;
 pub mod keys;
+pub mod launches;
 pub mod layout_rum;
 pub mod markets;
 pub mod mcp_remote;
@@ -29,6 +30,7 @@ pub mod onboarding;
 pub mod ondemand;
 pub mod openapi;
 pub mod projects;
+pub mod recommend;
 pub mod review;
 pub mod review_live;
 pub mod sync;
@@ -139,8 +141,10 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/openapi.json", get(openapi::spec))
         .merge(visual::routes())
         .merge(insights::routes())
+        .merge(launches::routes())
         .merge(layout_rum::routes())
         .merge(markets::routes())
+        .merge(recommend::routes())
         .merge(variants::routes())
         .merge(experiments::routes())
         .merge(experiments::generate::routes())
@@ -155,6 +159,7 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
     Router::new()
         .merge(api)
         .merge(insights::public_routes())
+        .merge(launches::public_routes())
         .merge(layout_rum::public_routes())
         .merge(feedback::public_routes())
         .merge(github_app::public_routes())

@@ -415,7 +415,7 @@ async fn segmented_experiments_api() {
         src, "Ship {count} apps",
         "the source locale is never rewritten by a promotion"
     );
-    // Keys freed: the CTA experiment can start now (pro: 2 live max 5).
+    // Keys freed: the CTA experiment can start now (pro: 1 live max).
     let (s, _) = call(
         &app,
         &mut owner,
@@ -435,6 +435,18 @@ async fn segmented_experiments_api() {
         Value::Null,
     )
     .await;
+    // Stopped: results kept until archived, then deletable.
+    let (s, _) = call(&app, &mut owner, Method::DELETE, &yu, Value::Null).await;
+    assert_eq!(s, StatusCode::CONFLICT);
+    let (s, _) = call(
+        &app,
+        &mut owner,
+        Method::POST,
+        &format!("{yu}/archive"),
+        Value::Null,
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
     let (s, _) = call(&app, &mut owner, Method::DELETE, &yu, Value::Null).await;
     assert_eq!(s, StatusCode::NO_CONTENT);
 

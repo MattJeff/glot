@@ -9,6 +9,7 @@ use glot_core::{
     catalog::Catalog,
     glossary::{Glossary, Term},
     lock::Lockfile,
+    validate::Syntax,
 };
 use glot_llm::engine::Workspace;
 
@@ -58,6 +59,20 @@ struct PushResponse {
     updated: usize,
     #[serde(default)]
     conflicts: Vec<Conflict>,
+    /// Absent on servers predating per-project syntax.
+    #[serde(default)]
+    syntax: Option<Syntax>,
+}
+
+/// Servers validate with the project's syntax: say so when it isn't glot.toml's.
+fn warn_syntax(ws: &Workspace, server: Option<Syntax>) {
+    if let Some(s) = server.filter(|s| *s != ws.config.syntax) {
+        anstream::eprintln!(
+            "{YELLOW}warning{YELLOW:#} the server validates this project with syntax = {}, glot.toml says {}: run `glot push --set-syntax` or change it in the dashboard (Settings)",
+            serde_json::json!(s),
+            serde_json::json!(ws.config.syntax)
+        );
+    }
 }
 
 #[derive(Deserialize)]
@@ -68,7 +83,7 @@ struct Conflict {
     local: Option<String>,
 }
 
-pub async fn push() -> Result<ExitCode> {
+pub async fn push(set_syntax: bool) -> Result<ExitCode> {
     let ws = crate::open()?;
     let r = remote(&ws)?;
     let catalogs: BTreeMap<&Locale, &BTreeMap<Key, String>> =
@@ -76,7 +91,7 @@ pub async fn push() -> Result<ExitCode> {
     let context = push_context(&ws);
     let body = serde_json::json!({
         "catalogs": catalogs, "lock": ws.lock, "glossary": ws.glossary.terms, "context": context,
-        "source_locale": ws.config.source_locale,
+        "source_locale": ws.config.source_locale, "syntax": ws.config.syntax, "set_syntax": set_syntax,
     });
     let res = r
         .client
@@ -92,6 +107,7 @@ pub async fn push() -> Result<ExitCode> {
         out.created,
         out.updated
     );
+    warn_syntax(&ws, out.syntax);
     for c in &out.conflicts {
         anstream::println!(
             "  {YELLOW}conflict{YELLOW:#} {} {}  server={:?} local={:?}",
@@ -141,6 +157,8 @@ struct PullResponse {
     lock: Lockfile,
     #[serde(default)]
     glossary: Vec<Term>,
+    #[serde(default)]
+    syntax: Option<Syntax>,
 }
 
 pub async fn pull() -> Result<ExitCode> {
@@ -165,6 +183,7 @@ pub async fn pull() -> Result<ExitCode> {
             ws.config.source_locale
         );
     }
+    warn_syntax(&ws, out.syntax);
     for (locale, entries) in out.catalogs {
         let paths = ws.config.catalog_files(&ws.root, &locale);
         // ponytail: single file per locale; splitting keys back into namespaces needs a key->file map.

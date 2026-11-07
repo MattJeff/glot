@@ -56,6 +56,9 @@ pub fn routes() -> Router<AppState> {
         .route(&format!("{p}/{{id}}/pause"), post(pause))
         .route(&format!("{p}/{{id}}/stop"), post(stop))
         .route(&format!("{p}/{{id}}/promote"), post(promote))
+        .route(&format!("{p}/{{id}}/duplicate"), post(duplicate))
+        .route(&format!("{p}/{{id}}/archive"), post(archive))
+        .route(&format!("{p}/{{id}}/unarchive"), post(unarchive))
 }
 
 const LIVE: &str = "('running', 'paused', 'personalized')";
@@ -191,6 +194,47 @@ async fn insert_segment(
     })
 }
 
+/// `{name, rule}` cell: the project's segment of that name (rule updated when no started experiment uses it),
+/// else a new one. Segments are named per project, so re-sending the same cell (wizard autosave) is idempotent.
+async fn reuse_segment(
+    conn: &mut PgConnection,
+    project: Uuid,
+    name: &str,
+    rule: &SegmentRule,
+) -> ApiResult<Uuid> {
+    let found: Option<(Uuid, DbJson<SegmentRule>)> =
+        sqlx::query_as("SELECT id, rule FROM xp_segments WHERE project_id = $1 AND name = $2")
+            .bind(project)
+            .bind(name.trim())
+            .fetch_optional(&mut *conn)
+            .await?;
+    let Some((id, old)) = found else {
+        return Ok(insert_segment(conn, project, name, rule).await?.id);
+    };
+    if old.0 != *rule {
+        rule.validate().map_err(bad)?;
+        let used: bool = sqlx::query_scalar(
+            "SELECT exists(SELECT 1 FROM xp_experiments WHERE project_id = $1 AND $2 = ANY(cells) AND status <> 'draft')",
+        )
+        .bind(project)
+        .bind(id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if used {
+            return Err(AppError::conflict(format!(
+                "segment '{}' is used by an experiment that has started: give this one another name",
+                name.trim()
+            )));
+        }
+        sqlx::query("UPDATE xp_segments SET rule = $2 WHERE id = $1")
+            .bind(id)
+            .bind(DbJson(rule))
+            .execute(&mut *conn)
+            .await?;
+    }
+    Ok(id)
+}
+
 /// Writes the fields present in `b`. `draft` = the experiment may still change shape.
 async fn apply(
     conn: &mut PgConnection,
@@ -315,7 +359,7 @@ async fn apply(
                 .fetch_optional(&mut *conn)
                 .await?
                 .ok_or_else(|| bad(format!("unknown segment {sid}")))?,
-                CellInput::New { name, rule } => insert_segment(conn, p.id, &name, &rule).await?.id,
+                CellInput::New { name, rule } => reuse_segment(conn, p.id, &name, &rule).await?,
             };
             if ids.contains(&sid) {
                 return Err(bad("a segment appears twice"));
@@ -570,11 +614,19 @@ pub async fn delete(
 ) -> ApiResult<StatusCode> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
     let mut tx = state.db.begin().await?;
-    if !matches!(
-        status_of(&mut tx, p.id, id).await?,
-        Status::Draft | Status::Stopped
-    ) {
-        return Err(AppError::conflict("stop the experiment before deleting it"));
+    let s = status_of(&mut tx, p.id, id).await?;
+    let archived: bool =
+        sqlx::query_scalar("SELECT archived_at IS NOT NULL FROM xp_experiments WHERE id = $1")
+            .bind(id)
+            .fetch_one(&mut *tx)
+            .await?;
+    // Results are never dropped by accident: a finished experiment is archived first.
+    if s != Status::Draft && !archived {
+        return Err(AppError::conflict(if s.live() {
+            "stop the experiment, then archive it, before deleting it"
+        } else {
+            "archive the experiment before deleting it (archiving keeps its results)"
+        }));
     }
     sqlx::query("DELETE FROM xp_experiments WHERE id = $1")
         .bind(id)
@@ -582,6 +634,114 @@ pub async fn delete(
         .await?;
     tx.commit().await?;
     Ok(StatusCode::NO_CONTENT)
+}
+
+async fn set_archived(
+    state: &AppState,
+    user: Uuid,
+    slug: &str,
+    id: Uuid,
+    on: bool,
+) -> ApiResult<Json<Experiment>> {
+    let p = projects::load(state, user, slug, Role::Admin).await?;
+    let mut tx = state.db.begin().await?;
+    let s = status_of(&mut tx, p.id, id).await?;
+    if !matches!(s, Status::Stopped | Status::Promoted) {
+        return Err(AppError::conflict(format!(
+            "only a stopped or promoted experiment can be archived (this one is {})",
+            s.as_str()
+        )));
+    }
+    sqlx::query("UPDATE xp_experiments SET archived_at = CASE WHEN $2 THEN coalesce(archived_at, now()) END WHERE id = $1")
+        .bind(id)
+        .bind(on)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(Json(load(state, p.id, id).await?))
+}
+
+pub async fn archive(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath((slug, id)): AppPath<(String, Uuid)>,
+) -> ApiResult<Json<Experiment>> {
+    set_archived(&state, user.id, &slug, id, true).await
+}
+
+pub async fn unarchive(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath((slug, id)): AppPath<(String, Uuid)>,
+) -> ApiResult<Json<Experiment>> {
+    set_archived(&state, user.id, &slug, id, false).await
+}
+
+/// Body `{}` or `{"name": "…"}` (default: "<name> (copy)").
+#[derive(Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+pub struct DuplicateBody {
+    pub name: Option<String>,
+}
+
+/// Any experiment -> a new draft with the same definition (keys, locales, segments, goal, variants and their
+/// texts). State, counts and results stay with the original. Variant approval is kept unless `review` is on.
+pub async fn duplicate(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath((slug, id)): AppPath<(String, Uuid)>,
+    AppJson(b): AppJson<DuplicateBody>,
+) -> ApiResult<(StatusCode, Json<Experiment>)> {
+    let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    let mut tx = state.db.begin().await?;
+    status_of(&mut tx, p.id, id).await?;
+    let name = match b.name {
+        Some(n) => valid_name(&n)?,
+        None => {
+            let n: String = sqlx::query_scalar("SELECT name FROM xp_experiments WHERE id = $1")
+                .bind(id)
+                .fetch_one(&mut *tx)
+                .await?;
+            valid_name(&format!(
+                "{} (copy)",
+                n.chars().take(92).collect::<String>()
+            ))?
+        }
+    };
+    let new = Uuid::new_v4();
+    sqlx::query(
+        "INSERT INTO xp_experiments (id, project_id, kind, name, locales, cells, allocation, weights, traffic_pct,
+           min_n, goal, metric, exposure, currency, guardrails, facts, fits, review)
+         SELECT $2, project_id, kind, $3, locales, cells, allocation, weights, traffic_pct,
+           min_n, goal, metric, exposure, currency, guardrails, facts, fits, review
+         FROM xp_experiments WHERE id = $1",
+    )
+    .bind(id)
+    .bind(new)
+    .bind(&name)
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query("INSERT INTO xp_keys (experiment_id, project_id, key) SELECT $2, project_id, key FROM xp_keys WHERE experiment_id = $1")
+        .bind(id)
+        .bind(new)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query(
+        "INSERT INTO xp_arms (experiment_id, arm, intent, approved)
+         SELECT $2, a.arm, a.intent, a.approved AND (a.arm = 0 OR NOT e.review)
+         FROM xp_arms a JOIN xp_experiments e ON e.id = a.experiment_id WHERE a.experiment_id = $1",
+    )
+    .bind(id)
+    .bind(new)
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query("INSERT INTO xp_values (experiment_id, arm, key, locale, value) SELECT $2, arm, key, locale, value FROM xp_values WHERE experiment_id = $1")
+        .bind(id)
+        .bind(new)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(load(&state, p.id, new).await?)))
 }
 
 #[derive(Deserialize)]
@@ -897,6 +1057,7 @@ pub async fn promote(
                                 score: None,
                                 extra_issues: vec![],
                                 author: Some(&user.name),
+                                syntax: p.syntax,
                             },
                         )
                         .await?;

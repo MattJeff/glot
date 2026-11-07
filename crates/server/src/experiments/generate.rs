@@ -301,7 +301,7 @@ pub async fn generate(
         style: p.style.clone(),
         segment,
         facts: x.facts.clone(),
-        syntax: Default::default(),
+        syntax: p.syntax,
         glossary: crate::glossary::load(&state.db, p.id).await?.terms,
         policy: project_policy(&state, p.id).await?,
     };

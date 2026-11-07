@@ -286,7 +286,7 @@ pub(crate) fn config(p: &ProjectRow) -> Config {
         target_locales: p.target_locales.clone(),
         files: vec![],
         format: Default::default(),
-        syntax: Default::default(),
+        syntax: p.syntax,
         llm: LlmConfig {
             provider: llm.provider,
             model: llm.model,
@@ -325,7 +325,7 @@ fn llm_err(e: glot_llm::Error) -> AppError {
 
 async fn project_by_id(state: &AppState, id: Uuid) -> ApiResult<ProjectRow> {
     Ok(sqlx::query_as(
-        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at FROM projects WHERE id = $1",
+        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax FROM projects WHERE id = $1",
     )
     .bind(id)
     .fetch_one(&state.db)
@@ -413,7 +413,7 @@ async fn propose(state: &AppState, p: &ProjectRow, group: Uuid) -> ApiResult<()>
     let t = got.into_iter().next().ok_or_else(|| {
         AppError::new(StatusCode::UNPROCESSABLE_ENTITY, "llm_error", "no proposal")
     })?;
-    let mut issues = crate::keys::check(&k.source, &t.value, &locale, &glossary);
+    let mut issues = crate::keys::check(&k.source, &t.value, &locale, p.syntax, &glossary);
     issues.extend(
         t.issues
             .into_iter()
@@ -705,7 +705,7 @@ async fn accept(
     let glossary = crate::glossary::load(&state.db, p.id).await?;
     let mut tx = state.db.begin().await?;
     let k = find_key(&mut tx, p.id, &g.key).await?;
-    let issues = crate::keys::check(&k.source, &value, &g.locale, &glossary);
+    let issues = crate::keys::check(&k.source, &value, &g.locale, p.syntax, &glossary);
     if has_errors(&issues) {
         let msg = issues
             .iter()
@@ -731,6 +731,7 @@ async fn accept(
             score: None,
             extra_issues: vec![],
             author: Some(&user.name),
+            syntax: p.syntax,
         },
     )
     .await?;

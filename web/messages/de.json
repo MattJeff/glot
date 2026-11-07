@@ -1,4 +1,98 @@
 {
+  "launches": {
+    "title": "Sprachstarts",
+    "open": "Sprachstarts",
+    "subtitle": "Hat eine neue Sprache die Conversions bewegt? Gemessen an den Besuchern, die sie bevorzugen.",
+    "back": "Einblicke",
+    "new": "Launch messen",
+    "empty": "Noch kein Launch gemessen. Starten Sie eine Messung, sobald eine Sprache live geht.",
+    "started": "Messung gestartet: {language}",
+    "dialog": {
+      "title": "Sprach-Launch messen",
+      "body": "Die Sprache kommt zu Ihren Zielsprachen hinzu (zuerst übersetzen). Danach misst glot ihre Wirkung auf das Zielereignis.",
+      "locale": "Sprache",
+      "mode": "Methode",
+      "holdout": "Kontrollgruppe (%)",
+      "days": "Dauer (Tage)",
+      "goal": "Zielereignis",
+      "start": "Messung starten",
+      "cancel": "Abbrechen"
+    },
+    "mode": {
+      "holdout": "Kontrollgruppe",
+      "holdoutHint": "Besucher, die diese Sprache bevorzugen, erhalten sie – außer einem Kontrollanteil, der den ganzen Zeitraum über bei {fallback} bleibt; danach erhalten sie alle. Misst die tatsächliche Wirkung. Erfordert zur Laufzeit geladene Kataloge (glot-CDN + @glot/insights).",
+      "before_after": "Vorher / nachher",
+      "before_afterHint": "Vergleicht dieselbe Zielgruppe vor und nach dem Launch, für in die App kompilierte Kataloge. Nicht kausal: Saisonalität und Kampagnen bewegen die Zahlen ebenfalls."
+    },
+    "status": {
+      "measuring": "Wird gemessen",
+      "rolled_out": "Für alle ausgerollt",
+      "invalid": "Ungültig",
+      "done": "Fertig"
+    },
+    "verdict": {
+      "collecting": "Sammelt Daten",
+      "probably_positive": "Wahrscheinlich positiv",
+      "probably_negative": "Wahrscheinlich negativ",
+      "inconclusive": "Noch nicht schlüssig",
+      "invalid": "Ungültige Messung",
+      "higher_after": "Höher nach dem Launch",
+      "lower_after": "Niedriger nach dem Launch",
+      "no_clear_change": "Keine klare Veränderung"
+    },
+    "explain": {
+      "collecting": "Noch nicht genug Daten: Das Ergebnis wartet eine volle Woche und die Mindeststichprobe in jeder Gruppe ab.",
+      "probably_positive": "Besucher, die die Sprache erhalten, konvertieren mit mindestens 95 % Wahrscheinlichkeit besser. Das Intervall zeigt die plausible Größe des Effekts.",
+      "probably_negative": "Besucher, die die Sprache erhalten, konvertieren mit mindestens 95 % Wahrscheinlichkeit schlechter. Prüfen Sie die Übersetzung, bevor Sie sie behalten.",
+      "inconclusive": "Noch hebt sich kein Unterschied vom Rauschen ab. Das Intervall zeigt, welche Effekte noch möglich sind.",
+      "invalid": "Die Traffic-Aufteilung entspricht nicht der Konfiguration (Sample Ratio Mismatch): Ein Teil der Zielgruppe erhält die falsche Sprache. Beheben Sie das und messen Sie erneut.",
+      "higher_after": "Die Zielgruppe konvertiert seit dem Launch häufiger als vorher. Eine Korrelation, kein Beweis, dass die Sprache die Ursache ist.",
+      "lower_after": "Die Zielgruppe konvertiert seit dem Launch seltener als vorher. Eine Korrelation, kein Beweis, dass die Sprache die Ursache ist.",
+      "no_clear_change": "Keine klare Veränderung zwischen vorher und nachher."
+    },
+    "story": {
+      "kicker": "Sprach-Launch",
+      "headline": "{project} auf {language}",
+      "period": "{from} – {to} · {mode}",
+      "step1": "Empfehlung",
+      "reco": "Platz {rank} von {of} Sprachen in den Empfehlungen von glot: {share} der Besucher bevorzugen sie, rund {cost} Übersetzungskosten (Konfidenz: {confidence, select, solid {solide} indicative {indikativ} other {gering}}).",
+      "recoNone": "Für diese Sprache wurde keine glot-Empfehlung gespeichert.",
+      "step2": "Kosten",
+      "cost": "{cost} Übersetzungskosten.",
+      "costEstimated": "Rund {cost} Übersetzungskosten (Schätzung).",
+      "step3": "Zielgruppe",
+      "audience": "{visits} Besucher bevorzugten diese Sprache ({language}) in den {days} Tagen vor dem Launch; {rate} von ihnen konvertierten ({goal}).",
+      "step4": "Ergebnis",
+      "armFallback": "Bei {language} geblieben",
+      "armNew": "{language} erhalten",
+      "armBefore": "Vor dem Launch",
+      "armAfter": "Nach dem Launch",
+      "lift": "Relative Veränderung der Conversion ({goal})",
+      "interval": "95-%-Glaubwürdigkeitsintervall",
+      "pBetter": "Wahrscheinlichkeit, dass {language} besser konvertiert: {p}",
+      "caveat": "Vorher-nachher-Vergleich: eine Korrelation, kein gemessener Effekt. Saisonalität, Kampagnen oder Trends können die Veränderung erklären.",
+      "caveatShort": "Vorher/nachher: Korrelation, keine Kausalität",
+      "explicit": "{n, plural, one {# Sitzung, die ihre Sprache selbst gewählt hat, ist} other {# Sitzungen, die ihre Sprache selbst gewählt haben, sind}} von der Analyse ausgeschlossen.",
+      "srm": "Die Traffic-Aufteilung entspricht nicht der Kontrollgruppe von {pct} %: Das Ergebnis ist nicht verlässlich.",
+      "chart": "Kumulierte Conversion-Rate",
+      "chartAria": "Kumulierte Conversion-Rate ({goal}) pro Tag: {a} und {b}",
+      "footer": "Gemessen mit glot Insights: anonyme Tagesaggregate, kein Cookie, keine Besucherdaten.",
+      "footerShort": "Gemessen gegen eine Kontrollgruppe"
+    },
+    "share": {
+      "button": "Teilen",
+      "title": "Öffentliche Fallstudie",
+      "body": "Schreibgeschützte Seite nur mit Aggregaten, ohne Besucherdaten. Jeder mit dem Link kann sie sehen, bis Sie ihn widerrufen.",
+      "revoke": "Link widerrufen",
+      "created": "Öffentlicher Link erstellt",
+      "revoked": "Link widerrufen"
+    },
+    "public": {
+      "title": "{project} auf {language}: Fallstudie",
+      "description": "{verdict}: {lift} bei der Conversion ({goal}). Eine Fallstudie von glot.",
+      "cta": "Messen Sie Ihre nächste Sprache mit glot"
+    }
+  },
   "auth": {
     "errors": {
       "invalid": "Ungültige E-Mail oder ungültiges Passwort.",
@@ -1036,7 +1130,24 @@
       "changeMissing": "{count, plural, one {# Schlüssel hat keine Übersetzung in {to} und behält seinen Text in {from} als Quelle, bis Sie ihn bearbeiten.} other {# Schlüssel haben keine Übersetzung in {to} und behalten ihren Text in {from} als Quelle, bis Sie sie bearbeiten.}}",
       "changeCli": "Sie nutzen die CLI? Setzen Sie in glot.toml source_locale auf \"{toCode}\" und fügen Sie \"{fromCode}\" zu target_locales hinzu, bevor Sie das nächste Mal glot pull ausführen.",
       "changeConfirm": "Quellsprache ändern",
-      "changed": "Quellsprache geändert"
+      "changed": "Quellsprache geändert",
+      "syntaxLabel": "Nachrichtensyntax",
+      "syntaxExample": "Beispiel",
+      "syntaxHint": "Wie glot Platzhalter, Tags und Pluralformen Ihrer Texte beim Prüfen und Übersetzen liest, wie syntax in glot.toml. Eine Änderung prüft alle Übersetzungen erneut.",
+      "syntax": {
+        "icu": "ICU MessageFormat (next-intl, FormatJS, Lingui): geschweifte Klammern enthalten Argumente, Plural- und Auswahlformen.",
+        "i18next": "i18next: doppelte geschweifte Klammern sind Variablen, Schlüsselsuffixe wie _one und _other sind Pluralformen.",
+        "mf2": "Unicode MessageFormat 2.0: Variablen beginnen mit einem Dollarzeichen in geschweiften Klammern.",
+        "printf": "printf-Stil (iOS, Android, gettext, Python): Platzhalter mit Prozentzeichen.",
+        "rails": "Rails und Ruby i18n: Variablen mit Prozent und geschweiften Klammern.",
+        "vue": "vue-i18n: Variablen in einfachen geschweiften Klammern, verknüpfte Nachrichten, Pluralformen mit senkrechten Strichen getrennt.",
+        "laravel": "Laravel: Variablen mit vorangestelltem Doppelpunkt, Pluralformen mit senkrechten Strichen getrennt.",
+        "template": "Liquid- und Go-Templates (Shopify, Jekyll, Hugo): Ausdrücke in doppelten geschweiften Klammern.",
+        "fluent": "Project Fluent (.ftl): Variablen mit Dollarzeichen, Terme und Selektoren.",
+        "plain": "Einfach: nur Namen in einfachen geschweiften Klammern sind Platzhalter. Alles andere, auch doppelte Klammern und Tags, ist Text.",
+        "symfony": "Symfony Translation: Variablen zwischen Prozentzeichen, Pluralintervalle mit senkrechten Strichen getrennt.",
+        "java": "Java MessageFormat (Spring, ResourceBundle): nummerierte Argumente, verdoppelte Apostrophe."
+      }
     },
     "preview": {
       "baseUrl": "Website-URL",
@@ -1393,7 +1504,7 @@
         "q": "Brauche ich dafür ein Cookie-Banner?"
       },
       "cost": {
-        "a": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und kostenlos; Ihren LLM-Anbieter bezahlen Sie direkt. glot cloud hat einen kostenlosen Plan mit 1 Experiment sowie kostenpflichtige Pro- und Team-Pläne mit Zielgruppen. Hosten Sie den Server selbst, gibt es keine Einschränkungen.",
+        "a": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und kostenlos; Ihren LLM-Anbieter bezahlen Sie direkt. glot cloud hat einen kostenlosen Plan für ein Projekt, Pro für zuverlässige Lokalisierung im Team und Growth für Experimente und Sprachstarts, gemessen am Umsatz. Hosten Sie den Server selbst, gibt es keine Einschränkungen.",
         "q": "Was kostet es?"
       },
       "facts": {
@@ -1523,7 +1634,7 @@
       "results": "Ergebnisse"
     },
     "pricing": {
-      "body": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und nie limitiert. glot cloud startet kostenlos mit einem Experiment. Pro fügt Zielgruppen hinzu, Team noch mehr. Wenn Sie den Server selbst hosten, ist nichts limitiert.",
+      "body": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und nie limitiert. In der Cloud hält Pro jede Sprache bei jedem Release korrekt, und Growth misst, welche Texte und welche Sprachen Umsatz bringen. Wenn Sie den Server selbst hosten, ist nichts limitiert.",
       "cta": "Preise ansehen",
       "title": "Kostenlos, wo es auf Ihrem Rechner läuft."
     },
@@ -1683,6 +1794,144 @@
       "title": "E-Mail-Adresse bestätigen"
     }
   },
+  "xpLifecycle": {
+    "more": "Weitere Aktionen für {name}",
+    "edit": "Bearbeiten",
+    "launch": "Starten",
+    "pause": "Pausieren",
+    "resume": "Fortsetzen",
+    "stop": "Beenden",
+    "rename": "Umbenennen",
+    "duplicate": "Duplizieren",
+    "duplicateDraft": "Als Entwurf duplizieren",
+    "archive": "Archivieren",
+    "unarchive": "Aus dem Archiv holen",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "copyName": "{name} (Kopie)",
+    "renameTitle": "Experiment umbenennen",
+    "renameBody": "Der Name erscheint nur im Dashboard und in der CLI. Umbenennen wirkt sich nie auf Besucher oder Ergebnisse aus.",
+    "nameLabel": "Name",
+    "launchFailed": "Das Experiment konnte nicht gestartet werden.",
+    "preflight": "Vor dem Start",
+    "checking": "Wird geprüft…",
+    "blocking": "{n, plural, one {# Punkt vor dem Start zu klären} other {# Punkte vor dem Start zu klären}}",
+    "readyWithWarnings": "Startbereit. Einige Signale fehlen noch: siehe unten.",
+    "ready": "Alles bereit: Besucher sehen die Varianten, sobald du startest.",
+    "ok": "Erledigt:",
+    "warning": "Prüfen:",
+    "missing": "Fehlt:",
+    "andMore": "und {n} weitere",
+    "warnHint": "Nicht blockierend: Das Experiment kann starten, aber ohne dies kommt kein Ergebnis.",
+    "toml": "Definitionen in Git? Wenn dieses Projekt <file>glot.experiments.toml</file> nutzt, überschreibt <push>glot experiments push</push> die hier gemachten Änderungen (gleicher Name). Übernimm sie mit <pull>glot experiments pull</pull> in die Datei.",
+    "locked": "Während das Experiment läuft, kann nur sein Name geändert werden. Varianten, Keys, Zielgruppe oder Ziel mittendrin zu ändern, würde zwei Experimente in denselben Zahlen vermischen und das Ergebnis verfälschen. Um etwas anderes zu testen, dupliziere es als Entwurf.",
+    "archivedNote": "Archiviert: in der Liste ausgeblendet, Ergebnisse bleiben erhalten. Du kannst es jetzt löschen; die Ergebnisse werden mitgelöscht.",
+    "endedNote": "Beendet. Archiviere es, um die Liste aufzuräumen, ohne die Ergebnisse zu verlieren; nur archivierte Experimente können gelöscht werden.",
+    "backToExperiment": "Zurück zum Experiment",
+    "editTitle": "„{name}“ bearbeiten",
+    "editSubtitle": "Änderungen werden beim Tippen gespeichert. Besucher sehen nichts, bis du startest.",
+    "archivedBadge": "Archiviert",
+    "toast": {
+      "pause": "Experiment pausiert: alle sehen den offiziellen Text",
+      "resume": "Experiment fortgesetzt",
+      "stop": "Experiment beendet: alle sehen den offiziellen Text",
+      "promote": "Fertig: die gewählte Variante ist jetzt der offizielle Text",
+      "archive": "Experiment archiviert, Ergebnisse erhalten",
+      "unarchive": "Experiment wieder in der Liste",
+      "renamed": "Experiment umbenannt",
+      "duplicated": "Entwurf aus diesem Experiment erstellt",
+      "deleted": "Experiment gelöscht",
+      "launched": "Experiment gestartet"
+    },
+    "confirmDelete": {
+      "title": "„{name}“ löschen?",
+      "draft": "Dieser Entwurf und die Texte seiner Varianten werden gelöscht. Besuchern wurde nichts gezeigt.",
+      "archived": "Das Experiment, seine Varianten und alle Ergebnisse werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
+      "cta": "Endgültig löschen"
+    },
+    "confirmStop": {
+      "title": "„{name}“ beenden?",
+      "body": "Die Ergebnisse bleiben erhalten. Wähle, was Besucher ab jetzt sehen.",
+      "then": "Danach",
+      "keep": "Offiziellen Text behalten",
+      "keepHint": "In deinen Katalogen ändert sich nichts.",
+      "publish": "„{arm}“ als offiziellen Text veröffentlichen",
+      "publishHint": "Wird in jede Sprache des Experiments geschrieben, mit Verlauf (und einem Pull Request, wenn ein Repository verknüpft ist).",
+      "cta": "Experiment beenden",
+      "ctaPublish": "Beenden und veröffentlichen"
+    },
+    "confirmLaunch": {
+      "title": "„{name}“ trotzdem starten?",
+      "body": "Das Experiment kann starten, aber diese Signale fehlen, daher kommt kein Ergebnis, bis sie behoben sind:",
+      "cta": "Trotzdem starten"
+    },
+    "check": {
+      "keys": "{n, plural, one {# Schlüssel getestet} other {# Schlüssel getestet}}",
+      "locales": "{n, plural, one {# Sprache} other {# Sprachen}}",
+      "variants": "{n, plural, one {# Variante gegen den offiziellen Text} other {# Varianten gegen den offiziellen Text}}",
+      "noVariant": "Füge mindestens eine Variante zum Vergleich mit dem offiziellen Text hinzu",
+      "unapproved": "{n, plural, one {# Variante wartet auf Freigabe und wird nicht gezeigt} other {# Varianten warten auf Freigabe und werden nicht gezeigt}}",
+      "texts": "Jede Variante hat in jeder Sprache einen gültigen Text",
+      "settings": "Einstellungen zu korrigieren",
+      "site": "Deine Website sendet ihre Besuche an glot",
+      "noSite": "In den letzten 30 Tagen kam kein Besuch von deiner Website: installiere @glot-i18n/insights",
+      "goal": "Das Ziel „{goal}“ wurde in den letzten 30 Tagen gemessen",
+      "noGoal": "Das Ziel „{goal}“ wurde in den letzten 30 Tagen nie gemessen: rufe track(\"{goal}\") auf deiner Website auf"
+    },
+    "blocker": {
+      "no_keys": "Wähle mindestens einen Schlüssel",
+      "key_missing": "Der Schlüssel {key} existiert nicht mehr",
+      "key_live": "Der Schlüssel {key} wird bereits in einem anderen laufenden Experiment getestet",
+      "no_locales": "Wähle mindestens eine Sprache",
+      "too_many_segments": "Höchstens 4 Segmente",
+      "currency": "Ein Umsatzziel braucht eine Währung",
+      "weights": "Die feste Aufteilung passt nicht zur Anzahl der Varianten",
+      "no_variant": "Gib mindestens eine Variante frei",
+      "cell_missing": "„{arm}“: kein Text für {key} in {locale}",
+      "cell_invalid": "„{arm}“: der Text für {key} in {locale} hat einen Fehler (Platzhalter, Glossar oder Länge)"
+    },
+    "filter": {
+      "label": "Nach Status filtern",
+      "all": "Alle",
+      "draft": "Entwürfe",
+      "live": "Laufend",
+      "ended": "Beendet",
+      "archived": "Archiviert",
+      "empty": "Kein Experiment in diesem Status."
+    },
+    "wizard": {
+      "locales": "Getestete Sprachen",
+      "localesHint": "Besucher anderer Sprachen behalten den offiziellen Text. Eine Sprache zu entfernen löscht die Texte ihrer Varianten.",
+      "rebalance": "Mehr Besucher zum Gewinner schicken",
+      "rebalanceOn": "An: Der Traffic verlagert sich mit den Ergebnissen automatisch zur besten Variante (weniger Besucher gehen an einen schwachen Text verloren).",
+      "rebalanceOff": "Aus: Der Traffic wird während des gesamten Experiments gleichmäßig auf den offiziellen Text und jede Variante verteilt.",
+      "traffic": "Anteil der Besucher im Experiment",
+      "trafficHint": "Die anderen sehen immer den offiziellen Text. Weniger Traffic = ein längeres Experiment."
+    },
+    "duration": {
+      "title": "Wie lange bis zu einem Ergebnis",
+      "hint": "Aus deinem Traffic und der aktuellen Rate von „{goal}“ über 30 Tage, mit {arms} Texten im Vergleich (95 % Konfidenz, 80 % Power).",
+      "allTraffic": "Gesamter Traffic",
+      "unavailable": "Schätzung gerade nicht verfügbar.",
+      "noData": "Noch kein Besuch und keine „{goal}“-Conversion gemessen: installiere @glot-i18n/insights und miss das Ziel, um eine Schätzung zu erhalten.",
+      "audience": "Zielgruppe",
+      "perDay": "Besucher / Tag",
+      "rate": "Rate",
+      "lift": "für +{lift}",
+      "upperBound": "(höchstens)",
+      "overYears": "{n, plural, one {über # Jahr} other {über # Jahre}}",
+      "weeks": "{n, plural, one {# Woche} other {# Wochen}}",
+      "days": "{n, plural, one {# Tag} other {# Tage}}",
+      "tooSlow": "Mit deinem Traffic kann dieses Experiment in {weeks} Wochen nur einen Gewinn von mindestens {lift} erkennen ({audience}).",
+      "tooSlowNone": "Mit deinem Traffic kann dieses Experiment in {weeks} Wochen keinen realistischen Gewinn erkennen ({audience}).",
+      "whatToDo": "Für ein schnelleres Ergebnis:",
+      "fewerVariants": "Vergleiche weniger Varianten (eine gegen den offiziellen Text).",
+      "oneSegment": "Ziele auf ein einziges Segment oder keines: Jedes Segment braucht eigene Besucher.",
+      "frequentGoal": "Wähle ein häufigeres Ziel, z. B. einen Klick auf den Button statt der Anmeldung.",
+      "busierPage": "Teste eine Seite mit mehr Besuchern."
+    }
+  },
   "experimentResults": {
     "back": "Experimente",
     "bySegment": "Ergebnisse nach Segment",
@@ -1834,7 +2083,7 @@
       "title": "Nicht genug Traffic in diesem Segment"
     },
     "verdict": {
-      "draft": "Entwurf: noch nicht für Besucher sichtbar. Schließen Sie die Einrichtung ab, um den Test zu starten.",
+      "draft": "Entwurf: Besuchern noch nicht gezeigt. Die Checkliste unten zeigt, was vor dem Start noch fehlt.",
       "elsewhere": "Anderswo noch kein Gewinner.",
       "learning": "Noch kein Gewinner.{days, plural, =-1 {} one { Bei aktuellem Traffic noch etwa # Tag.} other { Bei aktuellem Traffic noch etwa # Tage.}}",
       "noDifference": "Kein Text schlägt den offiziellen Text um einen relevanten Abstand: Ihn beizubehalten ist sicher.",
@@ -1987,21 +2236,56 @@
     "title": "GitHub App",
     "webhook": "Webhook-URL"
   },
-  "markets": {
-    "add": "{language} hinzufügen",
-    "added": "{language} zu den Zielsprachen hinzugefügt. Starten Sie einen Übersetzungs-Job, um sie zu füllen.",
-    "badge": "Beste Gelegenheit",
-    "cost": "{cost} für die Übersetzung + ~{review} Prüfung",
-    "demand": "~{share} Ihrer Besucher fragen bereits danach",
-    "footnote": "Basierend auf {visits, plural, =0 {noch keine Besuche} one {# Besuch} other {# Besuche}} in {days} Tagen, öffentlichen Marktdaten ({date}), Katalogkosten und RTL-/Font-/Plural-Aufwand.",
-    "headline": "{language} ({locale}) als Sprache hinzufügen",
-    "hours": "{n} h",
+  "nextLanguage": {
     "kicker": "Nächste Sprache",
-    "minutes": "{n} Min.",
-    "noEffort": "kein technischer Aufwand",
-    "public": "{users} Mio. Menschen online in dieser Sprache",
+    "headline": "{language}: {share} deiner Besucher wünschen sie",
+    "headlineFinish": "{language}: {share} deiner Besucher, nur {coverage} übersetzt",
+    "cost": "~{cost} für die Übersetzung ({keys, plural, one {# Schlüssel} other {# Schlüssel}})",
+    "gain": "{mid} „{goal}“ pro Monat erwartet (zwischen {low} und {high})",
+    "noGain": "noch kein messbarer Gewinn bei „{goal}“",
+    "perConversion": "{cost} pro erwarteter Conversion",
+    "servedNow": "Heute auf {locale} ausgeliefert ({share} ihrer Besuche)",
+    "rates": "„{goal}“-Rate heute: {fallback}, gegenüber {native} bei Besuchern in ihrer eigenen Sprache",
+    "trendUp": "Nachfrage im Zeitraum um {pct} gestiegen",
+    "trendDown": "Nachfrage im Zeitraum um {pct} gesunken",
+    "reasons": {
+      "thin_demand": "Bisher wenige Besuche in dieser Sprache: Die Zahlen werden sich noch bewegen.",
+      "thin_baseline": "Bisher werden wenige Besucher in ihrer eigenen Sprache bedient, der Vergleichswert ist schwach.",
+      "baseline_includes_source": "Der Vergleichswert enthält Besucher der Ausgangssprache (noch nicht genug Besucher anderer Sprachen).",
+      "gain_uncertain": "Das Intervall schließt null ein: Der Gewinn ist möglich, nicht belegt.",
+      "no_gain": "Besucher in ihrer eigenen Sprache konvertieren hier bisher nicht besser.",
+      "under_translated": "Bereits angeboten, aber fehlende Texte fallen auf die Ausgangssprache zurück.",
+      "no_conversions": "Conversions werden nicht erfasst.",
+      "rising": "Die Nachfrage steigt.",
+      "falling": "Die Nachfrage sinkt."
+    },
+    "confidence": {
+      "insufficient": "Zu wenige Daten",
+      "insufficientHint": "Unter 30 Besuche in dieser Sprache oder unter 100 Besucher in ihrer eigenen Sprache.",
+      "indicative": "Richtwert",
+      "indicativeHint": "Genug für eine Rangfolge, nicht für eine Zusage.",
+      "solid": "Belastbar",
+      "solidHint": "Über 300 Besuche auf beiden Seiten und je mindestens 10 Conversions."
+    },
+    "add": "{language} hinzufügen",
+    "finish": "{language} vervollständigen",
     "runnersUp": "Weitere Kandidaten",
-    "scoreLabel": "Potenzialwert {score} von 100"
+    "noConversions": "Conversions werden nicht erfasst, daher beruht diese Rangfolge nur auf Nachfrage und Kosten. Rufe glot.track(\"{goal}\") auf, wenn ein Besucher konvertiert, um zu sehen, was jede Sprache bringt.",
+    "allServed": "Alle Sprachen, die deine Besucher wünschen, werden bereits ausgeliefert und sind übersetzt.",
+    "footnote": "Basierend auf {visits, plural, one {# Besuch} other {# Besuchen}} in {days} Tagen. Der Gewinn vergleicht die heutige Conversion-Rate dieser Besucher mit der von Besuchern in ihrer eigenen Sprache (bayessche Schätzung, 90-%-Intervall).",
+    "started": "{language} hinzugefügt, Übersetzung gestartet (Obergrenze {cap}).",
+    "confirm": {
+      "title": "{language} hinzufügen und übersetzen?",
+      "titleFinish": "Den Rest von {language} übersetzen?",
+      "body": "{keys, plural, one {# Schlüssel} other {# Schlüssel}} mit {model}. Geschätzte Kosten {cost}; der Job stoppt bei {cap} (Schätzung + 20 %).",
+      "cta": "Hinzufügen und übersetzen"
+    },
+    "empty": {
+      "title": "Finde heraus, welche Sprache als Nächstes kommt",
+      "body": "Installiere Insights mit einem einzigen Tag. Es zählt pro Besuch die Browsersprache und die ausgelieferte Sprache als Tagessummen: kein Cookie, keine Besucher-ID, keine gespeicherte IP.",
+      "track": "Erfasse dann eine Conversion, damit glot schätzen kann, was jede Sprache bringt:",
+      "open": "Analysen öffnen"
+    }
   },
   "onboarding": {
     "achievements": {
@@ -2176,8 +2460,8 @@
     "current": "Aktueller Tarif",
     "faq": {
       "byok": {
-        "a": "Mit Ihrem eigenen LLM-Schlüssel zahlen Sie direkt an Ihren Anbieter, und glot erfasst nichts. Ohne Schlüssel kann die Cloud den glot-Schlüssel verwenden: Jeder Tarif enthält einen monatlichen Betrag, und monatliche Tarife können mit nutzungsabhängiger Abrechnung weiterlaufen.",
-        "q": "Muss ich für Übersetzungen bezahlen?"
+        "a": "Nein. Mit Ihrem eigenen Schlüssel zahlen Sie Ihren LLM-Anbieter direkt, und glot zählt diese Übersetzungen weder noch schlägt etwas auf. Ohne Schlüssel kann die Cloud den Schlüssel von glot nutzen: Jeder Plan enthält ein monatliches Kontingent, und Monatspläne können darüber hinaus nutzungsbasiert weiterlaufen.",
+        "q": "Schlagen Sie etwas auf die LLM-Kosten auf?"
       },
       "limits": {
         "a": "Der Cloud-Endpunkt antwortet mit 402, einer Meldung und einem Upgrade-Link; Ihre ausgelieferten Kataloge funktionieren weiter aus Ihrem Repository. Kontingente werden am 1. jedes Monats (UTC) zurückgesetzt.",
@@ -2188,19 +2472,27 @@
         "q": "Ist im Open-Source-Tool etwas begrenzt?"
       },
       "selfHost": {
-        "a": "Ja. Der Server liegt im selben MIT-Repository. Ohne Stripe-Schlüssel ist die Abrechnung deaktiviert und jedes Limit aufgehoben.",
-        "q": "Kann ich die Cloud-Funktionen selbst hosten?"
+        "a": "Ja. Der Server liegt im selben MIT-Repository. Ohne Stripe-Schlüssel ist die Abrechnung aus und alle Limits entfallen; Betrieb und Updates übernehmen Sie selbst.",
+        "q": "Ist Self-Hosting kostenlos?"
       },
       "tax": {
-        "a": "Zahlungen, Rechnungen und USt. werden von Stripe abgewickelt. Rechnungen finden Sie in Ihren Abrechnungseinstellungen; Geschäftskunden können bei der Kasse eine USt-IdNr. hinzufügen.",
-        "q": "Rechnungen und USt.?"
+        "a": "Die Preise verstehen sich ohne MwSt. Stripe übernimmt Zahlungen, Rechnungen und MwSt.: Die MwSt. wird beim Bezahlen hinzugefügt, wo sie anfällt, und Geschäftskunden können eine USt-IdNr. angeben. Rechnungen finden Sie in Ihren Abrechnungseinstellungen.",
+        "q": "Sind die Preise mit oder ohne MwSt.?"
       },
-      "title": "Fragen"
+      "title": "Fragen",
+      "quotas": {
+        "q": "Was zählt zu den Kontingenten?",
+        "a": "Nur was glot cloud ausliefert: CDN/OTA-Anfragen, Insights- und Experiment-Events, Remote-MCP-Aufrufe, Jobs für eine Sprache auf Abruf, Live-Review-Anmerkungen und Strings, die mit dem Schlüssel von glot übersetzt werden. Aktive Experimente und Cloud-Projekte zählen, solange sie bestehen. Nichts, was Sie lokal ausführen, und nichts, was mit Ihrem eigenen Schlüssel übersetzt wird, wird gezählt. Monatliche Zähler werden am 1. (UTC) zurückgesetzt."
+      },
+      "cancel": {
+        "q": "Kann ich jederzeit kündigen?",
+        "a": "Ja, im Abrechnungsportal. Ihr Plan bleibt bis zum Ende des bezahlten Zeitraums aktiv, danach wechselt das Konto zu Kostenlos. Projekte und Daten bleiben erhalten."
+      }
     },
     "forever": "dauerhaft",
     "interval": "Abrechnungsintervall",
     "meta": {
-      "description": "glot ist Open Source und kostenlos: CLI, lokaler MCP-Server, Validator, Lockfile. Bezahlt wird nur die gehostete Cloud: OTA-Auslieferung, Insights, Remote-MCP und serverseitige Übersetzung.",
+      "description": "glot-Preise: Die Open-Source-CLI und der MCP-Server sind kostenlos. Pro (zuverlässige Lokalisierung für Teams) und Growth (internationaler Umsatz) decken die gehostete Cloud ab.",
       "title": "Preise"
     },
     "monthly": "Monatlich",
@@ -2215,18 +2507,42 @@
     "plans": {
       "free": {
         "name": "Kostenlos",
-        "tagline": "Die Cloud mit einem Projekt testen."
+        "tagline": "Die Cloud mit einem Projekt testen.",
+        "for": "Entwickler, die glot evaluieren, Open-Source-Projekte.",
+        "features": {
+          "oss": "Open-Source-CLI, MCP-Server und GitHub Action, unbegrenzt auf Ihrem Rechner",
+          "project": "Ein Cloud-Projekt mit kleinen monatlichen Kontingenten",
+          "noCard": "Keine Kreditkarte nötig"
+        }
       },
       "pro": {
         "name": "Pro",
-        "tagline": "Für ein Produkt im Betrieb."
+        "tagline": "Zuverlässige Lokalisierung für Teams.",
+        "for": "Agenturen und SaaS-Teams, die in mehreren Sprachen ausliefern.",
+        "features": {
+          "sync": "GitHub-Sync: alle Sprachen in einem Pull Request",
+          "qa": "Visuelle QA: abgeschnittene, überlappende oder unübersetzte Texte finden",
+          "review": "Live-Review auf Ihrer echten Website, im Kontext",
+          "glossary": "Glossar und Validierung für jeden String",
+          "matrix": "Sprachmatrix: Ihre Website in jeder Sprache nebeneinander",
+          "byok": "Eigener LLM-Schlüssel: Sie zahlen Ihren Anbieter, glot schlägt nichts auf",
+          "xp": "Textexperimente zum Ausprobieren und Sprachempfehlungen"
+        }
       },
       "self_hosted": {
         "name": "Selbst gehostet"
       },
       "team": {
-        "name": "Team",
-        "tagline": "Für mehrere Produkte und ein Team."
+        "name": "Growth",
+        "tagline": "Internationalen Umsatz steigern.",
+        "for": "Produkte mit genug Traffic, um jede Sprache zu messen.",
+        "features": {
+          "everything": "Alles aus Pro",
+          "xp": "Textexperimente mit Zielgruppensegmenten, so viele Sie starten",
+          "recommend": "Welche Sprache als Nächstes, mit dem erwarteten Gewinn",
+          "launch": "Sprachstarts gegen eine Holdout-Gruppe gemessen, mit teilbarer Fallstudie",
+          "volume": "Mehr Projekte, Plätze und monatliches Volumen"
+        }
       }
     },
     "quota": {
@@ -2239,13 +2555,18 @@
       "projects": "Cloud-Projekte",
       "seats": "Plätze",
       "unlimited": "{name}: unbegrenzt",
-      "value": "{name}: {n}"
+      "value": "{name}: {n}",
+      "experiments": "Aktive Textexperimente"
     },
     "selfHosted": "Dieser Server wird selbst gehostet: Abrechnung ist deaktiviert und nichts ist begrenzt.",
-    "subtitle": "Die CLI, der lokale MCP-Server und alles im Open-Source-Repository sind kostenlos und nie begrenzt. Tarife decken nur die gehostete Cloud ab, die uns Server und Bandbreite kostet.",
-    "title": "Kostenlos, wo es auf Ihrem Rechner läuft. Kostenpflichtig, wo es auf unseren Servern läuft.",
+    "subtitle": "Pro hält Ihre Übersetzungen korrekt, geprüft und synchron mit Ihrem Code. Growth ergänzt Experimente und die Messung von Sprachstarts, die zeigen, welche Texte und welche Sprachen Umsatz bringen. Die Open-Source-CLI bleibt kostenlos und unbegrenzt.",
+    "title": "Jede Sprache bei jedem Release korrekt. Dann messen, was jede einbringt.",
     "usage": "Bei Monatstarifen werden serverseitige Übersetzungen mit dem LLM-Schlüssel von glot über das enthaltene Kontingent hinaus mit {price} pro 1.000 Strings abgerechnet. Mit Ihrem eigenen Schlüssel (BYOK) werden sie nie gezählt.",
-    "yearly": "Jährlich"
+    "yearly": "Jährlich",
+    "yearlySave": "{n, plural, one {# Monat gratis} other {# Monate gratis}}",
+    "yearlyEquiv": "{price} / Monat, jährliche Abrechnung",
+    "forWho": "Für wen:",
+    "vat": "Preise zzgl. MwSt."
   },
   "reviewPage": {
     "composer": {

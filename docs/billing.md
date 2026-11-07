@@ -16,7 +16,13 @@ One billing account per user; it covers the projects that user **owns** (no orga
 (`billing_usage`) reset on the 1st (UTC). Over a limit, the endpoint answers **402** `quota_exceeded` / `plan_required` /
 `plan_limit` with a message that names the quota and links to `/app/settings/billing`.
 
-| Monthly limit (default) | Free | Pro | Team | Enforced in |
+Packaging: **Pro** (99 €/month, 990 €/year) sells reliable localization to teams (GitHub sync, visual QA, live review,
+glossary/validation, locale matrix, BYO LLM key) with one live text experiment to try; **Growth** (plan id `team`,
+299 €/month, 2 990 €/year) sells international revenue optimization: unlimited text experiments with segments, language
+recommendations with expected gain, launch measurement with holdout and a shareable case study. Prices exclude VAT.
+402 messages name the cheapest plan that lifts the limit ("Unlimited on Growth.", "Up to 5 on Pro.").
+
+| Monthly limit (default) | Free | Pro | Growth (`team`) | Enforced in |
 |---|---|---|---|---|
 | Cloud projects (owned) | 1 | 5 | 25 | `projects::create` |
 | Seats | 1 | 3 | 15 | not enforced yet (no invite flow) |
@@ -25,6 +31,9 @@ One billing account per user; it covers the projects that user **owns** (no orga
 | Remote MCP calls (HTTP requests to `/mcp`) | 500 | 20k | 200k | `mcp_remote::guard` |
 | On-demand locale jobs | 0 | 30 | 300 | `ondemand::gate` |
 | Strings translated with glot's LLM key | 500 | 10k | 50k | `jobs::create`, `ondemand::gate` (check), `jobs::run` (count) |
+| Live text experiments (at once, not monthly) | 1 | 1 | unlimited | `check_experiment` (start) |
+| Segments per experiment | 0 | 2 | 4 | `check_experiment` (start) |
+| Live review annotations | 200 | 10k | unlimited | `review_live::api` |
 
 - **BYOK is never counted.** "glot's key" = a project without its own API key on `anthropic`/`openai` without `base_url`
   (the job then uses the server's provider env var).

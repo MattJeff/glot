@@ -367,7 +367,7 @@ pub fn spawn_worker(state: AppState) -> tokio::task::JoinHandle<()> {
             for id in ids {
                 let r = async {
                     let p: ProjectRow = sqlx::query_as(
-                        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at FROM projects WHERE id = $1",
+                        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax FROM projects WHERE id = $1",
                     )
                     .bind(id)
                     .fetch_one(&state.db)
@@ -537,7 +537,7 @@ async fn shorten(
             None => "unparseable answer".to_string(),
             Some(v) if v == current => "same text as before".to_string(),
             Some(v) => {
-                let issues = crate::keys::check(source, &v, &r.locale, glossary);
+                let issues = crate::keys::check(source, &v, &r.locale, p.syntax, glossary);
                 if has_errors(&issues) {
                     issues
                         .iter()

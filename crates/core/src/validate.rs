@@ -39,6 +39,15 @@ pub enum Syntax {
     Java,
 }
 
+/// Parse the `glot.toml` / database name (`"plain"`, `"i18next"`…), same spelling as serde.
+impl TryFrom<String> for Syntax {
+    type Error = serde::de::value::Error;
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        use serde::de::IntoDeserializer;
+        Self::deserialize(s.into_deserializer())
+    }
+}
+
 mod backend;
 mod fluent;
 

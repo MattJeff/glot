@@ -546,7 +546,7 @@ impl Remote {
             };
             let prop = ws.propose(&p.text, p.suggested_key.as_deref());
             let existing = ws.source().entries.get(&prop.key).cloned();
-            let syntax = glot_core::validate::placeholders(&p.text, glot_core::validate::Syntax::Icu);
+            let syntax = glot_core::validate::placeholders(&p.text, proj.syntax);
             let mut advice = Vec::new();
             if let Some((k, _)) = prop.duplicates.first() {
                 advice.push(format!("Reuse `{k}` instead of creating a new key (same text already exists)."));
@@ -570,7 +570,7 @@ impl Remote {
     }
 
     #[tool(
-        description = "Add (or with overwrite: true, change) a source string with an optional translator note, after propose_string. Validates ICU syntax; a changed source marks its translations stale. Then call translate."
+        description = "Add (or with overwrite: true, change) a source string with an optional translator note, after propose_string. Validates the project's message syntax; a changed source marks its translations stale. Then call translate."
     )]
     async fn add_string(
         &self,
@@ -579,7 +579,8 @@ impl Remote {
     ) -> CallToolResult {
         done(async {
             let (s, u, slug, a) = self.ctx(&parts)?;
-            glot_core::validate::placeholders(&p.text, glot_core::validate::Syntax::Icu)
+            let proj = projects::load(&self.state, a.user.id, &a.slug, Role::Translator).await.map_err(e)?;
+            glot_core::validate::placeholders(&p.text, proj.syntax)
                 .map_err(|i| format!("invalid source text: {} (nothing written)", i.message))?;
             let existing: Option<String> = sqlx::query_scalar("SELECT source FROM keys WHERE project_id = $1 AND key = $2")
                 .bind(a.project_id)
@@ -634,7 +635,7 @@ impl Remote {
     }
 
     #[tool(
-        description = "Validation issues stored on translations (placeholders, ICU syntax, tags, length, glossary). At most 100 per call; page with offset."
+        description = "Validation issues stored on translations (placeholders, message syntax, tags, length, glossary). At most 100 per call; page with offset."
     )]
     async fn check(
         &self,
@@ -678,7 +679,10 @@ impl Remote {
                 let g = glossary::load(&self.state.db, a.project_id)
                     .await
                     .map_err(e)?;
-                let issues = keys::check(&source, &p.value, &p.locale, &g);
+                let proj = projects::load(&self.state, a.user.id, &a.slug, Role::Translator)
+                    .await
+                    .map_err(e)?;
+                let issues = keys::check(&source, &p.value, &p.locale, proj.syntax, &g);
                 if glot_core::validate::has_errors(&issues) {
                     return Err(format!("not written, validation errors: {}", json!(issues)));
                 }

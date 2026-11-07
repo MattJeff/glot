@@ -7,6 +7,7 @@ import { ErrorState, PageHeader, ProgressBar, useLocaleName } from "@/components
 import { AnimatedNumber } from "@/components/gamification/progress-ring";
 import { HealthScore } from "@/components/health-score";
 import { isActive, JobRow } from "@/components/job-row";
+import { NextLanguageCard } from "@/components/markets/next-language";
 import { OnboardingOverview } from "@/components/onboarding/overview";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,6 +72,8 @@ export default function OverviewPage() {
       {p.stats.keys > 0 && p.target_locales.length > 0 && <HealthScore project={p} />}
 
       <OnboardingOverview slug={slug} />
+
+      <NextLanguageCard slug={slug} emptyState />
 
       {p.stats.keys === 0 ? null : (
         <div className="mt-6 grid gap-6 lg:grid-cols-5">

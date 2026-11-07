@@ -27,6 +27,8 @@ use crate::{
 };
 
 const VIEW: &str = "$view";
+/// A session of a language experiment picked a locale itself (switcher): its view leaves the arm (launches.rs).
+pub(crate) const EXPLICIT: &str = "$explicit";
 
 /// Public ingestion endpoint, callable from any origin (the customer's app), no credentials.
 pub fn public_routes() -> Router<AppState> {
@@ -70,6 +72,10 @@ pub struct Hit {
     country: Option<String>,
     /// Experiment arm previously returned to this session.
     arm: Option<String>,
+    /// The visitor chose a locale (language switcher): never assigned to a language experiment arm. Sent with
+    /// `arm` and no `event`, it withdraws that session from its arm (counted as `$explicit`).
+    #[serde(default)]
+    explicit: bool,
     /// Copy-experiment arms assigned to this session (`variants.rs`): {experiment id: arm}.
     #[serde(default)]
     variants: BTreeMap<Uuid, i32>,
@@ -86,7 +92,8 @@ pub struct Hit {
 
 #[derive(Serialize, Debug, PartialEq)]
 pub struct HitResponse {
-    /// Locale to render for this session when it is in the test arm of a running experiment.
+    /// Locale to render for this session: the test locale in the test arm of a running experiment, or the
+    /// fallback in the control arm of a launch holdout (`hold_locale`).
     pub locale: Option<String>,
     pub arm: Option<String>,
     /// Copy variants to render for this session (visits only).
@@ -272,17 +279,26 @@ pub async fn ingest(
     let country = country(hit.country.as_deref(), &headers);
 
     // Running experiment for this visitor's language: keep the session's arm, else draw one.
-    let exp: Option<(String, i32)> = sqlx::query_as(
-        "SELECT locale, traffic_pct FROM insight_experiments
+    let exp: Option<(String, i32, Option<String>)> = sqlx::query_as(
+        "SELECT locale, traffic_pct, hold_locale FROM insight_experiments
          WHERE project_id = $1 AND status = 'running' AND now() < ends_at AND split_part(lower(locale), '-', 1) = $2",
     )
     .bind(project_id)
     .bind(&preferred)
     .fetch_optional(&state.db)
     .await?;
+    let mut event = event;
     let (arm, locale) = match exp {
         None => (None, None),
-        Some((locale, pct)) => {
+        // Explicit choice always wins: withdraw the session from its arm (once, no event), else no arm at all.
+        Some(_) if hit.explicit => match hit.arm.as_deref() {
+            Some(a @ ("test" | "control")) if event == VIEW => {
+                event = EXPLICIT;
+                (Some(a), None)
+            }
+            _ => (None, None),
+        },
+        Some((locale, pct, hold)) => {
             let arm = match hit.arm.as_deref() {
                 Some(a @ ("test" | "control")) => a,
                 _ if event != VIEW => "", // events never draw an arm
@@ -292,7 +308,7 @@ pub async fn ingest(
             match arm {
                 "" => (None, None),
                 "test" => (Some("test"), Some(locale)),
-                a => (Some(a), None),
+                a => (Some(a), hold),
             }
         }
     };
@@ -325,7 +341,7 @@ pub async fn ingest(
     }
     Ok(Json(HitResponse {
         locale,
-        arm: arm.map(String::from),
+        arm: arm.filter(|_| event != EXPLICIT).map(String::from),
         variants,
     })
     .into_response())
@@ -583,7 +599,8 @@ async fn experiments(state: &AppState, project_id: Uuid) -> ApiResult<Vec<Experi
     );
     let rows: Vec<Row> = sqlx::query_as(
         "SELECT id, locale, traffic_pct, goal, started_at, ends_at, status, decided_at
-         FROM insight_experiments WHERE project_id = $1 ORDER BY started_at DESC LIMIT 20",
+         FROM insight_experiments WHERE project_id = $1 AND hold_locale IS NULL
+         ORDER BY started_at DESC LIMIT 20",
     )
     .bind(project_id)
     .fetch_all(&state.db)

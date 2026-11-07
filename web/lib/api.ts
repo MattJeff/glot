@@ -7,6 +7,9 @@ export type Me = User & { email_verified: boolean; email_enabled: boolean; local
 export type ApiToken = { id: string; name: string; created_at: string; last_used_at: string | null };
 
 export type Provider = "anthropic" | "openai" | "openai-compatible" | "mock";
+/** glot.toml `syntax`: how `{…}`, `<…>` and plurals are read when validating and translating. */
+export const SYNTAXES = ["icu", "i18next", "mf2", "printf", "rails", "vue", "laravel", "template", "fluent", "plain", "symfony", "java"] as const;
+export type MessageSyntax = (typeof SYNTAXES)[number];
 export type LocaleStats = { translated: number; reviewed: number; stale: number; issues: number };
 export type Project = {
   id: string;
@@ -17,6 +20,7 @@ export type Project = {
   style: string | null;
   public_cdn: boolean;
   created_at: string;
+  syntax: MessageSyntax;
   llm: {
     provider: Provider;
     model: string;
@@ -49,6 +53,8 @@ export type ProjectPatch = {
   llm?: LlmSettings;
   style?: string;
   public_cdn?: boolean;
+  /** Dashboard choice: wins over `glot push` (except `--set-syntax`), revalidates every translation. */
+  syntax?: MessageSyntax;
 };
 
 export type Severity = "error" | "warning";
@@ -397,27 +403,94 @@ export type InsightFunnel = {
   ci_low: number;
   ci_high: number;
 };
-/** `GET /markets`: "which language next?" (Labs). */
-export type Market = {
+
+/** `GET /insights/recommendations`: next language to add, with expected gain (Beta posteriors, 90 % interval). */
+export type RecoRate = { visits: number; conversions: number; rate: number; ci_low: number; ci_high: number };
+export type RecoReason =
+  | "no_conversions"
+  | "thin_demand"
+  | "thin_baseline"
+  | "baseline_includes_source"
+  | "gain_uncertain"
+  | "no_gain"
+  | "rising"
+  | "falling"
+  | "under_translated";
+export type Recommendation = {
   locale: string;
-  name: string;
-  score: number;
-  best: boolean;
+  language: string;
+  kind: "missing" | "under_translated";
   visits: number;
+  monthly_visits: number;
   share: number;
-  conversion_rate: number | null;
-  est_extra_conversions: number | null;
-  internet_users_m: number;
+  trend: number | null;
+  served_now: string | null;
+  served_now_share: number;
+  coverage: number;
+  fallback: RecoRate;
+  native: RecoRate;
+  gain_monthly: { mid: number; low: number; high: number } | null;
   cost_usd: number;
-  words: number;
-  review_hours: number;
-  rtl: boolean;
-  font: string | null;
-  plural_forms: number;
-  effort: number;
-  effort_notes: string[];
+  keys_to_translate: number;
+  cost_per_conversion: number | null;
+  confidence: "insufficient" | "indicative" | "solid";
+  reasons: RecoReason[];
+  summary: string;
 };
-export type Markets = { days: number; total_visits: number; keys: number; words: number; model: string; data_as_of: string; markets: Market[] };
+/** `GET /launches`: language launch measurement (holdout or before/after) and its case study. */
+export type LaunchVerdict =
+  | "collecting"
+  | "probably_positive"
+  | "probably_negative"
+  | "inconclusive"
+  | "invalid"
+  | "higher_after"
+  | "lower_after"
+  | "no_clear_change";
+export type LaunchCounts = { visits: number; conversions: number };
+export type LaunchStory = {
+  project: string;
+  locale: string;
+  fallback: string;
+  mode: "holdout" | "before_after";
+  goal: string;
+  status: "measuring" | "rolled_out" | "invalid" | "done";
+  verdict: LaunchVerdict;
+  causal: boolean;
+  launched_at: string;
+  ends_at: string;
+  decided_at: string | null;
+  days: number;
+  holdout_pct: number;
+  min_n: number;
+  baseline: LaunchCounts;
+  cost_usd: number;
+  cost_estimated: boolean;
+  recommendation: (Partial<Recommendation> & { rank?: number; of?: number }) | null;
+  /** [fallback / before, new locale / after] */
+  arms: [LaunchCounts, LaunchCounts];
+  explicit: [number, number];
+  lift: number;
+  lift_lo: number;
+  lift_hi: number;
+  p_better: number;
+  srm_p: number | null;
+  enough: boolean;
+  daily: { day: string; visits: [number, number]; conversions: [number, number] }[];
+};
+export type Launch = LaunchStory & { id: string; share_token: string | null };
+export type NewLaunch = { locale: string; mode: "holdout" | "before_after"; holdout_pct?: number; days?: number; goal?: string; fallback?: string };
+
+export type Recommendations = {
+  days: number;
+  goal: string;
+  model: string;
+  public_key: string;
+  total_visits: number;
+  conversions_tracked: boolean;
+  keys: number;
+  recommendations: Recommendation[];
+};
 
 export type Insights = {
   public_key: string;
@@ -530,6 +603,8 @@ export type XpExperiment = {
   created_at: string;
   started_at: string | null;
   ended_at: string | null;
+  /** Hidden from the default list, results kept. Only drafts and archived experiments can be deleted. */
+  archived_at: string | null;
 };
 export type NewXpExperiment = Partial<
   Pick<XpExperiment, "name" | "locales" | "allocation" | "weights" | "traffic_pct" | "min_n" | "goal" | "metric" | "currency" | "guardrails" | "facts" | "fits" | "review">
@@ -541,12 +616,23 @@ export type NewXpExperiment = Partial<
   arms?: { intent: string; values: XpVariant["values"] }[];
 };
 export type XpCellCheck = { arm: number; key: string; locale: string; value: string | null; ok: boolean; issues: Issue[] };
-export type XpReadiness = { ready: boolean; problems: string[]; cells: XpCellCheck[] };
+export type XpBlockerCode =
+  | "no_keys" | "key_missing" | "key_live" | "no_locales" | "too_many_segments" | "currency" | "weights" | "no_variant" | "cell_missing" | "cell_invalid";
+export type XpBlocker = { code: XpBlockerCode; arm?: number; key?: string; locale?: string };
+export type XpReadiness = { ready: boolean; problems: string[]; blockers: XpBlocker[]; cells: XpCellCheck[] };
 export type XpSettings = { holdout_pct: number; persistence: "none" | "session"; holdout_id: string | null };
 // ponytail: estimate (XP2) and generate (XP8) bodies aren't pinned in the contract v1; typed as the wizard reads them.
+/** `POST /xp/estimate` (rebalance.rs `Estimate`; days per lift from experiments/duration.rs). */
 export type XpEstimate = {
-  cells: { cell: string; name?: string; visitors_per_day: number; days: number | null; too_small?: boolean }[];
-  days?: number | null;
+  daily_visitors: number;
+  baseline: number | null;
+  per_arm: number | null;
+  days: number | null;
+  too_long: boolean;
+  exact: boolean;
+  lifts: { lift: number; per_arm: number | null; days: number | null }[];
+  detectable_lift: number | null;
+  warn_days: number;
 };
 export type XpGenerated = {
   arms: XpVariant[];
@@ -591,13 +677,14 @@ export type XpResults = {
   days?: number;
 };
 export type XpAction =
-  | { action: "pause" | "resume" | "stop" }
+  | { action: "pause" | "resume" | "stop" | "archive" | "unarchive" }
   | { action: "promote"; arm: number; scope: "all" }
   | { action: "promote"; arm: number; scope: "segment"; cell: string };
 
 // Billing (billing.rs). Limits/usage keys are shared; null limit = unlimited.
 export type QuotaKey = "projects" | "seats" | "cdn_requests" | "insights_events" | "mcp_calls" | "ondemand_jobs" | "llm_strings";
-export type Limits = Partial<Record<QuotaKey, number | null>>;
+/** `experiments` = text experiments live at once (not monthly). */
+export type Limits = Partial<Record<QuotaKey | "experiments", number | null>>;
 export type PlanId = "free" | "pro" | "team";
 export type BillingSummary = {
   enabled: boolean;
@@ -666,7 +753,7 @@ export const api = {
   issues: (slug: string) => request<ProjectIssue[]>("GET", `${p(slug)}/issues`),
 
   jobs: (slug: string) => request<Job[]>("GET", `${p(slug)}/jobs`),
-  createJob: (slug: string, b: { kind: "translate"; locales?: string[]; keys?: string[]; force?: boolean }) =>
+  createJob: (slug: string, b: { kind: "translate"; locales?: string[]; keys?: string[]; force?: boolean; budget_usd?: number }) =>
     request<Job>("POST", `${p(slug)}/jobs`, b),
   job: (id: string) => request<Job>("GET", `/api/jobs/${enc(id)}`),
   jobEventsUrl: (id: string) => `/api/jobs/${enc(id)}/events`,
@@ -682,12 +769,18 @@ export const api = {
   preview: (slug: string) => request<PreviewSettings>("GET", `${p(slug)}/preview`),
   updatePreview: (slug: string, b: PreviewSettings) => request<PreviewSettings>("PUT", `${p(slug)}/preview`, b),
   insights: (slug: string, q: { days?: number; goal?: string }) => request<Insights>("GET", `${p(slug)}/insights${qs(q)}`),
-  markets: (slug: string, days = 30) => request<Markets>("GET", `${p(slug)}/markets${qs({ days })}`),
+  recommendations: (slug: string, q: { days?: number; goal?: string }) =>
+    request<Recommendations>("GET", `${p(slug)}/insights/recommendations${qs(q)}`),
   rotateInsightsKey: (slug: string) => request<{ public_key: string }>("POST", `${p(slug)}/insights/rotate-key`),
   createExperiment: (slug: string, b: { locale: string; traffic_pct: number; days: number; goal?: string }) =>
     request<InsightExperiment>("POST", `${p(slug)}/insights/experiments`, b),
   decideExperiment: (slug: string, id: string, status: "kept" | "removed") =>
     request<void>("PATCH", `${p(slug)}/insights/experiments/${enc(id)}`, { status }),
+  launches: (slug: string) => request<Launch[]>("GET", `${p(slug)}/launches`),
+  launch: (slug: string, id: string) => request<Launch>("GET", `${p(slug)}/launches/${enc(id)}`),
+  createLaunch: (slug: string, b: NewLaunch) => request<Launch>("POST", `${p(slug)}/launches`, b),
+  shareLaunch: (slug: string, id: string) => request<{ token: string }>("POST", `${p(slug)}/launches/${enc(id)}/share`),
+  revokeLaunch: (slug: string, id: string) => request<void>("DELETE", `${p(slug)}/launches/${enc(id)}/share`),
   layoutRum: (slug: string, days?: number) => request<LayoutRum>("GET", `${p(slug)}/insights/layout${qs({ days })}`),
   repairLayout: (slug: string) => request<{ created: number; fixes: LayoutFix[] }>("POST", `${p(slug)}/insights/layout/repair`),
   feedback: (slug: string) => request<{ settings: FeedbackSettings; groups: FeedbackGroup[] }>("GET", `${p(slug)}/feedback`),
@@ -746,11 +839,13 @@ export const api = {
   xpPutArm: (slug: string, id: string, arm: number, b: { intent?: string; approved?: boolean; values?: XpVariant["values"] }) =>
     request<XpVariant>("PUT", `${p(slug)}/xp/${enc(id)}/arms/${arm}`, b),
   xpDeleteArm: (slug: string, id: string, arm: number) => request<void>("DELETE", `${p(slug)}/xp/${enc(id)}/arms/${arm}`),
+  xpDelete: (slug: string, id: string) => request<void>("DELETE", `${p(slug)}/xp/${enc(id)}`),
+  xpDuplicate: (slug: string, id: string, name?: string) => request<XpExperiment>("POST", `${p(slug)}/xp/${enc(id)}/duplicate`, name ? { name } : {}),
   xpCheck: (slug: string, id: string) => request<XpReadiness>("GET", `${p(slug)}/xp/${enc(id)}/check`),
   xpStart: (slug: string, id: string) => request<XpExperiment>("POST", `${p(slug)}/xp/${enc(id)}/start`),
   xpGenerate: (slug: string, id: string, b: { intents: string[]; locales?: string[] }) =>
     request<XpGenerated>("POST", `${p(slug)}/xp/${enc(id)}/generate`, b),
-  xpEstimate: (slug: string, b: { cells: NewXpExperiment["cells"]; arms: number; locales?: string[]; goal?: string; min_n?: number }) =>
+  xpEstimate: (slug: string, b: { rule: XpSegmentRule | null; arms: number; goal?: string; min_n?: number; traffic_pct?: number }) =>
     request<XpEstimate>("POST", `${p(slug)}/xp/estimate`, b),
   xpResults: (slug: string, id: string) => request<XpResults>("GET", `${p(slug)}/xp/${enc(id)}/results`),
   xpAction: (slug: string, id: string, { action, ...body }: XpAction) =>
@@ -780,7 +875,8 @@ export const qk = {
   visualReport: (slug: string, id: string) => ["visual-reports", slug, id] as const,
   preview: (slug: string) => ["preview", slug] as const,
   insights: (slug: string) => ["insights", slug] as const,
-  markets: (slug: string) => ["markets", slug] as const,
+  launches: (slug: string) => ["launches", slug] as const,
+  recommendations: (slug: string) => ["recommendations", slug] as const,
   feedback: (slug: string) => ["feedback", slug] as const,
   annotations: (slug: string) => ["annotations", slug] as const,
   annotation: (slug: string, id: string) => ["annotations", slug, "one", id] as const,

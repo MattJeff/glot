@@ -154,7 +154,12 @@ enum Cmd {
     #[command(hide = true)] // legacy spelling of `glot labs review`
     Review(review::ReviewArgs),
     /// (experimental server) Upload catalogs, lock and glossary to the glot server.
-    Push,
+    Push {
+        /// Make glot.toml's `syntax` the project's message syntax, even when it was already set (by an
+        /// earlier push or in the dashboard). Without it, push only replaces the default `icu`.
+        #[arg(long)]
+        set_syntax: bool,
+    },
     /// (experimental server) Download catalogs, lock and glossary from the glot server.
     Pull,
     /// Segmented copy experiments: definitions in glot.experiments.toml, state on the server.
@@ -500,7 +505,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Glossary(GlossaryCmd::Mine(a)) => review::mine(a).await?,
         Cmd::Glossary(g) => glossary(g)?,
         Cmd::Review(a) => return review::run(a).await,
-        Cmd::Push => return sync::push().await,
+        Cmd::Push { set_syntax } => return sync::push(set_syntax).await,
         Cmd::Pull => return sync::pull().await,
         Cmd::Experiments(c) => return experiments::run(c).await,
         Cmd::Annotations(a) => return annotations::run(a).await,

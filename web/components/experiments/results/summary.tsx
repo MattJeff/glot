@@ -1,6 +1,6 @@
 "use client";
 
-import { CirclePause, CirclePlay, Clock, Eye, Loader2, Square, Target, Trophy, Users } from "lucide-react";
+import { CirclePause, CirclePlay, Clock, Eye, Loader2, Target, Trophy, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -11,7 +11,6 @@ import { Link } from "@/i18n/navigation";
 import type { XpExperiment, XpStatus } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { Act } from "./cell-card";
-import { Confirm } from "./confirm";
 import { type CellView, useArmLabel, useXpFormat } from "./shared";
 
 const STATUS_STYLE: Record<XpStatus, string> = {
@@ -112,12 +111,15 @@ export function SummaryHeader({
   slug,
   busy,
   onAct,
+  extra,
 }: {
   exp: XpExperiment;
   cells: CellView[];
   slug: string;
   busy: boolean;
   onAct: (a: Act) => void;
+  /** Stop and the lifecycle menu (components/experiments/lifecycle.tsx). */
+  extra?: React.ReactNode;
 }) {
   const t = useTranslations("experimentResults");
   const { format } = useXpFormat();
@@ -127,7 +129,6 @@ export function SummaryHeader({
   const start = exp.started_at ? new Date(exp.started_at) : null;
   const end = exp.ended_at ? new Date(exp.ended_at) : new Date();
   const days = start ? Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86_400_000)) : null;
-  const live = exp.status === "running" || exp.status === "paused" || exp.status === "personalized";
 
   const stats = [
     { icon: Clock, label: t("summary.duration"), value: days == null ? "—" : t("summary.days", { n: days }), hint: start ? t("summary.since", { date: format.dateTime(start, { dateStyle: "medium" }) }) : null },
@@ -172,19 +173,7 @@ export function SummaryHeader({
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <CirclePlay aria-hidden />} {t("resume")}
             </Button>
           )}
-          {live && (
-            <Confirm
-              trigger={
-                <Button variant="ghost" size="sm" disabled={busy}>
-                  <Square aria-hidden /> {t("stop")}
-                </Button>
-              }
-              title={t("confirmStop.title", { name: exp.name })}
-              body={<p>{t("confirmStop.body")}</p>}
-              confirm={t("confirmStop.cta")}
-              onConfirm={() => onAct({ action: "stop" })}
-            />
-          )}
+          {extra}
         </div>
       </div>
 

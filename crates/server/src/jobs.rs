@@ -33,6 +33,9 @@ pub struct JobParams {
     pub keys: Option<Vec<String>>,
     #[serde(default)]
     pub force: bool,
+    /// Cap for this job, on top of the project budget (the stricter wins), e.g. a recommendation's estimate.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub budget_usd: Option<f64>,
 }
 
 #[derive(Debug, Clone, FromRow)]
@@ -115,6 +118,12 @@ pub async fn create(
         return Err(AppError::bad_request("kind must be 'translate'"));
     }
     crate::billing::check_llm(&state, &p).await?;
+    if b.params
+        .budget_usd
+        .is_some_and(|x| !(x.is_finite() && x > 0.0))
+    {
+        return Err(AppError::bad_request("budget_usd must be > 0"));
+    }
     if let Some(locs) = &b.params.locales
         && let Some(bad) = locs.iter().find(|l| !p.target_locales.contains(l))
     {
@@ -313,7 +322,7 @@ async fn run(state: AppState, mut job: JobRecord) {
 
 async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
     let p: ProjectRow = sqlx::query_as(
-        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at FROM projects WHERE id = $1",
+        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax FROM projects WHERE id = $1",
     )
     .bind(job.project_id)
     .fetch_one(&state.db)
@@ -331,7 +340,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
         target_locales: p.target_locales.clone(),
         files: vec![],
         format: Default::default(),
-        syntax: Default::default(),
+        syntax: p.syntax,
         llm: LlmConfig {
             provider: llm.provider,
             model: llm.model,
@@ -339,7 +348,10 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
             judge_model: llm.judge_model,
             api_key_env: None,
             base_url: llm.base_url,
-            budget_usd: llm.budget_usd,
+            budget_usd: match (llm.budget_usd, params.budget_usd) {
+                (Some(a), Some(b)) => Some(a.min(b)),
+                (a, b) => a.or(b),
+            },
             style: p.style.clone(),
             ..LlmConfig::default()
         },
@@ -449,6 +461,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
                         score: r.score,
                         extra_issues: low_score,
                         author: None,
+                        syntax: p.syntax,
                     },
                 )
                 .await

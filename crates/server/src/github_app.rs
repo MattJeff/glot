@@ -985,7 +985,7 @@ async fn handle_event(state: &AppState, event: &str, v: &Value) -> ApiResult<usi
 
 async fn project_row(state: &AppState, id: Uuid) -> sqlx::Result<ProjectRow> {
     sqlx::query_as(
-        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at FROM projects WHERE id = $1",
+        "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax FROM projects WHERE id = $1",
     )
     .bind(id)
     .fetch_one(&state.db)
@@ -1387,6 +1387,11 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         glossary: ws.glossary.terms.clone(),
         context: Default::default(),
         source_locale: None,
+        // The repo's glot.toml is the truth for this run's catalogs (dashboard choice overridden).
+        syntax: serde_json::to_value(ws.config.syntax)?
+            .as_str()
+            .map(str::to_string),
+        set_syntax: true,
     };
     let pushed = crate::sync::apply_push(state, &p, body, "glot[bot]")
         .await

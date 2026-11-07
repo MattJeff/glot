@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { api, qk, type Project } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { MIN_N, type Draft } from "./draft";
+import { DurationEstimate } from "@/components/experiments/duration";
+import { MIN_N, segmentsToCells, type Draft } from "./draft";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY", "CAD", "AUD"];
 
@@ -32,6 +33,7 @@ export function StepLaunch({
   onEdit: (step: number) => void;
 }) {
   const t = useTranslations("xpWizard.launch");
+  const tl = useTranslations("xpLifecycle.wizard");
   const format = useFormatter();
   const localeName = useLocaleName();
   // Events your site already sent in the last 30 days (glot.track).
@@ -104,6 +106,45 @@ export function StepLaunch({
             </div>
           )}
         </div>
+
+        <div className="space-y-3 rounded-lg border p-3 sm:p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Label htmlFor="xp-rebalance">{tl("rebalance")}</Label>
+              <p className="mt-0.5 text-xs text-pretty text-muted-foreground">{d.autoRebalance ? tl("rebalanceOn") : tl("rebalanceOff")}</p>
+            </div>
+            <Switch id="xp-rebalance" checked={d.autoRebalance} onCheckedChange={(autoRebalance) => update({ autoRebalance })} />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="xp-traffic">{tl("traffic")}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="xp-traffic"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={100}
+                value={d.trafficPct}
+                onChange={(e) => update({ trafficPct: Number(e.target.value) })}
+                className="h-9 max-w-24 tabular-nums"
+                aria-describedby="xp-traffic-hint"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
+            <p id="xp-traffic-hint" className="text-xs text-pretty text-muted-foreground">
+              {tl("trafficHint")}
+            </p>
+          </div>
+        </div>
+
+        <DurationEstimate
+          slug={project.slug}
+          segments={segmentsToCells(d.segments, t("segmentN", { n: 0 }))}
+          arms={armCount + 1}
+          goal={d.goal}
+          minN={d.minN}
+          trafficPct={d.trafficPct}
+        />
 
         <div className="grid gap-1.5">
           <Label htmlFor="xp-min">{t("minN")}</Label>

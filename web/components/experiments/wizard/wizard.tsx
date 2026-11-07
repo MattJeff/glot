@@ -7,10 +7,10 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { api, ApiError, qk, type Project } from "@/lib/api";
+import { api, ApiError, qk, type Project, type XpExperiment } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { cn } from "@/lib/utils";
-import { EMPTY, MIN_N, draftPatch, loadDraft, saveDraft, useDebounced, type Draft } from "./draft";
+import { EMPTY, MIN_N, draftPatch, fromExperiment, loadDraft, saveDraft, useDebounced, type Draft } from "./draft";
 import { StepAudience } from "./step-audience";
 import { StepKeys } from "./step-keys";
 import { StepLaunch } from "./step-launch";
@@ -26,16 +26,18 @@ const commonPrefix = (keys: string[]) => {
   return out.join(".") || keys[0] || "";
 };
 
-export function ExperimentWizard({ project }: { project: Project }) {
+/** `editing` = an existing server draft (detail page → Edit): no local mirror, no "restored" banner. */
+export function ExperimentWizard({ project, editing }: { project: Project; editing?: XpExperiment }) {
   const t = useTranslations("xpWizard");
   const errMsg = useErrorMessage();
   const router = useRouter();
   const qc = useQueryClient();
   const slug = project.slug;
-  const locales = [project.source_locale, ...project.target_locales];
-  const [initial] = useState(() => loadDraft(slug));
+  const allLocales = [project.source_locale, ...project.target_locales];
+  const [initial] = useState(() => (editing ? fromExperiment(editing, "session") : loadDraft(slug)));
   const [d, setD] = useState<Draft>(initial ?? EMPTY);
-  const [restored, setRestored] = useState(!!initial?.id);
+  const locales = d.locales?.length ? d.locales.filter((l) => allLocales.includes(l)) : allLocales;
+  const [restored, setRestored] = useState(!!initial?.id && !editing);
   const [blocked, setBlocked] = useState<string | null>(null);
   const update = (patch: Partial<Draft>) => {
     setBlocked(null);
@@ -50,13 +52,13 @@ export function ExperimentWizard({ project }: { project: Project }) {
   const s = useArms(slug, d.id, d.keys, locales);
   // The server draft disappeared or was launched elsewhere: start clean.
   const gone = (s.exp.error instanceof ApiError && s.exp.error.status === 404) || (s.exp.data && s.exp.data.status !== "draft");
-  if (gone && d.id) reset(); // adjust state during render (no effect round-trip)
+  if (gone && d.id && !editing) reset(); // adjust state during render (no effect round-trip)
 
   // Auto-save: local mirror at once (resume after reload), server draft after a pause.
   const launched = useRef(false);
   useEffect(() => {
-    if (!launched.current) saveDraft(slug, d);
-  }, [slug, d]);
+    if (!launched.current && !editing) saveDraft(slug, d);
+  }, [slug, d, editing]);
   const serverPatch = useDebounced(d.id ? JSON.stringify(draftPatch(d, t("audience.unnamed"))) : null, 800);
   const sync = useMutation({ mutationFn: (body: string) => api.xpUpdate(slug, d.id!, JSON.parse(body)) });
   const lastSynced = useRef<string | null>(null);
@@ -70,7 +72,7 @@ export function ExperimentWizard({ project }: { project: Project }) {
   const settings = useQuery({ queryKey: ["xp-settings", slug], queryFn: () => api.xpSettings(slug), retry: false });
   const settingsSeeded = useRef(false);
   useEffect(() => {
-    if (settings.data && !settingsSeeded.current && !initial) {
+    if (settings.data && !settingsSeeded.current && (!initial || editing)) {
       settingsSeeded.current = true;
       update({ persistence: settings.data.persistence });
     }
@@ -127,7 +129,7 @@ export function ExperimentWizard({ project }: { project: Project }) {
     },
     onSuccess: (exp) => {
       launched.current = true;
-      saveDraft(slug, null);
+      if (!editing) saveDraft(slug, null);
       qc.invalidateQueries({ queryKey: qk.variants(slug) });
       toast.success(t("launched"));
       router.push(`/app/${slug}/experiments/${exp.id}`);
@@ -181,7 +183,9 @@ export function ExperimentWizard({ project }: { project: Project }) {
           </header>
           {step === "keys" && <StepKeys project={project} keys={d.keys} onChange={(keys) => update({ keys })} />}
           {step === "variants" && d.id && <StepVariants project={project} locales={locales} draft={d} update={update} arms={s} />}
-          {step === "audience" && <StepAudience project={project} locales={locales} draft={d} update={update} armCount={s.arms.length} />}
+          {step === "audience" && (
+            <StepAudience project={project} locales={locales} allLocales={allLocales} draft={d} update={update} armCount={s.arms.length} />
+          )}
           {step === "launch" && (
             <StepLaunch project={project} locales={locales} draft={d} update={update} armCount={s.arms.length} problems={problems} onEdit={go} />
           )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FlaskConical, Globe2, Radar, ShieldCheck, Target, TrendingUp, Users } from "lucide-react";
+import { FlaskConical, Globe2, Radar, Rocket, ShieldCheck, Target, TrendingUp, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { NextLanguageCard } from "@/components/markets/next-language";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "@/i18n/navigation";
 import { api, qk, type InsightDemand } from "@/lib/api";
 import { useSlug } from "@/lib/hooks";
 import { DailyChart, DemandTable, ExperimentCard, ExperimentDialog, FunnelPlot, Install, Section, usePct } from "./parts";
@@ -19,6 +20,7 @@ const PERIODS = [7, 30, 90];
 
 export default function InsightsPage() {
   const t = useTranslations("insights");
+  const tl = useTranslations("launches");
   const format = useFormatter();
   const name = useLocaleName();
   const pct = usePct();
@@ -50,6 +52,11 @@ export default function InsightsPage() {
       subtitle={t("subtitle")}
       actions={
         <>
+          <Button size="sm" variant="outline" asChild>
+            <Link href={`/app/${slug}/insights/launches`}>
+              <Rocket /> {tl("open")}
+            </Link>
+          </Button>
           <Select value={goal ?? d?.goal ?? "signup"} onValueChange={setGoal}>
             <SelectTrigger size="sm" className="w-40" aria-label={t("goal")}>
               <Target className="size-3.5" />
@@ -104,7 +111,7 @@ export default function InsightsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       {header}
-      <NextLanguageCard slug={slug} days={days} />
+      <NextLanguageCard slug={slug} days={days} goal={goal ?? d.goal} />
 
       {d.total_visits === 0 ? (
         <>

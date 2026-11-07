@@ -14,7 +14,6 @@ use chrono::{DateTime, Utc};
 use glot_core::{
     config::{Config, LlmConfig},
     measure::Fit,
-    validate::Syntax,
 };
 use glot_llm::rewrite::{Instruction, Preset, Rewrite, RewriteRequest};
 use serde::{Deserialize, Serialize};
@@ -200,8 +199,8 @@ async fn request(
         // ponytail: glossary terms of the key only (the prompt stays small).
         glossary: glossary.matches(&k.source).into_iter().cloned().collect(),
         style: p.style.clone(),
-        // ponytail: syntax fixed to ICU like keys::check; project policy = defaults until the server stores `[policy]`.
-        syntax: Syntax::Icu,
+        // ponytail: project policy = defaults until the server stores `[policy]`.
+        syntax: p.syntax,
         policy: Default::default(),
         count: b.count.unwrap_or(3),
     })
@@ -250,7 +249,16 @@ pub async fn apply_handler(
             &errors.iter().collect::<Vec<_>>(),
         ));
     }
-    let written = api::write_values(&mut tx, &k, &values, &issues, &glossary, &actor.name).await?;
+    let written = api::write_values(
+        &mut tx,
+        &k,
+        &values,
+        &issues,
+        &glossary,
+        &actor.name,
+        ctx.project.syntax,
+    )
+    .await?;
     sqlx::query(
         "UPDATE review_annotations SET status = 'resolved', resolved_at = coalesce(resolved_at, now()),
            suggestion = $2, updated_at = now() WHERE id = $1",
@@ -315,7 +323,7 @@ pub async fn rephrase(
         target_locales: p.target_locales.clone(),
         files: vec![],
         format: Default::default(),
-        syntax: Default::default(),
+        syntax: p.syntax,
         llm: LlmConfig {
             provider: llm.provider.clone(),
             model: llm.model.clone(),

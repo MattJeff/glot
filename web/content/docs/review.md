@@ -94,4 +94,4 @@ The MCP server exposes the same operations as tools (`review_list`, `review_get`
 
 **Can I turn review off?** Revoke the links, or remove the origin in **Review → Settings**: the widget then refuses to start.
 
-**How many annotations can I create?** Free: 200 per month, Pro: 10,000, Team: unlimited. Self-hosted: unlimited.
+**How many annotations can I create?** Free: 200 per month, Pro: 10,000, Growth: unlimited. Self-hosted: unlimited.

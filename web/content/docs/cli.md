@@ -743,10 +743,11 @@ Options:
 ```text
 (experimental server) Upload catalogs, lock and glossary to the glot server
 
-Usage: glot push
+Usage: glot push [OPTIONS]
 
 Options:
-  -h, --help  Print help
+      --set-syntax  Make glot.toml's `syntax` the project's message syntax, even when it was already set (by an earlier push or in the dashboard). Without it, push only replaces the default `icu`
+  -h, --help        Print help
 ```
 
 ## glot pull

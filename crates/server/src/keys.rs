@@ -167,6 +167,8 @@ pub struct Write<'a> {
     pub score: Option<u8>,
     pub extra_issues: Vec<Issue>,
     pub author: Option<&'a str>,
+    /// The project's message syntax (`ProjectRow::syntax`).
+    pub syntax: Syntax,
 }
 
 /// The single write path for translations: validate + glossary check, store issues, record history.
@@ -175,7 +177,7 @@ pub async fn write_translation(
     glossary: &Glossary,
     w: Write<'_>,
 ) -> ApiResult<Translation> {
-    let mut issues = check(&w.key.source, w.value, w.locale, glossary);
+    let mut issues = check(&w.key.source, w.value, w.locale, w.syntax, glossary);
     for extra in w.extra_issues {
         if !issues.iter().any(|i| i.code == extra.code) {
             issues.push(extra);
@@ -213,16 +215,93 @@ pub async fn write_translation(
     Ok(t.into())
 }
 
-pub fn check(source: &str, target: &str, locale: &str, glossary: &Glossary) -> Vec<Issue> {
+pub fn check(
+    source: &str,
+    target: &str,
+    locale: &str,
+    syntax: Syntax,
+    glossary: &Glossary,
+) -> Vec<Issue> {
     let constraints = Constraints {
         max_length: None,
         max_length_ratio: Some(glot_core::config::QaConfig::default().max_length_ratio),
     };
-    // ponytail: syntax fixed to ICU; add a project column if i18next/mf2 projects show up.
-    let mut issues =
-        glot_core::validate::validate(source, target, locale, Syntax::Icu, &constraints);
+    let mut issues = glot_core::validate::validate(source, target, locale, syntax, &constraints);
     issues.extend(glossary.check(source, target, locale));
     issues
+}
+
+/// Set the project's message syntax and recompute the stored issues of every translation with it.
+/// `force = false` (push without `--set-syntax`) only replaces the untouched default: still `icu`,
+/// never chosen in the dashboard. `locked` records a dashboard choice. Returns the syntax in effect.
+pub async fn set_syntax(
+    conn: &mut PgConnection,
+    project_id: Uuid,
+    name: &str,
+    force: bool,
+    locked: bool,
+) -> ApiResult<Syntax> {
+    let wanted = Syntax::try_from(name.to_string())
+        .map_err(|_| AppError::bad_request(format!("unknown message syntax '{name}'")))?;
+    let (current, was_locked): (String, bool) =
+        sqlx::query_as("SELECT syntax, syntax_locked FROM projects WHERE id = $1 FOR UPDATE")
+            .bind(project_id)
+            .fetch_one(&mut *conn)
+            .await?;
+    if !force && (current != "icu" || was_locked) {
+        return Ok(Syntax::try_from(current).unwrap_or_default());
+    }
+    sqlx::query(
+        "UPDATE projects SET syntax = $2, syntax_locked = syntax_locked OR $3 WHERE id = $1",
+    )
+    .bind(project_id)
+    .bind(name)
+    .bind(locked)
+    .execute(&mut *conn)
+    .await?;
+    if current != name {
+        revalidate(conn, project_id, wanted).await?;
+    }
+    Ok(wanted)
+}
+
+/// Recompute `translations.issues` of a project (validation + glossary), keeping the issues that
+/// come from elsewhere (judge score, measured width, open annotations).
+// ponytail: inline, one UPDATE per changed row; a job if projects reach ~100k translations.
+pub async fn revalidate(
+    conn: &mut PgConnection,
+    project_id: Uuid,
+    syntax: Syntax,
+) -> ApiResult<u64> {
+    use glot_core::validate::IssueCode::{LowScore, OpenAnnotation, TooWide};
+    let glossary = crate::glossary::load(&mut *conn, project_id).await?;
+    let rows: Vec<(Uuid, String, String, String, DbJson<Vec<Issue>>)> = sqlx::query_as(
+        "SELECT t.key_id, t.locale, t.value, k.source, t.issues
+         FROM translations t JOIN keys k ON k.id = t.key_id WHERE k.project_id = $1",
+    )
+    .bind(project_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    let mut n = 0;
+    for (key_id, locale, value, source, old) in rows {
+        let mut issues = check(&source, &value, &locale, syntax, &glossary);
+        issues.extend(
+            old.0
+                .iter()
+                .filter(|i| matches!(i.code, LowScore | TooWide | OpenAnnotation))
+                .cloned(),
+        );
+        if issues != old.0 {
+            sqlx::query("UPDATE translations SET issues = $3 WHERE key_id = $1 AND locale = $2")
+                .bind(key_id)
+                .bind(&locale)
+                .bind(DbJson(&issues))
+                .execute(&mut *conn)
+                .await?;
+            n += 1;
+        }
+    }
+    Ok(n)
 }
 
 fn require_target(p: &ProjectRow, locale: &str) -> ApiResult<()> {
@@ -441,6 +520,7 @@ pub async fn put_translation(
             score: None,
             extra_issues: vec![],
             author: Some(&user.name),
+            syntax: p.syntax,
         },
     )
     .await?;

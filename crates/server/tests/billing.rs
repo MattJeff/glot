@@ -117,6 +117,29 @@ fn sub_event(id: &str, ty: &str, created: i64, user: &str, status: &str, lookup:
     })
 }
 
+#[test]
+fn packaging() {
+    // Pro = reliable localization with one experiment to try; Team (sold as Growth) = unlimited experiments.
+    let p = billing::default_plans();
+    let (free, pro, team) = (&p["free"], &p["pro"], &p["team"]);
+    assert_eq!(
+        (free.projects, pro.projects, team.projects),
+        (Some(1), Some(5), Some(25))
+    );
+    assert_eq!(
+        (free.seats, pro.seats, team.seats),
+        (Some(1), Some(3), Some(15))
+    );
+    assert_eq!(
+        (free.experiments, pro.experiments, team.experiments),
+        (Some(1), Some(1), None)
+    );
+    assert_eq!(
+        (free.xp_cells, pro.xp_cells, team.xp_cells),
+        (Some(0), Some(2), Some(4))
+    );
+}
+
 #[tokio::test]
 async fn webhooks_drive_entitlements_and_quotas() {
     let mut cfg = Config::new("sk_test_x", HOOK, MOCK, "http://localhost:3100");
@@ -139,11 +162,10 @@ async fn webhooks_drive_entitlements_and_quotas() {
     let (s, e) = call(&app, Method::POST, "/api/projects", c, Some(mk("pb"))).await;
     assert_eq!(s, StatusCode::PAYMENT_REQUIRED);
     assert_eq!(e["error"]["code"], "plan_limit");
+    let m = e["error"]["message"].as_str().unwrap();
     assert!(
-        e["error"]["message"]
-            .as_str()
-            .unwrap()
-            .contains("/app/settings/billing")
+        m.contains("/app/settings/billing") && m.contains("Up to 5 on Pro."),
+        "{m}"
     );
 
     // On-demand is not in Free (this attempt is also CDN request 1 of 3).

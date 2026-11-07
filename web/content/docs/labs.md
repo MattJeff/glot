@@ -169,7 +169,7 @@ glot labs markets --json --top 3
 glot labs markets --add pt-BR     # appends it to target_locales in glot.toml, then runs translate --dry-run for it
 ```
 
-The dashboard shows the same ranking as a **Next language** card on the Insights page, with one click to add the locale (`GET /api/projects/{slug}/markets`).
+The same ranking stays available as `GET /api/projects/{slug}/markets`. The dashboard's **Next language** card uses your own traffic only, with an expected gain and a confidence label: see [Language recommendations](insights.md#language-recommendations).
 
 ## Database content (`glot labs db`, `@glot-i18n/db`)
 

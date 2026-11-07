@@ -1,20 +1,31 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, FlaskConical, Trophy, Users } from "lucide-react";
+import { Archive, FlaskConical, Trophy, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
 import { CodeBlock, ErrorState, PageHeader, useLocaleName } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cellViews, CellStateBadge, useXpFormat } from "@/components/experiments/results/shared";
 import { useVerdict, XpStatusBadge } from "@/components/experiments/results/summary";
+import { isEnded, isLive, XpActionsMenu } from "@/components/experiments/lifecycle";
 import { Milestone, MilestoneList } from "@/components/gamification/milestone";
 import { Link } from "@/i18n/navigation";
 import { api, qk, type VariantExperiment, type XpExperiment } from "@/lib/api";
 import { useSlug } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { ExperimentCard } from "./parts";
+
+const FILTERS = {
+  all: (e: XpExperiment) => !e.archived_at,
+  draft: (e: XpExperiment) => e.status === "draft",
+  live: isLive,
+  ended: (e: XpExperiment) => isEnded(e) && !e.archived_at,
+  archived: (e: XpExperiment) => !!e.archived_at,
+} as const;
+type Filter = keyof typeof FILTERS;
 
 // Integration snippet shown as code, not UI copy.
 const SNIPPET = `// app/[locale]/layout.tsx — inside NextIntlClientProvider
@@ -31,6 +42,8 @@ export default function ExperimentsPage() {
   const name = useLocaleName();
   const slug = useSlug();
   const qc = useQueryClient();
+  const tl = useTranslations("xpLifecycle");
+  const [filter, setFilter] = useState<Filter>("all");
   const q = useQuery({ queryKey: qk.variants(slug), queryFn: () => api.variantExperiments(slug), refetchInterval: 30_000 });
   const xq = useQuery({ queryKey: qk.xpList(slug), queryFn: () => api.xpList(slug), refetchInterval: 30_000 });
   const act = useMutation({
@@ -49,7 +62,7 @@ export default function ExperimentsPage() {
   const xps = xq.data ?? [];
   const legacy = q.data ?? [];
   const xpLive = xps.filter((e) => ["draft", "running", "paused", "personalized"].includes(e.status));
-  const xpPast = xps.filter((e) => !xpLive.includes(e));
+  const shown = xps.filter(FILTERS[filter]);
   const live = legacy.filter((e) => e.status === "running" || e.status === "decided");
   const past = legacy.filter((e) => e.status === "promoted" || e.status === "stopped");
   const byLocale = Object.entries(
@@ -120,16 +133,38 @@ export default function ExperimentsPage() {
 
           <ExperimentMilestones started={all.length > 0} won={anyWinner} />
 
-          {xpLive.length > 0 && (
+          {xps.length > 0 && (
             <section aria-labelledby="xp-live" className="space-y-3">
-              <h2 id="xp-live" className="font-medium">
-                {t("segmented")}
-              </h2>
-              <ul className="space-y-3">
-                {xpLive.map((e) => (
-                  <XpRow key={e.id} exp={e} slug={slug} />
-                ))}
-              </ul>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 id="xp-live" className="font-medium">
+                  {t("segmented")}
+                </h2>
+                <div role="group" aria-label={tl("filter.label")} className="flex flex-wrap gap-1.5">
+                  {(Object.keys(FILTERS) as Filter[]).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      aria-pressed={filter === f}
+                      onClick={() => setFilter(f)}
+                      className={cn(
+                        "min-h-8 rounded-full border px-3 text-sm transition-colors duration-150 outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        filter === f && "border-brand bg-brand/10 font-medium",
+                      )}
+                    >
+                      {tl(`filter.${f}`)} <span className="text-xs text-muted-foreground tabular-nums">{xps.filter(FILTERS[f]).length}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {shown.length ? (
+                <ul className="space-y-3">
+                  {shown.map((e) => (
+                    <XpRow key={e.id} exp={e} slug={slug} />
+                  ))}
+                </ul>
+              ) : (
+                <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{tl("filter.empty")}</p>
+              )}
             </section>
           )}
 
@@ -142,15 +177,10 @@ export default function ExperimentsPage() {
             </section>
           ))}
 
-          {past.length + xpPast.length > 0 && (
+          {past.length > 0 && (
             <details className="group rounded-xl border p-4 sm:p-5">
-              <summary className="cursor-pointer font-medium">{t("history", { n: past.length + xpPast.length })}</summary>
-              <ul className="mt-4 space-y-3">
-                {xpPast.map((e) => (
-                  <XpRow key={e.id} exp={e} slug={slug} />
-                ))}
-              </ul>
-              {past.length > 0 && <div className="mt-3 space-y-3">{past.map(card)}</div>}
+              <summary className="cursor-pointer font-medium">{t("history", { n: past.length })}</summary>
+              <div className="mt-4 space-y-3">{past.map(card)}</div>
             </details>
           )}
           <CodeBlock code={SNIPPET} label={t("install")} />
@@ -176,19 +206,29 @@ function Stat({ icon: Icon, label, value, hint }: { icon: React.ComponentType<{ 
 /** One segmented experiment in the list: status, name, the verdict sentence, each segment's state. */
 function XpRow({ exp, slug }: { exp: XpExperiment; slug: string }) {
   const t = useTranslations("experimentResults");
+  const tl = useTranslations("xpLifecycle");
   const { cellName } = useXpFormat();
   const cells = cellViews(exp, null);
   const verdict = useVerdict(exp, cells);
   return (
-    <li>
+    <li className="relative">
+      {/* Menu sits outside the link (no nested interactive content); the link keeps room for it. */}
+      <div className="absolute end-3 top-3 z-10 sm:end-4 sm:top-4">
+        <XpActionsMenu exp={exp} slug={slug} />
+      </div>
       <Link
         href={`/app/${slug}/experiments/${exp.id}`}
-        className="group flex items-start gap-3 rounded-xl border bg-card p-4 shadow-(--shadow-card) transition-colors hover:bg-accent/40 sm:p-5"
+        className="group flex items-start gap-3 rounded-xl border bg-card p-4 pe-14 shadow-(--shadow-card) transition-colors hover:bg-accent/40 sm:p-5 sm:pe-16"
       >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-medium">{exp.name}</h3>
             <XpStatusBadge status={exp.status} />
+            {exp.archived_at && (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Archive className="size-3" aria-hidden /> {tl("archivedBadge")}
+              </span>
+            )}
           </div>
           <p className="mt-1 text-sm text-pretty text-muted-foreground">{verdict}</p>
           <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs" aria-label={t("list.segments")}>
@@ -203,7 +243,6 @@ function XpRow({ exp, slug }: { exp: XpExperiment; slug: string }) {
             {t("list.meta", { keys: exp.keys.length, locales: exp.locales.length })}
           </p>
         </div>
-        <ChevronRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100" aria-hidden />
       </Link>
     </li>
   );

@@ -14,6 +14,14 @@ import { cn } from "@/lib/utils";
 
 export const PLANS: PlanId[] = ["free", "pro", "team"];
 export const QUOTAS: QuotaKey[] = ["projects", "seats", "cdn_requests", "insights_events", "mcp_calls", "ondemand_jobs", "llm_strings"];
+/** Cards also show the live-experiment limit (not a monthly counter, so not on the usage list). */
+const CARD_QUOTAS: (QuotaKey | "experiments")[] = ["experiments", ...QUOTAS];
+/** Promise of each plan, as `pricing.plans.<plan>.features.<key>`. */
+const FEATURES = {
+  free: ["oss", "project", "noCard"],
+  pro: ["sync", "qa", "review", "glossary", "matrix", "byok", "xp"],
+  team: ["everything", "xp", "recommend", "launch", "volume"],
+} as const;
 export type Interval = "month" | "year";
 
 export function usePlans() {
@@ -23,7 +31,7 @@ export function usePlans() {
 export function useQuotaLabel() {
   const t = useTranslations("pricing.quota");
   const format = useFormatter();
-  return (key: QuotaKey, n: number | null | undefined) =>
+  return (key: QuotaKey | "experiments", n: number | null | undefined) =>
     n === null || n === undefined
       ? t("unlimited", { name: t(key) })
       : n === 0
@@ -51,12 +59,24 @@ export function PlanCards({
   const [interval, setInterval] = useState<Interval>("month");
   const info: PlansInfo | undefined = plans.data;
   const llm = info?.prices.glot_llm_strings;
+  const yearOf = (plan: PlanId) => info?.prices[`glot_${plan}_year`]?.unit_amount;
+  const monthOf = (plan: PlanId) => info?.prices[`glot_${plan}_month`]?.unit_amount;
+  // Months the yearly price saves, from the live Stripe amounts (12 × month − year).
+  const monthsFree = (() => {
+    const m = monthOf("pro");
+    const y = yearOf("pro");
+    return m && y ? Math.round(12 - y / m) : 0;
+  })();
 
   const price = (plan: PlanId) => {
-    if (plan === "free") return { main: money(format, 0, info?.prices.glot_pro_month?.currency ?? "eur"), per: t("forever") };
+    if (plan === "free") return { main: money(format, 0, info?.prices.glot_pro_month?.currency ?? "eur"), per: t("forever"), equiv: null };
     const p = info?.prices[`glot_${plan}_${interval}`];
-    if (!p?.unit_amount) return { main: "—", per: t("perMonth") };
-    return { main: money(format, p.unit_amount, p.currency), per: interval === "month" ? t("perMonth") : t("perYear") };
+    if (!p?.unit_amount) return { main: "—", per: t("perMonth"), equiv: null };
+    return {
+      main: money(format, p.unit_amount, p.currency),
+      per: interval === "month" ? t("perMonth") : t("perYear"),
+      equiv: interval === "year" ? t("yearlyEquiv", { price: money(format, Math.round(p.unit_amount / 12), p.currency) }) : null,
+    };
   };
 
   return (
@@ -72,13 +92,14 @@ export function PlanCards({
             className={cn("rounded-md px-3 py-1", interval === i ? "bg-accent font-medium" : "text-muted-foreground")}
           >
             {i === "month" ? t("monthly") : t("yearly")}
+            {i === "year" && monthsFree > 0 && <span className="ms-1.5 text-xs text-success">{t("yearlySave", { n: monthsFree })}</span>}
           </button>
         ))}
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {PLANS.map((plan) => {
           const limits: Limits = info?.plans[plan] ?? {};
-          const { main, per } = price(plan);
+          const { main, per, equiv } = price(plan);
           return (
             <section
               key={plan}
@@ -94,16 +115,20 @@ export function PlanCards({
                 <span className="text-3xl font-semibold tracking-tight">{main}</span>{" "}
                 <span className="text-sm text-muted-foreground">{per}</span>
               </p>
-              <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-success" />{t("ossIncluded")}</li>
+              {equiv && <p className="text-xs text-muted-foreground">{equiv}</p>}
+              <p className="mt-3 text-sm"><span className="font-medium">{t("forWho")}</span> {t(`plans.${plan}.for`)}</p>
+              <ul className="mt-4 space-y-1.5 text-sm">
+                {FEATURES[plan].map((f) => (
+                  <li key={f} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                    {t(`plans.${plan}.features.${f}` as "plans.free.features.oss")}
+                  </li>
+                ))}
+              </ul>
+              <ul className="mt-4 flex-1 space-y-1 border-t pt-3 text-xs text-muted-foreground">
                 {plans.isPending
                   ? null
-                  : QUOTAS.map((q) => (
-                      <li key={q} className="flex gap-2">
-                        <Check className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                        {label(q, limits[q])}
-                      </li>
-                    ))}
+                  : CARD_QUOTAS.map((q) => <li key={q}>{label(q, limits[q])}</li>)}
               </ul>
               <div className="mt-5">{action(plan, interval)}</div>
             </section>
@@ -117,6 +142,7 @@ export function PlanCards({
           })}
         </p>
       )}
+      <p className="mt-2 text-center text-xs text-muted-foreground">{t("vat")}</p>
       {info && !info.enabled && <p className="mt-4 text-center text-sm text-muted-foreground">{t("selfHosted")}</p>}
     </div>
   );

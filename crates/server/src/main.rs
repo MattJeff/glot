@@ -40,6 +40,7 @@ async fn main() -> anyhow::Result<()> {
     email::spawn_worker(state.clone());
     glot_server::experiments::rebalance::spawn_worker(state.clone());
     glot_server::layout_rum::spawn_worker(state.clone());
+    glot_server::launches::spawn_worker(state.clone());
 
     let listener = tokio::net::TcpListener::bind(&bind).await?;
     tracing::info!("glot-server listening on http://{bind}");

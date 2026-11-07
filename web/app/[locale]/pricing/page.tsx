@@ -18,7 +18,7 @@ export default async function Pricing({ params }: PageProps<"/[locale]/pricing">
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   const t = await getTranslations("pricing");
-  const faq = ["oss", "byok", "selfHost", "limits", "tax"] as const;
+  const faq = ["byok", "quotas", "limits", "cancel", "tax", "selfHost", "oss"] as const;
 
   return (
     <div className="flex min-h-screen flex-col">

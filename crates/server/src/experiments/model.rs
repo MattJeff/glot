@@ -202,6 +202,8 @@ pub struct Experiment {
     pub created_at: DateTime<Utc>,
     pub started_at: Option<DateTime<Utc>>,
     pub ended_at: Option<DateTime<Utc>>,
+    /// Hidden from the default list; results kept. Only drafts and archived experiments can be deleted.
+    pub archived_at: Option<DateTime<Utc>>,
 }
 
 /// One element of `Hit.exposures`.
@@ -238,10 +240,24 @@ pub struct CellCheck {
     pub issues: Vec<Issue>,
 }
 
+/// One reason an experiment cannot start, as a code (`no_keys`, `key_missing`, `key_live`, `no_locales`,
+/// `too_many_segments`, `currency`, `weights`, `no_variant`, `cell_missing`, `cell_invalid`) + where.
+#[derive(Debug, Clone, Default, Serialize, utoipa::ToSchema)]
+pub struct Blocker {
+    pub code: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arm: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locale: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Readiness {
     pub ready: bool,
     pub problems: Vec<String>,
+    pub blockers: Vec<Blocker>,
     pub cells: Vec<CellCheck>,
 }
 

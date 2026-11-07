@@ -20,6 +20,10 @@ read from the `glot_xp` cookie (edge persistence `session`) and from sessionStor
 event; nothing is attributed under Global Privacy Control / Do Not Track. Exposures themselves are counted by the edge;
 "seen" exposures (`glot:seen` from the runtime) go to `/api/insights/{pk}/batch`, once per session and experiment.
 
+Language launches (holdout): `onLocale` / the `glot:locale` window event give the locale to render, the new one or
+the fallback for held-out sessions. An explicit choice wins and leaves the measurement: `explicit: true` (or
+`data-explicit="1"`), a pick stored by `<glot-locale-switcher>`, or a `glot:locale-change` event mid-session.
+
 Server side (no client JS): `import { reportVisit } from "@glot-i18n/insights/server"`.
 
 MIT — part of [glot](https://github.com/MattJeff/glot).

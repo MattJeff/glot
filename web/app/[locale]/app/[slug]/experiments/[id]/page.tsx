@@ -9,6 +9,7 @@ import { CellCard, type Act } from "@/components/experiments/results/cell-card";
 import { WordingMatrix } from "@/components/experiments/results/segment-preview";
 import { cellViews } from "@/components/experiments/results/shared";
 import { SummaryHeader } from "@/components/experiments/results/summary";
+import { DraftPanel, EndedNote, isEnded, isLive, LockedNote, StopButton, XpActionsMenu } from "@/components/experiments/lifecycle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "@/i18n/navigation";
 import { api, ApiError, qk } from "@/lib/api";
@@ -43,7 +44,7 @@ export default function ExperimentResultsPage() {
       if (exp) qc.setQueryData(qk.xp(slug, id), exp);
       qc.invalidateQueries({ queryKey: qk.variants(slug) });
       if (a.action === "promote") qc.invalidateQueries({ queryKey: qk.keys(slug) });
-      toast.success(t(a.action === "promote" ? (a.scope === "all" ? "toast.promote_all" : "toast.promote_segment") : `toast.${a.action}`));
+      toast.success(t(a.action === "promote" ? (a.scope === "all" ? "toast.promote_all" : "toast.promote_segment") : `toast.${a.action as "pause" | "resume" | "stop"}`));
     },
   });
 
@@ -71,10 +72,27 @@ export default function ExperimentResultsPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <SummaryHeader exp={exp} cells={cells} slug={slug} busy={busy} onAct={act.mutate} />
+      <SummaryHeader
+        exp={exp}
+        cells={cells}
+        slug={slug}
+        busy={busy}
+        onAct={act.mutate}
+        extra={
+          <>
+            {isLive(exp) && <StopButton exp={exp} slug={slug} />}
+            <XpActionsMenu exp={exp} slug={slug} detail />
+          </>
+        }
+      />
+
+      {exp.status === "draft" && <DraftPanel exp={exp} slug={slug} />}
+      {isLive(exp) && <LockedNote exp={exp} slug={slug} />}
+      {isEnded(exp) && <EndedNote exp={exp} slug={slug} />}
 
       {res.isError && <ErrorState error={res.error} onRetry={() => res.refetch()} />}
 
+      {exp.status !== "draft" && (
       <section aria-labelledby="xp-segments" className="space-y-3">
         <div>
           <h2 id="xp-segments" className="font-medium">
@@ -86,6 +104,7 @@ export default function ExperimentResultsPage() {
           <CellCard key={c.id} exp={exp} cell={c} only={only} otherLocales={otherLocales} busy={busy} onAct={act.mutate} />
         ))}
       </section>
+      )}
 
       <section aria-labelledby="xp-wording" className="space-y-3">
         <div>

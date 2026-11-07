@@ -1,18 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { Globe2, Plus, Trash2, TriangleAlert, Users } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useLocaleName } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api, type Project } from "@/lib/api";
+import { DurationEstimate } from "@/components/experiments/duration";
+import type { Project } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ATTRS, MAX_SEGMENTS, segmentsToCells, uid, useDebounced, type Draft, type Segment, type SegmentAttr } from "./draft";
 
-const TOO_LONG = 90; // days: past this a cell is merged into "everyone else" (design doc §4)
 const PRESETS = [
   { name: "mobile", rules: { device: ["mobile"] } },
   { name: "search", rules: { source: ["search"] } },
@@ -22,39 +21,60 @@ const PRESETS = [
 export function StepAudience({
   project,
   locales,
+  allLocales,
   draft: d,
   update,
   armCount,
 }: {
   project: Project;
   locales: string[];
+  allLocales: string[];
   draft: Draft;
   update: (p: Partial<Draft>) => void;
   armCount: number;
 }) {
   const t = useTranslations("xpWizard.audience");
-  const format = useFormatter();
+  const tl = useTranslations("xpLifecycle.wizard");
+  const localeName = useLocaleName();
   const setSegments = (segments: Segment[]) => update({ segments });
-  const patch = (id: string, p: Partial<Segment>) => setSegments(d.segments.map((s) => (s.id === id ? { ...s, ...p } : s)));
+  // An edited segment is sent as {name, rule} again (no longer by server id).
+  const patch = (id: string, p: Partial<Segment>) => setSegments(d.segments.map((s) => (s.id === id ? { ...s, ...p, ref: undefined } : s)));
   const add = (preset?: (typeof PRESETS)[number]) =>
     setSegments([...d.segments, { id: uid(), name: preset ? t(`preset.${preset.name}`) : "", rules: preset ? { ...preset.rules } : {} }]);
 
   const cells = useDebounced(segmentsToCells(d.segments, t("unnamed")), 500);
-  const estimate = useQuery({
-    queryKey: ["xp-estimate", project.slug, cells, armCount, d.goal, d.minN],
-    queryFn: () => api.xpEstimate(project.slug, { cells, arms: armCount + 1, locales, goal: d.goal || undefined, min_n: d.minN }),
-    retry: false,
-    staleTime: 60_000,
-  });
-  // Estimate rows are matched by position: targeted segments first, then "*".
-  const est = (i: number) => estimate.data?.cells[i];
-  const rest = estimate.data?.cells.find((c) => c.cell === "*") ?? estimate.data?.cells[cells.length];
-  const days = (n: number | null | undefined) => (n == null ? "—" : t("days", { n: Math.ceil(n) }));
-  const slow = estimate.data?.cells.filter((c) => c.too_small || (c.days ?? 0) > TOO_LONG) ?? [];
-  const fragmented = cells.length >= 3 || slow.length > 0;
+  const fragmented = cells.length >= 3;
+
+  const toggleLocale = (l: string) =>
+    update({ locales: locales.includes(l) ? locales.filter((x) => x !== l) : allLocales.filter((x) => x === l || locales.includes(x)) });
 
   return (
     <div className="space-y-5">
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">{tl("locales")}</legend>
+        <p className="text-xs text-pretty text-muted-foreground">{tl("localesHint")}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {allLocales.map((l) => {
+            const on = locales.includes(l);
+            return (
+              <button
+                key={l}
+                type="button"
+                aria-pressed={on}
+                disabled={on && locales.length === 1}
+                onClick={() => toggleLocale(l)}
+                className={cn(
+                  "min-h-9 rounded-full border px-3 text-sm transition-colors duration-150 outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
+                  on && "border-brand bg-brand/10 font-medium text-foreground",
+                )}
+              >
+                {localeName(l)} <span className="font-mono text-xs text-muted-foreground">{l}</span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
       <div className="flex flex-wrap items-center gap-2">
         <Button type="button" variant="outline" size="lg" onClick={() => add()} disabled={d.segments.length >= MAX_SEGMENTS}>
           <Plus /> {t("add")}
@@ -77,71 +97,31 @@ export function StepAudience({
               onChange={(p) => patch(s.id, p)}
               onRemove={() => setSegments(d.segments.filter((x) => x.id !== s.id))}
             />
-            <Estimate row={est(i)} loading={estimate.isPending} format={format} days={days} />
           </li>
         ))}
         <li className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-dashed p-3 sm:p-4">
           <Users className="size-4 text-muted-foreground" aria-hidden />
           <span className="font-medium">{d.segments.length ? t("everyoneElse") : t("everyone")}</span>
           <span className="text-sm text-muted-foreground">{d.segments.length ? t("everyoneElseHint") : t("everyoneHint")}</span>
-          <div className="basis-full">
-            <Estimate row={rest} loading={estimate.isPending} format={format} days={days} />
-          </div>
         </li>
       </ul>
 
+      <DurationEstimate slug={project.slug} segments={cells} arms={armCount + 1} goal={d.goal} minN={d.minN} trafficPct={d.trafficPct} />
+
       <div aria-live="polite" className="space-y-2">
-        {estimate.isError && <p className="text-sm text-muted-foreground">{t("estimateUnavailable")}</p>}
-        {estimate.data?.days != null && (
-          <p className="text-sm">
-            {t.rich("total", { days: Math.ceil(estimate.data.days), b: (c) => <strong className="tabular-nums">{c}</strong> })}
-          </p>
-        )}
         {fragmented && (
           <div role="alert" className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
             <TriangleAlert className="mt-0.5 size-4 shrink-0 text-warning-foreground" aria-hidden />
             <div>
               <p className="font-medium">{t("fragmentedTitle")}</p>
               <p className="mt-0.5 text-pretty">
-                {slow.length ? t("fragmentedSlow", { n: slow.length, max: TOO_LONG }) : t("fragmentedMany", { n: cells.length })}
+                {t("fragmentedMany", { n: cells.length })}
               </p>
             </div>
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-function Estimate({
-  row,
-  loading,
-  format,
-  days,
-}: {
-  row: { visitors_per_day: number; days: number | null; too_small?: boolean } | undefined;
-  loading: boolean;
-  format: ReturnType<typeof useFormatter>;
-  days: (n: number | null | undefined) => string;
-}) {
-  const t = useTranslations("xpWizard.audience");
-  if (loading) return <div className="mt-3 h-5 w-48 animate-pulse rounded bg-muted motion-reduce:animate-none" />;
-  if (!row) return null;
-  const slow = row.too_small || (row.days ?? 0) > TOO_LONG;
-  return (
-    <p className={cn("mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm", slow && "text-warning-foreground")}>
-      <span>
-        <span className="font-medium tabular-nums">{format.number(Math.round(row.visitors_per_day))}</span> {t("perDay")}
-      </span>
-      <span>
-        {t("needs")} <span className="font-medium tabular-nums">{days(row.days)}</span>
-      </span>
-      {slow && (
-        <span className="inline-flex items-center gap-1">
-          <TriangleAlert className="size-3.5" aria-hidden /> {t("merged")}
-        </span>
-      )}
-    </p>
   );
 }
 

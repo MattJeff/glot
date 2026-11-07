@@ -437,6 +437,9 @@ pub struct EstimateRequest {
     pub goal: Option<String>,
     #[serde(default)]
     pub min_n: Option<i64>,
+    /// Share of the segment's traffic in the test (default 100).
+    #[serde(default)]
+    pub traffic_pct: Option<i32>,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
@@ -453,6 +456,18 @@ pub struct Estimate {
     pub too_long: bool,
     /// False when the rule uses attributes `insight_daily` does not record (device, source…): an upper bound.
     pub exact: bool,
+    /// Days to detect +10 %, +20 %, +50 % (`duration::LIFTS`), with these arms and traffic share.
+    pub lifts: Vec<LiftDays>,
+    /// Smallest relative lift detectable in `duration::WARN_DAYS` days (None: out of reach or no data).
+    pub detectable_lift: Option<f64>,
+    pub warn_days: f64,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct LiftDays {
+    pub lift: f64,
+    pub per_arm: Option<i64>,
+    pub days: Option<f64>,
 }
 
 /// `POST /api/projects/{slug}/xp/estimate`: traffic and duration of a segment before creating the experiment.
@@ -511,6 +526,23 @@ pub async fn estimate(
     let days = per_arm.filter(|_| daily_visitors > 0.0).map(|n| {
         (n as f64 * req.arms.unwrap_or(2).clamp(2, 8) as f64 / daily_visitors).max(stats::MIN_DAYS)
     });
+    use super::duration as dur;
+    let arms = req.arms.unwrap_or(2).clamp(2, 8);
+    let min_n = req.min_n.unwrap_or(500);
+    let in_test = daily_visitors * req.traffic_pct.unwrap_or(100).clamp(1, 100) as f64 / 100.0;
+    let lifts = dur::LIFTS
+        .iter()
+        .map(|&lift| {
+            let n = baseline
+                .and_then(|b| dur::per_arm(b, lift))
+                .map(|n| n.max(min_n));
+            LiftDays {
+                lift,
+                per_arm: n,
+                days: n.and_then(|n| dur::days(n, arms, in_test)),
+            }
+        })
+        .collect();
     Ok(Json(Estimate {
         daily_visitors,
         baseline,
@@ -518,5 +550,9 @@ pub async fn estimate(
         days,
         too_long: days.is_none_or(|d| d > MAX_DAYS),
         exact,
+        lifts,
+        detectable_lift: baseline
+            .and_then(|b| dur::detectable_lift(b, arms, in_test, min_n, dur::WARN_DAYS)),
+        warn_days: dur::WARN_DAYS,
     }))
 }

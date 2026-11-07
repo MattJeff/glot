@@ -1063,7 +1063,7 @@ pub async fn apply(
     let glossary = crate::glossary::load(&state.db, ctx.project.id).await?;
     let mut tx = state.db.begin().await?;
     let k = find_key(&mut tx, ctx.project.id, &key).await?;
-    let issues = crate::keys::check(&k.source, &value, &a.locale, &glossary);
+    let issues = crate::keys::check(&k.source, &value, &a.locale, ctx.project.syntax, &glossary);
     if has_errors(&issues) {
         let errs: Vec<&Issue> = issues.iter().collect();
         let by_locale = BTreeMap::from([(a.locale.clone(), issues.clone())]);
@@ -1082,6 +1082,7 @@ pub async fn apply(
             score: None,
             extra_issues: vec![],
             author: Some(&actor.name),
+            syntax: ctx.project.syntax,
         },
     )
     .await?;
@@ -1311,9 +1312,9 @@ pub(super) fn check_values(
                 "{loc}: value must be 1-10000 chars without control characters (DELETE the translation to clear it)"
             )));
         }
-        let mut issues = crate::keys::check(source, v, loc, glossary);
+        let mut issues = crate::keys::check(source, v, loc, ctx.project.syntax, glossary);
         if let Some(f) = fit
-            && let Some(i) = measure::check(v, Syntax::Icu, f)
+            && let Some(i) = measure::check(v, ctx.project.syntax, f)
         {
             issues.push(i);
         }
@@ -1354,6 +1355,7 @@ pub(super) async fn write_values(
     issues: &BTreeMap<String, Vec<Issue>>,
     glossary: &glot_core::glossary::Glossary,
     author: &str,
+    syntax: Syntax,
 ) -> ApiResult<BTreeMap<String, Translation>> {
     let mut written = BTreeMap::new();
     for (loc, v) in values {
@@ -1371,6 +1373,7 @@ pub(super) async fn write_values(
                 // keeps the pixel-budget issue (too_wide) next to the validator's (deduplicated by code)
                 extra_issues: issues[loc].clone(),
                 author: Some(author),
+                syntax,
             },
         )
         .await?;
@@ -1411,7 +1414,16 @@ pub async fn put_text(
             &errors.iter().collect::<Vec<_>>(),
         ));
     }
-    let written = write_values(&mut tx, &k, &b.values, &issues, &glossary, &actor.name).await?;
+    let written = write_values(
+        &mut tx,
+        &k,
+        &b.values,
+        &issues,
+        &glossary,
+        &actor.name,
+        ctx.project.syntax,
+    )
+    .await?;
     emit(
         &mut tx,
         ctx.project.id,
@@ -1514,7 +1526,16 @@ pub async fn revert_text(
             &errors.iter().collect::<Vec<_>>(),
         ));
     }
-    let mut written = write_values(&mut tx, &k, &values, &issues, &glossary, &actor.name).await?;
+    let mut written = write_values(
+        &mut tx,
+        &k,
+        &values,
+        &issues,
+        &glossary,
+        &actor.name,
+        ctx.project.syntax,
+    )
+    .await?;
     emit(
         &mut tx,
         ctx.project.id,
@@ -1669,7 +1690,16 @@ pub async fn create_text(
     let key = created.ok_or_else(|| AppError::conflict(format!("key '{base}' already exists")))?;
     let k = find_key(&mut tx, ctx.project.id, &key).await?;
     if !b.values.is_empty() {
-        write_values(&mut tx, &k, &b.values, &issues, &glossary, &actor.name).await?;
+        write_values(
+            &mut tx,
+            &k,
+            &b.values,
+            &issues,
+            &glossary,
+            &actor.name,
+            ctx.project.syntax,
+        )
+        .await?;
     }
     emit(
         &mut tx,

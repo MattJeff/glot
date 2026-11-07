@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 use glot_core::{
     config::LlmConfig,
     measure::{self, Fit},
-    validate::{Issue, Syntax, has_errors},
+    validate::{Issue, has_errors},
 };
 use glot_llm::provider::CompletionRequest;
 use rand::{Rng, SeedableRng, rngs::StdRng};
@@ -642,11 +642,11 @@ pub async fn create(
     let mut rejected = vec![];
     for c in generate(&state, &p, &k, &b.locale, &current, n, b.fit.as_ref()).await? {
         let text = c.text.trim().to_string();
-        let mut issues = keys::check(&k.source, &text, &b.locale, &glossary);
+        let mut issues = keys::check(&k.source, &text, &b.locale, p.syntax, &glossary);
         if let Some(i) = b
             .fit
             .as_ref()
-            .and_then(|f| measure::check(&text, Syntax::Icu, f))
+            .and_then(|f| measure::check(&text, p.syntax, f))
         {
             issues.push(i);
         }
@@ -770,6 +770,7 @@ pub async fn promote(
                 score: None,
                 extra_issues: vec![],
                 author: Some(&user.name),
+                syntax: p.syntax,
             },
         )
         .await?;

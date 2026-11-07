@@ -7,8 +7,12 @@ export type Options = {
   endpoint?: string;
   /** Locale the app rendered (default: <html lang>). */
   locale?: string;
-  /** Called when this session is in the test arm of a language experiment: render that locale. */
+  /** Called when a language experiment or launch holdout assigns this session a locale (the new one, or the
+   * fallback for held-out visitors): render that locale. Also dispatched as `glot:locale` on window. */
   onLocale?: (locale: string) => void;
+  /** The visitor picked this locale (switcher, `?lang=`, account setting): never held out, excluded from launch
+   * measurement. A pick in `<glot-locale-switcher>` (localStorage `glot-locale`) counts without this flag. */
+  explicit?: boolean;
 };
 /** Copy variant served to this session for a key: experiment id, arm, text. */
 export type Variant = { id: string; arm: number; value: string };
@@ -29,21 +33,42 @@ const read = (): State | null => {
 export type Exposure = { id: string; cell: string; arm: number };
 export type Revenue = { value?: number; currency?: string };
 
+/** An explicit language choice wins over any assignment (and leaves the launch analysis). */
+const chosen = (): boolean => {
+  if (opts?.explicit) return true;
+  try {
+    return !!localStorage.getItem("glot-locale");
+  } catch {
+    return false;
+  }
+};
+const save = (s: State) => {
+  try {
+    sessionStorage.setItem(SK, JSON.stringify(s));
+  } catch {}
+};
+const post = (body: object) =>
+  fetch(`${opts!.endpoint || ""}/api/insights/${opts!.key}`, { method: "POST", body: JSON.stringify(body), keepalive: true });
+const langs = () => [...(navigator.languages || [navigator.language])].slice(0, 5);
+const served = () => opts!.locale || document.documentElement.lang || "en";
+
 function send(event?: string, rev?: Revenue): Promise<State> {
   if (!opts) return Promise.resolve({});
+  const explicit = chosen();
   const body = {
-    langs: [...(navigator.languages || [navigator.language])].slice(0, 5),
-    served: opts.locale || document.documentElement.lang || "en",
+    langs: langs(),
+    served: served(),
     route: location.pathname,
     event,
-    arm: read()?.a,
+    arm: explicit ? undefined : read()?.a,
+    explicit: explicit || undefined,
     variants: event ? arms() : undefined,
     exposures: event ? exposures(event) : undefined,
     value: rev?.value,
     currency: rev?.currency?.toUpperCase(),
   };
   // String body = text/plain: a "simple" CORS request, no preflight.
-  return fetch(`${opts.endpoint || ""}/api/insights/${opts.key}`, { method: "POST", body: JSON.stringify(body), keepalive: true })
+  return post(body)
     .then((r) => (r.ok ? r.json() : {}))
     .then((r: { arm?: string; locale?: string; variants?: (Variant & { key: string })[] }) => ({
       a: r.arm,
@@ -59,14 +84,25 @@ export async function init(o: Options): Promise<void> {
   let s = read();
   if (!s) {
     s = await send();
-    try {
-      sessionStorage.setItem(SK, JSON.stringify(s));
-    } catch {}
+    save(s);
     // @glot/runtime's useGlotVariant / <GlotCopy> listen for this (no import between the packages).
     if (typeof dispatchEvent === "function") dispatchEvent(new Event("glot:variants"));
   }
-  if (s.l) o.onLocale?.(s.l);
+  if (s.l && !chosen()) {
+    o.onLocale?.(s.l);
+    if (typeof dispatchEvent === "function") dispatchEvent(new CustomEvent("glot:locale", { detail: { locale: s.l, arm: s.a } }));
+  }
 }
+
+/** The visitor picked a language mid-session (`glot:locale-change` from the switcher, or dispatched by your own
+ * picker): the session leaves its language-experiment arm, once; the choice is kept by the switcher. */
+function withdraw(): void {
+  const s = read();
+  if (!opts || !s?.a) return;
+  void post({ langs: langs(), served: served(), arm: s.a, explicit: true }).catch(() => {});
+  save({ v: s.v });
+}
+if (typeof addEventListener === "function") addEventListener("glot:locale-change", withdraw);
 
 /** Conversion event: "signup", "purchase" or any name (1-40 chars of a-z0-9_-.:). Credits this session's
  * language-experiment arm, copy-variant arms and segmented-experiment exposures (each experiment once per
@@ -139,5 +175,5 @@ export const glot = { init, track, variant };
 const el = typeof document !== "undefined" ? (document.currentScript as HTMLScriptElement | null) : null;
 if (el?.dataset.key) {
   (window as unknown as { glot: typeof glot }).glot = glot;
-  void init({ key: el.dataset.key, endpoint: el.dataset.endpoint, locale: el.dataset.locale });
+  void init({ key: el.dataset.key, endpoint: el.dataset.endpoint, locale: el.dataset.locale, explicit: !!el.dataset.explicit });
 }

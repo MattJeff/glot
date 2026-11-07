@@ -39,12 +39,30 @@ import { Link, useRouter } from "@/i18n/navigation";
 import {
   api,
   type LlmSettings,
+  type MessageSyntax,
   type PreviewSettings,
+  SYNTAXES,
   type Project,
   type Provider,
   qk,
 } from "@/lib/api";
 import { useOrigin, useProject, useSlug } from "@/lib/hooks";
+
+/** One catalog line per syntax, as glot.toml would hold it (code, not translated). */
+const SYNTAX_EXAMPLES: Record<MessageSyntax, string> = {
+  icu: "{count, plural, one {# file} other {# files}} for {name}",
+  i18next: "Hello {{name}}",
+  mf2: "Hello {$name}",
+  printf: "%1$d files for %2$@",
+  rails: "Hello %{name}",
+  vue: "no file | {n} file | {n} files",
+  laravel: "Hello :name",
+  template: "Hello {{ name }}",
+  fluent: "Hello { $name }",
+  plain: "Fill in the {{parameters}} for {name}",
+  symfony: "Hello %name%",
+  java: "{0} has {1,number} files",
+};
 
 const PROVIDERS: Provider[] = [
   "anthropic",
@@ -146,6 +164,7 @@ function SettingsForm({
   const [newLocale, setNewLocale] = useState("");
   const [style, setStyle] = useState(p.style ?? "");
   const [cdn, setCdn] = useState(p.public_cdn);
+  const [syntax, setSyntax] = useState<MessageSyntax>(p.syntax ?? "icu");
   const [llm, setLlm] = useState<LlmSettings>({
     provider: p.llm.provider,
     model: p.llm.model,
@@ -202,6 +221,8 @@ function SettingsForm({
         target_locales: targets,
         style,
         public_cdn: cdn,
+        // Sent only when changed: saving it pins the dashboard choice and rechecks every translation.
+        ...(syntax !== (p.syntax ?? "icu") ? { syntax } : {}),
         llm: {
           provider: llm.provider,
           model: llm.model,
@@ -428,6 +449,40 @@ function SettingsForm({
               <Plus /> {t("locales.add")}
             </Button>
           </div>
+        </div>
+        <Field
+          id="s-syntax"
+          label={t("locales.syntaxLabel")}
+          hint={t("locales.syntaxHint")}
+        >
+          <Select
+            value={syntax}
+            onValueChange={(v) => setSyntax(v as MessageSyntax)}
+          >
+            <SelectTrigger id="s-syntax" className="w-56">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SYNTAXES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  <span className="font-mono text-xs">{s}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <div className="space-y-1 text-sm">
+          <p className="text-pretty text-muted-foreground">
+            {t(`locales.syntax.${syntax}`)}
+          </p>
+          <p>
+            <span className="text-muted-foreground">
+              {t("locales.syntaxExample")}{" "}
+            </span>
+            <code dir="ltr" className="font-mono text-xs">
+              {SYNTAX_EXAMPLES[syntax]}
+            </code>
+          </p>
         </div>
       </Section>
 

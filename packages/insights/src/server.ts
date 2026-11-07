@@ -16,8 +16,10 @@ export function acceptLanguages(header: string | null): string[] {
     .slice(0, 5);
 }
 
-/** Posts one visit. Returns the experiment locale to serve when this visitor lands in the test arm. */
-export async function reportVisit(req: Request, o: ServerOptions & { event?: string; arm?: string }) {
+/** Posts one visit. Returns the locale to serve when an experiment or a launch holdout assigns one (the new locale,
+ * or the fallback for held-out visitors). `explicit`: the visitor picked the locale (cookie / URL set by your
+ * switcher): never assigned. */
+export async function reportVisit(req: Request, o: ServerOptions & { event?: string; arm?: string; explicit?: boolean }) {
   const h = req.headers;
   const body = {
     langs: acceptLanguages(h.get("accept-language")),
@@ -25,7 +27,8 @@ export async function reportVisit(req: Request, o: ServerOptions & { event?: str
     country: h.get("x-vercel-ip-country") || h.get("cf-ipcountry") || undefined,
     route: new URL(req.url).pathname,
     event: o.event,
-    arm: o.arm,
+    arm: o.explicit ? undefined : o.arm,
+    explicit: o.explicit || undefined,
   };
   try {
     const r = await fetch(`${o.endpoint}/api/insights/${o.key}`, { method: "POST", body: JSON.stringify(body) });

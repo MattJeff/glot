@@ -53,6 +53,8 @@ glot push      # catalogs, glot.lock, glossary and code context (refs, UI roles)
 glot pull      # back to Git, with descriptions edited in the dashboard
 ```
 
+The server checks placeholders with the project's message syntax (`syntax` in glot.toml). `glot push` adopts it while the project still has the default `icu` and nobody picked one in Settings; `glot push --set-syntax` always makes glot.toml's the project's. A GitHub App run uses the repository's glot.toml. `glot push` and `glot pull` warn when the server's syntax differs from yours. Every change rechecks the stored translations.
+
 Server-side translation jobs use the project's LLM settings (provider, model, key stored encrypted, budget). With an organization-level Anthropic key, set the workspace to bill in the project settings.
 
 ## OTA catalogs

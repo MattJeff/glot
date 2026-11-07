@@ -4,6 +4,7 @@ use glot_core::{
     glossary::Term,
     hash::hash,
     lock::{LockEntry, Lockfile, Origin},
+    validate::Syntax,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
@@ -34,6 +35,12 @@ pub struct PushBody {
     /// The client's idea of the source locale (`glot.toml`); a mismatch is refused, not merged.
     #[serde(default)]
     pub source_locale: Option<String>,
+    /// glot.toml `syntax`. Adopted when the project still has the untouched default (`icu`, not chosen
+    /// in the dashboard), or always with `set_syntax` (`glot push --set-syntax`). Absent = unchanged.
+    #[serde(default)]
+    pub syntax: Option<String>,
+    #[serde(default)]
+    pub set_syntax: bool,
 }
 
 #[derive(Deserialize, Default)]
@@ -58,11 +65,16 @@ pub struct PushResult {
     pub created: u32,
     pub updated: u32,
     pub conflicts: Vec<Conflict>,
+    /// The project's message syntax after this push.
+    #[schema(value_type = String)]
+    pub syntax: Syntax,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct PullResult {
     pub source_locale: String,
+    #[schema(value_type = String)]
+    pub syntax: Syntax,
     #[schema(value_type = Object)]
     pub catalogs: Catalogs,
     #[schema(value_type = Object)]
@@ -117,12 +129,17 @@ pub async fn apply_push(
             "'{bad}' is not a locale of this project"
         )));
     }
+    let mut tx = state.db.begin().await?;
+    let syntax = match &b.syntax {
+        Some(name) => crate::keys::set_syntax(&mut tx, p.id, name, b.set_syntax, false).await?,
+        None => p.syntax,
+    };
     let mut out = PushResult {
         created: 0,
         updated: 0,
         conflicts: vec![],
+        syntax,
     };
-    let mut tx = state.db.begin().await?;
     let mut keys = key_map(&mut tx, p.id).await?;
 
     if let Some(source) = b.catalogs.get(&p.source_locale) {
@@ -244,6 +261,7 @@ pub async fn apply_push(
                     score: entry.and_then(|e| e.score),
                     extra_issues: vec![],
                     author: Some(author),
+                    syntax,
                 },
             )
             .await?;
@@ -328,6 +346,7 @@ pub async fn pull(
     let glossary = crate::glossary::load(&state.db, p.id).await?;
     Ok(Json(PullResult {
         source_locale: p.source_locale.clone(),
+        syntax: p.syntax,
         catalogs,
         lock,
         glossary: glossary.terms,

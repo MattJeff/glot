@@ -2,6 +2,7 @@
 //! `GET /cdn/{slug}/experiments.json`. Contract: docs/design/segmented-copy-experiments-contract.md.
 //! The legacy one-key/one-locale experiments (`variants.rs`) keep running unchanged.
 pub mod api;
+pub mod duration;
 pub mod generate;
 pub mod ingest;
 pub mod model;
@@ -9,7 +10,7 @@ pub mod promote;
 pub mod rebalance;
 pub mod stats;
 
-use glot_core::validate::{Syntax, has_errors};
+use glot_core::validate::has_errors;
 use sqlx::types::Json as DbJson;
 use std::collections::BTreeMap;
 use uuid::Uuid;
@@ -45,12 +46,13 @@ struct Row {
     created_at: chrono::DateTime<chrono::Utc>,
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     ended_at: Option<chrono::DateTime<chrono::Utc>>,
+    archived_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 pub async fn load(state: &AppState, project_id: Uuid, id: Uuid) -> ApiResult<Experiment> {
     let r: Row = sqlx::query_as(
         "SELECT id, name, kind, status, locales, cells, allocation, weights, traffic_pct, min_n, goal, metric,
-                exposure, currency, guardrails, facts, fits, review, created_at, started_at, ended_at
+                exposure, currency, guardrails, facts, fits, review, created_at, started_at, ended_at, archived_at
          FROM xp_experiments WHERE project_id = $1 AND id = $2",
     )
     .bind(project_id)
@@ -163,6 +165,7 @@ pub async fn load(state: &AppState, project_id: Uuid, id: Uuid) -> ApiResult<Exp
         created_at: r.created_at,
         started_at: r.started_at,
         ended_at: r.ended_at,
+        archived_at: r.archived_at,
     })
 }
 
@@ -185,7 +188,14 @@ pub async fn live_key_owner(
 /// ICU, glossary) and `measure::check` when the key has a layout budget. Unapproved arms are reported, not blocking.
 pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<Readiness> {
     let x = load(state, p.id, id).await?;
+    // `problems` = English sentences (CLI); `blockers` = the same list as codes the dashboard translates.
     let mut problems = vec![];
+    let mut blockers: Vec<Blocker> = vec![];
+    let mut block = |code: &'static str, msg: String, b: Blocker| {
+        problems.push(msg);
+        blockers.push(Blocker { code, ..b });
+    };
+    let none = Blocker::default;
     let sources: Vec<(String, Option<String>)> = sqlx::query_as(
         "SELECT x.key, k.source FROM xp_keys x LEFT JOIN keys k ON k.project_id = x.project_id AND k.key = x.key
          WHERE x.experiment_id = $1 ORDER BY x.key",
@@ -194,11 +204,18 @@ pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<
     .fetch_all(&state.db)
     .await?;
     if sources.is_empty() {
-        problems.push("no key selected".to_string());
+        block("no_keys", "no key selected".into(), none());
     }
     for (k, s) in &sources {
         if s.is_none() {
-            problems.push(format!("key '{k}' does not exist"));
+            block(
+                "key_missing",
+                format!("key '{k}' does not exist"),
+                Blocker {
+                    key: Some(k.clone()),
+                    ..none()
+                },
+            );
         }
     }
     let taken: Vec<(String, String)> = sqlx::query_as(
@@ -214,27 +231,44 @@ pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<
     .fetch_all(&state.db)
     .await?;
     for (k, by) in taken {
-        problems.push(format!("key '{k}' is already live in {by}"));
+        block(
+            "key_live",
+            format!("key '{k}' is already live in {by}"),
+            Blocker {
+                key: Some(k),
+                ..none()
+            },
+        );
     }
     if x.locales.is_empty() {
-        problems.push("no locale selected".into());
+        block("no_locales", "no locale selected".into(), none());
     }
     if x.cells.len() > MAX_CELLS {
-        problems.push(format!("at most {MAX_CELLS} segments"));
+        block(
+            "too_many_segments",
+            format!("at most {MAX_CELLS} segments"),
+            none(),
+        );
     }
     if x.metric == Metric::Revenue && x.currency.is_none() {
-        problems.push("a revenue goal needs a currency".into());
+        block("currency", "a revenue goal needs a currency".into(), none());
     }
     let max_arm = x.arms.iter().map(|a| a.arm).max().unwrap_or(0);
     if let Some(w) = &x.weights
         && (w.len() != max_arm as usize + 1 || x.allocation != Allocation::Fixed)
     {
-        problems.push(format!(
-            "weights need allocation 'fixed' and one entry per arm 0..={max_arm}"
-        ));
+        block(
+            "weights",
+            format!("weights need allocation 'fixed' and one entry per arm 0..={max_arm}"),
+            none(),
+        );
     }
     if !x.arms.iter().any(|a| a.arm > 0 && a.approved) {
-        problems.push("at least one approved variant is needed".into());
+        block(
+            "no_variant",
+            "at least one approved variant is needed".into(),
+            none(),
+        );
     }
     let glossary = crate::glossary::load(&state.db, p.id).await?;
     let mut cells = vec![];
@@ -249,19 +283,32 @@ pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<
                 let value = a.values.get(locale).and_then(|m| m.get(key)).cloned();
                 let mut issues = vec![];
                 if let Some(v) = value.as_deref().filter(|v| !v.trim().is_empty()) {
-                    issues = keys::check(source, v, locale, &glossary);
+                    issues = keys::check(source, v, locale, p.syntax, &glossary);
                     issues.extend(
                         fit.as_ref()
-                            .and_then(|f| glot_core::measure::check(v, Syntax::Icu, f)),
+                            .and_then(|f| glot_core::measure::check(v, p.syntax, f)),
                     );
                 }
                 let ok =
                     value.as_deref().is_some_and(|v| !v.trim().is_empty()) && !has_errors(&issues);
                 if !ok && a.approved {
-                    problems.push(format!(
-                        "arm {} ({}) — {key} [{locale}] is missing or invalid",
-                        a.arm, a.intent
-                    ));
+                    block(
+                        if value.is_some() {
+                            "cell_invalid"
+                        } else {
+                            "cell_missing"
+                        },
+                        format!(
+                            "arm {} ({}) — {key} [{locale}] is missing or invalid",
+                            a.arm, a.intent
+                        ),
+                        Blocker {
+                            arm: Some(a.arm),
+                            key: Some(key.clone()),
+                            locale: Some(locale.clone()),
+                            ..none()
+                        },
+                    );
                 }
                 cells.push(CellCheck {
                     arm: a.arm,
@@ -277,6 +324,7 @@ pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<
     Ok(Readiness {
         ready: problems.is_empty(),
         problems,
+        blockers,
         cells,
     })
 }
