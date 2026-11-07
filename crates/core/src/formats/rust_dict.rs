@@ -14,8 +14,13 @@
 //! Writing patches string literals in place; a key new to the file is appended as a tuple to the
 //! first table (other columns `""`); a key gone from a locale empties its cell, and a row whose
 //! locale cells are all empty is removed. Columns are never added (the lookup code destructures
-//! fixed-size tuples): a locale without a column is a parse error that says so.
+//! fixed-size tuples): a locale without a column lives in a flat JSON catalog next to the crate,
+//! `{crate}/locales/{locale}.json` (`{"key": "text"}`), that the lookup code loads as a fallback
+//! (`include_str!("../locales/de.json")` + `serde_json`, or `glot.loadCatalog`).
 // ponytail: fixed-size arrays (`[(&str, &str); 6]`) are not tables: appending would break the length.
+use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
+
 use super::Parsed;
 use crate::catalog::Catalog;
 
@@ -419,6 +424,69 @@ pub fn parse(s: &str, locale: &str) -> Result<Parsed, String> {
     Ok(p)
 }
 
+/// `{crate}/locales/{locale}/{file}.json` when the file's tables name their columns and none is
+/// `locale`.
+pub fn sidecar(path: &Path, text: &str, locale: &str) -> Option<PathBuf> {
+    let ts = tables(text).ok()?;
+    let keyed: Vec<&Table> = ts.iter().filter(|t| t.is_keyed()).collect();
+    if keyed.is_empty()
+        || keyed
+            .iter()
+            .any(|t| t.locales.is_empty() || t.column(locale).is_some())
+    {
+        return None;
+    }
+    let dir = path.parent()?;
+    let base = dir
+        .ancestors()
+        .find(|d| d.join("Cargo.toml").is_file())
+        .unwrap_or(dir);
+    // One catalog per Rust file: two tables may use the same key (`a1` in landing and tools).
+    // ponytail: by file stem; two `mod.rs` tables of one crate would share a file.
+    let stem = path.file_stem()?.to_string_lossy();
+    Some(
+        base.join("locales")
+            .join(locale)
+            .join(format!("{stem}.json")),
+    )
+}
+
+fn read_sidecar(json: &Path) -> Result<BTreeMap<String, String>, String> {
+    match std::fs::read_to_string(json) {
+        Ok(s) => serde_json::from_str(&s).map_err(|e| {
+            format!(
+                "{}: expected a flat {{\"key\": \"text\"}} object: {e}",
+                json.display()
+            )
+        }),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(BTreeMap::new()),
+        Err(e) => Err(format!("{}: {e}", json.display())),
+    }
+}
+
+pub fn parse_sidecar(json: &Path) -> Result<Parsed, String> {
+    Ok(Parsed {
+        entries: read_sidecar(json)?
+            .into_iter()
+            .filter(|(_, v)| !v.is_empty())
+            .collect(),
+        ..Default::default()
+    })
+}
+
+/// The sidecar catalog for `cat` (sorted keys), `None` when it would not change.
+pub fn write_sidecar(json: &Path, cat: &Catalog) -> Result<Option<String>, String> {
+    let new: BTreeMap<&String, &String> =
+        cat.entries.iter().filter(|(_, v)| !v.is_empty()).collect();
+    let old = read_sidecar(json)?;
+    if json.exists() && new.len() == old.len() && new.iter().all(|(k, v)| old.get(*k) == Some(*v)) {
+        return Ok(None);
+    }
+    Ok(Some(
+        serde_json::to_string_pretty(&new).map_err(|e| e.to_string())? + "\n",
+    ))
+}
+
 fn render(v: &str, raw: Option<usize>) -> String {
     if let Some(h) = raw
         && !v.contains(&format!("\"{}", "#".repeat(h)))
@@ -651,6 +719,56 @@ pub fn tl(key: &str, en: bool) -> String {
             out2.contains("    (\"b\", \"B fr\", \"B en\"),\n"),
             "{out2}"
         );
+    }
+
+    #[test]
+    fn extra_locale_goes_to_sidecar_json() {
+        let d = std::env::temp_dir().join(format!("glot-rust-sidecar-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("web/src/pages")).unwrap();
+        std::fs::write(d.join("web/Cargo.toml"), "[package]\n").unwrap();
+        let rs = d.join("web/src/i18n.rs");
+        std::fs::write(&rs, SRC).unwrap();
+        // `a` again: the page has its own table (and lookup) for it.
+        let page = d.join("web/src/pages/p.rs");
+        let page_src = "// (key, fr, en)\nstatic P: &[(&str, &str, &str)] = &[(\"p_k\", \"P\", \"P\"), (\"a\", \"x\", \"y\")];\n";
+        std::fs::write(&page, page_src).unwrap();
+        let json = d.join("web/locales/de/i18n.json");
+        assert_eq!(sidecar(&rs, SRC, "de"), Some(json.clone()));
+        assert_eq!(sidecar(&rs, SRC, "en"), None);
+        let read = |p: &Path| {
+            crate::formats::read(p, "de", crate::catalog::Format::Auto)
+                .unwrap()
+                .unwrap()
+                .entries
+        };
+        assert!(read(&rs).is_empty(), "no file yet: nothing translated");
+        let write = |p: &Path, c: &Catalog| {
+            crate::formats::write_path(crate::catalog::Format::RustDict, p, c).unwrap()
+        };
+        let mut c = Catalog::new("de");
+        c.entries.insert("login_title".into(), "Anmelden".into());
+        c.entries.insert("a".into(), "A de".into());
+        write(&rs, &c);
+        assert_eq!(
+            std::fs::read_to_string(&rs).unwrap(),
+            SRC,
+            "Rust code untouched"
+        );
+        assert_eq!(
+            std::fs::read_to_string(&json).unwrap(),
+            "{\n  \"a\": \"A de\",\n  \"login_title\": \"Anmelden\"\n}\n"
+        );
+        let mut pc = Catalog::new("de");
+        pc.entries.insert("a".into(), "Y de".into());
+        write(&page, &pc);
+        assert_eq!(read(&rs), c.entries);
+        assert_eq!(read(&page), pc.entries, "same key, own file");
+        assert!(d.join("web/locales/de/p.json").is_file());
+        c.entries.remove("a");
+        write(&rs, &c);
+        assert_eq!(read(&rs), c.entries);
+        std::fs::remove_dir_all(&d).unwrap();
     }
 
     #[test]

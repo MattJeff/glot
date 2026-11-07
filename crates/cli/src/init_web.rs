@@ -21,6 +21,7 @@ pub fn detect(root: &Path, has: &dyn Fn(&str) -> bool) -> Option<Detected> {
             syntax,
             files,
             locales,
+            source: None,
         })
     };
     if has("@docusaurus/core") {
@@ -153,6 +154,11 @@ fn paraglide(root: &Path) -> Option<Detected> {
         syntax: "icu",
         files,
         locales,
+        source: s
+            .get("baseLocale")
+            .or_else(|| s.get("sourceLanguageTag"))
+            .and_then(|l| l.as_str())
+            .map(str::to_string),
     })
 }
 
@@ -202,6 +208,95 @@ fn docusaurus(root: &Path) -> Option<Detected> {
         syntax: "icu",
         files,
         locales,
+        source: None,
+    })
+}
+
+/// The source locale an i18n config declares: `defaultLocale` (Nuxt, Astro, Docusaurus,
+/// next-intl, next-i18next), Lingui `sourceLocale`, Transloco `defaultLang`.
+pub fn configured_source(root: &Path) -> Option<String> {
+    const FILES: &[&str] = &[
+        "lingui.config.ts",
+        "lingui.config.js",
+        "transloco.config.ts",
+        "transloco.config.js",
+        "nuxt.config.ts",
+        "nuxt.config.js",
+        "i18n.config.ts",
+        "astro.config.mjs",
+        "astro.config.ts",
+        "docusaurus.config.js",
+        "docusaurus.config.ts",
+        "i18n/routing.ts",
+        "src/i18n/routing.ts",
+        "next-i18next.config.js",
+    ];
+    let value = |text: &str, key: &str| -> Option<String> {
+        let rest = &text[text.find(key)? + key.len()..];
+        let rest = rest.trim_start_matches(['"', '\'']).trim_start();
+        let rest = rest.strip_prefix(':')?.trim_start();
+        let q = rest
+            .chars()
+            .next()
+            .filter(|c| matches!(c, '"' | '\'' | '`'))?;
+        let v = &rest[1..1 + rest[1..].find(q)?];
+        is_locale(v).then(|| v.to_string())
+    };
+    FILES.iter().find_map(|f| {
+        let text = std::fs::read_to_string(root.join(f)).ok()?;
+        ["sourceLocale", "defaultLocale", "defaultLang"]
+            .iter()
+            .find_map(|k| value(&text, k))
+    })
+}
+
+/// vue-i18n `<i18n>` blocks in single-file components: one `{dir}/{ns}.vue` pattern per top-level
+/// folder holding such components (keys `components/Hello:title`), and the locales they hold.
+// ponytail: two folders with the same component path (`pages/Foo`, `components/Foo`) share a key prefix.
+pub fn vue_sfc(root: &Path) -> Option<(Vec<String>, BTreeSet<String>)> {
+    fn walk(dir: &Path, depth: usize, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+            let (p, name) = (e.path(), e.file_name().to_string_lossy().to_string());
+            if p.is_dir() {
+                if depth < 8
+                    && !name.starts_with('.')
+                    && !["node_modules", "dist", "build", "public", "vendor"]
+                        .contains(&name.as_str())
+                {
+                    walk(&p, depth + 1, out);
+                }
+            } else if name.ends_with(".vue") {
+                out.push(p);
+            }
+        }
+    }
+    let mut vue = vec![];
+    walk(root, 0, &mut vue);
+    let (mut dirs, mut locales) = (BTreeSet::new(), BTreeSet::new());
+    for p in vue {
+        let Ok(text) = std::fs::read_to_string(&p) else {
+            continue;
+        };
+        let found = glot_core::formats::vue_sfc::locales(&text);
+        if found.is_empty() {
+            continue;
+        }
+        locales.extend(found.into_iter().filter(|l| is_locale(l)));
+        let rel = p.strip_prefix(root).ok()?;
+        let top = match rel.components().count() {
+            1 => String::new(),
+            _ => format!(
+                "{}/",
+                rel.components().next()?.as_os_str().to_string_lossy()
+            ),
+        };
+        dirs.insert(top);
+    }
+    (!dirs.is_empty()).then(|| {
+        (
+            dirs.into_iter().map(|d| format!("{d}{{ns}}.vue")).collect(),
+            locales,
+        )
     })
 }
 
@@ -346,6 +441,115 @@ mod tests {
 
     fn s(v: &[&str]) -> Vec<String> {
         v.iter().map(|x| x.to_string()).collect()
+    }
+
+    #[test]
+    fn declared_source_locale() {
+        let src = |files: &[(&str, &str)]| super::super::detect(project(files).path()).source;
+        let pkg = |d: &str| format!(r#"{{"dependencies":{{"{d}":"1"}}}}"#);
+        let para = pkg("@inlang/paraglide-js");
+        assert_eq!(
+            src(&[
+                ("package.json", &para),
+                (
+                    "project.inlang/settings.json",
+                    r#"{"baseLocale":"de","locales":["de","en"]}"#
+                ),
+            ]),
+            Some("de".into())
+        );
+        let docu = pkg("@docusaurus/core");
+        assert_eq!(
+            src(&[
+                ("package.json", &docu),
+                (
+                    "docusaurus.config.js",
+                    "export default { i18n: { defaultLocale: 'fr', locales: ['fr', 'en'] } };"
+                ),
+            ]),
+            Some("fr".into())
+        );
+        let nuxt = pkg("@nuxtjs/i18n");
+        assert_eq!(
+            src(&[
+                ("package.json", &nuxt),
+                (
+                    "nuxt.config.ts",
+                    "export default defineNuxtConfig({ i18n: { defaultLocale: 'es', locales: ['es', 'en'] } })"
+                ),
+            ]),
+            Some("es".into())
+        );
+        let lingui = pkg("@lingui/core");
+        assert_eq!(
+            src(&[
+                ("package.json", &lingui),
+                (
+                    "lingui.config.ts",
+                    "export default { sourceLocale: \"cs\", locales: [\"cs\", \"en\"] }"
+                )
+            ]),
+            Some("cs".into())
+        );
+        assert_eq!(
+            src(&[
+                ("pubspec.yaml", "dependencies:\n  slang: ^4.0.0\n"),
+                ("slang.yaml", "base_locale: de\n"),
+                ("lib/i18n/de.i18n.json", "{}"),
+                ("lib/i18n/en.i18n.json", "{}")
+            ]),
+            Some("de".into())
+        );
+        assert_eq!(
+            src(&[(
+                "translations/app_fr.ts",
+                "<?xml version=\"1.0\"?>\n<!DOCTYPE TS>\n<TS version=\"2.1\" language=\"fr\" sourcelanguage=\"de_DE\">\n</TS>\n"
+            )]),
+            Some("de".into())
+        );
+        assert_eq!(
+            src(&[
+                ("package.json", r#"{"dependencies":{"@angular/core":"20"}}"#),
+                (
+                    "angular.json",
+                    r#"{"projects":{"app":{"i18n":{"sourceLocale":"en-US","locales":{"de":"src/locale/messages.de.xtb"}}}}}"#
+                ),
+            ]),
+            Some("en-US".into())
+        );
+        assert_eq!(src(&[("package.json", &pkg("next-intl"))]), None);
+    }
+
+    #[test]
+    fn vue_single_file_components() {
+        let pkg = r#"{"dependencies":{"vue-i18n":"11"}}"#;
+        let app = "<template/>\n<i18n>\n{ \"en\": {\"a\": \"A\"}, \"ja\": {} }\n</i18n>\n";
+        let nav = "<i18n lang=\"yaml\">\nen:\n  b: B\nde:\n  b: Bb\n</i18n>\n";
+        let (stack, _, files, locales) = detected(&[
+            ("package.json", pkg),
+            ("src/App.vue", app),
+            ("src/components/Nav.vue", nav),
+            ("src/components/Plain.vue", "<template/>"),
+            ("node_modules/x/X.vue", app),
+        ]);
+        assert_eq!(stack, "vue-i18n");
+        assert_eq!(files, s(&["src/{ns}.vue"]));
+        assert_eq!(locales, s(&["de", "en", "ja"]));
+        // Beside a JSON catalog, both are kept (new keys go to the JSON one).
+        let (_, _, files, _) = detected(&[
+            ("package.json", pkg),
+            ("src/locales/en.json", "{}"),
+            ("components/App.vue", app),
+            ("pages/index.vue", nav),
+        ]);
+        assert_eq!(
+            files,
+            s(&[
+                "src/locales/{locale}.json",
+                "components/{ns}.vue",
+                "pages/{ns}.vue"
+            ])
+        );
     }
 
     #[test]

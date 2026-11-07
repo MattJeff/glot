@@ -33,12 +33,16 @@ pub(crate) fn fold_plurals(entries: &mut BTreeMap<Key, String>, sep: &str, local
     let cldr_zero = cats.contains(&crate::plural::PluralCategory::Zero);
     let mut fams: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
     let mut not_plural: BTreeSet<&str> = BTreeSet::new();
+    let mut meta: Vec<(&str, Key)> = vec![];
     for k in entries.keys() {
         let Some((parent, last)) = k.rsplit_once(sep) else {
             continue;
         };
         if CATS.contains(&last) {
             fams.entry(parent).or_default().push(last);
+        } else if is_meta(k, sep, |o| entries.contains_key(o)) {
+            // go-i18n `description` / `hash`: not a message, not a reason to keep the forms apart.
+            meta.push((parent, k.clone()));
         } else {
             not_plural.insert(parent);
         }
@@ -79,6 +83,14 @@ pub(crate) fn fold_plurals(entries: &mut BTreeMap<Key, String>, sep: &str, local
             ));
         }
     }
+    let meta: Vec<Key> = meta
+        .into_iter()
+        .filter(|(p, _)| !not_plural.contains(p))
+        .map(|(_, k)| k)
+        .collect();
+    for k in meta {
+        entries.remove(&k);
+    }
     for (parent, members, text) in folded {
         for c in members {
             entries.remove(&format!("{parent}{sep}{c}"));
@@ -115,6 +127,76 @@ pub(crate) fn unfold_plurals(entries: Vec<(Key, String)>, sep: &str) -> Vec<(Key
             }
             _ => out.push((k, v)),
         }
+    }
+    out
+}
+
+/// go-i18n message fields next to the plural forms (`{"Cats": {"description": …, "hash": …,
+/// "one": …, "other": …}}`): metadata, never translated, kept on write.
+pub(crate) const META: [&str; 4] = ["description", "hash", "leftDelim", "rightDelim"];
+
+/// Is `key` (`parent{sep}field`) a go-i18n metadata field of a message that has an `other` form
+/// in `has` (the catalog's leaf keys)?
+pub(crate) fn is_meta(key: &str, sep: &str, has: impl Fn(&str) -> bool) -> bool {
+    !sep.is_empty()
+        && key
+            .rsplit_once(sep)
+            .is_some_and(|(parent, f)| META.contains(&f) && has(&format!("{parent}{sep}other")))
+}
+
+// ---------------------------------------------------------------- layout of written files
+
+/// Move the keys of `map` that `is_new` says were just added so they follow the source order:
+/// each goes before the first key the source ranks after it (else last). Existing keys keep
+/// their order; keys the source doesn't have (`rank` = `None`) stay where they are.
+pub(crate) fn reorder(
+    map: &mut Map<String, Value>,
+    is_new: impl Fn(&str) -> bool,
+    rank: impl Fn(&str) -> Option<usize>,
+) {
+    if !map.keys().any(|k| is_new(k)) {
+        return;
+    }
+    let all: Vec<(String, Value)> = std::mem::take(map).into_iter().collect();
+    let (mut news, mut out): (Vec<_>, Vec<_>) = all.into_iter().partition(|(k, _)| is_new(k));
+    news.sort_by_key(|(k, _)| rank(k).unwrap_or(usize::MAX));
+    for (k, v) in news {
+        let at = rank(&k).and_then(|r| {
+            out.iter()
+                .position(|(o, _)| rank(o).is_some_and(|ro| ro > r))
+        });
+        out.insert(at.unwrap_or(out.len()), (k, v));
+    }
+    map.extend(out);
+}
+
+/// Serialize `v` like `style` (the file being replaced, or the source locale's file for a new
+/// one): one line when it is one line (i18n-js / minified bundles), else pretty-printed with its
+/// indentation (2 spaces by default); a trailing newline unless `style` has none.
+pub(crate) fn serialize_like(v: &Value, style: &str) -> String {
+    let body = style.trim();
+    let compact = body.len() > 2 && !body.contains('\n');
+    let mut out = if compact {
+        serde_json::to_string(v).expect("strings serialize")
+    } else {
+        let indent = style
+            .lines()
+            .find_map(|l| {
+                let ws = &l[..l.len() - l.trim_start().len()];
+                (!ws.is_empty() && l.trim_start().starts_with('"')).then_some(ws)
+            })
+            .unwrap_or("  ");
+        let mut buf = Vec::new();
+        let fmt = serde_json::ser::PrettyFormatter::with_indent(indent.as_bytes());
+        serde::Serialize::serialize(
+            v,
+            &mut serde_json::Serializer::with_formatter(&mut buf, fmt),
+        )
+        .expect("strings serialize");
+        String::from_utf8(buf).expect("serde_json writes UTF-8")
+    };
+    if style.ends_with('\n') || body.len() <= 2 {
+        out.push('\n');
     }
     out
 }
@@ -312,6 +394,7 @@ pub(crate) fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> Strin
         .find_map(|o| field(o).map(|(f, _)| f))
         .unwrap_or(if webext { "message" } else { "defaultMessage" });
     m.retain(|k, v| !v.is_object() || cat.entries.contains_key(k));
+    let old: BTreeSet<String> = m.keys().cloned().collect();
     for (k, v) in &cat.entries {
         let entry = m
             .entry(k.clone())
@@ -351,9 +434,13 @@ pub(crate) fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> Strin
             o.insert("placeholders".into(), ph);
         }
     }
-    let mut out = serde_json::to_string_pretty(&Value::Object(m)).expect("strings serialize");
-    out.push('\n');
-    out
+    let rank: std::collections::HashMap<&str, usize> = source
+        .keys()
+        .enumerate()
+        .map(|(i, k)| (k.as_str(), i))
+        .collect();
+    reorder(&mut m, |k| !old.contains(k), |k| rank.get(k).copied());
+    serialize_like(&Value::Object(m), existing.unwrap_or("{}"))
 }
 
 #[cfg(test)]
@@ -501,6 +588,17 @@ mod tests {
         // Docusaurus reads `message`, never `defaultMessage`.
         assert_eq!(v["title"]["message"], "Mon site");
         assert_eq!(v["title"]["description"], "The title in the navbar");
+        // New entries of an existing target follow the source's order, not the alphabet.
+        let src = r#"{"zeta":{"message":"Z"},"mid":{"message":"M"},"alpha":{"message":"A"}}"#;
+        std::fs::write(&en, src).unwrap();
+        let mut cat = Catalog::new("fr");
+        for k in ["zeta", "mid", "alpha"] {
+            cat.entries.insert(k.into(), k.into());
+        }
+        let existing = r#"{"zeta":{"message":"z"},"alpha":{"message":"a"}}"#;
+        let out = write(Some(existing), &cat, &fr);
+        let keys: Vec<String> = object(&out).unwrap().keys().cloned().collect();
+        assert_eq!(keys, ["zeta", "mid", "alpha"]);
         // Lingui `lingui` style: `message` is the source text, `translation` the locale's.
         let lingui = r#"{"Gq3yVQ":{"message":"Hello {name}","translation":"Bonjour {name}","origin":[["src/App.tsx",4]]}}"#;
         let p = parse(lingui, Path::new("src/locales/fr.json")).unwrap();

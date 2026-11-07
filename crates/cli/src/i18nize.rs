@@ -11,6 +11,8 @@ use crate::setup::{
 };
 use crate::style::*;
 
+#[path = "i18nize_rust.rs"]
+mod rust;
 #[path = "i18nize_swift.rs"]
 mod swift;
 
@@ -58,6 +60,9 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
     let mut ws = crate::open()?;
     if swift::is_swift(&ws) {
         return swift::run(ws, &args);
+    }
+    if rust::is_rust(&ws) {
+        return rust::run(ws, &args);
     }
     let project = setup::detect(&ws.root);
     // Hand-written TS/JS dictionaries = the app has its own `t()`: rewriting it to next-intl /

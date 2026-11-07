@@ -6,14 +6,14 @@ use crate::catalog::Catalog;
 use crate::plural::{PluralCategory, categories, language};
 
 #[derive(Default)]
-struct Entry {
-    ctx: Option<String>,
-    id: String,
-    id_plural: Option<String>,
-    strs: Vec<String>,
+pub(super) struct Entry {
+    pub(super) ctx: Option<String>,
+    pub(super) id: String,
+    pub(super) id_plural: Option<String>,
+    pub(super) strs: Vec<String>,
     extracted: Vec<String>,
-    refs: Vec<String>,
-    fuzzy: bool,
+    pub(super) refs: Vec<String>,
+    pub(super) fuzzy: bool,
     obsolete: bool,
     /// Byte span of the whole block, of its `#,` line and of its msgstr lines.
     span: (usize, usize),
@@ -22,7 +22,7 @@ struct Entry {
 }
 
 impl Entry {
-    fn key(&self) -> String {
+    pub(super) fn key(&self) -> String {
         match &self.ctx {
             Some(c) => format!("{c}\u{4}{}", self.id),
             None => self.id.clone(),
@@ -30,7 +30,7 @@ impl Entry {
     }
 }
 
-fn entries(s: &str) -> Result<Vec<Entry>, String> {
+pub(super) fn entries(s: &str) -> Result<Vec<Entry>, String> {
     let mut out = vec![];
     let mut cur: Option<Entry> = None;
     // Field receiving continuation lines: 0 ctx, 1 id, 2 id_plural, 3+n msgstr[n].
@@ -162,7 +162,7 @@ fn nplurals(list: &[Entry]) -> Option<usize> {
 
 /// CLDR category of each `msgstr[n]`. gettext omits CLDR's fraction-only category: `many` for
 /// Romance/Czech-like languages, `other` for East Slavic/Polish.
-fn po_categories(locale: &str, n: Option<usize>) -> Vec<&'static str> {
+pub(super) fn po_categories(locale: &str, n: Option<usize>) -> Vec<&'static str> {
     let mut cats = categories(locale);
     let n = n.unwrap_or(cats.len()).max(1);
     if cats.len() > n {
@@ -249,12 +249,18 @@ pub fn parse(s: &str, locale: &str) -> Result<Parsed, String> {
 }
 
 /// Patch `cat` into `existing`; new entries copy their block (comments, references, flags, `msgid_plural`)
-/// from `template`, the `.pot` (WordPress `languages/{domain}.pot`).
-pub fn write_from(existing: Option<&str>, cat: &Catalog, template: Option<&str>) -> String {
+/// from `template`, the `.pot` (WordPress `languages/{domain}.pot`). Without one, a new plural's
+/// `msgid_plural` comes from `siblings` (the other locales' `.po`).
+pub fn write_from(
+    existing: Option<&str>,
+    cat: &Catalog,
+    template: Option<&str>,
+    siblings: &[String],
+) -> String {
     let header = header(&cat.locale);
     let s = existing.unwrap_or(&header);
     let Ok(list) = entries(s) else {
-        return write_from(None, cat, template);
+        return write_from(None, cat, template, siblings);
     };
     let tpl: Vec<Entry> = template.and_then(|t| entries(t).ok()).unwrap_or_default();
     let cats = po_categories(&cat.locale, nplurals(&list));
@@ -314,12 +320,29 @@ pub fn write_from(existing: Option<&str>, cat: &Catalog, template: Option<&str>)
         }
         out += &format!("msgid {}\n", lines(id));
         if plural {
-            // ponytail: no source text here; the plural msgid repeats the singular.
-            out += &format!("msgid_plural {}\n", lines(id));
+            out += &format!("msgid_plural {}\n", lines(&id_plural(k, id, v, siblings)));
         }
         out += &msgstr(v, plural, &cats);
     }
     out
+}
+
+/// `msgid_plural` of a new entry: a sibling `.po`'s, else the `other` form when `v` is the source
+/// text itself (its `one` form is the msgid), else the singular (gettext's fallback).
+fn id_plural(key: &str, id: &str, v: &str, siblings: &[String]) -> String {
+    let from_sibling = siblings.iter().find_map(|s| {
+        entries(s)
+            .ok()?
+            .into_iter()
+            .find(|e| e.key() == key && e.id_plural.is_some())?
+            .id_plural
+    });
+    from_sibling
+        .or_else(|| {
+            let c = folded_choice(v)?;
+            (c.form("one")? == id).then(|| c.form("other").map(str::to_string))?
+        })
+        .unwrap_or_else(|| id.to_string())
 }
 
 /// A template block without its `fuzzy` flag.
@@ -407,4 +430,68 @@ fn header(locale: &str) -> String {
         h += &format!("\"Plural-Forms: {f}\\n\"\n");
     }
     h
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn plural_cat(locale: &str, v: &str) -> Catalog {
+        let mut c = Catalog::new(locale);
+        c.entries.insert("%d file".into(), v.into());
+        c
+    }
+
+    #[test]
+    fn new_plural_without_pot_takes_msgid_plural_from_the_source() {
+        // The source catalog itself: its `other` form is the plural msgid.
+        let en = plural_cat("en", "{count, plural, one {%d file} other {%d files}}");
+        let out = write_from(None, &en, None, &[]);
+        assert!(
+            out.contains("msgid \"%d file\"\nmsgid_plural \"%d files\"\n"),
+            "{out}"
+        );
+        // A target: the sibling source `.po` has it.
+        let fr = plural_cat(
+            "fr",
+            "{count, plural, one {%d fichier} other {%d fichiers}}",
+        );
+        let out = write_from(None, &fr, None, &[write_from(None, &en, None, &[])]);
+        assert!(
+            out.contains("msgid_plural \"%d files\"\nmsgstr[0] \"%d fichier\"\n"),
+            "{out}"
+        );
+        // Nothing to go on: gettext's fallback, the singular.
+        let out = write_from(None, &fr, None, &[]);
+        assert!(out.contains("msgid_plural \"%d file\"\n"), "{out}");
+    }
+
+    #[test]
+    fn siblings_and_mo_refresh_on_disk() {
+        let d = std::env::temp_dir().join(format!("glot-po-mo-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (en, fr) = (
+            d.join("locale/en/LC_MESSAGES/django.po"),
+            d.join("locale/fr/LC_MESSAGES/django.po"),
+        );
+        std::fs::create_dir_all(fr.parent().unwrap()).unwrap();
+        let src = plural_cat("en", "{count, plural, one {%d file} other {%d files}}");
+        super::super::write_path(crate::catalog::Format::Po, &en, &src).unwrap();
+        // An existing `.mo` is recompiled with each write.
+        std::fs::write(fr.with_extension("mo"), b"").unwrap();
+        let cat = plural_cat(
+            "fr",
+            "{count, plural, one {%d fichier} other {%d fichiers}}",
+        );
+        super::super::write_path(crate::catalog::Format::Po, &fr, &cat).unwrap();
+        let out = std::fs::read_to_string(&fr).unwrap();
+        assert!(out.contains("msgid_plural \"%d files\"\n"), "{out}");
+        let mo = std::fs::read(fr.with_extension("mo")).unwrap();
+        assert_eq!(mo, super::super::mo::compile(&out).unwrap());
+        assert!(
+            !en.with_extension("mo").exists(),
+            "no .mo unless one exists"
+        );
+        let _ = std::fs::remove_dir_all(&d);
+    }
 }

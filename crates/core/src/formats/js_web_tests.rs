@@ -53,3 +53,74 @@ fn rails_yaml_still_writes_plural_mappings() {
     let out = super::write(Format::Yaml, Path::new("config/locales/pl.yml"), None, &pl);
     assert!(out.contains("few:"), "{out}");
 }
+
+/// `src/{ns}.vue` lists the components with an `<i18n>` block (keys prefixed by their path), and
+/// the Angular `messages.{locale}.xtb` source is `messages.xmb`; both read and written end to end.
+#[test]
+fn vue_components_and_xmb_through_the_config() {
+    let dir = std::env::temp_dir().join(format!("glot-jsweb-{}", std::process::id()));
+    let w = |p: &str, t: &str| {
+        let p = dir.join(p);
+        std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+        std::fs::write(p, t).unwrap();
+    };
+    w(
+        "src/components/nav/Bar.vue",
+        "<template/>\n<i18n>\n{\n  \"en\": {\n    \"home\": \"Home\"\n  }\n}\n</i18n>\n",
+    );
+    w(
+        "src/App.vue",
+        "<i18n locale=\"en\">\n{ \"t\": \"T\" }\n</i18n>\n",
+    );
+    w("src/Plain.vue", "<template/>\n");
+    w(
+        "node_modules/x/Y.vue",
+        "<i18n>{\"en\":{\"x\":\"X\"}}</i18n>\n",
+    );
+    w(
+        "src/locale/messages.xmb",
+        "<messagebundle>\n  <msg id=\"hi\"><source>a.html:1</source>Hi <ph name=\"INTERPOLATION\"><ex>{{n}}</ex>{{n}}</ph></msg>\n</messagebundle>\n",
+    );
+    let c: crate::config::Config = toml::from_str(
+        "source_locale = \"en\"\ntarget_locales = [\"fr\"]\nfiles = [\"src/{ns}.vue\", \"src/locale/messages.{locale}.xtb\"]\n",
+    )
+    .unwrap();
+    let en = Catalog::load(&c, &dir, "en").unwrap();
+    assert_eq!(
+        en.entries.into_iter().collect::<Vec<_>>(),
+        [
+            ("App:t".to_string(), "T".to_string()),
+            ("components/nav/Bar:home".into(), "Home".into()),
+            ("hi".into(), "Hi {INTERPOLATION}".into()),
+        ]
+    );
+    for (p, layout) in c.catalog_files(&dir, "fr") {
+        let mut fr = Catalog::new("fr");
+        let key = format!("{}home", layout.ns);
+        fr.entries.insert(key, "Accueil".into());
+        if layout.ns.is_empty() {
+            fr.entries
+                .insert("hi".into(), "Salut {INTERPOLATION}".into());
+        }
+        fr.write_with(&p, Format::Auto, &layout).unwrap();
+    }
+    let read = |p: &str| std::fs::read_to_string(dir.join(p)).unwrap();
+    assert!(
+        read("src/components/nav/Bar.vue")
+            .contains("  },\n  \"fr\": {\n    \"home\": \"Accueil\"\n  }\n}\n</i18n>")
+    );
+    assert!(
+        read("src/App.vue")
+            .ends_with("<i18n locale=\"fr\">\n{\n  \"home\": \"Accueil\"\n}\n</i18n>\n")
+    );
+    assert!(
+        read("src/locale/messages.fr.xtb")
+            .contains("<translation id=\"hi\">Salut <ph name=\"INTERPOLATION\"/></translation>")
+    );
+    assert_eq!(read("src/Plain.vue"), "<template/>\n");
+    assert_eq!(
+        Catalog::load(&c, &dir, "fr").unwrap().entries["App:home"],
+        "Accueil"
+    );
+    std::fs::remove_dir_all(&dir).unwrap();
+}

@@ -46,7 +46,8 @@ for p in "${PACKAGES[@]}"; do
       if (fs.existsSync(r)) fs.writeFileSync(r, fs.readFileSync(r, "utf8").replaceAll("@glot/", scope + "/"));
     ' "$pkg" "$SCOPE"
   fi
-  if grep -rlq "@glot/" "$pkg/dist" 2>/dev/null && [[ "$SCOPE" != "@glot" ]]; then
+  # Imports only: doc comments may name the repo-side package.
+  if grep -rlqE "(from|import|require)[[:space:]]*\(?[[:space:]]*['\"]@glot/" "$pkg/dist" 2>/dev/null && [[ "$SCOPE" != "@glot" ]]; then
     echo "$p: dist/ still references @glot/*" >&2; exit 1
   fi
   name="$(node -p 'require(process.argv[1]).name + "@" + require(process.argv[1]).version' "$pkg/package.json")"

@@ -54,6 +54,7 @@ fn go_i18n(root: &Path) -> Option<Detected> {
         syntax: "template",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -93,6 +94,7 @@ fn nest(root: &Path, has: &dyn Fn(&str) -> bool) -> Option<Detected> {
         syntax: "icu",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -118,6 +120,7 @@ fn i18n_node(root: &Path, has: &dyn Fn(&str) -> bool) -> Option<Detected> {
         syntax: "printf",
         files: vec!["locales/{locale}.json".into()],
         locales,
+        source: None,
     })
 }
 

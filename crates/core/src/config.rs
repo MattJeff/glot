@@ -227,6 +227,7 @@ impl Config {
             key_separator: Separator::get(&self.i18next.key_separator, "."),
             i18next_plurals: self.syntax == Syntax::I18next,
             ns: String::new(),
+            source: None,
         };
         let ns_sep = Separator::get(&self.i18next.ns_separator, ":");
         let ns_sep = if ns_sep.is_empty() {
@@ -242,21 +243,66 @@ impl Config {
                         ns: format!("{ns}{ns_sep}"),
                         ..base.clone()
                     };
-                    out.extend(
-                        self.expand(root, &pattern.replace("{ns}", &ns), locale)
-                            .into_iter()
-                            .map(|p| (p, layout.clone())),
-                    );
+                    out.extend(self.paired(root, &pattern.replace("{ns}", &ns), locale, &layout));
                 }
             } else {
-                out.extend(
-                    self.expand(root, pattern, locale)
-                        .into_iter()
-                        .map(|p| (p, base.clone())),
-                );
+                out.extend(self.paired(root, pattern, locale, &base));
             }
         }
         out
+    }
+
+    /// The files of `pattern` for `locale`, each with its source-locale counterpart
+    /// ([`Layout::source`]): the only one, or the one named like it with the source locale.
+    fn paired(
+        &self,
+        root: &Path,
+        pattern: &str,
+        locale: &str,
+        layout: &Layout,
+    ) -> Vec<(PathBuf, Layout)> {
+        let files = self.expand(root, pattern, locale);
+        let sources = if locale == self.source_locale {
+            vec![]
+        } else {
+            self.expand(root, pattern, &self.source_locale)
+        };
+        let swap = |p: &Path| {
+            let s = p.to_string_lossy();
+            let mut out = String::new();
+            let mut rest = s.as_ref();
+            while let Some(i) = rest.find(locale) {
+                let edge = |c: Option<char>| !c.is_some_and(|c| c.is_ascii_alphanumeric());
+                let (before, after) = (
+                    rest[..i].chars().last(),
+                    rest[i + locale.len()..].chars().next(),
+                );
+                out.push_str(&rest[..i]);
+                out.push_str(if edge(before) && edge(after) {
+                    &self.source_locale
+                } else {
+                    locale
+                });
+                rest = &rest[i + locale.len()..];
+            }
+            PathBuf::from(out + rest)
+        };
+        files
+            .iter()
+            .map(|p| {
+                let source = match sources.as_slice() {
+                    [one] if files.len() == 1 => Some(one.clone()),
+                    all => Some(swap(p)).filter(|s| all.contains(s)),
+                };
+                (
+                    p.clone(),
+                    Layout {
+                        source,
+                        ..layout.clone()
+                    },
+                )
+            })
+            .collect()
     }
 
     /// Namespaces of a `{ns}` pattern: the source locale's files (`translation`, i18next's
@@ -268,9 +314,12 @@ impl Config {
             .to_string_lossy()
             .into_owned();
         let (pre, post) = full.split_once("{ns}").expect("checked by the caller");
+        // vue-i18n `src/{ns}.vue`: every component with an `<i18n>` block, `{ns}` = its path.
+        let vue = post == ".vue";
         let glob = format!(
-            "{}*{}",
+            "{}{}*{}",
             glob::Pattern::escape(pre),
+            if vue { "**/" } else { "" },
             glob::Pattern::escape(post)
         );
         let mut found: Vec<String> = glob::glob(&glob)
@@ -280,11 +329,18 @@ impl Config {
             .filter_map(|p| {
                 let s = p.to_string_lossy();
                 let ns = s.strip_prefix(pre)?.strip_suffix(post)?;
+                if vue {
+                    let ok = !ns
+                        .split(['/', '\\'])
+                        .any(|c| c.starts_with('.') || c == "node_modules")
+                        && std::fs::read_to_string(&p).is_ok_and(|t| t.contains("<i18n"));
+                    return ok.then(|| ns.replace('\\', "/"));
+                }
                 (!ns.is_empty() && !ns.contains(['/', '\\'])).then(|| ns.to_string())
             })
             .collect();
         found.sort();
-        if found.is_empty() {
+        if found.is_empty() && !vue {
             found.push("translation".into());
         }
         found
@@ -372,6 +428,12 @@ fn unsuffixed_source(root: &Path, pattern: &str, locale: &str, source: &str) -> 
     {
         return pot;
     }
+    // Angular XMB: the source of `messages.{locale}.xtb` is `messages.xmb`.
+    if let Some(stem) = pattern.strip_suffix(".{locale}.xtb")
+        && root.join(format!("{stem}.xmb")).is_file()
+    {
+        return format!("{stem}.xmb");
+    }
     for (tag, exts, always) in [
         (".{locale}.", &["resx"][..], true),
         ("_{locale}.", &["properties"][..], true),
@@ -379,7 +441,7 @@ fn unsuffixed_source(root: &Path, pattern: &str, locale: &str, source: &str) -> 
         // Flutter slang: the base locale is `strings.i18n.json`, targets `strings_de.i18n.json`.
         (
             "_{locale}.",
-            &["i18n.json", "i18n.yaml", "i18n.yml"][..],
+            &["i18n.json", "i18n.yaml", "i18n.yml", "i18n.csv"][..],
             false,
         ),
     ] {
@@ -507,6 +569,45 @@ mod tests {
             "Symfony keeps messages.en.xlf"
         );
         assert_eq!(u("{locale}.json", "en"), "{locale}.json");
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn target_files_know_their_source_file() {
+        let dir = tempfile_dir("paired");
+        std::fs::create_dir_all(dir.join("config/locales")).unwrap();
+        for f in ["en.yml", "devise.en.yml", "fr.yml", "devise.fr.yml"] {
+            std::fs::write(dir.join("config/locales").join(f), "").unwrap();
+        }
+        let c: Config = toml::from_str(
+            "source_locale = \"en\"\ntarget_locales = [\"fr\"]\nfiles = [\"config/locales/**/*{locale}.yml\", \"messages/{locale}.json\"]\n",
+        )
+        .unwrap();
+        let src = |p: &PathBuf| p.strip_prefix(&dir).unwrap().to_string_lossy().into_owned();
+        let got: Vec<(String, Option<String>)> = c
+            .catalog_files(&dir, "fr")
+            .iter()
+            .map(|(p, l)| (src(p), l.source.as_ref().map(src)))
+            .collect();
+        assert_eq!(
+            got,
+            [
+                (
+                    "config/locales/devise.fr.yml".to_string(),
+                    Some("config/locales/devise.en.yml".to_string())
+                ),
+                (
+                    "config/locales/fr.yml".into(),
+                    Some("config/locales/en.yml".into())
+                ),
+                ("messages/fr.json".into(), Some("messages/en.json".into())),
+            ]
+        );
+        assert!(
+            c.catalog_files(&dir, "en")
+                .iter()
+                .all(|(_, l)| l.source.is_none())
+        );
         std::fs::remove_dir_all(&dir).unwrap();
     }
 

@@ -295,6 +295,23 @@ impl Workspace {
             max_length_ratio: Some(self.config.qa.max_length_ratio),
         };
         let mut issues = validate::validate(source, target, locale, self.config.syntax, &c);
+        // gettext / Qt files store fewer plural forms than CLDR: don't ask for the others. Only
+        // looked up on a missing category (it reads the catalog's `Plural-Forms`).
+        if issues
+            .iter()
+            .any(|i| i.code == glot_core::validate::IssueCode::PluralCategoryMissing)
+            && let Some((path, _)) = self.config.catalog_files(&self.root, locale).first()
+            && let Some(forms) = glot_core::formats::plural_forms(self.config.format, path, locale)
+        {
+            issues = validate::validate_forms(
+                source,
+                target,
+                locale,
+                self.config.syntax,
+                &c,
+                Some(&forms),
+            );
+        }
         issues.extend(self.glossary.check(source, target, locale));
         // A source that is just a do-not-translate term (brand, product) is meant to stay identical.
         if self
@@ -972,6 +989,16 @@ impl Workspace {
                                         .is_some_and(|(k, _)| k.starts_with(&p))
                                 })
                             })
+                        })
+                        // A new plural goes to `plurals.xml` beside `strings.xml` (Android, moko).
+                        .or_else(|| {
+                            v.contains(", plural,")
+                                .then(|| {
+                                    files.iter().position(|f| {
+                                        f.0.file_name().is_some_and(|n| n == "plurals.xml")
+                                    })
+                                })
+                                .flatten()
                         })
                         .unwrap_or(0);
                     files[i].1.entries.insert(key.clone(), v.clone());

@@ -3,6 +3,7 @@
 //! Values keep markup and `&lt;` as written, other entities are decoded; Android backslash escapes (`\'`, `\"`, `\n`,
 //! `\@`, `\uXXXX`) are decoded, CDATA content is taken raw.
 use std::collections::{BTreeMap, BTreeSet};
+use std::path::Path;
 
 use super::xml::{self, Elem, Node};
 use super::{Parsed, folded_choice, icu_choice, line_end, line_start};
@@ -120,12 +121,19 @@ pub fn parse(s: &str) -> Result<Parsed, String> {
     Ok(p)
 }
 
-pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
+/// `path` decides the tag of new plurals: moko-resources (`moko-resources/`, `MR/`) says `<plural>`,
+/// as does a file already using it.
+pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     let s = existing.unwrap_or(SKELETON);
     let Ok(list) = entries(s) else {
         // ponytail: unparseable existing file => regenerate (parse errors surface on read first).
-        return write(None, cat);
+        return write(None, cat, path);
     };
+    let moko = list.iter().any(|e| e.elem.tag == "plural")
+        || path
+            .components()
+            .any(|c| c.as_os_str() == "moko-resources" || c.as_os_str() == "MR");
+    let tag = if moko { "plural" } else { "plurals" };
     let indent = list
         .first()
         .map(|e| s[line_start(s, e.elem.start)..e.elem.start].to_string())
@@ -147,7 +155,7 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
                     None => replace(&mut out, &mut pos, from, to, ""),
                     Some(v) if *v == inner(s, &e.elem) => {}
                     Some(v) if folded_choice(v).is_some() => {
-                        let el = render_plurals(&e.name, v, &indent, &indent);
+                        let el = render_plurals(tag, &e.name, v, &indent, &indent);
                         replace(&mut out, &mut pos, from, to, &el)
                     }
                     Some(v) => {
@@ -218,7 +226,7 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
                 out += &render_items(&head, "string-array", &items, &indent, &indent.repeat(2));
             }
         } else if folded_choice(v).is_some() {
-            out += &render_plurals(k, v, &indent, &indent);
+            out += &render_plurals(tag, k, v, &indent, &indent);
         } else {
             out += &format!(
                 "{indent}<string name=\"{k}\">{}</string>\n",
@@ -262,15 +270,9 @@ fn plural_items(v: &str) -> Vec<(String, String)> {
     }
 }
 
-fn render_plurals(name: &str, v: &str, ind: &str, step: &str) -> String {
-    let head = format!("<plurals name=\"{name}\">");
-    render_items(
-        &head,
-        "plurals",
-        &plural_items(v),
-        ind,
-        &format!("{ind}{step}"),
-    )
+fn render_plurals(tag: &str, name: &str, v: &str, ind: &str, step: &str) -> String {
+    let head = format!("<{tag} name=\"{name}\">");
+    render_items(&head, tag, &plural_items(v), ind, &format!("{ind}{step}"))
 }
 
 /// `head` + one `<item{attrs}>` per line + `</tag>`, each on its own indented line.

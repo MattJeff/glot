@@ -189,7 +189,7 @@ fn leptos_i18n(root: &Path, ms: &[(PathBuf, String)]) -> Option<Detected> {
     let ext = entries
         .iter()
         .filter_map(|p| p.extension()?.to_str().map(str::to_string))
-        .find(|e| matches!(e.as_str(), "json" | "yaml" | "yml" | "ftl"))
+        .find(|e| matches!(e.as_str(), "json" | "json5" | "yaml" | "yml" | "ftl"))
         .unwrap_or_else(|| "json".into());
     let base = prefix(root, &ldir);
     let namespaces = list("namespaces");
@@ -207,6 +207,7 @@ fn leptos_i18n(root: &Path, ms: &[(PathBuf, String)]) -> Option<Detected> {
         syntax,
         files,
         locales,
+        source: None,
     })
 }
 
@@ -242,6 +243,7 @@ fn fluent(root: &Path, dep: &dyn Fn(&str) -> bool) -> Option<Detected> {
         syntax: "fluent",
         files: files.into_iter().collect(),
         locales,
+        source: None,
     })
 }
 
@@ -281,11 +283,19 @@ fn rust_i18n(root: &Path, ms: &[(PathBuf, String)]) -> Option<Detected> {
             .to_string_lossy()
             .to_string();
         let base = prefix(root, p.parent().unwrap_or(&ldir));
-        if text.lines().any(|l| l.trim() == "_version: 2") {
-            // Every locale in one file: the locale leaves.
+        let toml = ext == "toml";
+        if text
+            .lines()
+            .any(|l| matches!(l.replace(' ', "").as_str(), "_version:2" | "_version=2"))
+        {
+            // Every locale in one file: the locale leaves (`  en: …` in YAML, `en = …` in TOML).
             files.insert(rel(root, &p));
             locales.extend(text.lines().filter_map(|l| {
-                let k = l.strip_prefix("  ")?.trim_start().split_once(':')?.0.trim();
+                let k = if toml {
+                    l.split_once('=')?.0.trim().trim_matches(['"', '\''])
+                } else {
+                    l.strip_prefix("  ")?.trim_start().split_once(':')?.0.trim()
+                };
                 is_locale(k).then(|| k.to_string())
             }));
         } else if is_locale(&stem) {
@@ -298,6 +308,7 @@ fn rust_i18n(root: &Path, ms: &[(PathBuf, String)]) -> Option<Detected> {
         syntax: "rails",
         files: files.into_iter().collect(),
         locales,
+        source: None,
     })
 }
 
@@ -349,6 +360,7 @@ fn dict(root: &Path) -> Option<Detected> {
         syntax: "plain",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -498,6 +510,32 @@ mod tests {
         assert_eq!(det.files, ["i18n/app.yml"]);
         assert_eq!(det.locales, ["en", "zh-CN"].map(String::from).into());
         assert_eq!(source(&d).as_deref(), Some("en"));
+        std::fs::remove_dir_all(&d).unwrap();
+        let d = tmp(
+            "ri18n-toml",
+            &[
+                ("Cargo.toml", "[dependencies]\nrust-i18n = \"3\"\n"),
+                ("src/main.rs", "rust_i18n::i18n!();\n"),
+                (
+                    "locales/app.toml",
+                    "_version = 2\n[hello]\nen = \"Hello\"\n\"pt-BR\" = \"Olá\"\n",
+                ),
+            ],
+        );
+        let det = detect(&d).unwrap();
+        assert_eq!(det.files, ["locales/app.toml"]);
+        assert_eq!(det.locales, ["en", "pt-BR"].map(String::from).into());
+        std::fs::remove_dir_all(&d).unwrap();
+        let d = tmp(
+            "leptos5",
+            &[
+                ("Cargo.toml", "[dependencies]\nleptos_i18n = \"0.5\"\n"),
+                ("locales/en.json5", "{ hi: 'Hi' }"),
+                ("locales/fr.json5", "{ hi: 'Salut' }"),
+            ],
+        );
+        let det = detect(&d).unwrap();
+        assert_eq!(det.files, ["locales/{locale}.json5"]);
         std::fs::remove_dir_all(&d).unwrap();
     }
 }

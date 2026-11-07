@@ -26,6 +26,8 @@ anstyle = "1"
 # glot db (database content → glot_translations)
 sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres"] }
 toml.workspace = true
+# glot docs: Hugo menus / titles patched into hugo.toml (already in the tree via glot-core)
+toml_edit = "0.22"
 glob.workspace = true
 # glot dev (overlay server)
 axum = "0.8"

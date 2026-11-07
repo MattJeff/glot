@@ -15,7 +15,7 @@ use std::path::Path;
 pub mod email;
 mod foreign;
 pub mod i18nize;
-mod rust;
+pub mod rust;
 mod scan;
 pub use scan::looks_like_css_classes;
 pub mod svg;

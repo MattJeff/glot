@@ -121,6 +121,19 @@ pub fn validate(
     syntax: Syntax,
     constraints: &Constraints,
 ) -> Vec<Issue> {
+    validate_forms(source, target, target_locale, syntax, constraints, None)
+}
+
+/// [`validate`] for a catalog format that stores only `forms` plural categories (gettext per its
+/// `Plural-Forms`, Qt numerus forms; see `formats::plural_forms`): no other category is required.
+pub fn validate_forms(
+    source: &str,
+    target: &str,
+    target_locale: &str,
+    syntax: Syntax,
+    constraints: &Constraints,
+    forms: Option<&[&str]>,
+) -> Vec<Issue> {
     let mut out = Vec::new();
     if target.trim().is_empty() {
         if !source.trim().is_empty() {
@@ -143,6 +156,8 @@ pub fn validate(
             locale: target_locale,
             src,
             tgt: &tgt,
+            texts: [source, target],
+            forms,
             out: &mut out,
         }
         .run();
@@ -1694,6 +1709,75 @@ fn split_printf(t: &str, next: &mut usize, py: &mut PyArgs, out: &mut Vec<Node>)
     flush(out, &mut text);
 }
 
+/// `name` as written in a printf-family text: `{0}` (.NET / Python), `{}` (easy_localization),
+/// `%1$s`, `%(name)s`, Qt `%1` / `%L1`, slang `$name`, or the n-th unnumbered `%s` / `%d`.
+fn printf_spelling(text: &str, name: &str) -> Option<String> {
+    let conv = |rest: &str| {
+        let end = rest
+            .find(|c: char| "@dixXfFeEgGcCsSpaAu".contains(c))
+            .filter(|&e| {
+                rest[..e]
+                    .chars()
+                    .all(|c| "-+0#'.*hlqLztj".contains(c) || c.is_ascii_digit())
+            })?;
+        Some(rest[..=end].to_string())
+    };
+    let numeric = !name.is_empty() && name.chars().all(|c| c.is_ascii_digit());
+    for open in [
+        format!("{{{name}}}"),
+        format!("{{{name}:"),
+        format!("{{{name}!"),
+    ] {
+        if let Some(i) = text.find(&open) {
+            return text[i..].find('}').map(|j| text[i..=i + j].to_string());
+        }
+    }
+    let tries = if numeric {
+        vec![format!("%{name}$"), format!("%L{name}"), format!("%{name}")]
+    } else {
+        vec![format!("%({name})"), format!("${name}"), format!("%{name}")]
+    };
+    for (n, p) in tries.iter().enumerate() {
+        for (i, _) in text.match_indices(p.as_str()) {
+            let rest = &text[i + p.len()..];
+            let next = rest.chars().next();
+            match n {
+                // `%1$s`, `%(name)s`: the conversion is part of the spelling.
+                0 => return Some(p.clone() + &conv(rest).unwrap_or_default()),
+                // Whole token only: `%1` is not `%12`, `$name` is not `$names`.
+                _ if !next.is_some_and(|c| c.is_alphanumeric() || c == '_') => {
+                    return Some(p.clone());
+                }
+                _ => {}
+            }
+        }
+    }
+    if !numeric {
+        return None;
+    }
+    let n: usize = name.parse().ok()?;
+    if text.contains("{}") {
+        return Some("{}".into());
+    }
+    // Unnumbered printf args are counted from 1.
+    let mut seen = 0;
+    let mut rest = text;
+    while let Some(i) = rest.find('%') {
+        rest = &rest[i + 1..];
+        if let Some(r) = rest.strip_prefix('%') {
+            rest = r;
+            continue;
+        }
+        if let Some(c) = conv(rest) {
+            seen += 1;
+            if seen == n {
+                return Some(format!("%{c}"));
+            }
+        }
+    }
+    None
+}
+
 fn flush(out: &mut Vec<Node>, text: &mut String) {
     if !text.is_empty() {
         out.push(Node::Text(std::mem::take(text)));
@@ -1825,6 +1909,9 @@ struct Checker<'a> {
     locale: &'a str,
     src: &'a [Node],
     tgt: &'a [Node],
+    /// Source and target as written, to show placeholders in their own spelling.
+    texts: [&'a str; 2],
+    forms: Option<&'a [&'a str]>,
     out: &'a mut Vec<Issue>,
 }
 
@@ -1907,6 +1994,11 @@ fn untranslated_keyword(k: &str) -> Option<&'static str> {
 
 impl Checker<'_> {
     fn ph(&self, name: &str) -> String {
+        if self.syntax == Syntax::Printf
+            && let Some(t) = self.texts.iter().find_map(|t| printf_spelling(t, name))
+        {
+            return t;
+        }
         match self.syntax {
             Syntax::Icu => format!("{{{name}}}"),
             Syntax::I18next => format!("{{{{{name}}}}}"),
@@ -2097,7 +2189,10 @@ impl Checker<'_> {
         let names = |v: Vec<PluralCategory>| -> Vec<&'static str> {
             v.iter().map(PluralCategory::as_str).collect()
         };
-        let cardinal = names(categories(self.locale));
+        let mut cardinal = names(categories(self.locale));
+        if let Some(f) = self.forms {
+            cardinal.retain(|c| *c == "other" || f.contains(c));
+        }
         let ordinal = names(crate::plural::ordinal_categories(self.locale));
         let is_mf2 = self.syntax == Syntax::Mf2;
         let other = if is_mf2 { "`*`" } else { "`other`" };
@@ -2892,5 +2987,48 @@ mod tests {
             lv(src, "{0} Aucun|[1,*] Quelques", "fr"),
             [PluralCategoryMissing]
         );
+    }
+
+    #[test]
+    fn printf_placeholders_shown_as_written() {
+        let msg = |s: &str, t: &str| {
+            validate(s, t, "fr", Syntax::Printf, &Constraints::default())
+                .into_iter()
+                .map(|i| i.message)
+                .collect::<Vec<_>>()
+                .join("\n")
+        };
+        // .NET resx / Java-ish `{0}`, easy_localization `{}`, Android `%1$s`, gettext `%s`, Qt `%1`.
+        for (s, t, shown) in [
+            ("Hello {0}", "Bonjour", "`{0}`"),
+            ("Hi {}", "Salut", "`{}`"),
+            ("Hi %1$s", "Salut", "`%1$s`"),
+            ("Hi %s and %d", "Salut %s", "`%d`"),
+            ("%1 files", "fichiers", "`%1`"),
+            ("Hi %(name)s", "Salut", "`%(name)s`"),
+        ] {
+            let m = msg(s, t);
+            assert!(m.contains(shown) && !m.contains("$…"), "{s}: {m}");
+        }
+        // Extra placeholder: shown in the target's own spelling.
+        assert!(msg("Hello", "Bonjour {0}").contains("`{0}`"));
+    }
+
+    #[test]
+    fn plural_forms_of_the_format() {
+        // gettext cs has 3 forms (no CLDR `many`), Qt fr 2: neither may be asked for.
+        let cs = "{count, plural, one {# soubor} few {# soubory} other {# souborů}}";
+        let src = "{count, plural, one {# file} other {# files}}";
+        let v = |t, l, f: Option<&[&str]>| {
+            validate_forms(src, t, l, Syntax::Printf, &Constraints::default(), f)
+                .into_iter()
+                .map(|i| i.code)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(v(cs, "cs", None), [PluralCategoryMissing]);
+        assert!(v(cs, "cs", Some(&["one", "few", "other"])).is_empty());
+        let fr = "{count, plural, one {# fichier} other {# fichiers}}";
+        assert_eq!(v(fr, "fr", None), [PluralCategoryMissing]);
+        assert!(v(fr, "fr", Some(&["one", "other"])).is_empty());
     }
 }

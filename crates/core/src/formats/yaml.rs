@@ -5,6 +5,7 @@
 //! flow collections and lists are left untouched and not translated.
 use std::path::Path;
 
+use super::json::META;
 use super::{Parsed, folded_choice, icu_choice};
 use crate::catalog::Catalog;
 
@@ -248,6 +249,11 @@ fn unescape_double(s: &str) -> String {
     out
 }
 
+/// go-i18n `description:` / `hash:` beside the forms of a message (not translated, kept).
+fn is_meta_item(it: &Item) -> bool {
+    META.contains(&it.path.last().map_or("", String::as_str))
+}
+
 /// Catalog entries: (key, value, item index, is plural).
 fn entries(doc: &Doc) -> Vec<(String, String, usize, bool)> {
     let skip = doc.root.as_ref().map_or(0, |_| 1);
@@ -262,8 +268,8 @@ fn entries(doc: &Doc) -> Vec<(String, String, usize, bool)> {
         let c = children(k);
         !c.is_empty()
             && c.iter().all(|&o| {
-                doc.items[o].scalar.is_some()
-                    && CATS.contains(&doc.items[o].path.last().unwrap().as_str())
+                let f = doc.items[o].path.last().unwrap().as_str();
+                doc.items[o].scalar.is_some() && (CATS.contains(&f) || META.contains(&f))
             })
             && c.iter()
                 .any(|&o| doc.items[o].path.last().unwrap() == "other")
@@ -281,6 +287,7 @@ fn entries(doc: &Doc) -> Vec<(String, String, usize, bool)> {
         if plurals.contains(&k) {
             let forms: Vec<(String, String)> = children(k)
                 .into_iter()
+                .filter(|&o| !is_meta_item(&doc.items[o]))
                 .map(|o| {
                     let c = &doc.items[o];
                     (c.path.last().unwrap().clone(), c.scalar.clone().unwrap().0)
@@ -312,8 +319,19 @@ pub fn parse(s: &str, locale: &str) -> Result<Parsed, String> {
 }
 
 pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
+    write_like(existing, cat, path, None)
+}
+
+/// [`write`], new keys placed in the order of `source` (the source locale's file): each one
+/// before the first existing sibling the source has after it.
+pub(crate) fn write_like(
+    existing: Option<&str>,
+    cat: &Catalog,
+    path: &Path,
+    source: Option<&str>,
+) -> String {
     // New file: Rails (`.yml`) nests under the locale, Symfony (`.yaml`) does not.
-    let fresh = if path.extension().is_some_and(|e| e == "yml") {
+    let fresh = if path.extension().is_some_and(|e| e == "yml") && !slang(path) {
         format!("{}:\n", cat.locale)
     } else {
         String::new()
@@ -332,13 +350,20 @@ pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
             Some(v) if v == current => {}
             Some(v) if *plural => {
                 let ind = " ".repeat(it.child_indent.unwrap_or(it.indent + 2));
-                let style = doc
+                let kids = doc
                     .items
                     .iter()
-                    .find(|c| c.line == it.line + 1)
+                    .filter(|c| c.path.len() == it.path.len() + 1 && c.path.starts_with(&it.path));
+                let style = kids
+                    .clone()
+                    .find(|c| !is_meta_item(c))
                     .and_then(|c| c.scalar.as_ref().map(|s| s.1))
                     .unwrap_or(Style::Double);
-                edits.push((it.line + 1, it.last, plural_lines(v, &ind, style)));
+                let meta: String = kids
+                    .filter(|c| is_meta_item(c))
+                    .flat_map(|c| doc.lines[c.line..=c.last].iter().copied())
+                    .collect();
+                edits.push((it.line + 1, it.last, meta + &plural_lines(v, &ind, style)));
             }
             Some(v) => {
                 let line = doc.lines[it.line];
@@ -371,10 +396,17 @@ pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     // Plurals are `one:`/`other:` mappings in Rails files (locale root) or files that already have
     // one; ember-intl / Symfony `+intl-icu` / vue-i18n YAML keep the ICU string as written.
     let mappings = doc.root.is_some() || list.iter().any(|e| e.3) || template_data(path);
-    for (k, v) in &cat.entries {
-        if !known.contains(k) {
-            text = insert(&text, &cat.locale, k, v, mappings);
-        }
+    let rank = source
+        .map(|s| source_rank(s, doc.root.is_some()))
+        .unwrap_or_default();
+    let mut new: Vec<(&String, &String)> = cat
+        .entries
+        .iter()
+        .filter(|(k, _)| !known.contains(k))
+        .collect();
+    new.sort_by_key(|(k, _)| rank.get(k.as_str()).copied().unwrap_or(usize::MAX));
+    for (k, v) in new {
+        text = insert(&text, &cat.locale, k, v, mappings, &rank);
     }
     if existing.is_some_and(|e| !e.ends_with('\n')) {
         text.pop();
@@ -382,7 +414,30 @@ pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     text
 }
 
-fn insert(text: &str, locale: &str, key: &str, v: &str, mappings: bool) -> String {
+/// Rank of each key path (mappings too, dotted, without a Rails locale root when `strip_root`)
+/// in the source file.
+fn source_rank(src: &str, strip_root: bool) -> std::collections::HashMap<String, usize> {
+    let Ok(doc) = parse_doc(src, "") else {
+        return Default::default();
+    };
+    let tops = doc.items.iter().filter(|it| it.path.len() == 1).count();
+    let skip = usize::from(strip_root && tops == 1);
+    let mut rank = std::collections::HashMap::new();
+    for it in doc.items.iter().filter(|it| it.path.len() > skip) {
+        let n = rank.len();
+        rank.entry(it.path[skip..].join(".")).or_insert(n);
+    }
+    rank
+}
+
+fn insert(
+    text: &str,
+    locale: &str,
+    key: &str,
+    v: &str,
+    mappings: bool,
+    rank: &std::collections::HashMap<String, usize>,
+) -> String {
     let Ok(doc) = parse_doc(text, locale) else {
         return text.to_string();
     };
@@ -397,6 +452,24 @@ fn insert(text: &str, locale: &str, key: &str, v: &str, mappings: bool) -> Strin
                 .map(|it| (n, it.last + 1, it.child_indent.unwrap_or(it.indent + 2)))
         })
         .unwrap_or((0, doc.lines.len(), 0));
+    // Before the first sibling the source orders after the new key (with its comment lines).
+    let skip = doc.root.iter().count();
+    let at = rank
+        .get(&segs[skip..=n].join("."))
+        .and_then(|&r| {
+            doc.items.iter().find(|it| {
+                it.path.len() == n + 1
+                    && it.path.starts_with(&segs[..n])
+                    && rank.get(&it.path[skip..].join(".")).is_some_and(|&o| o > r)
+            })
+        })
+        .map_or(at, |it| {
+            let mut l = it.line;
+            while l > 0 && doc.lines[l - 1].trim_start().starts_with('#') {
+                l -= 1;
+            }
+            l
+        });
     let mut add = String::new();
     for seg in &segs[n..segs.len() - 1] {
         add += &format!("{}{}:\n", " ".repeat(indent), yaml_key(seg));
@@ -438,7 +511,13 @@ fn template_data(path: &Path) -> bool {
                 .any(|f| site.join(f).is_file())
             })
     });
-    hugo || path.components().any(|c| c.as_os_str() == "_data")
+    hugo || slang(path) || path.components().any(|c| c.as_os_str() == "_data")
+}
+
+/// Flutter slang `strings_de.i18n.yaml`: no locale root, plurals as `one:`/`other:` mappings.
+fn slang(path: &Path) -> bool {
+    let n = path.to_string_lossy();
+    n.ends_with(".i18n.yaml") || n.ends_with(".i18n.yml")
 }
 
 fn plural_lines(v: &str, ind: &str, style: Style) -> String {
@@ -515,5 +594,77 @@ fn yaml_key(k: &str) -> String {
         k.to_string()
     } else {
         format!("\"{}\"", k.replace('\\', "\\\\").replace('"', "\\\""))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn cat(locale: &str, pairs: &[(&str, &str)]) -> Catalog {
+        let mut c = Catalog::new(locale);
+        for (k, v) in pairs {
+            c.entries.insert(k.to_string(), v.to_string());
+        }
+        c
+    }
+
+    #[test]
+    fn new_keys_follow_the_source_order() {
+        let src = "en:\n  zeta: Z\n  # The home page\n  home:\n    title: Home\n    intro: Hi\n  alpha: A\n";
+        let p = Path::new("config/locales/fr.yml");
+        let fr = cat(
+            "fr",
+            &[
+                ("zeta", "Z"),
+                ("home.title", "Accueil"),
+                ("home.intro", "Salut"),
+                ("alpha", "A"),
+            ],
+        );
+        // New file: the source's order, not the alphabet.
+        assert_eq!(
+            write_like(None, &fr, p, Some(src)),
+            "fr:\n  zeta: Z\n  home:\n    title: Accueil\n    intro: Salut\n  alpha: A\n"
+        );
+        // Existing file: a missing key goes before the next sibling the source has (and its comment).
+        let existing = "fr:\n  zeta: Z\n  home:\n    intro: Salut\n  # Last\n  alpha: A\n";
+        assert_eq!(
+            write_like(Some(existing), &fr, p, Some(src)),
+            "fr:\n  zeta: Z\n  home:\n    title: Accueil\n    intro: Salut\n  # Last\n  alpha: A\n"
+        );
+        // Without a source: appended at the end of the parent, as before.
+        assert_eq!(
+            write(Some(existing), &fr, p),
+            "fr:\n  zeta: Z\n  home:\n    intro: Salut\n    title: Accueil\n  # Last\n  alpha: A\n"
+        );
+    }
+
+    #[test]
+    fn go_i18n_description_is_kept_and_not_translated() {
+        let src = "PersonCats:\n  description: How many cats\n  one: \"{{.Count}} cat\"\n  other: \"{{.Count}} cats\"\n";
+        let p = parse(src, "en").unwrap();
+        assert_eq!(
+            p.entries.keys().collect::<Vec<_>>(),
+            ["PersonCats"],
+            "{:?}",
+            p.entries
+        );
+        assert_eq!(
+            p.entries["PersonCats"],
+            "{count, plural, one {{{.Count}} cat} other {{{.Count}} cats}}"
+        );
+        let path = Path::new("active.en.yaml");
+        let mut c = cat("en", &[]);
+        c.entries = p.entries.clone();
+        assert_eq!(write(Some(src), &c, path), src, "byte for byte");
+        c.entries.insert(
+            "PersonCats".into(),
+            "{count, plural, one {{{.Count}} kitty} other {{{.Count}} kitties}}".into(),
+        );
+        assert_eq!(
+            write(Some(src), &c, path),
+            "PersonCats:\n  description: How many cats\n  one: \"{{.Count}} kitty\"\n  other: \"{{.Count}} kitties\"\n"
+        );
     }
 }

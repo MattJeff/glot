@@ -22,9 +22,11 @@ mod render;
 mod review;
 mod seo;
 mod setup;
+mod site_labels;
 mod store;
 mod sync;
 mod variants;
+mod wif;
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
@@ -115,6 +117,8 @@ enum Cmd {
     /// Plural/select branch coverage per locale and CLDR category (`--render`: check each branch in a browser).
     #[command(hide = true)] // legacy spelling of `glot labs coverage`
     Coverage(coverage::CoverageArgs),
+    /// Compile gettext `.po` catalogs to `.mo` (+ WordPress script JSON); later writes keep them in sync.
+    Compile,
     /// Hardcoded strings in code, plus missing and unused keys.
     Extract {
         #[arg(long)]
@@ -202,6 +206,9 @@ enum Cmd {
     Tm(queue::TmCmd),
     #[command(hide = true)] // legacy spelling of `glot labs distill`
     Distill(distill::DistillArgs),
+    /// Keyless Claude: Workload Identity Federation issuers, rules, and a local JWT check.
+    #[command(subcommand)]
+    Wif(wif::WifCmd),
 }
 
 /// Experimental: useful, less proven than the core loop. Also callable without `labs` (old spelling).
@@ -299,6 +306,8 @@ Guarantees
                 $ glot add nav.billing \"Billing\" --note \"sidebar link\"
   glossary    Terms enforced by the validator (glossary.toml)
                 $ glot glossary add Workspace --fr \"Espace de travail\"
+  compile     gettext .po to .mo (+ WordPress script JSON), kept in sync afterwards
+                $ glot compile
 
 Pixel budgets
   measure     Record each key's box (width, lines, font) from the running app
@@ -315,6 +324,8 @@ Your agent and your app
                 $ glot agent-prompt
   provenance  Who/what produced each translation (model, date, reviewer), for AI-disclosure
                 $ glot provenance export --format csv
+  wif         Keyless Claude in CI (Workload Identity Federation): create issuer/rule, check a JWT
+                $ glot wif rule create --preset github --repo acme/web --issuer fdis_… --service-account svac_… --workspace wrkspc_… --name glot-ci
 
 Server (experimental)
   push, pull  Sync catalogs, lock and glossary with a self-hosted glot server
@@ -395,6 +406,26 @@ fn open() -> Result<Workspace> {
     Ok(ws)
 }
 
+fn compile() -> Result<()> {
+    let ws = open()?;
+    let mut n = 0;
+    for loc in ws.config.all_locales() {
+        for p in ws.config.catalog_paths(&ws.root, &loc) {
+            if p.extension().is_some_and(|e| e == "po") && p.is_file() {
+                for f in glot_core::formats::mo::compile_path(&p)? {
+                    n += 1;
+                    let f = f.strip_prefix(&ws.root).unwrap_or(&f).display().to_string();
+                    anstream::println!("{GREEN}compiled{GREEN:#} {f}");
+                }
+            }
+        }
+    }
+    if n == 0 {
+        bail!("no gettext `.po` catalog in glot.toml `files`");
+    }
+    Ok(())
+}
+
 fn print_json<T: serde::Serialize>(v: &T) -> Result<()> {
     println!("{}", serde_json::to_string_pretty(v)?);
     Ok(())
@@ -442,6 +473,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Measure(a) => return measure::run(a),
         Cmd::Coverage(a) => return coverage::run(a),
         Cmd::Extract { json } => extract(json)?,
+        Cmd::Compile => compile()?,
         Cmd::Unused { prune, json } => unused(prune, json)?,
         Cmd::Add { key, value, note } => {
             let mut ws = open()?;
@@ -492,6 +524,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Localize(a) => return localize::run(a),
         Cmd::AgentPrompt(a) => return localize::agent_prompt_cmd(a),
         Cmd::Provenance(c) => return provenance::run(c),
+        Cmd::Wif(c) => return wif::run(c).await,
     }
     Ok(ExitCode::SUCCESS)
 }

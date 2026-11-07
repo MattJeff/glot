@@ -89,6 +89,7 @@ pub fn detect(root: &Path) -> Option<Detected> {
             syntax,
             files,
             locales,
+            source: None,
         })
     };
     if let Some(d) = webext(root) {
@@ -263,6 +264,39 @@ pub fn detect(root: &Path) -> Option<Detected> {
     if let Some(d) = qt(root) {
         return Some(d);
     }
+    // Unity Localization: String Tables exported as CSV (`Key,Id,…,English(en),French(fr)`), every
+    // locale in one file; glot edits the CSV, the package's CSV import brings it back.
+    if root.join("ProjectSettings/ProjectVersion.txt").is_file() {
+        let (mut files, mut locales) = (vec![], BTreeSet::new());
+        for p in find(&root.join("Assets"), &|p| ext(p, "csv")) {
+            let text = std::fs::read_to_string(&p).unwrap_or_default();
+            let head = text
+                .trim_start_matches('\u{feff}')
+                .lines()
+                .next()
+                .unwrap_or_default();
+            let cols: Vec<&str> = head.split(',').map(str::trim).collect();
+            if !cols.contains(&"Key") {
+                continue;
+            }
+            let found: Vec<String> = cols
+                .iter()
+                .filter_map(|c| {
+                    c.strip_suffix(')')?
+                        .rsplit_once('(')
+                        .map(|(_, l)| l.to_string())
+                })
+                .filter(|l| is_locale(l))
+                .collect();
+            if !found.is_empty() {
+                files.push(rel(root, &p));
+                locales.extend(found);
+            }
+        }
+        if !files.is_empty() {
+            return d("unity", "printf", files, locales);
+        }
+    }
     // gettext: `<dir>/<locale>/LC_MESSAGES/<domain>.po` or `<dir>/<locale>.po`.
     let po = find(root, &|p| ext(p, "po"));
     if !po.is_empty() {
@@ -377,6 +411,7 @@ pub(super) fn webext(root: &Path) -> Option<Detected> {
         syntax: "icu",
         files: vec![with_dir(&rel(root, dir), "{locale}/messages.json")],
         locales,
+        source: None,
     })
 }
 
@@ -384,7 +419,7 @@ pub(super) fn webext(root: &Path) -> Option<Detected> {
 /// easy_localization `assets/translations/{locale}.json`, slang `lib/i18n/{locale}.i18n.json`.
 fn flutter_json(root: &Path) -> Option<Detected> {
     let pubspec = std::fs::read_to_string(root.join("pubspec.yaml")).ok()?;
-    let (stack, dirs, suffix): (_, &[&str], _) = if pubspec.contains("easy_localization") {
+    let (stack, dirs, suffixes): (_, &[&str], &[&str]) = if pubspec.contains("easy_localization") {
         (
             "easy_localization",
             &[
@@ -393,13 +428,13 @@ fn flutter_json(root: &Path) -> Option<Detected> {
                 "assets/lang",
                 "assets/l10n",
             ],
-            ".json",
+            &[".json"],
         )
     } else if pubspec.contains("slang") {
         (
             "slang",
             &["lib/i18n", "assets/i18n", "lib/l10n"],
-            ".i18n.json",
+            &[".i18n.json", ".i18n.yaml", ".i18n.yml", ".i18n.csv"],
         )
     } else {
         return None;
@@ -408,7 +443,10 @@ fn flutter_json(root: &Path) -> Option<Detected> {
         let (mut files, mut locales) = (BTreeSet::new(), BTreeSet::new());
         for e in read_dir(&root.join(dir)) {
             let name = e.file_name().to_string_lossy().to_string();
-            let Some(stem) = name.strip_suffix(suffix) else {
+            let Some((stem, suffix)) = suffixes
+                .iter()
+                .find_map(|s| Some((name.strip_suffix(s)?, *s)))
+            else {
                 continue;
             };
             // slang `strings_de.i18n.json` / `de.i18n.json`.
@@ -419,18 +457,23 @@ fn flutter_json(root: &Path) -> Option<Detected> {
             if is_locale(loc) {
                 files.insert(format!("{dir}/{pre}{{locale}}{suffix}"));
                 locales.insert(loc.to_string());
+            } else if suffix == ".i18n.csv"
+                && let Some(head) = std::fs::read_to_string(e.path())
+                    .ok()
+                    .and_then(|t| t.lines().next().map(str::to_string))
+                    .filter(|h| h.trim_start_matches('\u{feff}').starts_with("key,"))
+            {
+                // slang compact CSV: every locale in one file, `key,en,de-DE`.
+                files.insert(format!("{dir}/{name}"));
+                locales.extend(
+                    head.split(',')
+                        .skip(1)
+                        .map(|l| l.trim().to_string())
+                        .filter(|l| is_locale(l)),
+                );
             } else if stack == "slang" {
                 // slang's base file has no locale (`strings.i18n.json`): `base_locale`, `en` by default.
-                let cfg = ["slang.yaml", "build.yaml"]
-                    .iter()
-                    .find_map(|f| std::fs::read_to_string(root.join(f)).ok())
-                    .unwrap_or_default();
-                let base = cfg
-                    .lines()
-                    .find_map(|l| l.trim().strip_prefix("base_locale:"))
-                    .map(|v| v.trim().trim_matches(['"', '\'']).to_string())
-                    .filter(|l| is_locale(l))
-                    .unwrap_or_else(|| "en".into());
+                let base = slang_base(root).unwrap_or_else(|| "en".into());
                 files.insert(format!("{dir}/{stem}_{{locale}}{suffix}"));
                 locales.insert(base);
             }
@@ -441,16 +484,29 @@ fn flutter_json(root: &Path) -> Option<Detected> {
                 syntax: "printf",
                 files: files.into_iter().collect(),
                 locales,
+                source: (stack == "slang").then(|| slang_base(root)).flatten(),
             });
         }
     }
     None
 }
 
+/// slang `base_locale` (`slang.yaml` / `build.yaml`).
+fn slang_base(root: &Path) -> Option<String> {
+    let cfg = ["slang.yaml", "build.yaml"]
+        .iter()
+        .find_map(|f| std::fs::read_to_string(root.join(f)).ok())?;
+    cfg.lines()
+        .find_map(|l| l.trim().strip_prefix("base_locale:"))
+        .map(|v| v.trim().trim_matches(['"', '\'']).to_string())
+        .filter(|l| is_locale(l))
+}
+
 /// Qt Linguist: `<dir>/<app>_<locale>.ts` (XML), no source file (the source text is in every
 /// file, `sourcelanguage`, English by default).
 fn qt(root: &Path) -> Option<Detected> {
     let (mut files, mut locales) = (BTreeSet::new(), BTreeSet::new());
+    let mut source = None;
     for p in find(root, &|p| ext(p, "ts")) {
         let head = std::fs::read_to_string(&p).unwrap_or_default();
         if !head.contains("<TS") {
@@ -476,6 +532,7 @@ fn qt(root: &Path) -> Option<Detected> {
             .map(|(l, _)| l.split(['_', '-']).next().unwrap_or(l).to_string())
             .filter(|l| is_locale(l))
             .unwrap_or_else(|| "en".into());
+        source.get_or_insert_with(|| src.clone());
         locales.insert(src);
     }
     if files.is_empty() {
@@ -486,6 +543,7 @@ fn qt(root: &Path) -> Option<Detected> {
         syntax: "printf",
         files: files.into_iter().collect(),
         locales,
+        source,
     })
 }
 
@@ -514,6 +572,10 @@ fn moko(root: &Path) -> Option<Detected> {
             )
         })
         .collect();
+    // New plurals go to `plurals.xml` (moko reads `<plural>` there), created on first use.
+    if !files.iter().any(|f| f.ends_with("/plurals.xml")) {
+        files.push(with_dir(&rel(root, dir), "{locale}/plurals.xml"));
+    }
     files.sort_by_key(|f| !f.ends_with("/strings.xml"));
     let mut locales: BTreeSet<String> = ["en".to_string()].into();
     locales.extend(
@@ -527,6 +589,7 @@ fn moko(root: &Path) -> Option<Detected> {
         syntax: "printf",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -580,6 +643,7 @@ fn symfony(root: &Path) -> Option<Detected> {
         syntax: "symfony",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -632,6 +696,7 @@ fn backend(root: &Path) -> Option<Detected> {
                     syntax: "laravel",
                     files,
                     locales,
+                    source: None,
                 });
             }
         }
@@ -671,6 +736,7 @@ fn backend(root: &Path) -> Option<Detected> {
                 syntax: "icu",
                 files: files.into_iter().collect(),
                 locales,
+                source: Some(src.to_string()),
             });
         }
     }
@@ -710,6 +776,7 @@ fn backend(root: &Path) -> Option<Detected> {
             syntax: if stack == "symfony" { "symfony" } else { "icu" },
             files: files.into_iter().collect(),
             locales,
+            source: None,
         });
     }
     // Java `messages_<locale>.properties` and .NET `Strings.<locale>.resx` next to their
@@ -748,6 +815,7 @@ fn backend(root: &Path) -> Option<Detected> {
                 syntax,
                 files: files.into_iter().collect(),
                 locales,
+                source: None,
             });
         }
     }
@@ -929,6 +997,53 @@ mod tests {
                 "printf",
                 &["lib/i18n/strings_{locale}.i18n.json"],
                 &["de", "fr"],
+            ),
+            (
+                &[("shared/src/commonMain/moko-resources/base/strings.xml", "")],
+                "moko-resources",
+                "printf",
+                &[
+                    "shared/src/commonMain/moko-resources/{locale}/strings.xml",
+                    "shared/src/commonMain/moko-resources/{locale}/plurals.xml",
+                ],
+                &["en"],
+            ),
+            (
+                &[
+                    ("pubspec.yaml", "dependencies:\n  slang: ^4.0.0\n"),
+                    ("lib/i18n/strings.i18n.yaml", "a: b\n"),
+                    ("lib/i18n/strings_fr.i18n.yaml", "a: b\n"),
+                ],
+                "slang",
+                "printf",
+                &["lib/i18n/strings_{locale}.i18n.yaml"],
+                &["en", "fr"],
+            ),
+            (
+                &[
+                    ("pubspec.yaml", "dependencies:\n  slang: ^4.0.0\n"),
+                    ("lib/i18n/strings.i18n.csv", "key,en,de-DE\na,b,c\n"),
+                ],
+                "slang",
+                "printf",
+                &["lib/i18n/strings.i18n.csv"],
+                &["de-DE", "en"],
+            ),
+            (
+                &[
+                    (
+                        "ProjectSettings/ProjectVersion.txt",
+                        "m_EditorVersion: 6000.0.23f1\n",
+                    ),
+                    (
+                        "Assets/Localization/UI.csv",
+                        "Key,Id,Shared Comments,English(en),French(fr)\nOK,1,,OK,OK\n",
+                    ),
+                ],
+                "unity",
+                "printf",
+                &["Assets/Localization/UI.csv"],
+                &["en", "fr"],
             ),
         ];
         for (files, stack, syntax, patterns, locales) in cases {

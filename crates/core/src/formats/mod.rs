@@ -16,10 +16,14 @@ use crate::{Error, Key, Locale, Result};
 
 mod android;
 mod arb;
+mod csv;
+mod docusaurus;
 mod fluent;
 mod inlang;
 pub mod js;
 pub(crate) mod json;
+mod json5;
+pub mod mo;
 mod php;
 mod po;
 mod properties;
@@ -29,8 +33,10 @@ pub mod rust_dict;
 mod rust_i18n;
 mod strings;
 mod toml_i18n;
+pub mod vue_sfc;
 mod xcstrings;
 mod xliff;
+mod xmb;
 mod xml;
 mod yaml;
 
@@ -57,6 +63,29 @@ pub struct Parsed {
     pub implicit: BTreeMap<Key, String>,
     /// Marked reviewed in the file (XLIFF `final` / `signed-off`): lockfile `reviewed`.
     pub reviewed: BTreeSet<Key>,
+}
+
+/// The plural categories the file at `path` can store for `locale`, when the format has fewer than
+/// CLDR: gettext `msgstr[n]` per the file's `Plural-Forms` (no fraction-only `many` in cs/fr),
+/// Qt numerus forms. `None` = every CLDR category (see `validate::validate_forms`).
+pub fn plural_forms(format: Format, path: &Path, locale: &str) -> Option<Vec<&'static str>> {
+    match native(format, path)? {
+        Format::Qt => Some(po::default_categories(locale)),
+        Format::Po => {
+            let Ok(text) = std::fs::read_to_string(path) else {
+                return Some(po::default_categories(locale));
+            };
+            let n = text.split_once("nplurals=").and_then(|(_, r)| {
+                r.chars()
+                    .take_while(char::is_ascii_digit)
+                    .collect::<String>()
+                    .parse()
+                    .ok()
+            });
+            Some(po::po_categories(locale, n))
+        }
+        _ => None,
+    }
 }
 
 /// The native format handling `path`, `None` for JSON catalogs. `Auto`/JSON formats resolve by
@@ -86,6 +115,10 @@ pub fn native(format: Format, path: &Path) -> Option<Format> {
                 "resx" => Some(Format::Resx),
                 "php" => Some(Format::Php),
                 "ftl" => Some(Format::Fluent),
+                "json5" => Some(Format::Js),
+                "csv" => Some(Format::Csv),
+                "vue" => Some(Format::VueSfc),
+                "xmb" | "xtb" => Some(Format::Xmb),
                 "rs" => Some(Format::RustDict),
                 _ => None,
             }
@@ -106,17 +139,28 @@ pub fn parse(format: Format, path: &Path, text: &str, locale: &str) -> Result<Pa
         Format::Po => po::parse(text, locale),
         Format::Yaml if rust_i18n::is_rust_i18n(text) => rust_i18n::parse(text, locale),
         Format::Yaml => yaml::parse(text, locale),
+        Format::Js if json5::is_json5(path) => json5::parse(text, locale),
         Format::Js => js::parse(text, locale),
         Format::Xliff => xliff::parse(text, locale),
         Format::Properties => properties::parse(text),
         Format::Resx => resx::parse(text),
+        Format::Toml if rust_i18n::is_toml_v2(text) => rust_i18n::parse_toml(text, locale),
         Format::Toml => toml_i18n::parse(text),
         Format::Qt => qt::parse(text, locale),
         Format::Php => php::parse(text, path),
+        Format::JsonMessage if docusaurus::is_code_json(path) => {
+            json::parse(text, path).map(|p| docusaurus::fold(p, locale))
+        }
         Format::JsonMessage => json::parse(text, path),
+        Format::Csv => csv::parse(text, locale),
         Format::Inlang => inlang::parse(text),
+        Format::VueSfc => vue_sfc::parse(text, locale),
+        Format::Xmb => xmb::parse(text, locale),
         Format::Fluent => fluent::parse(text),
-        Format::RustDict => rust_dict::parse(text, locale),
+        Format::RustDict => match rust_dict::sidecar(path, text, locale) {
+            Some(json) => rust_dict::parse_sidecar(&json),
+            None => rust_dict::parse(text, locale),
+        },
         Format::Auto | Format::JsonNested | Format::JsonFlat => Err("not a native format".into()),
     }
 }
@@ -127,22 +171,40 @@ pub fn write(format: Format, path: &Path, existing: Option<&str>, cat: &Catalog)
         Format::Xcstrings => xcstrings::write(existing, cat),
         Format::Strings if is_stringsdict(path) => strings::write_dict(existing, cat),
         Format::Strings => strings::write(existing, cat),
-        Format::Android => android::write(existing, cat),
+        Format::Android => android::write(existing, cat, path),
         Format::Arb => arb::write(existing, cat),
-        Format::Po => po::write_from(existing, cat, pot_template(path).as_deref()),
+        Format::Po => {
+            let pot = pot_template(path);
+            let siblings = if pot.is_none() {
+                po_siblings(path)
+            } else {
+                vec![]
+            };
+            po::write_from(existing, cat, pot.as_deref(), &siblings)
+        }
         Format::Yaml if existing.is_some_and(rust_i18n::is_rust_i18n) => {
             rust_i18n::write(existing.unwrap_or_default(), cat, path)
         }
         Format::Yaml => yaml::write(existing, cat, path),
+        Format::Js if json5::is_json5(path) => json5::write(existing, cat),
         Format::Js => js::write(existing, cat),
         Format::Xliff => xliff::write(existing, cat, path),
         Format::Properties => properties::write(existing, cat),
         Format::Resx => resx::write(existing, cat),
+        Format::Toml if existing.is_some_and(rust_i18n::is_toml_v2) => {
+            rust_i18n::write_toml(existing.unwrap_or_default(), cat)
+        }
         Format::Toml => toml_i18n::write(existing, cat),
         Format::Qt => qt::write(existing, cat),
         Format::Php => php::write(existing, cat, path),
+        Format::JsonMessage if docusaurus::is_code_json(path) => {
+            json::write(existing, &docusaurus::unfold(cat), path)
+        }
         Format::JsonMessage => json::write(existing, cat, path),
+        Format::Csv => csv::write(existing, cat),
         Format::Inlang => inlang::write(existing, cat, path),
+        Format::VueSfc => vue_sfc::write(existing, cat),
+        Format::Xmb => xmb::write(existing, cat, path),
         Format::Fluent => fluent::write(existing, cat),
         Format::RustDict => rust_dict::write(existing, cat),
         Format::Auto | Format::JsonNested | Format::JsonFlat => cat.to_json(format),
@@ -166,12 +228,58 @@ pub fn read(path: &Path, locale: &str, format: Format) -> Result<Option<Parsed>>
 }
 
 /// Patch `cat` into the native file at `path`, keeping its encoding (UTF-16 `.strings` stay UTF-16).
+#[cfg(test)]
 pub(crate) fn write_path(format: Format, path: &Path, cat: &Catalog) -> Result<()> {
+    write_path_src(format, path, cat, None)
+}
+
+/// [`write_path`] with the source locale's file (`source`): YAML targets add new keys in its order.
+pub(crate) fn write_path_src(
+    format: Format,
+    path: &Path,
+    cat: &Catalog,
+    source: Option<&str>,
+) -> Result<()> {
     let existing = read_text(path)?;
     let (old, enc) = existing
         .as_ref()
         .map_or((None, Enc::Utf8), |(t, e)| (Some(t.as_str()), *e));
-    let mut text = write(format, path, old, cat);
+    // A locale without a column in the Rust tables: its `locales/{locale}.json` catalog.
+    if format == Format::RustDict
+        && let Some(src) = old
+        && let Some(json) = rust_dict::sidecar(path, src, &cat.locale)
+    {
+        let parse_err = |message| Error::Parse {
+            path: json.clone(),
+            message,
+        };
+        let Some(text) = rust_dict::write_sidecar(&json, cat).map_err(parse_err)? else {
+            return Ok(());
+        };
+        if !json.exists() {
+            eprintln!(
+                "note: {} has no `{}` column: its strings go to {} (load it in the lookup code as a fallback, see the glot docs on Rust string tables)",
+                path.display(),
+                cat.locale,
+                json.display()
+            );
+        }
+        let io = |source| Error::Io {
+            path: json.clone(),
+            source,
+        };
+        if let Some(dir) = json.parent() {
+            std::fs::create_dir_all(dir).map_err(io)?;
+        }
+        return std::fs::write(&json, text).map_err(io);
+    }
+    let mut text = match source {
+        Some(src) if format == Format::Yaml && !old.is_some_and(rust_i18n::is_rust_i18n) => {
+            yaml::write_like(old, cat, path, Some(src))
+        }
+        Some(src) if format == Format::Fluent => fluent::write_from(old, cat, Some(src)),
+        _ => write(format, path, old, cat),
+    };
     // Appended entries follow a CRLF file's line endings (Windows / old Xcode files).
     if old.is_some_and(|o| o.contains("\r\n") && !o.replace("\r\n", "").contains('\n')) {
         text = text.replace("\r\n", "\n").replace('\n', "\r\n");
@@ -185,7 +293,12 @@ pub(crate) fn write_path(format: Format, path: &Path, cat: &Catalog) -> Result<(
     std::fs::write(path, encode(&text, enc)).map_err(|source| Error::Io {
         path: path.to_path_buf(),
         source,
-    })
+    })?;
+    // A compiled `.mo` next to the `.po` (`glot compile` made it, or the project ships one) stays in sync.
+    if format == Format::Po && path.with_extension("mo").is_file() {
+        mo::compile_path(path)?;
+    }
+    Ok(())
 }
 
 /// On-disk encoding of a native file: Xcode still writes `.strings` as UTF-16 with a BOM.
@@ -400,6 +513,39 @@ fn pot_template(path: &Path) -> Option<String> {
         [one] => std::fs::read_to_string(one).ok(),
         _ => None,
     }
+}
+
+/// The other locales' `.po` of the same domain: `<dir>/*/LC_MESSAGES/<domain>.po`, else the
+/// `.po` files sharing the folder.
+fn po_siblings(path: &Path) -> Vec<String> {
+    let Some(dir) = path.parent() else {
+        return vec![];
+    };
+    let lc = dir.file_name().is_some_and(|n| n == "LC_MESSAGES");
+    let files: Vec<std::path::PathBuf> = match (lc, dir.parent().and_then(Path::parent)) {
+        (true, Some(base)) => std::fs::read_dir(base)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|e| {
+                e.path()
+                    .join("LC_MESSAGES")
+                    .join(path.file_name().unwrap_or_default())
+            })
+            .collect(),
+        _ => std::fs::read_dir(dir)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|e| e.path())
+            .filter(|p| p.extension().is_some_and(|e| e == "po"))
+            .collect(),
+    };
+    files
+        .iter()
+        .filter(|p| p.as_path() != path)
+        .filter_map(|p| std::fs::read_to_string(p).ok())
+        .collect()
 }
 
 fn is_stringsdict(path: &Path) -> bool {

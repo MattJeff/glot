@@ -107,14 +107,40 @@ fn moko_plural_tag() {
         "{count, plural, one {%d apple} other {%d apples}}"
     );
     let mut c = cat("en", &p);
-    assert_eq!(android::write(Some(src), &c), src);
+    assert_eq!(
+        android::write(Some(src), &c, Path::new("res/values/strings.xml")),
+        src
+    );
     c.entries.insert(
         "apples".into(),
         "{count, plural, one {%d pomme} other {%d pommes}}".into(),
     );
-    let out = android::write(Some(src), &c);
+    let out = android::write(Some(src), &c, Path::new("res/values/strings.xml"));
     assert!(out.contains("</plural>\n") && !out.contains("</plurals>"));
     assert_eq!(android::parse(&out).unwrap().entries, c.entries);
+}
+
+#[test]
+fn moko_new_plural_file() {
+    let c = Catalog {
+        locale: "en".into(),
+        entries: [(
+            "items".to_string(),
+            "{count, plural, one {%d item} other {%d items}}".to_string(),
+        )]
+        .into(),
+    };
+    let moko = android::write(
+        None,
+        &c,
+        Path::new("shared/src/commonMain/moko-resources/base/plurals.xml"),
+    );
+    assert!(
+        moko.contains("<plural name=\"items\">") && moko.contains("</plural>\n"),
+        "{moko}"
+    );
+    let plain = android::write(None, &c, Path::new("app/src/main/res/values/plurals.xml"));
+    assert!(plain.contains("<plurals name=\"items\">"), "{plain}");
 }
 
 #[test]
@@ -174,5 +200,34 @@ fn moko_and_slang_paths() {
             "shared/src/commonMain/moko-resources/pt-rBR/strings.xml",
             "strings_pt-BR.i18n.json"
         ]
+    );
+}
+
+#[test]
+fn slang_yaml_new_file() {
+    let c = Catalog {
+        locale: "fr".into(),
+        entries: [
+            ("hello".to_string(), "Bonjour $name".to_string()),
+            (
+                "apples".to_string(),
+                "{count, plural, one {Une pomme} other {$n pommes}}".to_string(),
+            ),
+        ]
+        .into(),
+    };
+    let out = write(
+        Format::Yaml,
+        Path::new("lib/i18n/strings_fr.i18n.yml"),
+        None,
+        &c,
+    );
+    assert!(!out.starts_with("fr:"), "no locale root: {out}");
+    assert!(out.contains("apples:\n  one: "), "{out}");
+    assert_eq!(
+        parse(Format::Yaml, Path::new("x.i18n.yml"), &out, "fr")
+            .unwrap()
+            .entries,
+        c.entries
     );
 }

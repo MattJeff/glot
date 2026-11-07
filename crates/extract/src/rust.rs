@@ -204,6 +204,28 @@ pub(crate) fn scan(path: &str, src: &str, functions: &[String]) -> ExtractReport
             "{path}: {pairs} inline translation pairs (`tr(\"…\", \"…\")`): glot cannot add a locale to them; move them into the string table and call t(key)"
         ));
     }
+    r.hardcoded
+        .extend(spots(path, src).into_iter().map(|s| s.copy));
+    r
+}
+
+/// A hardcoded literal and its byte span.
+#[derive(Debug, Clone)]
+pub struct Spot {
+    pub start: usize,
+    pub end: usize,
+    /// `placeholder="…"` rather than a text node.
+    pub attr: bool,
+    /// Leptos `view!` copy that `{move || t("key")}` / `attr=move || t("key")` replaces without
+    /// changing types: a text node right between tags, or a visible attribute. Text inside
+    /// expressions (`if ok { "Envoyé" } else { … }`) is left to the developer.
+    pub clean: bool,
+    pub copy: Hardcoded,
+}
+
+/// Every hardcoded literal of the `view!` / `html!` / `rsx!` bodies of `src`.
+pub fn spots(path: &str, src: &str) -> Vec<Spot> {
+    let mut out = vec![];
     for m in MACROS {
         for (i, _) in src.match_indices(m) {
             if src[..i].chars().next_back().is_some_and(is_ident) {
@@ -215,14 +237,18 @@ pub(crate) fn scan(path: &str, src: &str, functions: &[String]) -> ExtractReport
             if !src[i + m.len()..open].trim().is_empty() {
                 continue;
             }
-            hardcoded(path, src, open, *m == "rsx!", &mut r);
+            hardcoded(path, src, open, m, &mut out);
         }
     }
-    r
+    // A `view!` nested in another one is scanned twice.
+    out.sort_by_key(|s| s.start);
+    out.dedup_by_key(|s| s.start);
+    out
 }
 
 /// Copy in the macro body opened at `open`.
-fn hardcoded(path: &str, src: &str, open: usize, rsx: bool, r: &mut ExtractReport) {
+fn hardcoded(path: &str, src: &str, open: usize, mac: &str, out: &mut Vec<Spot>) {
+    let rsx = mac == "rsx!";
     // `paren`: inside a call (`json!({ "via": … })`, `log("…")`, `format!("…")`): code, not copy.
     let (b, mut depth, mut paren, mut i) = (src.as_bytes(), 0i32, 0i32, open);
     while i < src.len() {
@@ -271,16 +297,29 @@ fn hardcoded(path: &str, src: &str, open: usize, rsx: bool, r: &mut ExtractRepor
                     .filter(|r| paren == 0 && !(word && *r == "text"))
                     .filter(|_| scan::looks_like_text(&text))
                 {
-                    r.hardcoded.push(Hardcoded {
-                        at: SourceRef {
-                            path: path.to_string(),
-                            line: line(src, i),
+                    let attr = role != "text";
+                    let between_tags =
+                        before.ends_with('>') && src[end..].trim_start().starts_with('<');
+                    // `<Button label="…">`: a component prop may be `&'static str`, not a closure.
+                    let html_tag = src[open..i].rfind('<').is_some_and(|lt| {
+                        src[open + lt + 1..].starts_with(|c: char| c.is_ascii_lowercase())
+                    });
+                    out.push(Spot {
+                        start: i,
+                        end,
+                        attr,
+                        clean: mac == "view!" && if attr { html_tag } else { between_tags },
+                        copy: Hardcoded {
+                            at: SourceRef {
+                                path: path.to_string(),
+                                line: line(src, i),
+                            },
+                            suggested_key: scan::suggest_key(path, &text, role),
+                            text,
+                            ui_role: Some(role.to_string()),
+                            component: None,
+                            reason: None,
                         },
-                        suggested_key: scan::suggest_key(path, &text, role),
-                        text,
-                        ui_role: Some(role.to_string()),
-                        component: None,
-                        reason: None,
                     });
                 }
                 i = end;
@@ -359,6 +398,32 @@ pub fn Login() -> impl IntoView {
             ]
         );
         assert_eq!(r.hardcoded[0].at.line, 17);
+    }
+
+    #[test]
+    fn rewritable_spots() {
+        let src = r#"view! {
+    <p>"Bienvenue"</p>
+    <input placeholder="Ton e-mail" />
+    <Field label="Nom" />
+    <span>{if ok { "Envoyé !" } else { "Échec de l'envoi" }}</span>
+    {move || view! { <b>"Gras"</b> }}
+}"#;
+        let got: Vec<(&str, bool, bool)> = super::spots("web/src/pages/a.rs", src)
+            .iter()
+            .map(|s| (&src[s.start..s.end], s.attr, s.clean))
+            .collect();
+        assert_eq!(
+            got,
+            [
+                ("\"Bienvenue\"", false, true),
+                ("\"Ton e-mail\"", true, true),
+                ("\"Nom\"", true, false),
+                ("\"Envoyé !\"", false, false),
+                ("\"Échec de l'envoi\"", false, false),
+                ("\"Gras\"", false, true),
+            ]
+        );
     }
 
     #[test]

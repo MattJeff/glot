@@ -98,12 +98,18 @@ fn http(
     let mut h = match cfg.provider.as_str() {
         "anthropic" => {
             let (var, key) = env_key("ANTHROPIC_API_KEY");
-            let key = key.ok_or(Error::MissingApiKey(var))?;
             let base = cfg
                 .base_url
                 .clone()
                 .unwrap_or_else(|| "https://api.anthropic.com".into());
-            Http::new(Kind::Anthropic, base, Some(key))
+            let mut h = Http::new(Kind::Anthropic, base, key);
+            anthropic_auth(
+                &mut h,
+                &var,
+                |k| std::env::var(k).ok(),
+                crate::wif::Federation::shared_from_env,
+            )?;
+            h
         }
         "openai" => {
             let (var, key) = env_key("OPENAI_API_KEY");
@@ -144,8 +150,10 @@ fn http(
         .filter(|(_, v)| !v.trim().is_empty())
         .map(|(k, v)| (k.to_ascii_lowercase(), v.trim().to_string()))
         .collect();
-    // Org-level user keys (sk-ant-usr-…) must name the workspace to bill.
+    // Org-level user keys (sk-ant-usr-…) must name the workspace to bill. Federated tokens are
+    // already workspace-scoped (ANTHROPIC_WORKSPACE_ID went into the exchange instead).
     if h.kind == Kind::Anthropic
+        && h.api_key.is_some()
         && !h.headers.iter().any(|(k, _)| k == "anthropic-workspace-id")
         && let Ok(ws) = std::env::var("ANTHROPIC_WORKSPACE_ID")
         && !ws.is_empty()
@@ -153,6 +161,30 @@ fn http(
         h.headers.push(("anthropic-workspace-id".into(), ws));
     }
     Ok(h)
+}
+
+/// Anthropic credential precedence (as the SDKs): explicit / configured API key, then
+/// `ANTHROPIC_AUTH_TOKEN` (Bearer), then Workload Identity Federation env, else missing key.
+fn anthropic_auth(
+    h: &mut Http,
+    var: &str,
+    get: impl Fn(&str) -> Option<String>,
+    federation: impl FnOnce(&str) -> Option<std::sync::Arc<crate::wif::Federation>>,
+) -> Result<()> {
+    if h.api_key.is_some() {
+        return Ok(());
+    }
+    let get = |k: &str| get(k).filter(|v| !v.trim().is_empty());
+    if let Some(t) = get("ANTHROPIC_AUTH_TOKEN") {
+        h.bearer = Some(t.trim().to_string());
+    } else if let Some(f) = federation(&h.base_url) {
+        h.federation = Some(f);
+    } else {
+        return Err(Error::MissingApiKey(format!(
+            "{var} (or ANTHROPIC_AUTH_TOKEN, or Workload Identity Federation: ANTHROPIC_FEDERATION_RULE_ID + ANTHROPIC_ORGANIZATION_ID + ANTHROPIC_SERVICE_ACCOUNT_ID + ANTHROPIC_IDENTITY_TOKEN_FILE)"
+        )));
+    }
+    Ok(())
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -166,6 +198,10 @@ struct Http {
     kind: Kind,
     base_url: String,
     api_key: Option<String>,
+    /// Anthropic `ANTHROPIC_AUTH_TOKEN`: `Authorization: Bearer` instead of `x-api-key`.
+    bearer: Option<String>,
+    /// Anthropic Workload Identity Federation: Bearer token exchanged (and refreshed) per call.
+    federation: Option<std::sync::Arc<crate::wif::Federation>>,
     headers: Vec<(String, String)>,
     client: reqwest::Client,
     /// `provider = "local"`: completions are tagged `local:<model>` so they cost $0.
@@ -185,6 +221,8 @@ impl Http {
             kind,
             base_url: base_url.trim_end_matches('/').to_string(),
             api_key,
+            bearer: None,
+            federation: None,
             headers: vec![],
             client,
             local: false,
@@ -223,9 +261,12 @@ impl Http {
 
     fn with_headers(&self, mut rb: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
         if self.kind == Kind::Anthropic {
-            rb = rb
-                .header("x-api-key", self.api_key.as_deref().unwrap_or_default())
-                .header("anthropic-version", "2023-06-01");
+            rb = rb.header("anthropic-version", "2023-06-01");
+            if let Some(k) = &self.api_key {
+                rb = rb.header("x-api-key", k);
+            } else if let Some(t) = &self.bearer {
+                rb = rb.bearer_auth(t);
+            } // federation: Bearer added per attempt in `send`
         } else if let Some(k) = &self.api_key {
             rb = rb.bearer_auth(k);
         }
@@ -349,9 +390,19 @@ impl Http {
                 tracing::warn!(provider = self.name(), attempt, "retrying LLM call: {last}");
             }
             let mut wait = Duration::from_millis(1000 * 2u64.pow(attempt));
-            match mk().send().await {
+            let mut rb = mk();
+            if let Some(f) = &self.federation {
+                // Exchange errors are final: retrying would resend a single-use JWT.
+                rb = rb.bearer_auth(f.token().await?);
+            }
+            match rb.send().await {
                 Ok(resp) => {
                     let status = resp.status().as_u16();
+                    if status == 401
+                        && let Some(f) = &self.federation
+                    {
+                        f.invalidate().await; // revoked / expired early: next call re-exchanges
+                    }
                     if let Some(s) = resp
                         .headers()
                         .get("retry-after")
@@ -613,5 +664,108 @@ mod tests {
             "HTTP 400: output_config.format: unsupported for this model"
         ));
         assert!(!schema_rejected("HTTP 400: max_tokens too large"));
+    }
+
+    fn lookup(pairs: &[(&str, &str)]) -> impl Fn(&str) -> Option<String> + use<> {
+        let m: BTreeMap<String, String> = pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+        move |k| m.get(k).cloned()
+    }
+
+    const WIF: [(&str, &str); 4] = [
+        ("ANTHROPIC_FEDERATION_RULE_ID", "fdrl_r"),
+        (
+            "ANTHROPIC_ORGANIZATION_ID",
+            "00000000-0000-0000-0000-000000000000",
+        ),
+        ("ANTHROPIC_SERVICE_ACCOUNT_ID", "svac_s"),
+        ("ANTHROPIC_IDENTITY_TOKEN", "jwt"),
+    ];
+
+    fn anthropic(key: Option<&str>, env: &[(&str, &str)]) -> Result<Http> {
+        let mut h = Http::new(Kind::Anthropic, "http://x".into(), key.map(String::from));
+        let get = lookup(env);
+        let fed = |b: &str| crate::wif::Federation::from_lookup(b, &get).map(std::sync::Arc::new);
+        anthropic_auth(&mut h, "ANTHROPIC_API_KEY", &get, fed)?;
+        Ok(h)
+    }
+
+    #[test]
+    fn credential_precedence() {
+        let mut env = WIF.to_vec();
+        env.push(("ANTHROPIC_AUTH_TOKEN", "tok"));
+        // API key wins over everything.
+        let h = anthropic(Some("sk-ant-api"), &env).unwrap();
+        assert!(h.federation.is_none() && h.bearer.is_none());
+        let r = h.build(&tr_req(), false).build().unwrap();
+        assert_eq!(r.headers()["x-api-key"], "sk-ant-api");
+        assert!(r.headers().get("authorization").is_none());
+        // Then ANTHROPIC_AUTH_TOKEN (Bearer, no x-api-key).
+        let h = anthropic(None, &env).unwrap();
+        let r = h.build(&tr_req(), false).build().unwrap();
+        assert_eq!(r.headers()["authorization"], "Bearer tok");
+        assert!(r.headers().get("x-api-key").is_none());
+        assert_eq!(r.headers()["anthropic-version"], "2023-06-01");
+        // Then federation; an empty ANTHROPIC_AUTH_TOKEN does not count.
+        let mut env = WIF.to_vec();
+        env.push(("ANTHROPIC_AUTH_TOKEN", ""));
+        assert!(anthropic(None, &env).unwrap().federation.is_some());
+        // Nothing: missing key, naming the federation option.
+        let e = anthropic(None, &WIF[..3]).err().unwrap().to_string();
+        assert!(e.contains("ANTHROPIC_FEDERATION_RULE_ID"), "{e}");
+    }
+
+    #[tokio::test]
+    async fn federated_bearer_on_messages() {
+        use axum::{Json, Router, http::HeaderMap, routing::post};
+        type Seen = std::sync::Arc<std::sync::Mutex<Vec<(Option<String>, bool)>>>;
+        let seen: Seen = Default::default();
+        let s2 = seen.clone();
+        let app = Router::new()
+            .route(
+                "/v1/oauth/token",
+                post(|| async {
+                    Json(json!({"access_token": "sk-ant-oat01-x", "token_type": "Bearer", "expires_in": 3600}))
+                }),
+            )
+            .route(
+                "/v1/messages",
+                post(move |h: HeaderMap| {
+                    let s = s2.clone();
+                    async move {
+                        s.lock().unwrap().push((
+                            h.get("authorization").map(|v| v.to_str().unwrap().to_string()),
+                            h.contains_key("x-api-key") || h.contains_key("anthropic-workspace-id"),
+                        ));
+                        Json(json!({"model": "m", "content": [{"type": "text", "text": "hi"}], "usage": {}}))
+                    }
+                }),
+            );
+        let l = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let base = format!("http://{}", l.local_addr().unwrap());
+        tokio::spawn(async move { axum::serve(l, app).await.unwrap() });
+        let mut h = Http::new(Kind::Anthropic, base, None);
+        let mut env = WIF.to_vec();
+        env.push(("ANTHROPIC_WORKSPACE_ID", "wrkspc_w"));
+        let get = lookup(&env);
+        anthropic_auth(&mut h, "ANTHROPIC_API_KEY", &get, |b| {
+            crate::wif::Federation::from_lookup(b, &get).map(std::sync::Arc::new)
+        })
+        .unwrap();
+        let mut req = tr_req();
+        req.json = false;
+        assert_eq!(h.complete(req.clone()).await.unwrap().text, "hi");
+        h.complete(req).await.unwrap();
+        let seen = seen.lock().unwrap();
+        assert_eq!(seen.len(), 2);
+        for (auth, extra) in seen.iter() {
+            assert_eq!(auth.as_deref(), Some("Bearer sk-ant-oat01-x"));
+            assert!(
+                !extra,
+                "no x-api-key / workspace header with a federated token"
+            );
+        }
     }
 }

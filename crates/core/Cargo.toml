@@ -12,6 +12,8 @@ toml.workspace = true
 toml_edit = "0.22"
 thiserror.workspace = true
 sha2.workspace = true
+# WordPress script translation file names (`md5(js path)`); already in the tree.
+md-5 = "0.10"
 glob.workspace = true
 rustybuzz = "0.20"
 # glot labs render: bidi algorithm, WOFF2 cmap

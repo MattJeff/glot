@@ -210,8 +210,19 @@ pub async fn run(a: DocsArgs) -> Result<ExitCode> {
         config.target_locales.retain(|l| a.locale.contains(l));
     }
     let pages = pages(&root, &entries, &config)?;
-    if pages.is_empty() {
+    let labels = crate::site_labels::find(&root, &config.source_locale);
+    if pages.is_empty() && labels.is_empty() {
         bail!("[[docs]]: no Markdown page matches the source globs");
+    }
+    // Site config labels (nav, menus, theme texts): `file#hash` => masked text.
+    let label_key =
+        |rel: &str, masked: &str| format!("{rel}#{}", &glot_core::hash::hash(masked)[..12]);
+    let mut label_segs: BTreeMap<String, String> = BTreeMap::new();
+    for l in &labels {
+        for t in &l.texts {
+            let masked = glot_core::markdown::mask(t).0;
+            label_segs.insert(label_key(&l.rel, &masked), masked);
+        }
     }
     let dir = root.join(DIR);
     // ponytail: created even by --dry-run (empty), the pipeline resolves paths under it.
@@ -244,6 +255,15 @@ pub async fn run(a: DocsArgs) -> Result<ExitCode> {
                 .entry(k.clone())
                 .or_insert_with(|| format!("{NOTE} Page: {}.", p.rel));
         }
+    }
+    for (k, masked) in &label_segs {
+        source.insert(k.clone(), masked.clone());
+        ws.lock.notes.entry(k.clone()).or_insert_with(|| {
+            format!(
+                "A navigation / menu label of the site config ({}): keep it as short as the source. {{0}}, {{1}}… stand for code or tags: keep them.",
+                k.split('#').next().unwrap_or_default()
+            )
+        });
     }
     ws.lock.notes.retain(|k, _| source.contains_key(k));
     for (loc, cat) in ws.catalogs.iter_mut() {
@@ -321,9 +341,14 @@ pub async fn run(a: DocsArgs) -> Result<ExitCode> {
 
     let segs: usize = pages.iter().map(|p| p.keys.len()).sum();
     anstream::println!(
-        "{BOLD}{}{BOLD:#} pages, {BOLD}{segs}{BOLD:#} segments ({} unique){}",
+        "{BOLD}{}{BOLD:#} pages, {BOLD}{segs}{BOLD:#} segments ({} unique){}{}",
         pages.len(),
-        source.len(),
+        source.len() - label_segs.len(),
+        if label_segs.is_empty() {
+            String::new()
+        } else {
+            format!(", {} site config labels", label_segs.len())
+        },
         if imported > 0 {
             format!(", {imported} hand edits read back")
         } else {
@@ -403,6 +428,32 @@ pub async fn run(a: DocsArgs) -> Result<ExitCode> {
         &rendered_path,
         serde_json::to_string_pretty(&rendered)? + "\n",
     )?;
+    let labels_path = dir.join("labels.json");
+    let mut last: crate::site_labels::Written = std::fs::read_to_string(&labels_path)
+        .ok()
+        .and_then(|t| serde_json::from_str(&t).ok())
+        .unwrap_or_default();
+    for l in &labels {
+        for loc in &ws.config.target_locales {
+            let cat = ws.catalogs.get(loc);
+            let tr = |t: &str| {
+                let (masked, spans) = glot_core::markdown::mask(t);
+                let v = cat?.entries.get(&label_key(&l.rel, &masked))?;
+                Some(glot_core::markdown::unmask(v, &spans))
+            };
+            if let Some(p) = crate::site_labels::write(&root, l, &src_locale, loc, &tr, &mut last)?
+            {
+                anstream::println!(
+                    "  {GREEN}✓{GREEN:#} {loc:<6} labels of {} written to {}",
+                    l.rel,
+                    rel(&root, &p)
+                );
+            }
+        }
+    }
+    if !labels.is_empty() {
+        std::fs::write(&labels_path, serde_json::to_string_pretty(&last)? + "\n")?;
+    }
     anstream::println!(
         "{GREEN}✓{GREEN:#} {written} pages written {DIM}(translations in {DIR}/, `cd {DIR} && glot check` to review){DIM:#}"
     );

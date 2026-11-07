@@ -7,7 +7,8 @@
 //! validated by `Syntax::Fluent`. A `#` comment right above a message is its note; `##` / `###`
 //! comments, blank lines and order are kept.
 //! Writing patches values in place: untouched messages keep their bytes, changed ones are
-//! re-indented with 4 spaces (8 for attributes), new messages and attributes are appended.
+//! re-indented with 4 spaces (8 for attributes), new messages and attributes are appended
+//! ([`write_from`]: placed in the source file's order, with its comments).
 // ponytail: a line in a translated value starting with `[`, `*` or `.` would need `{"["}`-style
 // escaping to stay text; translators never produce that in practice.
 use std::collections::{BTreeMap, BTreeSet};
@@ -325,6 +326,15 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
         out += &s[pos..a];
         out += &text;
         pos = b;
+        // A removed message does not leave its blank lines next to the previous ones.
+        if text.is_empty() && (out.is_empty() || out.ends_with("\n\n")) {
+            while let Some(n) = s[pos..]
+                .find('\n')
+                .filter(|&n| s[pos..pos + n].trim().is_empty())
+            {
+                pos += n + 1;
+            }
+        }
     }
     out += &s[pos..];
     for (id, parts) in fresh {
@@ -339,6 +349,67 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
         for (a, v) in parts.iter().filter(|(a, _)| !a.is_empty()) {
             out += &format!("    .{a} ={}\n", render(v, "        "));
         }
+    }
+    out
+}
+
+/// [`write`], new messages placed as in `source` (the source-locale file): a new file is the
+/// source's layout (order, comments, `##` sections) with the translated values; a message new to
+/// an existing file goes after the closest message that precedes it in the source.
+pub fn write_from(existing: Option<&str>, cat: &Catalog, source: Option<&str>) -> String {
+    let Some(src) = source else {
+        return write(existing, cat);
+    };
+    let s = existing.unwrap_or("");
+    if s.trim().is_empty() {
+        return write(Some(src), cat);
+    }
+    let id_of = |k: &str| k.split_once('.').map_or(k, |(id, _)| id).to_string();
+    let have: BTreeSet<String> = messages(s).into_iter().map(|m| m.id).collect();
+    let wanted: BTreeSet<String> = cat.entries.keys().map(|k| id_of(k)).collect();
+    let smsgs = messages(src);
+    let fresh: Vec<&Message> = smsgs
+        .iter()
+        .filter(|m| !have.contains(&m.id) && wanted.contains(&m.id))
+        .collect();
+    let only = |keep: &dyn Fn(&str) -> bool| Catalog {
+        locale: cat.locale.clone(),
+        entries: cat
+            .entries
+            .iter()
+            .filter(|(k, _)| keep(&id_of(k)))
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect(),
+    };
+    let fresh_ids: BTreeSet<&str> = fresh.iter().map(|m| m.id.as_str()).collect();
+    let mut out = write(Some(s), &only(&|id| !fresh_ids.contains(id)));
+    // ponytail: re-parses `out` per new message (O(n²)); fine for the few new messages of a run.
+    for m in fresh {
+        let pos = smsgs.iter().position(|x| x.id == m.id).unwrap_or(0);
+        let placed = messages(&out);
+        let find = |id: &str| placed.iter().find(|p| p.id == id);
+        let before = smsgs[..pos].iter().rev().find_map(|x| find(&x.id));
+        let at = match before {
+            Some(p) => p.end,
+            None => smsgs[pos + 1..]
+                .iter()
+                .find_map(|x| find(&x.id))
+                .map_or(out.len(), |p| p.start),
+        };
+        let block = write(Some(&src[m.start..m.end]), &only(&|id| id == m.id));
+        let mut text = String::new();
+        if at > 0 && !out[..at].ends_with('\n') {
+            text.push('\n');
+        }
+        // A blank line above it in the source: one here too.
+        if before.is_some() && src[..m.start].ends_with("\n\n") {
+            text.push('\n');
+        }
+        text += &block;
+        if before.is_none() && at < out.len() && src[m.end..].starts_with('\n') {
+            text.push('\n');
+        }
+        out.insert_str(at, &text);
     }
     out
 }
@@ -428,6 +499,48 @@ mod tests {
         assert_eq!(parse(&out).unwrap().entries, c.entries);
         // Untouched messages keep their bytes.
         assert!(out.contains("shared-photos = { $userName } { $photoCount ->\n    [one]"));
+    }
+
+    #[test]
+    fn new_target_follows_source_layout() {
+        let mut de = Catalog::new("de");
+        for (k, v) in [
+            ("hello-world", "Hallo Welt!"),
+            ("-brand-name", "Cliponit"),
+            ("-brand-name.gender", "masculine"),
+            ("multiline", "Erste Zeile,\nzweite Zeile."),
+            ("only-attrs.title", "Tooltip"),
+        ] {
+            de.entries.insert(k.into(), v.into());
+        }
+        let out = write_from(None, &de, Some(FIX));
+        assert_eq!(
+            out,
+            "### Messages de l'application (fluent-templates : locales/fr/main.ftl).\n\n## Accueil\n\n# Titre de la page d'accueil\nhello-world = Hallo Welt!\n\n-brand-name = Cliponit\n    .gender = masculine\n\n## Divers\n\nmultiline = Erste Zeile,\n    zweite Zeile.\n\nonly-attrs =\n    .title = Tooltip\n"
+        );
+        assert_eq!(parse(&out).unwrap().entries, de.entries);
+        assert_eq!(
+            write(None, &de).lines().next(),
+            Some("-brand-name = Cliponit"),
+            "without the source: sorted"
+        );
+        // Later runs: a new message goes after its source predecessor, with its comment.
+        de.entries.insert(
+            "unread-emails".into(),
+            "{ $count ->\n   *[other] { $count } E-Mails\n}".into(),
+        );
+        de.entries.insert("literal".into(), "Wörtlich".into());
+        let out2 = write_from(Some(&out), &de, Some(FIX));
+        assert!(
+            out2.contains("    .gender = masculine\n\n# Nombre d'e-mails non lus\nunread-emails = { $count ->\n       *[other] { $count } E-Mails\n    }\n\n## Divers"),
+            "{out2}"
+        );
+        assert!(
+            out2.contains("    zweite Zeile.\nliteral = Wörtlich\n\nonly-attrs"),
+            "{out2}"
+        );
+        assert_eq!(parse(&out2).unwrap().entries, de.entries);
+        assert_eq!(write_from(Some(&out2), &de, Some(FIX)), out2, "stable");
     }
 
     #[test]

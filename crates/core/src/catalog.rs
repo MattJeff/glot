@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use crate::config::{read_optional, write_file};
@@ -50,6 +50,12 @@ pub enum Format {
     JsonMessage,
     /// inlang message format (Paraglide JS): `messages/{locale}.json` beside `project.inlang/` (by path, also under `auto`).
     Inlang,
+    /// vue-i18n single-file components: the `<i18n>` blocks of `src/{ns}.vue` (every locale in one block, or one block per locale).
+    VueSfc,
+    /// Angular XMB source (`messages.xmb`) and XTB translations (`messages.{locale}.xtb`), by extension.
+    Xmb,
+    /// CSV string tables (by extension): Unity Localization export, slang compact / per-locale CSV.
+    Csv,
 }
 
 /// How one catalog file maps to glot keys (from `glot.toml`, see [`crate::config::Config::catalog_files`]).
@@ -62,6 +68,9 @@ pub struct Layout {
     pub i18next_plurals: bool,
     /// Namespace prefix of this file's keys (`home:` for `public/locales/{locale}/home.json`).
     pub ns: String,
+    /// The source locale's file this target mirrors: new keys follow its order, a new file its
+    /// JSON style (see [`crate::config::Config::catalog_files`]).
+    pub source: Option<PathBuf>,
 }
 
 impl Default for Layout {
@@ -70,6 +79,7 @@ impl Default for Layout {
             key_separator: ".".into(),
             i18next_plurals: false,
             ns: String::new(),
+            source: None,
         }
     }
 }
@@ -178,9 +188,15 @@ impl Catalog {
             };
             &own
         };
+        let source = layout
+            .source
+            .as_deref()
+            .filter(|p| *p != path)
+            .and_then(|p| read_optional(p).ok().flatten());
         if let Some(f) = crate::formats::native(format, path) {
-            return crate::formats::write_path(f, path, cat);
+            return crate::formats::write_path_src(f, path, cat, source.as_deref());
         }
+        let source = source.as_deref().map(|t| json_banner(t).1);
         let existing = read_optional(path)?;
         // Shopify themes start their locale files with a `/* … */` banner: kept as is.
         let (head, existing) = match existing.as_deref().map(json_banner) {
@@ -194,7 +210,7 @@ impl Catalog {
             f => f,
         };
         if let Some(text) = existing.as_deref()
-            && let Some(merged) = cat.merge_into(text, format, layout)
+            && let Some(merged) = cat.merge_like(text, format, layout, source)
         {
             let same = serde_json::from_str::<Value>(text).ok()
                 == serde_json::from_str::<Value>(&merged).ok();
@@ -205,7 +221,7 @@ impl Catalog {
             };
         }
         let out = cat
-            .merge_into("{}", format, layout)
+            .merge_like("{}", format, layout, source)
             .expect("an empty object always merges");
         write_file(path, &out)
     }
@@ -213,7 +229,19 @@ impl Catalog {
     /// Update `text` (an existing catalog of the same `format`) in place: same order and
     /// indentation, changed values, removed keys dropped, new keys appended, non-message values
     /// (numbers, booleans, `null`) kept. `None` if it can't be reused as is.
-    fn merge_into(&self, text: &str, format: Format, layout: &Layout) -> Option<String> {
+    pub(crate) fn merge_into(&self, text: &str, format: Format, layout: &Layout) -> Option<String> {
+        self.merge_like(text, format, layout, None)
+    }
+
+    /// [`Catalog::merge_into`], new keys placed in the order of `source` (the source locale's
+    /// file); a new file (`text` = `{}`) also takes its style (one line / indentation).
+    fn merge_like(
+        &self,
+        text: &str,
+        format: Format,
+        layout: &Layout,
+        source: Option<&str>,
+    ) -> Option<String> {
         let Ok(Value::Object(root)) = serde_json::from_str::<Value>(text) else {
             return None;
         };
@@ -240,6 +268,10 @@ impl Catalog {
         let mut seen = HashSet::new();
         let mut root = Value::Object(root);
         update(&mut root, "", sep, &entries, &mut seen);
+        let mut old = HashSet::new();
+        paths(&root, "", sep, &mut |p| {
+            old.insert(p.to_string());
+        });
         let Value::Object(map) = &mut root else {
             unreachable!()
         };
@@ -247,20 +279,31 @@ impl Catalog {
         for (k, v) in ordered.iter().filter(|(k, _)| !seen.contains(k.as_str())) {
             append(map, k, v, split);
         }
-        let indent = text
-            .lines()
-            .find_map(|l| {
-                let ws = &l[..l.len() - l.trim_start().len()];
-                (!ws.is_empty() && l.trim_start().starts_with('"')).then_some(ws)
-            })
-            .unwrap_or("  ");
-        let mut out = Vec::new();
-        let fmt = serde_json::ser::PrettyFormatter::with_indent(indent.as_bytes());
-        root.serialize(&mut serde_json::Serializer::with_formatter(&mut out, fmt))
-            .ok()?;
-        let mut out = String::from_utf8(out).ok()?;
-        out.push('\n');
-        Some(out)
+        let src: Option<Value> = source.and_then(|t| serde_json::from_str(t).ok());
+        if let Some(src) = &src {
+            // Rank of every path of the source; a plural form it lacks (`item_few`, `money.many`)
+            // ranks with its family.
+            let mut rank: HashMap<String, usize> = HashMap::new();
+            let mut family: HashMap<String, usize> = HashMap::new();
+            paths(src, "", sep, &mut |p| {
+                let n = rank.len();
+                rank.entry(p.to_string()).or_insert(n);
+                if let Some(stem) = plural_stem(p, sep) {
+                    family.entry(stem.to_string()).or_insert(n);
+                }
+            });
+            let rank_of = |p: &str| {
+                rank.get(p)
+                    .or_else(|| plural_stem(p, sep).and_then(|s| family.get(s)))
+                    .copied()
+            };
+            place_like_source(&mut root, "", sep, &old, &rank_of);
+        }
+        let style = match (text.trim(), source) {
+            ("{}", Some(src)) => src,
+            _ => text,
+        };
+        Some(crate::formats::json::serialize_like(&root, style))
     }
 
     /// Detect the format of an existing file content.
@@ -318,10 +361,61 @@ fn update(
                 seen.insert(key.to_string());
                 true
             }
-            None => key == SCHEMA,
+            // go-i18n `description` / `hash` beside the forms of a message.
+            None => {
+                key == SCHEMA
+                    || crate::formats::json::is_meta(key, sep, |o| entries.contains_key(o))
+            }
         },
         // Numbers, booleans, null: not messages, kept verbatim.
         _ => true,
+    }
+}
+
+/// Every key path of `v` (objects and leaves), in file order, joined like [`flatten`].
+fn paths(v: &Value, key: &str, sep: &str, f: &mut impl FnMut(&str)) {
+    if !key.is_empty() {
+        f(key);
+    }
+    match v {
+        Value::Object(map) => {
+            for (k, c) in map {
+                paths(c, &join(key, k, sep), sep, f);
+            }
+        }
+        Value::Array(items) => {
+            for (i, c) in items.iter().enumerate() {
+                paths(c, &format!("{key}[{i}]"), sep, f);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// `item_few` / `money.few` => `item` / `money`.
+fn plural_stem<'k>(p: &'k str, sep: &str) -> Option<&'k str> {
+    plural_member(p).map(|(base, _, _)| base).or_else(|| {
+        let (stem, cat) = p.rsplit_once(sep).filter(|_| !sep.is_empty())?;
+        CATS.contains(&cat).then_some(stem)
+    })
+}
+
+/// Move the objects' keys not in `old` (just added) to follow the source order, recursively.
+fn place_like_source(
+    v: &mut Value,
+    key: &str,
+    sep: &str,
+    old: &HashSet<String>,
+    rank: &impl Fn(&str) -> Option<usize>,
+) {
+    let Value::Object(map) = v else { return };
+    crate::formats::json::reorder(
+        map,
+        |k| !old.contains(&join(key, k, sep)),
+        |k| rank(&join(key, k, sep)),
+    );
+    for (k, c) in map.iter_mut() {
+        place_like_source(c, &join(key, k, sep), sep, old, rank);
     }
 }
 
@@ -834,7 +928,8 @@ mod tests {
         c.write_with(&p, Format::Auto, &l).unwrap();
         assert_eq!(
             std::fs::read_to_string(&p).unwrap(),
-            "{\n  \"title\": \"Welcome home\",\n  \"sub\": {\n    \"x\": \"X\"\n  }\n}\n"
+            // A one-line file stays on one line.
+            r#"{"title":"Welcome home","sub":{"x":"X"}}"#
         );
         std::fs::remove_dir_all(&dir).unwrap();
     }
@@ -895,16 +990,120 @@ mod tests {
         let mut c = Catalog::new("fr");
         c.entries.insert("x.y".into(), "é".into());
         c.write(&p, Format::Auto).unwrap();
-        assert_eq!(
-            std::fs::read_to_string(&p).unwrap(),
-            "{\n  \"x.y\": \"é\"\n}\n"
-        );
+        assert_eq!(std::fs::read_to_string(&p).unwrap(), r#"{"x.y":"é"}"#);
         let q = dir.join("other/fr.json");
         let mut d = Catalog::new("fr");
         d.entries.insert("z".into(), "Z".into());
         d.write(&q, Format::Auto).unwrap();
         let all = Catalog::read_all(&[p, q], "fr", Format::Auto).unwrap();
         assert_eq!(all.entries.len(), 2);
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    fn with_source(src: &Path) -> Layout {
+        Layout {
+            source: Some(src.to_path_buf()),
+            ..Layout::default()
+        }
+    }
+
+    #[test]
+    fn new_keys_follow_the_source_order_and_style() {
+        let dir = tmp("source-order");
+        let en = dir.join("en.json");
+        // i18n-js: one line, keys not sorted.
+        let src = r#"{"zeta":"Z","home":{"title":"Home","count":{"one":"%{count} item","other":"%{count} items"}},"alpha":"A"}"#;
+        std::fs::write(&en, src).unwrap();
+        let l = with_source(&en);
+        let mut fr = Catalog::new("fr");
+        for (k, v) in [("zeta", "Z"), ("home.title", "Accueil"), ("alpha", "A")] {
+            fr.entries.insert(k.into(), v.into());
+        }
+        fr.entries.insert(
+            "home.count".into(),
+            "{_count, plural, one {%{count} élément} many {%{count} d'éléments} other {%{count} éléments}}".into(),
+        );
+        let p = dir.join("fr.json");
+        fr.write_with(&p, Format::Auto, &l).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(&p).unwrap(),
+            r#"{"zeta":"Z","home":{"title":"Accueil","count":{"one":"%{count} élément","many":"%{count} d'éléments","other":"%{count} éléments"}},"alpha":"A"}"#
+        );
+        // Existing target: its order stays, a missing key goes where the source has it.
+        std::fs::write(&p, "{\n    \"zeta\": \"Z\",\n    \"alpha\": \"A\"\n}\n").unwrap();
+        let mut two = Catalog::new("fr");
+        for k in ["alpha", "zeta", "home.title"] {
+            two.entries.insert(k.into(), "x".into());
+        }
+        two.write_with(&p, Format::Auto, &l).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(&p).unwrap(),
+            "{\n    \"zeta\": \"x\",\n    \"home\": {\n        \"title\": \"x\"\n    },\n    \"alpha\": \"x\"\n}\n"
+        );
+        // i18next: a form the source lacks (`_few`) joins its family.
+        let src = "{\n  \"b\": \"B\",\n  \"item_one\": \"one\",\n  \"item_other\": \"many\",\n  \"a\": \"A\"\n}\n";
+        std::fs::write(&en, src).unwrap();
+        let l = Layout {
+            i18next_plurals: true,
+            ..with_source(&en)
+        };
+        let mut pl = Catalog::new("pl");
+        for (k, v) in [("a", "A"), ("b", "B")] {
+            pl.entries.insert(k.into(), v.into());
+        }
+        pl.entries.insert(
+            "item".into(),
+            "{count, plural, one {1} few {2} many {5} other {x}}".into(),
+        );
+        let q = dir.join("pl.json");
+        pl.write_with(&q, Format::Auto, &l).unwrap();
+        let keys: Vec<String> =
+            serde_json::from_str::<Map<String, Value>>(&std::fs::read_to_string(&q).unwrap())
+                .unwrap()
+                .keys()
+                .cloned()
+                .collect();
+        assert_eq!(
+            keys,
+            ["b", "item_one", "item_few", "item_many", "item_other", "a"]
+        );
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn go_i18n_description_and_hash_are_metadata() {
+        let dir = tmp("goi18n");
+        let en = dir.join("active.en.json");
+        let src = "{\n  \"PersonCats\": {\n    \"description\": \"How many cats\",\n    \"hash\": \"sha1-1\",\n    \"one\": \"{{.Name}} has {{.Count}} cat.\",\n    \"other\": \"{{.Name}} has {{.Count}} cats.\"\n  },\n  \"Hi\": \"Hi\"\n}\n";
+        std::fs::write(&en, src).unwrap();
+        let c = Catalog::read(&en, "en", Format::Auto).unwrap();
+        assert_eq!(
+            c.entries.keys().collect::<Vec<_>>(),
+            ["Hi", "PersonCats"],
+            "description / hash are not messages"
+        );
+        // Rewriting the source keeps them (byte for byte).
+        let mut changed = c.clone();
+        changed.entries.insert("Hi".into(), "Hello".into());
+        changed.write(&en, Format::Auto).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(&en).unwrap(),
+            src.replace("\"Hi\"\n", "\"Hello\"\n")
+        );
+        // Polish target: every form, no description to translate.
+        let mut pl = Catalog::new("pl");
+        pl.entries.insert("Hi".into(), "Cześć".into());
+        pl.entries.insert(
+            "PersonCats".into(),
+            "{_count, plural, one {a} few {b} many {c} other {d}}".into(),
+        );
+        let p = dir.join("active.pl.json");
+        pl.write_with(&p, Format::Auto, &with_source(&en)).unwrap();
+        let v: Value = serde_json::from_str(&std::fs::read_to_string(&p).unwrap()).unwrap();
+        assert_eq!(v["PersonCats"]["few"], "b");
+        assert_eq!(v["PersonCats"]["many"], "c");
+        assert!(v["PersonCats"].get("description").is_none());
+        assert_eq!(Catalog::read(&p, "pl", Format::Auto).unwrap(), pl);
         std::fs::remove_dir_all(&dir).unwrap();
     }
 }

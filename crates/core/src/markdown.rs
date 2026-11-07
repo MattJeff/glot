@@ -30,6 +30,19 @@ pub struct Segment {
     quote: Quote,
     /// Original bytes of the segment (rendered when it has no translation).
     orig: String,
+    /// A paragraph wrapped over several lines in the source: translations are wrapped alike.
+    wrap: Option<Wrap>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct Wrap {
+    /// Longest source line, in chars (prefix included).
+    width: usize,
+    /// Chars before the text on the first line (`- `, `> `).
+    first: usize,
+    /// What starts every other line (indentation, `> `).
+    cont: String,
+    nl: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -90,9 +103,12 @@ impl Doc {
                 },
                 Part::Seg(i) => {
                     let s = &self.segments[*i];
-                    match tr(*i) {
-                        Some(t) => out.push_str(&requote(&unmask(&t, &s.spans), s.quote)),
-                        None => out.push_str(&s.orig),
+                    match (tr(*i), &s.wrap) {
+                        (Some(t), Some(w)) if !t.contains("  ") && !t.contains('\n') => {
+                            out.push_str(&wrap(&t, &s.spans, w))
+                        }
+                        (Some(t), _) => out.push_str(&requote(&unmask(&t, &s.spans), s.quote)),
+                        (None, _) => out.push_str(&s.orig),
                     }
                 }
             }
@@ -122,6 +138,7 @@ impl Doc {
                 spans,
                 quote,
                 orig: orig.to_string(),
+                wrap: None,
             });
         } else {
             self.raw(orig);
@@ -329,7 +346,27 @@ impl Doc {
         let orig = &p.orig[p.prefix.len()..p.orig.len() - p.nl.len()];
         let orig = &orig[..orig.len() - brk.len()];
         let prefix = p.prefix.clone();
+        let n = self.segments.len();
         self.seg(&prefix, &text, orig, &format!("{brk}{}", p.nl), Quote::Body);
+        let lines: Vec<&str> = p.orig.lines().collect();
+        if let (Some(s), [_, second, ..]) = (self.segments.get_mut(n), lines.as_slice()) {
+            let body = second.trim_end_matches('\r');
+            s.wrap = Some(Wrap {
+                width: lines
+                    .iter()
+                    .map(|l| l.trim_end().chars().count())
+                    .max()
+                    .unwrap_or(0),
+                first: prefix.chars().count(),
+                cont: container(body).0.to_string(),
+                nl: if p.orig.contains("\r\n") {
+                    "\r\n"
+                } else {
+                    "\n"
+                }
+                .into(),
+            });
+        }
     }
 
     fn table_row(&mut self, row: &str) {
@@ -523,6 +560,22 @@ pub fn mask(s: &str) -> (String, Vec<String>) {
             }
             _ => None,
         };
+        // A tag's readable attributes (`<Card title="…">`, `alt`, `aria-label`…) are text.
+        let texts = match end {
+            Some(e) if c == '<' => tag_texts(&s[i..e]),
+            _ => vec![],
+        };
+        if let (Some(e), false) = (end, texts.is_empty()) {
+            let mut at = 0;
+            for (a, b) in texts {
+                push(&mut out, &s[i + at..i + a]);
+                out.push_str(&s[i + a..i + b].replace('\'', "''"));
+                at = b;
+            }
+            push(&mut out, &s[i + at..e]);
+            i = e;
+            continue;
+        }
         match end {
             // `]` stays text: only the link target after it is protected.
             Some(e) if c == ']' => {
@@ -545,6 +598,68 @@ pub fn mask(s: &str) -> (String, Vec<String>) {
         }
     }
     (out, spans)
+}
+
+/// HTML / JSX attributes people read: their quoted values are translated.
+const TEXT_ATTRS: &[&str] = &[
+    "title",
+    "alt",
+    "label",
+    "placeholder",
+    "aria-label",
+    "aria-description",
+    "description",
+    "caption",
+    "tooltip",
+    "summary",
+];
+
+/// Byte ranges of the readable attribute values in `tag` (`<Card title="Hello" icon="x">`).
+/// ponytail: a translation using the attribute's own quote char would break the tag; LLMs use
+/// typographic quotes in prose, so not escaped.
+fn tag_texts(tag: &str) -> Vec<(usize, usize)> {
+    let b = tag.as_bytes();
+    let mut out = vec![];
+    // After the tag name.
+    let mut i = 1 + tag[1..]
+        .find(|c: char| c.is_whitespace() || c == '>' || c == '/')
+        .unwrap_or(tag.len() - 1);
+    while i < b.len() {
+        if !(b[i].is_ascii_alphabetic()) {
+            i += 1;
+            continue;
+        }
+        let start = i;
+        while i < b.len() && (b[i].is_ascii_alphanumeric() || matches!(b[i], b'-' | b'_' | b':')) {
+            i += 1;
+        }
+        let name = &tag[start..i];
+        if b.get(i) != Some(&b'=') {
+            continue;
+        }
+        i += 1;
+        match b.get(i) {
+            Some(&q @ (b'"' | b'\'')) => {
+                let Some(len) = tag[i + 1..].find(q as char) else {
+                    return out;
+                };
+                let (a, z) = (i + 1, i + 1 + len);
+                let v = &tag[a..z];
+                if TEXT_ATTRS.contains(&name)
+                    && v.chars().any(char::is_alphabetic)
+                    && !v.contains(['{', '}', '<', '>'])
+                    && !v.starts_with(['/', '#'])
+                    && !v.contains("://")
+                {
+                    out.push((a, z));
+                }
+                i = z + 1;
+            }
+            Some(b'{') => i = closing(tag, i, '{', '}').map_or(b.len(), |j| j + 1),
+            _ => {}
+        }
+    }
+    out
 }
 
 /// Masked text back to Markdown: `{n}` => span, `''` => `'`.
@@ -595,6 +710,43 @@ impl Segment {
         out.push_str(rest);
         Some(out)
     }
+}
+
+/// A translated paragraph (masked) wrapped like its source: greedy, at the source's longest line,
+/// never inside a code span / link / tag, never starting a line with Markdown syntax.
+fn wrap(t: &str, spans: &[String], w: &Wrap) -> String {
+    let (mut out, mut line, mut avail) = (
+        String::new(),
+        String::new(),
+        w.width.saturating_sub(w.first),
+    );
+    for word in t.split(' ').map(|x| unmask(x, spans)) {
+        let len = line.chars().count();
+        if line.is_empty() || len + 1 + word.chars().count() <= avail || starts_block(&word) {
+            if !line.is_empty() {
+                line.push(' ');
+            }
+            line.push_str(&word);
+        } else {
+            out += &line;
+            out += &w.nl;
+            out += &w.cont;
+            line = word;
+            avail = w.width.saturating_sub(w.cont.chars().count());
+        }
+    }
+    out + &line
+}
+
+/// A line starting with `word` would not continue the paragraph (list item, heading, quote, table,
+/// setext underline, fence, MDX import / export).
+fn starts_block(word: &str) -> bool {
+    let digits = word.chars().take_while(char::is_ascii_digit).count();
+    matches!(word, "-" | "*" | "+" | ">" | "import" | "export")
+        || word.starts_with(['#', '>', '|', '`', '~', '='])
+        || word.starts_with(":::")
+        || (digits > 0 && word.len() == digits + 1 && word.ends_with(['.', ')']))
+        || (!word.is_empty() && word.chars().all(|c| c == '-'))
 }
 
 fn requote(s: &str, q: Quote) -> String {
@@ -745,11 +897,14 @@ next line.
             out.contains("# Bienvenue dans `glot` {#welcome}\n"),
             "{out}"
         );
+        // Paragraphs wrapped over several lines in the source are wrapped alike.
         assert!(
-            out.contains("voir [le guide](https://example.com/guide \"Guide\") et l'[API][api].\n"),
+            out.contains(
+                "voir [le guide](https://example.com/guide \"Guide\") et\nl'[API][api].\n"
+            ),
             "{out}"
         );
-        assert!(out.contains("- [ ] Deuxième élément\n\n"), "{out}");
+        assert!(out.contains("- [ ] Deuxième\n  élément\n\n"), "{out}");
         assert!(
             out.contains("Utilisez {props.key} avec <kbd>Ctrl</kbd>.\n:::"),
             "{out}"
@@ -762,6 +917,61 @@ next line.
         assert_eq!(
             back.segments()[9].renumbered(&d.segments()[9]).as_deref(),
             Some("Utilisez {2} avec {0}Ctrl{1}.")
+        );
+    }
+
+    #[test]
+    fn jsx_attributes_are_text() {
+        let src = "<Card title=\"Quick start\" icon=\"rocket\" href=\"/start\">\n\n![A cat](cat.png)\n\n<img src=\"a.png\" alt='Logo of the site' />\n\n<TabItem value=\"js\" label=\"JavaScript\" default>\n<Tabs groupId=\"x\">\n";
+        let d = Doc::parse(src);
+        assert_eq!(
+            texts(&d),
+            [
+                "{0}Quick start{1}",
+                "![A cat]{0}",
+                "{0}Logo of the site{1}",
+                "{0}JavaScript{1}"
+            ]
+        );
+        let out = d.render(
+            &|i| match i {
+                0 => Some("{0}Démarrage rapide{1}".into()),
+                2 => Some("{0}Logo du site{1}".into()),
+                _ => None,
+            },
+            None,
+        );
+        assert!(
+            out.starts_with("<Card title=\"Démarrage rapide\" icon=\"rocket\" href=\"/start\">\n"),
+            "{out}"
+        );
+        assert!(
+            out.contains("<img src=\"a.png\" alt='Logo du site' />"),
+            "{out}"
+        );
+        assert_eq!(d.render(&|_| None, None), src);
+    }
+
+    #[test]
+    fn wrapped_paragraphs_stay_wrapped() {
+        let src = "> This paragraph is wrapped at\n> thirty columns or so, like\n> the source.\n\nOne line only.\n";
+        let d = Doc::parse(src);
+        let out = d.render(
+            &|i| match i {
+                0 => Some("Ce paragraphe est coupé à trente colonnes environ, comme la source - et 1. ici.".into()),
+                1 => Some("Une seule ligne, même si elle devient beaucoup plus longue que la source.".into()),
+                _ => None,
+            },
+            None,
+        );
+        assert_eq!(
+            out,
+            "> Ce paragraphe est coupé à\n> trente colonnes environ,\n> comme la source - et 1. ici.\n\nUne seule ligne, même si elle devient beaucoup plus longue que la source.\n"
+        );
+        let back = Doc::parse(&out);
+        assert_eq!(
+            back.segments()[0].text,
+            "Ce paragraphe est coupé à trente colonnes environ, comme la source - et 1. ici."
         );
     }
 

@@ -30,17 +30,17 @@ Statut : **OK** (détecté, lu/écrit à l'identique, syntaxe validée), **parti
 | Framework | Format | Avant (constaté) | Après | Reste à faire |
 |---|---|---|---|---|
 | Rails | YAML `config/locales/**/*.{l}.yml`, `%{x}`, `one/other` | OK (pattern par fichier, `devise.fr.yml` créé en miroir, `few/many` ajoutés) | OK | strftime `date.formats` traduit comme du texte |
-| Django | PO `locale/{l}/LC_MESSAGES/django.po`, `%(x)s`, `{x}` | OK (msgctxt, pluriels, en-têtes intacts) | OK | `.mo` à compiler par l'utilisateur (`compilemessages`) |
+| Django | PO `locale/{l}/LC_MESSAGES/django.po`, `%(x)s`, `{x}` | OK (msgctxt, pluriels, en-têtes intacts) | OK | fait : `glot compile` écrit les `.mo` (relus par `gettext.GNUTranslations`), resynchronisés ensuite |
 | Flask-Babel / Babel | PO + `messages.pot` à la racine | partiel : le `.pot` ignoré, un msgid présent seulement dans le `.pot` n'était jamais traduit | OK : `.pot` = source quand il n'y a pas de `.po` source (dossier ou parents), et modèle des nouvelles entrées | `pybabel compile` |
 | Elixir / Phoenix | PO `priv/gettext/{l}/LC_MESSAGES/*.po` + `*.pot`, `%{x}` | partiel : idem (sans `mix gettext.extract --merge`, nouveaux msgids invisibles ; nouvelles entrées sans commentaires ni `msgid_plural` réel) | OK : `priv/gettext/default.pot` source + modèle (`#.`, `#:`, `msgid_plural` copiés) | — |
-| PHP gettext | PO `locale/{l}/LC_MESSAGES/*.po` | OK | OK | `.mo` (msgfmt) |
-| WordPress | PO/POT `languages/{domain}-{l}.po` | traité par l'agent CMS (détection `wordpress-plugin/theme`, `.pot` source) | idem | `.mo` / `.l10n.php` (`wp i18n make-mo/make-php`) |
+| PHP gettext | PO `locale/{l}/LC_MESSAGES/*.po` | OK | OK | fait : `.mo` par `glot compile` |
+| WordPress | PO/POT `languages/{domain}-{l}.po` | traité par l'agent CMS (détection `wordpress-plugin/theme`, `.pot` source) | idem | `.mo` + JSON JS faits (`glot compile`) ; `.l10n.php` (`wp i18n make-php`) |
 | Laravel | `lang/{l}.json` + `lang/{l}/*.php`, `:name`, `a\|b`, `{0}…\|[2,*]` | OK (détection, PHP patché, syntaxe `laravel`) | OK | Symfony-like `.php` hors Laravel non géré |
 | Symfony | YAML/XLIFF `translations/{domain}.{l}.*`, `+intl-icu` | partiel : syntaxe `icu` → `{{ value }}` des validators **rejeté** comme ICU invalide, `%name%` et intervalles `]1,Inf[` non vérifiés | OK : syntaxe `symfony` (ICU pour les messages avec plural/select, sinon `%x%`, `{{ x }}`, `{x}`, formes `\|` avec intervalles conservés, nombre de formes par langue) | `.php`/`.json`/`.csv` Symfony |
 | Spring | `.properties`, MessageFormat `{0}` | partiel : syntaxe `icu` → `L'utilisateur {0}` accepté alors que Java affiche `Lutilisateur {0}` | OK : syntaxe `java` (quotes Java, `''`, `{0,choice}` ; erreur explicite sur `'` seul quand il y a des arguments ; message sans `{` = texte brut comme Spring par défaut) | `alwaysUseMessageFormat=true` non pris en compte |
 | Java ResourceBundle | `.properties` | idem Spring (stack `java`) | OK (`java`) | — |
 | ASP.NET / .NET | `.resx` + `.{culture}.resx` | OK (`{0:C2}`, `{{`, `<comment>` → note, fichier cible créé avec resheaders) | OK | — |
-| Go go-i18n v2 | TOML/JSON/YAML `active.{l}.*`, `{{.Name}}` | absent : stack `generic`, `locales/{l}.json`, syntaxe ICU (format TOML ajouté en parallèle par l'agent CMS) | OK en TOML : détection `go-i18n` (`go.mod`), syntaxe `template`, `few/many` complétés | JSON/YAML : un `description` à côté des formes casse le repli pluriel et est traduit |
+| Go go-i18n v2 | TOML/JSON/YAML `active.{l}.*`, `{{.Name}}` | absent : stack `generic`, `locales/{l}.json`, syntaxe ICU (format TOML ajouté en parallèle par l'agent CMS) | OK en TOML, JSON et YAML : détection `go-i18n` (`go.mod`), syntaxe `template`, `few/many` complétés ; `description`/`hash` à côté des formes jamais traduits et gardés dans le source | `description` JSON/YAML pas encore remonté comme note de traduction (il l'est en TOML) |
 | Go gotext | JSON `messages[]` | absent | absent (documenté) | format `gotext.json` (faible usage, outil expérimental) |
 | Express + i18next | JSON i18next | OK | OK | — |
 | Express + `i18n` (mashpie) | `locales/{l}.json`, `%s`, `{{x}}` | partiel : stack `generic`, ICU → `{{name}}` **rejeté** | OK : stack `i18n (node)`, syntaxe `printf` | mustache `{{x}}` non vérifié |
@@ -50,7 +50,8 @@ Statut : **OK** (détecté, lu/écrit à l'identique, syntaxe validée), **parti
 ## Bugs trouvés hors périmètre direct
 
 - `po.rs` (nouvelle entrée sans modèle) : `msgid_plural` répète le singulier (`"%d comment"`), corrigé quand un `.pot`
-  est trouvé ; sans `.pot` la limite reste (commentaire `ponytail` existant).
+  est trouvé ; sans `.pot` : **corrigé** (le `msgid_plural` vient du `.po` d'une autre locale du même domaine, ou de
+  la forme `other` du catalogue source ; le singulier n'est plus répété que faute de toute source).
 
 ## Fichiers
 

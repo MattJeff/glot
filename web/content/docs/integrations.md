@@ -84,6 +84,9 @@ It validates catalogs (inline annotations), translates the delta, commits the ca
 | `openai-api-key` | | Exported as `OPENAI_API_KEY` |
 | `llm-api-key` | | Exported under `llm.api_key_env` (else the provider's default variable) |
 | `anthropic-workspace-id` | | Exported as `ANTHROPIC_WORKSPACE_ID` (org-level keys `sk-ant-usr-…`) |
+| `federation-rule-id`, `organization-id`, `service-account-id` | | Keyless Claude via Workload Identity Federation (needs `permissions: id-token: write`), see [below](github.md#keyless-claude-access-with-workload-identity-federation) |
+| `workspace-id` | | `wrkspc_…`, when the federation rule spans several workspaces |
+| `audience` | `https://api.anthropic.com` | Audience of the GitHub OIDC token; must match the rule |
 | `comment` | `true` | Post or update the summary comment |
 | `fail-on-error` | `true` | Fail the job when `glot check` reports errors |
 | `github-token` | `github.token` | Used to comment |

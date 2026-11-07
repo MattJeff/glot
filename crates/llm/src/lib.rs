@@ -18,6 +18,7 @@ pub mod store;
 pub mod tm;
 pub mod translate;
 pub mod visual;
+pub mod wif;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

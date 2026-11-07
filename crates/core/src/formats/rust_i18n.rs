@@ -3,9 +3,10 @@
 //! not a message). `_version: 2`: every locale in one file, the locale is the leaf
 //! (`hello:\n  en: Hello\n  fr: Bonjour`); glot reads and patches only `locale`'s leaves.
 //! Values keep rust-i18n's `%{name}` (`Syntax::Rails`).
+//! TOML files work the same (`_version = 2`, `[hello]\nen = "Hello"`), patched through `toml_i18n`.
 use std::path::Path;
 
-use super::{Parsed, yaml};
+use super::{Parsed, toml_i18n, yaml};
 use crate::catalog::Catalog;
 
 const VERSION: &str = "_version";
@@ -31,17 +32,54 @@ pub fn parse(text: &str, locale: &str) -> Result<Parsed, String> {
     if !v2(text) {
         return Ok(p);
     }
+    Ok(leaves(p, locale))
+}
+
+/// A rust-i18n `_version = 2` TOML file (every locale in one file).
+pub fn is_toml_v2(text: &str) -> bool {
+    text.lines().any(|l| {
+        l.split_once('=')
+            .is_some_and(|(k, v)| k.trim() == VERSION && v.trim() == "2")
+    })
+}
+
+/// `locale`'s leaves of `p` (`hello.en` => `hello`).
+fn leaves(p: Parsed, locale: &str) -> Parsed {
     let suffix = format!(".{locale}");
     let strip = |m: std::collections::BTreeMap<String, String>| {
         m.into_iter()
             .filter_map(|(k, v)| Some((k.strip_suffix(&suffix)?.to_string(), v)))
             .collect()
     };
-    Ok(Parsed {
+    Parsed {
         entries: strip(p.entries),
         notes: strip(p.notes),
         ..Default::default()
-    })
+    }
+}
+
+pub fn parse_toml(text: &str, locale: &str) -> Result<Parsed, String> {
+    Ok(leaves(toml_i18n::parse(text)?, locale))
+}
+
+/// Patch `cat`'s leaves into a v2 TOML file; the other locales' values are kept.
+pub fn write_toml(existing: &str, cat: &Catalog) -> String {
+    let Ok(p) = toml_i18n::parse(existing) else {
+        return existing.to_string();
+    };
+    let suffix = format!(".{}", cat.locale);
+    let mut full = Catalog::new("_");
+    full.entries = p
+        .entries
+        .into_iter()
+        .filter(|(k, _)| !k.ends_with(&suffix))
+        .chain(
+            cat.entries
+                .iter()
+                .map(|(k, v)| (format!("{k}{suffix}"), v.clone())),
+        )
+        .collect();
+    toml_i18n::write(Some(existing), &full)
 }
 
 pub fn write(existing: &str, cat: &Catalog, path: &Path) -> String {
@@ -171,6 +209,45 @@ mod tests {
         let out = write(V2, &d, p);
         assert!(out.ends_with("brand.new:\n  de: \"Neu: %{x}\"\n"), "{out}");
         assert_eq!(parse(&out, "de").unwrap().entries, d.entries);
+    }
+
+    #[test]
+    fn toml_v2() {
+        let t = "_version = 2\n\n# Accueil\n[hello]\nen = \"Hello, %{name}\"\nzh-CN = \"你好, %{name}\" # salut\n\n[messages.bye]\nen = 'Bye'\n";
+        assert!(is_toml_v2(t) && !is_toml_v2("version = 2\n"));
+        let en = parse_toml(t, "en").unwrap();
+        assert_eq!(en.entries.len(), 2);
+        assert_eq!(en.entries["messages.bye"], "Bye");
+        assert_eq!(
+            parse_toml(t, "zh-CN").unwrap().entries["hello"],
+            "你好, %{name}"
+        );
+        let same = Catalog {
+            locale: "en".into(),
+            entries: en.entries.clone(),
+        };
+        assert_eq!(write_toml(t, &same), t, "byte for byte");
+        let mut fr = Catalog::new("fr");
+        fr.entries.insert("hello".into(), "Bonjour, %{name}".into());
+        fr.entries.insert("messages.bye".into(), "Au revoir".into());
+        fr.entries.insert("brand.new".into(), "Neuf".into());
+        let out = write_toml(t, &fr);
+        assert!(out.starts_with("_version = 2\n\n# Accueil\n[hello]\nen = \"Hello, %{name}\"\nzh-CN = \"你好, %{name}\" # salut\nfr = \"Bonjour, %{name}\"\n"), "{out}");
+        assert!(
+            out.contains("[messages.bye]\nen = 'Bye'\nfr = \"Au revoir\"\n"),
+            "{out}"
+        );
+        assert!(out.contains("[brand.new]\nfr = \"Neuf\"\n"), "{out}");
+        assert_eq!(parse_toml(&out, "fr").unwrap().entries, fr.entries);
+        assert_eq!(parse_toml(&out, "en").unwrap().entries, en.entries);
+        // Dropping a key of one locale keeps the others.
+        fr.entries.remove("hello");
+        let out2 = write_toml(&out, &fr);
+        assert!(!out2.contains("fr = \"Bonjour"), "{out2}");
+        assert!(
+            out2.contains("zh-CN = \"你好, %{name}\" # salut\n"),
+            "{out2}"
+        );
     }
 
     #[test]

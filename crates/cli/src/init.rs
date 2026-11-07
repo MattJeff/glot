@@ -45,6 +45,9 @@ pub struct Detected {
     pub syntax: &'static str,
     pub files: Vec<String>,
     pub locales: BTreeSet<String>,
+    /// The source locale the project declares (Paraglide `baseLocale`, slang `base_locale`, Qt
+    /// `sourcelanguage`, Angular `sourceLocale`, `defaultLocale` …): used unless `--source`.
+    pub source: Option<String>,
 }
 
 pub fn detect(root: &Path) -> Detected {
@@ -66,6 +69,7 @@ pub fn detect(root: &Path) -> Detected {
     // Paraglide, Docusaurus, Starlight, Svelte, Qwik, Ember: catalogs outside `locales/`.
     if let Some(mut d) = web::detect(root, &has) {
         d.locales.extend(web::configured_locales(root));
+        d.source = d.source.or_else(|| web::configured_source(root));
         return d;
     }
     // Mobile / gettext / Rails catalogs, unless a JS i18n library says otherwise.
@@ -106,6 +110,7 @@ pub fn detect(root: &Path) -> Detected {
                 syntax: "laravel",
                 files: vec!["lang/{locale}.json".into()],
                 locales: BTreeSet::new(),
+                source: None,
             };
         }
     }
@@ -116,6 +121,7 @@ pub fn detect(root: &Path) -> Detected {
         return Detected {
             stack: "lingui",
             syntax: "icu",
+            source: web::configured_source(root),
             ..d
         };
     }
@@ -194,8 +200,19 @@ pub fn detect(root: &Path) -> Detected {
         };
         syntax = "icu";
     }
-    if files.is_empty() {
+    let defaulted = files.is_empty();
+    if defaulted {
         files.push(default_file.to_string());
+    }
+    // vue-i18n / Nuxt: `<i18n>` blocks of single-file components (alone when no catalog exists).
+    if matches!(stack, "vue-i18n" | "nuxt-i18n")
+        && let Some((sfc, l)) = web::vue_sfc(root)
+    {
+        if defaulted && !root.join(default_file.replace("{locale}", "en")).exists() {
+            files.clear();
+        }
+        files.extend(sfc);
+        locales.extend(l);
     }
     if stack == "i18next" {
         files = ns_patterns(files);
@@ -213,6 +230,7 @@ pub fn detect(root: &Path) -> Detected {
         syntax,
         files,
         locales,
+        source: web::configured_source(root),
     }
 }
 
@@ -776,7 +794,7 @@ pub fn run(args: InitArgs) -> Result<()> {
     let guessed = report
         .as_ref()
         .and_then(|r| guess_language(r.hardcoded.iter().chain(&r.config).map(|h| h.text.as_str())));
-    let mut source = args.source.clone().unwrap_or_else(|| {
+    let mut source = args.source.clone().or(d.source.clone()).unwrap_or_else(|| {
         // Rust apps say it (`fallback_language`, leptos_i18n `default`, a `(key, fr, en)` table).
         if let Some(s) = rust::source(&root).filter(|s| d.locales.contains(s)) {
             s
@@ -1313,7 +1331,20 @@ fn workflow(provider: &str) -> String {
         }
         "gemini" => "\n        env:\n          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}",
         "mock" => "",
-        _ => "\n          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}",
+        _ => concat!(
+            "\n          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}",
+            "\n          # Keyless instead (Workload Identity Federation, see `glot wif`): drop the key above,",
+            "\n          # uncomment `id-token: write` under permissions and these:",
+            "\n          # federation-rule-id: fdrl_...",
+            "\n          # organization-id: 00000000-0000-0000-0000-000000000000",
+            "\n          # service-account-id: svac_...",
+        ),
+    };
+    // Only Anthropic federates: other providers get no OIDC hint.
+    let perm = if key.contains("federation-rule-id") {
+        "\n  # id-token: write   # keyless Claude (Workload Identity Federation)"
+    } else {
+        ""
     };
     r#"name: glot
 on:
@@ -1321,7 +1352,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  pull-requests: writePERM
 
 jobs:
   i18n:
@@ -1336,6 +1367,7 @@ jobs:
         with:
           command: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'both' || 'check' }}KEY"#
         .replace("KEY", key)
+        .replace("PERM", perm)
         + "\n"
 }
 
@@ -1353,6 +1385,19 @@ fn glot_on_path() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn workflow_offers_keyless_claude_only_for_anthropic() {
+        let a = workflow("anthropic");
+        assert!(a.contains("pull-requests: write\n  # id-token: write"));
+        assert!(a.contains("# federation-rule-id: fdrl_..."));
+        assert!(
+            !a.contains("\n  id-token: write"),
+            "commented out by default"
+        );
+        let o = workflow("openai");
+        assert!(!o.contains("id-token") && !o.contains("federation"));
+    }
 
     #[test]
     fn guesses_source_language_from_copy() {

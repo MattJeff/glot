@@ -878,3 +878,37 @@ msgstr "Bonjour {name}"
     );
     assert_eq!(write(f, Path::new("m.po"), Some(text), &cat), text);
 }
+
+#[test]
+fn plural_forms_follow_the_file() {
+    let dir = std::env::temp_dir().join(format!("glot-plural-forms-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let po = dir.join("cs.po");
+    std::fs::write(
+        &po,
+        "msgid \"\"\nmsgstr \"\"\n\"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\\n\"\n",
+    )
+    .unwrap();
+    assert_eq!(
+        plural_forms(Format::Po, &po, "cs").unwrap(),
+        ["one", "few", "other"]
+    );
+    // Missing file: the forms glot's header would declare.
+    assert_eq!(
+        plural_forms(Format::Po, &dir.join("fr.po"), "fr").unwrap(),
+        ["one", "other"]
+    );
+    assert_eq!(
+        plural_forms(Format::Qt, Path::new("app_fr.ts"), "fr").unwrap(),
+        ["one", "other"]
+    );
+    assert_eq!(
+        plural_forms(
+            Format::Android,
+            Path::new("res/values-fr/strings.xml"),
+            "fr"
+        ),
+        None
+    );
+    std::fs::remove_dir_all(&dir).unwrap();
+}

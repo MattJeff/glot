@@ -80,6 +80,7 @@ fn shopify(root: &Path) -> Option<Detected> {
         syntax: "template",
         files,
         locales,
+        source: None,
     })
 }
 
@@ -140,6 +141,7 @@ fn wordpress(root: &Path) -> Option<Detected> {
         syntax: "printf",
         files: vec![format!("{dir}/{prefix}{{locale}}.po")],
         locales,
+        source: None,
     })
 }
 
@@ -200,6 +202,7 @@ fn hugo(root: &Path) -> Option<Detected> {
         syntax: "template",
         files: vec![format!("i18n/{{locale}}.{ext}")],
         locales,
+        source: None,
     })
 }
 
@@ -245,6 +248,7 @@ fn jekyll(root: &Path) -> Option<Detected> {
         syntax: "template",
         files: files.into_iter().collect(),
         locales,
+        source: None,
     })
 }
 

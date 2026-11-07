@@ -33,6 +33,11 @@ jobs:
 | `openai-api-key` | | Exported as `OPENAI_API_KEY` (`openai`, `openai-compatible`) |
 | `llm-api-key` | | Generic key, exported under `llm.api_key_env` from `glot.toml` (else the provider's default variable) |
 | `anthropic-workspace-id` | | Exported as `ANTHROPIC_WORKSPACE_ID` (required by org-level user keys `sk-ant-usr-…`) |
+| `federation-rule-id` | | Keyless Claude: `fdrl_…` rule (Workload Identity Federation, see below) |
+| `organization-id` | | Anthropic organization UUID, for federation |
+| `service-account-id` | | `svac_…` the rule targets, for federation |
+| `workspace-id` | | `wrkspc_…`; required when the rule spans several workspaces |
+| `audience` | `https://api.anthropic.com` | Audience of the GitHub OIDC token; must match the rule |
 | `comment` | `true` | Post or update the summary comment |
 | `fail-on-error` | `true` | Fail the job when `glot check` reports errors |
 | `github-token` | `github.token` | Used to comment on the PR |
@@ -41,6 +46,30 @@ jobs:
 Output: `check-exit-code`.
 
 Empty key inputs leave the job's environment alone, so `env: ANTHROPIC_API_KEY: …` at job level works too.
+
+## Keyless Claude (Workload Identity Federation)
+
+No `ANTHROPIC_API_KEY` secret: glot requests a fresh GitHub OIDC token for every exchange and trades it
+for a short-lived Anthropic token. Create the issuer and rule once (`glot wif issuer create --preset github`,
+then `glot wif rule create --preset github --repo OWNER/REPO …`, or the Console's *Connect workload* wizard), then:
+
+```yaml
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write          # lets the job mint GitHub OIDC tokens
+# …
+      - uses: MattJeff/glot/action@v0
+        with:
+          command: both
+          federation-rule-id: fdrl_…
+          organization-id: 00000000-0000-0000-0000-000000000000
+          service-account-id: svac_…
+          workspace-id: wrkspc_…   # only if the rule spans several workspaces
+```
+
+These IDs are not secrets. Leave `anthropic-api-key` empty: an API key wins over federation. Full setup:
+[GitHub Action docs](https://glotlang.com/docs/github#keyless-claude-access-with-workload-identity-federation).
 
 ## Supply chain
 
