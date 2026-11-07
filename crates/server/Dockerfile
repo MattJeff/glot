@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build /glot-server /usr/local/bin/glot-server
 COPY --from=build /glot /usr/local/bin/glot
+# Volume mount points owned by the runtime user (a fresh named volume copies this ownership): the Edge cache, and
+# the Caddy fallback map glot writes (deploy/Caddyfile imports it).
+RUN mkdir -p /var/cache/glot-edge /etc/caddy/edge && chown nobody /var/cache/glot-edge /etc/caddy/edge
 ENV GLOT_BIND=0.0.0.0:8790
 EXPOSE 8790
 USER nobody

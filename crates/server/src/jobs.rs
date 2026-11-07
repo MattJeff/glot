@@ -44,7 +44,7 @@ pub(crate) struct JobRecord {
     pub(crate) project_id: Uuid,
     pub(crate) kind: String,
     pub(crate) status: String,
-    params: DbJson<JobParams>,
+    pub(crate) params: DbJson<JobParams>,
     pub(crate) progress_done: i32,
     pub(crate) progress_total: i32,
     pub(crate) cost_usd: f64,
@@ -286,8 +286,11 @@ async fn run(state: AppState, mut job: JobRecord) {
     save(state, &job).await;
     // GitHub jobs: progress counts steps, and the LLM runs in the `glot` subprocess with the project's own key.
     let github = job.kind.starts_with("github_");
+    let edge = job.kind == crate::edge::tm::JOB_KIND;
     let result = if github {
         crate::github_app::run_job(state, &mut job).await
+    } else if edge {
+        crate::edge::tm::run_job(state, &mut job).await
     } else {
         translate(state, &mut job).await
     };
@@ -305,7 +308,8 @@ async fn run(state: AppState, mut job: JobRecord) {
     }
     save(state, &job).await;
     tracing::info!(job = %job.id, status = %job.status, cost_usd = job.cost_usd, "job finished");
-    if github {
+    // Edge jobs run in the background on traffic: no email per job.
+    if github || edge {
         return;
     }
     crate::email::job_finished(
@@ -320,14 +324,24 @@ async fn run(state: AppState, mut job: JobRecord) {
     .await;
 }
 
-async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
+/// What a translation job needs: the project, its config (budget = project's, capped by `budget`), the
+/// translator on the project's provider/key and the glossary. Shared with `edge::tm::run_job`.
+pub(crate) async fn setup(
+    state: &AppState,
+    project_id: Uuid,
+    budget: Option<f64>,
+) -> anyhow::Result<(
+    ProjectRow,
+    Config,
+    Translator,
+    glot_core::glossary::Glossary,
+)> {
     let p: ProjectRow = sqlx::query_as(
         "SELECT id, slug, name, source_locale, target_locales, style, public_cdn, llm, api_key_enc, created_at, syntax FROM projects WHERE id = $1",
     )
-    .bind(job.project_id)
+    .bind(project_id)
     .fetch_one(&state.db)
     .await?;
-    let params = job.params.0.clone();
     let llm = p.llm.0.clone();
     let api_key = match &p.api_key_enc {
         Some(enc) => Some(crate::auth::decrypt(&state.secret, enc).ok_or_else(|| {
@@ -348,7 +362,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
             judge_model: llm.judge_model,
             api_key_env: None,
             base_url: llm.base_url,
-            budget_usd: match (llm.budget_usd, params.budget_usd) {
+            budget_usd: match (llm.budget_usd, budget) {
                 (Some(a), Some(b)) => Some(a.min(b)),
                 (a, b) => a.or(b),
             },
@@ -365,6 +379,12 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
     let glossary = crate::glossary::load(&state.db, p.id)
         .await
         .map_err(|e| anyhow::anyhow!(e.message))?;
+    Ok((p, config, translator, glossary))
+}
+
+async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
+    let params = job.params.0.clone();
+    let (p, config, translator, glossary) = setup(state, job.project_id, params.budget_usd).await?;
 
     let all_keys: Vec<KeyRecord> = sqlx::query_as(
         "SELECT id, key, source, description, refs, ui_role, component FROM keys WHERE project_id = $1 ORDER BY key",

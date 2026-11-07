@@ -1,0 +1,256 @@
+[
+  {
+    "hash": "8af65f0a742fb42f3c27c2cbb25114b7",
+    "text": "Pricing & plans",
+    "role": "title",
+    "discoverable": true
+  },
+  {
+    "hash": "7739f53006b269eda7d30adc68562689",
+    "text": "Auto captions",
+    "role": "li",
+    "discoverable": true
+  },
+  {
+    "hash": "feaa44a12c7de98a6cf2915053c90b77",
+    "text": "Face <0>reframing</0>",
+    "role": "li",
+    "discoverable": true
+  },
+  {
+    "hash": "a38d15bb6269c14cbc949ac39c5b9b07",
+    "text": "Learn more",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "f7f3df91c07fd4a9ce3b166612b531b7",
+    "text": "First paragraph",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "06b6c2762e4c5cdaaeb33d1ad076dcff",
+    "text": "A div closes it",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "b53e89fc9e8c9f6af76b57613fd6d670",
+    "text": "How much do clippers make?",
+    "role": "h3",
+    "discoverable": true
+  },
+  {
+    "hash": "4499a55aef26e9cea3bcbbd4116931e6",
+    "text": "A guide to earnings.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "ef709802ff4c4df4e5854ae7e3eb4952",
+    "text": "Read article",
+    "role": "body",
+    "discoverable": true
+  },
+  {
+    "hash": "b1667292659855ca359d8f913ffb686a",
+    "text": "Plan",
+    "role": "th",
+    "discoverable": true
+  },
+  {
+    "hash": "1b8675fc3335271ebbfa07a42b4d02d1",
+    "text": "Price",
+    "role": "th",
+    "discoverable": true
+  },
+  {
+    "hash": "a108e741fed672cc03bb1e88717c83c4",
+    "text": "Pro",
+    "role": "td",
+    "discoverable": true
+  },
+  {
+    "hash": "f0061012e2865f689ee892a74455f2e0",
+    "text": "${0}<0>/month</0>",
+    "role": "td",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "19"
+      }
+    ]
+  },
+  {
+    "hash": "fc3c0c7b9943e77f69acd149399b1556",
+    "text": "Growth",
+    "role": "td",
+    "discoverable": true
+  },
+  {
+    "hash": "4f96b8d2aca2280e4d7ccf205c5a5983",
+    "text": "Save {0} %",
+    "role": "td",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "20"
+      }
+    ]
+  },
+  {
+    "hash": "a5caa4b1f12552dac96c50c23b4260ab",
+    "text": "Simple pricing",
+    "role": "h2",
+    "key": "pricing.title",
+    "discoverable": true
+  },
+  {
+    "hash": "94295b880cbc908ebaa68fe7bf589b2c",
+    "text": "Not keyed itself",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "729b6aa548a89809efaa31b23f436209",
+    "text": "Choose a plan",
+    "role": "p",
+    "key": "pricing.cta",
+    "discoverable": true
+  },
+  {
+    "hash": "9068f0650cc0640f712834a11d81687d",
+    "text": "Upgrade now",
+    "role": "button",
+    "discoverable": true
+  },
+  {
+    "hash": "13bc4d2a309efb32e4ba4e84951a354b",
+    "text": "Price: <0>${0}</0> per month",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "19"
+      }
+    ]
+  },
+  {
+    "hash": "8e8fad88bcc763ff608861d3b87049f8",
+    "text": "Lots of whitespace here",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "10d3640590d6c04c1d77cb6621fc7d34",
+    "text": "Line one<0/>line two",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "aaa8e0f726d5c685609cf9102cd253b0",
+    "text": "<0><1>Deeply</1> nested</0> <2>text</2>",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "3f623ce1a77e676d51e6c8ed020b1258",
+    "text": "One",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "7e4abaa9d7ba5d3db260ff9bc7407172",
+    "text": "Two",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "1c975b6fcf41b57b2cabd722f4be0812",
+    "text": "<0>Docs</0> and <1>API</1>",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "a9db040090c8887015924e57e4609601",
+    "text": "What is a clip?",
+    "role": "summary",
+    "discoverable": true
+  },
+  {
+    "hash": "d7af0529293b03f25f71adac12fb36e1",
+    "text": "A short vertical video.",
+    "role": "details",
+    "discoverable": true
+  },
+  {
+    "hash": "f1de36f26653b8dcc7f42ee173318e94",
+    "text": "Term",
+    "role": "dt",
+    "discoverable": true
+  },
+  {
+    "hash": "cd9c6263323ac21228a9c7ca10c426d7",
+    "text": "Definition",
+    "role": "dd",
+    "discoverable": true
+  },
+  {
+    "hash": "e51741ef7fe32527e28322a56638f0da",
+    "text": "Dashboard screenshot",
+    "role": "img:alt",
+    "discoverable": true
+  },
+  {
+    "hash": "23e7c614651408403d347abe792869f3",
+    "text": "The dashboard",
+    "role": "figcaption",
+    "discoverable": true
+  },
+  {
+    "hash": "d389fa6a32210f51731c293c382b7fb2",
+    "text": "Price is {0} € — cheap… <really> 😀",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "9"
+      }
+    ]
+  },
+  {
+    "hash": "fa92f1f2136d58544bb1735cb0c018cf",
+    "text": "Custom element text",
+    "role": "custom-card",
+    "discoverable": true
+  },
+  {
+    "hash": "e1f7c16f650706717643b18b6f5dc592",
+    "text": "Tooltip text",
+    "role": "p:title",
+    "discoverable": true
+  },
+  {
+    "hash": "35d73694bde1b8c8f414f70e14369a8c",
+    "text": "Hover me",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "d753d31ec3c4b8ed307a0551bde5e0ae",
+    "text": "Unclosed <0>bold to the end</0>",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "77dfe4ff843e152141ee02ab28c4bf92",
+    "text": "End",
+    "role": "p",
+    "discoverable": true
+  }
+]

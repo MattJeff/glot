@@ -1,0 +1,234 @@
+[
+  {
+    "hash": "65964e2ed5062049d40ae9581c3a8efa",
+    "text": "Account",
+    "role": "title",
+    "discoverable": true
+  },
+  {
+    "hash": "f8ee45b101e823a09ab0f2ab26ca7623",
+    "text": "Hello <0/>, welcome back!",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "f987e7838b3f33cd273e2acb80a28251",
+    "text": "But this one",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "7ccad654157b3c238e2f59b925a6668a",
+    "text": "Static label",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "3870c1e1c5d632c63f863ba578834301",
+    "text": "Your message",
+    "role": "label",
+    "discoverable": true
+  },
+  {
+    "hash": "6aa4fea9f6eb6dc1a0d77c10abd3fa40",
+    "text": "Write something nice",
+    "role": "textarea:placeholder",
+    "discoverable": true
+  },
+  {
+    "hash": "ab6de6649eee809956e260c38b25561b",
+    "text": "Message",
+    "role": "textarea:title",
+    "discoverable": true
+  },
+  {
+    "hash": "41e3260a5211f79bbb77a362f5b9ef17",
+    "text": "Project",
+    "role": "select:title",
+    "discoverable": true
+  },
+  {
+    "hash": "3a5e50f3277da7277102a822142f2669",
+    "text": "Full name",
+    "role": "input:placeholder",
+    "discoverable": true
+  },
+  {
+    "hash": "8206e72ec57212d5ad1483d63408d00b",
+    "text": "Clear",
+    "role": "input:value",
+    "discoverable": true
+  },
+  {
+    "hash": "5786cc11dfe39d8a4084a16bf40656b4",
+    "text": "Use <0/> to export, or press <1/>+<2/> to save.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "ea38af72d5f4adfd119e3c23b2f53fcd",
+    "text": "Call {0} before rendering.",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "code",
+        "value": "init_app()"
+      }
+    ]
+  },
+  {
+    "hash": "0459797311a0a217024a4194583df16f",
+    "text": "Contact us at {0}",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "public",
+        "value": "support@cliponit.app"
+      }
+    ]
+  },
+  {
+    "hash": "5286e008c08c22748f93a40ee28d6ee4",
+    "text": "Write to {0} for details.",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "email",
+        "value": "jean.dupont@gmail.com"
+      }
+    ]
+  },
+  {
+    "hash": "9dc15fc68568539fb51c0932fa1b3546",
+    "text": "Call {0} today",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "phone",
+        "value": "+33 6 12 34 56 78"
+      }
+    ]
+  },
+  {
+    "hash": "bfe9c43065f31dc5513a27e46a19e59c",
+    "text": "Card {0} was charged",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "card",
+        "value": "4242 4242 4242 4242"
+      }
+    ]
+  },
+  {
+    "hash": "984620d274f252e7c42066df446ee22f",
+    "text": "IBAN {0} on file",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "iban",
+        "value": "FR7630006000011234567890189"
+      }
+    ]
+  },
+  {
+    "hash": "8d98035d8363597f6c287faa511dfdcc",
+    "text": "Order {0} shipped",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "uuid",
+        "value": "123e4567-e89b-12d3-a456-426614174000"
+      }
+    ]
+  },
+  {
+    "hash": "db40186d77842cbf7e2add073e2410e3",
+    "text": "Your key {0} is active",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "token",
+        "value": "sk_live_51Habc123def456ghi789"
+      }
+    ]
+  },
+  {
+    "hash": "705adf8ef00fad632fdf78308ffc9616",
+    "text": "Ship to {0} rue de la Paix, Paris",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "number",
+        "value": "12"
+      }
+    ]
+  },
+  {
+    "hash": "cadcab8c62bc6d16d2c1e5122c86fcd6",
+    "text": "Account number {0}",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "long_number",
+        "value": "123456789"
+      }
+    ]
+  },
+  {
+    "hash": "dc71d73ddf91d7e2cfaaaee36f2d1563",
+    "text": "Save {0} % on {1} renders",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "20"
+      },
+      {
+        "kind": "number",
+        "value": "1,000,000"
+      }
+    ]
+  },
+  {
+    "hash": "24480946910d9613e4d85047f6d0ec18",
+    "text": "Only €{0}/mo, billed yearly",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "9.99"
+      }
+    ]
+  },
+  {
+    "hash": "b45f92c4a03c86092f25012f8c46ffcc",
+    "text": "Visit {0} for details.",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "url",
+        "value": "https://cliponit.app/pricing"
+      }
+    ]
+  },
+  {
+    "hash": "20bb390ef46c00e8c95bdfa2b1176f58",
+    "text": "4K export, H264, mp4",
+    "role": "p",
+    "discoverable": true
+  }
+]

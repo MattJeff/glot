@@ -131,6 +131,16 @@ async fn run(mut url: Url, app_origin: &str) -> Probe {
 
 /// One request, no redirect following, to a host that resolves only to public addresses (pinned: no rebinding).
 async fn fetch(url: &Url) -> Result<reqwest::Response, &'static str> {
+    fetch_with(url, false, "glot-review-probe/1").await
+}
+
+/// [`fetch`] for other server-side crawlers (glot Edge SEO report, sitemaps). `allow_private` is for local
+/// development and tests only (origins on 127.0.0.1).
+pub(crate) async fn fetch_with(
+    url: &Url,
+    allow_private: bool,
+    user_agent: &str,
+) -> Result<reqwest::Response, &'static str> {
     if !matches!(url.scheme(), "http" | "https") {
         return Err("unreachable");
     }
@@ -147,14 +157,14 @@ async fn fetch(url: &Url) -> Result<reqwest::Response, &'static str> {
     if addrs.is_empty() {
         return Err("unreachable");
     }
-    if addrs.iter().any(|a| !is_public(a.ip())) {
+    if !allow_private && addrs.iter().any(|a| !is_public(a.ip())) {
         return Err("private");
     }
     let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .timeout(TIMEOUT)
         .resolve_to_addrs(&host, &addrs)
-        .user_agent("glot-review-probe/1")
+        .user_agent(user_agent)
         .build()
         .map_err(|_| "unreachable")?;
     client.get(url.clone()).send().await.map_err(|e| {
@@ -180,7 +190,7 @@ async fn body(mut resp: reqwest::Response) -> String {
     String::from_utf8_lossy(&buf).into_owned()
 }
 
-fn is_public(ip: IpAddr) -> bool {
+pub(crate) fn is_public(ip: IpAddr) -> bool {
     match ip {
         IpAddr::V4(v) => {
             let o = v.octets();

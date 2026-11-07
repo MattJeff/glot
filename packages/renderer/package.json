@@ -1,0 +1,24 @@
+{
+  "name": "@glot/renderer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "glot Edge renderer: headless-Chromium snapshots of SPA pages, cached and refreshed (never rendered per request).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.ts",
+    "test": "node --test 'test/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "e2e:cliponit": "node e2e/cliponit.e2e.ts",
+    "e2e:next": "node e2e/hydration-next.e2e.ts",
+    "bench:ttfb": "node bench/ttfb.ts"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "typescript": "^5.9"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

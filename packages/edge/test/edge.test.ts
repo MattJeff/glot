@@ -90,3 +90,28 @@ test("worker: copy experiment overlay on a source page, forged x-glot-xp dropped
   await Promise.all(bg);
   assert.deepEqual(posted, [{ served: "en", exposures: [{ id: XP, cell: "*", arm: 1 }] }]);
 });
+
+test("worker: glot Edge translates the rendered page (no keys), data-glot keys win, /__glot/tm.json", async () => {
+  const { hash16 } = await import("../src/patcher.ts");
+  const tm = { v: 3, locale: "de", t: { [hash16("en\u0000Static text")]: "Statischer Text", [hash16("en\u0000Welcome")]: "Hallo (TM)" } };
+  globalThis.fetch = (async (input: Request | string) => {
+    const u = String(typeof input === "string" ? input : input.url);
+    if (u.endsWith("/edge/v1/site/status")) return new Response(JSON.stringify({ enabled: true, off: [], versions: { de: 3 } }));
+    if (u.endsWith("/edge/v1/site/de/tm")) return new Response(JSON.stringify(tm));
+    if (u.startsWith("https://glot/cdn/site/de.json")) return new Response('{"home":{"title":"Willkommen"}}', { headers: { etag: '"2"' } });
+    if (u.includes("/missing")) return new Response("{}");
+    return new Response('<html lang="en"><head></head><h1 data-glot="home.title">Welcome</h1><p>Static text</p></html>', { headers: { "content-type": "text/html", "x-frame-options": "DENY" } });
+  }) as typeof fetch;
+  const { default: worker } = await import("../src/worker.ts");
+  const env = { GLOT_SERVER: "https://glot", GLOT_PROJECT: "site", LOCALES: "de" };
+  const res = await worker.fetch(new Request("https://s/de/pricing", { headers: html }), env);
+  const body = await res.text();
+  assert.match(body, /<p>Statischer Text<\/p>/);
+  assert.match(body, /<h1 data-glot="home.title">Willkommen/); // catalog key over the TM
+  assert.doesNotMatch(body, /Hallo/);
+  assert.match(body, /hreflang="de" href="https:\/\/s\/de\/pricing"/);
+  assert.equal(res.headers.get("x-frame-options"), "DENY");
+  assert.equal(res.headers.get("content-language"), "de");
+  const own = await worker.fetch(new Request("https://s/__glot/tm.json?locale=de"), env);
+  assert.equal((await own.json()).v, 3);
+});

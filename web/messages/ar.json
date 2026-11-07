@@ -1,4 +1,277 @@
 {
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "توطين لمحركات البحث: كل لغة تُقدَّم بصفحات HTML مترجمة على عنوان URL خاص بها، قابلة للفهرسة دون JavaScript، ودون مفاتيح إلزامية.",
+    "tabs": {
+      "setup": "الإعداد",
+      "coverage": "التغطية",
+      "review": "قائمة المراجعة",
+      "seo": "تقرير SEO",
+      "performance": "الأداء",
+      "settings": "الإعدادات"
+    },
+    "kill": {
+      "labelOn": "Edge مفعّل",
+      "labelOff": "Edge متوقف",
+      "hint": "عند الإيقاف: يقدّم كل نطاق موقعك الأصلي كما هو خلال دقيقة.",
+      "aria": "مفتاح إيقاف glot Edge",
+      "on": "أُعيد تفعيل glot Edge.",
+      "off": "تم إيقاف glot Edge: يُقدَّم موقعك الأصلي كما هو."
+    },
+    "setup": {
+      "dynamic": {
+        "title": "التوطين الديناميكي",
+        "body": "كتالوجات CDN مع وقت التشغيل: سريع، دون نشر، والترجمة في المتصفح. ترى محركات البحث غالبًا لغة المصدر.",
+        "cta": "إعداد CDN"
+      },
+      "seo": {
+        "title": "التوطين لمحركات البحث",
+        "badge": "Growth",
+        "body": "glot Edge أو العرض المسبق: أول بايت من HTML مترجم مسبقًا، وعنوان URL لكل لغة، مع hreflang وcanonical. الصفحات قابلة للفهرسة.",
+        "quota": "{used} من {limit} صفحة edge قُدّمت هذا الشهر",
+        "quotaUnlimited": "{used} صفحة edge قُدّمت هذا الشهر"
+      },
+      "upgrade": "التوطين لمحركات البحث مضمَّن في Growth (Pro: تجربة محدودة).",
+      "upgradeCta": "عرض الخطط",
+      "steps": {
+        "title": "خطوات الإعداد",
+        "domain": "إضافة نطاق",
+        "dns": "التحقق من DNS",
+        "tls": "HTTPS مفعّل",
+        "ready": "لغة جاهزة",
+        "done": "تم",
+        "todo": "متبقٍ"
+      },
+      "add": {
+        "title": "إضافة نطاق",
+        "mode": "وضع التقديم",
+        "host": "النطاق الفرعي للغة",
+        "site": "نطاق الموقع",
+        "locale": "اللغة",
+        "origin": "الأصل (موقعك)",
+        "submit": "إضافة"
+      },
+      "mode": {
+        "subdomain": "نطاق فرعي",
+        "subdomainHint": "es.example.com: سجل CNAME يشير إلى glot، ويُدار HTTPS تلقائيًا.",
+        "subdirectory": "مجلد فرعي",
+        "subdirectoryHint": "example.com/es/: ‏Cloudflare Worker أو قاعدة وكيل أمام موقعك.",
+        "middleware": "برمجية وسيطة",
+        "middlewareHint": "برمجية وسيطة لـ Next.js أو Express: يبقى كل شيء على استضافتك."
+      },
+      "added": "أُضيف النطاق. انشر سجلات DNS أدناه.",
+      "empty": {
+        "title": "لا توجد نطاقات بعد",
+        "body": "أضف النطاق الذي ستُقدَّم عليه لغة. لا يتغير شيء في موقعك قبل التحقق من DNS."
+      },
+      "status": {
+        "verified": "تم التحقق من DNS",
+        "unverified": "لم يتم التحقق من DNS",
+        "tls": {
+          "pending": "HTTPS قيد الإعداد",
+          "active": "HTTPS مفعّل",
+          "error": "خطأ في HTTPS"
+        }
+      },
+      "domainOn": "قيد التقديم",
+      "domainOff": "متوقف مؤقتًا",
+      "verify": "التحقق من DNS",
+      "verified": "تم التحقق من DNS.",
+      "notYet": "لم يُعثر على السجلات بعد. قد يستغرق انتشار DNS بضع دقائق.",
+      "remove": "إزالة النطاق",
+      "removeConfirm": "إزالة {host}؟ ستعود حركة المرور إلى موقعك الأصلي.",
+      "originLine": "الأصل: {origin}",
+      "checkedAt": "تم الفحص {when}",
+      "dnsSubdomain": "أنشئ هذين السجلين لدى مزوّد DNS ثم تحقّق:",
+      "dnsTxt": "أنشئ سجل TXT هذا لإثبات ملكيتك للنطاق ثم تحقّق:",
+      "dnsLabel": "سجلات DNS",
+      "dnsNothing": "لم يُعثر على شيء",
+      "wiring": {
+        "subdomain": "الإعداد",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "برمجية Next.js الوسيطة"
+      },
+      "hreflang": {
+        "title": "وسوم hreflang لموقعك المصدر",
+        "body": "في وضع النطاق الفرعي لا تمر صفحاتك المصدر عبر glot: أضف هذه الوسوم إلى head فيها لتشير كل لغة إلى الأخرى (يجب أن يكون hreflang متبادلًا).",
+        "path": "المسار",
+        "show": "عرض"
+      }
+    },
+    "coverage": {
+      "intro": "تُقاس على الصفحات المقدَّمة فعليًا: المقاطع المترجمة / المقاطع المعروضة. تصبح اللغة جاهزة (في المحوِّل وlocales.json) عندما تبلغ كل صفحة حرجة {critical} وتبلغ التغطية الإجمالية {global}.",
+      "ready": "جاهزة",
+      "notReady": "غير جاهزة",
+      "global": "الإجمالي",
+      "critical": "الصفحات الحرجة",
+      "pages": "الصفحات بـ{locale}",
+      "mark": "تعليم كصفحة حرجة",
+      "unmark": "إلغاء التعليم كصفحة حرجة",
+      "byPattern": "حرجة عبر نمط: عدّله في الإعدادات",
+      "criticalBadge": "حرجة",
+      "missing": "{n, plural, zero {لا مقاطع ناقصة} one {مقطع ناقص واحد} two {مقطعان ناقصان} few {# مقاطع ناقصة} many {# مقطعًا ناقصًا} other {# مقطع ناقص}}",
+      "empty": {
+        "title": "لم تُرَ أي صفحة بعد",
+        "body": "تظهر التغطية بعد أن يقدّم glot Edge صفحات بهذه اللغة."
+      },
+      "pagesSeen": "الصفحات المرئية"
+    },
+    "segments": {
+      "title": "المقاطع",
+      "subtitle": "نصوص صفحاتك المعروضة، مترجمة دون مفاتيح. لمفاتيح كتالوجاتك الأولوية دائمًا.",
+      "viewKeys": "المفاتيح",
+      "viewSegments": "المقاطع",
+      "intro": "كل مقطع نص معروض في سياقه (العنصر وقالب الصفحة). تُتحقَّق التعديلات كالمفاتيح: الصياغة والمسرد والطول.",
+      "queueIntro": "تُقدَّم المقاطع الجديدة من الصفحات الحساسة (الدفع، الحساب) بلغة المصدر حتى يوافق أحد على ترجمتها.",
+      "search": "البحث عن نص",
+      "locale": "اللغة",
+      "status": "الحالة",
+      "all": "كل الحالات",
+      "statuses": {
+        "missing": "ناقص",
+        "pending": "للمراجعة",
+        "machine": "آلية",
+        "reviewed": "مُراجَعة",
+        "stale": "قديمة"
+      },
+      "sensitive": "صفحة حساسة",
+      "hits": "{n, plural, zero {لا مشاهدات} one {مشاهدة واحدة} two {مشاهدتان} few {# مشاهدات} many {# مشاهدة} other {# مشاهدة}}",
+      "translation": "الترجمة",
+      "save": "حفظ",
+      "approve": "موافقة",
+      "saved": "تم حفظ الترجمة.",
+      "approved": "تمت الموافقة على الترجمة: تُقدَّم بدءًا من الطلب التالي.",
+      "prev": "السابق",
+      "next": "التالي",
+      "empty": {
+        "title": "لا توجد مقاطع",
+        "body": "تظهر المقاطع كلما قدّم glot Edge صفحات، أو جرّب عامل تصفية آخر."
+      },
+      "queueEmpty": {
+        "title": "لا شيء للمراجعة",
+        "body": "تمت الموافقة على كل مقاطع الصفحات الحساسة."
+      }
+    },
+    "settings": {
+      "saved": "تم حفظ إعدادات Edge.",
+      "save": "حفظ",
+      "translate": {
+        "title": "الترجمة التلقائية",
+        "auto": "ترجمة المقاطع الجديدة تلقائيًا",
+        "autoHint": "بنموذجك ومسردك ومدقّقاتك. وإلى أن تكتمل يُقدَّم نص المصدر: لا فراغات أبدًا.",
+        "budget": "الميزانية الشهرية (USD)",
+        "budgetHint": "فارغ: ميزانية المشروع لكل مهمة فقط."
+      },
+      "rendering": {
+        "label": "العرض",
+        "auto": "تلقائي",
+        "origin": "HTML الأصل",
+        "prerender": "لقطة معروضة مسبقًا",
+        "autoHint": "يستخدم لقطة معروضة مسبقًا عندما يعيد الأصل هيكلًا فارغًا (SPA).",
+        "originHint": "يترجم HTML الذي يعيده خادمك كما هو.",
+        "prerenderHint": "يترجم دائمًا لقطة عرضها متصفح دون واجهة (مخزّنة مؤقتًا، وتُحدَّث عند النشر)."
+      },
+      "discovery": {
+        "title": "مناطق الاكتشاف",
+        "body": "حيث يمكن لـ glot Edge تعلّم نصوص جديدة. لا خلف تسجيل الدخول أبدًا، ولا بيانات شخصية، وبحد يومي.",
+        "include": "المسارات المسموح بها",
+        "includeHint": "نمط في كل سطر، و* كحرف بدل. فارغ: كل الصفحات العامة.",
+        "exclude": "المسارات المستبعدة",
+        "excludeHint": "لا تُكتشف أبدًا حتى لو سُمح بها أعلاه.",
+        "selectorsInclude": "المناطق المترجمة (محددات CSS)",
+        "selectorsIncludeHint": "فارغ: الصفحة كاملة.",
+        "selectors": "المحددات المستبعدة",
+        "selectorsHint": "لا تُترجم ولا تُرسل إلى glot أبدًا: محتوى المستخدمين والأسماء والأدوات.",
+        "cap": "المقاطع الجديدة يوميًا",
+        "capHint": "بعد هذا الحد تُقدَّم النصوص الجديدة بلغة المصدر حتى اليوم التالي."
+      },
+      "critical": {
+        "title": "الصفحات الحرجة والحساسة",
+        "body": "تحدد الصفحات الحرجة ما إذا كانت اللغة تُعرض. ولا تنشر الصفحات الحساسة أي جديد دون مراجعة.",
+        "patterns": "الصفحات الحرجة",
+        "patternsHint": "افتراضيًا: الرئيسية والتسجيل والأسعار والدفع.",
+        "sensitive": "الصفحات الحساسة",
+        "sensitiveHint": "تنتظر المقاطع الجديدة في قائمة المراجعة.",
+        "threshold": "حد التغطية الحرجة (%)",
+        "thresholdHint": "يجب أن تبلغه كل صفحة حرجة قبل أن تصبح اللغة جاهزة."
+      }
+    },
+    "seo": {
+      "run": "تشغيل التقرير",
+      "empty": {
+        "title": "لا تقارير بعد",
+        "body": "يجلب التقرير كل لغة لما يصل إلى 20 صفحة دون JavaScript، كما يفعل Google، ويتحقق من hreflang وcanonical والبيانات الوصفية والنصوص غير المترجمة. يتطلب نطاقًا تم التحقق منه."
+      },
+      "summary": "{indexable} من {total} صفحة قابلة للفهرسة تقنيًا",
+      "indexedNote": "يُقاس هنا كون الصفحة قابلة للفهرسة تقنيًا. أما كونها مفهرسة فعليًا فلا يُعرف إلا بربط Search Console؛ وإلا يظهر كمجهول، ولا يُخمَّن أبدًا.",
+      "indexable": "قابلة للفهرسة",
+      "notIndexable": "غير قابلة للفهرسة",
+      "indexed": "مفهرسة",
+      "notIndexed": "غير مفهرسة",
+      "indexedUnknown": "الفهرسة غير معروفة",
+      "untranslated": "{n} غير مترجم",
+      "renderDiffNone": "لم تتم المقارنة",
+      "renderDiffSame": "النص نفسه مع JavaScript ودونه",
+      "renderDiffCount": "{n, plural, zero {لا مقاطع تظهر} one {مقطع واحد يظهر} two {مقطعان يظهران} few {# مقاطع تظهر} many {# مقطعًا يظهر} other {# مقطع يظهر}} بعد JavaScript فقط",
+      "indexNow": "إشعار Bing وYandex ‏(IndexNow)",
+      "indexNowHint": "لا يستخدم Google ‏IndexNow: بل يقرأ خرائط الموقع المعلنة في robots.txt.",
+      "indexNowDone": "{n, plural, zero {لم يُرسل أي عنوان URL} one {أُرسل عنوان URL واحد} two {أُرسل عنوانا URL} few {أُرسلت # عناوين URL} many {أُرسل # عنوانًا URL} other {أُرسل # عنوان URL}} إلى IndexNow.",
+      "running": "جارٍ جلب الصفحات…",
+      "issuesTitle": "المشكلات المكتشفة",
+      "sitemaps": "خرائط الموقع لكل لغة",
+      "critical": "حرجة",
+      "notReciprocal": "hreflang غير متبادل",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "Canonical",
+        "title": "العنوان",
+        "description": "الوصف",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "فشل الجلب",
+        "http_error": "خطأ HTTP",
+        "noindex": "noindex",
+        "robots_txt_blocked": "محظورة بواسطة robots.txt",
+        "redirected": "معاد توجيهها",
+        "canonical_missing": "لا يوجد canonical",
+        "canonical_multiple": "عدة canonical",
+        "canonical_to_source": "canonical يشير إلى صفحة المصدر",
+        "canonical_not_self": "canonical يشير إلى صفحة أخرى",
+        "html_lang": "html lang غير صحيح",
+        "html_dir": "اتجاه النص غير صحيح",
+        "content_language": "Content-Language غير صحيح",
+        "hreflang_self_missing": "لا يوجد hreflang ذاتي",
+        "hreflang_x_default_missing": "لا يوجد x-default",
+        "hreflang_not_reciprocal": "hreflang غير متبادل",
+        "advertised_but_not_ready": "مُعلَنة لكنها غير جاهزة",
+        "title_missing": "لا يوجد عنوان",
+        "title_untranslated": "العنوان غير مترجم",
+        "description_untranslated": "الوصف غير مترجم",
+        "og_title_untranslated": "og:title غير مترجم",
+        "jsonld_language": "JSON-LD بلغة أخرى",
+        "untranslated_segments": "مقاطع غير مترجمة"
+      }
+    },
+    "perf": {
+      "period": "الفترة",
+      "days": "{n, plural, zero {لا أيام} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+      "requests": "الصفحات المقدَّمة",
+      "hitRatio": "نسبة إصابة التخزين المؤقت",
+      "failOpen": "Fail-open",
+      "glotP50": "تكلفة glot p50",
+      "glotP95": "تكلفة glot p95",
+      "originP50": "الأصل p50",
+      "note": "تكلفة glot = الوقت المضاف فوق موقعك الأصلي (Server-Timing). Fail-open = صفحات قُدّمت دون ترجمة لأن glot لم يستجب في الوقت المحدد: ليست خطأً أبدًا.",
+      "byDay": "حسب اليوم",
+      "date": "اليوم",
+      "empty": {
+        "title": "لا توجد حركة مرور بعد",
+        "body": "تظهر المقاييس بعد أن يقدّم نطاق ما صفحات."
+      }
+    }
+  },
   "launches": {
     "title": "الإطلاقات",
     "open": "الإطلاقات",
@@ -178,6 +451,7 @@
     "menu": "القائمة",
     "onThisPage": "في هذه الصفحة",
     "pages": {
+      "edge": "glot Edge (التوطين لمحركات البحث)",
       "cli": "مرجع CLI",
       "concepts": "المفاهيم",
       "faq": "الأسئلة الشائعة والتكاليف",
@@ -1204,6 +1478,7 @@
     "subtitle": "الاسم واللغات ونموذج الترجمة والتسليم لهذا المشروع. تُطبَّق التغييرات على المهمة التالية."
   },
   "shell": {
+    "edge": "glot Edge",
     "apiTokens": "رموز API",
     "experiments": "التجارب",
     "feedback": "المراجعة",

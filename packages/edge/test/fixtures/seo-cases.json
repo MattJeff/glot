@@ -1,0 +1,130 @@
+[
+  {
+    "name": "dir-es-pricing",
+    "source": "fr",
+    "locale": "es",
+    "path": "/pricing",
+    "bases": [
+      [
+        "fr",
+        "https://cliponit.app"
+      ],
+      [
+        "es",
+        "https://cliponit.app/es"
+      ],
+      [
+        "ar",
+        "https://cliponit.app/ar"
+      ]
+    ],
+    "tr": {
+      "Clip videos": "Recorta vídeos",
+      "Pricing": "Precios"
+    },
+    "html": "<!doctype html><html lang=\"fr\"><head><title>Tarifs</title>\n<link rel=\"canonical\" href=\"https://cliponit.app/pricing?utm=x\">\n<link rel=\"alternate\" hreflang=\"fr\" href=\"https://cliponit.app/pricing\">\n<link rel=\"alternate\" hreflang=\"en\" href=\"/pricing?lang=en\">\n<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://cliponit.app/pricing\">\n<meta property=\"og:locale\" content=\"fr_FR\"><meta property=\"og:url\" content=\"https://cliponit.app/pricing\">\n<script type=\"application/ld+json\">{\"@type\":\"Product\",\"name\":\"Clip videos\",\"url\":\"https://cliponit.app/pricing\",\"inLanguage\":\"fr\",\"brand\":\"ClipOnIt\"}</script>\n</head><body><a href=\"/pricing\">Tarifs</a> <a href=\"https://cliponit.app/\">Accueil</a> <a href=\"/logo.png\">l</a>\n<a href=\"https://other.io/x\">x</a> <a href=\"#top\">t</a> <a href=\"/?lang=en\" hreflang=\"en\">EN</a> <a href=\"/estate\">e</a></body></html>"
+  },
+  {
+    "name": "dir-ar-rtl-home",
+    "source": "fr",
+    "locale": "ar",
+    "path": "/",
+    "bases": [
+      [
+        "fr",
+        "https://cliponit.app"
+      ],
+      [
+        "es",
+        "https://cliponit.app/es"
+      ],
+      [
+        "ar",
+        "https://cliponit.app/ar"
+      ]
+    ],
+    "tr": {},
+    "html": "<HTML LANG=fr DIR=ltr><HEAD><TITLE>Accueil</TITLE><META PROPERTY=\"og:url\" CONTENT=\"https://cliponit.app/?a=1&b=2\"/></HEAD><BODY><A HREF=\"/\">Home</A> <a href='/es/pricing'>es</a> <a href=/ar/x>ar</a> <a href=\"https://cliponit.app/es\">abs</a> <a href=\"mailto:a@b.c\">m</a> <a href=\"//cdn.x/y\">c</a> <a href=\"/_next/static/x\">n</a> <a href=\"/blog.html\">h</a> <a data-glot-skip href=\"/keep\">k</a></BODY></HTML>"
+  },
+  {
+    "name": "source-page-lists-translations",
+    "source": "fr",
+    "locale": "fr",
+    "path": "/a",
+    "bases": [
+      [
+        "fr",
+        "https://cliponit.app"
+      ],
+      [
+        "es",
+        "https://cliponit.app/es"
+      ],
+      [
+        "ar",
+        "https://cliponit.app/ar"
+      ]
+    ],
+    "tr": {},
+    "html": "<html><head><title>x</title></head><body><a href=\"/b\">b</a></body></html>"
+  },
+  {
+    "name": "jsonld-graph",
+    "source": "en",
+    "locale": "de",
+    "path": "/blog/post",
+    "bases": [
+      [
+        "en",
+        "https://s.io"
+      ],
+      [
+        "de",
+        "https://s.io/de"
+      ]
+    ],
+    "tr": {
+      "Hello world": "Hallo Welt",
+      "A post": "Ein Beitrag",
+      "Home": "Startseite",
+      "fast, simple": "schnell, einfach"
+    },
+    "html": "<html><head><script type=\"application/ld+json\">\n{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"BlogPosting\",\"@id\":\"https://s.io/blog/post#a\",\"headline\":\"Hello world\",\"description\":\"A post\",\"keywords\":[\"fast, simple\"],\"inLanguage\":\"en-US\",\"sameAs\":[\"https://s.io/about\",\"https://x.com/s\"],\"image\":\"https://s.io/cover.png\",\"author\":{\"name\":\"Ann </b> Lee\"}},{\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://s.io/\"}]}]}\n</script><script type=\"application/ld+json\">{oops</script><link rel=\"stylesheet\" href=\"/a.css\"></head><body><p>x</p></body></html>"
+  },
+  {
+    "name": "subdomain",
+    "source": "fr",
+    "locale": "es",
+    "path": "/pricing",
+    "bases": [
+      [
+        "fr",
+        "https://cliponit.app"
+      ],
+      [
+        "es",
+        "https://es.cliponit.app"
+      ]
+    ],
+    "tr": {},
+    "html": "<html lang=\"fr\"><head><link rel=\"canonical\" href=\"/pricing\"></head><body><a href=\"/pricing\">p</a> <a href=\"https://cliponit.app/x\">x</a></body></html>"
+  },
+  {
+    "name": "attr-serialization",
+    "source": "en",
+    "locale": "de",
+    "path": "/x",
+    "bases": [
+      [
+        "en",
+        "https://s.io"
+      ],
+      [
+        "de",
+        "https://s.io/de"
+      ]
+    ],
+    "tr": {},
+    "html": "<html class=a   data-x lang='e\"n'><head><link rel=\"alternate\" hreflang=\"pt\" href=\"/x?l=pt&amp;q=1\"></head><body><a  data-y href=/p?a=1&amp;b=2 title='say \"hi\"' >p</a><a href=\"/q\"/>q</a><a HREF=\"/r\" class=\"c\"\n  id=r>r</a></body></html>"
+  }
+]

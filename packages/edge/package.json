@@ -27,13 +27,22 @@
     "./experiments": {
       "types": "./dist/experiments.d.ts",
       "default": "./dist/experiments.js"
+    },
+    "./runtime": {
+      "types": "./dist/edge.d.ts",
+      "default": "./dist/edge.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "default": "./dist/express.js"
     }
   },
   "scripts": {
-    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts src/experiments.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak",
+    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts src/experiments.ts src/edge.ts src/express.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --external:node:* --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak && esbuild src/patcher.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/edge-patcher.global.js && npm run size",
     "prepack": "npm run build",
     "test": "node --test test/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "size": "node -e \"const n=require('zlib').gzipSync(require('fs').readFileSync('../../web/public/widget/edge-patcher.global.js'),{level:9}).length;console.log('edge-patcher.global.js',n,'B gz');if(n>6656)process.exit(1)\""
   },
   "peerDependencies": {
     "next": ">=15"

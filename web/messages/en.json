@@ -1,4 +1,277 @@
 {
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "SEO localization: every language served as translated HTML on its own URL, indexable without JavaScript, no keys required.",
+    "tabs": {
+      "setup": "Setup",
+      "coverage": "Coverage",
+      "review": "Review queue",
+      "seo": "SEO report",
+      "performance": "Performance",
+      "settings": "Settings"
+    },
+    "kill": {
+      "labelOn": "Edge is on",
+      "labelOff": "Edge is off",
+      "hint": "Off: every domain serves your origin unchanged within a minute.",
+      "aria": "glot Edge kill switch",
+      "on": "glot Edge is back on.",
+      "off": "glot Edge is off: your origin is served unchanged."
+    },
+    "setup": {
+      "dynamic": {
+        "title": "Dynamic localization",
+        "body": "CDN catalogs + runtime: fast, no deploy, translated in the browser. Search engines mostly see your source language.",
+        "cta": "Configure the CDN"
+      },
+      "seo": {
+        "title": "SEO localization",
+        "badge": "Growth",
+        "body": "glot Edge or pre-rendering: the first HTML byte is already translated, one URL per language, hreflang and canonical set. Pages are indexable.",
+        "quota": "{used} of {limit} edge pages served this month",
+        "quotaUnlimited": "{used} edge pages served this month"
+      },
+      "upgrade": "SEO localization is included in Growth (Pro: limited trial).",
+      "upgradeCta": "See plans",
+      "steps": {
+        "title": "Setup steps",
+        "domain": "Add a domain",
+        "dns": "Verify DNS",
+        "tls": "HTTPS active",
+        "ready": "A language is ready",
+        "done": "done",
+        "todo": "to do"
+      },
+      "add": {
+        "title": "Add a domain",
+        "mode": "Serving mode",
+        "host": "Language subdomain",
+        "site": "Site domain",
+        "locale": "Language",
+        "origin": "Origin (your site)",
+        "submit": "Add"
+      },
+      "mode": {
+        "subdomain": "Subdomain",
+        "subdomainHint": "es.example.com: a CNAME to glot, HTTPS handled for you.",
+        "subdirectory": "Subdirectory",
+        "subdirectoryHint": "example.com/es/: a Cloudflare Worker or proxy rule in front of your site.",
+        "middleware": "Middleware",
+        "middlewareHint": "Next.js or Express middleware: everything stays on your hosting."
+      },
+      "added": "Domain added. Publish the DNS records below.",
+      "empty": {
+        "title": "No domain yet",
+        "body": "Add the domain where a language will be served. Nothing changes on your site until DNS is verified."
+      },
+      "status": {
+        "verified": "DNS verified",
+        "unverified": "DNS not verified",
+        "tls": {
+          "pending": "HTTPS pending",
+          "active": "HTTPS active",
+          "error": "HTTPS error"
+        }
+      },
+      "domainOn": "Serving",
+      "domainOff": "Paused",
+      "verify": "Check DNS",
+      "verified": "DNS verified.",
+      "notYet": "Records not found yet. DNS can take a few minutes to propagate.",
+      "remove": "Remove domain",
+      "removeConfirm": "Remove {host}? Its traffic goes back to your origin.",
+      "originLine": "Origin: {origin}",
+      "checkedAt": "checked {when}",
+      "dnsSubdomain": "Create these two records at your DNS provider, then check:",
+      "dnsTxt": "Create this TXT record to prove you own the domain, then check:",
+      "dnsLabel": "DNS records",
+      "dnsNothing": "nothing found",
+      "wiring": {
+        "subdomain": "Configuration",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "Next.js middleware"
+      },
+      "hreflang": {
+        "title": "hreflang tags for your source site",
+        "body": "In subdomain mode your source pages are not served by glot: add these tags to their head so every language links back (hreflang must be reciprocal).",
+        "path": "Path",
+        "show": "Show"
+      }
+    },
+    "coverage": {
+      "intro": "Measured on the pages actually served: translated segments / rendered segments. A language is ready (switcher and locales.json) once every critical page reaches {critical} and overall coverage reaches {global}.",
+      "ready": "Ready",
+      "notReady": "Not ready",
+      "global": "Overall",
+      "critical": "Critical pages",
+      "pages": "Pages in {locale}",
+      "mark": "Mark as critical",
+      "unmark": "Unmark as critical",
+      "byPattern": "Critical through a pattern: edit it in Settings",
+      "criticalBadge": "Critical",
+      "missing": "{n, plural, one {# missing segment} other {# missing segments}}",
+      "empty": {
+        "title": "No page seen yet",
+        "body": "Coverage appears once glot Edge has served pages in this language."
+      },
+      "pagesSeen": "Pages seen"
+    },
+    "segments": {
+      "title": "Segments",
+      "subtitle": "Text from your rendered pages, translated without keys. Keys from your catalogs always take precedence.",
+      "viewKeys": "Keys",
+      "viewSegments": "Segments",
+      "intro": "Each segment is a piece of rendered text in its context (element and page template). Edits are validated like keys: syntax, glossary, length.",
+      "queueIntro": "New segments from sensitive pages (payment, account) are served in the source language until someone approves their translation.",
+      "search": "Search text",
+      "locale": "Language",
+      "status": "Status",
+      "all": "All statuses",
+      "statuses": {
+        "missing": "Missing",
+        "pending": "To review",
+        "machine": "Machine",
+        "reviewed": "Reviewed",
+        "stale": "Stale"
+      },
+      "sensitive": "Sensitive page",
+      "hits": "{n, plural, one {# view} other {# views}}",
+      "translation": "Translation",
+      "save": "Save",
+      "approve": "Approve",
+      "saved": "Translation saved.",
+      "approved": "Translation approved: served from the next request.",
+      "prev": "Previous",
+      "next": "Next",
+      "empty": {
+        "title": "No segment",
+        "body": "Segments appear as glot Edge serves pages, or try another filter."
+      },
+      "queueEmpty": {
+        "title": "Nothing to review",
+        "body": "Every segment from sensitive pages has been approved."
+      }
+    },
+    "settings": {
+      "saved": "Edge settings saved.",
+      "save": "Save",
+      "translate": {
+        "title": "Automatic translation",
+        "auto": "Translate new segments automatically",
+        "autoHint": "With your model, glossary and validators. Until it is done, the source text is served: never a blank.",
+        "budget": "Monthly budget (USD)",
+        "budgetHint": "Empty: only the project budget per job."
+      },
+      "rendering": {
+        "label": "Rendering",
+        "auto": "Automatic",
+        "origin": "Origin HTML",
+        "prerender": "Pre-rendered snapshot",
+        "autoHint": "Uses a pre-rendered snapshot when the origin returns an empty shell (SPA).",
+        "originHint": "Translates the HTML your server returns, as is.",
+        "prerenderHint": "Always translates a snapshot rendered by a headless browser (cached, refreshed on deploy)."
+      },
+      "discovery": {
+        "title": "Discovery zones",
+        "body": "Where glot Edge may learn new text. Never behind a login, never personal data, capped per day.",
+        "include": "Allowed paths",
+        "includeHint": "One pattern per line, * as wildcard. Empty: every public page.",
+        "exclude": "Excluded paths",
+        "excludeHint": "Never discovered, even when allowed above.",
+        "selectorsInclude": "Translated areas (CSS selectors)",
+        "selectorsIncludeHint": "Empty: the whole page.",
+        "selectors": "Excluded selectors",
+        "selectorsHint": "Never translated or sent to glot: user content, names, widgets.",
+        "cap": "New segments per day",
+        "capHint": "Beyond this, new text is served in the source language until the next day."
+      },
+      "critical": {
+        "title": "Critical and sensitive pages",
+        "body": "Critical pages gate whether a language is offered. Sensitive pages publish nothing new without a review.",
+        "patterns": "Critical pages",
+        "patternsHint": "Home, sign-up, pricing, checkout by default.",
+        "sensitive": "Sensitive pages",
+        "sensitiveHint": "New segments wait in the review queue.",
+        "threshold": "Critical coverage threshold (%)",
+        "thresholdHint": "Each critical page must reach it before the language is ready."
+      }
+    },
+    "seo": {
+      "run": "Run the report",
+      "empty": {
+        "title": "No report yet",
+        "body": "The report fetches every language of up to 20 pages without JavaScript, as Google does, and checks hreflang, canonical, metadata and untranslated text. It needs a verified domain."
+      },
+      "summary": "{indexable} of {total} pages technically indexable",
+      "indexedNote": "Technically indexable is measured here. Actually indexed is only known with Search Console connected; otherwise it shows as unknown, never guessed.",
+      "indexable": "Indexable",
+      "notIndexable": "Not indexable",
+      "indexed": "Indexed",
+      "notIndexed": "Not indexed",
+      "indexedUnknown": "Indexing unknown",
+      "untranslated": "{n} untranslated",
+      "renderDiffNone": "Not compared",
+      "renderDiffSame": "Same text with and without JavaScript",
+      "renderDiffCount": "{n, plural, one {# segment appears} other {# segments appear}} only after JavaScript",
+      "indexNow": "Notify Bing and Yandex (IndexNow)",
+      "indexNowHint": "Google does not use IndexNow: it reads the sitemaps announced in robots.txt.",
+      "indexNowDone": "{n, plural, one {# URL submitted} other {# URLs submitted}} to IndexNow.",
+      "running": "Fetching pages…",
+      "issuesTitle": "Issues found",
+      "sitemaps": "Sitemaps per language",
+      "critical": "Critical",
+      "notReciprocal": "hreflang not reciprocal",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "Canonical",
+        "title": "Title",
+        "description": "Description",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "Fetch failed",
+        "http_error": "HTTP error",
+        "noindex": "noindex",
+        "robots_txt_blocked": "Blocked by robots.txt",
+        "redirected": "Redirected",
+        "canonical_missing": "No canonical",
+        "canonical_multiple": "Several canonicals",
+        "canonical_to_source": "Canonical points to the source page",
+        "canonical_not_self": "Canonical points elsewhere",
+        "html_lang": "Wrong html lang",
+        "html_dir": "Wrong text direction",
+        "content_language": "Wrong Content-Language",
+        "hreflang_self_missing": "No self hreflang",
+        "hreflang_x_default_missing": "No x-default",
+        "hreflang_not_reciprocal": "hreflang not reciprocal",
+        "advertised_but_not_ready": "Linked but not ready",
+        "title_missing": "No title",
+        "title_untranslated": "Title not translated",
+        "description_untranslated": "Description not translated",
+        "og_title_untranslated": "og:title not translated",
+        "jsonld_language": "JSON-LD in another language",
+        "untranslated_segments": "Untranslated segments"
+      }
+    },
+    "perf": {
+      "period": "Period",
+      "days": "{n, plural, one {# day} other {# days}}",
+      "requests": "Pages served",
+      "hitRatio": "Cache hit ratio",
+      "failOpen": "Fail-open",
+      "glotP50": "glot cost p50",
+      "glotP95": "glot cost p95",
+      "originP50": "Origin p50",
+      "note": "glot cost = time added on top of your origin (Server-Timing). Fail-open = pages served untranslated because glot did not answer in time: never an error.",
+      "byDay": "By day",
+      "date": "Day",
+      "empty": {
+        "title": "No traffic yet",
+        "body": "Metrics appear once a domain serves pages."
+      }
+    }
+  },
   "launches": {
     "title": "Launches",
     "open": "Launches",
@@ -1195,6 +1468,7 @@
     "subtitle": "Name, locales, translation model and delivery for this project. Changes apply to the next job."
   },
   "shell": {
+    "edge": "glot Edge",
     "apiTokens": "API tokens",
     "glossary": "Glossary",
     "jobs": "Jobs",
@@ -1625,6 +1899,7 @@
       "labs": "Labs (experimental)"
     },
     "pages": {
+      "edge": "glot Edge (SEO localization)",
       "getting-started": "Install & quickstart",
       "concepts": "Concepts",
       "mcp": "MCP server",

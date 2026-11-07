@@ -2,6 +2,7 @@
 pub mod catalog;
 pub mod config;
 pub mod context;
+pub mod edge;
 pub mod formats;
 pub mod glossary;
 pub mod hash;

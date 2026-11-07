@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "nodenext",
+    "lib": [
+      "es2024",
+      "dom",
+      "dom.iterable"
+    ],
+    "strict": true,
+    "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "test",
+    "e2e",
+    "bench"
+  ],
+  "exclude": [
+    "e2e/fixtures"
+  ]
+}

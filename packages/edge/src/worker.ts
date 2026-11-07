@@ -1,14 +1,20 @@
-// Cloudflare Worker in front of a static / marketing site (route it on your zone; `fetch(req)` reaches the origin).
-// `/de/pricing` = the origin's `/pricing` with every `data-glot="key"` element filled from glot's `de` catalog,
-// asked on demand: while glot translates (first visit), the source page is served uncached.
+// Cloudflare Worker in front of a site (route it on your zone; `fetch(req)` reaches the origin).
+// `/es/pricing` = the origin's `/pricing`, its rendered HTML translated by glot Edge (no keys needed: segments of
+// the page are looked up in the project's translation memory; unknown ones are reported, translated by glot and
+// served from the next request; meanwhile the source text is served, never a hole). Elements with
+// `data-glot="key"` still get the glot catalog value on top (keys win over segments).
 //   wrangler.toml: main = "node_modules/@glot/edge/dist/worker.js"
-//   [vars] GLOT_SERVER = "https://glot.example.com"  GLOT_PROJECT = "site"  LOCALES = "de,it,ja"  SOURCE_LOCALE = "en"
-// Copy experiments: add `GLOT_KEY = "pk_…"` → arms decided here, `data-glot` elements get the variant text,
-// on source pages too (static sites have no React to read `x-glot-xp`; it's still forwarded to the origin).
-// ponytail: plain strings only (no ICU formatting) and links inside the page are not rewritten to `/de/…`.
+//   [vars] GLOT_SERVER = "https://api.glotlang.com"  GLOT_PROJECT = "site"  LOCALES = "es,de"  SOURCE_LOCALE = "en"
+//          GLOT_KEY = "pk_…"   (discovery of new segments + copy experiments)
+//          GLOT_EDGE = "0"     (optional: catalogs/`data-glot` only, no segment translation)
+//          GLOT_TIMEOUT_MS = "300"  (cold-start budget for glot; past it the origin page is served untranslated)
+// Fail-open: whatever happens to glot, the visitor gets the origin's page. Last known TM: isolate memory + Cache API.
+// ponytail: experiments overlay + data-glot are plain strings (no ICU formatting).
 import { createOnDemandLoader } from "@glot/runtime/ondemand";
 import { route } from "./route.ts";
 import { glotExperiments, type Decision } from "./experiments.ts";
+import { createEdge, type PageCache, type Store } from "./edge.ts";
+import { translate } from "./translate.ts";
 
 export interface Env {
   GLOT_SERVER: string;
@@ -16,8 +22,10 @@ export interface Env {
   /** Comma-separated locales served under `/{locale}/` (glot's on-demand whitelist). */
   LOCALES: string;
   SOURCE_LOCALE?: string;
-  /** Project public key (`pk_…`): enables segmented copy experiments. */
+  /** Project public key (`pk_…`): segment discovery + segmented copy experiments. */
   GLOT_KEY?: string;
+  GLOT_EDGE?: string;
+  GLOT_TIMEOUT_MS?: string;
 }
 
 interface Element {
@@ -29,48 +37,91 @@ declare const HTMLRewriter: new () => {
   on(selector: string, handlers: { element(e: Element): void }): InstanceType<typeof HTMLRewriter>;
   transform(res: Response): Response;
 };
+declare const caches: { default?: { match(k: string): Promise<Response | undefined>; put(k: string, r: Response): Promise<void> } } | undefined;
 
 let load: ReturnType<typeof createOnDemandLoader> | undefined; // per isolate: memory cache + ETag revalidation
 let xp: ReturnType<typeof glotExperiments> | undefined;
+let edge: ReturnType<typeof createEdge> | undefined;
+
+/** Cache API as the Worker's "disk": last known TM/status survive isolate restarts (per colo). */
+const cacheStore = (c: NonNullable<NonNullable<typeof caches>["default"]>): Store => ({
+  get: async (k) => (await c.match(`https://glot-edge.invalid/_state/${k}`))?.text() ?? null,
+  put: (k, v) => c.put(`https://glot-edge.invalid/_state/${k}`, new Response(v, { headers: { "cache-control": "max-age=2592000" } })),
+});
+
+function getEdge(env: Env, source: string, locales: string[]) {
+  const c = typeof caches !== "undefined" ? caches?.default : undefined;
+  return (edge ??= createEdge({
+    server: env.GLOT_SERVER,
+    project: env.GLOT_PROJECT,
+    key: env.GLOT_KEY,
+    source,
+    locales,
+    translate,
+    timeout: Number(env.GLOT_TIMEOUT_MS) || 300,
+    store: c && cacheStore(c),
+    pageCache: c as PageCache | undefined,
+  }));
+}
 
 export default {
   async fetch(req: Request, env: Env, ctx?: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(req.url);
     const source = env.SOURCE_LOCALE ?? "en";
-    const r = route(url, req.headers, { source, locales: env.LOCALES.split(",").map((l) => l.trim()) });
+    const locales = env.LOCALES.split(",").map((l) => l.trim());
+    const wait = ctx && ((p: Promise<unknown>) => ctx.waitUntil(p));
+    if (env.GLOT_EDGE !== "0" && url.pathname.startsWith("/__glot/")) {
+      const own = await getEdge(env, source, locales).own(req, wait);
+      if (own) return own;
+    }
+    const r = route(url, req.headers, { source, locales });
     if ("redirect" in r) return new Response(null, { status: 302, headers: { location: r.redirect, vary: "Accept-Language, Cookie" } });
 
     let d: Decision | undefined;
     if (env.GLOT_KEY && req.method === "GET" && req.headers.get("accept")?.includes("text/html")) {
       xp ??= glotExperiments({ server: env.GLOT_SERVER, project: env.GLOT_PROJECT, key: env.GLOT_KEY });
-      d = await xp(req, r.locale, ctx && ((p) => ctx.waitUntil(p)));
+      d = await xp(req, r.locale, wait).catch(() => undefined);
     }
-    url.pathname = r.path;
-    const up = new Request(url, req);
-    up.headers.delete("x-glot-xp"); // client-forged
-    if (d?.header) up.headers.set("x-glot-xp", d.header);
-    const page = await fetch(up);
+    const originUrl = new URL(url);
+    originUrl.pathname = r.path;
+    const origin = (u: URL) => {
+      const up = new Request(u, req);
+      up.headers.delete("x-glot-xp"); // client-forged
+      if (d?.header) up.headers.set("x-glot-xp", d.header);
+      return fetch(up);
+    };
+    const useEdge = env.GLOT_EDGE !== "0" && r.locale !== source;
+    let page: Response;
+    if (useEdge) page = await getEdge(env, source, locales)(req, r.locale, originUrl, origin, wait);
+    else page = await origin(originUrl);
     if (!page.headers.get("content-type")?.includes("text/html")) return page;
+
     let messages: Record<string, unknown> | null = null;
     if (r.locale !== source) {
       load ??= createOnDemandLoader({ server: env.GLOT_SERVER, project: env.GLOT_PROJECT });
-      messages = await load(r.locale);
+      // Fail-open: the catalog is optional on top of segments; never wait long for it.
+      messages = await Promise.race([load(r.locale).catch(() => null), new Promise<null>((ok) => setTimeout(() => ok(null), 300))]);
     }
     const res = new Response(page.body, page);
     if (d?.header) res.headers.set("cache-control", "private, no-store"); // a variant is never shared
-    else if (r.locale !== source && !messages) res.headers.set("cache-control", "no-store"); // never cache the source under the German URL
+    else if (!useEdge && r.locale !== source && !messages) res.headers.set("cache-control", "no-store"); // never cache the source under the German URL
     for (const c of d?.cookies ?? []) res.headers.append("set-cookie", c);
     const overlay = d?.overlay ?? {};
-    if (!messages && !Object.keys(overlay).length) return res;
+    const lang = r.locale !== source;
+    if (!messages && !Object.keys(overlay).length && !lang) return res;
     const lookup = (key: string) => overlay[key] ?? key.split(".").reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], messages);
-    return new HTMLRewriter()
-      .on("html", { element: (e) => e.setAttribute("lang", r.locale) })
-      .on("[data-glot]", {
-        element(e) {
-          const v = lookup(e.getAttribute("data-glot") ?? "");
-          if (typeof v === "string") e.setInnerContent(v); // text, HTML-escaped by HTMLRewriter
-        },
-      })
-      .transform(res);
+    try {
+      return new HTMLRewriter()
+        .on("html", { element: (e) => lang && e.setAttribute("lang", r.locale) })
+        .on("[data-glot]", {
+          element(e) {
+            const v = lookup(e.getAttribute("data-glot") ?? "");
+            if (typeof v === "string") e.setInnerContent(v); // text, HTML-escaped by HTMLRewriter
+          },
+        })
+        .transform(res);
+    } catch {
+      return res; // fail-open
+    }
   },
 };

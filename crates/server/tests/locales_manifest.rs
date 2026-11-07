@@ -118,9 +118,9 @@ async fn locales_manifest() {
     assert_eq!(
         m["locales"],
         json!([
-            {"code": "en", "name": "English", "dir": "ltr", "coverage": 1.0},
-            {"code": "fr", "name": "Français", "dir": "ltr", "coverage": 1.0},
-            {"code": "ar", "name": "العربية", "dir": "rtl", "coverage": 0.5},
+            {"code": "en", "name": "English", "dir": "ltr", "coverage": 1.0, "critical_coverage": 1.0, "ready": true, "version": 0},
+            {"code": "fr", "name": "Français", "dir": "ltr", "coverage": 1.0, "critical_coverage": null, "ready": true, "version": 1},
+            {"code": "ar", "name": "العربية", "dir": "rtl", "coverage": 0.5, "critical_coverage": null, "ready": true, "version": 1},
         ])
     );
     let etag = h[header::ETAG].to_str().unwrap().to_string();
@@ -142,6 +142,16 @@ async fn locales_manifest() {
         .map(|l| l["code"].as_str().unwrap())
         .collect();
     assert_eq!(codes, ["en", "fr"]);
+    // `all=1`: the locale that is not ready is listed, flagged.
+    let (_, _, m) = call(
+        Method::GET,
+        "/cdn/od/locales.json?min=0.95&all=1",
+        None,
+        None,
+    )
+    .await;
+    assert_eq!(m["locales"][2]["code"], "ar");
+    assert_eq!(m["locales"][2]["ready"], false);
 
     // A new target shows up without anything else (no redeploy), at coverage 0.
     call(

@@ -1,0 +1,240 @@
+[
+  {
+    "hash": "53c233f88fb5eba3bfc09c8a27a391e6",
+    "text": "Upper <0>case</0> tags",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "1dd714f411e7685e1e09f5e3103140b1",
+    "text": "Unquoted <0>link</0> and 'single' <1>quotes</1>",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "91e33805c82c531bf65cf00bcb6c634c",
+    "text": "Hint",
+    "role": "a:title",
+    "discoverable": true
+  },
+  {
+    "hash": "c5859da09837646443f9b963fa7dc616",
+    "text": "It's here",
+    "role": "span:title",
+    "discoverable": true
+  },
+  {
+    "hash": "2da7bc7c394b661d583d20c5af6e90a7",
+    "text": "Fake close",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "c0982d7e7e6a9b1f03e507ea6a7f9b04",
+    "text": "after script",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "8bd7b20a4d13ae5de5c92b320d242148",
+    "text": "Entities: &amp; \u0000 &#x110000; &#xD800; AB &unknown; &amp &AMP; &#; &#x;",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "a8f5351fa31513c0cd1ede3a8a7d5e1c",
+    "text": "Emoji 😀 and 𝟙𝟚 math digits {0} and Ω {1}",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "12"
+      },
+      {
+        "kind": "number",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "hash": "95c75df7264e421b2bb04a03240b0010",
+    "text": "Times {0}, ratio {1}, version {2}, range {3}, date {4}",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "10:30"
+      },
+      {
+        "kind": "number",
+        "value": "16:9"
+      },
+      {
+        "kind": "number",
+        "value": "1.2.3"
+      },
+      {
+        "kind": "number",
+        "value": "5-10"
+      },
+      {
+        "kind": "number",
+        "value": "2026-11-07"
+      }
+    ]
+  },
+  {
+    "hash": "83863a338c8de0b55c3679ff5153900e",
+    "text": "Phone {0} vs {1} vs {2}",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "phone",
+        "value": "06 12 34 56 78"
+      },
+      {
+        "kind": "number",
+        "value": "1 000 000"
+      },
+      {
+        "kind": "phone",
+        "value": "+44 20 7946 0958"
+      }
+    ]
+  },
+  {
+    "hash": "7380b314f9309e68fc82cee1b9725884",
+    "text": "Hex {0} and {1}",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "token",
+        "value": "1234567890abcdef"
+      },
+      {
+        "kind": "token",
+        "value": "deadbeefcafe0000feed"
+      }
+    ]
+  },
+  {
+    "hash": "1231b59c74d5f93b076e5d91a82993d6",
+    "text": "See {0}, {1}; or ({2}).",
+    "role": "p",
+    "discoverable": false,
+    "values": [
+      {
+        "kind": "url",
+        "value": "www.example.com"
+      },
+      {
+        "kind": "email",
+        "value": "mail@example.co.uk"
+      },
+      {
+        "kind": "url",
+        "value": "https://a.io/b?c=1"
+      }
+    ]
+  },
+  {
+    "hash": "a04094884b6be59a06bb29a9aa66584c",
+    "text": "Edge punct \"'\" (.) — fin.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "8cb21588dc84cbd6858c09f921ef7cbd",
+    "text": "After self-closed svg",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "150d50c9e7937d9165a87abcd48450c4",
+    "text": "Inline image",
+    "role": "img:alt",
+    "discoverable": true
+  },
+  {
+    "hash": "4df7f8558653ff119842df51533b0ac3",
+    "text": "starts with image",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "e2861c37be88ebc412ca2c925846dc8e",
+    "text": "Ends with icon",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "363ed153c6dd9af0cdc7799928abc1cb",
+    "text": "Text",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "0904db80bf9d6c203a85386b0af3c0ec",
+    "text": "nested block",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "c0156ff9b5bc41089921b9d944ed47e4",
+    "text": "tail text",
+    "role": "div",
+    "discoverable": true
+  },
+  {
+    "hash": "64b549091ecc685bd1446baeaa9508ba",
+    "text": "but this",
+    "role": "body",
+    "discoverable": true
+  },
+  {
+    "hash": "87911231fb01a1cd1527b596cd76e237",
+    "text": "is great",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "bec1cdc5f51f1dea2271ab1a2a413766",
+    "text": "Tab one",
+    "role": "button:aria-label",
+    "discoverable": true
+  },
+  {
+    "hash": "3f623ce1a77e676d51e6c8ed020b1258",
+    "text": "One",
+    "role": "tab",
+    "discoverable": true
+  },
+  {
+    "hash": "01be2fd09d427c98862c90fa1104e2e0",
+    "text": "Empty title",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "b312f24dddd19359a57f65d11f0d4bf1",
+    "text": "Tab and newline",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "364acc199acd7cccf0dd0fb9aaa9de5a",
+    "text": "after textarea",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "4fd1e434c311dd412b43a946f6e0566f",
+    "text": "Unterminated",
+    "role": "p",
+    "discoverable": true
+  }
+]

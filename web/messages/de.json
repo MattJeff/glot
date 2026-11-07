@@ -1,4 +1,277 @@
 {
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "SEO-Lokalisierung: jede Sprache als übersetztes HTML unter eigener URL, ohne JavaScript indexierbar, ohne Pflicht-Schlüssel.",
+    "tabs": {
+      "setup": "Einrichtung",
+      "coverage": "Abdeckung",
+      "review": "Prüfwarteschlange",
+      "seo": "SEO-Bericht",
+      "performance": "Leistung",
+      "settings": "Einstellungen"
+    },
+    "kill": {
+      "labelOn": "Edge ist an",
+      "labelOff": "Edge ist aus",
+      "hint": "Aus: jede Domain liefert Ihren Ursprung binnen einer Minute unverändert aus.",
+      "aria": "Notschalter für glot Edge",
+      "on": "glot Edge ist wieder an.",
+      "off": "glot Edge ist aus: Ihr Ursprung wird unverändert ausgeliefert."
+    },
+    "setup": {
+      "dynamic": {
+        "title": "Dynamische Lokalisierung",
+        "body": "CDN-Kataloge + Runtime: schnell, ohne Deployment, im Browser übersetzt. Suchmaschinen sehen meist Ihre Ausgangssprache.",
+        "cta": "CDN konfigurieren"
+      },
+      "seo": {
+        "title": "SEO-Lokalisierung",
+        "badge": "Growth",
+        "body": "glot Edge oder Pre-Rendering: das erste HTML-Byte ist bereits übersetzt, eine URL pro Sprache, hreflang und Canonical gesetzt. Die Seiten sind indexierbar.",
+        "quota": "{used} von {limit} Edge-Seiten in diesem Monat ausgeliefert",
+        "quotaUnlimited": "{used} Edge-Seiten in diesem Monat ausgeliefert"
+      },
+      "upgrade": "SEO-Lokalisierung ist in Growth enthalten (Pro: begrenzte Testphase).",
+      "upgradeCta": "Tarife ansehen",
+      "steps": {
+        "title": "Einrichtungsschritte",
+        "domain": "Domain hinzufügen",
+        "dns": "DNS prüfen",
+        "tls": "HTTPS aktiv",
+        "ready": "Eine Sprache ist bereit",
+        "done": "erledigt",
+        "todo": "offen"
+      },
+      "add": {
+        "title": "Domain hinzufügen",
+        "mode": "Auslieferungsmodus",
+        "host": "Subdomain der Sprache",
+        "site": "Domain der Website",
+        "locale": "Sprache",
+        "origin": "Ursprung (Ihre Website)",
+        "submit": "Hinzufügen"
+      },
+      "mode": {
+        "subdomain": "Subdomain",
+        "subdomainHint": "es.example.com: ein CNAME auf glot, HTTPS wird automatisch eingerichtet.",
+        "subdirectory": "Unterverzeichnis",
+        "subdirectoryHint": "example.com/es/: ein Cloudflare Worker oder eine Proxy-Regel vor Ihrer Website.",
+        "middleware": "Middleware",
+        "middlewareHint": "Next.js- oder Express-Middleware: alles bleibt bei Ihrem Hosting."
+      },
+      "added": "Domain hinzugefügt. Veröffentlichen Sie die DNS-Einträge unten.",
+      "empty": {
+        "title": "Noch keine Domain",
+        "body": "Fügen Sie die Domain hinzu, unter der eine Sprache ausgeliefert wird. Bis zur DNS-Prüfung ändert sich an Ihrer Website nichts."
+      },
+      "status": {
+        "verified": "DNS geprüft",
+        "unverified": "DNS nicht geprüft",
+        "tls": {
+          "pending": "HTTPS ausstehend",
+          "active": "HTTPS aktiv",
+          "error": "HTTPS-Fehler"
+        }
+      },
+      "domainOn": "Aktiv",
+      "domainOff": "Pausiert",
+      "verify": "DNS prüfen",
+      "verified": "DNS geprüft.",
+      "notYet": "Einträge noch nicht gefunden. Die DNS-Verbreitung kann einige Minuten dauern.",
+      "remove": "Domain entfernen",
+      "removeConfirm": "{host} entfernen? Der Verkehr geht wieder an Ihren Ursprung.",
+      "originLine": "Ursprung: {origin}",
+      "checkedAt": "geprüft {when}",
+      "dnsSubdomain": "Legen Sie diese zwei Einträge bei Ihrem DNS-Anbieter an und prüfen Sie dann:",
+      "dnsTxt": "Legen Sie diesen TXT-Eintrag an, um die Domain als Ihre nachzuweisen, und prüfen Sie dann:",
+      "dnsLabel": "DNS-Einträge",
+      "dnsNothing": "nichts gefunden",
+      "wiring": {
+        "subdomain": "Konfiguration",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "Next.js-Middleware"
+      },
+      "hreflang": {
+        "title": "hreflang-Tags für Ihre Ausgangswebsite",
+        "body": "Im Subdomain-Modus laufen Ihre Ausgangsseiten nicht über glot: Fügen Sie diese Tags in ihren head ein, damit jede Sprache zurückverlinkt (hreflang muss wechselseitig sein).",
+        "path": "Pfad",
+        "show": "Anzeigen"
+      }
+    },
+    "coverage": {
+      "intro": "Gemessen an den tatsächlich ausgelieferten Seiten: übersetzte / gerenderte Segmente. Eine Sprache ist bereit (Umschalter und locales.json), sobald jede kritische Seite {critical} und die Gesamtabdeckung {global} erreicht.",
+      "ready": "Bereit",
+      "notReady": "Nicht bereit",
+      "global": "Gesamt",
+      "critical": "Kritische Seiten",
+      "pages": "Seiten auf {locale}",
+      "mark": "Als kritisch markieren",
+      "unmark": "Nicht mehr als kritisch markieren",
+      "byPattern": "Kritisch über ein Muster: in den Einstellungen bearbeiten",
+      "criticalBadge": "Kritisch",
+      "missing": "{n, plural, one {# fehlendes Segment} other {# fehlende Segmente}}",
+      "empty": {
+        "title": "Noch keine Seite gesehen",
+        "body": "Die Abdeckung erscheint, sobald glot Edge Seiten in dieser Sprache ausgeliefert hat."
+      },
+      "pagesSeen": "Gesehene Seiten"
+    },
+    "segments": {
+      "title": "Segmente",
+      "subtitle": "Texte Ihrer gerenderten Seiten, ohne Schlüssel übersetzt. Schlüssel aus Ihren Katalogen haben immer Vorrang.",
+      "viewKeys": "Schlüssel",
+      "viewSegments": "Segmente",
+      "intro": "Jedes Segment ist ein gerenderter Text in seinem Kontext (Element und Seitenvorlage). Änderungen werden wie Schlüssel validiert: Syntax, Glossar, Länge.",
+      "queueIntro": "Neue Segmente sensibler Seiten (Zahlung, Konto) werden in der Ausgangssprache ausgeliefert, bis jemand ihre Übersetzung freigibt.",
+      "search": "Text suchen",
+      "locale": "Sprache",
+      "status": "Status",
+      "all": "Alle Status",
+      "statuses": {
+        "missing": "Fehlend",
+        "pending": "Zu prüfen",
+        "machine": "Maschinell",
+        "reviewed": "Geprüft",
+        "stale": "Veraltet"
+      },
+      "sensitive": "Sensible Seite",
+      "hits": "{n, plural, one {# Aufruf} other {# Aufrufe}}",
+      "translation": "Übersetzung",
+      "save": "Speichern",
+      "approve": "Freigeben",
+      "saved": "Übersetzung gespeichert.",
+      "approved": "Übersetzung freigegeben: ab der nächsten Anfrage ausgeliefert.",
+      "prev": "Zurück",
+      "next": "Weiter",
+      "empty": {
+        "title": "Kein Segment",
+        "body": "Segmente erscheinen, während glot Edge Seiten ausliefert, oder versuchen Sie einen anderen Filter."
+      },
+      "queueEmpty": {
+        "title": "Nichts zu prüfen",
+        "body": "Alle Segmente sensibler Seiten sind freigegeben."
+      }
+    },
+    "settings": {
+      "saved": "Edge-Einstellungen gespeichert.",
+      "save": "Speichern",
+      "translate": {
+        "title": "Automatische Übersetzung",
+        "auto": "Neue Segmente automatisch übersetzen",
+        "autoHint": "Mit Ihrem Modell, Glossar und Ihren Validatoren. Bis dahin wird der Ausgangstext ausgeliefert: nie eine Lücke.",
+        "budget": "Monatsbudget (USD)",
+        "budgetHint": "Leer: nur das Projektbudget pro Job."
+      },
+      "rendering": {
+        "label": "Rendering",
+        "auto": "Automatisch",
+        "origin": "HTML des Ursprungs",
+        "prerender": "Vorgerenderter Snapshot",
+        "autoHint": "Nutzt einen vorgerenderten Snapshot, wenn der Ursprung eine leere Hülle liefert (SPA).",
+        "originHint": "Übersetzt das HTML Ihres Servers unverändert.",
+        "prerenderHint": "Übersetzt immer einen von einem Headless-Browser gerenderten Snapshot (gecacht, beim Deployment erneuert)."
+      },
+      "discovery": {
+        "title": "Erkennungszonen",
+        "body": "Wo glot Edge neue Texte lernen darf. Nie hinter einem Login, nie personenbezogene Daten, mit Tageslimit.",
+        "include": "Erlaubte Pfade",
+        "includeHint": "Ein Muster pro Zeile, * als Platzhalter. Leer: alle öffentlichen Seiten.",
+        "exclude": "Ausgeschlossene Pfade",
+        "excludeHint": "Nie erkannt, auch wenn oben erlaubt.",
+        "selectorsInclude": "Übersetzte Bereiche (CSS-Selektoren)",
+        "selectorsIncludeHint": "Leer: die ganze Seite.",
+        "selectors": "Ausgeschlossene Selektoren",
+        "selectorsHint": "Nie übersetzt oder an glot gesendet: Nutzerinhalte, Namen, Widgets.",
+        "cap": "Neue Segmente pro Tag",
+        "capHint": "Darüber hinaus werden neue Texte bis zum nächsten Tag in der Ausgangssprache ausgeliefert."
+      },
+      "critical": {
+        "title": "Kritische und sensible Seiten",
+        "body": "Kritische Seiten entscheiden, ob eine Sprache angeboten wird. Sensible Seiten veröffentlichen nichts Neues ohne Prüfung.",
+        "patterns": "Kritische Seiten",
+        "patternsHint": "Standardmäßig Startseite, Registrierung, Preise, Kasse.",
+        "sensitive": "Sensible Seiten",
+        "sensitiveHint": "Neue Segmente warten in der Prüfwarteschlange.",
+        "threshold": "Schwelle der kritischen Abdeckung (%)",
+        "thresholdHint": "Jede kritische Seite muss sie erreichen, bevor die Sprache bereit ist."
+      }
+    },
+    "seo": {
+      "run": "Bericht starten",
+      "empty": {
+        "title": "Noch kein Bericht",
+        "body": "Der Bericht ruft jede Sprache von bis zu 20 Seiten ohne JavaScript ab, wie Google, und prüft hreflang, Canonical, Metadaten und unübersetzte Texte. Er benötigt eine geprüfte Domain."
+      },
+      "summary": "{indexable} von {total} Seiten technisch indexierbar",
+      "indexedNote": "Gemessen wird hier, ob eine Seite technisch indexierbar ist. Ob sie tatsächlich indexiert ist, weiß man nur mit verbundener Search Console; sonst wird es als unbekannt angezeigt, nie geraten.",
+      "indexable": "Indexierbar",
+      "notIndexable": "Nicht indexierbar",
+      "indexed": "Indexiert",
+      "notIndexed": "Nicht indexiert",
+      "indexedUnknown": "Indexierung unbekannt",
+      "untranslated": "{n} unübersetzt",
+      "renderDiffNone": "Nicht verglichen",
+      "renderDiffSame": "Gleicher Text mit und ohne JavaScript",
+      "renderDiffCount": "{n, plural, one {# Segment erscheint} other {# Segmente erscheinen}} erst nach JavaScript",
+      "indexNow": "Bing und Yandex benachrichtigen (IndexNow)",
+      "indexNowHint": "Google nutzt IndexNow nicht: es liest die in robots.txt angekündigten Sitemaps.",
+      "indexNowDone": "{n, plural, one {# URL} other {# URLs}} an IndexNow übermittelt.",
+      "running": "Seiten werden abgerufen…",
+      "issuesTitle": "Gefundene Probleme",
+      "sitemaps": "Sitemaps pro Sprache",
+      "critical": "Kritisch",
+      "notReciprocal": "hreflang nicht wechselseitig",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "Canonical",
+        "title": "Titel",
+        "description": "Beschreibung",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "Abruf fehlgeschlagen",
+        "http_error": "HTTP-Fehler",
+        "noindex": "noindex",
+        "robots_txt_blocked": "Durch robots.txt blockiert",
+        "redirected": "Weitergeleitet",
+        "canonical_missing": "Kein Canonical",
+        "canonical_multiple": "Mehrere Canonicals",
+        "canonical_to_source": "Canonical zeigt auf die Ausgangsseite",
+        "canonical_not_self": "Canonical zeigt woandershin",
+        "html_lang": "Falsches html lang",
+        "html_dir": "Falsche Textrichtung",
+        "content_language": "Falsches Content-Language",
+        "hreflang_self_missing": "Kein eigenes hreflang",
+        "hreflang_x_default_missing": "Kein x-default",
+        "hreflang_not_reciprocal": "hreflang nicht wechselseitig",
+        "advertised_but_not_ready": "Verlinkt, aber nicht bereit",
+        "title_missing": "Kein Titel",
+        "title_untranslated": "Titel nicht übersetzt",
+        "description_untranslated": "Beschreibung nicht übersetzt",
+        "og_title_untranslated": "og:title nicht übersetzt",
+        "jsonld_language": "JSON-LD in anderer Sprache",
+        "untranslated_segments": "Unübersetzte Segmente"
+      }
+    },
+    "perf": {
+      "period": "Zeitraum",
+      "days": "{n, plural, one {# Tag} other {# Tage}}",
+      "requests": "Ausgelieferte Seiten",
+      "hitRatio": "Cache-Trefferquote",
+      "failOpen": "Fail-open",
+      "glotP50": "glot-Kosten p50",
+      "glotP95": "glot-Kosten p95",
+      "originP50": "Ursprung p50",
+      "note": "glot-Kosten = zusätzliche Zeit zu Ihrem Ursprung (Server-Timing). Fail-open = unübersetzt ausgelieferte Seiten, weil glot nicht rechtzeitig antwortete: nie ein Fehler.",
+      "byDay": "Pro Tag",
+      "date": "Tag",
+      "empty": {
+        "title": "Noch kein Verkehr",
+        "body": "Metriken erscheinen, sobald eine Domain Seiten ausliefert."
+      }
+    }
+  },
   "launches": {
     "title": "Sprachstarts",
     "open": "Sprachstarts",
@@ -178,6 +451,7 @@
     "menu": "Menü",
     "onThisPage": "Auf dieser Seite",
     "pages": {
+      "edge": "glot Edge (SEO-Lokalisierung)",
       "cli": "CLI-Referenz",
       "concepts": "Konzepte",
       "faq": "FAQ & Kosten",
@@ -1204,6 +1478,7 @@
     "subtitle": "Name, Sprachen, Übersetzungsmodell und Auslieferung für dieses Projekt. Änderungen gelten für den nächsten Job."
   },
   "shell": {
+    "edge": "glot Edge",
     "apiTokens": "API-Tokens",
     "experiments": "Experimente",
     "feedback": "Review",

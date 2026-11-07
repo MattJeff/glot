@@ -4,6 +4,11 @@ description = "Product name"
 do_not_translate = true
 
 [[term]]
+term = "glot Edge"
+description = "Product name: glot's SEO localization proxy"
+do_not_translate = true
+
+[[term]]
 term = "MCP"
 description = "Model Context Protocol"
 do_not_translate = true

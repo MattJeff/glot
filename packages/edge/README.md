@@ -1,6 +1,51 @@
 # @glot-i18n/edge
 
-Locale URLs for glot on-demand locales, at the edge.
+Locale URLs for glot on-demand locales, at the edge — and **glot Edge**: your rendered HTML translated by
+segments from the project's translation memory, no i18n keys needed, indexable from the first byte.
+
+## glot Edge (Localisation SEO)
+
+`/es/pricing` = your `/pricing`, fetched and translated before it reaches the visitor (or Google): text,
+`title`/`meta`/`alt`/`aria-*`, framework payloads (`__NEXT_DATA__`, RSC flight, `__NUXT_DATA__`), `<html lang dir>`,
+canonical + reciprocal hreflang + x-default, internal links under `/es`. Unknown segments are reported (path only,
+never query strings, cookies or personal data, never for logged-in requests), translated by glot with your
+glossary and validators, and served from a following request; meanwhile the source text is served.
+
+- **Fail-open**: glot slow or down → your page untranslated (`x-glot-edge: fail-open`), never an error. A cold
+  start waits at most `timeout` ms (300) for glot; the last known TM is kept in memory and in `store`.
+- **One version per page**: each request uses one TM snapshot (`x-glot-version: es@12`); a change in glot bumps
+  the version, which is the page cache key (the purge).
+- **Kill switch**: Edge off for the project or a domain in glot → passthrough within a minute, no redeploy.
+- **Headers kept** (CSP, HSTS, cookies…); `Server-Timing: glot;dur=…, origin;dur=…` shows glot's cost.
+- **SEO** (same output as the glot server's Rust rewrite, tested byte for byte): one canonical (the origin's,
+  localized), hreflang for the **ready** locales only (`/cdn/{project}/locales.json`) + x-default, `og:locale`,
+  `og:url`, JSON-LD texts through the TM and its site URLs localized.
+- **Client patcher**, served same-origin (route `/__glot/*` to the middleware): `/__glot/patcher.js` (6.4 kB gzip,
+  `async`), `/__glot/tm.json?locale=es` (the TM snapshot, `&since=12` → 204 until a newer one) and, with a `key`,
+  `POST /__glot/missing`: text that only exists after the app's JavaScript ran is reported there (debounced, once
+  per page view, never with a session cookie — HttpOnly ones are checked here — never personal data), forwarded to
+  glot with the key, and applied in place when the new TM version lands.
+- `translate` (the default `Translator`) is synchronous: `(html, tm, ctx) => { html, total, translated, missing }`.
+
+**Cloudflare Worker** (`dist/worker.js`): on by default; `[vars]` as below plus `GLOT_KEY = "pk_…"` (discovery and
+plan usage), `GLOT_TIMEOUT_MS`, `GLOT_EDGE = "0"` to keep only the `data-glot` catalog fill. Cache API = page cache
+and last-known state.
+
+**Next.js**: `glotProxy({ source: "en", locales: ["es"], edge: { server, project, key } })`, matcher including
+`"/__glot/:path*"`.
+
+**Express / Connect / node:http**:
+
+```ts
+import { glotEdge, fileStore } from "@glot-i18n/edge/express";
+app.use(glotEdge({ source: "en", locales: ["es"], server: "https://api.glotlang.com", project: "site",
+                   key: "pk_…", store: fileStore(".glot-edge") }));
+```
+
+**Subdomain mode** (`es.example.com`, nothing to install): CNAME to `edge.<glot domain>`, verify it in glot; the glot
+server proxies and translates (same rules).
+
+**Anything else**: `import { createEdge } from "@glot-i18n/edge/runtime"`.
 
 ```sh
 npm i @glot-i18n/edge

@@ -8,7 +8,7 @@ import { GITHUB_URL } from "@/lib/snippets";
 export const NAV = [
   { section: "start", pages: ["getting-started", "concepts"] },
   { section: "agents", pages: ["mcp", "integrations", "skills"] },
-  { section: "guides", pages: ["github", "frameworks", "runtime", "quality", "review", "provenance"] },
+  { section: "guides", pages: ["github", "frameworks", "runtime", "edge", "quality", "review", "provenance"] },
   { section: "reference", pages: ["cli", "faq", "benchmark"] },
   { section: "labs", pages: ["labs", "insights", "experiments", "self-hosting", "deploy-hetzner", "mcp-remote"] },
 ] as const;

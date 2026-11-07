@@ -1,0 +1,134 @@
+[
+  {
+    "hash": "288bc7fcd45107ce9ba56a811080268c",
+    "text": "ClipOnIt — AI video clipping",
+    "role": "title",
+    "discoverable": true
+  },
+  {
+    "hash": "b48843e1e5e74626df48b5177fb46571",
+    "text": "Upload a video, the AI finds the best moments & exports {0} clips.",
+    "role": "meta:description",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "9:16"
+      }
+    ]
+  },
+  {
+    "hash": "288bc7fcd45107ce9ba56a811080268c",
+    "text": "ClipOnIt — AI video clipping",
+    "role": "meta:og:title",
+    "discoverable": true
+  },
+  {
+    "hash": "74f8742d490e57acf49cc3652d3a8657",
+    "text": "Turn long videos into shorts.",
+    "role": "meta:twitter:description",
+    "discoverable": true
+  },
+  {
+    "hash": "89f293378ed3277826bd2e80b9c19af9",
+    "text": "ClipOnIt home",
+    "role": "img:alt",
+    "discoverable": true
+  },
+  {
+    "hash": "77acb45c6ad9803c7b8e775fe554ef13",
+    "text": "Pricing",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "7db0001c291bd33d2c22b885489942de",
+    "text": "Explainer video",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "0b04b15f9e8007ce77126d5379ff0efa",
+    "text": "Blog",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "cd63f4420f6c8fbcddee5c0ce9132d4b",
+    "text": "Open menu",
+    "role": "button:aria-label",
+    "discoverable": true
+  },
+  {
+    "hash": "e072acc7d53cb5d08f3950c1527666c2",
+    "text": "Turn long videos into <0>viral</0> shorts",
+    "role": "h1",
+    "discoverable": true
+  },
+  {
+    "hash": "39b19b833237c6bdfbc2d844cf481b06",
+    "text": "Upload a video or a <0>YouTube link</0>: the AI finds the best moments, reframes on the face and adds captions.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "468d8def7dbacc35aae6a95dd70182e7",
+    "text": "Read our <0>terms</0> & <1>privacy policy</1>.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "d33875280ad8ef2d8244933f7ab53871",
+    "text": "Terms of service",
+    "role": "a:title",
+    "discoverable": true
+  },
+  {
+    "hash": "8abf41fceddc35690825ef2a63d06749",
+    "text": "Start for free",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "18bd294b9082c7e7548659bb2608f8bc",
+    "text": "Save",
+    "role": "button",
+    "discoverable": true
+  },
+  {
+    "hash": "8bf51d59d92ca20afcc501f88ebcdef2",
+    "text": "Send",
+    "role": "input:value",
+    "discoverable": true
+  },
+  {
+    "hash": "88d3d714dae06b146bd33953a0c77a94",
+    "text": "Search clips",
+    "role": "input:placeholder",
+    "discoverable": true
+  },
+  {
+    "hash": "ceaba91d35d04b63f357ba135a851da8",
+    "text": "No credit card required.<0/>Cancel anytime.",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "ee81c82b7d74948abda11041435d6012",
+    "text": "© {0} ClipOnIt SAS",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "2026"
+      }
+    ]
+  },
+  {
+    "hash": "710afd8496d4573da08af18e5de93f60",
+    "text": "Enable JavaScript to edit clips.",
+    "role": "p",
+    "discoverable": true
+  }
+]

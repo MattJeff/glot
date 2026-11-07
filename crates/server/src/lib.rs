@@ -14,6 +14,7 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
 pub mod auth;
 pub mod billing;
 pub mod cdn;
+pub mod edge;
 pub mod email;
 pub mod experiments;
 pub mod feedback;
@@ -154,6 +155,12 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(onboarding::routes())
         .merge(billing::routes())
         .merge(review_live::routes())
+        .merge(edge::tm::routes())
+        .merge(edge::discover::routes())
+        .merge(edge::seo_report::routes())
+        .merge(edge::metrics::routes())
+        .merge(edge::domains::routes())
+        .merge(edge::sitemap::routes())
         .layer(cors);
 
     Router::new()
@@ -165,6 +172,16 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(github_app::public_routes())
         .merge(billing::public_routes())
         .merge(onboarding::public_routes())
+        .merge(edge::tm::public_routes())
+        .merge(edge::missing::public_routes())
+        .merge(edge::sitemap::public_routes())
+        .merge(edge::ask::public_routes())
+        .merge(
+            edge::proxy::public_routes().layer(axum::middleware::from_fn_with_state(
+                state.clone(),
+                edge::metrics::record,
+            )),
+        )
         .merge(review_live::widget_routes(&state, web_origin))
         .merge(mcp_remote::routes(state.clone(), web_origin))
         .route("/cdn/{slug}/experiments.json", get(cdn::experiments))

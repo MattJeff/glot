@@ -2,6 +2,13 @@
 # Let's Encrypt is automatic; for GLOT_DOMAIN=localhost Caddy uses its internal CA instead.
 {
 	email {$ACME_EMAIL}
+	# Admin API on the internal `caddy_admin` network only (alias below): glot-server reloads the Edge fallback
+	# map through it (POST /load). Never published, never on the network the web app shares.
+	admin caddy-admin:2019
+	# glot Edge: certificates for customer subdomains, only for hosts glot verified (GET /edge/ask?domain=…).
+	on_demand_tls {
+		ask http://server:8790/edge/ask
+	}
 }
 
 (common) {
@@ -50,4 +57,55 @@ app.{$GLOT_DOMAIN} {
 api.{$GLOT_DOMAIN} {
 	import common
 	reverse_proxy server:8790
+}
+
+# glot Edge CNAME target: customers point `es.their-site.com CNAME edge.<domain>`.
+edge.{$GLOT_DOMAIN} {
+	import common
+	respond "glot Edge: point a CNAME here, then verify the domain in glot." 200
+}
+
+# glot Edge, subdomain mode: any other host = a customer subdomain. TLS on demand (refused unless verified),
+# every request reverse-proxied to glot-server's edge proxy (Host kept: it picks the domain, its fixed origin and
+# locale). No `common` headers: the origin's own security headers are passed through untouched.
+# glot-server down (connection refused / timeout → 502/503/504): Caddy serves the customer's origin itself,
+# untranslated, from the map glot writes on every domain change (verified subdomain-mode domains only,
+# edge/domains.rs): `map {host} {glot_origin} {glot_origin_host} {glot_origin_scheme}`. No map file yet = the glob
+# matches nothing and the fallback answers 502.
+https:// {
+	tls {
+		on_demand
+	}
+	encode zstd gzip
+	log {
+		output stdout
+		format json
+	}
+	import /etc/caddy/edge/*.caddy
+	rewrite * /edge/proxy{uri}
+	reverse_proxy server:8790 {
+		lb_try_duration 1s
+	}
+	handle_errors 502 503 504 {
+		rewrite * {http.request.orig_uri}
+		@https expression `{glot_origin_scheme} == "https"`
+		handle @https {
+			header x-glot-edge "fail-open; glot=down"
+			reverse_proxy {glot_origin} {
+				header_up Host {glot_origin_host}
+				transport http {
+					tls
+					tls_server_name {glot_origin_host}
+				}
+			}
+		}
+		@http expression `{glot_origin_scheme} == "http"`
+		handle @http {
+			header x-glot-edge "fail-open; glot=down"
+			reverse_proxy {glot_origin} {
+				header_up Host {glot_origin_host}
+			}
+		}
+		respond "glot Edge: origin unavailable" 502
+	}
 }

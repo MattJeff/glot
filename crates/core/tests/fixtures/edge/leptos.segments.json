@@ -1,0 +1,98 @@
+[
+  {
+    "hash": "77acb45c6ad9803c7b8e775fe554ef13",
+    "text": "Pricing",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "dbcfe341fbf430638744befb1325c73e",
+    "text": "Clipping",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "8acb87dfb2a344b6fa33db6b15138118",
+    "text": "Log in",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "687183429fe0ebbbe505c9b7c2636279",
+    "text": "Your best moments, <0>clipped</0> automatically",
+    "role": "h1",
+    "discoverable": true
+  },
+  {
+    "hash": "e517438012133f013c0369a03795129b",
+    "text": "Paste a link. Get {0} ready-to-post clips in minutes.",
+    "role": "p",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "10"
+      }
+    ]
+  },
+  {
+    "hash": "9a08c859fb7927fc82e3a1303d419667",
+    "text": "Try it free",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "f798e7ea1cb180980997ebeeb5c85bdd",
+    "text": "See an example",
+    "role": "a",
+    "discoverable": true
+  },
+  {
+    "hash": "a108e741fed672cc03bb1e88717c83c4",
+    "text": "Pro",
+    "role": "h3",
+    "discoverable": true
+  },
+  {
+    "hash": "e0e5fb22620a2211d5fa359c337fa406",
+    "text": "/mo",
+    "role": "p",
+    "discoverable": true
+  },
+  {
+    "hash": "0a948b2b95affc60b16687e856266ccd",
+    "text": "{0} minutes of video",
+    "role": "li",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "60"
+      }
+    ]
+  },
+  {
+    "hash": "87013b51b27b94d5f49a1b95fec56d37",
+    "text": "Captions in {0}+ languages",
+    "role": "li",
+    "discoverable": true,
+    "values": [
+      {
+        "kind": "number",
+        "value": "30"
+      }
+    ]
+  },
+  {
+    "hash": "29cccf3671f2bea8165485b8adfa8004",
+    "text": "Choose Pro",
+    "role": "button",
+    "discoverable": true
+  },
+  {
+    "hash": "0448d3bf234286b4d684cb69f3a3404a",
+    "text": "Made in Paris · <0>Legal</0>",
+    "role": "p",
+    "discoverable": true
+  }
+]

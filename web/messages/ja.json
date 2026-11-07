@@ -1,4 +1,277 @@
 {
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "SEO ローカライズ：各言語を独自の URL で翻訳済み HTML として配信。JavaScript なしでインデックス可能、キーは不要です。",
+    "tabs": {
+      "setup": "セットアップ",
+      "coverage": "カバレッジ",
+      "review": "レビュー待ち",
+      "seo": "SEO レポート",
+      "performance": "パフォーマンス",
+      "settings": "設定"
+    },
+    "kill": {
+      "labelOn": "Edge オン",
+      "labelOff": "Edge オフ",
+      "hint": "オフ：1 分以内にすべてのドメインがオリジンをそのまま配信します。",
+      "aria": "glot Edge の停止スイッチ",
+      "on": "glot Edge を再開しました。",
+      "off": "glot Edge を停止しました：オリジンがそのまま配信されます。"
+    },
+    "setup": {
+      "dynamic": {
+        "title": "ダイナミックローカライズ",
+        "body": "CDN カタログ + ランタイム：高速、デプロイ不要、ブラウザ内で翻訳。検索エンジンには主にソース言語が見えます。",
+        "cta": "CDN を設定"
+      },
+      "seo": {
+        "title": "SEO ローカライズ",
+        "badge": "Growth",
+        "body": "glot Edge またはプリレンダリング：最初の HTML バイトから翻訳済み、言語ごとに 1 つの URL、hreflang と canonical を設定。ページはインデックス可能です。",
+        "quota": "今月の配信 edge ページ：{used} / {limit}",
+        "quotaUnlimited": "今月の配信 edge ページ：{used}"
+      },
+      "upgrade": "SEO ローカライズは Growth に含まれます（Pro：制限付きトライアル）。",
+      "upgradeCta": "プランを見る",
+      "steps": {
+        "title": "セットアップ手順",
+        "domain": "ドメインを追加",
+        "dns": "DNS を確認",
+        "tls": "HTTPS 有効",
+        "ready": "言語の準備完了",
+        "done": "完了",
+        "todo": "未完了"
+      },
+      "add": {
+        "title": "ドメインを追加",
+        "mode": "配信モード",
+        "host": "言語のサブドメイン",
+        "site": "サイトのドメイン",
+        "locale": "言語",
+        "origin": "オリジン（あなたのサイト）",
+        "submit": "追加"
+      },
+      "mode": {
+        "subdomain": "サブドメイン",
+        "subdomainHint": "es.example.com：glot への CNAME。HTTPS は自動で設定されます。",
+        "subdirectory": "サブディレクトリ",
+        "subdirectoryHint": "example.com/es/：サイトの前段に Cloudflare Worker またはプロキシルール。",
+        "middleware": "ミドルウェア",
+        "middlewareHint": "Next.js または Express のミドルウェア：すべて自社ホスティングに残ります。"
+      },
+      "added": "ドメインを追加しました。以下の DNS レコードを公開してください。",
+      "empty": {
+        "title": "ドメインがありません",
+        "body": "言語を配信するドメインを追加してください。DNS が確認されるまでサイトには何も変わりません。"
+      },
+      "status": {
+        "verified": "DNS 確認済み",
+        "unverified": "DNS 未確認",
+        "tls": {
+          "pending": "HTTPS 準備中",
+          "active": "HTTPS 有効",
+          "error": "HTTPS エラー"
+        }
+      },
+      "domainOn": "配信中",
+      "domainOff": "一時停止",
+      "verify": "DNS を確認",
+      "verified": "DNS を確認しました。",
+      "notYet": "レコードがまだ見つかりません。DNS の反映には数分かかることがあります。",
+      "remove": "ドメインを削除",
+      "removeConfirm": "{host} を削除しますか？トラフィックはオリジンに戻ります。",
+      "originLine": "オリジン：{origin}",
+      "checkedAt": "{when} に確認",
+      "dnsSubdomain": "DNS プロバイダーで次の 2 つのレコードを作成し、確認してください：",
+      "dnsTxt": "ドメインの所有を証明するため、この TXT レコードを作成し、確認してください：",
+      "dnsLabel": "DNS レコード",
+      "dnsNothing": "見つかりません",
+      "wiring": {
+        "subdomain": "設定",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "Next.js ミドルウェア"
+      },
+      "hreflang": {
+        "title": "ソースサイト用の hreflang タグ",
+        "body": "サブドメインモードでは、ソースページは glot を経由しません。各言語が相互にリンクするよう、これらのタグを head に追加してください（hreflang は相互である必要があります）。",
+        "path": "パス",
+        "show": "表示"
+      }
+    },
+    "coverage": {
+      "intro": "実際に配信されたページで計測：翻訳済みセグメント / 表示セグメント。すべての重要ページが {critical}、全体のカバレッジが {global} に達すると、その言語は準備完了（切り替えと locales.json）になります。",
+      "ready": "準備完了",
+      "notReady": "未完了",
+      "global": "全体",
+      "critical": "重要ページ",
+      "pages": "{locale} のページ",
+      "mark": "重要ページに指定",
+      "unmark": "重要ページの指定を解除",
+      "byPattern": "パターンにより重要ページ：設定で編集してください",
+      "criticalBadge": "重要",
+      "missing": "{n, plural, other {未翻訳セグメント # 件}}",
+      "empty": {
+        "title": "まだページがありません",
+        "body": "glot Edge がこの言語でページを配信すると、カバレッジが表示されます。"
+      },
+      "pagesSeen": "確認済みページ"
+    },
+    "segments": {
+      "title": "セグメント",
+      "subtitle": "表示されたページのテキストを、キーなしで翻訳します。カタログのキーが常に優先されます。",
+      "viewKeys": "キー",
+      "viewSegments": "セグメント",
+      "intro": "各セグメントは、コンテキスト（要素とページテンプレート）付きの表示テキストです。編集はキーと同様に検証されます：構文、用語集、長さ。",
+      "queueIntro": "機密ページ（決済、アカウント）の新しいセグメントは、誰かが翻訳を承認するまでソース言語で配信されます。",
+      "search": "テキストを検索",
+      "locale": "言語",
+      "status": "ステータス",
+      "all": "すべてのステータス",
+      "statuses": {
+        "missing": "未翻訳",
+        "pending": "レビュー待ち",
+        "machine": "機械翻訳",
+        "reviewed": "レビュー済み",
+        "stale": "古い"
+      },
+      "sensitive": "機密ページ",
+      "hits": "{n, plural, other {# 回表示}}",
+      "translation": "翻訳",
+      "save": "保存",
+      "approve": "承認",
+      "saved": "翻訳を保存しました。",
+      "approved": "翻訳を承認しました：次のリクエストから配信されます。",
+      "prev": "前へ",
+      "next": "次へ",
+      "empty": {
+        "title": "セグメントがありません",
+        "body": "glot Edge がページを配信するとセグメントが表示されます。別のフィルターもお試しください。"
+      },
+      "queueEmpty": {
+        "title": "レビュー対象はありません",
+        "body": "機密ページのセグメントはすべて承認済みです。"
+      }
+    },
+    "settings": {
+      "saved": "Edge の設定を保存しました。",
+      "save": "保存",
+      "translate": {
+        "title": "自動翻訳",
+        "auto": "新しいセグメントを自動で翻訳",
+        "autoHint": "プロジェクトのモデル、用語集、バリデーターを使用します。完了まではソーステキストを配信するため、空白にはなりません。",
+        "budget": "月間予算（USD）",
+        "budgetHint": "空欄：ジョブごとのプロジェクト予算のみ。"
+      },
+      "rendering": {
+        "label": "レンダリング",
+        "auto": "自動",
+        "origin": "オリジンの HTML",
+        "prerender": "プリレンダリング済みスナップショット",
+        "autoHint": "オリジンが空のシェル（SPA）を返す場合、プリレンダリング済みスナップショットを使います。",
+        "originHint": "サーバーが返す HTML をそのまま翻訳します。",
+        "prerenderHint": "常にヘッドレスブラウザで表示したスナップショットを翻訳します（キャッシュされ、デプロイ時に更新）。"
+      },
+      "discovery": {
+        "title": "検出ゾーン",
+        "body": "glot Edge が新しいテキストを学習できる場所。ログインの背後や個人データは対象外で、1 日の上限があります。",
+        "include": "許可するパス",
+        "includeHint": "1 行に 1 パターン、* はワイルドカード。空欄：すべての公開ページ。",
+        "exclude": "除外するパス",
+        "excludeHint": "上で許可されていても検出しません。",
+        "selectorsInclude": "翻訳する領域（CSS セレクター）",
+        "selectorsIncludeHint": "空欄：ページ全体。",
+        "selectors": "除外するセレクター",
+        "selectorsHint": "翻訳も glot への送信もしません：ユーザーコンテンツ、名前、ウィジェット。",
+        "cap": "1 日あたりの新規セグメント数",
+        "capHint": "上限を超えた新しいテキストは翌日までソース言語で配信されます。"
+      },
+      "critical": {
+        "title": "重要ページと機密ページ",
+        "body": "重要ページは言語を提供するかどうかを決めます。機密ページはレビューなしに新しい内容を公開しません。",
+        "patterns": "重要ページ",
+        "patternsHint": "既定ではトップ、登録、料金、決済。",
+        "sensitive": "機密ページ",
+        "sensitiveHint": "新しいセグメントはレビュー待ちに入ります。",
+        "threshold": "重要ページのカバレッジしきい値（%）",
+        "thresholdHint": "言語が準備完了になる前に、すべての重要ページがこれに達する必要があります。"
+      }
+    },
+    "seo": {
+      "run": "レポートを実行",
+      "empty": {
+        "title": "レポートがありません",
+        "body": "レポートは最大 20 ページの各言語を Google と同じく JavaScript なしで取得し、hreflang、canonical、メタデータ、未翻訳テキストを確認します。確認済みドメインが必要です。"
+      },
+      "summary": "{total} ページ中 {indexable} ページが技術的にインデックス可能",
+      "indexedNote": "ここで計測するのは技術的にインデックス可能かどうかです。実際にインデックスされたかは Search Console を接続した場合のみ分かり、それ以外は推測せず不明と表示します。",
+      "indexable": "インデックス可能",
+      "notIndexable": "インデックス不可",
+      "indexed": "インデックス済み",
+      "notIndexed": "未インデックス",
+      "indexedUnknown": "インデックス状況不明",
+      "untranslated": "未翻訳 {n} 件",
+      "renderDiffNone": "未比較",
+      "renderDiffSame": "JavaScript の有無でテキストは同じ",
+      "renderDiffCount": "{n, plural, other {# 件のセグメント}}は JavaScript 実行後にのみ表示されます",
+      "indexNow": "Bing と Yandex に通知（IndexNow）",
+      "indexNowHint": "Google は IndexNow を使用せず、robots.txt で告知されたサイトマップを読み取ります。",
+      "indexNowDone": "{n, plural, other {# 件の URL}}を IndexNow に送信しました。",
+      "running": "ページを取得中…",
+      "issuesTitle": "検出された問題",
+      "sitemaps": "言語別サイトマップ",
+      "critical": "重要",
+      "notReciprocal": "hreflang が相互でない",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "Canonical",
+        "title": "タイトル",
+        "description": "説明",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "取得に失敗",
+        "http_error": "HTTP エラー",
+        "noindex": "noindex",
+        "robots_txt_blocked": "robots.txt でブロック",
+        "redirected": "リダイレクト",
+        "canonical_missing": "canonical なし",
+        "canonical_multiple": "canonical が複数",
+        "canonical_to_source": "canonical がソースページを指す",
+        "canonical_not_self": "canonical が別のページを指す",
+        "html_lang": "html lang が不正",
+        "html_dir": "テキスト方向が不正",
+        "content_language": "Content-Language が不正",
+        "hreflang_self_missing": "自己参照の hreflang なし",
+        "hreflang_x_default_missing": "x-default なし",
+        "hreflang_not_reciprocal": "hreflang が相互でない",
+        "advertised_but_not_ready": "リンク済みだが未完了",
+        "title_missing": "タイトルなし",
+        "title_untranslated": "タイトルが未翻訳",
+        "description_untranslated": "説明が未翻訳",
+        "og_title_untranslated": "og:title が未翻訳",
+        "jsonld_language": "JSON-LD が別の言語",
+        "untranslated_segments": "未翻訳のセグメント"
+      }
+    },
+    "perf": {
+      "period": "期間",
+      "days": "{n, plural, other {# 日}}",
+      "requests": "配信ページ数",
+      "hitRatio": "キャッシュヒット率",
+      "failOpen": "フェイルオープン",
+      "glotP50": "glot のコスト p50",
+      "glotP95": "glot のコスト p95",
+      "originP50": "オリジン p50",
+      "note": "glot のコスト = オリジンに上乗せされた時間（Server-Timing）。フェイルオープン = glot が時間内に応答しなかったため未翻訳で配信したページ。エラーにはなりません。",
+      "byDay": "日別",
+      "date": "日付",
+      "empty": {
+        "title": "まだトラフィックがありません",
+        "body": "ドメインがページを配信するとメトリクスが表示されます。"
+      }
+    }
+  },
   "launches": {
     "title": "ローンチ",
     "open": "ローンチ",
@@ -178,6 +451,7 @@
     "menu": "メニュー",
     "onThisPage": "このページの内容",
     "pages": {
+      "edge": "glot Edge（SEO ローカライズ）",
       "cli": "CLI リファレンス",
       "concepts": "基本概念",
       "faq": "FAQ・料金",
@@ -1204,6 +1478,7 @@
     "subtitle": "このプロジェクトの名前、ロケール、翻訳モデル、配信設定。変更は次のジョブから適用されます。"
   },
   "shell": {
+    "edge": "glot Edge",
     "apiTokens": "API トークン",
     "experiments": "実験的機能",
     "feedback": "レビュー",

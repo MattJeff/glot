@@ -57,7 +57,11 @@ pub async fn serve(
 }
 
 /// Public projects (public_cdn) are readable by anyone; private ones only by members. Counts one CDN request.
-async fn readable(state: &AppState, slug: &str, headers: &HeaderMap) -> ApiResult<ProjectRow> {
+pub(crate) async fn readable(
+    state: &AppState,
+    slug: &str,
+    headers: &HeaderMap,
+) -> ApiResult<ProjectRow> {
     let not_found = || AppError::not_found("catalog not found");
     let p = crate::projects::load_public(state, slug)
         .await?
@@ -253,9 +257,13 @@ pub async fn experiments(
     Ok(respond(&headers, config.to_string(), etag, p.public_cdn))
 }
 
-/// `GET /cdn/{slug}/locales.json[?min=0.95]`: what a language switcher needs — the source and the target locales
-/// whose coverage (non-stale translations / keys) is at least `min` (default 0: all), with endonym and direction.
-/// Adding a target in glot makes it appear here (≤ 60 s cache), no redeploy of the site.
+/// `GET /cdn/{slug}/locales.json[?min=0.95][&all=1]`: what a language switcher needs — the source and the target
+/// locales that are **ready**, with endonym, direction, coverage and version. Ready = global coverage (catalog keys
+/// and segments rendered by glot Edge pages, non-stale) ≥ `min` (default 0) **and** every critical page (home,
+/// pricing, signup, checkout… `edge_settings.critical_patterns`) ≥ its threshold (98 %): `critical_coverage` is the
+/// worst critical page, `null` while no page has been seen (key-only projects). `all=1` also lists the locales
+/// that are not ready (`ready: false`), for dashboards. Adding a target in glot makes it appear here once ready
+/// (≤ 60 s cache), no redeploy of the site.
 pub async fn locales(
     State(state): State<AppState>,
     AppPath(slug): AppPath<String>,
@@ -267,39 +275,52 @@ pub async fn locales(
         .and_then(|v| v.parse().ok())
         .filter(|m: &f64| m.is_finite())
         .unwrap_or(0.0);
+    let all = q.get("all").is_some_and(|v| v == "1");
     let p = readable(&state, &slug, &headers).await?;
-    let keys: i64 = sqlx::query_scalar("SELECT count(*) FROM keys WHERE project_id = $1")
-        .bind(p.id)
-        .fetch_one(&state.db)
-        .await?;
-    let rows: Vec<(String, i64, Option<chrono::DateTime<chrono::Utc>>)> = sqlx::query_as(
-        "SELECT t.locale, count(*) FILTER (WHERE t.status <> 'stale'), max(t.updated_at)
-         FROM translations t JOIN keys k ON k.id = t.key_id
-         WHERE k.project_id = $1 AND t.locale = ANY($2) GROUP BY t.locale",
+    let ready = crate::edge::seo_report::readiness(&state, &p).await?;
+    let updated_at: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
+        "SELECT max(t.updated_at) FROM translations t JOIN keys k ON k.id = t.key_id
+         WHERE k.project_id = $1 AND t.locale = ANY($2)",
     )
     .bind(p.id)
     .bind(&p.target_locales)
-    .fetch_all(&state.db)
+    .fetch_one(&state.db)
     .await?;
-    let entry = |code: &str, coverage: f64| {
+    let edge_updated: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
+        "SELECT max(updated_at) FROM edge_catalog_version WHERE project_id = $1 AND locale = ANY($2)",
+    )
+    .bind(p.id)
+    .bind(&p.target_locales)
+    .fetch_one(&state.db)
+    .await?;
+    let round = |x: f64| (x * 1000.0).round() / 1000.0;
+    let entry = |code: &str, coverage: f64, critical: Option<f64>, ready: bool, version: i64| {
         json!({"code": code, "name": endonym(code), "dir": if is_rtl(code) { "rtl" } else { "ltr" },
-               "coverage": (coverage * 1000.0).round() / 1000.0})
+               "coverage": round(coverage), "critical_coverage": critical, "ready": ready, "version": version})
     };
-    let mut list = vec![entry(&p.source_locale, 1.0)];
-    for l in &p.target_locales {
-        let done = rows.iter().find(|r| &r.0 == l).map_or(0, |r| r.1);
-        let coverage = if keys == 0 {
-            0.0
-        } else {
-            done.min(keys) as f64 / keys as f64
-        };
-        if coverage >= min {
-            list.push(entry(l, coverage));
+    let source_version = crate::edge::tm::version(&state.db, p.id, &p.source_locale).await?;
+    let mut list = vec![entry(
+        &p.source_locale,
+        1.0,
+        Some(1.0),
+        true,
+        source_version,
+    )];
+    for r in &ready {
+        let ok = r.ready(min);
+        if ok || all {
+            list.push(entry(
+                &r.locale,
+                r.coverage(),
+                r.critical_coverage,
+                ok,
+                r.version,
+            ));
         }
     }
-    let updated_at = rows
-        .iter()
-        .filter_map(|r| r.2)
+    let updated_at = updated_at
+        .into_iter()
+        .chain(edge_updated)
         .max()
         .map(|t| t.to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
     let body =

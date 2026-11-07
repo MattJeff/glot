@@ -53,6 +53,7 @@ import {
   type Translation,
   type TranslationStatus,
 } from "@/lib/api";
+import { Link } from "@/i18n/navigation";
 import { useMediaQuery } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
@@ -110,6 +111,7 @@ const isTyping = (el: EventTarget | null) =>
 export function KeysEditor({ project }: { project: Project }) {
   const t = useTranslations("editor");
   const ts = useTranslations("status");
+  const tseg = useTranslations("edge.segments");
   const format = useFormatter();
   const localeName = useLocaleName();
   const qc = useQueryClient();
@@ -365,6 +367,9 @@ export function KeysEditor({ project }: { project: Project }) {
         <div className="me-2 flex items-baseline gap-2">
           <h1 className="text-base font-semibold">{t("title")}</h1>
           <p className="hidden text-xs text-muted-foreground 2xl:block">{t("subtitle")}</p>
+          <Link href={`/app/${slug}/keys?view=segments`} className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+            {tseg("viewSegments")}
+          </Link>
         </div>
         <p role="status" aria-live="polite" className="sr-only">
           {announce}

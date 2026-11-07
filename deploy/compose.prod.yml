@@ -59,6 +59,20 @@ services:
       RUST_LOG: ${RUST_LOG:-glot_server=info,tower_http=info}
       GLOT_LOG_FORMAT: json
       GLOT_ADMIN_EMAILS: ${GLOT_ADMIN_EMAILS:-}
+      GLOT_RENDERER_URL: http://renderer:8795
+      GLOT_RENDERER_TOKEN: ${GLOT_RENDERER_TOKEN:-}
+      # glot Edge proxy: last known domains/TMs on disk (served if Postgres is down, survives restarts).
+      GLOT_EDGE_CACHE_DIR: /var/cache/glot-edge
+      # glot Edge: DNS verification target, and Caddy's fallback map (server down → Caddy serves the origin).
+      GLOT_EDGE_CNAME: edge.${GLOT_DOMAIN}
+      GLOT_CADDY_MAP: /etc/caddy/edge/origins.caddy
+      GLOT_CADDY_ADMIN: http://caddy-admin:2019
+      GLOT_CADDYFILE: /etc/glot/Caddyfile
+    volumes:
+      - edge_cache:/var/cache/glot-edge
+      - caddy_edge:/etc/caddy/edge
+      - ./Caddyfile:/etc/glot/Caddyfile:ro
+    networks: [default, render, caddy_admin]
     depends_on:
       postgres: { condition: service_healthy }
     # The image has no curl: bash /dev/tcp is enough for a liveness probe.
@@ -89,6 +103,32 @@ services:
     mem_limit: 512m
     logging: *logging
 
+  # glot Edge snapshots of SPA pages (packages/renderer). Own network: reaches the internet and the server, never Postgres.
+  renderer:
+    # Opt-in (Chromium is heavy): `docker compose --profile renderer up -d`. Without it, Edge serves SPA origins as-is.
+    profiles: [renderer]
+    image: glot-renderer:latest
+    build:
+      context: ..
+      dockerfile: packages/renderer/Dockerfile
+    restart: unless-stopped
+    environment:
+      RENDERER_TOKEN: ${GLOT_RENDERER_TOKEN:-}
+      RENDERER_TTL_S: ${GLOT_RENDERER_TTL_S:-86400}
+      RENDERER_CONCURRENCY: ${GLOT_RENDERER_CONCURRENCY:-2}
+    volumes:
+      - renderer:/data
+    networks: [render]
+    ipc: host  # Chromium needs more than Docker's 64 MB /dev/shm
+    init: true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8795/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    mem_limit: 1g
+    logging: *logging
+
   caddy:
     image: caddy:2
     restart: unless-stopped
@@ -103,17 +143,32 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data      # certificates: keep it, or Let's Encrypt rate limits bite
       - caddy_config:/config
+      - caddy_edge:/etc/caddy/edge:ro  # glot Edge fallback map, written by the server
+    networks:
+      default:
+      caddy_admin:
+        aliases: [caddy-admin]  # the admin API binds to this network only (Caddyfile `admin caddy-admin:2019`)
     depends_on:
       web: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:2019/config/"]
+      test: ["CMD", "wget", "-qO-", "http://caddy-admin:2019/config/"]
       interval: 30s
       timeout: 5s
       retries: 3
     mem_limit: 256m
     logging: *logging
 
+networks:
+  default:
+  render:
+  # Caddy admin API ↔ glot-server only.
+  caddy_admin:
+    internal: true
+
 volumes:
   pg:
+  renderer:
+  edge_cache:
   caddy_data:
   caddy_config:
+  caddy_edge:
