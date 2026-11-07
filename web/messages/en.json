@@ -602,7 +602,8 @@
     "kind": {
       "translate": "Translate",
       "github_localize": "Localize repository",
-      "github_update": "Update pull request"
+      "github_update": "Update pull request",
+      "edge_translate": "Edge translation"
     },
     "live": "Live",
     "progress": "{done} / {total}",

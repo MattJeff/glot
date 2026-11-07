@@ -976,7 +976,8 @@
     "kind": {
       "translate": "翻訳",
       "github_localize": "リポジトリをローカライズ",
-      "github_update": "プルリクエストを更新"
+      "github_update": "プルリクエストを更新",
+      "edge_translate": "Edge 翻訳"
     },
     "live": "ライブ",
     "progress": "{done} / {total}",

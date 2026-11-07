@@ -976,7 +976,8 @@
     "kind": {
       "translate": "ترجمة",
       "github_localize": "توطين المستودع",
-      "github_update": "تحديث طلب السحب"
+      "github_update": "تحديث طلب السحب",
+      "edge_translate": "ترجمة Edge"
     },
     "live": "مباشر",
     "progress": "{done} / {total}",

@@ -976,7 +976,8 @@
     "kind": {
       "translate": "Übersetzen",
       "github_localize": "Repository lokalisieren",
-      "github_update": "Pull Request aktualisieren"
+      "github_update": "Pull Request aktualisieren",
+      "edge_translate": "Edge-Übersetzung"
     },
     "live": "Live",
     "progress": "{done} / {total}",

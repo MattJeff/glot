@@ -976,7 +976,8 @@
     "kind": {
       "translate": "Traduire",
       "github_localize": "Localiser le dépôt",
-      "github_update": "Mettre à jour la pull request"
+      "github_update": "Mettre à jour la pull request",
+      "edge_translate": "Traduction Edge"
     },
     "live": "En direct",
     "progress": "{done} / {total}",
