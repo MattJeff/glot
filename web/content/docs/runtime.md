@@ -67,14 +67,16 @@ Example and end-to-end test (real Next build, `de` not shipped): [`examples/runt
 
 ## Language switcher & live languages
 
-A drop-in `<glot-locale-switcher>` element, fed by your project's public CDN. It works with any stack (React, Vue, Svelte, Leptos, plain HTML): one script tag, no dependency, ~2.5 kB gzipped. Turn on **Settings → Public CDN**: the dashboard shows this snippet prefilled for your project, with a live preview.
+A drop-in `<glot-locale-switcher>` element, fed by your project's public CDN. It works with any stack (React, Vue, Svelte, Leptos, plain HTML): one script tag, no dependency, ~5 kB gzipped. Turn on **Settings → Public CDN**: the dashboard shows this snippet prefilled for your project, with a live preview.
 
 ```html
 <script src="https://app.glotlang.com/widget/locale-switcher.global.js"
         data-project="your-slug" data-cdn="https://app.glotlang.com" defer></script>
 
-<glot-locale-switcher strategy="query:lang"></glot-locale-switcher>
+<glot-locale-switcher variant="menu" strategy="query:lang"></glot-locale-switcher>
 ```
+
+It renders a compact button with the current language (🇪🇸 ES); a click opens the list of every language, each with its flag, its own name and its code.
 
 ### The locales manifest
 
@@ -84,25 +86,63 @@ The element reads `GET /cdn/{slug}/locales.json?min=0.95`:
 {
   "source": "en",
   "locales": [
-    { "code": "en", "name": "English", "dir": "ltr", "coverage": 1 },
-    { "code": "fr", "name": "Français", "dir": "ltr", "coverage": 0.98 }
+    { "code": "en", "name": "English", "dir": "ltr", "coverage": 1, "critical_coverage": 1, "ready": true, "version": 0 },
+    { "code": "fr", "name": "Français", "dir": "ltr", "coverage": 0.98, "critical_coverage": 0.99, "ready": true, "version": 42 }
   ],
   "updated_at": "2026-11-07T10:00:00Z"
 }
 ```
 
-The source locale, then every target locale of the project whose coverage (non-stale translations / keys) is at least `min` (default `0`: all of them; the element asks for `0.95`). It is served with an ETag, `Cache-Control: public, max-age=60, stale-while-revalidate=600` and `Access-Control-Allow-Origin: *`. Add a language in glot and translate it: within about a minute of crossing the threshold it appears in every visitor's switcher.
+The source locale, then every target locale that is **ready**:
+
+- `coverage`: catalog keys and the segments rendered by glot Edge pages together (non-stale translations / total) must be at least `min` (default `0`; the element asks for `0.95`);
+- `critical_coverage`: the worst critical page (home, pricing, signup, checkout… set in Edge settings) — each must reach its threshold (98 % by default). "95 % of the keys" is not "95 % of the experience": one untranslated pricing page keeps the language out. It is `null` while glot Edge has not seen any page (key-only projects: only `coverage` counts);
+- `version`: the locale's catalog version, the same one the CDN catalogs, the Edge translation memory and pre-rendered pages use.
+
+Add `&all=1` to also list the locales that are not ready (`"ready": false`), e.g. for a dashboard. It is served with an ETag, `Cache-Control: public, max-age=60, stale-while-revalidate=600` and `Access-Control-Allow-Origin: *`. Add a language in glot and translate it: within about a minute of becoming ready it appears in every visitor's switcher.
 
 ### Attributes
 
 | Attribute | Values | Default |
 | --- | --- | --- |
 | `strategy` | `query:NAME`, `prefix`, `prefix:always`, `cookie:NAME`, `event`, `auto` | `auto` |
-| `variant` | `pills`, `select` | `pills` |
-| `labels` | `code` (FR / EN), `name` (Français / English) | `code` for pills, `name` for select |
+| `variant` | `menu`, `pills`, `select` | `menu` |
+| `labels` | `code` (FR / EN), `name` (Français / English): the trigger of `menu`, the pills, the select options | `code`, `name` for select |
+| `flags` | `auto`, `off` (menu only) | `auto` |
+| `flag-CODE` | an emoji or a region code, `""` for none: `flag-en="🇺🇸"`, `flag-en="us"`, `flag-ar="sa"`, `flag-fr=""` | |
+| `search-label` | label of the menu's search field (shown above 8 languages) | `Search` |
 | `min` | coverage threshold, 0 to 1 | `0.95` |
 | `project`, `cdn` | override the script's `data-project` / `data-cdn` | |
-| `aria-label` | label of the group | `Language` |
+| `aria-label` | label of the group / list | `Language` |
+
+`menu` is now the default (it used to be `pills`). A page that sets `variant` keeps its variant; set `variant="pills"` to keep the row of pills on a page that did not.
+
+### Flags
+
+Languages are not countries, so a flag is only a hint. The menu uses:
+
+- the region of the tag when there is one: `pt-BR` → 🇧🇷, `en-US` → 🇺🇸, `zh-TW` → 🇹🇼, `es-MX` → 🇲🇽. A continent (`es-419`) gets no flag;
+- otherwise one representative country, only where it is the obvious default: `fr` → 🇫🇷, `de` → 🇩🇪, `ja` → 🇯🇵, `en` → 🇬🇧, `pt` → 🇵🇹, `zh` → 🇨🇳…;
+- no flag for languages spoken in many countries or none (`ar`, `sw`, `ca`, `eo`, `la`…): the code in a small badge instead.
+
+Override per language with `flag-CODE` attributes (lowercase code, read when the element renders) or the `flags` property, which re-renders:
+
+```html
+<glot-locale-switcher flag-en="🇺🇸" flag-ar="sa"></glot-locale-switcher>
+<script>document.querySelector("glot-locale-switcher").flags = { en: "us", "pt-br": "🇧🇷" };</script>
+```
+
+An explicit region beats a language override (`flag-en="us"` leaves `en-GB` on 🇬🇧). `flags="off"` shows the code badges only. Windows does not draw flag emoji (it shows two letters): the element checks once and shows the code badge there.
+
+### Keyboard and screen readers (menu)
+
+The trigger is a button with `aria-haspopup="listbox"` and `aria-expanded`; the list is a `listbox` of `option`s with `aria-selected` on the current language, each with its own `lang` and `dir`.
+
+- Enter, Space, Arrow Down or Arrow Up on the trigger opens the list; focus goes to the search field (above 8 languages) or the current language.
+- Arrow Up / Down move, Home / End jump to the ends, typing a letter jumps to the next language starting with it.
+- The search matches the language's own name, its code and its name in the visitor's language ("German" finds Deutsch); Enter picks the first match.
+- Enter or Space picks; Escape closes and returns focus to the trigger; Tab or a click outside closes.
+- The list opens on the inline-start side (right-aligned on RTL pages), flips up near the bottom of the window and does not animate with `prefers-reduced-motion`.
 
 Strategies decide how the current locale is read and what a click does:
 
@@ -114,11 +154,14 @@ Strategies decide how the current locale is read and what a click does:
 
 Every strategy first dispatches a cancelable, bubbling `glot:locale-change` event (`detail: { locale, previous, dir }`); call `preventDefault()` to handle the change yourself. The choice is saved in `localStorage["glot-locale"]`. When nothing in the URL or cookie names a locale (or with `event`, which starts from the saved choice), the element uses `<html lang>`, then the saved choice, then the source.
 
-Styling: shadow DOM with parts `list`, `pill`, `pill-current`, `select`, and custom properties `--glot-gap`, `--glot-radius`, `--glot-padding`, `--glot-font-size`, `--glot-fg`, `--glot-bg`, `--glot-border`, `--glot-list-bg`, `--glot-active-bg`, `--glot-active-fg`, `--glot-focus`. Pills are buttons with `aria-current`; arrow keys (mirrored in RTL), Home and End move between them. Each label carries its own `lang` and `dir`.
+Styling: shadow DOM with parts `trigger`, `flag`, `menu`, `search`, `option`, `option-current` (menu), `list`, `pill`, `pill-current` (pills), `select`, and custom properties `--glot-gap`, `--glot-radius`, `--glot-padding`, `--glot-font-size`, `--glot-fg`, `--glot-bg`, `--glot-border`, `--glot-list-bg`, `--glot-active-bg`, `--glot-active-fg`, `--glot-focus`, and for the menu `--glot-menu-bg`, `--glot-menu-fg` (default: the system `Canvas` / `CanvasText` pair), `--glot-menu-radius`, `--glot-menu-max-height`, `--glot-hover-bg`, `--glot-shadow`, `--glot-z`. The trigger inherits the page's color and font. Pills are buttons with `aria-current`; arrow keys (mirrored in RTL), Home and End move between them. Each label carries its own `lang` and `dir`.
 
 ```css
 glot-locale-switcher { --glot-active-bg: #111; --glot-active-fg: #fff; --glot-border: #ddd; }
 glot-locale-switcher::part(pill) { text-transform: lowercase; }
+/* dark site: give the menu your surface colors */
+.dark glot-locale-switcher { --glot-menu-bg: #18181b; --glot-menu-fg: #fafafa; }
+glot-locale-switcher::part(flag) { font-size: 1.1em; }
 ```
 
 ### Strings over the air

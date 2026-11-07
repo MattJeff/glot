@@ -795,7 +795,7 @@ function LocaleSwitcherCard({ slug, origin, pattern }: { slug: string; origin: s
   const query = pattern.match(/[?&]([^=&]+)=\{locale\}/)?.[1];
   const strategy = query ? `query:${query}` : pattern.startsWith("/{locale}") ? "prefix" : "";
   const snippet = `<script src="${origin}/widget/locale-switcher.global.js" data-project="${slug}" data-cdn="${origin}" defer></script>
-<glot-locale-switcher${strategy ? ` strategy="${strategy}"` : ""}></glot-locale-switcher>`;
+<glot-locale-switcher variant="menu"${strategy ? ` strategy="${strategy}"` : ""}></glot-locale-switcher>`;
   useEffect(() => {
     if (!customElements.get("glot-locale-switcher") && !document.querySelector("script[data-glot-switcher]")) {
       const s = document.createElement("script");
@@ -818,8 +818,8 @@ function LocaleSwitcherCard({ slug, origin, pattern }: { slug: string; origin: s
       <CodeBlock label={t("snippet")} code={snippet} />
       <div ref={ref} className="flex flex-wrap items-center gap-6 text-sm">
         <span className="text-muted-foreground">{t("preview")}</span>
-        {createElement("glot-locale-switcher", { project: slug, cdn: origin, strategy: "event" })}
-        {createElement("glot-locale-switcher", { project: slug, cdn: origin, strategy: "event", variant: "select" })}
+        {/* The menu's popover takes the dashboard's popover tokens (light/dark). */}
+        {createElement("glot-locale-switcher", { project: slug, cdn: origin, strategy: "event", variant: "menu", style: { "--glot-menu-bg": "var(--popover)", "--glot-menu-fg": "var(--popover-foreground)" } })}
       </div>
       <p className="text-xs text-muted-foreground">{t("hint")}</p>
     </div>

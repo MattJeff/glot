@@ -20,6 +20,8 @@ export declare function resolveStrategy(strategy: string, url: URL, codes: strin
 export declare function currentLocale(strategy: string, url: URL, cookie: string, htmlLang: string, saved: string | null, m: Manifest): string;
 /** Where to go for `code` under a navigating strategy (`query:*`, `prefix`, `prefix:always`); null otherwise. */
 export declare function targetUrl(strategy: string, url: URL, code: string, m: Manifest): string | null;
+/** The flag for a locale ("" = none, show the code badge). `over` keys are lowercase codes; values an emoji or a region (`us`). */
+export declare function flagFor(code: string, over?: Record<string, string>): string;
 /** Fetches a published catalog (nested JSON) and announces it with a `glot:catalog` event on `document`. */
 export declare function loadCatalog(locale: string, opts?: {
     project?: string;
