@@ -135,7 +135,7 @@ test("menu variant in a real browser: open/close, keyboard, search, selection, f
     if (u.pathname === "/cdn/demo/locales.json") return res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(many));
     const dir = u.searchParams.get("dir") ?? "ltr";
     const pad = u.searchParams.has("bottom") ? "margin-top:calc(100vh - 40px)" : "margin:0 200px";
-    res.writeHead(200, { "content-type": "text/html" }).end(`<html lang="en" dir="${dir}"><body style="margin:0"><script src="/s.js" data-project="demo" defer></script><div style="${pad}"><glot-locale-switcher strategy="query:lang" flag-de="at"></glot-locale-switcher></div><p id="out">outside</p>`);
+    res.writeHead(200, { "content-type": "text/html" }).end(`<html lang="en" dir="${dir}"><body style="margin:0"><script src="/s.js" data-project="demo" defer></script><div style="${pad}"><glot-locale-switcher strategy="query:lang" flag-de="at"></glot-locale-switcher></div><p id="out">outside</p>${u.searchParams.has("two") ? '<glot-locale-switcher strategy="query:lang"></glot-locale-switcher>' : ""}`);
   });
   await new Promise<void>((r) => server.listen(0, r));
   const base = `http://localhost:${(server.address() as { port: number }).port}`;
@@ -236,6 +236,58 @@ test("menu variant in a real browser: open/close, keyboard, search, selection, f
     // JS `flags` property overrides.
     await page.evaluate(() => ((document.querySelector("glot-locale-switcher") as unknown as { flags: object }).flags = { en: "🇺🇸" }));
     assert.equal(await trigger.locator("[part~=flag]").textContent(), "🇺🇸");
+
+    // The app re-creates the element (CSR mount over a pre-rendered page): an open menu survives, with its search,
+    // highlighted option and focus; a closed one stays closed; the right one of two is restored.
+    await page.goto(`${base}/p?lang=en&two`);
+    await trigger.first().waitFor();
+    const recreate = (i: number) => page.evaluate((i) => {
+      const old = document.querySelectorAll("glot-locale-switcher")[i];
+      old.replaceWith(old.cloneNode());
+    }, i);
+    const state = (i: number) => page.evaluate((i) => {
+      const r = document.querySelectorAll("glot-locale-switcher")[i].shadowRoot!;
+      const a = r.activeElement as HTMLElement | null;
+      return {
+        open: !r.querySelector<HTMLElement>("[part~=menu]")?.hidden,
+        q: r.querySelector("input")?.value,
+        shown: [...r.querySelectorAll<HTMLElement>("[role=option]")].filter((o) => !o.hidden).length,
+        focus: a?.lang || a?.getAttribute("part"),
+      };
+    }, i);
+    const settled = () => page.waitForFunction(() => [...document.querySelectorAll("glot-locale-switcher")].every((e) => e.shadowRoot!.querySelector("[part~=trigger]")));
+    await trigger.nth(1).click();
+    await page.keyboard.type("i");
+    await page.keyboard.press("ArrowDown");
+    const before = await state(1);
+    assert.equal(before.open, true);
+    assert.ok(before.shown < 10);
+    await recreate(1);
+    await settled();
+    assert.deepEqual(await state(1), before);
+    assert.equal((await state(0)).open, false);
+    // Closed, then re-created: stays closed.
+    await page.keyboard.press("Escape");
+    await recreate(1);
+    await settled();
+    assert.equal((await state(1)).open, false);
+    // Removed while open, then another menu opened before it comes back: not reopened.
+    await trigger.nth(1).click();
+    await page.evaluate(() => (window as unknown as { gone: Node }).gone = document.querySelectorAll("glot-locale-switcher")[1].cloneNode());
+    await page.evaluate(() => document.querySelectorAll("glot-locale-switcher")[1].remove());
+    await trigger.first().click();
+    await page.evaluate(() => document.body.append((window as unknown as { gone: Node }).gone));
+    await settled();
+    assert.equal((await state(0)).open, true);
+    assert.equal((await state(1)).open, false);
+    // Past the 2 s window: not reopened.
+    await page.keyboard.press("Escape");
+    await trigger.nth(1).click();
+    await page.evaluate(() => document.querySelectorAll("glot-locale-switcher")[1].remove());
+    await page.waitForTimeout(2100);
+    await page.evaluate(() => document.body.append((window as unknown as { gone: Node }).gone.cloneNode()));
+    await settled();
+    assert.equal((await state(1)).open, false);
 
     // No flag emoji (Windows): code badges, no flag in the trigger.
     const win = await browser.newPage();

@@ -160,6 +160,13 @@ ul{list-style:none;margin:0;padding:0}
 small{opacity:.6}.b{font-size:.7em;font-weight:600;border:1px solid;border-radius:3px;padding:0 .3em;min-width:2em;text-align:center;opacity:.7}
 input{display:block;width:100%;box-sizing:border-box;margin-bottom:4px;font:inherit;color:inherit;background:transparent;border:1px solid var(--l);border-radius:4px;padding:.3em .5em}`;
 
+// An app that mounts over a pre-rendered page (Leptos/React CSR) re-creates the element: an open menu is remembered
+// on disconnect and reopened by the instance that renders at the same document position within 2 s.
+// ponytail: matched by position among all switchers (attributes may differ between the static and app markup).
+let kept: { i: number; q: string; f: number; t: number } | undefined;
+let live: HTMLElement | undefined; // the switcher whose menu is open
+const nth = (e: HTMLElement) => [...document.querySelectorAll("glot-locale-switcher")].indexOf(e);
+
 if (typeof customElements !== "undefined" && !customElements.get("glot-locale-switcher")) {
   class GlotLocaleSwitcher extends HTMLElement {
     static observedAttributes = ["project", "cdn", "variant", "labels", "strategy", "min", "flags"];
@@ -167,7 +174,7 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
     #m?: Manifest;
     #strategy = "event";
     #flags: Record<string, string> = {};
-    #close = () => {};
+    #close = (_keep?: boolean) => {};
 
     /** Per-locale flag overrides (`{ en: "🇺🇸", ar: "" }`), on top of the `flag-xx` attributes. */
     get flags() {
@@ -180,6 +187,9 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
 
     connectedCallback() {
       this.#load();
+    }
+    disconnectedCallback() {
+      this.#close(true);
     }
     attributeChangedCallback() {
       if (this.isConnected) this.#load();
@@ -315,11 +325,24 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
         pop.hidden = true;
         b.setAttribute("aria-expanded", "false");
         document.removeEventListener("pointerdown", outside, true);
+        if (live === this) live = undefined;
         if (focus) b.focus();
       };
-      this.#close = close;
-      const open = () => {
+      // What had focus (index in [trigger, search, ...options]; -1 none). Removal fires focusout with no target: kept.
+      const parts = () => [b, search, ...ul.children] as (HTMLElement | null)[];
+      let f = -1;
+      wrap.addEventListener("focusin", (e) => (f = parts().indexOf(e.target as HTMLElement)));
+      wrap.addEventListener("focusout", (e) => e.relatedTarget && (f = -1));
+      let at = -1;
+      this.#close = (keep) => {
+        if (keep && !pop.hidden) kept = { i: at, q: search?.value ?? "", f, t: Date.now() };
+        close();
+      };
+      const open = (focus = true) => {
         pop.hidden = false;
+        live = this;
+        kept = undefined; // a menu opened since: the remembered one is stale
+        at = nth(this);
         b.setAttribute("aria-expanded", "true");
         // Flip up when there is no room below (and more above).
         const r = b.getBoundingClientRect();
@@ -327,7 +350,7 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
         pop.classList.toggle("up", below < pop.offsetHeight + 8 && r.top > below);
         document.addEventListener("pointerdown", outside, true);
         const sel = ul.querySelector<HTMLElement>("[aria-selected=true]")!;
-        (search ?? sel).focus();
+        if (focus) (search ?? sel).focus();
         sel.scrollIntoView?.({ block: "nearest" });
       };
       const pick = (c: string) => {
@@ -372,6 +395,15 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
         e.preventDefault();
         (to === -1 ? search : os[to])?.focus();
       };
+
+      const k = kept;
+      if (k && Date.now() - k.t < 2000 && k.i === nth(this) && !live?.isConnected) {
+        kept = undefined;
+        if (search) (search.value = k.q), search.dispatchEvent(new Event("input"));
+        open(false);
+        const a = document.activeElement;
+        if (k.f >= 0 && (!a || a === document.body)) parts()[k.f]?.focus();
+      }
     }
 
     #choose(code: string, previous: string) {
