@@ -970,6 +970,13 @@
       "example": "Beispiel-URL",
       "title": "Öffentliches CDN"
     },
+    "switcher": {
+      "description": "Ein Script-Tag, dann {tag} an der gewünschten Stelle. Eine hier hinzugefügte Sprache erscheint innerhalb einer Minute auf deiner Website, ohne neues Deployment.",
+      "hint": "Nur Sprachen, die zu mindestens 95 % übersetzt sind, erscheinen (Attribut min). Deine Website muss die Texte der neuen Sprache trotzdem laden: siehe Doku, Sprachumschalter.",
+      "preview": "Vorschau",
+      "snippet": "In deine Website einfügen",
+      "title": "Sprachumschalter"
+    },
     "danger": {
       "confirmBody": "Dies kann nicht rückgängig gemacht werden. Geben Sie {slug} zur Bestätigung ein.",
       "confirmTitle": "{name} löschen?",

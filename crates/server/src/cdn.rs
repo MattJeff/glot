@@ -252,3 +252,124 @@ pub async fn experiments(
         json!(chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
     Ok(respond(&headers, config.to_string(), etag, p.public_cdn))
 }
+
+/// `GET /cdn/{slug}/locales.json[?min=0.95]`: what a language switcher needs — the source and the target locales
+/// whose coverage (non-stale translations / keys) is at least `min` (default 0: all), with endonym and direction.
+/// Adding a target in glot makes it appear here (≤ 60 s cache), no redeploy of the site.
+pub async fn locales(
+    State(state): State<AppState>,
+    AppPath(slug): AppPath<String>,
+    AppQuery(q): AppQuery<std::collections::HashMap<String, String>>,
+    headers: HeaderMap,
+) -> ApiResult<Response> {
+    let min: f64 = q
+        .get("min")
+        .and_then(|v| v.parse().ok())
+        .filter(|m: &f64| m.is_finite())
+        .unwrap_or(0.0);
+    let p = readable(&state, &slug, &headers).await?;
+    let keys: i64 = sqlx::query_scalar("SELECT count(*) FROM keys WHERE project_id = $1")
+        .bind(p.id)
+        .fetch_one(&state.db)
+        .await?;
+    let rows: Vec<(String, i64, Option<chrono::DateTime<chrono::Utc>>)> = sqlx::query_as(
+        "SELECT t.locale, count(*) FILTER (WHERE t.status <> 'stale'), max(t.updated_at)
+         FROM translations t JOIN keys k ON k.id = t.key_id
+         WHERE k.project_id = $1 AND t.locale = ANY($2) GROUP BY t.locale",
+    )
+    .bind(p.id)
+    .bind(&p.target_locales)
+    .fetch_all(&state.db)
+    .await?;
+    let entry = |code: &str, coverage: f64| {
+        json!({"code": code, "name": endonym(code), "dir": if is_rtl(code) { "rtl" } else { "ltr" },
+               "coverage": (coverage * 1000.0).round() / 1000.0})
+    };
+    let mut list = vec![entry(&p.source_locale, 1.0)];
+    for l in &p.target_locales {
+        let done = rows.iter().find(|r| &r.0 == l).map_or(0, |r| r.1);
+        let coverage = if keys == 0 {
+            0.0
+        } else {
+            done.min(keys) as f64 / keys as f64
+        };
+        if coverage >= min {
+            list.push(entry(l, coverage));
+        }
+    }
+    let updated_at = rows
+        .iter()
+        .filter_map(|r| r.2)
+        .max()
+        .map(|t| t.to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
+    let body =
+        json!({"source": p.source_locale, "locales": list, "updated_at": updated_at}).to_string();
+    let etag = format!("\"loc-{}\"", glot_core::hash::hash(&body));
+    Ok(respond(&headers, body, etag, p.public_cdn))
+}
+
+fn is_rtl(code: &str) -> bool {
+    let base = code.split(['-', '_']).next().unwrap_or(code);
+    matches!(
+        base,
+        "ar" | "he" | "iw" | "fa" | "ur" | "ps" | "sd" | "ug" | "yi" | "dv" | "ckb"
+    )
+}
+
+/// Endonym of the base language; the code itself when unknown (the switcher falls back to `Intl.DisplayNames`).
+// ponytail: fixed table of common languages, regional variants share the base name.
+fn endonym(code: &str) -> String {
+    let base = code
+        .split(['-', '_'])
+        .next()
+        .unwrap_or(code)
+        .to_ascii_lowercase();
+    let name = match base.as_str() {
+        "en" => "English",
+        "fr" => "Français",
+        "es" => "Español",
+        "de" => "Deutsch",
+        "it" => "Italiano",
+        "pt" => "Português",
+        "nl" => "Nederlands",
+        "ja" => "日本語",
+        "ko" => "한국어",
+        "zh" => "中文",
+        "ru" => "Русский",
+        "ar" => "العربية",
+        "hi" => "हिन्दी",
+        "th" => "ไทย",
+        "vi" => "Tiếng Việt",
+        "tr" => "Türkçe",
+        "pl" => "Polski",
+        "sv" => "Svenska",
+        "da" => "Dansk",
+        "nb" | "no" => "Norsk",
+        "fi" => "Suomi",
+        "cs" => "Čeština",
+        "el" => "Ελληνικά",
+        "he" | "iw" => "עברית",
+        "id" => "Bahasa Indonesia",
+        "ms" => "Bahasa Melayu",
+        "uk" => "Українська",
+        "ro" => "Română",
+        "hu" => "Magyar",
+        "bg" => "Български",
+        "hr" => "Hrvatski",
+        "sk" => "Slovenčina",
+        "sl" => "Slovenščina",
+        "sr" => "Српски",
+        "ca" => "Català",
+        "fa" => "فارسی",
+        "ur" => "اردو",
+        "bn" => "বাংলা",
+        "ta" => "தமிழ்",
+        "tl" | "fil" => "Filipino",
+        "lt" => "Lietuvių",
+        "lv" => "Latviešu",
+        "et" => "Eesti",
+        "sw" => "Kiswahili",
+        _ => return code.to_string(),
+    };
+    name.to_string()
+}

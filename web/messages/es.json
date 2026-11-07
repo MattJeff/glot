@@ -970,6 +970,13 @@
       "example": "URL de ejemplo",
       "title": "CDN pública"
     },
+    "switcher": {
+      "description": "Una etiqueta script y luego {tag} donde lo quieras. Un idioma que añadas aquí aparece en tu sitio en menos de un minuto, sin redesplegar.",
+      "hint": "Solo aparecen los idiomas traducidos al menos al 95 % (atributo min). Tu sitio aún debe cargar los textos del nuevo idioma: consulta la documentación, Selector de idioma.",
+      "preview": "Vista previa",
+      "snippet": "Pégalo en tu sitio",
+      "title": "Selector de idioma"
+    },
     "danger": {
       "confirmBody": "Esta acción no se puede deshacer. Escribe {slug} para confirmar.",
       "confirmTitle": "¿Eliminar {name}?",

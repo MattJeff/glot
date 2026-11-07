@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cloneElement, useState } from "react";
+import { cloneElement, createElement, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   CodeBlock,
@@ -580,6 +580,7 @@ function SettingsForm({
           <Switch checked={cdn} onCheckedChange={setCdn} /> {t("cdn.enable")}
         </label>
         {cdn && <CodeBlock label={t("cdn.example")} code={`curl ${cdnUrl}`} />}
+        {cdn && <LocaleSwitcherCard slug={p.slug} origin={origin} pattern={pattern} />}
       </Section>
 
       <Section
@@ -731,6 +732,45 @@ function SettingsForm({
 }
 
 /** `orizn.app` -> `https://orizn.app`, `localhost:3000` -> `http://localhost:3000`, empty -> null. */
+/** Drop-in `<glot-locale-switcher>`: copyable snippet + live preview fed by `/cdn/{slug}/locales.json`. */
+function LocaleSwitcherCard({ slug, origin, pattern }: { slug: string; origin: string; pattern: string }) {
+  const t = useTranslations("settings.switcher");
+  const ref = useRef<HTMLDivElement>(null);
+  // Strategy from the preview URL pattern: `{route}?lang={locale}` → query:lang, `/{locale}{route}` → prefix.
+  const query = pattern.match(/[?&]([^=&]+)=\{locale\}/)?.[1];
+  const strategy = query ? `query:${query}` : pattern.startsWith("/{locale}") ? "prefix" : "";
+  const snippet = `<script src="${origin}/widget/locale-switcher.global.js" data-project="${slug}" data-cdn="${origin}" defer></script>
+<glot-locale-switcher${strategy ? ` strategy="${strategy}"` : ""}></glot-locale-switcher>`;
+  useEffect(() => {
+    if (!customElements.get("glot-locale-switcher") && !document.querySelector("script[data-glot-switcher]")) {
+      const s = document.createElement("script");
+      s.src = "/widget/locale-switcher.global.js";
+      s.dataset.glotSwitcher = "";
+      document.head.append(s);
+    }
+    // The preview must not navigate the dashboard or change its <html lang> (the event bubbles out of the shadow DOM).
+    const el = ref.current;
+    const stop = (e: Event) => e.preventDefault();
+    el?.addEventListener("glot:locale-change", stop);
+    return () => el?.removeEventListener("glot:locale-change", stop);
+  }, []);
+  return (
+    <div className="space-y-3 rounded-lg border p-4">
+      <div>
+        <h3 className="text-sm font-medium">{t("title")}</h3>
+        <p className="text-sm text-muted-foreground">{t("description", { tag: "<glot-locale-switcher>" })}</p>
+      </div>
+      <CodeBlock label={t("snippet")} code={snippet} />
+      <div ref={ref} className="flex flex-wrap items-center gap-6 text-sm">
+        <span className="text-muted-foreground">{t("preview")}</span>
+        {createElement("glot-locale-switcher", { project: slug, cdn: origin, strategy: "event" })}
+        {createElement("glot-locale-switcher", { project: slug, cdn: origin, strategy: "event", variant: "select" })}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("hint")}</p>
+    </div>
+  );
+}
+
 function siteUrl(raw: string): string | null {
   const v = raw.trim().replace(/\/+$/, "");
   if (!v) return null;

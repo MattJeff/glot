@@ -163,6 +163,7 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(review_live::widget_routes(&state, web_origin))
         .merge(mcp_remote::routes(state.clone(), web_origin))
         .route("/cdn/{slug}/experiments.json", get(cdn::experiments))
+        .route("/cdn/{slug}/locales.json", get(cdn::locales))
         .route("/cdn/{slug}/{file}", get(cdn::serve))
         .route("/healthz", get(|| async { "ok" }))
         .fallback(|| async { AppError::not_found("route not found") })

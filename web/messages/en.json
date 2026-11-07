@@ -961,6 +961,13 @@
       "example": "Example URL",
       "title": "Public CDN"
     },
+    "switcher": {
+      "description": "One script tag, then {tag} where you want it. A language you add here shows up on your site within a minute, no redeploy.",
+      "hint": "Only languages at least 95% translated appear (min attribute). Your site still has to load the new language's strings: see the docs, Language switcher.",
+      "preview": "Preview",
+      "snippet": "Paste into your site",
+      "title": "Language switcher"
+    },
     "danger": {
       "confirmBody": "This cannot be undone. Type {slug} to confirm.",
       "confirmTitle": "Delete {name}?",

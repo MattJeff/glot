@@ -970,6 +970,13 @@
       "example": "URL d'exemple",
       "title": "CDN public"
     },
+    "switcher": {
+      "description": "Une balise script, puis {tag} là où vous le voulez. Une langue ajoutée ici apparaît sur votre site en moins d'une minute, sans redéploiement.",
+      "hint": "Seules les langues traduites à 95 % ou plus apparaissent (attribut min). Votre site doit encore charger les textes de la nouvelle langue : voir la doc, Sélecteur de langue.",
+      "preview": "Aperçu",
+      "snippet": "À coller dans votre site",
+      "title": "Sélecteur de langue"
+    },
     "danger": {
       "confirmBody": "Cette action est irréversible. Saisissez {slug} pour confirmer.",
       "confirmTitle": "Supprimer {name} ?",

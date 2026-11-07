@@ -64,3 +64,124 @@ import { GlotFallbackBackend } from "@glot-i18n/runtime/i18next";
 The Translator API is available in recent Chrome desktop. Elsewhere the status is `unsupported` and the source language is shown. When the browser needs to download a language model, the status is `needs-activation` and the badge offers a click to start it.
 
 Example and end-to-end test (real Next build, `de` not shipped): [`examples/runtime-next`](https://github.com/MattJeff/glot/tree/main/examples/runtime-next).
+
+## Language switcher & live languages
+
+A drop-in `<glot-locale-switcher>` element, fed by your project's public CDN. It works with any stack (React, Vue, Svelte, Leptos, plain HTML): one script tag, no dependency, ~2.5 kB gzipped. Turn on **Settings → Public CDN**: the dashboard shows this snippet prefilled for your project, with a live preview.
+
+```html
+<script src="https://app.glotlang.com/widget/locale-switcher.global.js"
+        data-project="your-slug" data-cdn="https://app.glotlang.com" defer></script>
+
+<glot-locale-switcher strategy="query:lang"></glot-locale-switcher>
+```
+
+### The locales manifest
+
+The element reads `GET /cdn/{slug}/locales.json?min=0.95`:
+
+```json
+{
+  "source": "en",
+  "locales": [
+    { "code": "en", "name": "English", "dir": "ltr", "coverage": 1 },
+    { "code": "fr", "name": "Français", "dir": "ltr", "coverage": 0.98 }
+  ],
+  "updated_at": "2026-11-07T10:00:00Z"
+}
+```
+
+The source locale, then every target locale of the project whose coverage (non-stale translations / keys) is at least `min` (default `0`: all of them; the element asks for `0.95`). It is served with an ETag, `Cache-Control: public, max-age=60, stale-while-revalidate=600` and `Access-Control-Allow-Origin: *`. Add a language in glot and translate it: within about a minute of crossing the threshold it appears in every visitor's switcher.
+
+### Attributes
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `strategy` | `query:NAME`, `prefix`, `prefix:always`, `cookie:NAME`, `event`, `auto` | `auto` |
+| `variant` | `pills`, `select` | `pills` |
+| `labels` | `code` (FR / EN), `name` (Français / English) | `code` for pills, `name` for select |
+| `min` | coverage threshold, 0 to 1 | `0.95` |
+| `project`, `cdn` | override the script's `data-project` / `data-cdn` | |
+| `aria-label` | label of the group | `Language` |
+
+Strategies decide how the current locale is read and what a click does:
+
+- `query:lang`: reads `?lang=`, navigates to the same URL with `?lang=fr`.
+- `prefix`: reads the first path segment (`/fr/pricing`), navigates by swapping it. The source locale is unprefixed; use `prefix:always` if your source has a prefix too.
+- `cookie:NAME`: reads the cookie, sets it (one year, `path=/`) and reloads.
+- `event`: navigates nowhere. Sets `<html lang dir>`; your app swaps its strings.
+- `auto`: `query:lang` when the URL has `?lang=`, `prefix` when the path starts with a locale, `event` otherwise.
+
+Every strategy first dispatches a cancelable, bubbling `glot:locale-change` event (`detail: { locale, previous, dir }`); call `preventDefault()` to handle the change yourself. The choice is saved in `localStorage["glot-locale"]`. When nothing in the URL or cookie names a locale (or with `event`, which starts from the saved choice), the element uses `<html lang>`, then the saved choice, then the source.
+
+Styling: shadow DOM with parts `list`, `pill`, `pill-current`, `select`, and custom properties `--glot-gap`, `--glot-radius`, `--glot-padding`, `--glot-font-size`, `--glot-fg`, `--glot-bg`, `--glot-border`, `--glot-list-bg`, `--glot-active-bg`, `--glot-active-fg`, `--glot-focus`. Pills are buttons with `aria-current`; arrow keys (mirrored in RTL), Home and End move between them. Each label carries its own `lang` and `dir`.
+
+```css
+glot-locale-switcher { --glot-active-bg: #111; --glot-active-fg: #fff; --glot-border: #ddd; }
+glot-locale-switcher::part(pill) { text-transform: lowercase; }
+```
+
+### Strings over the air
+
+The switcher only lists languages. Showing a new language without a redeploy also needs the app to **load its strings at runtime** instead of bundling them at build time. The same script exposes:
+
+```js
+const messages = await glot.loadCatalog("fr"); // GET /cdn/{slug}/fr.json, nested JSON
+document.addEventListener("glot:catalog", (e) => console.log(e.detail.locale, e.detail.messages));
+```
+
+The browser's HTTP cache revalidates with the ETag after 60 s; there are no custom headers, so no CORS preflight.
+
+What this means for your site:
+
+- **Client-rendered apps** (SPA, Leptos/Yew CSR, Vue, React without SSR): load the catalog for the chosen locale with `glot.loadCatalog` and feed your i18n library. A new language then needs nothing on your side.
+- **Catalogs compiled into the bundle** (`import fr from "./fr.json"`, `include_str!`, a Rust `i18n!` macro, static site generation): a language glot adds after the build is not in the bundle. The switcher can list it, but the strings come only from a runtime fetch. Keep the compiled catalogs as the fallback and fetch the others, or rebuild.
+- **Server-rendered apps** (Next, Remix, Node): fetch on the server with `createOnDemandLoader` from `@glot-i18n/runtime/ondemand` (in-memory cache, ETag revalidation, deep merge over the source) and render real HTML.
+
+### Leptos (CSR)
+
+```rust
+// index.html: the script tag above, and <glot-locale-switcher strategy="event"></glot-locale-switcher> in your header.
+use wasm_bindgen::{closure::Closure, JsCast};
+
+let (messages, set_messages) = signal(serde_json::Value::Null);
+let load = move |locale: String| {
+    let glot = js_sys::Reflect::get(&web_sys::window().unwrap(), &"glot".into()).unwrap();
+    let f: js_sys::Function = js_sys::Reflect::get(&glot, &"loadCatalog".into()).unwrap().into();
+    let p: js_sys::Promise = f.call1(&glot, &locale.into()).unwrap().into();
+    leptos::task::spawn_local(async move {
+        if let Ok(v) = wasm_bindgen_futures::JsFuture::from(p).await {
+            set_messages.set(serde_wasm_bindgen::from_value(v).unwrap_or_default());
+        }
+    });
+};
+let on_change = Closure::<dyn Fn(web_sys::CustomEvent)>::new(move |e: web_sys::CustomEvent| {
+    let locale = js_sys::Reflect::get(&e.detail(), &"locale".into()).unwrap().as_string().unwrap();
+    load(locale);
+});
+document().add_event_listener_with_callback("glot:locale-change", on_change.as_ref().unchecked_ref()).unwrap();
+on_change.forget();
+```
+
+A site that already switches with `?lang=xx` (and reloads) can keep doing so: use `strategy="query:lang"` and, at startup, `glot.loadCatalog(lang)` when `lang` isn't one of the compiled catalogs.
+
+### Plain JS
+
+```html
+<glot-locale-switcher strategy="event" variant="select"></glot-locale-switcher>
+<h1 data-i18n="home.title">Welcome</h1>
+<script>
+  const get = (o, k) => k.split(".").reduce((x, p) => x?.[p], o);
+  document.addEventListener("glot:catalog", ({ detail }) => {
+    for (const el of document.querySelectorAll("[data-i18n]")) {
+      el.textContent = get(detail.messages, el.dataset.i18n) ?? el.textContent;
+    }
+  });
+  document.addEventListener("glot:locale-change", (e) => glot.loadCatalog(e.detail.locale));
+  // The script is deferred: `glot` exists from DOMContentLoaded on.
+  addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("glot-locale");
+    if (saved) glot.loadCatalog(saved);
+  });
+</script>
+```
