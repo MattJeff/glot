@@ -228,7 +228,8 @@ export function SiteFrame({
           break;
         }
         case "glot:review:error":
-          cb.current.setState("unreachable");
+          // The bridge may already answer: the page stays live, only the widget's features are missing.
+          cb.current.setState((s) => (s === "bridge" ? s : "unreachable"));
           cb.current.onEvent({ type: "error", status: Number(d.status) || 0 });
           break;
         case "glot:pick-cancel":

@@ -705,7 +705,8 @@ export function start(opts: ReviewOptions & { token: string }): void {
       ctx = await api.context();
     } catch (e: any) {
       // Tell the Review page why it won't connect (401 = token, 0 = network/CORS).
-      post("glot:review:error", { status: Number(e?.status) || 0 });
+      console.warn("[glot review] context call failed:", e);
+      post("glot:review:error", { status: Number(e?.status) || 0, message: String(e?.message ?? e).slice(0, 200) });
       bar.replaceChildren(grip, h("p", { className: "err", role: "alert", style: "margin:0;padding:0 8px" }, e?.status === 401 ? L.expired : L.error), btn(ic("x"), quit, "btn", { "aria-label": L.quit }));
       return placeBar();
     }

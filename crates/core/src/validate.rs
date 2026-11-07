@@ -22,7 +22,25 @@ pub enum Syntax {
     Vue,
     /// Laravel: `:name` / `:Name` / `:NAME`, plurals `a|b` and `{0} none|[1,19] some|[20,*] many`.
     Laravel,
+    /// Double-brace templates: Liquid `{{ count }}` (Shopify themes, Jekyll), Go templates
+    /// `{{ .Count }}` (Hugo); plurals are `one`/`other` sub-objects (ICU wrapper in memory).
+    Template,
+    /// Project Fluent `.ftl`: `{ $name }`, terms `{ -brand }`, message refs, `{ NUMBER($n) }`,
+    /// selects `{ $n -> [one] … *[other] … }` (`validate/fluent.rs`).
+    Fluent,
+    /// Hand-rolled runtimes (`t(key).replace("{n}", …)`, cliponit's Rust tables): `{name}` is a
+    /// placeholder, everything else is text (`{{literal}}`, `<key>`, apostrophes).
+    Plain,
+    /// Symfony Translation: `%name%`, `{{ name }}`, `|` plural forms with intervals
+    /// (`{0}…|]1,Inf[…`); ICU for `+intl-icu` messages (`validate/backend.rs`).
+    Symfony,
+    /// Java `MessageFormat` (Spring, `ResourceBundle`): `{0}`, `{0,number}`, `''` apostrophe,
+    /// a single `'` quotes text (`validate/backend.rs`).
+    Java,
 }
+
+mod backend;
+mod fluent;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -130,6 +148,16 @@ pub fn validate(
         .run();
         if matches!(syntax, Syntax::Vue | Syntax::Laravel) {
             out.extend(pipe_forms(source, target, target_locale, syntax));
+        }
+        // Legacy Symfony plurals are Laravel's (Laravel's selector is Symfony's).
+        if syntax == Syntax::Symfony && crate::formats::choices(source).is_empty() {
+            out.extend(pipe_forms(source, target, target_locale, syntax));
+        }
+        if syntax == Syntax::Java && backend::java_lone_quote(target) {
+            out.push(error(
+                IssueCode::SyntaxError,
+                "Java MessageFormat: a single `'` hides the text after it up to the next `'` (placeholders included); write an apostrophe as `''`.".into(),
+            ));
         }
     }
     let src_nodes = src.unwrap_or_else(|| vec![Node::Text(source.into())]);
@@ -395,6 +423,11 @@ fn syntax_issue(e: &str, syntax: Syntax) -> Issue {
         Syntax::Rails => "Rails i18n",
         Syntax::Vue => "vue-i18n",
         Syntax::Laravel => "Laravel",
+        Syntax::Template => "template ({{ }})",
+        Syntax::Fluent => "Fluent",
+        Syntax::Plain => "plain {name}",
+        Syntax::Symfony => "Symfony",
+        Syntax::Java => "Java MessageFormat",
     };
     error(
         IssueCode::SyntaxError,
@@ -513,6 +546,21 @@ fn parse(text: &str, syntax: Syntax) -> Result<Vec<Node>, String> {
         // HTML in these messages goes through `v-html` / `{!! !!}`: compared, not required balanced.
         Syntax::Vue => return p.vue_seq(),
         Syntax::Laravel => return Ok(p.laravel_seq()),
+        // Markup in Fluent values is compared, not required balanced (Firefox `<a data-l10n-name>`).
+        Syntax::Fluent => return p.fluent(),
+        Syntax::Plain => return Ok(fluent::plain(text)),
+        Syntax::Symfony if crate::formats::choices(text).is_empty() => {
+            return Ok(p.symfony_legacy());
+        }
+        Syntax::Symfony => p.icu_seq(0, false)?,
+        Syntax::Java => {
+            p.s = backend::java_to_icu(text).chars().collect();
+            p.icu_seq(0, false)?
+        }
+        Syntax::Template => {
+            p.s = template_to_icu(text).chars().collect();
+            p.icu_seq(0, false)?
+        }
     };
     check_tags(&nodes)?;
     Ok(nodes)
@@ -1418,6 +1466,41 @@ const R_BRACE: char = '\u{E002}';
 /// Braces in printf catalogs: `{n, plural, …}` (native plurals) stay for the ICU parser; Python
 /// `str.format` fields (`{}`, `{0}`, `{name!r}`, `{:.2f}`, gettext `python-brace-format`) become
 /// [`PY_ARG`] (name, conversion/spec as the format); any other brace is literal text (iOS/Android).
+/// `{{ expr }}` (`{{- x -}}` trims) => ICU `{expr}` (whitespace dropped, ICU specials replaced),
+/// apostrophes doubled so they stay text; the `{_count, plural, …}` wrapper is kept.
+fn template_to_icu(s: &str) -> String {
+    let mut out = String::new();
+    let mut rest = s;
+    while let Some(mut i) = rest.find("{{") {
+        // `one {{{ count }} item}`: the first `{` opens the plural option.
+        while rest[i + 2..].starts_with('{') {
+            i += 1;
+        }
+        let Some(j) = rest[i + 2..].find("}}") else {
+            break;
+        };
+        out.push_str(&rest[..i].replace('\'', "''"));
+        let expr = rest[i + 2..i + 2 + j].trim_matches('-');
+        let name: String = expr
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .map(|c| {
+                if matches!(c, ',' | '{' | '}' | '\'' | '#' | '<') {
+                    '_'
+                } else {
+                    c
+                }
+            })
+            .collect();
+        out.push('{');
+        out.push_str(if name.is_empty() { "_" } else { &name });
+        out.push('}');
+        rest = &rest[i + 4 + j..];
+    }
+    out.push_str(&rest.replace('\'', "''"));
+    out
+}
+
 fn printf_braces(s: &str) -> (String, Vec<(String, Option<String>)>) {
     let (mut out, mut py, mut auto) = (String::new(), vec![], 0);
     let mut i = 0;
@@ -1502,6 +1585,23 @@ fn split_printf(t: &str, next: &mut usize, py: &mut PyArgs, out: &mut Vec<Node>)
             i += 1;
             continue;
         }
+        // Dart / Flutter slang `$name` (`${name}` is a brace field, handled above).
+        if c[i] == '$'
+            && c.get(i + 1)
+                .is_some_and(|x| x.is_ascii_alphabetic() || *x == '_')
+        {
+            let n = c[i + 1..]
+                .iter()
+                .take_while(|x| x.is_ascii_alphanumeric() || **x == '_')
+                .count();
+            flush(out, &mut text);
+            out.push(Node::Arg {
+                name: c[i + 1..i + 1 + n].iter().collect(),
+                format: None,
+            });
+            i += 1 + n;
+            continue;
+        }
         if c[i] != '%' {
             text.push(c[i]);
             i += 1;
@@ -1564,8 +1664,30 @@ fn split_printf(t: &str, next: &mut usize, py: &mut PyArgs, out: &mut Vec<Node>)
                 i = j + 1;
             }
             None => {
-                text.push('%');
-                i += 1;
+                // Qt `%1`..`%99`, `%n` (numerus count), `%L1` (localized number).
+                let k = i + 1 + usize::from(c.get(i + 1) == Some(&'L'));
+                let digits = c[k..]
+                    .iter()
+                    .take(2)
+                    .take_while(|x| x.is_ascii_digit())
+                    .count();
+                let qt = if digits > 0 && c[k] != '0' {
+                    Some(c[k..k + digits].iter().collect::<String>())
+                } else {
+                    (c.get(k) == Some(&'n') && !c.get(k + 1).is_some_and(|x| x.is_alphanumeric()))
+                        .then(|| "n".to_string())
+                };
+                match qt {
+                    Some(name) => {
+                        flush(out, &mut text);
+                        out.push(Node::Arg { name, format: None });
+                        i = k + digits.max(1);
+                    }
+                    None => {
+                        text.push('%');
+                        i += 1;
+                    }
+                }
             }
         }
     }
@@ -1601,10 +1723,11 @@ fn pipe_split(text: &str) -> Vec<&str> {
 /// Laravel range prefix of a form: `{0}`, `[1,19]`, `[20,*]` (spaces dropped).
 fn laravel_range(form: &str) -> Option<String> {
     let f = form.trim_start();
-    if !f.starts_with(['{', '[']) {
+    // `]1,Inf[`: Symfony's open intervals.
+    if !f.starts_with(['{', '[', ']']) {
         return None;
     }
-    let end = f.find(['}', ']'])?;
+    let end = 1 + f[1..].find(['}', ']', '['])?;
     Some(f[..=end].split_whitespace().collect())
 }
 
@@ -1646,6 +1769,11 @@ fn pipe_forms(source: &str, target: &str, locale: &str, syntax: Syntax) -> Vec<I
             ),
         )];
     }
+    let lib = if syntax == Syntax::Symfony {
+        "Symfony"
+    } else {
+        "Laravel"
+    };
     let ranges = |v: &[&str]| v.iter().map(|f| laravel_range(f)).collect::<Vec<_>>();
     let (sr, tr) = (ranges(&src), ranges(&tgt));
     if sr.iter().any(Option::is_some) {
@@ -1661,7 +1789,7 @@ fn pipe_forms(source: &str, target: &str, locale: &str, syntax: Syntax) -> Vec<I
         return vec![error(
             IssueCode::PluralCategoryMissing,
             format!(
-                "Laravel plural: the source forms are `{}` but the translation has `{}`; keep the same ranges in the same order and translate only the text after them.",
+                "{lib} plural: the source forms are `{}` but the translation has `{}`; keep the same ranges in the same order and translate only the text after them.",
                 show(&sr),
                 show(&tr)
             ),
@@ -1675,14 +1803,14 @@ fn pipe_forms(source: &str, target: &str, locale: &str, syntax: Syntax) -> Vec<I
         vec![error(
             IssueCode::PluralCategoryMissing,
             format!(
-                "Laravel plural: {locale} needs {need} `|`-separated forms, the translation has {m}; Laravel falls back to the first form otherwise."
+                "{lib} plural: {locale} needs {need} `|`-separated forms, the translation has {m}; {lib} falls back to the first form otherwise."
             ),
         )]
     } else if m > need {
         vec![warning(
             IssueCode::PluralCategoryExtra,
             format!(
-                "Laravel plural: {locale} uses {need} `|`-separated forms, the translation has {m}; the extra ones are never shown."
+                "{lib} plural: {locale} uses {need} `|`-separated forms, the translation has {m}; the extra ones are never shown."
             ),
         )]
     } else {
@@ -1788,6 +1916,11 @@ impl Checker<'_> {
             Syntax::Rails => format!("%{{{name}}}"),
             Syntax::Vue => format!("{{{name}}}"),
             Syntax::Laravel => format!(":{name}"),
+            Syntax::Template => format!("{{{{ {name} }}}}"),
+            Syntax::Fluent => format!("{{ ${name} }}"),
+            Syntax::Plain => format!("{{{name}}}"),
+            Syntax::Symfony => format!("%{name}%"),
+            Syntax::Java => format!("{{{name}}}"),
         }
     }
 
@@ -1846,6 +1979,8 @@ impl Checker<'_> {
                     .map(|k| {
                         if vue {
                             format!("@:{k}")
+                        } else if self.syntax == Syntax::Fluent {
+                            format!("{{ {k} }}")
                         } else {
                             format!("$t({k})")
                         }
@@ -1853,7 +1988,11 @@ impl Checker<'_> {
                     .collect::<Vec<_>>()
                     .join(", ")
             };
-            let shape = if vue { "@:key" } else { "$t(...)" };
+            let shape = match (vue, self.syntax == Syntax::Fluent) {
+                (true, _) => "@:key",
+                (_, true) => "{ -term } / { message }",
+                _ => "$t(...)",
+            };
             self.out.push(error(
                 IssueCode::PlaceholderMissing,
                 format!("Nested translations differ: the source uses [{}] but the translation uses [{}]; keep `{shape}` references unchanged.", fmt(&src), fmt(&tgt)),

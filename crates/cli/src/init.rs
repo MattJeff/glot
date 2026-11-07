@@ -25,8 +25,16 @@ pub struct InitArgs {
     force: bool,
 }
 
+#[path = "init_backend.rs"]
+mod backend;
+#[path = "init_cms.rs"]
+mod cms;
 #[path = "init_native.rs"]
 mod native;
+#[path = "init_rust.rs"]
+mod rust;
+#[path = "init_web.rs"]
+mod web;
 
 const MARK_START: &str = "<!-- glot:start -->";
 const MARK_END: &str = "<!-- glot:end -->";
@@ -55,6 +63,11 @@ pub fn detect(root: &Path) -> Detected {
         deps.iter()
             .any(|d| d == n || d.starts_with(&format!("{n}/")))
     };
+    // Paraglide, Docusaurus, Starlight, Svelte, Qwik, Ember: catalogs outside `locales/`.
+    if let Some(mut d) = web::detect(root, &has) {
+        d.locales.extend(web::configured_locales(root));
+        return d;
+    }
     // Mobile / gettext / Rails catalogs, unless a JS i18n library says otherwise.
     let js = [
         "next-intl",
@@ -71,6 +84,17 @@ pub fn detect(root: &Path) -> Detected {
         "i18n-js",
     ];
     if !js.iter().any(|n| has(n)) {
+        // go-i18n, nestjs-i18n, Node `i18n` (mashpie).
+        if let Some(d) = backend::detect(root, &has) {
+            return d;
+        }
+        if let Some(d) = rust::detect(root) {
+            return d;
+        }
+        // Static sites and CMS themes (Shopify, WordPress, Hugo, Jekyll).
+        if let Some(d) = cms::detect(root) {
+            return d;
+        }
         if let Some(d) = native::detect(root) {
             return d;
         }
@@ -176,6 +200,14 @@ pub fn detect(root: &Path) -> Detected {
     if stack == "i18next" {
         files = ns_patterns(files);
     }
+    if stack == "transloco" {
+        files.extend(web::transloco_scopes(root, &files));
+    }
+    if let Some((s, x)) = web::syntax_override(&has) {
+        (stack, syntax) = (s, x);
+    }
+    // Locales the i18n config declares (Transloco `langs`, Nuxt / Astro / next-intl `locales`).
+    locales.extend(web::configured_locales(root));
     Detected {
         stack,
         syntax,
@@ -530,7 +562,8 @@ fn find_dictionary(root: &Path) -> Option<(String, BTreeSet<String>)> {
     let mut best: Option<(usize, String, BTreeSet<String>)> = None;
     for rel in code_files(root) {
         let name = rel.rsplit('/').next().unwrap_or(&rel).to_ascii_lowercase();
-        if !HINTS.iter().any(|h| name.contains(h)) {
+        // Astro's i18n recipe: `src/i18n/ui.ts`.
+        if !HINTS.iter().any(|h| name.contains(h)) && !rel.contains("i18n/") {
             continue;
         }
         let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
@@ -687,8 +720,12 @@ fn find_in(root: &Path, dirs: &[&str]) -> (Vec<String>, BTreeSet<String>) {
                         locales.insert(name.clone());
                     }
                 }
-            } else if let Some(stem) = name.strip_suffix(".json").filter(|s| is_locale(s)) {
-                patterns.insert(format!("{dir}/{{locale}}.json"));
+            } else if let Some((stem, ext)) = name
+                .rsplit_once('.')
+                .filter(|(s, e)| is_locale(s) && matches!(*e, "json" | "yaml" | "yml"))
+            {
+                // vue-i18n / Nuxt / ember-intl also keep `{locale}.yaml`.
+                patterns.insert(format!("{dir}/{{locale}}.{ext}"));
                 locales.insert(stem.to_string());
             }
         }
@@ -740,7 +777,10 @@ pub fn run(args: InitArgs) -> Result<()> {
         .as_ref()
         .and_then(|r| guess_language(r.hardcoded.iter().chain(&r.config).map(|h| h.text.as_str())));
     let mut source = args.source.clone().unwrap_or_else(|| {
-        if d.locales.contains("en") {
+        // Rust apps say it (`fallback_language`, leptos_i18n `default`, a `(key, fr, en)` table).
+        if let Some(s) = rust::source(&root).filter(|s| d.locales.contains(s)) {
+            s
+        } else if d.locales.contains("en") {
             "en".into()
         } else if d.locales.is_empty() {
             guessed.unwrap_or("en").into()
@@ -835,7 +875,12 @@ pub fn run(args: InitArgs) -> Result<()> {
         );
     }
     let hardcoded = report.map_or(0, |r| r.hardcoded.len());
-    if hardcoded > 0 {
+    if hardcoded > 0 && rust::is_rust(d.stack) {
+        // `glot i18nize` rewrites JS/TS only.
+        anstream::println!(
+            "\n{BOLD}Next:{BOLD:#} {hardcoded} hardcoded strings in view!/html!/rsx! ({DIM}{glot} extract{DIM:#} lists them): move them into the catalog and call the app's t(), then {DIM}{glot} translate{DIM:#}"
+        );
+    } else if hardcoded > 0 {
         anstream::println!(
             "\n{BOLD}Next:{BOLD:#} {hardcoded} hardcoded strings found: run {BOLD}{glot} i18nize{BOLD:#} to move them into the catalog and wire the i18n library ({DIM}--dry-run{DIM:#} to preview), then {DIM}{glot} translate{DIM:#}"
         );
@@ -1036,7 +1081,7 @@ fn glot_toml(
          # Catalog files, `{{locale}}` is replaced by each locale.\n\
          files = {}\n\
          format = \"{}\"   # auto | json-nested | json-flat | json-message | xcstrings | strings | android | arb | po | yaml | js\n\
-         syntax = \"{}\"   # icu | i18next | mf2 | printf | rails | vue | laravel\n\n\
+         syntax = \"{}\"   # icu | i18next | mf2 | printf | rails | vue | laravel | symfony | java | template | fluent | plain\n\n\
          [llm]\n\
          provider = \"{}\"   # anthropic | openai | openai-compatible | mock\n\
          model = \"{model}\"\n",
@@ -1044,6 +1089,9 @@ fn glot_toml(
         toml_list(&d.files),
         if message_objects(root, d, source) {
             "json-message"
+        } else if d.stack == "qt" {
+            // A new `app_de.ts` is XML, not TypeScript.
+            "qt"
         } else {
             "auto"
         },
@@ -1088,12 +1136,17 @@ fn glot_toml(
     if d.stack == "i18next" {
         s += &i18next_section(root);
     }
+    s += &cms::extra_toml(root, d.stack, source);
     Ok(s)
 }
 
 /// FormatJS extracted catalog (`{"id": {"defaultMessage": …, "description": …}}`): every entry of
 /// the source file is a message object.
 fn message_objects(root: &Path, d: &Detected, source: &str) -> bool {
+    // `docusaurus write-translations` files are `{"id": {"message", "description"}}`.
+    if d.stack == "docusaurus" {
+        return true;
+    }
     let Some(f) = d.files.first().filter(|f| f.ends_with(".json")) else {
         return false;
     };
@@ -1136,6 +1189,8 @@ fn includes(root: &Path) -> Vec<String> {
     {
         include.extend(["src/**/*.php", "templates/**/*.twig"].map(String::from));
     }
+    // Rust crates (Leptos `view!`, Yew `html!`, Dioxus `rsx!`): their `src/`.
+    include.extend(rust::includes(root));
     if include.is_empty() {
         glot_core::config::ExtractConfig::default().include
     } else {

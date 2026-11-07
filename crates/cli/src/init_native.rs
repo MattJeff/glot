@@ -26,7 +26,7 @@ const SKIP: &[&str] = &[
 ];
 
 /// Files under `root` (depth <= 6) matching `pred`, sorted.
-fn find(root: &Path, pred: &dyn Fn(&Path) -> bool) -> Vec<PathBuf> {
+pub(super) fn find(root: &Path, pred: &dyn Fn(&Path) -> bool) -> Vec<PathBuf> {
     fn walk(dir: &Path, depth: usize, pred: &dyn Fn(&Path) -> bool, out: &mut Vec<PathBuf>) {
         let Ok(rd) = std::fs::read_dir(dir) else {
             return;
@@ -49,7 +49,7 @@ fn find(root: &Path, pred: &dyn Fn(&Path) -> bool) -> Vec<PathBuf> {
     out
 }
 
-fn rel(root: &Path, p: &Path) -> String {
+pub(super) fn rel(root: &Path, p: &Path) -> String {
     p.strip_prefix(root)
         .unwrap_or(p)
         .to_string_lossy()
@@ -181,15 +181,21 @@ pub fn detect(root: &Path) -> Option<Detected> {
             );
         }
     }
-    // Android: `res/values/strings.xml` is the source, `values-<qualifier>` the targets.
+    // Android: `res/values/strings.xml` is the source, `values-<qualifier>` the targets. Compose
+    // Multiplatform `composeResources/values[-fr]/strings.xml` is the same format and layout.
     let android = find(root, &|p| {
         p.file_name().is_some_and(|n| n == "strings.xml")
             && p.parent()
                 .and_then(|d| d.file_name())
                 .is_some_and(|n| n == "values")
-            && rel(root, p).contains("res/")
+            && (rel(root, p).contains("res/") || rel(root, p).contains("composeResources/"))
     });
     if let Some(src) = android.first() {
+        let stack = if rel(root, src).contains("composeResources/") {
+            "compose-multiplatform"
+        } else {
+            "android"
+        };
         let res = src.parent().unwrap().parent().unwrap();
         let mut locales: BTreeSet<String> = ["en".to_string()].into();
         for e in std::fs::read_dir(res).into_iter().flatten().flatten() {
@@ -201,11 +207,14 @@ pub fn detect(root: &Path) -> Option<Detected> {
             }
         }
         return d(
-            "android",
+            stack,
             "printf",
             vec![format!("{}/values-{{locale}}/strings.xml", rel(root, res))],
             locales,
         );
+    }
+    if let Some(d) = moko(root) {
+        return Some(d);
     }
     if let Some(d) = flutter_json(root) {
         return Some(d);
@@ -250,6 +259,9 @@ pub fn detect(root: &Path) -> Option<Detected> {
                 locales,
             );
         }
+    }
+    if let Some(d) = qt(root) {
+        return Some(d);
     }
     // gettext: `<dir>/<locale>/LC_MESSAGES/<domain>.po` or `<dir>/<locale>.po`.
     let po = find(root, &|p| ext(p, "po"));
@@ -338,7 +350,7 @@ pub fn detect(root: &Path) -> Option<Detected> {
 }
 
 /// WebExtensions: `_locales/{locale}/messages.json`, source = `default_locale` of `manifest.json`.
-fn webext(root: &Path) -> Option<Detected> {
+pub(super) fn webext(root: &Path) -> Option<Detected> {
     let msgs = find(root, &|p| {
         p.file_name().is_some_and(|n| n == "messages.json")
             && p.parent()
@@ -407,6 +419,20 @@ fn flutter_json(root: &Path) -> Option<Detected> {
             if is_locale(loc) {
                 files.insert(format!("{dir}/{pre}{{locale}}{suffix}"));
                 locales.insert(loc.to_string());
+            } else if stack == "slang" {
+                // slang's base file has no locale (`strings.i18n.json`): `base_locale`, `en` by default.
+                let cfg = ["slang.yaml", "build.yaml"]
+                    .iter()
+                    .find_map(|f| std::fs::read_to_string(root.join(f)).ok())
+                    .unwrap_or_default();
+                let base = cfg
+                    .lines()
+                    .find_map(|l| l.trim().strip_prefix("base_locale:"))
+                    .map(|v| v.trim().trim_matches(['"', '\'']).to_string())
+                    .filter(|l| is_locale(l))
+                    .unwrap_or_else(|| "en".into());
+                files.insert(format!("{dir}/{stem}_{{locale}}{suffix}"));
+                locales.insert(base);
             }
         }
         if !files.is_empty() {
@@ -419,6 +445,89 @@ fn flutter_json(root: &Path) -> Option<Detected> {
         }
     }
     None
+}
+
+/// Qt Linguist: `<dir>/<app>_<locale>.ts` (XML), no source file (the source text is in every
+/// file, `sourcelanguage`, English by default).
+fn qt(root: &Path) -> Option<Detected> {
+    let (mut files, mut locales) = (BTreeSet::new(), BTreeSet::new());
+    for p in find(root, &|p| ext(p, "ts")) {
+        let head = std::fs::read_to_string(&p).unwrap_or_default();
+        if !head.contains("<TS") {
+            continue;
+        }
+        let stem = p.file_stem().unwrap().to_string_lossy().to_string();
+        let Some(i) = stem
+            .match_indices('_')
+            .map(|(i, _)| i)
+            .rev()
+            .find(|&i| is_locale(&stem[i + 1..]))
+        else {
+            continue;
+        };
+        files.insert(with_dir(
+            &rel(root, p.parent().unwrap()),
+            &format!("{}_{{locale}}.ts", &stem[..i]),
+        ));
+        locales.insert(stem[i + 1..].to_string());
+        let src = head
+            .split_once("sourcelanguage=\"")
+            .and_then(|(_, r)| r.split_once('"'))
+            .map(|(l, _)| l.split(['_', '-']).next().unwrap_or(l).to_string())
+            .filter(|l| is_locale(l))
+            .unwrap_or_else(|| "en".into());
+        locales.insert(src);
+    }
+    if files.is_empty() {
+        return None;
+    }
+    Some(Detected {
+        stack: "qt",
+        syntax: "printf",
+        files: files.into_iter().collect(),
+        locales,
+    })
+}
+
+/// moko-resources (Kotlin Multiplatform): Android XML in `moko-resources/base/` (older:
+/// `resources/MR/base/`), one folder per qualifier; `strings.xml` first, then `plurals.xml`.
+fn moko(root: &Path) -> Option<Detected> {
+    let base = find(root, &|p| {
+        p.file_name()
+            .is_some_and(|n| n == "strings.xml" || n == "plurals.xml")
+            && p.parent()
+                .and_then(Path::file_name)
+                .is_some_and(|n| n == "base")
+            && p.parent()
+                .and_then(Path::parent)
+                .and_then(Path::file_name)
+                .is_some_and(|n| n == "moko-resources" || n == "MR")
+    });
+    let dir = base.first()?.parent()?.parent()?;
+    let mut files: Vec<String> = base
+        .iter()
+        .filter(|p| p.parent().and_then(Path::parent) == Some(dir))
+        .map(|p| {
+            with_dir(
+                &rel(root, dir),
+                &format!("{{locale}}/{}", p.file_name().unwrap().to_string_lossy()),
+            )
+        })
+        .collect();
+    files.sort_by_key(|f| !f.ends_with("/strings.xml"));
+    let mut locales: BTreeSet<String> = ["en".to_string()].into();
+    locales.extend(
+        read_dir(dir)
+            .iter()
+            .filter(|e| e.path().is_dir())
+            .filter_map(|e| from_qualifier(&e.file_name().to_string_lossy())),
+    );
+    Some(Detected {
+        stack: "moko-resources",
+        syntax: "printf",
+        files,
+        locales,
+    })
 }
 
 /// Symfony: `translations/<domain>[+intl-icu].<locale>.<yaml|xlf|…>` (`default_path` of
@@ -465,9 +574,10 @@ fn symfony(root: &Path) -> Option<Detected> {
             f.clone(),
         )
     });
+    // `+intl-icu` messages are ICU, the others `%name%` / `|` intervals: `symfony` reads both.
     Some(Detected {
         stack: "symfony",
-        syntax: "icu",
+        syntax: "symfony",
         files,
         locales,
     })
@@ -597,7 +707,7 @@ fn backend(root: &Path) -> Option<Detected> {
         };
         return Some(Detected {
             stack,
-            syntax: "icu",
+            syntax: if stack == "symfony" { "symfony" } else { "icu" },
             files: files.into_iter().collect(),
             locales,
         });
@@ -605,7 +715,7 @@ fn backend(root: &Path) -> Option<Detected> {
     // Java `messages_<locale>.properties` and .NET `Strings.<locale>.resx` next to their
     // locale-less source file (the default bundle, English by convention).
     for (e, sep, stack, syntax) in [
-        ("properties", '_', "java", "icu"),
+        ("properties", '_', "java", "java"),
         ("resx", '.', ".net", "printf"),
     ] {
         let (mut files, mut locales) = (BTreeSet::new(), BTreeSet::new());
@@ -764,6 +874,81 @@ mod tests {
 
     #[test]
     #[allow(clippy::type_complexity)]
+    fn detects_mobile_desktop_stacks() {
+        const TS: &str = "<?xml version=\"1.0\"?>\n<!DOCTYPE TS>\n<TS version=\"2.1\" language=\"pt_BR\" sourcelanguage=\"en_US\">\n</TS>\n";
+        let cases: &[(&[(&str, &str)], &str, &str, &[&str], &[&str])] = &[
+            (
+                &[
+                    (
+                        "composeApp/src/commonMain/composeResources/values/strings.xml",
+                        "",
+                    ),
+                    (
+                        "composeApp/src/commonMain/composeResources/values-fr/strings.xml",
+                        "",
+                    ),
+                ],
+                "compose-multiplatform",
+                "printf",
+                &["composeApp/src/commonMain/composeResources/values-{locale}/strings.xml"],
+                &["en", "fr"],
+            ),
+            (
+                &[
+                    ("shared/src/commonMain/moko-resources/base/strings.xml", ""),
+                    ("shared/src/commonMain/moko-resources/base/plurals.xml", ""),
+                    ("shared/src/commonMain/moko-resources/de/strings.xml", ""),
+                ],
+                "moko-resources",
+                "printf",
+                &[
+                    "shared/src/commonMain/moko-resources/{locale}/strings.xml",
+                    "shared/src/commonMain/moko-resources/{locale}/plurals.xml",
+                ],
+                &["de", "en"],
+            ),
+            (
+                &[
+                    ("translations/app_pt_BR.ts", TS),
+                    ("translations/app_fr.ts", TS),
+                    ("src/main.ts", "export {};"),
+                ],
+                "qt",
+                "printf",
+                &["translations/app_{locale}.ts"],
+                &["en", "fr", "pt_BR"],
+            ),
+            (
+                &[
+                    ("pubspec.yaml", "dependencies:\n  slang: ^4.0.0\n"),
+                    ("slang.yaml", "base_locale: de\n"),
+                    ("lib/i18n/strings.i18n.json", "{}"),
+                    ("lib/i18n/strings_fr.i18n.json", "{}"),
+                ],
+                "slang",
+                "printf",
+                &["lib/i18n/strings_{locale}.i18n.json"],
+                &["de", "fr"],
+            ),
+        ];
+        for (files, stack, syntax, patterns, locales) in cases {
+            let dir = tempfile::tempdir().unwrap();
+            for (f, body) in *files {
+                touch(dir.path(), f, body);
+            }
+            let d = detect(dir.path()).unwrap_or_else(|| panic!("{stack} not detected"));
+            assert_eq!((d.stack, d.syntax), (*stack, *syntax));
+            assert_eq!(d.files, *patterns, "{stack}");
+            assert_eq!(
+                d.locales.iter().map(String::as_str).collect::<Vec<_>>(),
+                *locales,
+                "{stack}"
+            );
+        }
+    }
+
+    #[test]
+    #[allow(clippy::type_complexity)]
     fn detects_backend_catalogs() {
         let cases: &[(&[(&str, &str)], &str, &str, &[&str], &[&str])] = &[
             (
@@ -809,7 +994,7 @@ mod tests {
                     ("translations/messages.fr.xlf", ""),
                 ],
                 "symfony",
-                "icu",
+                "symfony",
                 &["translations/messages.{locale}.xlf"],
                 &["en", "fr"],
             ),
@@ -822,7 +1007,7 @@ mod tests {
                     ("src/main/resources/application.properties", ""),
                 ],
                 "spring",
-                "icu",
+                "java",
                 &["src/main/resources/messages_{locale}.properties"],
                 &["en", "fr", "pt_BR"],
             ),
@@ -914,7 +1099,7 @@ mod tests {
                     ("i18n/README.md", ""),
                 ],
                 "symfony",
-                "icu",
+                "symfony",
                 &[
                     "i18n/messages+intl-icu.{locale}.yaml",
                     "i18n/validators.{locale}.yaml",

@@ -36,9 +36,20 @@ pub enum Format {
     Resx,
     /// Laravel `lang/{locale}/*.php` arrays.
     Php,
+    /// Project Fluent `.ftl` (fluent-rs, fluent-templates, i18n-embed, dioxus-i18n), by extension.
+    Fluent,
+    /// Rust string tables `static DICT: &[(&str, &str, &str)] = &[("key", "fr", "en"), …]` (every
+    /// locale in one `.rs` file, column order from a `// (key, fr, en)` comment or the lookup code).
+    RustDict,
+    /// TOML: Hugo `i18n/fr.toml`, go-i18n `active.fr.toml` (by extension, also under `auto`).
+    Toml,
+    /// Qt Linguist `translations/app_fr.ts` (XML; `.ts` files that are XML also resolve under `auto`).
+    Qt,
     /// JSON message objects: FormatJS extracted `{"id": {"defaultMessage", "description"}}`,
     /// WebExtensions `_locales/{locale}/messages.json` (by path, also under `auto`).
     JsonMessage,
+    /// inlang message format (Paraglide JS): `messages/{locale}.json` beside `project.inlang/` (by path, also under `auto`).
+    Inlang,
 }
 
 /// How one catalog file maps to glot keys (from `glot.toml`, see [`crate::config::Config::catalog_files`]).
@@ -171,6 +182,11 @@ impl Catalog {
             return crate::formats::write_path(f, path, cat);
         }
         let existing = read_optional(path)?;
+        // Shopify themes start their locale files with a `/* … */` banner: kept as is.
+        let (head, existing) = match existing.as_deref().map(json_banner) {
+            Some((h, body)) => (h.to_string(), Some(body.to_string())),
+            None => (String::new(), None),
+        };
         let format = match format {
             Format::Auto => existing
                 .as_deref()
@@ -185,7 +201,7 @@ impl Catalog {
             return if same {
                 Ok(())
             } else {
-                write_file(path, &merged)
+                write_file(path, &format!("{head}{merged}"))
             };
         }
         let out = cat
@@ -399,7 +415,7 @@ fn parse_at(json: &str, locale: &str, path: &Path, layout: &Layout) -> Result<Ca
         path: path.to_path_buf(),
         message,
     };
-    let value: Value = serde_json::from_str(json).map_err(|e| err(e.to_string()))?;
+    let value: Value = serde_json::from_str(json_banner(json).1).map_err(|e| err(e.to_string()))?;
     if !value.is_object() {
         return Err(err("catalog root must be a JSON object".into()));
     }
@@ -414,6 +430,20 @@ fn parse_at(json: &str, locale: &str, path: &Path, layout: &Layout) -> Result<Ca
 }
 
 const SCHEMA: &str = "$schema";
+
+/// A leading `/* … */` comment (Shopify `locales/*.json`) and the JSON after it.
+fn json_banner(text: &str) -> (&str, &str) {
+    let t = text.trim_start_matches('\u{feff}');
+    let lead = text.len() - t.trim_start().len();
+    if t.trim_start().starts_with("/*")
+        && let Some(end) = text[lead..].find("*/")
+    {
+        let body = &text[lead + end + 2..];
+        let cut = text.len() - body.trim_start().len();
+        return (&text[..cut], &text[cut..]);
+    }
+    ("", text)
+}
 
 fn flatten(v: &Value, key: &str, sep: &str, out: &mut BTreeMap<Key, String>) {
     match v {

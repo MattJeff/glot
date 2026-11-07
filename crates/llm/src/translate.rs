@@ -739,6 +739,21 @@ fn syntax_rules(syntax: Syntax) -> &'static str {
         Syntax::Laravel => {
             "Laravel: keep every :name / :Name / :NAME placeholder verbatim (never translate the word after `:`). Plurals are `|`-separated forms: keep range prefixes like {0}, [1,19], [2,*] exactly; without ranges, write one form per plural form of the target language in Laravel's order (singular first)."
         }
+        Syntax::Template => {
+            "Liquid / Go templates: keep every {{ ... }} expression verbatim, including what is inside (`{{ count }}`, `{{ .Count }}`, `{{ price | money }}`), and every {% ... %} tag. Plurals are wrapped as {_count, plural, one {...} other {...}}: never translate the argument name, the keyword or the selectors; translate only the text inside the option braces."
+        }
+        Syntax::Plain => {
+            "Plain placeholders: keep every {name} placeholder verbatim (single braces, never translated). Everything else is literal text shown as is: {{double braces}} and <angle brackets> are part of the text, not syntax."
+        }
+        Syntax::Symfony => {
+            "Symfony: keep every %name% and {{ name }} parameter verbatim (never translate the word inside). Legacy plurals are `|`-separated forms: keep interval prefixes like {0}, {1}, ]1,Inf[, [2,Inf] exactly and translate only the text after them; without intervals, write one form per plural form of the target language (singular first). Messages with {count, plural, ...} or {x, select, ...} are ICU: never translate the argument name, the keyword or the selectors, keep `#`."
+        }
+        Syntax::Java => {
+            "Java MessageFormat: keep every {0}, {1,number}, {0,choice,...} placeholder verbatim. In a message that has placeholders an apostrophe must be written as two apostrophes (l''utilisateur, it''s): a single ' hides the text after it. In a message without placeholders write apostrophes normally."
+        }
+        Syntax::Fluent => {
+            "Project Fluent (.ftl): keep every placeable verbatim: { $name }, { -brand-name } (terms), { other-message } / { msg.attr } references, { NUMBER($n, ...) }, { DATETIME($d) } and { \"literal\" }. A select expression `{ $n ->\n    [one] ...\n   *[other] ...\n}` keeps its selector, the variant keys in [brackets] and the `*` default marker untranslated, one variant per line; translate only the text after each [key]. For plurals use the CLDR categories the target language needs (keep exactly one `*[other]` default). Keep the line breaks and the indentation of continuation lines. A key starting with `-` and holding a dot (`-brand.gender`) is a term attribute read by selectors: answer with the bare keyword the selectors use (masculine, feminine, neuter, plural...), never a translated word."
+        }
     }
 }
 

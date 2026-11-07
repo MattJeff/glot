@@ -47,7 +47,8 @@ fn entries(s: &str) -> Result<Vec<Entry>, String> {
         let note = note.take();
         let kind = match e.tag.as_str() {
             "string" => Kind::String,
-            "plurals" => Kind::Plurals,
+            // moko-resources `plurals.xml` says `<plural>`.
+            "plurals" | "plural" => Kind::Plurals,
             "string-array" => Kind::Array,
             _ => continue,
         };
@@ -170,7 +171,7 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
                             .filter(|i| i.trim().is_empty() && !i.is_empty())
                             .unwrap_or_else(|| format!("{ind}{indent}"));
                         let head = &s[e.elem.start..e.elem.open_end];
-                        let el = render_items(head, "plurals", &plural_items(v), &ind, &item_ind);
+                        let el = render_items(head, &e.elem.tag, &plural_items(v), &ind, &item_ind);
                         replace(&mut out, &mut pos, from, to, &el)
                     }
                 }

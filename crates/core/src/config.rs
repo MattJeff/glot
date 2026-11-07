@@ -312,6 +312,19 @@ impl Config {
     }
 }
 
+/// `<domain>.pot` in `dir` (relative to `root`, `/`-terminated or empty) or the nearest folder
+/// above it: `priv/gettext/default.pot`, `locale/django.pot`, `messages.pot` (pybabel's default).
+pub(crate) fn gettext_pot(root: &Path, dir: &str, domain: &str) -> Option<String> {
+    let mut d = Path::new(dir.trim_end_matches('/'));
+    loop {
+        let rel = d.join(format!("{domain}.pot"));
+        if root.join(&rel).is_file() {
+            return Some(rel.to_string_lossy().into_owned());
+        }
+        d = d.parent()?;
+    }
+}
+
 /// Source catalogs named without their locale: `Resources.resx` (`Resources.{locale}.resx`),
 /// `messages.properties` (`messages_{locale}.properties`), Angular `messages.xlf`
 /// (`messages.{locale}.xlf`). `.resx`/`.properties` always (their convention), XLIFF when that
@@ -320,10 +333,55 @@ fn unsuffixed_source(root: &Path, pattern: &str, locale: &str, source: &str) -> 
     if locale != source {
         return pattern.to_string();
     }
+    // Shopify themes: the source of `locales/{locale}.json` is `locales/en.default.json`.
+    for ext in [".schema.json", ".json"] {
+        if let Some(stem) = pattern.strip_suffix(&format!("{{locale}}{ext}")) {
+            let shopify = format!("{stem}{{locale}}.default{ext}");
+            if root.join(shopify.replace("{locale}", locale)).exists() {
+                return shopify;
+            }
+            break;
+        }
+    }
+    // WordPress: without a source `.po`, the source of `languages/{domain}-{locale}.po` is the
+    // `languages/{domain}.pot` template (themes: `languages/{locale}.po` + the folder's one `.pot`).
+    if let Some(stem) = pattern.strip_suffix("{locale}.po")
+        && !root.join(pattern.replace("{locale}", locale)).exists()
+    {
+        let pot = format!("{}.pot", stem.trim_end_matches(['-', '_', '.']));
+        if !pot.ends_with("/.pot") && root.join(&pot).is_file() {
+            return pot;
+        }
+        let pots: Vec<_> = std::fs::read_dir(root.join(stem))
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter(|e| e.path().extension().is_some_and(|x| x == "pot"))
+            .collect();
+        if let [one] = pots.as_slice() {
+            return format!("{stem}{}", one.file_name().to_string_lossy());
+        }
+    }
+    // gettext `<dir>/{locale}/LC_MESSAGES/<domain>.po` without a source `.po`: the `<domain>.pot`
+    // template (Phoenix `priv/gettext/default.pot`, Babel `messages.pot` at the project root).
+    if let Some((dir, domain)) = pattern
+        .strip_suffix(".po")
+        .and_then(|p| p.split_once("{locale}/LC_MESSAGES/"))
+        && !root.join(pattern.replace("{locale}", locale)).exists()
+        && let Some(pot) = gettext_pot(root, dir, domain)
+    {
+        return pot;
+    }
     for (tag, exts, always) in [
         (".{locale}.", &["resx"][..], true),
         ("_{locale}.", &["properties"][..], true),
         (".{locale}.", &["xlf", "xliff"][..], false),
+        // Flutter slang: the base locale is `strings.i18n.json`, targets `strings_de.i18n.json`.
+        (
+            "_{locale}.",
+            &["i18n.json", "i18n.yaml", "i18n.yml"][..],
+            false,
+        ),
     ] {
         let Some(ext) = exts
             .iter()
@@ -345,7 +403,18 @@ fn unsuffixed_source(root: &Path, pattern: &str, locale: &str, source: &str) -> 
 
 /// Android resource folders: `values-{locale}` is `values` for the source locale and a resource
 /// qualifier otherwise (`pt-BR` => `values-pt-rBR`, `sr-Latn` => `values-b+sr+Latn`).
+/// moko-resources: `moko-resources/base/` (or `MR/base/`) for the source, the qualifier otherwise.
 fn android_values(pattern: &str, locale: &str, source: &str) -> String {
+    for m in ["moko-resources/{locale}/", "MR/{locale}/"] {
+        if pattern.contains(m) {
+            let dir = if locale == source {
+                "base".to_string()
+            } else {
+                android_qualifier(locale)
+            };
+            return pattern.replace(m, &m.replace("{locale}", &dir));
+        }
+    }
     if !pattern.contains("values-{locale}") {
         return pattern.to_string();
     }

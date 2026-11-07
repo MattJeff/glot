@@ -6,6 +6,7 @@ mod culture;
 mod db;
 mod dev;
 mod distill;
+mod docs;
 mod experiments;
 mod fit;
 mod i18nize;
@@ -164,6 +165,8 @@ enum Cmd {
     /// Localize emails, SVG and OG images: i18nize, translate, render per locale, check.
     #[command(hide = true)] // legacy spelling of `glot labs assets`
     Assets(assets::AssetsArgs),
+    /// Translate Markdown / MDX pages whole (`[[docs]]` in glot.toml): Docusaurus, VitePress, Starlight, MkDocs, Hugo, Jekyll.
+    Docs(docs::DocsArgs),
     /// Local server for the in-app editing overlay (@glot/overlay).
     Dev(dev::DevArgs),
     /// Task parity: an agent runs the same tasks in every locale (glot.tasks.yaml) and compares success.
@@ -280,6 +283,8 @@ Start
                 $ glot translate --locale fr,de --dry-run
   localize    All of the above in one idempotent step, then check
                 $ glot localize --yes --targets fr,de
+  docs        Translate Markdown / MDX pages whole ([[docs]]: Docusaurus, VitePress, Starlight, MkDocs, Hugo)
+                $ glot docs --dry-run
 
 Guarantees
   check       Validate every catalog: syntax, placeholders, CLDR plurals, glossary, width (CI)
@@ -470,6 +475,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         Cmd::Mcp => glot_mcp::serve_stdio(std::env::current_dir()?).await?,
         Cmd::I18nize(args) => i18nize::run(args).await?,
         Cmd::Assets(a) => return assets::run(a).await,
+        Cmd::Docs(a) => return docs::run(a).await,
         Cmd::Dev(args) => dev::run(args).await?,
         Cmd::Parity(args) => return parity::run(args),
         Cmd::Seo(args) => return seo::run(args).await,

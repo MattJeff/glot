@@ -16,18 +16,32 @@ use crate::{Error, Key, Locale, Result};
 
 mod android;
 mod arb;
+mod fluent;
+mod inlang;
 pub mod js;
 pub(crate) mod json;
 mod php;
 mod po;
 mod properties;
+mod qt;
 mod resx;
+pub mod rust_dict;
+mod rust_i18n;
 mod strings;
+mod toml_i18n;
 mod xcstrings;
 mod xliff;
 mod xml;
 mod yaml;
 
+#[cfg(test)]
+mod backend_tests;
+#[cfg(test)]
+mod cms_tests;
+#[cfg(test)]
+mod js_web_tests;
+#[cfg(test)]
+mod mobile_tests;
 #[cfg(test)]
 mod tests;
 
@@ -53,6 +67,9 @@ pub fn native(format: Format, path: &Path) -> Option<Format> {
             if json::is_webext(path) {
                 return Some(Format::JsonMessage);
             }
+            if inlang::is_inlang(path) {
+                return Some(Format::Inlang);
+            }
             match path.extension()?.to_str()?.to_ascii_lowercase().as_str() {
                 "xcstrings" => Some(Format::Xcstrings),
                 "strings" | "stringsdict" => Some(Format::Strings),
@@ -60,11 +77,16 @@ pub fn native(format: Format, path: &Path) -> Option<Format> {
                 "arb" => Some(Format::Arb),
                 "po" | "pot" => Some(Format::Po),
                 "yml" | "yaml" => Some(Format::Yaml),
+                "toml" => Some(Format::Toml),
+                // Qt Linguist `.ts` is XML; a new one needs `format = "qt"` (`glot init` sets it).
+                "ts" if is_qt_ts(path) => Some(Format::Qt),
                 "ts" | "tsx" | "js" | "jsx" | "mjs" | "cjs" | "mts" => Some(Format::Js),
                 "xlf" | "xliff" => Some(Format::Xliff),
                 "properties" => Some(Format::Properties),
                 "resx" => Some(Format::Resx),
                 "php" => Some(Format::Php),
+                "ftl" => Some(Format::Fluent),
+                "rs" => Some(Format::RustDict),
                 _ => None,
             }
         }
@@ -82,13 +104,19 @@ pub fn parse(format: Format, path: &Path, text: &str, locale: &str) -> Result<Pa
         Format::Android => android::parse(text),
         Format::Arb => arb::parse(text),
         Format::Po => po::parse(text, locale),
+        Format::Yaml if rust_i18n::is_rust_i18n(text) => rust_i18n::parse(text, locale),
         Format::Yaml => yaml::parse(text, locale),
         Format::Js => js::parse(text, locale),
         Format::Xliff => xliff::parse(text, locale),
         Format::Properties => properties::parse(text),
         Format::Resx => resx::parse(text),
+        Format::Toml => toml_i18n::parse(text),
+        Format::Qt => qt::parse(text, locale),
         Format::Php => php::parse(text, path),
         Format::JsonMessage => json::parse(text, path),
+        Format::Inlang => inlang::parse(text),
+        Format::Fluent => fluent::parse(text),
+        Format::RustDict => rust_dict::parse(text, locale),
         Format::Auto | Format::JsonNested | Format::JsonFlat => Err("not a native format".into()),
     }
 }
@@ -101,14 +129,22 @@ pub fn write(format: Format, path: &Path, existing: Option<&str>, cat: &Catalog)
         Format::Strings => strings::write(existing, cat),
         Format::Android => android::write(existing, cat),
         Format::Arb => arb::write(existing, cat),
-        Format::Po => po::write(existing, cat),
+        Format::Po => po::write_from(existing, cat, pot_template(path).as_deref()),
+        Format::Yaml if existing.is_some_and(rust_i18n::is_rust_i18n) => {
+            rust_i18n::write(existing.unwrap_or_default(), cat, path)
+        }
         Format::Yaml => yaml::write(existing, cat, path),
         Format::Js => js::write(existing, cat),
         Format::Xliff => xliff::write(existing, cat, path),
         Format::Properties => properties::write(existing, cat),
         Format::Resx => resx::write(existing, cat),
+        Format::Toml => toml_i18n::write(existing, cat),
+        Format::Qt => qt::write(existing, cat),
         Format::Php => php::write(existing, cat, path),
         Format::JsonMessage => json::write(existing, cat, path),
+        Format::Inlang => inlang::write(existing, cat, path),
+        Format::Fluent => fluent::write(existing, cat),
+        Format::RustDict => rust_dict::write(existing, cat),
         Format::Auto | Format::JsonNested | Format::JsonFlat => cat.to_json(format),
     }
 }
@@ -322,6 +358,48 @@ pub fn load_meta(
         }
     }
     Ok(())
+}
+
+/// An existing `.ts` file that starts as XML (Qt Linguist), not TypeScript.
+fn is_qt_ts(path: &Path) -> bool {
+    use std::io::Read;
+    let mut head = [0u8; 256];
+    let n = std::fs::File::open(path)
+        .and_then(|mut f| f.read(&mut head))
+        .unwrap_or(0);
+    let head = String::from_utf8_lossy(&head[..n]);
+    let head = head.trim_start_matches('\u{feff}').trim_start();
+    head.starts_with("<?xml") || head.starts_with("<!DOCTYPE TS") || head.starts_with("<TS")
+}
+
+/// The `.pot` next to a `.po` (one per folder: WordPress `languages/`, gettext `po/`).
+fn pot_template(path: &Path) -> Option<String> {
+    if path.extension().is_none_or(|e| e != "po") {
+        return None;
+    }
+    // `<dir>/<locale>/LC_MESSAGES/<domain>.po`: `<domain>.pot` in `<dir>` or a folder above.
+    let lc = path.parent()?;
+    if lc.file_name().is_some_and(|n| n == "LC_MESSAGES") {
+        let domain = path.file_stem()?.to_string_lossy();
+        // ponytail: 3 folders up covers `priv/gettext/`, `app/translations/` + root `messages.pot`.
+        return lc
+            .ancestors()
+            .skip(2)
+            .take(3)
+            .map(|d| d.join(format!("{domain}.pot")))
+            .find(|p| p.is_file())
+            .and_then(|p| std::fs::read_to_string(p).ok());
+    }
+    let pots: Vec<_> = std::fs::read_dir(path.parent()?)
+        .ok()?
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|e| e == "pot"))
+        .collect();
+    match pots.as_slice() {
+        [one] => std::fs::read_to_string(one).ok(),
+        _ => None,
+    }
 }
 
 fn is_stringsdict(path: &Path) -> bool {

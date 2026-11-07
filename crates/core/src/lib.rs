@@ -6,6 +6,7 @@ pub mod formats;
 pub mod glossary;
 pub mod hash;
 pub mod lock;
+pub mod markdown;
 pub mod markets;
 pub mod measure;
 pub mod plural;

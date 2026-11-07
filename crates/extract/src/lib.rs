@@ -15,6 +15,7 @@ use std::path::Path;
 pub mod email;
 mod foreign;
 pub mod i18nize;
+mod rust;
 mod scan;
 pub use scan::looks_like_css_classes;
 pub mod svg;
@@ -216,6 +217,10 @@ pub fn extract_source(path: &str, source: &str, cfg: &ExtractConfig) -> ExtractR
     // Rails / Django / Laravel / Symfony / Angular templates: literal patterns, not oxc.
     if foreign::handles(path) {
         return foreign::scan(path, source);
+    }
+    // Leptos / Yew / Dioxus: literal patterns, not oxc.
+    if path.ends_with(".rs") {
+        return rust::scan(path, source, &cfg.functions);
     }
     let mut report = scan::scan(path, source, &cfg.functions);
     if path.ends_with(".ts") {

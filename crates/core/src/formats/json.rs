@@ -138,9 +138,10 @@ pub(crate) fn is_webext(path: &Path) -> bool {
             .is_some_and(|n| n == "_locales")
 }
 
-/// The message field of an entry object.
+/// The message field of an entry object. Lingui's `lingui` JSON style keeps the source text in
+/// `message` and the locale's text in `translation`.
 fn field(o: &Map<String, Value>) -> Option<(&'static str, &str)> {
-    ["message", "defaultMessage"]
+    ["translation", "message", "defaultMessage"]
         .into_iter()
         .find_map(|f| Some((f, o.get(f)?.as_str()?)))
 }
@@ -255,6 +256,43 @@ fn webext_source(path: &Path) -> Option<PathBuf> {
     (src != path).then_some(src)
 }
 
+/// Another locale's file of a message-object catalog, to model new entries on:
+/// `i18n/{fr}/code.json` => `i18n/{en}/code.json` (Docusaurus), `lang/fr.json` => `lang/en.json`.
+/// The fullest one wins (the source locale usually has every message).
+fn sibling(path: &Path) -> Option<Map<String, Value>> {
+    // The locale is one of the last components: swap it for each of its siblings.
+    let mut cands: Vec<PathBuf> = vec![];
+    let mut tail = PathBuf::new();
+    for (node, depth) in path.ancestors().zip(0..3) {
+        let Some(parent) = node.parent() else { break };
+        if depth == 0 {
+            for e in std::fs::read_dir(parent).into_iter().flatten().flatten() {
+                cands.push(e.path());
+            }
+        } else {
+            for e in std::fs::read_dir(parent).into_iter().flatten().flatten() {
+                cands.push(e.path().join(&tail));
+            }
+        }
+        let name = Path::new(node.file_name()?);
+        tail = if depth == 0 {
+            name.into()
+        } else {
+            name.join(&tail)
+        };
+    }
+    cands
+        .into_iter()
+        .filter(|p| p != path && p.extension().is_some_and(|e| e == "json"))
+        .filter_map(|p| object(&std::fs::read_to_string(p).ok()?).ok())
+        .filter(|m| {
+            m.values()
+                .filter_map(Value::as_object)
+                .any(|o| field(o).is_some())
+        })
+        .max_by_key(Map::len)
+}
+
 pub(crate) fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     let webext = is_webext(path);
     let mut m = existing.and_then(|t| object(t).ok()).unwrap_or_default();
@@ -265,11 +303,12 @@ pub(crate) fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> Strin
             .and_then(|t| object(&t).ok())
             .unwrap_or_default()
     } else {
-        Map::new()
+        sibling(path).unwrap_or_default()
     };
     let name = m
         .values()
         .filter_map(Value::as_object)
+        .chain(source.values().filter_map(Value::as_object))
         .find_map(|o| field(o).map(|(f, _)| f))
         .unwrap_or(if webext { "message" } else { "defaultMessage" });
     m.retain(|k, v| !v.is_object() || cat.entries.contains_key(k));
@@ -281,6 +320,14 @@ pub(crate) fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> Strin
             *entry = Value::Object(Map::new());
         }
         let o = entry.as_object_mut().expect("object");
+        // A new entry mirrors the other locale's (Docusaurus / FormatJS `description`, Lingui
+        // `message` + `origin`), its text replaced below.
+        if o.is_empty()
+            && !webext
+            && let Some(s) = source.get(k).and_then(Value::as_object)
+        {
+            o.extend(s.iter().map(|(k, v)| (k.clone(), v.clone())));
+        }
         let ph = source
             .get(k)
             .and_then(|s| s.get("placeholders"))
@@ -438,6 +485,32 @@ mod tests {
             .unwrap(),
             p
         );
+    }
+
+    #[test]
+    fn docusaurus_and_lingui_new_entries_mirror_the_source() {
+        let dir = tmp("docu");
+        let en = dir.join("i18n/en/docusaurus-theme-classic/navbar.json");
+        std::fs::create_dir_all(en.parent().unwrap()).unwrap();
+        let src = r#"{"title":{"message":"My Site","description":"The title in the navbar"}}"#;
+        std::fs::write(&en, src).unwrap();
+        let fr = dir.join("i18n/fr/docusaurus-theme-classic/navbar.json");
+        let mut cat = Catalog::new("fr");
+        cat.entries.insert("title".into(), "Mon site".into());
+        let v: Value = serde_json::from_str(&write(None, &cat, &fr)).unwrap();
+        // Docusaurus reads `message`, never `defaultMessage`.
+        assert_eq!(v["title"]["message"], "Mon site");
+        assert_eq!(v["title"]["description"], "The title in the navbar");
+        // Lingui `lingui` style: `message` is the source text, `translation` the locale's.
+        let lingui = r#"{"Gq3yVQ":{"message":"Hello {name}","translation":"Bonjour {name}","origin":[["src/App.tsx",4]]}}"#;
+        let p = parse(lingui, Path::new("src/locales/fr.json")).unwrap();
+        assert_eq!(p.entries["Gq3yVQ"], "Bonjour {name}");
+        let mut fr = Catalog::new("fr");
+        fr.entries.insert("Gq3yVQ".into(), "Salut {name}".into());
+        let v: Value =
+            serde_json::from_str(&write(Some(lingui), &fr, Path::new("x/fr.json"))).unwrap();
+        assert_eq!(v["Gq3yVQ"]["translation"], "Salut {name}");
+        assert_eq!(v["Gq3yVQ"]["message"], "Hello {name}");
     }
 
     #[test]

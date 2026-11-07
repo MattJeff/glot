@@ -176,6 +176,14 @@ fn po_categories(locale: &str, n: Option<usize>) -> Vec<&'static str> {
     cats.iter().map(PluralCategory::as_str).collect()
 }
 
+/// Plural forms of `locale` as gettext / Qt number them (no fraction-only category).
+pub(super) fn default_categories(locale: &str) -> Vec<&'static str> {
+    po_categories(
+        locale,
+        nplurals(&entries(&header(locale)).unwrap_or_default()),
+    )
+}
+
 fn value(e: &Entry, cats: &[&str]) -> String {
     if e.id_plural.is_none() {
         return e.strs.first().cloned().unwrap_or_default();
@@ -240,12 +248,15 @@ pub fn parse(s: &str, locale: &str) -> Result<Parsed, String> {
     Ok(p)
 }
 
-pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
+/// Patch `cat` into `existing`; new entries copy their block (comments, references, flags, `msgid_plural`)
+/// from `template`, the `.pot` (WordPress `languages/{domain}.pot`).
+pub fn write_from(existing: Option<&str>, cat: &Catalog, template: Option<&str>) -> String {
     let header = header(&cat.locale);
     let s = existing.unwrap_or(&header);
     let Ok(list) = entries(s) else {
-        return write(None, cat);
+        return write_from(None, cat, template);
     };
+    let tpl: Vec<Entry> = template.and_then(|t| entries(t).ok()).unwrap_or_default();
     let cats = po_categories(&cat.locale, nplurals(&list));
     let (mut out, mut pos) = (String::new(), 0);
     let mut seen = std::collections::BTreeSet::new();
@@ -289,11 +300,19 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
             Some((c, i)) => (Some(c), i),
             None => (None, k.as_str()),
         };
+        let plural = folded_choice(v).is_some_and(|c| c.kind == "plural");
+        if let (Some(e), Some(t)) = (tpl.iter().find(|e| e.key() == *k), template)
+            && !e.obsolete
+            && e.id_plural.is_some() == plural
+        {
+            out += &unfuzzy_block(&t[e.span.0..e.msgstr.0]);
+            out += &msgstr(v, plural, &cats);
+            continue;
+        }
         if let Some(c) = ctx {
             out += &format!("msgctxt {}\n", lines(c));
         }
         out += &format!("msgid {}\n", lines(id));
-        let plural = folded_choice(v).is_some_and(|c| c.kind == "plural");
         if plural {
             // ponytail: no source text here; the plural msgid repeats the singular.
             out += &format!("msgid_plural {}\n", lines(id));
@@ -301,6 +320,20 @@ pub fn write(existing: Option<&str>, cat: &Catalog) -> String {
         out += &msgstr(v, plural, &cats);
     }
     out
+}
+
+/// A template block without its `fuzzy` flag.
+fn unfuzzy_block(block: &str) -> String {
+    block
+        .split_inclusive('\n')
+        .map(|l| {
+            if l.trim_start().starts_with("#,") {
+                unfuzzy(l)
+            } else {
+                l.to_string()
+            }
+        })
+        .collect()
 }
 
 /// `#, fuzzy, c-format` => `#, c-format`; a lone fuzzy flag line disappears.

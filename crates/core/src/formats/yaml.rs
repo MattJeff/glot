@@ -368,9 +368,12 @@ pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     let mut text: String = lines.concat();
     // New keys: under their deepest existing parent mapping, one at a time.
     let known: std::collections::BTreeSet<&String> = list.iter().map(|e| &e.0).collect();
+    // Plurals are `one:`/`other:` mappings in Rails files (locale root) or files that already have
+    // one; ember-intl / Symfony `+intl-icu` / vue-i18n YAML keep the ICU string as written.
+    let mappings = doc.root.is_some() || list.iter().any(|e| e.3) || template_data(path);
     for (k, v) in &cat.entries {
         if !known.contains(k) {
-            text = insert(&text, &cat.locale, k, v);
+            text = insert(&text, &cat.locale, k, v, mappings);
         }
     }
     if existing.is_some_and(|e| !e.ends_with('\n')) {
@@ -379,7 +382,7 @@ pub fn write(existing: Option<&str>, cat: &Catalog, path: &Path) -> String {
     text
 }
 
-fn insert(text: &str, locale: &str, key: &str, v: &str) -> String {
+fn insert(text: &str, locale: &str, key: &str, v: &str, mappings: bool) -> String {
     let Ok(doc) = parse_doc(text, locale) else {
         return text.to_string();
     };
@@ -401,7 +404,7 @@ fn insert(text: &str, locale: &str, key: &str, v: &str) -> String {
     }
     let last = yaml_key(segs.last().unwrap());
     let pad = " ".repeat(indent);
-    if folded_choice(v).is_some_and(|c| c.kind == "plural") {
+    if mappings && folded_choice(v).is_some_and(|c| c.kind == "plural") {
         add += &format!("{pad}{last}:\n");
         add += &plural_lines(v, &" ".repeat(indent + 2), Style::Double);
     } else if v.contains('\n') {
@@ -415,6 +418,27 @@ fn insert(text: &str, locale: &str, key: &str, v: &str) -> String {
     }
     lines.insert(at.min(lines.len()), add);
     lines.concat()
+}
+
+/// Hugo `i18n/{locale}.yaml` (next to the site config) and Jekyll `_data/`: plurals are
+/// `one:`/`other:` mappings even in a new file.
+fn template_data(path: &Path) -> bool {
+    let hugo = path.parent().is_some_and(|d| {
+        d.file_name().is_some_and(|n| n == "i18n")
+            && d.parent().is_some_and(|site| {
+                [
+                    "hugo.toml",
+                    "hugo.yaml",
+                    "hugo.yml",
+                    "hugo.json",
+                    "config.toml",
+                    "config.yaml",
+                ]
+                .iter()
+                .any(|f| site.join(f).is_file())
+            })
+    });
+    hugo || path.components().any(|c| c.as_os_str() == "_data")
 }
 
 fn plural_lines(v: &str, ind: &str, style: Style) -> String {
