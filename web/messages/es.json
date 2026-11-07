@@ -16,11 +16,15 @@
       "days": "Duración (días)",
       "goal": "Evento objetivo",
       "start": "Iniciar la medición",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "guardDown": "Salvaguardas (una bajada es grave)",
+      "guardUp": "Salvaguardas (una subida es grave)",
+      "guardHint": "Eventos separados por comas. El paso al 100 % se bloquea si alguno empeora más de un 5 % o le faltan datos.",
+      "auto": "Pasar al 100 % automáticamente cuando se cumplan todas las condiciones"
     },
     "mode": {
       "holdout": "Grupo de control",
-      "holdoutHint": "Los visitantes que prefieren este idioma lo reciben, salvo una parte de control que se mantiene en {fallback} durante todo el periodo; después, todos lo reciben. Mide el efecto real. Requiere catálogos cargados en tiempo de ejecución (CDN de glot + @glot/insights).",
+      "holdoutHint": "Los visitantes que prefieren este idioma lo reciben, salvo una parte de control que se mantiene en {fallback}; pasa al 100 % cuando se cumplen todas las condiciones (con su confirmación, o automáticamente si lo activa). Mide el efecto real. Requiere catálogos cargados en tiempo de ejecución (CDN de glot + @glot/insights).",
       "before_after": "Antes / después",
       "before_afterHint": "Compara la misma audiencia antes y después del lanzamiento, para catálogos compilados en la aplicación. No es causal: la estacionalidad y las campañas también mueven las cifras."
     },
@@ -28,7 +32,8 @@
       "measuring": "Midiendo",
       "rolled_out": "Desplegado para todos",
       "invalid": "No válido",
-      "done": "Terminado"
+      "done": "Terminado",
+      "ready": "Listo para el 100 %"
     },
     "verdict": {
       "collecting": "Recopilando datos",
@@ -77,7 +82,13 @@
       "chart": "Tasa de conversión acumulada",
       "chartAria": "Tasa de conversión acumulada ({goal}) por día: {a} y {b}",
       "footer": "Medido con glot Insights: agregados diarios anónimos, sin cookies, sin datos de visitantes.",
-      "footerShort": "Medido frente a un grupo de control"
+      "footerShort": "Medido frente a un grupo de control",
+      "scope": "Se excluye a los visitantes que eligieron su idioma: el efecto medido es el de la localización automática en visitantes sin una preferencia explícita.",
+      "guardrails": "Salvaguardas",
+      "guardrailsHint": "Eventos que no deben empeorar. El paso al 100 % se bloquea si la probabilidad de empeorar más de un 5 % supera el 20 %.",
+      "guardrailDown": "una bajada es grave",
+      "guardrailUp": "una subida es grave",
+      "pWorse": "P(peor en > 5 %): {p}"
     },
     "share": {
       "button": "Compartir",
@@ -91,6 +102,30 @@
       "title": "{project} en {language}: caso de estudio",
       "description": "{verdict}: {lift} en la conversión ({goal}). Un caso de estudio de glot.",
       "cta": "Mida su próximo idioma con glot"
+    },
+    "rollout": {
+      "readyTitle": "Listo para pasar al 100 %",
+      "readyBody": "Se cumplen todas las condiciones: {min} conversiones por grupo, 7 días, reparto de tráfico conforme, mejora creíble, salvaguardas estables. El grupo de control se mantiene en {fallback} hasta que confirme.",
+      "confirm": "Pasar al 100 %",
+      "endedTitle": "Medición terminada sin cumplir todas las condiciones",
+      "endedBody": "El grupo de control se mantiene en {fallback} hasta que decida.",
+      "done": "{language} se sirve ahora a todos los visitantes que lo prefieren",
+      "pending": "Antes de pasar al 100 %:",
+      "pendingAuto": "Pasa al 100 % automáticamente cuando se cumpla lo siguiente:"
+    },
+    "blocker": {
+      "min_days": "una semana completa de medición",
+      "min_visitors": "{n} visitantes en cada grupo",
+      "min_conversions": "{min} conversiones en cada grupo",
+      "srm": "un reparto del tráfico conforme a la configuración",
+      "no_credible_lift": "una mejora creíble (al menos 95 % de probabilidad)",
+      "guardrail": "salvaguardas con datos suficientes y sin empeorar",
+      "no_holdout": "un grupo de control"
+    },
+    "guardrailStatus": {
+      "ok": "Estable",
+      "degraded": "Empeorado",
+      "insufficient": "Datos insuficientes"
     }
   },
   "auth": {
@@ -2285,7 +2320,9 @@
       "body": "Instala Insights con una sola etiqueta. Cuenta el idioma del navegador y el idioma servido en cada visita, en totales diarios: sin cookies, sin identificador de visitante, sin guardar la IP.",
       "track": "Después registra una conversión para que glot estime lo que aporta cada idioma:",
       "open": "Abrir análisis"
-    }
+    },
+    "gainLocked": "Ganancia esperada incluida en Growth",
+    "upgrade": "Mejorar plan"
   },
   "onboarding": {
     "achievements": {

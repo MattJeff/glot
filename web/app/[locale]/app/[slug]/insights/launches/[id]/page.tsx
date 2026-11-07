@@ -1,11 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Link2Off, Share2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Link2Off, Rocket, Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { CopyButton, ErrorState } from "@/components/common";
+import { CopyButton, ErrorState, useLocaleName } from "@/components/common";
 import { LaunchStoryView } from "@/components/launch-story";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +18,7 @@ export default function LaunchPage() {
   const slug = useSlug();
   const { id } = useParams<{ id: string }>();
   const origin = useOrigin();
+  const name = useLocaleName();
   const qc = useQueryClient();
   const key = [...qk.launches(slug), id];
   const q = useQuery({ queryKey: key, queryFn: () => api.launch(slug, id), refetchInterval: 60_000 });
@@ -28,6 +29,15 @@ export default function LaunchPage() {
     onSuccess: (_, on) => {
       qc.invalidateQueries({ queryKey: qk.launches(slug) });
       toast.success(t(on ? "share.created" : "share.revoked"));
+    },
+  });
+
+  const rollout = useMutation({
+    mutationFn: () => api.rolloutLaunch(slug, id),
+    onSuccess: (l) => {
+      qc.setQueryData(key, l);
+      qc.invalidateQueries({ queryKey: qk.launches(slug) });
+      toast.success(t("rollout.done", { language: name(l.locale) }));
     },
   });
 
@@ -59,6 +69,40 @@ export default function LaunchPage() {
               <Link2Off /> {t("share.revoke")}
             </Button>
           </div>
+        </div>
+      )}
+      {l?.mode === "holdout" && l.status === "ready" && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-success/40 bg-success/10 p-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 text-sm font-medium">
+              <CheckCircle2 className="size-4 text-success-foreground" /> {t("rollout.readyTitle")}
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t("rollout.readyBody", { min: l.min_conversions, fallback: name(l.fallback) })}</p>
+          </div>
+          <Button size="sm" disabled={rollout.isPending} onClick={() => rollout.mutate()}>
+            <Rocket /> {t("rollout.confirm")}
+          </Button>
+        </div>
+      )}
+      {l?.mode === "holdout" && (l.status === "done" || l.status === "invalid") && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/30 p-4">
+          <div className="min-w-0">
+            <div className="text-sm font-medium">{t("rollout.endedTitle")}</div>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t("rollout.endedBody", { fallback: name(l.fallback) })}</p>
+          </div>
+          <Button size="sm" variant="outline" disabled={rollout.isPending} onClick={() => rollout.mutate()}>
+            <Rocket /> {t("rollout.confirm")}
+          </Button>
+        </div>
+      )}
+      {l?.mode === "holdout" && l.status === "measuring" && l.blockers.length > 0 && (
+        <div className="rounded-xl border p-4 text-xs text-muted-foreground">
+          <div className="font-medium text-foreground">{t(l.auto_rollout ? "rollout.pendingAuto" : "rollout.pending")}</div>
+          <ul className="mt-1 list-disc space-y-0.5 ps-4">
+            {l.blockers.map((b) => (
+              <li key={b}>{t(`blocker.${b}`, { min: l.min_conversions, n: l.min_n })}</li>
+            ))}
+          </ul>
         </div>
       )}
       {l ? <LaunchStoryView story={l} /> : <Skeleton className="h-96 rounded-xl" />}

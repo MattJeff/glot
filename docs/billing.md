@@ -34,6 +34,11 @@ recommendations with expected gain, launch measurement with holdout and a sharea
 | Live text experiments (at once, not monthly) | 1 | 1 | unlimited | `check_experiment` (start) |
 | Segments per experiment | 0 | 2 | 4 | `check_experiment` (start) |
 | Live review annotations | 200 | 10k | unlimited | `review_live::api` |
+| Expected gain of a language (recommendations) | locked | locked | yes | `recommend::handler` (`gain_locked`) |
+| Language launches, case-study sharing | no | no | yes | `require_growth` (`launches::create`, `share`) |
+
+A comped account (founder, partners) is a `billing_accounts` row with `plan = 'team'`, `status = 'active'` and no
+Stripe subscription: the effective plan is Growth.
 
 - **BYOK is never counted.** "glot's key" = a project without its own API key on `anthropic`/`openai` without `base_url`
   (the job then uses the server's provider env var).

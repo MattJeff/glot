@@ -16,11 +16,15 @@
       "days": "Dauer (Tage)",
       "goal": "Zielereignis",
       "start": "Messung starten",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "guardDown": "Leitplanken (Rückgang ist schlecht)",
+      "guardUp": "Leitplanken (Anstieg ist schlecht)",
+      "guardHint": "Ereignisse durch Kommas getrennt. Der Schritt auf 100 % wird blockiert, wenn sich eines um mehr als 5 % verschlechtert oder Daten fehlen.",
+      "auto": "Automatisch auf 100 % gehen, sobald alle Bedingungen erfüllt sind"
     },
     "mode": {
       "holdout": "Kontrollgruppe",
-      "holdoutHint": "Besucher, die diese Sprache bevorzugen, erhalten sie – außer einem Kontrollanteil, der den ganzen Zeitraum über bei {fallback} bleibt; danach erhalten sie alle. Misst die tatsächliche Wirkung. Erfordert zur Laufzeit geladene Kataloge (glot-CDN + @glot/insights).",
+      "holdoutHint": "Besucher, die diese Sprache bevorzugen, erhalten sie – außer einem Kontrollanteil, der bei {fallback} bleibt; sie geht auf 100 %, sobald alle Bedingungen erfüllt sind (nach Ihrer Bestätigung oder automatisch, wenn Sie es aktivieren). Misst die tatsächliche Wirkung. Erfordert zur Laufzeit geladene Kataloge (glot-CDN + @glot/insights).",
       "before_after": "Vorher / nachher",
       "before_afterHint": "Vergleicht dieselbe Zielgruppe vor und nach dem Launch, für in die App kompilierte Kataloge. Nicht kausal: Saisonalität und Kampagnen bewegen die Zahlen ebenfalls."
     },
@@ -28,7 +32,8 @@
       "measuring": "Wird gemessen",
       "rolled_out": "Für alle ausgerollt",
       "invalid": "Ungültig",
-      "done": "Fertig"
+      "done": "Fertig",
+      "ready": "Bereit für 100 %"
     },
     "verdict": {
       "collecting": "Sammelt Daten",
@@ -77,7 +82,13 @@
       "chart": "Kumulierte Conversion-Rate",
       "chartAria": "Kumulierte Conversion-Rate ({goal}) pro Tag: {a} und {b}",
       "footer": "Gemessen mit glot Insights: anonyme Tagesaggregate, kein Cookie, keine Besucherdaten.",
-      "footerShort": "Gemessen gegen eine Kontrollgruppe"
+      "footerShort": "Gemessen gegen eine Kontrollgruppe",
+      "scope": "Besucher, die ihre Sprache selbst gewählt haben, sind ausgeschlossen: Gemessen wird die Wirkung der automatischen Lokalisierung auf Besucher ohne ausdrückliche Präferenz.",
+      "guardrails": "Leitplanken",
+      "guardrailsHint": "Ereignisse, die sich nicht verschlechtern dürfen. Der Schritt auf 100 % wird blockiert, wenn die Wahrscheinlichkeit einer Verschlechterung um mehr als 5 % über 20 % liegt.",
+      "guardrailDown": "Rückgang ist schlecht",
+      "guardrailUp": "Anstieg ist schlecht",
+      "pWorse": "P(schlechter um > 5 %): {p}"
     },
     "share": {
       "button": "Teilen",
@@ -91,6 +102,30 @@
       "title": "{project} auf {language}: Fallstudie",
       "description": "{verdict}: {lift} bei der Conversion ({goal}). Eine Fallstudie von glot.",
       "cta": "Messen Sie Ihre nächste Sprache mit glot"
+    },
+    "rollout": {
+      "readyTitle": "Bereit für 100 %",
+      "readyBody": "Alle Bedingungen sind erfüllt: {min} Conversions pro Gruppe, 7 Tage, erwartete Traffic-Aufteilung, glaubwürdiger Zuwachs, stabile Leitplanken. Die Kontrollgruppe bleibt bei {fallback}, bis Sie bestätigen.",
+      "confirm": "Auf 100 % gehen",
+      "endedTitle": "Messung beendet, ohne alle Bedingungen zu erfüllen",
+      "endedBody": "Die Kontrollgruppe bleibt bei {fallback}, bis Sie entscheiden.",
+      "done": "{language} wird jetzt allen Besuchern ausgeliefert, die sie bevorzugen",
+      "pending": "Vor dem Schritt auf 100 %:",
+      "pendingAuto": "Geht automatisch auf 100 %, sobald Folgendes erfüllt ist:"
+    },
+    "blocker": {
+      "min_days": "eine volle Woche Messung",
+      "min_visitors": "{n} Besucher in jeder Gruppe",
+      "min_conversions": "{min} Conversions in jeder Gruppe",
+      "srm": "eine Traffic-Aufteilung, die der Konfiguration entspricht",
+      "no_credible_lift": "ein glaubwürdiger Zuwachs (mindestens 95 % Wahrscheinlichkeit)",
+      "guardrail": "Leitplanken mit genug Daten und ohne Verschlechterung",
+      "no_holdout": "eine Kontrollgruppe"
+    },
+    "guardrailStatus": {
+      "ok": "Stabil",
+      "degraded": "Verschlechtert",
+      "insufficient": "Zu wenig Daten"
     }
   },
   "auth": {
@@ -2285,7 +2320,9 @@
       "body": "Installiere Insights mit einem einzigen Tag. Es zählt pro Besuch die Browsersprache und die ausgelieferte Sprache als Tagessummen: kein Cookie, keine Besucher-ID, keine gespeicherte IP.",
       "track": "Erfasse dann eine Conversion, damit glot schätzen kann, was jede Sprache bringt:",
       "open": "Analysen öffnen"
-    }
+    },
+    "gainLocked": "Erwarteter Zugewinn in Growth enthalten",
+    "upgrade": "Upgraden"
   },
   "onboarding": {
     "achievements": {

@@ -138,6 +138,15 @@ fn packaging() {
         (free.xp_cells, pro.xp_cells, team.xp_cells),
         (Some(0), Some(2), Some(4))
     );
+    // Localisation SEO (glot Edge): Growth, a one-domain trial on Pro, none on Free.
+    assert_eq!(
+        (free.edge_pages, pro.edge_pages, team.edge_pages),
+        (Some(0), Some(10_000), Some(2_000_000))
+    );
+    assert_eq!(
+        (free.edge_domains, pro.edge_domains, team.edge_domains),
+        (Some(0), Some(1), None)
+    );
 }
 
 #[tokio::test]
@@ -483,4 +492,149 @@ async fn checkout_portal_and_meter_against_stripe_mock() {
     let _ = sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
         .execute(&admin)
         .await;
+}
+
+#[tokio::test]
+async fn growth_gates_expected_gain_launches_and_sharing() {
+    let Some((app, admin, pool, db)) = setup(Config::new(
+        "sk_test_x",
+        HOOK,
+        MOCK,
+        "http://localhost:3100",
+    ))
+    .await
+    else {
+        return;
+    };
+    let (cookie, user) = signup(&app, "g@x.io").await;
+    let c = Some(cookie.as_str());
+    let (s, _) = call(
+        &app,
+        Method::POST,
+        "/api/projects",
+        c,
+        Some(json!({"name": "G", "slug": "gro", "source_locale": "en", "target_locales": ["fr"]})),
+    )
+    .await;
+    assert_eq!(s, StatusCode::CREATED);
+    call(
+        &app,
+        Method::POST,
+        "/api/projects/gro/keys",
+        c,
+        Some(json!({"key": "a", "source": "Create your account"})),
+    )
+    .await;
+    for (pref, served, event, n) in [
+        ("en", "en", "$view", 1000i64),
+        ("en", "en", "signup", 50),
+        ("fr", "fr", "$view", 400),
+        ("fr", "fr", "signup", 24),
+        ("es", "en", "$view", 600),
+        ("es", "en", "signup", 12),
+    ] {
+        sqlx::query(
+            "INSERT INTO insight_daily (project_id, day, preferred, served, country, arm, event, n)
+             SELECT id, (now() AT TIME ZONE 'utc')::date - 3, $1, $2, '', '', $3, $4 FROM projects WHERE slug = 'gro'",
+        )
+        .bind(pref)
+        .bind(served)
+        .bind(event)
+        .bind(n)
+        .execute(&pool)
+        .await
+        .unwrap();
+    }
+    let reco = "/api/projects/gro/insights/recommendations";
+    let launch = json!({"locale": "es"});
+
+    // Free: demand, current experience, cost and confidence; the expected gain is withheld.
+    let (s, r) = call(&app, Method::GET, reco, c, None).await;
+    assert_eq!(s, StatusCode::OK, "{r}");
+    let es = &r["recommendations"][0];
+    assert_eq!(es["locale"], "es");
+    assert_eq!(es["gain_locked"], true, "{es}");
+    assert!(es["gain_monthly"].is_null() && es["cost_per_conversion"].is_null());
+    assert_eq!(es["visits"], 600);
+    assert!(es["cost_usd"].as_f64().unwrap() > 0.0);
+    assert!(es["fallback"]["rate"].as_f64().unwrap() > 0.0);
+    assert!(es["confidence"].is_string());
+    assert!(es["summary"].as_str().unwrap().contains("Growth"), "{es}");
+    let (s, e) = call(
+        &app,
+        Method::POST,
+        "/api/projects/gro/launches",
+        c,
+        Some(launch.clone()),
+    )
+    .await;
+    assert_eq!(s, StatusCode::PAYMENT_REQUIRED, "{e}");
+    assert_eq!(e["error"]["code"], "plan_required");
+    let m = e["error"]["message"].as_str().unwrap();
+    assert!(
+        m.contains("Free plan") && m.contains("Growth") && m.contains("/app/settings/billing"),
+        "{m}"
+    );
+
+    // Pro: same gate.
+    sqlx::query(
+        "INSERT INTO billing_accounts (user_id, plan, status) VALUES ($1::uuid, 'pro', 'active')",
+    )
+    .bind(&user)
+    .execute(&pool)
+    .await
+    .unwrap();
+    let (_, r) = call(&app, Method::GET, reco, c, None).await;
+    assert_eq!(r["recommendations"][0]["gain_locked"], true);
+    let (s, _) = call(
+        &app,
+        Method::POST,
+        "/api/projects/gro/launches",
+        c,
+        Some(launch.clone()),
+    )
+    .await;
+    assert_eq!(s, StatusCode::PAYMENT_REQUIRED);
+
+    // Comped Growth (`team`, active, no Stripe subscription: the founder's account): everything unlocked.
+    sqlx::query("UPDATE billing_accounts SET plan = 'team' WHERE user_id = $1::uuid")
+        .bind(&user)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let (_, r) = call(&app, Method::GET, reco, c, None).await;
+    let es = &r["recommendations"][0];
+    assert_eq!(es["gain_locked"], false);
+    assert!(es["gain_monthly"]["mid"].as_f64().unwrap() > 0.0, "{es}");
+    let (s, l) = call(
+        &app,
+        Method::POST,
+        "/api/projects/gro/launches",
+        c,
+        Some(launch),
+    )
+    .await;
+    assert_eq!(s, StatusCode::CREATED, "{l}");
+    let share = format!(
+        "/api/projects/gro/launches/{}/share",
+        l["id"].as_str().unwrap()
+    );
+    let (s, _) = call(&app, Method::POST, &share, c, None).await;
+    assert_eq!(s, StatusCode::OK);
+
+    // Back to Pro: sharing a case study is refused again (the existing launch keeps measuring).
+    sqlx::query("UPDATE billing_accounts SET plan = 'pro' WHERE user_id = $1::uuid")
+        .bind(&user)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let (s, e) = call(&app, Method::POST, &share, c, None).await;
+    assert_eq!(s, StatusCode::PAYMENT_REQUIRED, "{e}");
+    assert_eq!(e["error"]["code"], "plan_required");
+
+    pool.close().await;
+    sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
+        .execute(&admin)
+        .await
+        .ok();
 }

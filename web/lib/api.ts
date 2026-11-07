@@ -332,7 +332,7 @@ export type LayoutFix = {
 };
 export type LayoutRum = { days: number; min_rate: number; min_views: number; rows: LayoutRow[]; fixes: LayoutFix[] };
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+export async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   let res: Response;
   try {
     res = await fetch(path, {
@@ -357,7 +357,7 @@ const enc = encodeURIComponent;
 const p = (slug: string) => `/api/projects/${enc(slug)}`;
 const rv = (slug: string) => `${p(slug)}/review`;
 
-function qs(params: Record<string, string | number | undefined>) {
+export function qs(params: Record<string, string | number | undefined>) {
   const s = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== "") s.set(k, String(v));
   const out = s.toString();
@@ -433,6 +433,8 @@ export type Recommendation = {
   cost_usd: number;
   keys_to_translate: number;
   cost_per_conversion: number | null;
+  /** Below Growth (cloud billing): `gain_monthly` and `cost_per_conversion` are withheld. */
+  gain_locked: boolean;
   confidence: "insufficient" | "indicative" | "solid";
   reasons: RecoReason[];
   summary: string;
@@ -454,7 +456,7 @@ export type LaunchStory = {
   fallback: string;
   mode: "holdout" | "before_after";
   goal: string;
-  status: "measuring" | "rolled_out" | "invalid" | "done";
+  status: "measuring" | "ready" | "rolled_out" | "invalid" | "done";
   verdict: LaunchVerdict;
   causal: boolean;
   launched_at: string;
@@ -463,6 +465,11 @@ export type LaunchStory = {
   days: number;
   holdout_pct: number;
   min_n: number;
+  min_conversions: number;
+  auto_rollout: boolean;
+  guardrails: LaunchGuardrail[];
+  /** Conditions a rollout to 100 % still misses (empty = all met). */
+  blockers: LaunchBlocker[];
   baseline: LaunchCounts;
   cost_usd: number;
   cost_estimated: boolean;
@@ -478,8 +485,27 @@ export type LaunchStory = {
   enough: boolean;
   daily: { day: string; visits: [number, number]; conversions: [number, number] }[];
 };
+export type LaunchGuardrail = {
+  event: string;
+  higher_is_worse: boolean;
+  counts: [number, number];
+  /** P(new locale worse by more than 5 %, relative) */
+  p_worse: number;
+  status: "ok" | "degraded" | "insufficient";
+};
+export type LaunchBlocker = "min_days" | "min_visitors" | "min_conversions" | "srm" | "no_credible_lift" | "guardrail" | "no_holdout";
 export type Launch = LaunchStory & { id: string; share_token: string | null };
-export type NewLaunch = { locale: string; mode: "holdout" | "before_after"; holdout_pct?: number; days?: number; goal?: string; fallback?: string };
+export type NewLaunch = {
+  locale: string;
+  mode: "holdout" | "before_after";
+  holdout_pct?: number;
+  days?: number;
+  goal?: string;
+  fallback?: string;
+  min_conversions?: number;
+  guardrails?: { event: string; higher_is_worse?: boolean }[];
+  auto_rollout?: boolean;
+};
 
 export type Recommendations = {
   days: number;
@@ -781,6 +807,7 @@ export const api = {
   createLaunch: (slug: string, b: NewLaunch) => request<Launch>("POST", `${p(slug)}/launches`, b),
   shareLaunch: (slug: string, id: string) => request<{ token: string }>("POST", `${p(slug)}/launches/${enc(id)}/share`),
   revokeLaunch: (slug: string, id: string) => request<void>("DELETE", `${p(slug)}/launches/${enc(id)}/share`),
+  rolloutLaunch: (slug: string, id: string) => request<Launch>("POST", `${p(slug)}/launches/${enc(id)}/rollout`),
   layoutRum: (slug: string, days?: number) => request<LayoutRum>("GET", `${p(slug)}/insights/layout${qs({ days })}`),
   repairLayout: (slug: string) => request<{ created: number; fixes: LayoutFix[] }>("POST", `${p(slug)}/insights/layout/repair`),
   feedback: (slug: string) => request<{ settings: FeedbackSettings; groups: FeedbackGroup[] }>("GET", `${p(slug)}/feedback`),

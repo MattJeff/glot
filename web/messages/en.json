@@ -16,11 +16,15 @@
       "days": "Duration (days)",
       "goal": "Goal event",
       "start": "Start measuring",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "guardDown": "Guardrails (a drop is bad)",
+      "guardUp": "Guardrails (a rise is bad)",
+      "guardHint": "Comma-separated events. Going to 100 % is blocked if one of them gets more than 5 % worse, or lacks data.",
+      "auto": "Go to 100 % automatically once every condition is met"
     },
     "mode": {
       "holdout": "Holdout",
-      "holdoutHint": "Visitors who prefer this language get it, except a held-out share kept on {fallback} for the whole period; then everyone gets it. Measures the actual effect. Needs runtime catalogs (glot CDN + @glot/insights).",
+      "holdoutHint": "Visitors who prefer this language get it, except a held-out share kept on {fallback}; it goes to 100 % once every condition is met (on your confirmation, or automatically if you opt in). Measures the actual effect. Needs runtime catalogs (glot CDN + @glot/insights).",
       "before_after": "Before / after",
       "before_afterHint": "Compares the same audience before and after the launch, for catalogs compiled into the app. Not causal: seasonality and campaigns move the numbers too."
     },
@@ -28,7 +32,8 @@
       "measuring": "Measuring",
       "rolled_out": "Rolled out to everyone",
       "invalid": "Invalid",
-      "done": "Done"
+      "done": "Done",
+      "ready": "Ready for 100 %"
     },
     "verdict": {
       "collecting": "Collecting data",
@@ -77,7 +82,13 @@
       "chart": "Cumulative conversion rate",
       "chartAria": "Cumulative conversion rate ({goal}) by day: {a} and {b}",
       "footer": "Measured with glot Insights: anonymous daily aggregates, no cookie, no visitor data.",
-      "footerShort": "Measured against a holdout group"
+      "footerShort": "Measured against a holdout group",
+      "scope": "Visitors who chose their language themselves are excluded: the effect measured is the effect of automatic localization on visitors without an explicit preference.",
+      "guardrails": "Guardrails",
+      "guardrailsHint": "Events that must not get worse. Going to 100 % is blocked when the probability of a degradation above 5 % exceeds 20 %.",
+      "guardrailDown": "a drop is bad",
+      "guardrailUp": "a rise is bad",
+      "pWorse": "P(worse by > 5 %): {p}"
     },
     "share": {
       "button": "Share",
@@ -91,6 +102,30 @@
       "title": "{project} in {language}: case study",
       "description": "{verdict}: {lift} on conversion ({goal}). A glot case study.",
       "cta": "Measure your next language with glot"
+    },
+    "rollout": {
+      "readyTitle": "Ready to go to 100 %",
+      "readyBody": "Every condition is met: {min} conversions per group, 7 days, expected traffic split, credible lift, guardrails stable. The held-out group stays on {fallback} until you confirm.",
+      "confirm": "Go to 100 %",
+      "endedTitle": "Measurement ended without meeting every condition",
+      "endedBody": "The held-out group stays on {fallback} until you decide.",
+      "done": "{language} is now served to every visitor who prefers it",
+      "pending": "Before going to 100 %:",
+      "pendingAuto": "Goes to 100 % automatically once these are met:"
+    },
+    "blocker": {
+      "min_days": "a full week of measurement",
+      "min_visitors": "{n} visitors in each group",
+      "min_conversions": "{min} conversions in each group",
+      "srm": "a traffic split that matches the configuration",
+      "no_credible_lift": "a credible lift (at least 95 % probability)",
+      "guardrail": "guardrails with enough data and not degraded",
+      "no_holdout": "a held-out group"
+    },
+    "guardrailStatus": {
+      "ok": "Stable",
+      "degraded": "Degraded",
+      "insufficient": "Not enough data"
     }
   },
   "auth": {
@@ -1351,7 +1386,9 @@
       "body": "Install Insights with one tag. It counts each visit’s browser language and the locale you served, as daily totals: no cookie, no visitor id, no IP stored.",
       "track": "Then track a conversion, so glot can estimate what each language brings:",
       "open": "Open Analyses"
-    }
+    },
+    "gainLocked": "Expected gain included in Growth",
+    "upgrade": "Upgrade"
   },
   "insights": {
     "layout": {

@@ -34,6 +34,9 @@ pub const MCP: &str = "mcp_calls";
 pub const ONDEMAND: &str = "ondemand_jobs";
 pub const LLM: &str = "llm_strings";
 pub const REVIEW: &str = "review_annotations";
+/// Pages served translated by glot Edge (Localisation SEO), counted by the proxy / worker.
+pub const EDGE_PAGES: &str = "edge_pages";
+pub const EDGE_DOMAINS: &str = "edge_domains";
 
 /// Monthly limits of a plan; `null` = unlimited. Overridable with `GLOT_PLAN_LIMITS` (JSON, per plan).
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
@@ -55,6 +58,12 @@ pub struct Limits {
     /// Live review annotations created per month (review_live).
     #[serde(default)]
     pub review_annotations: Option<i64>,
+    /// glot Edge pages served per month (Localisation SEO: Growth; Pro = a limited trial; Free = none).
+    #[serde(default)]
+    pub edge_pages: Option<i64>,
+    /// glot Edge domains (not monthly).
+    #[serde(default)]
+    pub edge_domains: Option<i64>,
 }
 
 impl Limits {
@@ -67,6 +76,8 @@ impl Limits {
             ONDEMAND => self.ondemand_jobs,
             LLM => self.llm_strings,
             REVIEW => self.review_annotations,
+            EDGE_PAGES => self.edge_pages,
+            EDGE_DOMAINS => self.edge_domains,
             _ => None,
         }
     }
@@ -80,6 +91,8 @@ fn label(kind: &str) -> &'static str {
         ONDEMAND => "On-demand translation jobs",
         LLM => "Server-side translations with glot's LLM key",
         REVIEW => "Live review annotations",
+        EDGE_PAGES => "glot Edge pages served",
+        EDGE_DOMAINS => "glot Edge domains",
         _ => "Cloud projects",
     }
 }
@@ -96,6 +109,8 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
         experiments: None,
         xp_cells: None,
         review_annotations: None,
+        edge_pages: None,
+        edge_domains: None,
     };
     let xp = |l: Limits, experiments, xp_cells| Limits {
         experiments,
@@ -130,7 +145,40 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
             l.review_annotations = Some(max);
         }
     }
+    // Localisation SEO (glot Edge): Growth feature, a one-domain trial on Pro.
+    for (plan, pages, domains) in [
+        ("free", Some(0), Some(0)),
+        ("pro", Some(10_000), Some(1)),
+        ("team", Some(2_000_000), None),
+    ] {
+        if let Some(l) = plans.get_mut(plan) {
+            l.edge_pages = pages;
+            l.edge_domains = domains;
+        }
+    }
     plans
+}
+
+/// Before adding an Edge domain: `count` = the project owner's Edge domains once this one exists.
+pub async fn check_edge_domains(state: &AppState, project: Uuid, count: i64) -> ApiResult<()> {
+    let Some(cfg) = &state.billing else {
+        return Ok(());
+    };
+    let Some(user) = owner(&state.db, project).await? else {
+        return Ok(());
+    };
+    let acct = account(&state.db, user).await?;
+    let plan = acct.effective();
+    match cfg.limits(plan).edge_domains {
+        Some(max) if count > max => Err(quota_error(
+            cfg,
+            plan,
+            EDGE_DOMAINS,
+            max,
+            " glot Edge (Localisation SEO) is a Growth feature.",
+        )),
+        _ => Ok(()),
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -408,6 +456,40 @@ pub async fn check_experiment(
         (_, Some(max)) if cells > max => refuse("Experiment segments", max, |l| l.xp_cells),
         _ => Ok(()),
     }
+}
+
+/// Effective plan of the project's owner when it is below Growth (`team`); `None` = Growth, no owner, or
+/// billing off (a self-hosted server is never gated).
+async fn below_growth(state: &AppState, project: Uuid) -> ApiResult<Option<String>> {
+    if state.billing.is_none() {
+        return Ok(None);
+    }
+    let Some(user) = owner(&state.db, project).await? else {
+        return Ok(None);
+    };
+    let plan = account(&state.db, user).await?.effective().to_string();
+    Ok((plan != "team").then_some(plan))
+}
+
+/// Growth features (expected gain of a language, launch measurement, case-study sharing) are available.
+pub async fn has_growth(state: &AppState, project: Uuid) -> ApiResult<bool> {
+    Ok(below_growth(state, project).await?.is_none())
+}
+
+/// 402 `plan_required` below Growth, worded like the quota errors (`what` is plural: "Language launches").
+pub async fn require_growth(state: &AppState, project: Uuid, what: &str) -> ApiResult<()> {
+    let (Some(cfg), Some(plan)) = (&state.billing, below_growth(state, project).await?) else {
+        return Ok(());
+    };
+    Err(AppError::new(
+        StatusCode::PAYMENT_REQUIRED,
+        "plan_required",
+        format!(
+            "{what} are not included in the {} plan. Included in Growth. Upgrade: {}",
+            title(&plan),
+            cfg.upgrade_url()
+        ),
+    ))
 }
 
 /// Before creating a project: the creator becomes its owner and pays for it.

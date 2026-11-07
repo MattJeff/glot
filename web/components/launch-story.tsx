@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Coins, Lightbulb, Target, Users } from "lucide-react";
+import { AlertTriangle, Coins, Lightbulb, ShieldCheck, Target, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useLocaleName } from "@/components/common";
 import { Badge } from "@/components/ui/badge";
@@ -162,8 +162,43 @@ export function LaunchStoryView({ story: s }: { story: LaunchStory }) {
             <AlertTriangle className="size-4 shrink-0 text-warning-foreground" /> {t("story.srm", { pct: s.holdout_pct })}
           </p>
         )}
-        {excluded > 0 && <p className="mt-3 text-xs text-muted-foreground">{t("story.explicit", { n: excluded })}</p>}
+        {holdout && <p className="mt-3 text-xs text-muted-foreground">{t("story.scope")}</p>}
+        {excluded > 0 && <p className="mt-1 text-xs text-muted-foreground">{t("story.explicit", { n: excluded })}</p>}
       </section>
+
+      {s.guardrails.length > 0 && (
+        <section className="rounded-xl border p-4 sm:p-5">
+          <h2 className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <ShieldCheck className="size-3.5" /> {t("story.guardrails")}
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">{t("story.guardrailsHint")}</p>
+          <ul className="mt-3 divide-y text-sm">
+            {s.guardrails.map((g) => (
+              <li key={g.event} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span className="min-w-0">
+                  <span className="font-mono text-xs" translate="no">
+                    {g.event}
+                  </span>{" "}
+                  <span className="text-xs text-muted-foreground">· {t(g.higher_is_worse ? "story.guardrailUp" : "story.guardrailDown")}</span>
+                  <span className="block text-xs text-muted-foreground tabular-nums">
+                    {labels[0]} {pct(s.arms[0].visits > 0 ? g.counts[0] / s.arms[0].visits : 0)} · {labels[1]}{" "}
+                    {pct(s.arms[1].visits > 0 ? g.counts[1] / s.arms[1].visits : 0)} · {t("story.pWorse", { p: pct(g.p_worse) })}
+                  </span>
+                </span>
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "border-0 font-medium",
+                    g.status === "ok" ? "bg-success/15 text-success-foreground" : g.status === "degraded" ? "bg-destructive/15 text-destructive" : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {t(`guardrailStatus.${g.status}`)}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="rounded-xl border p-4 sm:p-5">
         <h2 className="mb-3 text-sm font-medium">{t("story.chart")}</h2>

@@ -131,6 +131,8 @@ pub struct Recommendation {
     pub keys_to_translate: i64,
     /// cost / expected monthly gain (first month payback), when the gain is positive.
     pub cost_per_conversion: Option<f64>,
+    /// Billing on and the owner below Growth: `gain_monthly` and `cost_per_conversion` withheld (null).
+    pub gain_locked: bool,
     /// insufficient | indicative | solid
     pub confidence: &'static str,
     /// Machine codes, translated by the dashboard: no_conversions, thin_demand, thin_baseline,
@@ -300,6 +302,7 @@ pub fn rank(
             cost_usd: 0.0,
             keys_to_translate: 0,
             cost_per_conversion: None,
+            gain_locked: false,
             confidence,
             reasons,
             summary: String::new(),
@@ -345,6 +348,7 @@ fn summary(r: &Recommendation) -> String {
         )
     };
     let gain = match r.gain_monthly {
+        None if r.gain_locked => "expected gain included in Growth".to_string(),
         None => "conversions not tracked, ranked on demand and cost".to_string(),
         Some(g) => format!(
             "{:+.1} conversions/month expected (90 % interval {:.1} to {:.1})",
@@ -455,6 +459,17 @@ pub async fn for_project(
     })
 }
 
+/// Below Growth: demand, current experience, cost and confidence stay; the expected gain (and the reasons
+/// that would reveal it) goes.
+pub fn lock_gain(r: &mut Recommendation) {
+    r.gain_monthly = None;
+    r.cost_per_conversion = None;
+    r.gain_locked = true;
+    r.reasons
+        .retain(|x| !matches!(*x, "no_gain" | "gain_uncertain"));
+    r.summary = summary(r);
+}
+
 #[derive(Deserialize)]
 pub struct Query {
     days: Option<i64>,
@@ -475,9 +490,11 @@ async fn handler(
         }
         None => "signup".into(),
     };
-    Ok(Json(
-        for_project(&state, &p, q.days.unwrap_or(30), &goal).await?,
-    ))
+    let mut r = for_project(&state, &p, q.days.unwrap_or(30), &goal).await?;
+    if !crate::billing::has_growth(&state, p.id).await? {
+        r.recommendations.iter_mut().for_each(lock_gain);
+    }
+    Ok(Json(r))
 }
 
 #[cfg(test)]
@@ -580,5 +597,32 @@ mod tests {
         );
         assert!((recs[1].coverage - 0.3).abs() < 1e-9);
         assert!(recs[1].summary.contains("conversions not tracked"));
+    }
+
+    #[test]
+    fn locked_gain_keeps_demand_cost_and_confidence() {
+        let rows = vec![
+            row("en", "en", false, true, 1000),
+            row("en", "en", true, true, 50),
+            row("de", "de", false, true, 400),
+            row("de", "de", true, true, 4),
+            row("es", "en", false, true, 30),
+            row("es", "en", true, true, 1),
+        ];
+        let (_, _, mut recs) = rank(30, "en", &[], 10, &rows, |_, _| (2.0, 10));
+        let mut r = recs.remove(0);
+        let (visits, cost, confidence) = (r.visits, r.cost_usd, r.confidence);
+        lock_gain(&mut r);
+        assert!(r.gain_locked && r.gain_monthly.is_none() && r.cost_per_conversion.is_none());
+        assert_eq!(
+            (r.visits, r.cost_usd, r.confidence),
+            (visits, cost, confidence)
+        );
+        assert!(
+            !r.reasons
+                .iter()
+                .any(|x| *x == "no_gain" || *x == "gain_uncertain")
+        );
+        assert!(r.summary.contains("included in Growth"), "{}", r.summary);
     }
 }

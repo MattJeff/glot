@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Languages, Plus, Radar, TrendingDown, TrendingUp } from "lucide-react";
+import { Languages, Lock, Plus, Radar, TrendingDown, TrendingUp } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -94,6 +94,14 @@ export function NextLanguageCard({ slug, days = 30, goal, emptyState }: { slug: 
   const headline = (r: Recommendation) =>
     t(r.kind === "missing" ? "headline" : "headlineFinish", { language: title(name(r.locale)), share: pct(r.share), coverage: pct(r.coverage) });
   const cta = (r: Recommendation) => t(r.kind === "missing" ? "add" : "finish", { language: name(r.locale) });
+  const locked = (
+    <span className="inline-flex items-center gap-1">
+      <Lock className="size-3" aria-hidden /> {t("gainLocked")} ·{" "}
+      <Link href="/app/settings/billing" className="font-medium underline underline-offset-4">
+        {t("upgrade")}
+      </Link>
+    </span>
+  );
 
   return (
     <section aria-labelledby="next-language" className="mt-6 rounded-xl border bg-gradient-to-br from-brand/10 via-background to-background p-5 sm:p-6">
@@ -111,7 +119,10 @@ export function NextLanguageCard({ slug, days = 30, goal, emptyState }: { slug: 
                 <p className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">{headline(best)}</p>
                 <Confidence r={best} />
               </div>
-              <p className="mt-2 text-sm">{facts(best).join(" · ")}</p>
+              <p className="mt-2 text-sm">
+                {facts(best).join(" · ")}
+                {best.gain_locked && d.conversions_tracked && <> · {locked}</>}
+              </p>
               <ul className="mt-2 space-y-0.5 text-sm text-muted-foreground">
                 {best.served_now && (
                   <li>{t("servedNow", { locale: name(best.served_now), share: pct(best.served_now_share) })}</li>
@@ -146,7 +157,10 @@ export function NextLanguageCard({ slug, days = 30, goal, emptyState }: { slug: 
                       <span className="truncate">{headline(r)}</span>
                       <Confidence r={r} />
                     </span>
-                    <span className="block text-xs text-muted-foreground">{facts(r).join(" · ")}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {facts(r).join(" · ")}
+                      {r.gain_locked && d.conversions_tracked && <> · {locked}</>}
+                    </span>
                   </span>
                   <Button size="sm" variant="outline" onClick={() => setConfirm(r)} disabled={add.isPending} aria-label={cta(r)}>
                     <Plus aria-hidden />

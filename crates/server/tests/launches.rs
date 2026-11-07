@@ -226,8 +226,24 @@ async fn language_launch_end_to_end() {
     assert_eq!(d["arms"][1]["conversions"], 2);
     assert_eq!(d["verdict"], "collecting", "day 0: time guard");
     assert!(d["srm_p"].as_f64().unwrap() > 0.001);
+    assert_eq!(
+        (d["auto_rollout"].clone(), d["min_conversions"].clone()),
+        (json!(false), json!(30))
+    );
+    let blockers = d["blockers"].as_array().unwrap();
+    for b in [
+        "min_days",
+        "min_visitors",
+        "min_conversions",
+        "no_credible_lift",
+    ] {
+        assert!(blockers.contains(&json!(b)), "{b}: {d}");
+    }
+    let (s, _, _) = call(Method::POST, &format!("{base}/{id}/rollout"), c, None).await;
+    assert_eq!(s, StatusCode::CONFLICT, "no rollout while measuring");
 
-    // Two weeks of a clear effect, then the end date: the worker rolls out and freezes the verdict.
+    // Two weeks of a clear effect, then the end date: every condition holds, but without opt-in the worker only
+    // marks the launch ready (verdict frozen, holdout kept) until the owner confirms.
     sqlx::query(
         "UPDATE language_launches SET launched_at = now() - interval '15 days', ends_at = now() - interval '1 hour'
          WHERE id = $1::uuid",
@@ -240,27 +256,35 @@ async fn language_launch_end_to_end() {
         .fetch_one(&pool)
         .await
         .unwrap();
-    for (arm, views, conv) in [("control", 2000, 60), ("test", 8000, 360)] {
-        for (event, n) in [("$view", views), ("signup", conv)] {
-            sqlx::query(
-                "INSERT INTO insight_daily (project_id, day, preferred, served, country, arm, event, n)
-                 VALUES ($1, (now() AT TIME ZONE 'utc')::date - 7, 'es', 'es', '', $2, $3, $4)",
-            )
-            .bind(pid)
-            .bind(arm)
-            .bind(event)
-            .bind(n as i64)
-            .execute(&pool)
-            .await
-            .unwrap();
-        }
-    }
+    let clear = [
+        ("control", "$view", 2000),
+        ("control", "signup", 60),
+        ("test", "$view", 8000),
+        ("test", "signup", 360),
+    ];
+    arms(&pool, pid, "es", &clear).await;
     glot_server::launches::tick(&state).await.unwrap();
     let (_, _, d) = call(Method::GET, &format!("{base}/{id}"), c, None).await;
-    assert_eq!(d["status"], "rolled_out", "{d}");
+    assert_eq!(d["status"], "ready", "{d}");
     assert_eq!(d["verdict"], "probably_positive");
+    assert_eq!(d["blockers"], json!([]));
     assert!(d["lift_lo"].as_f64().unwrap() > 0.0);
     assert!(!d["daily"].as_array().unwrap().is_empty());
+    let (_, _, r) = call(
+        Method::POST,
+        &hit,
+        None,
+        Some(json!({"langs": ["es"], "served": "en"})),
+    )
+    .await;
+    assert!(
+        r["arm"].is_string(),
+        "ready ≠ rolled out: still held until confirmed, past the end date: {r}"
+    );
+    let (s, _, d) = call(Method::POST, &format!("{base}/{id}/rollout"), c, None).await;
+    assert_eq!(s, StatusCode::OK, "{d}");
+    assert_eq!(d["status"], "rolled_out");
+    assert_eq!(d["verdict"], "probably_positive");
     // Rolled out: nobody is held any more.
     let (_, _, r) = call(
         Method::POST,
@@ -270,6 +294,94 @@ async fn language_launch_end_to_end() {
     )
     .await;
     assert!(r["arm"].is_null() && r["locale"].is_null(), "{r}");
+
+    // ---------- opt-in auto rollout, guardrails ----------
+    let mut auto = vec![];
+    for (locale, purchases) in [("it", [200, 640]), ("pt", [200, 840])] {
+        let (s, _, l) = call(
+            Method::POST,
+            base,
+            c,
+            Some(json!({"locale": locale, "auto_rollout": true,
+                        "guardrails": [{"event": "purchase"}, {"event": "error", "higher_is_worse": true}]})),
+        )
+        .await;
+        assert_eq!(s, StatusCode::CREATED, "{l}");
+        assert_eq!(l["auto_rollout"], true);
+        let lid = l["id"].as_str().unwrap().to_string();
+        sqlx::query(
+            "UPDATE language_launches SET launched_at = now() - interval '15 days', ends_at = now() - interval '1 hour'
+             WHERE id = $1::uuid",
+        )
+        .bind(&lid)
+        .execute(&pool)
+        .await
+        .unwrap();
+        let lang = &locale[..2];
+        let mut rows = clear.to_vec();
+        rows.extend([
+            ("control", "purchase", purchases[0]),
+            ("test", "purchase", purchases[1]),
+            ("control", "error", 40),
+            ("test", "error", 120),
+        ]);
+        arms(&pool, pid, lang, &rows).await;
+        auto.push((locale, lid));
+    }
+    for (bad, msg) in [
+        (
+            json!({"locale": "nl", "guardrails": [{"event": "signup"}]}),
+            "guardrail = goal",
+        ),
+        (
+            json!({"locale": "nl", "min_conversions": 0}),
+            "min_conversions",
+        ),
+    ] {
+        let (s, _, _) = call(Method::POST, base, c, Some(bad)).await;
+        assert_eq!(s, StatusCode::BAD_REQUEST, "{msg}");
+    }
+    glot_server::launches::tick(&state).await.unwrap();
+    // it: purchases 10 % → 8 % with the new locale: the guardrail blocks the rollout despite the signup lift.
+    let (_, _, d) = call(Method::GET, &format!("{base}/{}", auto[0].1), c, None).await;
+    assert_eq!(d["status"], "done", "{d}");
+    assert_eq!(d["verdict"], "probably_positive");
+    assert_eq!(d["blockers"], json!(["guardrail"]));
+    assert_eq!(d["guardrails"][0]["status"], "degraded", "{d}");
+    assert_eq!(d["guardrails"][0]["counts"], json!([200, 640]));
+    assert_eq!(d["guardrails"][1]["status"], "ok");
+    let (_, _, r) = call(
+        Method::POST,
+        &hit,
+        None,
+        Some(json!({"langs": ["it"], "served": "en"})),
+    )
+    .await;
+    assert!(r["arm"].is_string(), "blocked: the holdout stays: {r}");
+    // pt: guardrails stable and opted in: rolled out by the worker, nobody held any more.
+    let (_, _, d) = call(Method::GET, &format!("{base}/{}", auto[1].1), c, None).await;
+    assert_eq!(d["status"], "rolled_out", "{d}");
+    assert_eq!(d["blockers"], json!([]));
+    let (_, _, r) = call(
+        Method::POST,
+        &hit,
+        None,
+        Some(json!({"langs": ["pt"], "served": "en"})),
+    )
+    .await;
+    assert!(r["arm"].is_null(), "{r}");
+    // The owner may still take the blocked one to 100 % by hand.
+    let (s, _, d) = call(
+        Method::POST,
+        &format!("{base}/{}/rollout", auto[0].1),
+        c,
+        None,
+    )
+    .await;
+    assert_eq!(
+        (s, d["status"].clone()),
+        (StatusCode::OK, json!("rolled_out"))
+    );
 
     // ---------- share ----------
     let (s, _, t) = call(Method::POST, &format!("{base}/{id}/share"), c, None).await;
@@ -286,7 +398,9 @@ async fn language_launch_end_to_end() {
     for private in ["id", "share_token", "project_id", "slug"] {
         assert!(pubd.get(private).is_none(), "{private} leaked");
     }
-    let tampered = format!("{}0", &token[..token.len() - 1]);
+    // Flip the last char (a fixed replacement would be a no-op 1 time in 16).
+    let last = if token.ends_with('0') { '1' } else { '0' };
+    let tampered = format!("{}{last}", &token[..token.len() - 1]);
     let (s, _, _) = call(
         Method::GET,
         &format!("/api/public/launches/{tampered}"),
@@ -362,11 +476,29 @@ async fn language_launch_end_to_end() {
     assert_eq!(ba["arms"][1]["conversions"], 150);
 
     let (_, _, all) = call(Method::GET, base, c, None).await;
-    assert_eq!(all.as_array().unwrap().len(), 2);
+    assert_eq!(all.as_array().unwrap().len(), 4);
 
     pool.close().await;
     sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
         .execute(&admin)
         .await
         .ok();
+}
+
+/// Counters of a holdout on day −7 for visitors preferring `lang`: (arm, event, n).
+async fn arms(pool: &PgPool, project: uuid::Uuid, lang: &str, rows: &[(&str, &str, i64)]) {
+    for (arm, event, n) in rows {
+        sqlx::query(
+            "INSERT INTO insight_daily (project_id, day, preferred, served, country, arm, event, n)
+             VALUES ($1, (now() AT TIME ZONE 'utc')::date - 7, $2, $2, '', $3, $4, $5)",
+        )
+        .bind(project)
+        .bind(lang)
+        .bind(arm)
+        .bind(event)
+        .bind(n)
+        .execute(pool)
+        .await
+        .unwrap();
+    }
 }

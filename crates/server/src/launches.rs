@@ -5,8 +5,21 @@
 //! fallback (`hold_locale`) for N days, then everyone gets it (`rolled_out`). Analysed with the Bayesian engine of
 //! segmented experiments (`experiments::stats`: one cell, 2 arms, alpha-spending looks): relative lift with a 95 %
 //! credible interval, SRM χ² on the assignment counts (p < 0.001 ⇒ `invalid`), no conclusion before 7 days and
-//! `min_n` visitors per arm. An early decisive win rolls out early; anything else rolls out at the end date.
-//! A session whose visitor picked a language in the switcher is never assigned (or leaves its arm: `$explicit`).
+//! `min_n` visitors per arm.
+//!
+//! **Rollout to 100 %** (stopping the holdout) needs every condition (`blockers`): ≥ 7 days, `min_n` visitors and
+//! `min_conversions` (default 30) goal conversions per arm, no SRM, a credible lift (`probably_positive`), and no
+//! guardrail event degraded: for each guardrail (e.g. `purchase`, or `error` with `higher_is_worse`),
+//! P(new locale worse by more than 5 % relative) ≤ 0.2 with at least `min_conversions` events across both arms.
+//! It is automatic only when the launch opted in (`auto_rollout`, default off); otherwise the launch waits in
+//! `ready` for a confirmation (`POST …/rollout`). A launch that ends without meeting them (`done`, `invalid`)
+//! keeps its holdout until the owner decides: the experiment no longer lapses at the end date.
+//!
+//! **Audience and assignment.** A session whose visitor picked a language (switcher, `explicit`) is never assigned
+//! (or leaves its arm: `$explicit`), so the effect measured is the effect of *automatic* localisation on visitors
+//! without an explicit preference. The arm is drawn on the session's first visit, before anything is rendered in
+//! the new locale, and kept for the session (`@glot/insights` returns it from sessionStorage on every hit). There is
+//! deliberately no visitor id (no cookie, no localStorage id): a returning visitor in a new session is drawn again.
 //!
 //! **Before/after** (compiled-in catalogs, no holdout possible): the same audience N days before vs since the
 //! launch. Never causal (seasonality, campaigns, trends): verdicts say "higher/lower after", not "positive".
@@ -37,7 +50,7 @@ use crate::{
     insights::{self, EXPLICIT, lang},
     projects::{self, Role},
     validate_locale,
-    variants::WIN_PROB,
+    variants::{WIN_PROB, draw},
 };
 
 pub fn routes() -> Router<AppState> {
@@ -46,6 +59,7 @@ pub fn routes() -> Router<AppState> {
         .route(p, get(list).post(create))
         .route(&format!("{p}/{{id}}"), get(detail))
         .route(&format!("{p}/{{id}}/share"), post(share).delete(revoke))
+        .route(&format!("{p}/{{id}}/rollout"), post(rollout))
 }
 
 /// Public, unauthenticated: the shared case study.
@@ -96,6 +110,7 @@ pub struct Outcome {
 }
 
 const DRAWS: usize = 4000;
+const VIEW: &str = "$view";
 
 pub fn evaluate(e: &Eval) -> Outcome {
     let cells = [stats::Cell {
@@ -168,6 +183,102 @@ pub fn evaluate(e: &Eval) -> Outcome {
     }
 }
 
+/// A guardrail event: rollout is blocked if the new locale makes it worse.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct Guardrail {
+    pub event: String,
+    /// `error`-like events: a rise is the degradation (default: a drop, e.g. `purchase`).
+    #[serde(default)]
+    pub higher_is_worse: bool,
+}
+
+#[derive(Serialize, Clone, Debug, PartialEq)]
+pub struct GuardrailResult {
+    pub event: String,
+    pub higher_is_worse: bool,
+    /// Events per arm [fallback / before, new locale / after].
+    pub counts: [i64; 2],
+    /// P(new locale worse than the fallback by more than `GUARDRAIL_TOLERANCE`, relative).
+    pub p_worse: f64,
+    /// ok | degraded | insufficient
+    pub status: &'static str,
+}
+
+/// Relative degradation a guardrail tolerates, and the probability of exceeding it that blocks a rollout.
+pub const GUARDRAIL_TOLERANCE: f64 = 0.05;
+pub const GUARDRAIL_MAX_P: f64 = 0.2;
+
+/// Beta posteriors per arm (uniform prior), seeded: `insufficient` under `min_events` events across both arms.
+pub fn guardrail(
+    g: &Guardrail,
+    visits: [i64; 2],
+    counts: [i64; 2],
+    min_events: i64,
+    seed: u64,
+) -> GuardrailResult {
+    let mut rng = StdRng::seed_from_u64(seed);
+    let worse = (0..DRAWS)
+        .filter(|_| {
+            let c = draw(visits[0], counts[0], &mut rng);
+            let t = draw(visits[1], counts[1], &mut rng);
+            if g.higher_is_worse {
+                t > c * (1.0 + GUARDRAIL_TOLERANCE)
+            } else {
+                t < c * (1.0 - GUARDRAIL_TOLERANCE)
+            }
+        })
+        .count() as f64
+        / DRAWS as f64;
+    GuardrailResult {
+        event: g.event.clone(),
+        higher_is_worse: g.higher_is_worse,
+        counts,
+        p_worse: worse,
+        status: if counts[0] + counts[1] < min_events {
+            "insufficient"
+        } else if worse > GUARDRAIL_MAX_P {
+            "degraded"
+        } else {
+            "ok"
+        },
+    }
+}
+
+/// What still prevents a rollout to 100 % (empty = ready). Codes, translated by the dashboard.
+pub fn blockers(
+    holdout: bool,
+    o: &Outcome,
+    arms: &[Counts; 2],
+    days: f64,
+    min_n: i64,
+    min_conversions: i64,
+    guards: &[GuardrailResult],
+) -> Vec<&'static str> {
+    if !holdout {
+        return vec!["no_holdout"];
+    }
+    let mut b = vec![];
+    if days < stats::MIN_DAYS {
+        b.push("min_days");
+    }
+    if arms.iter().any(|a| a.visits < min_n) {
+        b.push("min_visitors");
+    }
+    if arms.iter().any(|a| a.conversions < min_conversions) {
+        b.push("min_conversions");
+    }
+    if o.srm_p.is_some_and(|p| p < stats::SRM_P) {
+        b.push("srm");
+    }
+    if o.verdict != "probably_positive" {
+        b.push("no_credible_lift");
+    }
+    if guards.iter().any(|g| g.status != "ok") {
+        b.push("guardrail");
+    }
+    b
+}
+
 // ---------- storage ----------
 
 #[derive(sqlx::FromRow)]
@@ -193,10 +304,14 @@ struct Row {
     cost_estimated: bool,
     recommendation: Option<DbJson<Value>>,
     share_nonce: Option<String>,
+    min_conversions: i32,
+    guardrails: DbJson<Vec<Guardrail>>,
+    auto_rollout: bool,
 }
 
 const COLS: &str = "id, project_id, locale, mode, experiment_id, fallback, goal, holdout_pct, days, min_n, launched_at,
-    ends_at, status, verdict, looks, decided_at, baseline, cost_usd, cost_estimated, recommendation, share_nonce";
+    ends_at, status, verdict, looks, decided_at, baseline, cost_usd, cost_estimated, recommendation, share_nonce,
+    min_conversions, guardrails, auto_rollout";
 
 #[derive(Serialize, Clone, Debug)]
 pub struct Point {
@@ -210,6 +325,8 @@ struct Measure {
     arms: [Counts; 2],
     assigned: [i64; 2],
     explicit: [i64; 2],
+    /// Guardrail event counts per arm, in `Row::guardrails` order.
+    guards: Vec<[i64; 2]>,
     daily: Vec<Point>,
 }
 
@@ -221,20 +338,18 @@ async fn measure(state: &AppState, r: &Row, end: DateTime<Utc>) -> ApiResult<Mea
     } else {
         r.launched_at - chrono::Duration::days(r.days as i64)
     };
-    let rows: Vec<(NaiveDate, String, i64, i64, i64)> = sqlx::query_as(
-        "SELECT day, arm, coalesce(sum(n) FILTER (WHERE event = '$view'), 0)::int8,
-                coalesce(sum(n) FILTER (WHERE event = $5), 0)::int8,
-                coalesce(sum(n) FILTER (WHERE event = $6), 0)::int8
-         FROM insight_daily WHERE project_id = $1 AND preferred = $2
-           AND day BETWEEN ($3 AT TIME ZONE 'utc')::date AND ($4 AT TIME ZONE 'utc')::date
-         GROUP BY day, arm ORDER BY day",
+    let mut events = vec![VIEW.to_string(), EXPLICIT.to_string(), r.goal.clone()];
+    events.extend(r.guardrails.0.iter().map(|g| g.event.clone()));
+    let rows: Vec<(NaiveDate, String, String, i64)> = sqlx::query_as(
+        "SELECT day, arm, event, sum(n)::int8 FROM insight_daily WHERE project_id = $1 AND preferred = $2
+           AND day BETWEEN ($3 AT TIME ZONE 'utc')::date AND ($4 AT TIME ZONE 'utc')::date AND event = ANY($5)
+         GROUP BY day, arm, event ORDER BY day",
     )
     .bind(r.project_id)
     .bind(lang(&r.locale))
     .bind(from)
     .bind(end)
-    .bind(EXPLICIT)
-    .bind(&r.goal)
+    .bind(&events)
     .fetch_all(&state.db)
     .await?;
     let launch_day = r.launched_at.date_naive();
@@ -242,30 +357,48 @@ async fn measure(state: &AppState, r: &Row, end: DateTime<Utc>) -> ApiResult<Mea
         arms: Default::default(),
         assigned: [0; 2],
         explicit: [0; 2],
+        guards: vec![[0; 2]; r.guardrails.0.len()],
         daily: vec![],
     };
     let mut days: BTreeMap<NaiveDate, Point> = BTreeMap::new();
-    for (day, arm, views, explicit, conv) in rows {
+    for (day, arm, event, n) in rows {
         let i = match (holdout, arm.as_str()) {
             (true, "control") => 0,
             (true, "test") => 1,
             (true, _) => continue, // explicit choices and visitors outside the holdout
             (false, _) => (day >= launch_day) as usize,
         };
-        let visits = (views - explicit).max(0);
-        m.assigned[i] += views;
-        m.explicit[i] += explicit;
-        m.arms[i].visits += visits;
-        m.arms[i].conversions += conv;
         let p = days.entry(day).or_insert(Point {
             day,
             visits: [0; 2],
             conversions: [0; 2],
         });
-        p.visits[i] += visits;
-        p.conversions[i] += conv;
+        // An explicit choice withdraws a session already counted as a visit.
+        if event == VIEW {
+            m.assigned[i] += n;
+            m.arms[i].visits += n;
+            p.visits[i] += n;
+        } else if event == EXPLICIT {
+            m.explicit[i] += n;
+            m.arms[i].visits -= n;
+            p.visits[i] -= n;
+        } else if event == r.goal {
+            m.arms[i].conversions += n;
+            p.conversions[i] += n;
+        } else if let Some(j) = r.guardrails.0.iter().position(|g| g.event == event) {
+            m.guards[j][i] += n;
+        }
     }
-    m.daily = days.into_values().collect();
+    for a in &mut m.arms {
+        a.visits = a.visits.max(0);
+    }
+    m.daily = days
+        .into_values()
+        .map(|mut p| {
+            p.visits = p.visits.map(|v| v.max(0));
+            p
+        })
+        .collect();
     Ok(m)
 }
 
@@ -286,24 +419,57 @@ fn seed(id: Uuid) -> u64 {
     id.as_u64_pair().0
 }
 
-/// End of the measured window and the evaluation of it.
-async fn outcome(state: &AppState, r: &Row) -> ApiResult<(Measure, Outcome, bool)> {
+struct Checked {
+    m: Measure,
+    o: Outcome,
+    guards: Vec<GuardrailResult>,
+    blockers: Vec<&'static str>,
+    ended: bool,
+}
+
+/// End of the measured window, the evaluation of it and the rollout conditions.
+async fn outcome(state: &AppState, r: &Row) -> ApiResult<Checked> {
     let now = Utc::now();
     let end = r.decided_at.unwrap_or(now).min(r.ends_at);
     let ended = r.decided_at.is_some() || now >= r.ends_at;
     let m = measure(state, r, end).await?;
+    let holdout = r.mode == "holdout";
+    let days = (end - r.launched_at).num_seconds() as f64 / 86_400.0;
     let o = evaluate(&Eval {
-        holdout: r.mode == "holdout",
+        holdout,
         arms: m.arms,
         assigned: m.assigned,
         holdout_pct: r.holdout_pct,
         min_n: r.min_n as i64,
-        days: (end - r.launched_at).num_seconds() as f64 / 86_400.0,
+        days,
         look: r.looks,
         ended,
         seed: seed(r.id),
     });
-    Ok((m, o, ended))
+    let visits = [m.arms[0].visits, m.arms[1].visits];
+    let guards: Vec<GuardrailResult> = r
+        .guardrails
+        .0
+        .iter()
+        .zip(&m.guards)
+        .map(|(g, c)| guardrail(g, visits, *c, r.min_conversions as i64, seed(r.id)))
+        .collect();
+    let blockers = blockers(
+        holdout,
+        &o,
+        &m.arms,
+        days,
+        r.min_n as i64,
+        r.min_conversions as i64,
+        &guards,
+    );
+    Ok(Checked {
+        m,
+        o,
+        guards,
+        blockers,
+        ended,
+    })
 }
 
 // ---------- story ----------
@@ -326,6 +492,14 @@ pub struct Story {
     pub days: i32,
     pub holdout_pct: i32,
     pub min_n: i32,
+    /// Goal conversions needed in each arm before a rollout.
+    pub min_conversions: i32,
+    /// The holdout goes to 100 % on its own when every condition holds (else `ready` waits for a confirmation).
+    pub auto_rollout: bool,
+    pub guardrails: Vec<GuardrailResult>,
+    /// Conditions a rollout still misses (empty = all met): min_days, min_visitors, min_conversions, srm,
+    /// no_credible_lift, guardrail, no_holdout.
+    pub blockers: Vec<&'static str>,
     pub baseline: Counts,
     pub cost_usd: f64,
     pub cost_estimated: bool,
@@ -349,7 +523,13 @@ pub struct Launch {
 }
 
 async fn story(state: &AppState, r: &Row, project: String) -> ApiResult<Story> {
-    let (m, mut o, _) = outcome(state, r).await?;
+    let Checked {
+        m,
+        mut o,
+        guards,
+        blockers,
+        ..
+    } = outcome(state, r).await?;
     if let Some(v) = r.verdict.as_deref() {
         // Frozen at the decision: a later look must not rewrite a published story.
         o.verdict = VERDICTS
@@ -379,6 +559,10 @@ async fn story(state: &AppState, r: &Row, project: String) -> ApiResult<Story> {
         days: r.days,
         holdout_pct: r.holdout_pct,
         min_n: r.min_n,
+        min_conversions: r.min_conversions,
+        auto_rollout: r.auto_rollout,
+        guardrails: guards,
+        blockers,
         baseline: r.baseline.0,
         cost_usd,
         cost_estimated,
@@ -479,6 +663,13 @@ pub struct NewLaunch {
     /// Default: the source locale.
     fallback: Option<String>,
     min_n: Option<i32>,
+    /// Goal conversions per arm before a rollout, default 30.
+    min_conversions: Option<i32>,
+    #[serde(default)]
+    guardrails: Vec<Guardrail>,
+    /// Go to 100 % without confirmation once every condition holds (default off).
+    #[serde(default)]
+    auto_rollout: bool,
 }
 
 /// glot's recommendation for `locale` (`recommend.rs`) from the data available at launch, computed as if it were
@@ -513,6 +704,7 @@ pub async fn create(
     AppJson(b): AppJson<NewLaunch>,
 ) -> ApiResult<(StatusCode, Json<Launch>)> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::billing::require_growth(&state, p.id, "Language launches").await?;
     validate_locale(&b.locale)?;
     let fallback = b.fallback.unwrap_or_else(|| p.source_locale.clone());
     validate_locale(&fallback)?;
@@ -545,6 +737,20 @@ pub async fn create(
     }
     let goal = b.goal.unwrap_or_else(|| "signup".into());
     insights::check_event(&goal)?;
+    let min_conversions = b.min_conversions.unwrap_or(30);
+    if min_conversions < 1 || b.guardrails.len() > 5 {
+        return Err(AppError::bad_request(
+            "min_conversions must be ≥ 1 and guardrails at most 5",
+        ));
+    }
+    for (i, g) in b.guardrails.iter().enumerate() {
+        insights::check_event(&g.event)?;
+        if g.event == goal || b.guardrails[..i].iter().any(|x| x.event == g.event) {
+            return Err(AppError::bad_request(
+                "a guardrail must differ from the goal and the other guardrails",
+            ));
+        }
+    }
 
     let keys: Vec<(String, String)> =
         sqlx::query_as("SELECT key, source FROM keys WHERE project_id = $1 ORDER BY key")
@@ -582,15 +788,15 @@ pub async fn create(
     let experiment_id = if holdout {
         let xid = Uuid::new_v4();
         sqlx::query(
+            // The holdout lasts until the launch stops it (rollout), not until the measurement end date.
             "INSERT INTO insight_experiments (id, project_id, locale, traffic_pct, goal, ends_at, hold_locale)
-             VALUES ($1, $2, $3, $4, $5, now() + make_interval(days => $6), $7)",
+             VALUES ($1, $2, $3, $4, $5, 'infinity', $6)",
         )
         .bind(xid)
         .bind(p.id)
         .bind(&b.locale)
         .bind(100 - holdout_pct)
         .bind(&goal)
-        .bind(days)
         .bind(&fallback)
         .execute(&mut *tx)
         .await
@@ -606,8 +812,10 @@ pub async fn create(
     };
     sqlx::query(
         "INSERT INTO language_launches (id, project_id, locale, mode, experiment_id, fallback, goal, holdout_pct,
-           days, min_n, ends_at, baseline, cost_usd, cost_estimated, recommendation)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now() + make_interval(days => $9), $11, $12, $13, $14)",
+           days, min_n, ends_at, baseline, cost_usd, cost_estimated, recommendation, min_conversions, guardrails,
+           auto_rollout)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now() + make_interval(days => $9), $11, $12, $13, $14,
+           $15, $16, $17)",
     )
     .bind(id)
     .bind(p.id)
@@ -623,6 +831,9 @@ pub async fn create(
     .bind(cost)
     .bind(estimated)
     .bind(rec.map(DbJson))
+    .bind(min_conversions)
+    .bind(DbJson(&b.guardrails))
+    .bind(b.auto_rollout && holdout)
     .execute(&mut *tx)
     .await
     .map_err(|e| match AppError::from(e) {
@@ -649,6 +860,7 @@ pub async fn share(
     AppPath((slug, id)): AppPath<(String, Uuid)>,
 ) -> ApiResult<Json<Value>> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::billing::require_growth(&state, p.id, "Shared case studies").await?;
     // Idempotent: sharing twice keeps the same link.
     let nonce: String = sqlx::query_scalar(
         "UPDATE language_launches SET share_nonce = coalesce(share_nonce, $3)
@@ -663,6 +875,54 @@ pub async fn share(
     Ok(Json(
         serde_json::json!({ "token": token(&state.secret, id, &nonce) }),
     ))
+}
+
+/// The owner's confirmation: stop the holdout (everyone who prefers the language gets it). Allowed once the
+/// measurement stopped (`ready`, or `done` / `invalid` without meeting the conditions: the owner's call).
+pub async fn rollout(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath((slug, id)): AppPath<(String, Uuid)>,
+) -> ApiResult<Json<Launch>> {
+    let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    let r = load(&state, p.id, id).await?;
+    if r.mode != "holdout" || !matches!(r.status.as_str(), "ready" | "done" | "invalid") {
+        return Err(AppError::conflict(
+            "only a holdout whose measurement has stopped can go to 100 %",
+        ));
+    }
+    let mut tx = state.db.begin().await?;
+    let n = sqlx::query(
+        "UPDATE language_launches SET status = 'rolled_out' WHERE id = $1 AND status = $2",
+    )
+    .bind(r.id)
+    .bind(&r.status)
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    if n == 0 {
+        return Err(AppError::conflict("the launch changed meanwhile"));
+    }
+    stop_holdout(&mut tx, r.experiment_id).await?;
+    tx.commit().await?;
+    let r = load(&state, p.id, id).await?;
+    Ok(Json(view(&state, &r, &p.name).await?))
+}
+
+/// Stopping the holdout = everyone who prefers the language gets it (no arm drawn any more).
+async fn stop_holdout(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    experiment: Option<Uuid>,
+) -> ApiResult<()> {
+    if let Some(xid) = experiment {
+        sqlx::query(
+            "UPDATE insight_experiments SET status = 'kept', decided_at = now() WHERE id = $1 AND status = 'running'",
+        )
+        .bind(xid)
+        .execute(&mut **tx)
+        .await?;
+    }
+    Ok(())
 }
 
 pub async fn revoke(
@@ -720,8 +980,9 @@ pub async fn public(
 
 // ---------- worker ----------
 
-/// Every `GLOT_XP_TICK_SECS` (default 300): spend decision looks, roll out at a decisive win or the end date,
-/// invalidate on SRM, close before/after measurements.
+/// Every `GLOT_XP_TICK_SECS` (default 300): spend decision looks; once every rollout condition holds, roll out
+/// (`auto_rollout`) or wait for a confirmation (`ready`); at the end date close as `done` (holdout kept until the
+/// owner decides), invalidate on SRM, close before/after measurements.
 pub fn spawn_worker(state: AppState) -> tokio::task::JoinHandle<()> {
     let secs = std::env::var("GLOT_XP_TICK_SECS")
         .ok()
@@ -745,12 +1006,16 @@ pub async fn tick(state: &AppState) -> ApiResult<()> {
     .fetch_all(&state.db)
     .await?;
     for r in rows {
-        let (_, o, ended) = outcome(state, &r).await?;
-        let status = match (r.mode.as_str(), o.verdict) {
+        let Checked {
+            o, blockers, ended, ..
+        } = outcome(state, &r).await?;
+        let ready = blockers.is_empty();
+        let status = match o.verdict {
             // ponytail: SRM acts at decision looks and at the end only (a χ² re-tested every tick false-alarms).
-            (_, "invalid") if o.decision_look || ended => "invalid",
-            ("holdout", _) if o.winner == Some(1) || ended => "rolled_out",
-            ("before_after", _) if ended => "done",
+            "invalid" if o.decision_look || ended => "invalid",
+            _ if ready && r.auto_rollout => "rolled_out",
+            _ if ready => "ready",
+            _ if ended => "done",
             _ => {
                 if o.decision_look {
                     sqlx::query("UPDATE language_launches SET looks = looks + 1 WHERE id = $1 AND looks = $2")
@@ -778,16 +1043,8 @@ pub async fn tick(state: &AppState) -> ApiResult<()> {
         .execute(&mut *tx)
         .await?
         .rows_affected();
-        if done == 1
-            && let Some(xid) = r.experiment_id
-        {
-            // Stopping the holdout = everyone who prefers the language gets it (no arm drawn any more).
-            sqlx::query(
-                "UPDATE insight_experiments SET status = 'kept', decided_at = now() WHERE id = $1 AND status = 'running'",
-            )
-            .bind(xid)
-            .execute(&mut *tx)
-            .await?;
+        if done == 1 && status == "rolled_out" {
+            stop_holdout(&mut tx, r.experiment_id).await?;
         }
         tx.commit().await?;
         tracing::info!(launch = %r.id, status, verdict, "language launch measured");
@@ -874,6 +1131,89 @@ mod tests {
         assert_eq!(o.winner, None, "before/after never rolls anything out");
         x.arms[1].conversions = 92;
         assert_eq!(evaluate(&x).verdict, "no_clear_change");
+    }
+
+    #[test]
+    fn guardrails_block_on_degradation_or_thin_data() {
+        let buy = Guardrail {
+            event: "purchase".into(),
+            higher_is_worse: false,
+        };
+        let err = Guardrail {
+            event: "error".into(),
+            higher_is_worse: true,
+        };
+        // Purchases 4 % → 3 % (−25 %): degraded. 10 % → 10.5 %: ok. 10 events: insufficient.
+        assert_eq!(
+            guardrail(&buy, [2000, 8000], [80, 240], 30, 1).status,
+            "degraded"
+        );
+        let ok = guardrail(&buy, [2000, 8000], [200, 840], 30, 1);
+        assert_eq!(ok.status, "ok", "{ok:?}");
+        assert!(ok.p_worse < GUARDRAIL_MAX_P);
+        assert_eq!(
+            guardrail(&buy, [2000, 8000], [2, 8], 30, 1).status,
+            "insufficient"
+        );
+        // Errors 1 % → 2 %: a rise is the degradation.
+        assert_eq!(
+            guardrail(&err, [2000, 8000], [20, 160], 30, 1).status,
+            "degraded"
+        );
+        assert_eq!(guardrail(&err, [2000, 8000], [40, 120], 30, 1).status, "ok");
+    }
+
+    #[test]
+    fn rollout_needs_every_condition() {
+        let arms = [(2000, 60), (8000, 360)];
+        let counts = arms.map(|(visits, conversions)| Counts {
+            visits,
+            conversions,
+        });
+        let win = evaluate(&e(arms, 14.0, false));
+        let ok = guardrail(
+            &Guardrail {
+                event: "purchase".into(),
+                higher_is_worse: false,
+            },
+            [2000, 8000],
+            [200, 840],
+            30,
+            1,
+        );
+        let b = |o: &Outcome, counts: &[Counts; 2], days: f64, g: &[GuardrailResult]| {
+            blockers(true, o, counts, days, 200, 30, g)
+        };
+        assert!(b(&win, &counts, 14.0, std::slice::from_ref(&ok)).is_empty());
+        // Too few real conversions in the control arm (min 30), whatever the lift.
+        let few = [
+            Counts {
+                visits: 2000,
+                conversions: 29,
+            },
+            counts[1],
+        ];
+        assert_eq!(b(&win, &few, 14.0, &[]), ["min_conversions"]);
+        assert_eq!(b(&win, &counts, 6.0, &[]), ["min_days"]);
+        let degraded = GuardrailResult {
+            status: "degraded",
+            ..ok.clone()
+        };
+        assert_eq!(b(&win, &counts, 14.0, &[degraded]), ["guardrail"]);
+        let thin = GuardrailResult {
+            status: "insufficient",
+            ..ok
+        };
+        assert_eq!(b(&win, &counts, 14.0, &[thin]), ["guardrail"]);
+        let flat = evaluate(&e([(2000, 60), (8000, 242)], 14.0, true));
+        assert_eq!(b(&flat, &counts, 14.0, &[]), ["no_credible_lift"]);
+        let mut srm = e(arms, 14.0, false);
+        srm.assigned = [5000, 5000];
+        assert!(b(&evaluate(&srm), &counts, 14.0, &[]).contains(&"srm"));
+        assert_eq!(
+            blockers(false, &win, &counts, 14.0, 200, 30, &[]),
+            ["no_holdout"]
+        );
     }
 
     #[test]

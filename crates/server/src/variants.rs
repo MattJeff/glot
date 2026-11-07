@@ -63,7 +63,7 @@ pub(crate) fn gamma(shape: f64, rng: &mut impl Rng) -> f64 {
 }
 
 /// One draw of the Beta(1 + conversions, 1 + misses) posterior of an arm.
-fn draw(views: i64, conversions: i64, rng: &mut impl Rng) -> f64 {
+pub(crate) fn draw(views: i64, conversions: i64, rng: &mut impl Rng) -> f64 {
     let c = conversions.clamp(0, views.max(0)) as f64;
     let (a, b) = (1.0 + c, 1.0 + views.max(0) as f64 - c);
     if a.min(b) > 50.0 {

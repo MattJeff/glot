@@ -1098,6 +1098,91 @@ async fn git(
 }
 
 /// Bytes on disk, never following symlinks; Err if one points outside or the tree is too large.
+/// Never checked out in a localization run: media, fonts, archives, models, compiled artifacts.
+const SKIP_EXT: &[&str] = &[
+    "mp4",
+    "mov",
+    "webm",
+    "mkv",
+    "avi",
+    "m4v",
+    "mp3",
+    "wav",
+    "ogg",
+    "flac",
+    "m4a",
+    "aac",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "webp",
+    "avif",
+    "heic",
+    "ico",
+    "bmp",
+    "tif",
+    "tiff",
+    "psd",
+    "ai",
+    "sketch",
+    "fig",
+    "blend",
+    "blend1",
+    "glb",
+    "gltf",
+    "fbx",
+    "obj",
+    "usdz",
+    "woff",
+    "woff2",
+    "ttf",
+    "otf",
+    "eot",
+    "zip",
+    "gz",
+    "tgz",
+    "bz2",
+    "xz",
+    "7z",
+    "rar",
+    "jar",
+    "pdf",
+    "wasm",
+    "so",
+    "dylib",
+    "dll",
+    "exe",
+    "bin",
+    "onnx",
+    "pt",
+    "safetensors",
+    "gguf",
+    "npy",
+    "parquet",
+    "sqlite",
+    "db",
+];
+
+/// Paths of `git ls-tree -r -l` entries larger than `limit` bytes.
+fn large_paths(ls_tree: &str, limit: u64) -> impl Iterator<Item = &str> {
+    ls_tree.lines().filter_map(move |l| {
+        let (meta, path) = l.split_once('\t')?;
+        let size: u64 = meta.split_whitespace().nth(3)?.parse().ok()?;
+        (size > limit).then_some(path)
+    })
+}
+
+/// Escapes a path for a gitignore-style sparse-checkout pattern.
+fn sparse_escape(p: &str) -> String {
+    p.chars()
+        .flat_map(|c| {
+            let esc = matches!(c, '*' | '?' | '[' | ']' | '\\' | '!' | '#' | ' ');
+            esc.then_some('\\').into_iter().chain(std::iter::once(c))
+        })
+        .collect()
+}
+
 fn tree_size(dir: &Path, max: u64) -> anyhow::Result<u64> {
     let mut total = 0u64;
     let mut stack = vec![dir.to_path_buf()];
@@ -1340,6 +1425,9 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
             "1",
             "--single-branch",
             "--no-tags",
+            // Big repos: blobs over 2 MB are never downloaded; media, binaries and those files are never checked out.
+            "--filter=blob:limit=2m",
+            "--no-checkout",
             "--branch",
             &link.branch,
             "-c",
@@ -1351,7 +1439,24 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         t,
     )
     .await?;
-    let max = num_env("GLOT_GITHUB_MAX_REPO_MB", 300) << 20;
+    let tree = git(&dir, &home, &token, &["ls-tree", "-r", "-l", "HEAD"], t).await?;
+    let mut patterns = vec!["/*".to_string()];
+    patterns.extend(SKIP_EXT.iter().map(|e| format!("!*.{e}")));
+    patterns.extend(large_paths(&tree, 2 << 20).map(|p| format!("!/{}", sparse_escape(p))));
+    let pattern_file = root.0.join("sparse");
+    std::fs::write(&pattern_file, patterns.join("\n") + "\n")?;
+    std::fs::create_dir_all(dir.join(".git/info"))?;
+    std::fs::copy(&pattern_file, dir.join(".git/info/sparse-checkout"))?;
+    git(
+        &dir,
+        &home,
+        &token,
+        &["config", "core.sparseCheckout", "true"],
+        t,
+    )
+    .await?;
+    git(&dir, &home, &token, &["checkout", "-q", "HEAD"], t).await?;
+    let max = num_env("GLOT_GITHUB_MAX_REPO_MB", 4096) << 20;
     let size_dir = dir.clone();
     tokio::task::spawn_blocking(move || tree_size(&size_dir, max)).await??;
     let base_sha = git(&dir, &home, &token, &["rev-parse", "HEAD"], t)
@@ -1714,6 +1819,20 @@ mod tests {
         std::fs::write(d.join("glot.toml"), "").unwrap();
         assert_eq!(app_dir(&d), d);
         std::fs::remove_dir_all(&d).unwrap();
+    }
+
+    #[test]
+    fn big_and_media_files_are_skipped() {
+        let tree = "100644 blob aaa 1048576\tsrc/i18n.rs\n100644 blob bbb 5242880\tassets/demo data.json\n";
+        assert_eq!(
+            large_paths(tree, 2 << 20).collect::<Vec<_>>(),
+            ["assets/demo data.json"]
+        );
+        assert_eq!(
+            sparse_escape("assets/demo data[1].json"),
+            "assets/demo\\ data\\[1\\].json"
+        );
+        assert!(SKIP_EXT.contains(&"mp4"));
     }
 
     #[test]

@@ -106,6 +106,7 @@ export function runCommand(
     ...(target.pattern !== "/{locale}{route}"
       ? [`--url-pattern ${sh(target.pattern)}`]
       : []),
-    `--upload ${server} --project ${p.slug}`,
+    // Reports carry screenshots: upload straight to the API host, not through the dashboard's proxy (body size cap).
+    `--upload ${server.replace("://app.", "://api.")} --project ${p.slug}`,
   ].join(" \\\n  ");
 }

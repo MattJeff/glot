@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { ErrorState, PageHeader, useLocaleName } from "@/components/common";
 import { useSigned, VerdictBadge } from "@/components/launch-story";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,8 +89,19 @@ function NewLaunchDialog({ slug, onClose }: { slug: string; onClose: () => void 
   const p = project.data;
   const [b, setB] = useState<NewLaunch>({ locale: p?.target_locales[0] ?? "", mode: "holdout", holdout_pct: 20, days: 14, goal: "signup" });
   const set = (patch: Partial<NewLaunch>) => setB((x) => ({ ...x, ...patch }));
+  // Guardrail events, comma-separated: [a drop is bad, a rise is bad].
+  const [guards, setGuards] = useState(["", ""]);
+  const events = (s: string) => s.split(",").map((e) => e.trim()).filter(Boolean);
+  const holdout = b.mode === "holdout";
   const create = useMutation({
-    mutationFn: () => api.createLaunch(slug, { ...b, locale: b.locale.trim(), holdout_pct: b.mode === "holdout" ? b.holdout_pct : undefined }),
+    mutationFn: () =>
+      api.createLaunch(slug, {
+        ...b,
+        locale: b.locale.trim(),
+        holdout_pct: holdout ? b.holdout_pct : undefined,
+        auto_rollout: holdout && !!b.auto_rollout,
+        guardrails: guards.flatMap((g, i) => events(g).map((event) => ({ event, higher_is_worse: i === 1 }))),
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: qk.launches(slug) });
       qc.invalidateQueries({ queryKey: qk.project(slug) });
@@ -150,6 +162,29 @@ function NewLaunchDialog({ slug, onClose }: { slug: string; onClose: () => void 
               <Input id="launch-goal" value={b.goal} onChange={(e) => set({ goal: e.target.value })} className="font-mono" />
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[t("dialog.guardDown"), t("dialog.guardUp")].map((label, i) => (
+              <div key={label} className="grid gap-1.5">
+                <Label htmlFor={`launch-guard-${i}`}>{label}</Label>
+                <Input
+                  id={`launch-guard-${i}`}
+                  value={guards[i]}
+                  onChange={(e) => setGuards((g) => g.map((x, j) => (j === i ? e.target.value : x)))}
+                  placeholder={i ? "error" : "purchase"}
+                  className="font-mono"
+                />
+              </div>
+            ))}
+          </div>
+          <p className="-mt-2 text-xs text-muted-foreground">{t("dialog.guardHint")}</p>
+          {holdout && (
+            <div className="flex items-start gap-2">
+              <Checkbox id="launch-auto" checked={!!b.auto_rollout} onCheckedChange={(v) => set({ auto_rollout: v === true })} className="mt-0.5" />
+              <Label htmlFor="launch-auto" className="font-normal leading-snug">
+                {t("dialog.auto")}
+              </Label>
+            </div>
+          )}
         </form>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>

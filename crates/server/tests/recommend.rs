@@ -153,6 +153,10 @@ async fn recommendations_from_aggregates() {
     assert!(es["gain_monthly"]["mid"].as_f64().unwrap() > 15.0, "{es}");
     assert!(es["gain_monthly"]["low"].as_f64().unwrap() > 0.0, "{es}");
     assert_eq!(es["confidence"], "solid");
+    assert_eq!(
+        es["gain_locked"], false,
+        "self-hosted (no billing): never gated"
+    );
     assert!(
         es["reasons"].as_array().unwrap().contains(&json!("rising")),
         "{es}"
