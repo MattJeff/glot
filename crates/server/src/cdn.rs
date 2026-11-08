@@ -258,7 +258,8 @@ pub async fn experiments(
 }
 
 /// `GET /cdn/{slug}/locales.json[?min=0.95][&all=1]`: what a language switcher needs — the source and the target
-/// locales that are **ready**, with endonym, direction, coverage and version. Ready = global coverage (catalog keys
+/// locales whose catalog coverage is ≥ `min`, with endonym, direction, coverage and version, and `ready` (SEO
+/// readiness, used for hreflang and sitemaps only). Ready = global coverage (catalog keys
 /// and segments rendered by glot Edge pages, non-stale) ≥ `min` (default 0) **and** every critical page (home,
 /// pricing, signup, checkout… `edge_settings.critical_patterns`) ≥ its threshold (98 %): `critical_coverage` is the
 /// worst critical page, `null` while no page has been seen (key-only projects). `all=1` also lists the locales
@@ -306,14 +307,22 @@ pub async fn locales(
         true,
         source_version,
     )];
+    // Listed (language switcher, runtime catalogs) on catalog coverage only, as before glot Edge: segments Edge
+    // discovers on rendered pages never hide a language whose catalog is translated. `ready` stays the SEO gate
+    // (hreflang/sitemaps): global coverage incl. Edge segments + critical pages.
     for r in &ready {
-        let ok = r.ready(min);
-        if ok || all {
+        // Edge-only projects (no catalog keys) are listed on their Edge coverage.
+        let keys = if r.keys == 0 {
+            r.coverage()
+        } else {
+            r.keys_done as f64 / r.keys as f64
+        };
+        if keys + 1e-9 >= min || all {
             list.push(entry(
                 &r.locale,
-                r.coverage(),
+                keys,
                 r.critical_coverage,
-                ok,
+                r.ready(min),
                 r.version,
             ));
         }
