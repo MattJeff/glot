@@ -715,8 +715,8 @@
         "reviewed": false
       },
       "common.retry": {
-        "source_hash": "942087cc2d41e013",
-        "target_hash": "14d5786f2e6476da",
+        "source_hash": "d8b8392e2c542950",
+        "target_hash": "64fdf0330af8190e",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -21351,7 +21351,7 @@
         "reviewed": false
       },
       "common.retry": {
-        "source_hash": "942087cc2d41e013",
+        "source_hash": "d8b8392e2c542950",
         "target_hash": "948643cb59e8274f",
         "origin": {
           "kind": "machine",
@@ -41987,7 +41987,7 @@
         "reviewed": false
       },
       "common.retry": {
-        "source_hash": "942087cc2d41e013",
+        "source_hash": "d8b8392e2c542950",
         "target_hash": "a9254c5f812829af",
         "origin": {
           "kind": "machine",
@@ -62623,7 +62623,7 @@
         "reviewed": false
       },
       "common.retry": {
-        "source_hash": "942087cc2d41e013",
+        "source_hash": "d8b8392e2c542950",
         "target_hash": "af273d956b5bec8d",
         "origin": {
           "kind": "machine",
@@ -83259,7 +83259,7 @@
         "reviewed": false
       },
       "common.retry": {
-        "source_hash": "942087cc2d41e013",
+        "source_hash": "d8b8392e2c542950",
         "target_hash": "fb6cc190949da044",
         "origin": {
           "kind": "machine",
