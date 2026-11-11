@@ -85,6 +85,59 @@ impl FromRequestParts<AppState> for AuthUser {
     }
 }
 
+/// `AuthUser` whose address is confirmed. Guards everything that creates or spends (projects, API tokens, jobs,
+/// experiments, Edge domains, review links, checkout): 403 `email_unverified` otherwise. Reads stay on `AuthUser`.
+pub struct VerifiedUser(pub User);
+
+impl FromRequestParts<AppState> for VerifiedUser {
+    type Rejection = AppError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        let AuthUser(user) = AuthUser::from_request_parts(parts, state).await?;
+        require_verified(state, user.id).await?;
+        Ok(VerifiedUser(user))
+    }
+}
+
+pub fn email_unverified() -> AppError {
+    AppError::new(
+        StatusCode::FORBIDDEN,
+        "email_unverified",
+        "confirm your email address first: open the link we emailed you (or resend it from the dashboard) to create projects, API tokens and jobs",
+    )
+}
+
+/// `GLOT_ADMIN_EMAILS` (comma-separated): instance admins, never gated by email verification.
+pub fn is_admin_email(email: &str) -> bool {
+    std::env::var("GLOT_ADMIN_EMAILS").is_ok_and(|list| {
+        list.split(',')
+            .any(|e| e.trim().eq_ignore_ascii_case(email))
+    })
+}
+
+/// Ok unless this server sends email and `user` has not confirmed their address. Without a mailer
+/// (self-hosted, no RESEND_API_KEY) nobody can verify, so nothing is gated.
+pub async fn require_verified(state: &AppState, user: Uuid) -> ApiResult<()> {
+    if state.mailer.is_none() {
+        return Ok(());
+    }
+    let (email, verified): (String, bool) =
+        sqlx::query_as("SELECT email, email_verified_at IS NOT NULL FROM users WHERE id = $1")
+            .bind(user)
+            .fetch_one(&state.db)
+            .await?;
+    if verified || is_admin_email(&email) {
+        Ok(())
+    } else {
+        Err(email_unverified())
+    }
+}
+
+/// Bearer tokens of unverified users are refused outright (403 `email_unverified`), reads included: a token is
+/// a machine credential, and one minted before verification became mandatory must not bypass it.
 pub async fn authenticate(headers: &HeaderMap, state: &AppState) -> ApiResult<Option<User>> {
     if let Some(token) = headers
         .get(header::AUTHORIZATION)
@@ -98,6 +151,9 @@ pub async fn authenticate(headers: &HeaderMap, state: &AppState) -> ApiResult<Op
         .bind(sha256_hex(token.trim()))
         .fetch_optional(&state.db)
         .await?;
+        if let Some(u) = &user {
+            require_verified(state, u.id).await?;
+        }
         return Ok(user);
     }
     let Some(token) = session_cookie(headers) else {
@@ -155,6 +211,87 @@ pub struct SignupBody {
     /// UI locale; emails are sent in it (unsupported => en).
     #[serde(default)]
     locale: Option<String>,
+    /// Honeypot: hidden in the form, only bots fill it.
+    #[serde(default)]
+    website: String,
+}
+
+/// Signups per client IP: per hour, per day.
+const SIGNUPS_PER_HOUR: i64 = 5;
+const SIGNUPS_PER_DAY: i64 = 20;
+
+/// Client IP as Caddy sets it: Caddy replaces an untrusted `X-Forwarded-For` with the peer address, and Next's
+/// rewrite passes it through; the rightmost entry is the one our proxy wrote. `None` = no proxy in front (dev,
+/// tests, a self-hosted server reached directly): no per-IP limit.
+pub fn client_ip(headers: &HeaderMap) -> Option<String> {
+    headers
+        .get_all("x-forwarded-for")
+        .iter()
+        .filter_map(|v| v.to_str().ok())
+        .flat_map(|v| v.split(','))
+        .next_back()?
+        .trim()
+        .parse::<std::net::IpAddr>()
+        .ok()
+        .map(|ip| ip.to_string())
+}
+
+/// Throwaway addresses refused at signup. Kept short on purpose: the reserved TLDs (RFC 2606 / 6761) and the most
+/// common disposable-inbox services; a domain with neither MX nor A record is caught by the DNS check instead.
+/// ponytail: grow it from addresses actually seen in abuse, not from a 100k-line list.
+const DENY_TLDS: &[&str] = &["invalid", "test", "example", "localhost", "local"];
+const DENY_DOMAINS: &[&str] = &[
+    "mailinator.com",
+    "guerrillamail.com",
+    "sharklasers.com",
+    "yopmail.com",
+    "10minutemail.com",
+    "temp-mail.org",
+    "tempmail.com",
+    "trashmail.com",
+    "getnada.com",
+    "maildrop.cc",
+    "dispostable.com",
+    "throwawaymail.com",
+    "fakeinbox.com",
+];
+
+fn denied_domain(domain: &str) -> bool {
+    let tld = domain.rsplit('.').next().unwrap_or("");
+    DENY_TLDS.contains(&tld)
+        || DENY_DOMAINS
+            .iter()
+            .any(|d| domain == *d || domain.ends_with(&format!(".{d}")))
+}
+
+/// The domain must be able to receive mail: an MX or, failing that, an A record (RFC 5321 implicit MX).
+/// Fail-open: resolver errors and timeouts accept the signup (the verification email is the real check).
+async fn domain_resolves(domain: &str) -> bool {
+    let check = async {
+        let (mx, a) = tokio::join!(
+            crate::edge::domains::doh(domain, "MX"),
+            crate::edge::domains::doh(domain, "A")
+        );
+        match (mx, a) {
+            (Ok(mx), Ok(a)) => !mx.is_empty() || !a.is_empty(),
+            _ => true,
+        }
+    };
+    tokio::time::timeout(std::time::Duration::from_secs(3), check)
+        .await
+        .unwrap_or(true)
+}
+
+fn bad_domain() -> AppError {
+    AppError::new(
+        StatusCode::BAD_REQUEST,
+        "email_domain_rejected",
+        "this email domain cannot receive mail or is a disposable inbox: use your real address",
+    )
+}
+
+fn too_many(message: &str) -> AppError {
+    AppError::new(StatusCode::TOO_MANY_REQUESTS, "rate_limited", message)
 }
 
 fn valid_email(e: &str) -> bool {
@@ -172,12 +309,42 @@ fn valid_email(e: &str) -> bool {
 
 pub async fn signup(
     State(state): State<AppState>,
+    headers: HeaderMap,
     AppJson(b): AppJson<SignupBody>,
 ) -> ApiResult<Response> {
     let email = b.email.trim().to_lowercase();
     let name = b.name.trim().to_string();
+    let ip = client_ip(&headers);
+    if !b.website.trim().is_empty() {
+        tracing::warn!(
+            ip = ip.as_deref().unwrap_or("-"),
+            "signup refused: honeypot filled"
+        );
+        return Err(AppError::bad_request("signup refused"));
+    }
     if !valid_email(&email) {
         return Err(AppError::bad_request("invalid email"));
+    }
+    if let Some(ip) = &ip {
+        let (hour, day): (i64, i64) = sqlx::query_as(
+            "SELECT count(*) FILTER (WHERE created_at > now() - interval '1 hour'), count(*)
+             FROM users WHERE signup_ip = $1 AND created_at > now() - interval '1 day'",
+        )
+        .bind(ip)
+        .fetch_one(&state.db)
+        .await?;
+        if hour >= SIGNUPS_PER_HOUR || day >= SIGNUPS_PER_DAY {
+            tracing::warn!(%ip, hour, day, "signup refused: per-IP limit");
+            return Err(too_many(
+                "too many accounts created from this network, try again later",
+            ));
+        }
+    }
+    let domain = email.rsplit_once('@').map(|(_, d)| d).unwrap_or("");
+    // DNS only where email is on (the cloud): a self-hosted server without a mailer makes no outbound lookups.
+    if denied_domain(domain) || (state.mailer.is_some() && !domain_resolves(domain).await) {
+        tracing::warn!(%domain, "signup refused: email domain");
+        return Err(bad_domain());
     }
     if b.password.len() < 8 {
         return Err(AppError::bad_request(
@@ -193,13 +360,14 @@ pub async fn signup(
         .filter(|l| crate::email::supported_locale(l))
         .unwrap_or_else(|| "en".into());
     let user = sqlx::query_as::<_, User>(
-        "INSERT INTO users (id, email, name, password_hash, locale) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name",
+        "INSERT INTO users (id, email, name, password_hash, locale, signup_ip) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, email, name",
     )
     .bind(Uuid::new_v4())
     .bind(&email)
     .bind(&name)
     .bind(hash)
     .bind(&locale)
+    .bind(&ip)
     .fetch_one(&state.db)
     .await
     .map_err(email_taken)?;
@@ -337,7 +505,7 @@ pub struct CreatedToken {
 
 pub async fn create_token(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     AppJson(b): AppJson<CreateTokenBody>,
 ) -> ApiResult<(StatusCode, Json<CreatedToken>)> {
     let name = b.name.trim();
@@ -578,10 +746,102 @@ pub async fn resend_verification(
         return Err(email_disabled());
     }
     let me = load_me(&state, user).await?;
-    if !me.email_verified {
-        send_verification(&state, &me.user, &me.locale, &me.user.email).await?;
+    if me.email_verified {
+        return Ok(StatusCode::NO_CONTENT);
     }
+    // Verify links are issued with a fixed TTL, so `expires_at - TTL` is when each was sent (signup included).
+    let (last_minute, last_day): (i64, i64) = sqlx::query_as(
+        "SELECT count(*) FILTER (WHERE expires_at > now() + make_interval(hours => $2) - interval '1 minute'),
+                count(*) FILTER (WHERE expires_at > now() + make_interval(hours => $2) - interval '1 day')
+         FROM email_tokens WHERE user_id = $1 AND purpose = 'verify'",
+    )
+    .bind(me.user.id)
+    .bind(VERIFY_HOURS as i32)
+    .fetch_one(&state.db)
+    .await?;
+    if last_minute >= RESEND_PER_MINUTE {
+        return Err(too_many(
+            "a confirmation email was just sent: wait a minute before asking again",
+        ));
+    }
+    if last_day >= RESEND_PER_DAY {
+        return Err(too_many(
+            "too many confirmation emails today: try again tomorrow",
+        ));
+    }
+    send_verification(&state, &me.user, &me.locale, &me.user.email).await?;
     Ok(StatusCode::NO_CONTENT)
+}
+
+const RESEND_PER_MINUTE: i64 = 1;
+const RESEND_PER_DAY: i64 = 5;
+
+/// Unverified accounts older than this, with no project activity, are deleted (`prune_unverified`).
+const PRUNE_AFTER_DAYS: i32 = 14;
+
+/// Daily: deletes accounts never verified after `PRUNE_AFTER_DAYS` that never did anything (every project they
+/// belong to has no key and no job, no Stripe subscription), and the empty projects they own. Admins are kept.
+/// Only where email is on (elsewhere nobody can verify). Returns how many accounts were deleted.
+pub async fn prune_unverified(state: &AppState) -> ApiResult<u64> {
+    if state.mailer.is_none() {
+        return Ok(0);
+    }
+    let admins: Vec<String> = std::env::var("GLOT_ADMIN_EMAILS")
+        .unwrap_or_default()
+        .split(',')
+        .map(|e| e.trim().to_lowercase())
+        .filter(|e| !e.is_empty())
+        .collect();
+    let mut tx = state.db.begin().await?;
+    let doomed: Vec<(Uuid, String)> = sqlx::query_as(
+        "SELECT u.id, split_part(u.email, '@', 2) FROM users u
+         WHERE u.email_verified_at IS NULL AND u.created_at < now() - make_interval(days => $1)
+           AND NOT (lower(u.email) = ANY($2))
+           AND NOT EXISTS (SELECT 1 FROM project_members m WHERE m.user_id = u.id AND (
+                 EXISTS (SELECT 1 FROM keys k WHERE k.project_id = m.project_id)
+                 OR EXISTS (SELECT 1 FROM jobs j WHERE j.project_id = m.project_id)))
+           AND NOT EXISTS (SELECT 1 FROM billing_accounts b WHERE b.user_id = u.id AND b.stripe_subscription_id IS NOT NULL)
+         FOR UPDATE OF u",
+    )
+    .bind(PRUNE_AFTER_DAYS)
+    .bind(&admins)
+    .fetch_all(&mut *tx)
+    .await?;
+    if doomed.is_empty() {
+        return Ok(0);
+    }
+    let ids: Vec<Uuid> = doomed.iter().map(|(id, _)| *id).collect();
+    let projects = sqlx::query(
+        "DELETE FROM projects p USING project_members m
+         WHERE m.project_id = p.id AND m.role = 'owner' AND m.user_id = ANY($1)",
+    )
+    .bind(&ids)
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    let n = sqlx::query("DELETE FROM users WHERE id = ANY($1)")
+        .bind(&ids)
+        .execute(&mut *tx)
+        .await?
+        .rows_affected();
+    tx.commit().await?;
+    for (id, domain) in &doomed {
+        tracing::info!(user = %id, %domain, "deleted unverified inactive account");
+    }
+    tracing::info!(accounts = n, projects, "pruned unverified accounts");
+    Ok(n)
+}
+
+pub fn spawn_pruner(state: AppState) -> Option<tokio::task::JoinHandle<()>> {
+    state.mailer.as_ref()?;
+    Some(tokio::spawn(async move {
+        loop {
+            if let Err(e) = prune_unverified(&state).await {
+                tracing::error!("unverified account pruning: {}", e.message);
+            }
+            tokio::time::sleep(std::time::Duration::from_secs(86_400)).await;
+        }
+    }))
 }
 
 #[derive(Deserialize)]
@@ -803,5 +1063,25 @@ mod tests {
         assert!(super::valid_email("a@b.co"));
         assert!(!super::valid_email("a@b"));
         assert!(!super::valid_email("a b@c.de"));
+    }
+
+    #[test]
+    fn denylist_and_client_ip() {
+        for d in [
+            "example.invalid",
+            "x.test",
+            "foo.example",
+            "mailinator.com",
+            "a.yopmail.com",
+        ] {
+            assert!(super::denied_domain(d), "{d}");
+        }
+        for d in ["example.com", "gmail.com", "notmailinator.com"] {
+            assert!(!super::denied_domain(d), "{d}");
+        }
+        let mut h = axum::http::HeaderMap::new();
+        assert_eq!(super::client_ip(&h), None);
+        h.insert("x-forwarded-for", "6.6.6.6, 203.0.113.9".parse().unwrap());
+        assert_eq!(super::client_ip(&h).as_deref(), Some("203.0.113.9"));
     }
 }

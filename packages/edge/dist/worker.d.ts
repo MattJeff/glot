@@ -9,6 +9,11 @@ export interface Env {
     GLOT_EDGE?: string;
     GLOT_TIMEOUT_MS?: string;
 }
+/** Language of the same-site page that requested this subresource (`Referer`); none or foreign → the source. */
+export declare function refererLocale(req: Request, url: URL, o: {
+    source: string;
+    locales: string[];
+}): string;
 declare const _default: {
     fetch(req: Request, env: Env, ctx?: {
         waitUntil(p: Promise<unknown>): void;

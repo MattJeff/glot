@@ -4,11 +4,43 @@
     "subtitle": "SEO localization: every language served as translated HTML on its own URL, indexable without JavaScript, no keys required.",
     "tabs": {
       "setup": "Setup",
+      "website": "Website tag",
       "coverage": "Coverage",
       "review": "Review queue",
       "seo": "SEO report",
       "performance": "Performance",
       "settings": "Settings"
+    },
+    "website": {
+      "title": "Website tag",
+      "body": "One script tag translates any public site in the visitor’s browser — Wix, Squarespace, Bubble, Lovable, Carrd, Jimdo, Duda or hand-written HTML. It adds a language switcher, applies your translation memory and sends new public text to glot. No DNS, no proxy.",
+      "tagLabel": "Paste it in the head of every page (or in your site builder’s site-wide custom code)",
+      "tagHint": "The key is public: it only lets the page report text to translate. Nothing happens until the tag is on below. Personal data, form content and pages seen with a session cookie are never sent.",
+      "on": "Tag on",
+      "onHint": "Off: the tag does nothing and every page stays as published (within a minute).",
+      "auto": "Translate new text automatically",
+      "autoHint": "Off: text the tag discovers waits in the review queue before visitors see it translated.",
+      "position": "Language switcher",
+      "positions": {
+        "bottom-right": "Floating, bottom right",
+        "bottom-left": "Floating, bottom left",
+        "top-right": "Floating, top right",
+        "top-left": "Floating, top left",
+        "none": "Hidden (my own switcher)",
+        "selector": "Inside an element (CSS selector)"
+      },
+      "selector": "CSS selector",
+      "selectorHint": "The switcher is added inside the first matching element, for example your header menu. An element with data-glot-switcher always wins.",
+      "locales": "Languages offered",
+      "localesHint": "None checked = every target language of the project.",
+      "save": "Save",
+      "saved": "Website tag saved",
+      "seo": {
+        "title": "Search engines",
+        "body": "Text translated in the browser is not reliably indexed by Google. For pages you want found in other languages, add a glot Edge subdomain (es.your-site.com, one CNAME): pages are translated on the server, with hreflang, and the switcher sends visitors there.",
+        "ready": "Your Edge subdomain is verified: the switcher sends visitors to it and the tag adds hreflang links in the browser. Search engines should also find them in the HTML: paste these tags in your site’s head (custom code).",
+        "cta": "Set up a subdomain"
+      }
     },
     "kill": {
       "labelOn": "Edge is on",
@@ -205,6 +237,19 @@
         "proxy": "Pass through untranslated",
         "actionHint": "Redirect: 302 (307 for forms) to the same page on your domain, with the language as your site expects it. Pass through: your server’s response untouched, cookies included.",
         "suggest": "Use the suggested list"
+      },
+      "auth": {
+        "title": "Pages behind sign-in",
+        "body": "Dashboards, account, invoices: pages where the visitor has a session. glot never receives their content or your users' data.",
+        "mode": "Translate signed-in pages",
+        "server": "By Edge, private response",
+        "patcher": "In the browser (script tag)",
+        "off": "Don't translate",
+        "serverHint": "Edge translates each page for this visitor only, from the translation memory: Cache-Control private, never in a shared cache, no discovery. Your domain's cookies pass through untouched.",
+        "patcherHint": "Edge serves your page untouched; the data-glot-app script tag on your pages applies the translation memory in the browser, on your domain (session untouched), with a language switcher.",
+        "offHint": "Signed-in visitors see your pages in the source language.",
+        "discover": "Discover interface text",
+        "discoverHint": "Browser mode only. Only text marked data-glot-ui is sent, plus the fingerprint of text glot already knows; never personal data. Every new text waits for a review before it is served."
       }
     },
     "seo": {
@@ -516,6 +561,7 @@
     }
   },
   "errors": {
+    "emailUnverified": "Confirm your email address first: open the link we sent you, or resend it from the banner.",
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Check your connection and try again.",
     "notFound": "Not found.",
@@ -603,7 +649,8 @@
       "translate": "Translate",
       "github_localize": "Localize repository",
       "github_update": "Update pull request",
-      "edge_translate": "Edge translation"
+      "edge_translate": "Edge translation",
+      "connector_translate": "CMS translation"
     },
     "live": "Live",
     "progress": "{done} / {total}",
@@ -1507,7 +1554,8 @@
     "billing": "Billing",
     "mainNav": "Main",
     "skipToContent": "Skip to content",
-    "github": "GitHub"
+    "github": "GitHub",
+    "integrations": "Integrations"
   },
   "status": {
     "machine": "Machine",
@@ -1912,12 +1960,14 @@
     },
     "pages": {
       "edge": "glot Edge (SEO localization)",
+      "website": "Website tag (any site builder)",
       "getting-started": "Install & quickstart",
       "concepts": "Concepts",
       "mcp": "MCP server",
       "integrations": "Integrations",
       "frameworks": "Frameworks",
       "runtime": "Runtime fallback",
+      "mobile-ota": "Mobile apps (OTA)",
       "quality": "Quality & review",
       "review": "Live review",
       "insights": "Insights",
@@ -2085,8 +2135,16 @@
       "done": "Your password was updated.",
       "again": "Request a new link"
     },
+    "gate": {
+      "tooltip": "Confirm your email address to unlock this."
+    },
+    "inbox": {
+      "title": "Check your inbox",
+      "body": "We sent a confirmation link to {email}. Open it to start creating projects.",
+      "hint": "Nothing after a few minutes? Check your spam folder or resend the email."
+    },
     "banner": {
-      "text": "Confirm your email address ({email}) to secure your account.",
+      "text": "Confirm your email address to create projects. We sent a link to {email}.",
       "resend": "Resend email",
       "sent": "Confirmation email sent"
     }
@@ -2157,6 +2215,25 @@
           "oss": "Open-source CLI, MCP server and GitHub Action, unlimited on your machine",
           "project": "One cloud project with small monthly quotas",
           "noCard": "No credit card needed"
+        }
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "Launch your site or app in other languages.",
+        "for": "Indie makers, shops and apps opening their first languages.",
+        "features": {
+          "projects": "Two cloud projects",
+          "dynamic": "Dynamic localization: CDN catalogs and a language switcher",
+          "sync": "GitHub sync: every language in a single pull request",
+          "qa": "Visual QA: catch truncated, overlapping or untranslated text",
+          "cms": "CMS integrations (Shopify, WordPress, Webflow, Contentful, Sanity, Strapi)",
+          "quotas": "Modest monthly quotas, sized for a first launch"
+        },
+        "excluded": {
+          "edge": "glot Edge (SEO localization)",
+          "xp": "Segmented experiments",
+          "launch": "Language launch measurement",
+          "recommend": "Language recommendations with expected gain"
         }
       },
       "pro": {
@@ -2233,6 +2310,10 @@
         "q": "What counts toward the quotas?",
         "a": "Only what glot cloud serves: CDN/OTA requests, insights and experiment events, remote MCP calls, on-demand locale jobs, live review annotations and strings translated with glot's key. Live experiments and cloud projects count while they exist. Nothing you run locally, and nothing translated with your own key, is counted. Monthly counters reset on the 1st (UTC)."
       },
+      "trial": {
+        "q": "Can I try Growth before paying?",
+        "a": "Yes. Your first Growth subscription starts with a 14-day free trial, once per account. Your payment method is saved at sign-up but nothing is charged before the trial ends; cancel before then from the billing portal and you pay nothing. Starter and Pro have no trial."
+      },
       "cancel": {
         "q": "Can I cancel anytime?",
         "a": "Yes, from the billing portal. Your plan stays active until the end of the period you paid for, then the account moves to Free. Projects and data are kept."
@@ -2241,10 +2322,13 @@
     "compare": "How this compares with Lokalise, Crowdin, Tolgee and Lingo.dev: <link>see the comparison</link>.",
     "yearlySave": "{n, plural, one {# month free} other {# months free}}",
     "yearlyEquiv": "{price} / month, billed yearly",
+    "trial": "{days}-day free trial, cancel anytime",
+    "excludedSr": "Not included:",
     "forWho": "Who it’s for:",
     "vat": "Prices exclude VAT."
   },
   "billing": {
+    "trialing": "{plan} trial until {date}. Unless you cancel in the portal before then, the subscription starts and the first payment is taken.",
     "title": "Billing",
     "subtitle": "Your plan covers the cloud projects you own. The CLI and local MCP server are never limited.",
     "selfHosted": "Billing is off on this self-hosted server: nothing is limited.",
@@ -3398,6 +3482,346 @@
       "neverExpires": "Never expires",
       "revoke": "Revoke {label}",
       "revoked": "Link revoked"
+    }
+  },
+  "connectors": {
+    "magento": {
+      "description": "Products and categories via the REST API, one store view per language.",
+      "fields": {
+        "url": "Store URL",
+        "token": "Access token",
+        "token_secret": "Access token secret",
+        "consumer_key": "Consumer key",
+        "consumer_secret": "Consumer secret"
+      },
+      "hints": {
+        "token": "System → Extensions → Integrations: create and activate an integration with the Catalog and Stores resources.",
+        "token_secret": "With the consumer key and secret, glot signs requests with OAuth 1.0a. Without them, the token is sent as a Bearer token, which Commerce 2.4.4+ accepts only if that option is enabled."
+      }
+    },
+    "prestashop": {
+      "description": "Products, categories, CMS pages and brands through the Webservice API; HTML descriptions keep their tags.",
+      "fields": {
+        "url": "Shop URL",
+        "api_key": "Webservice key"
+      },
+      "hints": {
+        "url": "The shop's address, without /api.",
+        "api_key": "Advanced Parameters → Webservice: a key with GET and PUT on products, categories, content_management_system and manufacturers, and GET on languages and configurations."
+      }
+    },
+    "woocommerce": {
+      "description": "Products, categories and tags via the WooCommerce REST API; WPML (WooCommerce Multilingual) and Polylang for WooCommerce supported.",
+      "fields": {
+        "url": "Store URL",
+        "consumer_key": "Consumer key",
+        "consumer_secret": "Consumer secret",
+        "webhook_secret": "Webhook secret"
+      },
+      "hints": {
+        "consumer_key": "WooCommerce → Settings → Advanced → REST API → Add key, Read/Write permission.",
+        "webhook_secret": "Any long random string: glot registers the product webhooks with it and checks their signature."
+      }
+    },
+    "bigcommerce": {
+      "description": "Products, categories and brands, via the Translations API, per channel and locale.",
+      "fields": {
+        "store_hash": "Store hash",
+        "token": "Access token",
+        "channel_id": "Channel ID",
+        "webhook_secret": "Webhook secret"
+      },
+      "hints": {
+        "store_hash": "The code in your API path: api.bigcommerce.com/stores/STORE_HASH/v3.",
+        "token": "Store-level API account with Products (modify), Store information (read) and Channel settings (modify).",
+        "channel_id": "1 for the default storefront.",
+        "webhook_secret": "Any random string: glot registers product and category webhooks and checks it on every call."
+      }
+    },
+    "shopware": {
+      "description": "Products, categories and properties through the Admin API, written into each Shopware language.",
+      "fields": {
+        "url": "Shop URL",
+        "client_id": "Access key ID",
+        "client_secret": "Secret access key",
+        "webhook_secret": "App secret (webhook signature)"
+      },
+      "hints": {
+        "client_id": "Settings → System → Integrations → Add integration (Administrator role).",
+        "client_secret": "Shown once when the integration is created.",
+        "webhook_secret": "Only if a Shopware app sends the webhooks: glot checks the shopware-shop-signature header."
+      }
+    },
+    "contentful": {
+      "description": "Entries of every content type: localized Short text, Long text (Markdown) and Rich Text fields, through the Content Management API.",
+      "fields": {
+        "space_id": "Space ID",
+        "token": "Personal access token",
+        "environment": "Environment",
+        "api_url": "API URL"
+      },
+      "hints": {
+        "token": "Settings → CMA tokens. Needs read and write access to the space.",
+        "api_url": "Only for EU data residency: https://api.eu.contentful.com"
+      }
+    },
+    "sanity": {
+      "description": "Documents through the HTTP API: field-level (localized objects, internationalized arrays) or document-level (document-internationalization) i18n, Portable Text kept intact.",
+      "fields": {
+        "project_id": "Project ID",
+        "dataset": "Dataset",
+        "token": "API token",
+        "source_locale": "Source language code",
+        "webhook_secret": "Webhook secret"
+      },
+      "hints": {
+        "token": "sanity.io/manage → API → Tokens, with Editor permissions.",
+        "source_locale": "The language key of your schema (en by default).",
+        "webhook_secret": "The secret of your GROQ webhook, to verify its signature."
+      }
+    },
+    "strapi": {
+      "description": "Localized collection and single types of Strapi 4 and 5 (i18n plugin): text, Markdown and Blocks fields.",
+      "fields": {
+        "url": "Strapi URL",
+        "token": "API token"
+      },
+      "hints": {
+        "token": "Settings → API Tokens, Full access (or find, update and createLocalization on your types)."
+      }
+    },
+    "hubspot": {
+      "description": "Blog posts, website and landing pages (rich text modules included), written as HubSpot multi-language variations.",
+      "fields": {
+        "token": "Private app access token",
+        "webhook_secret": "App client secret"
+      },
+      "hints": {
+        "token": "Settings → Integrations → Private apps, with the content scope.",
+        "webhook_secret": "Optional: verifies X-HubSpot-Signature (v1) on webhook calls."
+      }
+    },
+    "drupal": {
+      "description": "Nodes and taxonomy terms through core JSON:API: titles and formatted text, written into existing translations (Content Translation).",
+      "fields": {
+        "url": "Site URL",
+        "username": "Username",
+        "password": "Password",
+        "token": "OAuth token"
+      },
+      "hints": {
+        "username": "With the basic_auth module. Or leave empty and give an OAuth token.",
+        "token": "Bearer token (Simple OAuth), instead of username and password."
+      }
+    },
+    "ghost": {
+      "description": "Posts and pages through the Admin API. Each language is a post tagged #fr (slug-fr), Ghost's routing pattern.",
+      "fields": {
+        "url": "Site URL",
+        "admin_key": "Admin API key",
+        "webhook_secret": "Webhook secret"
+      },
+      "hints": {
+        "admin_key": "Settings → Integrations → Add custom integration, id:secret.",
+        "webhook_secret": "Any string: glot then registers signed Ghost webhooks."
+      }
+    },
+    "craft": {
+      "description": "Entries through the GraphQL API: titles and text fields, saved in the Craft site of each language.",
+      "fields": {
+        "url": "GraphQL endpoint",
+        "token": "Schema token",
+        "sites": "Sites per locale"
+      },
+      "hints": {
+        "token": "GraphQL → Tokens, with a schema that can query and save the entries in every site.",
+        "sites": "glot locale: Craft site handle, comma separated. Default: the site named like the locale."
+      }
+    },
+    "zendesk": {
+      "description": "Help Center categories, sections and articles, translated in every Guide locale.",
+      "fields": {
+        "subdomain": "Zendesk subdomain",
+        "email": "Agent email",
+        "token": "API token",
+        "webhook_secret": "Webhook signing secret"
+      },
+      "hints": {
+        "token": "Admin Center → Apps and integrations → Zendesk API.",
+        "webhook_secret": "Optional: verifies X-Zendesk-Webhook-Signature."
+      }
+    },
+    "helpscout": {
+      "description": "Docs articles, written to one Docs site per language (Help Scout's way to translate Docs).",
+      "fields": {
+        "api_key": "API key",
+        "collections": "Collections per locale"
+      },
+      "hints": {
+        "api_key": "Your Profile → Authentication → API Keys.",
+        "collections": "glot locale: collection id of that language's Docs site, comma separated."
+      }
+    },
+    "page": {
+      "title": "Integrations",
+      "subtitle": "Connect a CMS or a store: glot pulls its content, translates it with your project's model and writes validated translations back.",
+      "docs": "How sync works, per CMS: <docs>integrations documentation</docs>."
+    },
+    "connect": "Connect",
+    "save": "Test and save",
+    "testing": "Testing…",
+    "cancel": "Cancel",
+    "optional": "optional",
+    "connected": "{name} connected. First sync queued.",
+    "localeMismatch": "The CMS's default language ({locale}) differs from the project's source language.",
+    "webhooksError": "Connected, but automatic webhooks could not be registered: add the webhook URL by hand.",
+    "syncQueued": "Sync queued",
+    "testOk": "{name} reachable. Languages: {locales}",
+    "lastSync": "synced {when}",
+    "stats": "{items, plural, one {# field} other {# fields}} · {pushed} pushed · {waiting} waiting for translation",
+    "webhook": "Webhook URL",
+    "webhookHint": "Content changes sent here trigger an incremental sync. Keep it secret: it contains a token.",
+    "sync": "Sync now",
+    "syncing": "Syncing…",
+    "test": "Test",
+    "remove": "Disconnect",
+    "removeConfirm": "Disconnect {name}? Translations stay in glot; nothing is deleted from the CMS.",
+    "status": {
+      "idle": "Not synced",
+      "queued": "Queued",
+      "running": "Syncing",
+      "ok": "Up to date",
+      "error": "Error"
+    },
+    "shopify": {
+      "description": "Products, collections, pages, articles, metafields, menus and theme texts, through the Translations API.",
+      "fields": {
+        "shop": "Store domain",
+        "token": "Admin API access token",
+        "webhook_secret": "API secret key (webhook signatures)"
+      },
+      "hints": {
+        "token": "Custom app with read/write translations, products, content, online store pages, themes and locales scopes.",
+        "webhook_secret": "Lets glot verify Shopify's product and collection webhooks."
+      }
+    },
+    "webflow": {
+      "description": "CMS collections (plain and rich text fields), static page content and components, in every secondary locale of the site (Webflow Localization).",
+      "fields": {
+        "token": "Site API token",
+        "site_id": "Site ID",
+        "webhook_secret": "Webhook signing secret"
+      },
+      "hints": {
+        "token": "Site settings → Apps & integrations → API access, with read and write access to CMS, Pages, Components and Sites.",
+        "site_id": "Only needed when the token can reach several sites.",
+        "webhook_secret": "Only for webhooks signed by Webflow (OAuth app client secret). Webhooks added in Site settings use the webhook URL below instead."
+      }
+    },
+    "wordpress": {
+      "description": "Posts, pages, categories, tags and menus through the REST API; WPML and Polylang supported.",
+      "fields": {
+        "url": "Site URL",
+        "username": "Username",
+        "app_password": "Application password"
+      },
+      "hints": {
+        "app_password": "Users → Profile → Application passwords. Never your login password."
+      }
+    }
+  },
+  "integrations": {
+    "nav": "Integrations",
+    "meta": {
+      "title": "Integrations: translate your site on any platform",
+      "description": "Step-by-step guides to translate a site with glot on {count} platforms: website builders, shops, CMSs, AI app builders, course platforms and help centers."
+    },
+    "title": "Integrations",
+    "subtitle": "glot runs on any site that lets you add a script to every page. Pick your platform for the exact steps, the plan it requires, and how to get translated URLs for search engines.",
+    "search": "Search platforms",
+    "searchPlaceholder": "Wix, Shopify, Ghost…",
+    "filter": "Filter by category",
+    "all": "All",
+    "count": "{count, plural, =0 {No platform} one {# platform} other {# platforms}}",
+    "empty": "No platform matches “{q}”. If your site accepts custom code, the universal tag works there too.",
+    "categories": {
+      "site-builder": "Website builders",
+      "e-commerce": "E-commerce",
+      "cms": "CMS",
+      "ai-builder": "AI app builders",
+      "lms": "Course platforms",
+      "help-center": "Help centers",
+      "enterprise": "Enterprise"
+    },
+    "methods": {
+      "connector": "Connector",
+      "plugin": "Plugin",
+      "tag": "Universal tag"
+    },
+    "generic": {
+      "title": "Your platform isn't listed?",
+      "body": "If it lets you add a script to the head of every page, the universal tag works there. If you control your domain's DNS, glot Edge can serve translated URLs too.",
+      "cta": "Read the website tag guide"
+    },
+    "page": {
+      "metaTitle": "glot for {name}: translate your {name} site",
+      "metaDescription": "How to translate a {name} site with glot: {method, select, connector {the glot connector} plugin {the glot plugin} other {one script tag}}, the plan it requires, and translated URLs for search engines, step by step.",
+      "breadcrumb": "Breadcrumb",
+      "title": "glot for {name}",
+      "intro": {
+        "connector": "glot connects to {name} directly: it reads your content, translates it with your glossary and checks, and writes the translations back into {name}'s own languages.",
+        "plugin": "glot installs in {name} as a plugin. The steps below set it up.",
+        "tag": "On {name}, glot runs from one script tag added to every page. It translates the page in the visitor's browser and adds a language menu."
+      },
+      "unavailable": "{name} doesn't let you add a script to every page, so the universal tag can't run there. The notes below say what is possible.",
+      "unverified": "We couldn't confirm these steps in {name}'s official documentation. Check them in {name}'s help center before you rely on them.",
+      "englishNote": "Platform steps are in English, with the menu names of {name}'s interface.",
+      "nativeTitle": {
+        "connector": "Connect {name}",
+        "plugin": "Install the glot plugin"
+      },
+      "nativeDoc": "Full connector documentation",
+      "tagDoc": "Website tag guide",
+      "tagTitle": "Add the glot tag",
+      "tagAltTitle": "Alternative: the universal tag",
+      "tagAltBody": "To translate in the browser what the {name} integration doesn't cover, add the universal tag instead.",
+      "prep": {
+        "project": "In glot, create a project and add your languages.",
+        "mode": "Open glot Edge → Website tag and turn the tag on.",
+        "copy": "Copy your tag from that tab: it already carries your project and its public key (data-key). The tag below shows its shape."
+      },
+      "snippetLabel": "glot tag",
+      "plansTitle": "Plan requirements",
+      "glotPlan": "On the glot side, see Pricing for what each plan includes. glot Edge (translated URLs) is part of the Growth plan, with a limited trial on Pro.",
+      "seoTitle": "Translated URLs for search engines",
+      "seoYes": "For translated pages that search engines index without running JavaScript, put glot Edge on a subdomain of your domain (es.example.com) with two DNS records:",
+      "seoNo": "glot Edge's subdomain mode isn't possible here:",
+      "dnsLabel": "DNS records (the TXT token is shown in glot Edge → Setup)",
+      "edgeDoc": "How glot Edge works",
+      "faqTitle": "Questions",
+      "faq": {
+        "partner": {
+          "q": "Is glot a {name} partner?",
+          "a": "No. glot is independent, and not affiliated with or endorsed by {name}. This guide only uses {name}'s standard features."
+        },
+        "content": {
+          "q": "Does glot change my {name} content?",
+          "a": "{method, select, tag {No. The tag translates the page in the visitor's browser; your {name} content stays as it is. Remove the tag and the site is back to its source language.} plugin {Your source content stays as it is. The plugin translates pages in the browser and, when you connect it, writes translations into language fields you review before publishing.} other {Your source content stays as it is. glot writes the translations into {name}'s own language fields, where you can review them before you publish.}}"
+        },
+        "seo": {
+          "q": "Will search engines index my translations?",
+          "a": "Not from the tag alone: it translates in the browser, so search engines mostly index your source language. Translated pages with their own URLs need glot Edge or a platform that publishes each language on its own URL."
+        }
+      },
+      "docsTitle": "Official {name} documentation",
+      "trademark": "{name} is a trademark of its owner. glot is not affiliated with {name}.",
+      "cta": {
+        "title": "Translate your {name} site",
+        "body": "Create a project, choose your languages, and follow the steps above.",
+        "start": "Create a project",
+        "docs": "Read the docs"
+      },
+      "related": "More integrations: {category}"
     }
   }
 }

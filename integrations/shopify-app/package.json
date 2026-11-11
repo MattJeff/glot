@@ -1,0 +1,7 @@
+{
+  "name": "glot-shopify-app",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node test/embed.test.mjs" },
+  "devDependencies": { "liquidjs": "10.30.1" }
+}

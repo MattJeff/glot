@@ -257,6 +257,10 @@ pub async fn create_link(
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     member_only(&ctx)?;
     ctx.need_admin(&state).await?;
+    // Inviting reviewers: same gate as everything that creates (auth::VerifiedUser).
+    if let Some(u) = ctx.actor.user_id {
+        crate::auth::require_verified(&state, u).await?;
+    }
     if !["read", "comment", "edit"].contains(&b.access.as_str()) {
         return Err(AppError::bad_request("access must be read|comment|edit"));
     }

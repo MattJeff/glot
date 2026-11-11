@@ -4,11 +4,43 @@
     "subtitle": "SEO ローカライズ：各言語を独自の URL で翻訳済み HTML として配信。JavaScript なしでインデックス可能、キーは不要です。",
     "tabs": {
       "setup": "セットアップ",
+      "website": "サイト用タグ",
       "coverage": "カバレッジ",
       "review": "レビュー待ち",
       "seo": "SEO レポート",
       "performance": "パフォーマンス",
       "settings": "設定"
+    },
+    "website": {
+      "title": "サイト用タグ",
+      "body": "1 つの script タグで、公開サイトを訪問者のブラウザー上で翻訳します。Wix、Squarespace、Bubble、Lovable、Carrd、Jimdo、Duda、手書きの HTML にも対応。言語切り替えを追加し、翻訳メモリを適用して、新しい公開テキストを glot に送ります。DNS もプロキシも不要です。",
+      "tagLabel": "すべてのページの head に貼り付けます (またはサイトビルダーのサイト全体のカスタムコードに)",
+      "tagHint": "キーは公開用で、ページが翻訳対象のテキストを報告できるだけです。下でタグをオンにするまで何も起こりません。個人データ、フォームの内容、セッション Cookie 付きで表示されたページは送信されません。",
+      "on": "タグを有効化",
+      "onHint": "オフ: タグは何もせず、各ページは公開時のまま表示されます (1 分以内に反映)。",
+      "auto": "新しいテキストを自動翻訳",
+      "autoHint": "オフ: タグが見つけたテキストは、訳文が表示される前にレビュー待ちになります。",
+      "position": "言語切り替え",
+      "positions": {
+        "bottom-right": "フローティング (右下)",
+        "bottom-left": "フローティング (左下)",
+        "top-right": "フローティング (右上)",
+        "top-left": "フローティング (左上)",
+        "none": "非表示 (独自の切り替えを使用)",
+        "selector": "要素の中 (CSS セレクター)"
+      },
+      "selector": "CSS セレクター",
+      "selectorHint": "最初に一致した要素 (ヘッダーのメニューなど) の中に追加されます。data-glot-switcher 属性を持つ要素が常に優先されます。",
+      "locales": "提供する言語",
+      "localesHint": "何も選択しない場合はプロジェクトのすべての対象言語。",
+      "save": "保存",
+      "saved": "サイト用タグを保存しました",
+      "seo": {
+        "title": "検索エンジン",
+        "body": "ブラウザーで翻訳されたテキストは、Google に確実にはインデックスされません。他の言語で検索されたいページには、glot Edge のサブドメイン (es.your-site.com、CNAME 1 件) を追加してください。ページはサーバー側で hreflang 付きで翻訳され、言語切り替えから訪問者がそこへ移動します。",
+        "ready": "Edge サブドメインは検証済みです。言語切り替えから訪問者がそこへ移動し、タグがブラウザーで hreflang リンクを追加します。検索エンジンが HTML でも確認できるよう、これらのタグをサイトの head (カスタムコード) に貼り付けてください。",
+        "cta": "サブドメインを設定"
+      }
     },
     "kill": {
       "labelOn": "Edge オン",
@@ -205,6 +237,19 @@
         "proxy": "翻訳せずにそのまま中継",
         "actionHint": "リダイレクト：元のドメインの同じページへ 302（フォームは 307）、言語はサイトが想定する形式で付与。中継：サーバーの応答をそのまま、Cookie も含めて返します。",
         "suggest": "おすすめのリストを使う"
+      },
+      "auth": {
+        "title": "ログインが必要なページ",
+        "body": "ダッシュボード、アカウント、請求書など、訪問者がセッションを持つページです。glot はその内容やユーザーのデータを一切受け取りません。",
+        "mode": "ログイン中のページの翻訳",
+        "server": "Edge で翻訳（プライベート応答）",
+        "patcher": "ブラウザで翻訳（script タグ）",
+        "off": "翻訳しない",
+        "serverHint": "Edge は翻訳メモリから、その訪問者のためだけに各ページを翻訳します。Cache-Control private、共有キャッシュには保存せず、検出も行いません。ドメインの Cookie はそのまま渡されます。",
+        "patcherHint": "Edge はページをそのまま返します。ページ上の data-glot-app script タグが、ブラウザ内・自社ドメイン上（セッションはそのまま）で翻訳メモリを適用し、言語切り替えを表示します。",
+        "offHint": "ログイン中の訪問者には原文の言語でページが表示されます。",
+        "discover": "UI テキストを検出",
+        "discoverHint": "ブラウザモードのみ。送信されるのは data-glot-ui を付けたテキストと、glot が既に知っているテキストの指紋だけで、個人データは送信されません。新しいテキストはレビュー後に配信されます。"
       }
     },
     "seo": {
@@ -463,6 +508,7 @@
     "onThisPage": "このページの内容",
     "pages": {
       "edge": "glot Edge（SEO ローカライズ）",
+      "website": "サイト用タグ (あらゆるサイトビルダー)",
       "cli": "CLI リファレンス",
       "concepts": "基本概念",
       "faq": "FAQ・料金",
@@ -473,6 +519,7 @@
       "integrations": "インテグレーション",
       "mcp": "MCP サーバー",
       "runtime": "ランタイムのフォールバック",
+      "mobile-ota": "モバイルアプリ（OTA）",
       "self-hosting": "セルフホストサーバー",
       "benchmark": "ベンチマーク",
       "deploy-hetzner": "VPS にデプロイ",
@@ -590,6 +637,7 @@
     "subtitle": "翻訳をキーごとに編集、レビュー、承認します。"
   },
   "errors": {
+    "emailUnverified": "先にメールアドレスを確認してください。送信したリンクを開くか、バナーから再送信できます。",
     "generic": "問題が発生しました。もう一度お試しください。",
     "network": "ネットワークエラーです。接続を確認して、もう一度お試しください。",
     "notFound": "見つかりません。",
@@ -977,7 +1025,8 @@
       "translate": "翻訳",
       "github_localize": "リポジトリをローカライズ",
       "github_update": "プルリクエストを更新",
-      "edge_translate": "Edge 翻訳"
+      "edge_translate": "Edge 翻訳",
+      "connector_translate": "CMS 翻訳"
     },
     "live": "ライブ",
     "progress": "{done} / {total}",
@@ -1517,7 +1566,8 @@
     "billing": "請求",
     "github": "GitHub",
     "mainNav": "メイン",
-    "skipToContent": "コンテンツへスキップ"
+    "skipToContent": "コンテンツへスキップ",
+    "integrations": "連携"
   },
   "status": {
     "machine": "機械翻訳",
@@ -2060,6 +2110,7 @@
     "title": "アカウント"
   },
   "billing": {
+    "trialing": "{plan} のトライアルは {date} まで。それまでにポータルで解約しない場合、サブスクリプションが開始され初回の支払いが行われます。",
     "downgrade": "課金ポータルでキャンセル",
     "endsOn": "{date} に終了",
     "invoice": {
@@ -2084,10 +2135,18 @@
     "usage": "今月の使用状況"
   },
   "emailAuth": {
+    "gate": {
+      "tooltip": "この操作を行うには、メールアドレスを確認してください。"
+    },
+    "inbox": {
+      "title": "受信トレイを確認してください",
+      "body": "{email} に確認リンクを送信しました。リンクを開くと、プロジェクトを作成できるようになります。",
+      "hint": "数分経っても届かない場合は、迷惑メールフォルダを確認するか、メールを再送信してください。"
+    },
     "banner": {
       "resend": "メールを再送信",
       "sent": "確認メールを送信しました",
-      "text": "アカウントを保護するため、メールアドレス（{email}）を確認してください。"
+      "text": "プロジェクトを作成するには、メールアドレスを確認してください。{email} にリンクを送信しました。"
     },
     "confirmPassword": "新しいパスワードの確認",
     "email": "メールアドレス",
@@ -2808,6 +2867,10 @@
         "q": "クォータには何がカウントされますか？",
         "a": "glot cloud が提供するものだけです：CDN/OTA リクエスト、インサイトと実験のイベント、リモート MCP 呼び出し、オンデマンドのロケールジョブ、ライブレビューの注釈、glot のキーで翻訳された文字列。実行中の実験とクラウドプロジェクトは存在する間カウントされます。ローカルで実行するもの、独自のキーで翻訳したものはカウントされません。月間カウンターは毎月1日（UTC）にリセットされます。"
       },
+      "trial": {
+        "q": "支払い前に Growth を試せますか？",
+        "a": "はい。最初の Growth サブスクリプションは 14 日間の無料トライアルから始まります（1 アカウントにつき 1 回）。登録時に支払い方法を保存しますが、トライアル終了までは請求されません。それまでに請求ポータルで解約すれば料金はかかりません。Starter と Pro にトライアルはありません。"
+      },
       "cancel": {
         "q": "いつでも解約できますか？",
         "a": "はい、請求ポータルから解約できます。プランは支払い済み期間の終了まで有効で、その後アカウントは無料プランに移行します。プロジェクトとデータは保持されます。"
@@ -2837,6 +2900,25 @@
           "oss": "オープンソースの CLI、MCP サーバー、GitHub Action はローカルで無制限",
           "project": "小さな月間クォータ付きのクラウドプロジェクト1件",
           "noCard": "クレジットカード不要"
+        }
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "サイトやアプリを他の言語で公開するために。",
+        "for": "最初の言語展開を始める個人開発者、ショップ、アプリ。",
+        "features": {
+          "projects": "クラウドプロジェクト 2 件",
+          "dynamic": "動的ローカライズ：CDN 配信のカタログと言語切り替え",
+          "sync": "GitHub 同期：すべての言語を 1 つのプルリクエストに",
+          "qa": "ビジュアル QA：切れた、重なった、未翻訳のテキストを検出",
+          "cms": "CMS 連携（Shopify、WordPress、Webflow、Contentful、Sanity、Strapi）",
+          "quotas": "最初のローンチに合わせた控えめな月間クォータ"
+        },
+        "excluded": {
+          "edge": "glot Edge（SEO ローカライズ）",
+          "xp": "セグメント別の実験",
+          "launch": "言語ローンチの効果測定",
+          "recommend": "期待収益つきの言語レコメンド"
         }
       },
       "pro": {
@@ -2889,6 +2971,8 @@
     "yearly": "年額",
     "yearlySave": "{n}か月分無料",
     "yearlyEquiv": "月あたり {price}（年払い）",
+    "trial": "{days} 日間の無料トライアル、いつでも解約可能",
+    "excludedSr": "含まれないもの：",
     "forWho": "対象：",
     "vat": "価格は税抜きです。"
   },
@@ -3420,6 +3504,346 @@
         "saveError": "最後の編集を保存できませんでした。接続を確認してください。次に入力したときに再試行します。"
       },
       "variantName": "バリアント {letter}"
+    }
+  },
+  "connectors": {
+    "magento": {
+      "description": "商品とカテゴリーを REST API で翻訳します。言語ごとに 1 つのストアビュー。",
+      "fields": {
+        "url": "ストア URL",
+        "token": "アクセストークン",
+        "token_secret": "アクセストークンシークレット",
+        "consumer_key": "コンシューマーキー",
+        "consumer_secret": "コンシューマーシークレット"
+      },
+      "hints": {
+        "token": "システム → 拡張機能 → 統合：カタログとストアのリソースを持つ統合を作成して有効化します。",
+        "token_secret": "コンシューマーキーとシークレットがあれば、glot は OAuth 1.0a でリクエストに署名します。ない場合はトークンを Bearer で送信しますが、Commerce 2.4.4 以降ではこのオプションを有効にする必要があります。"
+      }
+    },
+    "prestashop": {
+      "description": "商品、カテゴリー、CMS ページ、ブランドを Webservice API で翻訳します。HTML の説明文はタグを保持します。",
+      "fields": {
+        "url": "ショップ URL",
+        "api_key": "Webservice キー"
+      },
+      "hints": {
+        "url": "ショップのアドレス（/api は不要）。",
+        "api_key": "高度なパラメータ → Webservice：products、categories、content_management_system、manufacturers に GET と PUT、languages と configurations に GET を許可したキー。"
+      }
+    },
+    "woocommerce": {
+      "description": "商品、カテゴリー、タグを WooCommerce REST API で翻訳します。WPML（WooCommerce Multilingual）と Polylang for WooCommerce に対応。",
+      "fields": {
+        "url": "ストア URL",
+        "consumer_key": "コンシューマーキー",
+        "consumer_secret": "コンシューマーシークレット",
+        "webhook_secret": "Webhook シークレット"
+      },
+      "hints": {
+        "consumer_key": "WooCommerce → 設定 → 高度な設定 → REST API → キーを追加、権限は読み取り/書き込み。",
+        "webhook_secret": "任意の長いランダム文字列。glot はこれで商品の Webhook を登録し、署名を確認します。"
+      }
+    },
+    "bigcommerce": {
+      "description": "商品、カテゴリー、ブランドを Translations API でチャネル・ロケールごとに翻訳します。",
+      "fields": {
+        "store_hash": "ストアハッシュ",
+        "token": "アクセストークン",
+        "channel_id": "チャネル ID",
+        "webhook_secret": "Webhook シークレット"
+      },
+      "hints": {
+        "store_hash": "API パスのコード：api.bigcommerce.com/stores/STORE_HASH/v3。",
+        "token": "Products（変更）、Store Information（読み取り）、Channel Settings（変更）権限を持つストアレベルの API アカウント。",
+        "channel_id": "デフォルトのストアフロントは 1。",
+        "webhook_secret": "任意のランダムな文字列。glot が商品・カテゴリーの Webhook を登録し、呼び出しごとに確認します。"
+      }
+    },
+    "shopware": {
+      "description": "商品、カテゴリー、プロパティを Admin API で翻訳し、Shopware の各言語に書き込みます。",
+      "fields": {
+        "url": "ショップ URL",
+        "client_id": "アクセスキー ID",
+        "client_secret": "シークレットアクセスキー",
+        "webhook_secret": "アプリシークレット（Webhook 署名）"
+      },
+      "hints": {
+        "client_id": "設定 → システム → 統合 → 統合を追加（管理者ロール）。",
+        "client_secret": "統合の作成時に一度だけ表示されます。",
+        "webhook_secret": "Shopware アプリが Webhook を送る場合のみ。glot が shopware-shop-signature ヘッダーを確認します。"
+      }
+    },
+    "contentful": {
+      "description": "すべてのコンテンツタイプのエントリー：Content Management API 経由で、ローカライズされた Short text、Long text（Markdown）、Rich Text フィールドを翻訳します。",
+      "fields": {
+        "space_id": "スペース ID",
+        "token": "パーソナルアクセストークン",
+        "environment": "環境",
+        "api_url": "API の URL"
+      },
+      "hints": {
+        "token": "Settings → CMA tokens。スペースへの読み書き権限が必要です。",
+        "api_url": "EU データ所在地の場合のみ：https://api.eu.contentful.com"
+      }
+    },
+    "sanity": {
+      "description": "HTTP API 経由のドキュメント：フィールド単位（ローカライズ済みオブジェクト、国際化配列）またはドキュメント単位（document-internationalization）の i18n。Portable Text はそのまま保持されます。",
+      "fields": {
+        "project_id": "プロジェクト ID",
+        "dataset": "データセット",
+        "token": "API トークン",
+        "source_locale": "ソース言語コード",
+        "webhook_secret": "Webhook シークレット"
+      },
+      "hints": {
+        "token": "sanity.io/manage → API → Tokens（Editor 権限）。",
+        "source_locale": "スキーマの言語キー（既定は en）。",
+        "webhook_secret": "GROQ Webhook のシークレット。署名の検証に使います。"
+      }
+    },
+    "strapi": {
+      "description": "Strapi 4 / 5（i18n プラグイン）のローカライズされたコレクション型とシングル型：テキスト、Markdown、Blocks フィールド。",
+      "fields": {
+        "url": "Strapi の URL",
+        "token": "API トークン"
+      },
+      "hints": {
+        "token": "Settings → API Tokens、フルアクセス（または対象タイプの find、update、createLocalization）。"
+      }
+    },
+    "hubspot": {
+      "description": "ブログ記事、ウェブサイトページ、ランディングページ（リッチテキストモジュールを含む）を HubSpot の多言語バリエーションとして書き込みます。",
+      "fields": {
+        "token": "非公開アプリのアクセストークン",
+        "webhook_secret": "アプリのクライアントシークレット"
+      },
+      "hints": {
+        "token": "設定 → 連携 → 非公開アプリ。content スコープが必要です。",
+        "webhook_secret": "任意：Webhook の X-HubSpot-Signature（v1）を検証します。"
+      }
+    },
+    "drupal": {
+      "description": "コアの JSON:API でノードとタクソノミー用語を同期：タイトルと書式付きテキストを既存の翻訳（Content Translation）に書き込みます。",
+      "fields": {
+        "url": "サイトの URL",
+        "username": "ユーザー名",
+        "password": "パスワード",
+        "token": "OAuth トークン"
+      },
+      "hints": {
+        "username": "basic_auth モジュールを使用。空欄にして OAuth トークンを指定することもできます。",
+        "token": "ユーザー名とパスワードの代わりに使う Bearer トークン（Simple OAuth）。"
+      }
+    },
+    "ghost": {
+      "description": "Admin API で投稿とページを同期。各言語は #fr タグ付きの投稿（slug-fr）で、Ghost のルーティングの方式です。",
+      "fields": {
+        "url": "サイトの URL",
+        "admin_key": "Admin API キー",
+        "webhook_secret": "Webhook シークレット"
+      },
+      "hints": {
+        "admin_key": "Settings → Integrations → Add custom integration、id:secret の形式。",
+        "webhook_secret": "任意の文字列：glot が署名付きの Ghost Webhook を登録します。"
+      }
+    },
+    "craft": {
+      "description": "GraphQL API でエントリーを同期：タイトルとテキストフィールドを各言語の Craft サイトに保存します。",
+      "fields": {
+        "url": "GraphQL エンドポイント",
+        "token": "スキーマトークン",
+        "sites": "ロケールごとのサイト"
+      },
+      "hints": {
+        "token": "GraphQL → Tokens。すべてのサイトでエントリーを取得・保存できるスキーマが必要です。",
+        "sites": "glot のロケール: Craft サイトのハンドル（カンマ区切り）。既定はロケールと同名のサイト。"
+      }
+    },
+    "zendesk": {
+      "description": "ヘルプセンターのカテゴリー、セクション、記事を Guide の各ロケールに翻訳します。",
+      "fields": {
+        "subdomain": "Zendesk サブドメイン",
+        "email": "エージェントのメールアドレス",
+        "token": "API トークン",
+        "webhook_secret": "Webhook の署名シークレット"
+      },
+      "hints": {
+        "token": "管理センター → アプリと連携 → Zendesk API。",
+        "webhook_secret": "任意：X-Zendesk-Webhook-Signature を検証します。"
+      }
+    },
+    "helpscout": {
+      "description": "Docs の記事を言語ごとの Docs サイトに書き込みます（Help Scout が推奨する Docs の翻訳方法）。",
+      "fields": {
+        "api_key": "API キー",
+        "collections": "ロケールごとのコレクション"
+      },
+      "hints": {
+        "api_key": "Your Profile → Authentication → API Keys。",
+        "collections": "glot のロケール: そのロケールの Docs サイトのコレクション ID（カンマ区切り）。"
+      }
+    },
+    "page": {
+      "title": "連携",
+      "subtitle": "CMS やストアを接続すると、glot がコンテンツを取得し、プロジェクトのモデルで翻訳して、検証済みの翻訳を書き戻します。",
+      "docs": "CMS ごとの同期の仕組み：<docs>連携のドキュメント</docs>。"
+    },
+    "connect": "接続",
+    "save": "テストして保存",
+    "testing": "テスト中…",
+    "cancel": "キャンセル",
+    "optional": "任意",
+    "connected": "{name} を接続しました。最初の同期を予約しました。",
+    "localeMismatch": "CMS の既定言語（{locale}）がプロジェクトのソース言語と異なります。",
+    "webhooksError": "接続しましたが、Webhook を自動登録できませんでした。Webhook URL を手動で追加してください。",
+    "syncQueued": "同期を予約しました",
+    "testOk": "{name} に接続できます。言語：{locales}",
+    "lastSync": "{when}に同期",
+    "stats": "{items} フィールド · {pushed} 件反映 · {waiting} 件が翻訳待ち",
+    "webhook": "Webhook の URL",
+    "webhookHint": "ここに送られたコンテンツの変更で差分同期が始まります。トークンを含むため、公開しないでください。",
+    "sync": "今すぐ同期",
+    "syncing": "同期中…",
+    "test": "テスト",
+    "remove": "接続を解除",
+    "removeConfirm": "{name} の接続を解除しますか？翻訳は glot に残り、CMS からは何も削除されません。",
+    "status": {
+      "idle": "未同期",
+      "queued": "予約済み",
+      "running": "同期中",
+      "ok": "最新",
+      "error": "エラー"
+    },
+    "shopify": {
+      "description": "商品、コレクション、ページ、ブログ記事、メタフィールド、メニュー、テーマのテキストを Translations API で翻訳します。",
+      "fields": {
+        "shop": "ストアのドメイン",
+        "token": "Admin API アクセストークン",
+        "webhook_secret": "API シークレットキー（Webhook 署名）"
+      },
+      "hints": {
+        "token": "翻訳、商品、コンテンツ、オンラインストアのページ、テーマ、言語の読み書き権限を持つカスタムアプリ。",
+        "webhook_secret": "Shopify の商品・コレクション Webhook を glot が検証するために使います。"
+      }
+    },
+    "webflow": {
+      "description": "CMSコレクション（プレーンテキストとリッチテキストのフィールド）、静的ページのコンテンツ、コンポーネントを、サイトのすべてのセカンダリロケール（Webflow Localization）で。",
+      "fields": {
+        "token": "サイトAPIトークン",
+        "site_id": "サイトID",
+        "webhook_secret": "Webhook署名シークレット"
+      },
+      "hints": {
+        "token": "サイト設定 → Apps & integrations → API access。CMS、Pages、Components、Sitesの読み取りと書き込み権限が必要です。",
+        "site_id": "トークンが複数のサイトにアクセスできる場合のみ必要です。",
+        "webhook_secret": "Webflowが署名するWebhook（OAuthアプリのクライアントシークレット）の場合のみ。サイト設定で追加したWebhookは、下のWebhook URLを使います。"
+      }
+    },
+    "wordpress": {
+      "description": "投稿、固定ページ、カテゴリー、タグ、メニューを REST API で翻訳します。WPML と Polylang に対応。",
+      "fields": {
+        "url": "サイト URL",
+        "username": "ユーザー名",
+        "app_password": "アプリケーションパスワード"
+      },
+      "hints": {
+        "app_password": "ユーザー → プロフィール → アプリケーションパスワード。ログインパスワードは使わないでください。"
+      }
+    }
+  },
+  "integrations": {
+    "nav": "連携",
+    "meta": {
+      "title": "連携：あらゆるプラットフォームでサイトを翻訳",
+      "description": "{count} のプラットフォームで glot を使ってサイトを翻訳する手順ガイド。サイトビルダー、EC、CMS、AI アプリビルダー、オンライン講座、ヘルプセンターに対応。"
+    },
+    "title": "連携",
+    "subtitle": "glot は、すべてのページにスクリプトを追加できるサイトなら動作します。プラットフォームを選ぶと、正確な手順、必要なプラン、検索エンジン向けの翻訳済み URL の作り方がわかります。",
+    "search": "プラットフォームを検索",
+    "searchPlaceholder": "Wix、Shopify、Ghost…",
+    "filter": "カテゴリで絞り込む",
+    "all": "すべて",
+    "count": "{count, plural, =0 {該当なし} other {# 件のプラットフォーム}}",
+    "empty": "「{q}」に一致するプラットフォームはありません。サイトにカスタムコードを追加できるなら、ユニバーサルタグが使えます。",
+    "categories": {
+      "site-builder": "サイトビルダー",
+      "e-commerce": "EC",
+      "cms": "CMS",
+      "ai-builder": "AI アプリビルダー",
+      "lms": "オンライン講座",
+      "help-center": "ヘルプセンター",
+      "enterprise": "エンタープライズ"
+    },
+    "methods": {
+      "connector": "コネクタ",
+      "plugin": "プラグイン",
+      "tag": "ユニバーサルタグ"
+    },
+    "generic": {
+      "title": "お使いのプラットフォームがありませんか？",
+      "body": "すべてのページの head にスクリプトを追加できれば、ユニバーサルタグが使えます。ドメインの DNS を管理できれば、glot Edge で翻訳済み URL も配信できます。",
+      "cta": "サイト用タグのガイドを読む"
+    },
+    "page": {
+      "metaTitle": "{name} 向け glot：{name} のサイトを翻訳",
+      "metaDescription": "glot で {name} のサイトを翻訳する方法：{method, select, connector {glot コネクタ} plugin {glot プラグイン} other {スクリプトタグ 1 つ}}、必要なプラン、検索エンジン向けの翻訳済み URL を順に説明します。",
+      "breadcrumb": "パンくずリスト",
+      "title": "{name} 向け glot",
+      "intro": {
+        "connector": "glot は {name} に直接接続します。コンテンツを読み取り、用語集とチェックを使って翻訳し、{name} の言語に書き戻します。",
+        "plugin": "glot は {name} にプラグインとしてインストールします。設定方法は下の手順のとおりです。",
+        "tag": "{name} では、すべてのページに追加する 1 つのスクリプトタグで glot が動きます。訪問者のブラウザでページを翻訳し、言語メニューを追加します。"
+      },
+      "unavailable": "{name} ではすべてのページにスクリプトを追加できないため、ユニバーサルタグは動作しません。可能なことは下の説明をご覧ください。",
+      "unverified": "この手順は {name} の公式ドキュメントで確認できませんでした。利用する前に {name} のヘルプセンターで確認してください。",
+      "englishNote": "プラットフォーム側の手順は、{name} の画面のメニュー名に合わせて英語で記載しています。",
+      "nativeTitle": {
+        "connector": "{name} を接続する",
+        "plugin": "glot プラグインをインストールする"
+      },
+      "nativeDoc": "コネクタの詳しいドキュメント",
+      "tagDoc": "サイト用タグのガイド",
+      "tagTitle": "glot タグを追加する",
+      "tagAltTitle": "別の方法：ユニバーサルタグ",
+      "tagAltBody": "{name} 連携で対応していない部分をブラウザで翻訳するには、ユニバーサルタグを追加します。",
+      "prep": {
+        "project": "glot でプロジェクトを作成し、言語を追加します。",
+        "mode": "glot Edge → サイト用タグを開き、タグをオンにします。",
+        "copy": "そのタブからタグをコピーします。プロジェクトと公開キー（data-key）はすでに入っています。下のタグはその形式の例です。"
+      },
+      "snippetLabel": "glot タグ",
+      "plansTitle": "必要なプラン",
+      "glotPlan": "glot の各プランの内容は料金ページをご覧ください。glot Edge（翻訳済み URL）は Growth プランに含まれ、Pro では限定トライアルを利用できます。",
+      "seoTitle": "検索エンジン向けの翻訳済み URL",
+      "seoYes": "JavaScript を実行せずに検索エンジンがインデックスできる翻訳ページにするには、2 つの DNS レコードで glot Edge をドメインのサブドメイン（es.example.com）に置きます。",
+      "seoNo": "ここでは glot Edge のサブドメインモードは使えません。",
+      "dnsLabel": "DNS レコード（TXT トークンは glot Edge → セットアップに表示されます）",
+      "edgeDoc": "glot Edge の仕組み",
+      "faqTitle": "よくある質問",
+      "faq": {
+        "partner": {
+          "q": "glot は {name} のパートナーですか？",
+          "a": "いいえ。glot は独立しており、{name} との提携や {name} による推奨はありません。このガイドは {name} の標準機能だけを使っています。"
+        },
+        "content": {
+          "q": "glot は {name} のコンテンツを変更しますか？",
+          "a": "{method, select, tag {いいえ。タグは訪問者のブラウザでページを翻訳するだけで、{name} のコンテンツはそのままです。タグを外せば、サイトは元の言語に戻ります。} plugin {元のコンテンツはそのままです。プラグインはブラウザでページを翻訳し、接続すると、公開前に確認できる言語フィールドに翻訳を書き込みます。} other {元のコンテンツはそのままです。glot は {name} の言語フィールドに翻訳を書き込むので、公開前にそこで確認できます。}}"
+        },
+        "seo": {
+          "q": "翻訳は検索エンジンにインデックスされますか？",
+          "a": "タグだけではほとんどされません。ブラウザで翻訳するため、検索エンジンが主にインデックスするのは元の言語です。言語ごとの URL を持つ翻訳ページには、glot Edge か、言語ごとに URL を公開するプラットフォームが必要です。"
+        }
+      },
+      "docsTitle": "{name} の公式ドキュメント",
+      "trademark": "{name} は各所有者の商標です。glot は {name} と提携していません。",
+      "cta": {
+        "title": "{name} のサイトを翻訳する",
+        "body": "プロジェクトを作成して言語を選び、上の手順に従ってください。",
+        "start": "プロジェクトを作成",
+        "docs": "ドキュメントを読む"
+      },
+      "related": "その他の連携：{category}"
     }
   }
 }

@@ -223,6 +223,22 @@ export interface PatcherOptions {
   missing?: string;
   /** TM re-poll delays after a report, ms. */
   poll?: number[];
+  /** Project excluded selectors when the TM doesn't carry them (app mode reads glot's TM directly). */
+  skip?: string[];
+  /**
+   * App mode (pages behind sign-in, `app.global.ts`): there is no server pass, so every text is the app's and a
+   * session cookie doesn't stop discovery — but only text inside `allow` is a candidate, and only `[data-glot-ui]`
+   * text is reported as text; any other candidate goes as its hash alone (glot keeps it only if it already knows
+   * that text from a public page: a user's name never matches).
+   */
+  app?: { allow: string };
+  /**
+   * Website tag (`website.global.ts`): no server pass, every text of the page is a candidate (not only what the
+   * app rendered after boot); still never with a session cookie, and in a `<form>` only labels/legends/buttons.
+   */
+  all?: boolean;
+  /** Extra fields of the discovery report (`key`, `auth`, `mode`). */
+  report?: Record<string, unknown>;
 }
 
 export function startPatcher(o: PatcherOptions) {
@@ -246,18 +262,22 @@ export function startPatcher(o: PatcherOptions) {
   const fresh = (n: Node | null) => { for (; n; n = n.parentNode) if (dyn.has(n)) return true; };
   const discover = (seg: DomSegment) => {
     if (!o.missing || !seg.discoverable || seg.el || outs.has(seg.text) || sent.has(seg.hash + seg.role)) return;
-    const nodes = seg.gaps.flat();
-    if (!nodes.some(fresh) || nodes.some((n) => /\S/.test(n.nodeValue!) && mine.get(n) === n.nodeValue)) return; // not the app's / ours
-    if (SESSION_COOKIE.test(document.cookie)) return; // signed in: never discovered (the runtime re-checks HttpOnly ones)
+    const nodes = seg.gaps.flat(), host = nodes.find((n) => /\S/.test(n.nodeValue!))?.parentElement;
+    if (nodes.some((n) => /\S/.test(n.nodeValue!) && mine.get(n) === n.nodeValue)) return; // ours
+    if (o.app ? !host?.closest(o.app.allow) : !o.all && !nodes.some(fresh)) return; // not a UI candidate / not the app's
+    if (o.all && host?.closest("form") && !host.closest("label,legend,button")) return; // a form: its labels only
+    if (!o.app && SESSION_COOKIE.test(document.cookie)) return; // signed in: never discovered (the runtime re-checks HttpOnly ones)
+    const text = !o.app || host?.closest("[data-glot-ui]") ? seg.text : "";
+    if (!text && !(seg.hash in tm!.t)) return; // hash-only: only a text glot already serves (never a user's own text)
     sent.add(seg.hash + seg.role);
-    queue.push({ hash: seg.hash, text: seg.text, role: seg.role, url: location.pathname });
+    queue.push({ hash: seg.hash, text, role: seg.role, url: location.pathname });
     clearTimeout(timer);
     timer = setTimeout(send, 1500);
   };
   const send = () => {
     const segments = queue.splice(0, 200);
     if (!segments.length || !tm) return;
-    fetch(o.missing!, { method: "POST", body: JSON.stringify({ locale: tm.locale, segments }), keepalive: true }).catch(() => {});
+    fetch(o.missing!, { method: "POST", body: JSON.stringify({ ...o.report, locale: tm.locale, segments }), keepalive: true }).catch(() => {});
     if (!polling && o.tmUrl) {
       polling = true;
       const v = tm.v;
@@ -292,7 +312,7 @@ export function startPatcher(o: PatcherOptions) {
     const c = x as PatcherTm | null;
     if (!c || typeof c.t !== "object" || !(c.v >= min) || (tm && tm.v >= c.v)) return false;
     tm = c;
-    skip = (c.skip ?? []).filter((s) => { try { return document.querySelector(s), true; } catch { return false; } }).map((s) => `,${s}`).join("");
+    skip = (c.skip ?? o.skip ?? []).filter((s) => { try { return document.querySelector(s), true; } catch { return false; } }).map((s) => `,${s}`).join("");
     outs = new Set(Object.values(c.t).flatMap((v) => (typeof v === "string" ? [v] : Object.values(v))).map(collapseWs));
     // late or new TM: catch up on everything rendered so far
     dirty.add(document.documentElement);

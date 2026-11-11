@@ -30,7 +30,19 @@ export type EdgeSettings = {
   app_paths: string[];
   /** Action of rules without one. */
   app_action: AppAction;
+  /** Requests with a session: translated by Edge (private), by the browser tag `data-glot-app`, or not at all. */
+  auth_pages: AuthPages;
+  /** App-mode patcher reports UI text (review-gated). */
+  auth_discover: boolean;
+  /** Universal website tag (`widget/glot.js`). */
+  website_snippet: WebsiteSnippet;
 };
+
+/** edge::discover::WebsiteSnippet. `position`: a corner, `none`, or a CSS selector the switcher goes into. */
+export type WebsiteSnippet = { on: boolean; auto_translate: boolean; position: string; locales: string[] };
+export const SNIPPET_CORNERS = ["bottom-right", "bottom-left", "top-right", "top-left", "none"] as const;
+
+export type AuthPages = "off" | "patcher" | "server";
 
 export type AppAction = "redirect" | "proxy";
 /** edge::app_paths::SUGGESTED (column default of new settings rows). */
@@ -153,6 +165,8 @@ const e = (slug: string) => `/api/projects/${enc(slug)}/edge`;
 export const edgeApi = {
   settings: (slug: string) => request<EdgeSettings>("GET", `${e(slug)}/settings`),
   putSettings: (slug: string, b: EdgeSettings) => request<EdgeSettings>("PUT", `${e(slug)}/settings`, b),
+  /** Public key for the website tag's `data-key`. */
+  snippet: (slug: string) => request<{ public_key: string }>("GET", `${e(slug)}/snippet`),
   // ponytail: domains + metrics are the dashboard contract; no server route yet (see report).
   domains: (slug: string) => request<EdgeDomain[]>("GET", `${e(slug)}/domains`),
   addDomain: (slug: string, b: NewEdgeDomain) => request<EdgeDomain>("POST", `${e(slug)}/domains`, b),
@@ -182,6 +196,7 @@ export const edgeApi = {
 export const edgeKeys = {
   all: (slug: string) => ["edge", slug] as const,
   settings: (slug: string) => ["edge", slug, "settings"] as const,
+  snippet: (slug: string) => ["edge", slug, "snippet"] as const,
   domains: (slug: string) => ["edge", slug, "domains"] as const,
   coverage: (slug: string) => ["edge", slug, "coverage"] as const,
   segments: (slug: string) => ["edge", slug, "segments"] as const,

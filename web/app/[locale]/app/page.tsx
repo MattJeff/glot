@@ -6,6 +6,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, ProgressBar } from "@/components/common";
 import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { VerifiedOnly } from "@/components/email-pages";
 import { projectHealth } from "@/components/gamification/project-progress";
 import { ProgressRing } from "@/components/gamification/progress-ring";
 import { Button } from "@/components/ui/button";
@@ -19,9 +20,11 @@ export default function ProjectsPage() {
   const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
 
   const newButton = (
-    <Button onClick={() => setOpen(true)}>
-      <Plus /> {t("create.title")}
-    </Button>
+    <VerifiedOnly>
+      <Button onClick={() => setOpen(true)}>
+        <Plus /> {t("create.title")}
+      </Button>
+    </VerifiedOnly>
   );
 
   return (
@@ -41,9 +44,11 @@ export default function ProjectsPage() {
           title={t("empty.title")}
           body={t("empty.body")}
           action={
-            <Button onClick={() => setOpen(true)}>
-              <Plus /> {t("empty.cta")}
-            </Button>
+            <VerifiedOnly>
+              <Button onClick={() => setOpen(true)}>
+                <Plus /> {t("empty.cta")}
+              </Button>
+            </VerifiedOnly>
           }
         />
       ) : (

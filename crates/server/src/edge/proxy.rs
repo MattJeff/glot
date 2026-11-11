@@ -56,6 +56,8 @@ use crate::{AppState, projects::ProjectRow, review_live::probe::is_public};
 
 /// glot's own budget per request (lookups + translation), past it: the origin page untranslated.
 const GLOT_BUDGET: Duration = Duration::from_millis(400);
+/// glot's budget to localize one JavaScript chunk (`bundle.rs`), past it: the origin chunk, `no-store`.
+const BUNDLE_BUDGET: Duration = Duration::from_millis(1500);
 /// Domain rows (kill switch, origin) are re-read this often.
 const DOMAIN_TTL: Duration = Duration::from_secs(15);
 /// TM version re-checked this often (a translation edited in glot is live within it).
@@ -322,23 +324,43 @@ impl Edge {
     }
 
     async fn project(&self, state: &AppState, d: &Domain) -> Option<ProjectRow> {
-        if let Some(p) = self.projects.read().ok()?.get(&d.project_id) {
+        self.project_of(state, d.project_id, &d.slug).await
+    }
+
+    async fn project_of(&self, state: &AppState, id: Uuid, slug: &str) -> Option<ProjectRow> {
+        if let Some(p) = self.projects.read().ok()?.get(&id) {
             return Some(p.clone());
         }
-        let p = crate::projects::load_public(state, &d.slug).await.ok()??;
-        self.projects.write().ok()?.insert(d.project_id, p.clone());
+        let p = crate::projects::load_public(state, slug).await.ok()??;
+        self.projects.write().ok()?.insert(id, p.clone());
         Some(p)
     }
 
     /// The TM snapshot to translate this request with, within `deadline`. Newer versions load in the background
     /// when they miss it (the old snapshot is served whole meanwhile).
     async fn tm(&self, state: &AppState, d: &Domain, deadline: Instant) -> Option<Arc<Tm>> {
-        let key = (d.project_id, d.locale.clone());
-        let disk_name = format!("tm-{}-{}", d.project_id, d.locale);
+        self.tm_of(state, d.project_id, &d.slug, &d.locale, deadline)
+            .await
+    }
+
+    async fn tm_of(
+        &self,
+        state: &AppState,
+        project_id: Uuid,
+        slug: &str,
+        locale: &str,
+        deadline: Instant,
+    ) -> Option<Arc<Tm>> {
+        let key = (project_id, locale.to_string());
+        let disk_name = format!("tm-{project_id}-{locale}");
         let mut cur = self.tms.read().ok()?.get(&key).cloned();
         if cur.is_none()
-            && let Some(t) = self.load::<Tm>(&disk_name)
+            && let Some(mut t) = self.load::<Tm>(&disk_name)
         {
+            // `dom` (bundle localization) is not serialized with the TM
+            t.dom = self
+                .load(&format!("tmdom-{project_id}-{locale}"))
+                .unwrap_or_default();
             let t = Arc::new(t);
             self.tms.write().ok()?.insert(key.clone(), t.clone());
             cur = Some(t);
@@ -348,11 +370,8 @@ impl Edge {
             Some((at, v)) if at.elapsed() < VERSION_TTL => v,
             _ => {
                 let left = deadline.saturating_duration_since(Instant::now());
-                match tokio::time::timeout(
-                    left,
-                    super::tm::version(&state.db, d.project_id, &d.locale),
-                )
-                .await
+                match tokio::time::timeout(left, super::tm::version(&state.db, project_id, locale))
+                    .await
                 {
                     Ok(Ok(v)) => {
                         self.versions
@@ -371,9 +390,9 @@ impl Edge {
         if !self.loading.lock().ok()?.insert(key.clone()) {
             return cur; // another request is loading it
         }
-        let p = self.project(state, d).await?;
+        let p = self.project_of(state, project_id, slug).await?;
         let st = state.clone();
-        let locale = d.locale.clone();
+        let locale = locale.to_string();
         let load = tokio::spawn(async move {
             let r = super::tm::snapshot(&st.db, &p, &locale).await;
             let e = &*EDGE;
@@ -383,6 +402,7 @@ impl Edge {
                     m.insert((p.id, locale.clone()), t.clone());
                 }
                 e.save(&format!("tm-{}-{locale}", p.id), &*t);
+                e.save(&format!("tmdom-{}-{locale}", p.id), &t.dom);
             }
             if let Ok(mut l) = e.loading.lock() {
                 l.remove(&(p.id, locale));
@@ -395,6 +415,17 @@ impl Edge {
             _ => cur,
         }
     }
+}
+
+/// The TM snapshot of (project, locale) with the proxy's caches (memory, disk, version re-check): the worker's
+/// bundle endpoint (`bundle.rs`).
+pub(super) async fn tm_for(
+    state: &AppState,
+    p: &ProjectRow,
+    locale: &str,
+    deadline: Instant,
+) -> Option<Arc<Tm>> {
+    EDGE.tm_of(state, p.id, &p.slug, locale, deadline).await
 }
 
 async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain>> {
@@ -736,6 +767,10 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         .get(header::CONTENT_TYPE)
         .and_then(|v| v.to_str().ok())
         .is_some_and(|t| t.contains("text/html"));
+    let is_js = headers
+        .get(header::CONTENT_TYPE)
+        .and_then(|v| v.to_str().ok())
+        .is_some_and(super::bundle::is_js);
     let len = resp.content_length().unwrap_or(0) as usize;
     let mode = if app_proxy {
         "app"
@@ -745,9 +780,23 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         "quota"
     } else if translatable && status == StatusCode::OK && is_html && len <= MAX_HTML {
         "translate"
+    } else if translatable && status == StatusCode::OK && is_js {
+        "bundle"
     } else {
         "passthrough"
     };
+    if mode == "bundle" {
+        return serve_bundle(
+            status,
+            headers,
+            resp,
+            &d,
+            tm,
+            parts.headers.get(header::IF_NONE_MATCH),
+            (t_lookup, t_origin, deadline),
+        )
+        .await;
+    }
     if mode != "translate" {
         let origin_ms = t_origin.elapsed();
         let mut res = stream(status, headers, resp);
@@ -764,8 +813,12 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     // The "empty shell" verdict is kept per path for 10 min (it scans the whole page).
     let t_shell = Instant::now();
     let html = match d.rendering.as_str() {
-        "prerender" => snapshot(&origin, deadline).await.unwrap_or(html),
-        "auto" if is_shell(&host, path, &html) => snapshot(&origin, deadline).await.unwrap_or(html),
+        "prerender" => snapshot(&state, &d, &origin, deadline)
+            .await
+            .unwrap_or(html),
+        "auto" if is_shell(&host, path, &html) => snapshot(&state, &d, &origin, deadline)
+            .await
+            .unwrap_or(html),
         _ => html,
     };
     let t_lookup = t_lookup + t_shell.elapsed();
@@ -870,6 +923,57 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     let mut res = (status, headers, body).into_response();
     let cache = if reused { "hit-body" } else { "miss" };
     finish(&mut res, st, glot_ms, origin_ms, Some(cache));
+    res
+}
+
+/// A JavaScript chunk of a translating domain (`bundle.rs`): its hard-coded strings localized like the HTML.
+/// Without a TM or past the budget/size, the origin chunk is served untouched but never cacheable
+/// (`no-store`, no validators): a year-long `immutable` source copy would keep the client on the source text.
+async fn serve_bundle(
+    status: StatusCode,
+    mut headers: HeaderMap,
+    resp: reqwest::Response,
+    d: &Domain,
+    tm: Option<Arc<Tm>>,
+    inm: Option<&HeaderValue>,
+    (t_lookup, t_origin, deadline): (Duration, Instant, Instant),
+) -> Response {
+    let body = match read_capped(resp, 8 * super::bundle::MAX_JS).await {
+        Ok(Some(b)) => axum::body::Bytes::from(b),
+        _ => return plain(StatusCode::BAD_GATEWAY, "origin read error", "origin-error"),
+    };
+    let origin_ms = t_origin.elapsed();
+    let t = Instant::now();
+    let out = match tm {
+        Some(tm) if body.len() <= super::bundle::MAX_JS => {
+            let (src, tt) = (d.source_locale.clone(), tm.clone());
+            let b = body.clone();
+            let job = tokio::task::spawn_blocking(move || super::bundle::localize(&b, &src, &tt));
+            // A chunk is not on the first-paint path (the translated HTML already is): a larger budget than
+            // pages, so a cold chunk (first request of a version) is localized rather than served as source.
+            let left = deadline
+                .saturating_duration_since(Instant::now())
+                .max(BUNDLE_BUDGET);
+            match tokio::time::timeout(left, job).await {
+                Ok(Ok(l)) => Some((l, tm)),
+                _ => None, // the job still fills the cache for the next request
+            }
+        }
+        _ => None,
+    };
+    let glot_ms = t_lookup + t.elapsed();
+    let Some((l, tm)) = out else {
+        for h in [header::ETAG, header::LAST_MODIFIED, header::CONTENT_LENGTH] {
+            headers.remove(h);
+        }
+        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+        let mut res = (status, headers, body).into_response();
+        finish(&mut res, "fail-open", glot_ms, origin_ms, None);
+        return res;
+    };
+    let mut res = super::bundle::respond(status, headers, &l, inm, &tm);
+    let st = if l.n > 0 { "bundle" } else { "passthrough" };
+    finish(&mut res, st, glot_ms, origin_ms, None);
     res
 }
 
@@ -1088,6 +1192,7 @@ async fn client_missing(state: &AppState, d: &Domain, h: &HeaderMap, body: Body)
         auth: has_session(h),
         segments,
         pages: vec![],
+        mode: None,
     };
     if let Err(e) = missing::record(state, &p, &r).await {
         tracing::info!(target: "glot_edge", "client discovery report failed: {}", e.message);
@@ -1156,7 +1261,14 @@ fn is_shell(host: &str, path: &str, html: &[u8]) -> bool {
 }
 
 /// The renderer's stored snapshot of `url` (`GLOT_RENDERER_URL`), within the glot budget; None = use the origin.
-async fn snapshot(url: &Url, deadline: Instant) -> Option<Vec<u8>> {
+/// Snapshots imported from the customer's CI (`edge::snapshots`) come first: no browser needed on this server.
+// ponytail: one primary-key read per SPA request; cache it in memory if SPA traffic makes it show in Server-Timing.
+async fn snapshot(state: &AppState, d: &Domain, url: &Url, deadline: Instant) -> Option<Vec<u8>> {
+    let left = deadline.saturating_duration_since(Instant::now());
+    let ci = super::snapshots::imported(&state.db, d.project_id, url.path());
+    if let Ok(Some(html)) = tokio::time::timeout(left, ci).await {
+        return Some(html);
+    }
     let base = std::env::var("GLOT_RENDERER_URL").ok()?;
     let token = std::env::var("GLOT_RENDERER_TOKEN").unwrap_or_default();
     let left = deadline.saturating_duration_since(Instant::now());
@@ -1255,6 +1367,8 @@ fn translate(html: &str, d: &Domain, tm: &Tm, path: &str) -> Out {
         &html,
         &format!(r#"<meta name="glot-tm" content="{}@{}">"#, d.locale, tm.v),
     );
+    // A small TM rides in the page: text the app renders right after load is translated before it is painted.
+    let html = hydration::inject_head(&html, &hydration::tm_inline(tm));
     let html = hydration::inject_head(
         &html,
         &hydration::patcher_tag(PATCHER_PATH, TM_PATH, &d.source_locale, Some(MISSING_PATH)),
@@ -1317,6 +1431,7 @@ fn report(
             auth: false,
             segments,
             pages,
+            mode: None,
         };
         if let Err(e) = missing::record(&state, &p, &r).await {
             tracing::info!(target: "glot_edge", "discovery report failed: {}", e.message);

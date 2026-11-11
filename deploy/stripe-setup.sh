@@ -8,7 +8,7 @@
 #   options: --webhook-url URL (default https://api.$GLOT_DOMAIN/api/billing/webhook) --return-url URL
 #
 # Prices are minor units of CURRENCY (default eur), tax-exclusive; override with env:
-#   PRO_MONTH=1900 PRO_YEAR=19000 TEAM_MONTH=7900 TEAM_YEAR=79000 LLM_PER_STRING=0.15 (cents per string)
+#   STARTER_MONTH=2900 STARTER_YEAR=29000 PRO_MONTH=9900 PRO_YEAR=99000 TEAM_MONTH=29900 TEAM_YEAR=299000 LLM_PER_STRING=0.15 (cents per string)
 # Changing an amount and re-running creates a new price and moves the lookup key to it (new checkouts use it;
 # existing subscribers keep their price until you migrate them in the dashboard).
 # STRIPE_API_BASE=http://localhost:12111 runs it against stripe-mock.
@@ -32,8 +32,9 @@ done
 KEY="${STRIPE_SECRET_KEY:?set STRIPE_SECRET_KEY (a restricted rk_ key, see docs/billing.md)}"
 API="${STRIPE_API_BASE:-https://api.stripe.com}"
 CURRENCY="${CURRENCY:-eur}"
-PRO_MONTH="${PRO_MONTH:-1900}" PRO_YEAR="${PRO_YEAR:-19000}"
-TEAM_MONTH="${TEAM_MONTH:-7900}" TEAM_YEAR="${TEAM_YEAR:-79000}"
+STARTER_MONTH="${STARTER_MONTH:-2900}" STARTER_YEAR="${STARTER_YEAR:-29000}"
+PRO_MONTH="${PRO_MONTH:-9900}" PRO_YEAR="${PRO_YEAR:-99000}"
+TEAM_MONTH="${TEAM_MONTH:-29900}" TEAM_YEAR="${TEAM_YEAR:-299000}"
 LLM_PER_STRING="${LLM_PER_STRING:-0.15}"
 METER_EVENT=glot_llm_strings
 
@@ -48,7 +49,7 @@ if [ "$LIVE" = 1 ]; then
   [ "$MODE" = live ] || { echo "--live needs a live key (sk_live_/rk_live_)" >&2; exit 1; }
   cat <<EOF
 About to create LIVE Stripe objects (real money):
-  products glot_pro, glot_team, glot_llm; prices in $CURRENCY: pro $PRO_MONTH/mo $PRO_YEAR/yr, team $TEAM_MONTH/mo $TEAM_YEAR/yr,
+  products glot_starter, glot_pro, glot_team, glot_llm; prices in $CURRENCY: starter $STARTER_MONTH/mo $STARTER_YEAR/yr, pro $PRO_MONTH/mo $PRO_YEAR/yr, team $TEAM_MONTH/mo $TEAM_YEAR/yr,
   LLM $LLM_PER_STRING cents/string (meter $METER_EVENT); portal configuration; webhook -> $WEBHOOK_URL
 EOF
   read -r -p "Type 'create live billing' to continue: " answer
@@ -89,9 +90,12 @@ price() { # lookup_key product amount interval plan [extra curl args...]; reuses
   echo "created price $lk" >&2
 }
 
+product glot_starter "glot Starter" starter
 product glot_pro "glot Pro" pro
 product glot_team "glot Team" team
 product glot_llm "glot LLM translations (glot's key)" llm
+price glot_starter_month glot_starter "$STARTER_MONTH" month starter >/dev/null
+price glot_starter_year glot_starter "$STARTER_YEAR" year starter >/dev/null
 price glot_pro_month glot_pro "$PRO_MONTH" month pro >/dev/null
 price glot_pro_year glot_pro "$PRO_YEAR" year pro >/dev/null
 price glot_team_month glot_team "$TEAM_MONTH" month team >/dev/null

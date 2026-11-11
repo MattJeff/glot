@@ -5,6 +5,7 @@ import { ListChecks, Loader2, Sparkles } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { EmptyState, ErrorState, PageHeader } from "@/components/common";
 import { isActive, JobRow } from "@/components/job-row";
+import { VerifiedOnly } from "@/components/email-pages";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, qk } from "@/lib/api";
@@ -26,10 +27,12 @@ export default function JobsPage() {
   const spent = jobs.data?.reduce((s, j) => s + j.cost_usd, 0) ?? 0;
 
   const button = (
-    <Button onClick={() => translate.mutate()} disabled={busy}>
-      {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-      {to("translateMissing")}
-    </Button>
+    <VerifiedOnly>
+      <Button onClick={() => translate.mutate()} disabled={busy}>
+        {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
+        {to("translateMissing")}
+      </Button>
+    </VerifiedOnly>
   );
 
   return (

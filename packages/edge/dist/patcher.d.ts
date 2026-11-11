@@ -38,6 +38,24 @@ export interface PatcherOptions {
     missing?: string;
     /** TM re-poll delays after a report, ms. */
     poll?: number[];
+    /** Project excluded selectors when the TM doesn't carry them (app mode reads glot's TM directly). */
+    skip?: string[];
+    /**
+     * App mode (pages behind sign-in, `app.global.ts`): there is no server pass, so every text is the app's and a
+     * session cookie doesn't stop discovery — but only text inside `allow` is a candidate, and only `[data-glot-ui]`
+     * text is reported as text; any other candidate goes as its hash alone (glot keeps it only if it already knows
+     * that text from a public page: a user's name never matches).
+     */
+    app?: {
+        allow: string;
+    };
+    /**
+     * Website tag (`website.global.ts`): no server pass, every text of the page is a candidate (not only what the
+     * app rendered after boot); still never with a session cookie, and in a `<form>` only labels/legends/buttons.
+     */
+    all?: boolean;
+    /** Extra fields of the discovery report (`key`, `auth`, `mode`). */
+    report?: Record<string, unknown>;
 }
 export declare function startPatcher(o: PatcherOptions): {
     mo: MutationObserver;

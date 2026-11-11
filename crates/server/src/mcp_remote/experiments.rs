@@ -68,6 +68,8 @@ impl Api for InProcess {
         async move {
             let s = || State(self.state.clone());
             let u = || AuthUser(self.user.clone());
+            // MCP credentials of unverified users are refused upstream (mcp_remote::resolve).
+            let v = || crate::auth::VerifiedUser(self.user.clone());
             let slug = || AppPath(self.slug.clone());
             let b = body.unwrap_or_else(|| json!({}));
             let segs: Vec<&str> = path.split('/').filter(|x| !x.is_empty()).collect();
@@ -78,7 +80,7 @@ impl Api for InProcess {
             let at = |x: &str| id(x).map(|i| AppPath((self.slug.clone(), i)));
             let r = match (method.as_str(), segs.as_slice()) {
                 ("GET", []) => api::list(s(), u(), slug()).await.into_response(),
-                ("POST", []) => api::create(s(), u(), slug(), json_body(&b)?)
+                ("POST", []) => api::create(s(), v(), slug(), json_body(&b)?)
                     .await
                     .into_response(),
                 ("GET", ["segments"]) => api::list_segments(s(), u(), slug()).await.into_response(),
@@ -96,10 +98,10 @@ impl Api for InProcess {
                 ("POST", [x, "propagate"]) => promote::propagate(s(), u(), at(x)?, json_body(&b)?)
                     .await
                     .into_response(),
-                ("POST", [x, "generate"]) => generate::generate(s(), u(), at(x)?, json_body(&b)?)
+                ("POST", [x, "generate"]) => generate::generate(s(), v(), at(x)?, json_body(&b)?)
                     .await
                     .into_response(),
-                ("POST", [x, "start"]) => api::start(s(), u(), at(x)?).await.into_response(),
+                ("POST", [x, "start"]) => api::start(s(), v(), at(x)?).await.into_response(),
                 ("POST", [x, "promote"]) => api::promote(s(), u(), at(x)?, json_body(&b)?)
                     .await
                     .into_response(),

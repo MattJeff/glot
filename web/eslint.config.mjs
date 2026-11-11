@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Built bundles (packages/* → web/public/widget), linted in their own packages.
+    "public/widget/**",
   ]),
 ]);
 

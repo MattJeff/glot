@@ -169,7 +169,7 @@ const nth = (e: HTMLElement) => [...document.querySelectorAll("glot-locale-switc
 
 if (typeof customElements !== "undefined" && !customElements.get("glot-locale-switcher")) {
   class GlotLocaleSwitcher extends HTMLElement {
-    static observedAttributes = ["project", "cdn", "variant", "labels", "strategy", "min", "flags"];
+    static observedAttributes = ["project", "cdn", "variant", "labels", "strategy", "min", "flags", "locales"];
     #root = this.attachShadow({ mode: "open" });
     #m?: Manifest;
     #strategy = "event";
@@ -199,7 +199,10 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
       const project = this.getAttribute("project") ?? defaults.project;
       const min = this.getAttribute("min") ?? "0.95";
       try {
-        this.#m = await get<Manifest>(`${base(this.getAttribute("cdn") ?? "")}/cdn/${encodeURIComponent(project)}/locales.json?min=${encodeURIComponent(min)}`);
+        const m = await get<Manifest>(`${base(this.getAttribute("cdn") ?? "")}/cdn/${encodeURIComponent(project)}/locales.json?min=${encodeURIComponent(min)}`);
+        // `locales="es,de"`: only these (and the source) are offered.
+        const only = (this.getAttribute("locales") ?? "").split(",").map((c) => c.trim()).filter(Boolean);
+        this.#m = only.length ? { ...m, locales: m.locales.filter((l) => l.code === m.source || only.includes(l.code)) } : m;
       } catch {
         this.#root.innerHTML = ""; // no manifest: render nothing rather than a broken control
         return;

@@ -4,7 +4,9 @@
 //! - `GET /edge/v1/{project}/status`: kill switch + versions, `{"enabled": true, "off": ["es.x.io"],
 //!   "versions": {"es": 7}, "selectors": {"include": [], "exclude": [".user-bio"]},
 //!   "app": {"rules": ["/login", "proxy /api/"], "action": "redirect", "locale": "query:lang"}}` (application
-//!   paths, `app_paths`). Cached 10 s: switching Edge
+//!   paths, `app_paths`), `"auth": {"pages": "server", "discover": false}` (requests with a session),
+//!   `"website": {"on": true, "position": "bottom-right", …}, "hreflang": {"en": "https://x.io", "es": "https://es.x.io"}`
+//!   (universal website tag, `widget/glot.js`). Cached 10 s: switching Edge
 //!   off (project or domain) reaches every runtime in < 1 min (runtimes revalidate every 20 s). Nothing secret:
 //!   hostnames are public DNS, versions are counters.
 //! - `POST /edge/v1/{project}/usage` `{"key": "pk_…", "pages": 120}`: translated pages served by a JS runtime
@@ -124,6 +126,15 @@ async fn status(
             .bind(p.id)
             .fetch_optional(&state.db)
             .await?;
+    let hreflang: BTreeMap<String, String> = if s.website_snippet.on {
+        super::sitemap::site(&state, &p, true)
+            .await?
+            .bases
+            .into_iter()
+            .collect()
+    } else {
+        BTreeMap::new()
+    };
     let body = json!({
         "enabled": s.enabled,
         "off": off,
@@ -134,6 +145,12 @@ async fn status(
             "action": s.app_action,
             "locale": super::app_paths::locale_style(url_pattern.as_deref()),
         },
+        // Pages behind sign-in: off | patcher | server (+ app-mode discovery of UI text, review-gated).
+        "auth": {"pages": s.auth_pages, "discover": s.auth_discover},
+        // Universal website tag (`widget/glot.js`) + the Edge bases it advertises as hreflang (SEO-ready
+        // locales on verified domains; `{}` = no Edge domain yet). Computed only when the tag is on.
+        "website": s.website_snippet.0,
+        "hreflang": hreflang,
     });
     let mut res = Json(body).into_response();
     let h = res.headers_mut();

@@ -14,10 +14,12 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
 pub mod auth;
 pub mod billing;
 pub mod cdn;
+pub mod connectors;
 pub mod edge;
 pub mod email;
 pub mod experiments;
 pub mod feedback;
+pub mod framer_plugin;
 pub mod github_app;
 pub mod glossary;
 pub mod insights;
@@ -161,6 +163,8 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(edge::metrics::routes())
         .merge(edge::domains::routes())
         .merge(edge::sitemap::routes())
+        .merge(edge::snapshots::routes())
+        .merge(connectors::api::routes())
         .layer(cors);
 
     Router::new()
@@ -174,8 +178,11 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(onboarding::public_routes())
         .merge(edge::tm::public_routes())
         .merge(edge::missing::public_routes())
+        .merge(edge::bundle::public_routes())
         .merge(edge::sitemap::public_routes())
         .merge(edge::ask::public_routes())
+        .merge(connectors::api::public_routes())
+        .merge(framer_plugin::public_routes())
         .merge(
             edge::proxy::public_routes().layer(axum::middleware::from_fn_with_state(
                 state.clone(),

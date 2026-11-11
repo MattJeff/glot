@@ -1,0 +1,34 @@
+{
+  "embed": {
+    "name": "glot",
+    "project": {
+      "label": "Project",
+      "info": "Your glot project slug. Languages, and turning the tag on, are set in glot (glot Edge → Website tag)."
+    },
+    "key": {
+      "label": "Public key",
+      "info": "Starts with pk_ (glot Edge → Website tag). Never a secret glot_ key."
+    },
+    "switcher": {
+      "label": "Language switcher",
+      "shopify": "Store languages (Shopify URLs, /es/)",
+      "glot": "glot menu (same URL)",
+      "none": "None"
+    },
+    "position": {
+      "label": "Switcher position",
+      "bottom_right": "Bottom right",
+      "bottom_left": "Bottom left",
+      "top_right": "Top right",
+      "top_left": "Top left"
+    },
+    "server": {
+      "label": "glot server",
+      "info": "Change only for a self-hosted glot."
+    },
+    "script": {
+      "label": "Script URL",
+      "info": "Change only for a self-hosted glot."
+    }
+  }
+}

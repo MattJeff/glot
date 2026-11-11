@@ -147,6 +147,150 @@ fn packaging() {
         (free.edge_domains, pro.edge_domains, team.edge_domains),
         (Some(0), Some(1), None)
     );
+    // Starter sits between Free and Pro on every quota, without Edge.
+    let starter = &p["starter"];
+    for (f, s, pr) in [
+        (free.projects, starter.projects, pro.projects),
+        (free.cdn_requests, starter.cdn_requests, pro.cdn_requests),
+        (
+            free.insights_events,
+            starter.insights_events,
+            pro.insights_events,
+        ),
+        (free.mcp_calls, starter.mcp_calls, pro.mcp_calls),
+        (free.ondemand_jobs, starter.ondemand_jobs, pro.ondemand_jobs),
+        (free.llm_strings, starter.llm_strings, pro.llm_strings),
+        (
+            free.review_annotations,
+            starter.review_annotations,
+            pro.review_annotations,
+        ),
+    ] {
+        assert!(f < s && s < pr, "{f:?} < {s:?} < {pr:?}");
+    }
+    assert_eq!((starter.projects, starter.seats), (Some(2), Some(1)));
+    assert_eq!((starter.experiments, starter.xp_cells), (Some(1), Some(0)));
+    assert_eq!(
+        (starter.edge_pages, starter.edge_domains),
+        (Some(0), Some(0))
+    );
+}
+
+/// Minimal Stripe stand-in that records every Checkout Session form (stripe-mock does not echo them).
+async fn fake_stripe() -> (String, Arc<std::sync::Mutex<Vec<String>>>) {
+    use axum::routing::{get, post};
+    let seen = Arc::new(std::sync::Mutex::new(vec![]));
+    let s2 = seen.clone();
+    let app = Router::new()
+        .route(
+            "/v1/prices",
+            get(|| async { axum::Json(json!({"data": [{"id": "price_t"}]})) }),
+        )
+        .route(
+            "/v1/customers",
+            post(|| async { axum::Json(json!({"id": "cus_T"})) }),
+        )
+        .route(
+            "/v1/checkout/sessions",
+            post(move |body: String| async move {
+                s2.lock().unwrap().push(body);
+                axum::Json(json!({"url": "https://checkout.example/s"}))
+            }),
+        );
+    let l = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let url = format!("http://{}", l.local_addr().unwrap());
+    tokio::spawn(async move { axum::serve(l, app).await.unwrap() });
+    (url, seen)
+}
+
+#[tokio::test]
+async fn starter_checkout_and_growth_trial_once() {
+    let (base, seen) = fake_stripe().await;
+    let Some((app, admin, pool, db)) = setup(Config::new(
+        "sk_test_x",
+        HOOK,
+        &base,
+        "http://localhost:3100",
+    ))
+    .await
+    else {
+        return;
+    };
+    let (cookie, user) = signup(&app, "t@x.io").await;
+    let c = Some(cookie.as_str());
+    let trial = "subscription_data%5Btrial_period_days%5D=14";
+    let checkout = |plan: &'static str| {
+        let app = app.clone();
+        async move {
+            call(
+                &app,
+                Method::POST,
+                "/api/billing/checkout",
+                c,
+                Some(json!({"plan": plan})),
+            )
+            .await
+        }
+    };
+    assert_eq!(
+        call(&app, Method::GET, "/api/billing", c, None).await.1["trial_available"],
+        true
+    );
+    // Starter: a plan of its own, never a trial.
+    assert_eq!(checkout("starter").await.0, StatusCode::OK);
+    assert!(!seen.lock().unwrap()[0].contains("trial_period_days"));
+    // Growth: 14-day trial while unused.
+    assert_eq!(checkout("team").await.0, StatusCode::OK);
+    assert!(seen.lock().unwrap()[1].contains(trial));
+    assert!(!{
+        let pro = checkout("pro").await;
+        assert_eq!(pro.0, StatusCode::OK);
+        seen.lock().unwrap()[2].contains("trial_period_days")
+    });
+    // The trialing subscription arrives: Growth applies, and the trial is used up.
+    let mut ev = sub_event(
+        "evt_t",
+        "customer.subscription.created",
+        1,
+        &user,
+        "trialing",
+        "glot_team_month",
+    );
+    ev["data"]["object"]["trial_end"] = json!(1_900_000_000i64);
+    ev["data"]["object"]["customer"] = json!("cus_T");
+    assert_eq!(hook(&app, &ev, HOOK).await, StatusCode::OK);
+    let (_, b) = call(&app, Method::GET, "/api/billing", c, None).await;
+    assert_eq!(
+        (b["plan"].as_str(), b["status"].as_str()),
+        (Some("team"), Some("trialing"))
+    );
+    assert_eq!(b["trial_available"], false);
+    // Canceled, then back to Checkout: no second trial.
+    ev["id"] = json!("evt_t2");
+    ev["type"] = json!("customer.subscription.deleted");
+    ev["created"] = json!(2);
+    assert_eq!(hook(&app, &ev, HOOK).await, StatusCode::OK);
+    assert_eq!(checkout("team").await.0, StatusCode::OK);
+    let last = seen.lock().unwrap().last().cloned().unwrap();
+    assert!(!last.contains("trial_period_days"), "{last}");
+    // A Starter subscription maps to the starter plan.
+    let ev = sub_event(
+        "evt_s",
+        "customer.subscription.created",
+        3,
+        &user,
+        "active",
+        "glot_starter_year",
+    );
+    assert_eq!(hook(&app, &ev, HOOK).await, StatusCode::OK);
+    let (_, b) = call(&app, Method::GET, "/api/billing", c, None).await;
+    assert_eq!(b["plan"], "starter");
+    assert_eq!(b["limits"]["projects"], 2);
+
+    pool.close().await;
+    let _ = sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
+        .execute(&admin)
+        .await;
 }
 
 #[tokio::test]
@@ -173,7 +317,7 @@ async fn webhooks_drive_entitlements_and_quotas() {
     assert_eq!(e["error"]["code"], "plan_limit");
     let m = e["error"]["message"].as_str().unwrap();
     assert!(
-        m.contains("/app/settings/billing") && m.contains("Up to 5 on Pro."),
+        m.contains("/app/settings/billing") && m.contains("Up to 2 on Starter."),
         "{m}"
     );
 

@@ -75,3 +75,8 @@ do_not_translate = true
 term = "Growth"
 description = "Name of the paid plan above Pro (plan id team)"
 do_not_translate = true
+
+[[term]]
+term = "Starter"
+description = "Name of the paid plan between Free and Pro (plan id starter)"
+do_not_translate = true

@@ -1,0 +1,71 @@
+{%- comment -%}
+  glot app embed: the glot website tag (glot.js, packages/edge/src/website.global.ts) and a language switcher on
+  every storefront page. Languages, and turning the tag on, are set in glot (glot Edge → Website tag).
+  App embed blocks: https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration
+  Language selector (localization form): https://shopify.dev/docs/storefronts/themes/markets/multiple-currencies-languages
+{%- endcomment -%}
+{%- assign project = block.settings.project | strip -%}
+{%- if project != blank -%}
+  {%- if block.settings.switcher == 'shopify' -%}
+    {%- if localization.available_languages.size > 1 -%}
+      {%- assign side = block.settings.position | split: '-' -%}
+      <div class="glot-embed" style="position:fixed;{{ side[0] }}:16px;{{ side[1] }}:16px;z-index:2147483646" data-glot-skip>
+        {%- form 'localization' -%}
+          <select name="language_code" aria-label="{{ 'switcher.label' | t }}" onchange="this.form.submit()">
+            {%- for language in localization.available_languages -%}
+              <option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
+                {{- language.endonym_name | capitalize -}}
+              </option>
+            {%- endfor -%}
+          </select>
+          <noscript><button type="submit">{{ 'switcher.label' | t }}</button></noscript>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+    {%- comment -%} The language is the store's (URL /es/…): glot.js translates into it instead of picking its own. {%- endcomment -%}
+    <script>try { localStorage.setItem("glot-locale", {{ request.locale.iso_code | json }}); } catch (e) {}</script>
+  {%- endif -%}
+
+  <script async src="{{ block.settings.script | default: 'https://app.glotlang.com/widget/glot.js' | escape }}"
+    data-project="{{ project | escape }}"
+    data-server="{{ block.settings.server | default: 'https://api.glotlang.com' | escape }}"
+    {% if block.settings.key contains 'pk_' %}data-key="{{ block.settings.key | strip | escape }}"{% endif %}
+    {% if block.settings.switcher == 'glot' %}data-position="{{ block.settings.position | escape }}"{% else %}data-switcher="none"{% endif %}></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:embed.name",
+  "target": "body",
+  "disabled_on": { "templates": ["customers/account", "customers/activate_account", "customers/addresses", "customers/login", "customers/order", "customers/register", "customers/reset_password", "password"] },
+  "settings": [
+    { "type": "text", "id": "project", "label": "t:embed.project.label", "info": "t:embed.project.info" },
+    { "type": "text", "id": "key", "label": "t:embed.key.label", "info": "t:embed.key.info" },
+    {
+      "type": "select",
+      "id": "switcher",
+      "label": "t:embed.switcher.label",
+      "default": "shopify",
+      "options": [
+        { "value": "shopify", "label": "t:embed.switcher.shopify" },
+        { "value": "glot", "label": "t:embed.switcher.glot" },
+        { "value": "none", "label": "t:embed.switcher.none" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "t:embed.position.label",
+      "default": "bottom-right",
+      "options": [
+        { "value": "bottom-right", "label": "t:embed.position.bottom_right" },
+        { "value": "bottom-left", "label": "t:embed.position.bottom_left" },
+        { "value": "top-right", "label": "t:embed.position.top_right" },
+        { "value": "top-left", "label": "t:embed.position.top_left" }
+      ]
+    },
+    { "type": "text", "id": "server", "label": "t:embed.server.label", "info": "t:embed.server.info", "default": "https://api.glotlang.com" },
+    { "type": "text", "id": "script", "label": "t:embed.script.label", "info": "t:embed.script.info", "default": "https://app.glotlang.com/widget/glot.js" }
+  ]
+}
+{% endschema %}

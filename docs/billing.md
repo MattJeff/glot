@@ -16,26 +16,37 @@ One billing account per user; it covers the projects that user **owns** (no orga
 (`billing_usage`) reset on the 1st (UTC). Over a limit, the endpoint answers **402** `quota_exceeded` / `plan_required` /
 `plan_limit` with a message that names the quota and links to `/app/settings/billing`.
 
-Packaging: **Pro** (99 €/month, 990 €/year) sells reliable localization to teams (GitHub sync, visual QA, live review,
+Packaging: **Starter** (plan id `starter`, 29 €/month, 290 €/year) is for launching a site or an app in other languages:
+2 cloud projects, dynamic localization (CDN + locale switcher), GitHub sync, visual QA, CMS integrations, modest quotas;
+no glot Edge (Localisation SEO), no experiment segments, no launch measurement, no expected-gain recommendations
+(it keeps Free's single unsegmented experiment, so upgrading from Free never removes anything). **Pro** (99 €/month, 990 €/year) sells reliable localization to teams (GitHub sync, visual QA, live review,
 glossary/validation, locale matrix, BYO LLM key) with one live text experiment to try; **Growth** (plan id `team`,
 299 €/month, 2 990 €/year) sells international revenue optimization: unlimited text experiments with segments, language
 recommendations with expected gain, launch measurement with holdout and a shareable case study. Prices exclude VAT.
-402 messages name the cheapest plan that lifts the limit ("Unlimited on Growth.", "Up to 5 on Pro.").
+402 messages name the cheapest higher plan that lifts the limit, in the order Free < Starter < Pro < Growth
+("Up to 2 on Starter.", "Unlimited on Growth.").
 
-| Monthly limit (default) | Free | Pro | Growth (`team`) | Enforced in |
-|---|---|---|---|---|
-| Cloud projects (owned) | 1 | 5 | 25 | `projects::create` |
-| Seats | 1 | 3 | 15 | not enforced yet (no invite flow) |
-| CDN/OTA requests | 50k | 1M | 10M | `cdn::serve` |
-| Insights events | 10k | 250k | 2M | `insights::ingest` |
-| Remote MCP calls (HTTP requests to `/mcp`) | 500 | 20k | 200k | `mcp_remote::guard` |
-| On-demand locale jobs | 0 | 30 | 300 | `ondemand::gate` |
-| Strings translated with glot's LLM key | 500 | 10k | 50k | `jobs::create`, `ondemand::gate` (check), `jobs::run` (count) |
-| Live text experiments (at once, not monthly) | 1 | 1 | unlimited | `check_experiment` (start) |
-| Segments per experiment | 0 | 2 | 4 | `check_experiment` (start) |
-| Live review annotations | 200 | 10k | unlimited | `review_live::api` |
-| Expected gain of a language (recommendations) | locked | locked | yes | `recommend::handler` (`gain_locked`) |
-| Language launches, case-study sharing | no | no | yes | `require_growth` (`launches::create`, `share`) |
+**Growth trial**: a Checkout of Growth starts with a 14-day free trial (`subscription_data[trial_period_days]=14`,
+card collected by Checkout, charged at the end unless canceled in the portal), once per account:
+`billing_accounts.trial_used_at` (migration `0160_billing_trial.sql`) is set by the first subscription event that carries
+a `trial_end` or a Growth price, and Checkout then omits the trial. `trialing` applies the subscribed plan like `active`.
+Starter and Pro have no trial; plan swaps of a live subscription never add one.
+
+| Monthly limit (default) | Free | Starter | Pro | Growth (`team`) | Enforced in |
+|---|---|---|---|---|---|
+| Cloud projects (owned) | 1 | 2 | 5 | 25 | `projects::create` |
+| Seats | 1 | 1 | 3 | 15 | not enforced yet (no invite flow) |
+| CDN/OTA requests | 50k | 250k | 1M | 10M | `cdn::serve` |
+| Insights events | 10k | 50k | 250k | 2M | `insights::ingest` |
+| Remote MCP calls (HTTP requests to `/mcp`) | 500 | 5k | 20k | 200k | `mcp_remote::guard` |
+| On-demand locale jobs | 0 | 5 | 30 | 300 | `ondemand::gate` |
+| Strings translated with glot's LLM key | 500 | 2k | 10k | 50k | `jobs::create`, `ondemand::gate` (check), `jobs::run` (count) |
+| Live text experiments (at once, not monthly) | 1 | 1 | 1 | unlimited | `check_experiment` (start) |
+| Segments per experiment | 0 | 0 | 2 | 4 | `check_experiment` (start) |
+| Live review annotations | 200 | 1k | 10k | unlimited | `review_live::api` |
+| glot Edge pages served / domains | 0 / 0 | 0 / 0 | 10k / 1 | 2M / unlimited | `edge::proxy`, `edge::domains` |
+| Expected gain of a language (recommendations) | locked | locked | locked | yes | `recommend::handler` (`gain_locked`) |
+| Language launches, case-study sharing | no | no | no | yes | `require_growth` (`launches::create`, `share`) |
 
 A comped account (founder, partners) is a `billing_accounts` row with `plan = 'team'`, `status = 'active'` and no
 Stripe subscription: the effective plan is Growth.
@@ -63,13 +74,13 @@ Existing projects and data are never deleted on downgrade; only new projects and
 
 ```
 GET  /api/billing            -> {enabled, plan (in force), subscribed_plan, status, current_period_end, cancel_at_period_end,
-                                 grace_until, metered, has_customer, limits: Limits, usage: {<limit key>: n}}
-POST /api/billing/checkout   {plan: "pro"|"team", interval: "month"|"year"} -> {url}
+                                 grace_until, metered, has_customer, trial_available, limits: Limits, usage: {<limit key>: n}}
+POST /api/billing/checkout   {plan: "starter"|"pro"|"team", interval: "month"|"year"} -> {url}
        no subscription: Checkout Session (mode=subscription, automatic_tax if STRIPE_AUTOMATIC_TAX=1, tax id collection,
-       promotion codes); live subscription: swaps the plan price (prorated) and returns the billing page URL.
+       promotion codes, 14-day trial on Growth when trial_available); live subscription: swaps the plan price (prorated) and returns the billing page URL.
 POST /api/billing/portal     -> {url}   Customer Portal (payment method, invoices, tax ids, cancel at period end)
 GET  /api/billing/invoices   -> [{id, number, status, total, currency, created, hosted_invoice_url, invoice_pdf}]
-GET  /api/billing/plans      (public) -> {enabled, plans: {free|pro|team: Limits}, prices: {<lookup_key>: {...}}}
+GET  /api/billing/plans      (public) -> {enabled, plans: {free|starter|pro|team: Limits}, prices: {<lookup_key>: {...}}}
 POST /api/billing/webhook    (Stripe) Stripe-Signature verified (HMAC-SHA256, 5 min tolerance)
 ```
 
@@ -119,11 +130,11 @@ restrict the runtime key to the VPS IP.
 STRIPE_SECRET_KEY=rk_test_... deploy/stripe-setup.sh --webhook-url https://<staging>/api/billing/webhook
 
 # Prices (minor units, EUR, tax-exclusive) are env-overridable:
-PRO_MONTH=1900 PRO_YEAR=19000 TEAM_MONTH=7900 TEAM_YEAR=79000 LLM_PER_STRING=0.15 STRIPE_SECRET_KEY=... deploy/stripe-setup.sh
+STARTER_MONTH=2900 STARTER_YEAR=29000 PRO_MONTH=1900 PRO_YEAR=19000 TEAM_MONTH=7900 TEAM_YEAR=79000 LLM_PER_STRING=0.15 STRIPE_SECRET_KEY=... deploy/stripe-setup.sh
 ```
 
-The script is idempotent: fixed product ids (`glot_pro`, `glot_team`, `glot_llm`), prices found by lookup key
-(`glot_{pro,team}_{month,year}`, `glot_llm_strings`; a changed amount creates a new price and transfers the lookup key),
+The script is idempotent: fixed product ids (`glot_starter`, `glot_pro`, `glot_team`, `glot_llm`), prices found by lookup key
+(`glot_{starter,pro,team}_{month,year}`, `glot_llm_strings`; a changed amount creates a new price and transfers the lookup key),
 meter found by event name, portal configuration by `metadata.glot=1`, webhook endpoint by URL. It refuses a live key
 without `--live`, and `--live` asks you to type a confirmation phrase.
 

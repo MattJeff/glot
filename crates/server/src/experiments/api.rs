@@ -545,7 +545,7 @@ async fn upsert_arm(
 
 pub async fn create(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(mut b): AppJson<NewExperiment>,
 ) -> ApiResult<(StatusCode, Json<Experiment>)> {
@@ -688,7 +688,7 @@ pub struct DuplicateBody {
 /// texts). State, counts and results stay with the original. Variant approval is kept unless `review` is on.
 pub async fn duplicate(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath((slug, id)): AppPath<(String, Uuid)>,
     AppJson(b): AppJson<DuplicateBody>,
 ) -> ApiResult<(StatusCode, Json<Experiment>)> {
@@ -837,7 +837,7 @@ fn initial_weights(x: &Experiment) -> Vec<f64> {
 /// draft → running (start) and paused → running (resume): re-validated each time.
 pub async fn start(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath((slug, id)): AppPath<(String, Uuid)>,
 ) -> ApiResult<Response> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;

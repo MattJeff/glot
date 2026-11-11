@@ -294,7 +294,7 @@ struct CreatedToken {
 /// A personal API token named after the project, shown once and pasted into the onboarding commands.
 async fn create_token(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
 ) -> ApiResult<(StatusCode, Json<CreatedToken>)> {
     let p = projects::load(&state, user.id, &slug, Role::Translator).await?;

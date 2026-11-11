@@ -1,0 +1,35 @@
+{
+  "name": "@glot-i18n/ota-react-native",
+  "version": "0.1.0",
+  "description": "Over-the-air strings from glot's CDN for React Native / Expo: an i18next backend with an AsyncStorage cache and your bundled JSON as fallback.",
+  "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/ota-react-native"
+  },
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "peerDependencies": {
+    "i18next": ">=21",
+    "@react-native-async-storage/async-storage": ">=1"
+  },
+  "peerDependenciesMeta": {
+    "@react-native-async-storage/async-storage": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "typecheck": "tsc --noEmit --strict --allowJs --checkJs --module nodenext --target es2022 index.js index.d.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

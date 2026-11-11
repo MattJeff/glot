@@ -1,0 +1,9 @@
+# framework fixtures: build outputs (npm i && npm run build in each)
+build/
+.output/
+.nuxt/
+.svelte-kit/
+.react-router/
+.astro/
+.vinxi/
+dist/

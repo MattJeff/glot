@@ -1,0 +1,4 @@
+# Theme app extension: https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration
+name = "glot-embed"
+type = "theme"
+handle = "glot-embed"

@@ -7,10 +7,12 @@ license.workspace = true
 [dependencies]
 toml.workspace = true
 glot-core.workspace = true
+glot-extract.workspace = true
 glot-llm.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 anyhow.workspace = true
+async-trait.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
@@ -32,6 +34,7 @@ rmcp = { version = "3.5.1", features = ["server", "macros", "transport-streamabl
 schemars = "1"
 base64 = "0.23"
 hmac = "0.12"
+roxmltree = "0.20"
 ring = "0.17"
 
 [dev-dependencies]

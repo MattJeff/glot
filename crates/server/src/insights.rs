@@ -824,7 +824,7 @@ pub struct NewExperiment {
 
 pub async fn create_experiment(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(b): AppJson<NewExperiment>,
 ) -> ApiResult<(StatusCode, Json<Experiment>)> {

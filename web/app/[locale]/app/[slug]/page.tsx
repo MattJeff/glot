@@ -9,6 +9,7 @@ import { HealthScore } from "@/components/health-score";
 import { isActive, JobRow } from "@/components/job-row";
 import { NextLanguageCard } from "@/components/markets/next-language";
 import { OnboardingOverview } from "@/components/onboarding/overview";
+import { VerifiedOnly } from "@/components/email-pages";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
@@ -45,10 +46,12 @@ export default function OverviewPage() {
         eyebrow={p.slug !== slugOf(p.name) ? <span className="font-mono">{p.slug}</span> : undefined}
         subtitle={t("subtitle")}
         actions={
-          <Button onClick={() => translate.mutate()} disabled={busy || p.stats.keys === 0}>
-            {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-            {t("translateMissing")}
-          </Button>
+          <VerifiedOnly>
+            <Button onClick={() => translate.mutate()} disabled={busy || p.stats.keys === 0}>
+              {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
+              {t("translateMissing")}
+            </Button>
+          </VerifiedOnly>
         }
       />
 

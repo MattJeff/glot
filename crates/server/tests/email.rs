@@ -125,7 +125,21 @@ impl Ctx {
         cookie: Option<&str>,
         body: Option<Value>,
     ) -> (StatusCode, HeaderMap, Value) {
+        self.call_with(method, uri, cookie, body, &[]).await
+    }
+
+    async fn call_with(
+        &self,
+        method: Method,
+        uri: &str,
+        cookie: Option<&str>,
+        body: Option<Value>,
+        headers: &[(&str, &str)],
+    ) -> (StatusCode, HeaderMap, Value) {
         let mut req = Request::builder().method(method).uri(uri);
+        for (k, v) in headers {
+            req = req.header(*k, *v);
+        }
         if let Some(c) = cookie {
             req = req.header(header::COOKIE, format!("glot_session={c}"));
         }
@@ -553,6 +567,240 @@ async fn email_change_and_job_notification() {
     ctx.finish().await;
 }
 
+/// Mandatory verification (mailer on): unverified = read-only, tokens refused; resend budget; signup per-IP
+/// limit, domain denylist, honeypot; pruning of stale unverified accounts.
+#[tokio::test]
+async fn verification_gates_and_signup_abuse() {
+    let Some(ctx) = setup().await else { return };
+    let xff = |ip: &'static str| [("x-forwarded-for", ip)];
+    let signup = |email: &str, ip: &'static str, extra: Value| {
+        let mut b = json!({"email": email, "password": "correct horse", "name": "Marcus Reed"});
+        b.as_object_mut()
+            .unwrap()
+            .extend(extra.as_object().unwrap().clone());
+        let ctx = &ctx;
+        async move {
+            ctx.call_with(Method::POST, "/api/auth/signup", None, Some(b), &xff(ip))
+                .await
+        }
+    };
+    let code = |v: &Value| v["error"]["code"].as_str().unwrap_or("").to_string();
+    let project =
+        json!({"name": "P", "slug": "bob-p", "source_locale": "en", "target_locales": ["fr"]});
+
+    let (s, h, _) = signup("bob@example.com", "203.0.113.7", json!({})).await;
+    assert_eq!(s, StatusCode::CREATED);
+    let bob = Ctx::cookie(&h);
+    let verify_token = token_of(&ctx.wait_requests(1).await[0].2);
+
+    // Unverified: logged in, reads OK, everything that creates or spends is 403 email_unverified.
+    let (s, _, _) = ctx
+        .call(Method::GET, "/api/projects", Some(&bob), None)
+        .await;
+    assert_eq!(s, StatusCode::OK);
+    for (uri, body) in [
+        ("/api/projects", project.clone()),
+        ("/api/tokens", json!({"name": "ci"})),
+        (
+            "/api/billing/checkout",
+            json!({"plan": "pro", "interval": "month"}),
+        ),
+    ] {
+        let (s, _, e) = ctx.call(Method::POST, uri, Some(&bob), Some(body)).await;
+        assert_eq!(
+            (s, code(&e)),
+            (StatusCode::FORBIDDEN, "email_unverified".into()),
+            "{uri}"
+        );
+    }
+    // A token minted before verification became mandatory is refused too, reads included.
+    let bob_id: uuid::Uuid =
+        sqlx::query_scalar("SELECT id FROM users WHERE email = 'bob@example.com'")
+            .fetch_one(&ctx.pool)
+            .await
+            .unwrap();
+    sqlx::query(
+        "INSERT INTO api_tokens (id, user_id, name, token_hash) VALUES ($1, $2, 'old', $3)",
+    )
+    .bind(uuid::Uuid::new_v4())
+    .bind(bob_id)
+    .bind(glot_server::auth::sha256_hex("glot_oldtoken"))
+    .execute(&ctx.pool)
+    .await
+    .unwrap();
+    let bearer = [("authorization", "Bearer glot_oldtoken")];
+    let (s, _, e) = ctx
+        .call_with(Method::GET, "/api/projects", None, None, &bearer)
+        .await;
+    assert_eq!(
+        (s, code(&e)),
+        (StatusCode::FORBIDDEN, "email_unverified".into())
+    );
+
+    // Resend: 1 per minute (the signup email counts), 5 per day.
+    let resend = || {
+        ctx.call(
+            Method::POST,
+            "/api/auth/verify-email/resend",
+            Some(&bob),
+            None,
+        )
+    };
+    let (s, _, e) = resend().await;
+    assert_eq!(
+        (s, code(&e)),
+        (StatusCode::TOO_MANY_REQUESTS, "rate_limited".into())
+    );
+    let age = || async {
+        sqlx::query("UPDATE email_tokens SET expires_at = expires_at - interval '2 minutes'")
+            .execute(&ctx.pool)
+            .await
+            .unwrap();
+    };
+    age().await;
+    assert_eq!(resend().await.0, StatusCode::NO_CONTENT);
+    assert_eq!(resend().await.0, StatusCode::TOO_MANY_REQUESTS);
+    age().await;
+    sqlx::query(
+        "INSERT INTO email_tokens (token_hash, user_id, purpose, email, expires_at)
+         SELECT md5(g::text), $1, 'verify', 'bob@example.com', now() + interval '47 hours' FROM generate_series(1, 3) g",
+    )
+    .bind(bob_id)
+    .execute(&ctx.pool)
+    .await
+    .unwrap();
+    let (s, _, e) = resend().await;
+    assert_eq!(s, StatusCode::TOO_MANY_REQUESTS);
+    assert!(
+        e["error"]["message"].as_str().unwrap().contains("today"),
+        "{e}"
+    );
+
+    // Verified: creation works, the old token works.
+    let (s, _, _) = ctx
+        .call(
+            Method::POST,
+            "/api/auth/verify-email",
+            None,
+            Some(json!({"token": verify_token})),
+        )
+        .await;
+    assert_eq!(s, StatusCode::NO_CONTENT);
+    let (s, _, e) = ctx
+        .call(Method::POST, "/api/projects", Some(&bob), Some(project))
+        .await;
+    assert_eq!(s, StatusCode::CREATED, "{e}");
+    let (s, _, _) = ctx
+        .call_with(Method::GET, "/api/projects/bob-p", None, None, &bearer)
+        .await;
+    assert_eq!(s, StatusCode::OK);
+
+    // An unverified user's existing project stays readable; jobs on it are refused.
+    let (s, h, _) = signup("carol@example.com", "198.51.100.1", json!({})).await;
+    assert_eq!(s, StatusCode::CREATED);
+    let carol = Ctx::cookie(&h);
+    sqlx::query(
+        "WITH p AS (INSERT INTO projects (id, slug, name, source_locale, target_locales, llm)
+                    VALUES (gen_random_uuid(), 'carol-p', 'C', 'en', '{fr}', '{\"provider\":\"mock\",\"model\":\"mock\"}') RETURNING id)
+         INSERT INTO project_members (project_id, user_id, role) SELECT p.id, u.id, 'owner' FROM p, users u WHERE u.email = 'carol@example.com'",
+    )
+    .execute(&ctx.pool)
+    .await
+    .unwrap();
+    let (s, _, _) = ctx
+        .call(Method::GET, "/api/projects/carol-p", Some(&carol), None)
+        .await;
+    assert_eq!(s, StatusCode::OK);
+    let (s, _, e) = ctx
+        .call(
+            Method::POST,
+            "/api/projects/carol-p/jobs",
+            Some(&carol),
+            Some(json!({"kind": "translate"})),
+        )
+        .await;
+    assert_eq!(
+        (s, code(&e)),
+        (StatusCode::FORBIDDEN, "email_unverified".into())
+    );
+
+    // Signup anti-abuse: 5 per IP per hour (bob counts), reserved/disposable domains, honeypot.
+    for i in 0..4 {
+        let (s, _, e) = signup(&format!("u{i}@example.com"), "203.0.113.7", json!({})).await;
+        assert_eq!(s, StatusCode::CREATED, "{e}");
+    }
+    let (s, _, e) = signup("u9@example.com", "203.0.113.7", json!({})).await;
+    assert_eq!(
+        (s, code(&e)),
+        (StatusCode::TOO_MANY_REQUESTS, "rate_limited".into())
+    );
+    let (s, _, _) = signup("u9@example.com", "203.0.113.8", json!({})).await;
+    assert_eq!(s, StatusCode::CREATED, "another IP is not limited");
+    for email in [
+        "probe018@example.invalid",
+        "m@reed.test",
+        "x@mailinator.com",
+    ] {
+        let (s, _, e) = signup(email, "192.0.2.1", json!({})).await;
+        assert_eq!(
+            (s, code(&e)),
+            (StatusCode::BAD_REQUEST, "email_domain_rejected".into()),
+            "{email}"
+        );
+    }
+    let (s, _, _) = signup(
+        "bot@example.com",
+        "192.0.2.2",
+        json!({"website": "http://spam"}),
+    )
+    .await;
+    assert_eq!(s, StatusCode::BAD_REQUEST);
+    let bots: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM users WHERE email = 'bot@example.com' OR email LIKE '%.invalid'",
+    )
+    .fetch_one(&ctx.pool)
+    .await
+    .unwrap();
+    assert_eq!(bots, 0);
+
+    // Pruning: unverified + older than 14 days + no key/job anywhere => deleted with its empty project.
+    // u0 has activity (a key in a project), bob is verified, u1 is recent: all kept.
+    sqlx::query(
+        "UPDATE users SET created_at = now() - interval '15 days' WHERE email <> 'u1@example.com'",
+    )
+    .execute(&ctx.pool)
+    .await
+    .unwrap();
+    sqlx::query(
+        "WITH p AS (INSERT INTO projects (id, slug, name, source_locale, target_locales, llm)
+                    VALUES (gen_random_uuid(), 'u0-p', 'U', 'en', '{fr}', '{}') RETURNING id),
+              m AS (INSERT INTO project_members (project_id, user_id, role) SELECT p.id, u.id, 'owner' FROM p, users u WHERE u.email = 'u0@example.com')
+         INSERT INTO keys (id, project_id, key, source) SELECT gen_random_uuid(), p.id, 'k', 'v' FROM p",
+    )
+    .execute(&ctx.pool)
+    .await
+    .unwrap();
+    let pruned = glot_server::auth::prune_unverified(&ctx.state)
+        .await
+        .unwrap();
+    let left: Vec<String> = sqlx::query_scalar("SELECT email FROM users ORDER BY email")
+        .fetch_all(&ctx.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        left,
+        ["bob@example.com", "u0@example.com", "u1@example.com"]
+    );
+    assert_eq!(pruned, 4, "carol, u2, u3, u9");
+    let slugs: Vec<String> = sqlx::query_scalar("SELECT slug FROM projects ORDER BY slug")
+        .fetch_all(&ctx.pool)
+        .await
+        .unwrap();
+    assert_eq!(slugs, ["bob-p", "u0-p"]);
+
+    ctx.finish().await;
+}
+
 #[tokio::test]
 async fn disabled_without_api_key() {
     let url = std::env::var("DATABASE_URL")
@@ -608,6 +856,18 @@ async fn disabled_without_api_key() {
     let me: Value =
         serde_json::from_slice(&res.into_body().collect().await.unwrap().to_bytes()).unwrap();
     assert_eq!(me["email_enabled"], false);
+    // No mailer: nobody can verify, so nothing is gated.
+    let res = app
+        .clone()
+        .oneshot(req(
+            Method::POST,
+            "/api/projects",
+            json!({"name": "D", "slug": "d-p", "source_locale": "en", "target_locales": ["fr"]}),
+            Some(&c),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(res.status(), StatusCode::CREATED);
     let res = app
         .clone()
         .oneshot(req(

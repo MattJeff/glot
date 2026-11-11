@@ -479,7 +479,8 @@ type NavLink = { href: string; label: string; route?: boolean };
 export type Chrome = { skip: string; home: string; nav: string; docs: string; pricing: string; openApp: string; stars: string; tagline: string; npm: string; license: string };
 
 /** Sticky marketing header (home and /i18n). `route` links go through next-intl, others are in-page anchors. */
-export function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLink[]; stars: number | null }) {
+export async function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLink[]; stars: number | null }) {
+  const ti = await getTranslations("integrations");
   const item = "rounded-md px-2.5 py-1.5 transition-colors hover:bg-muted hover:text-foreground";
   return (
     <>
@@ -503,6 +504,9 @@ export function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLink[]; s
                 </a>
               ),
             )}
+            <Link href="/integrations" className={item}>
+              {ti("nav")}
+            </Link>
             <Link href="/docs" className={item}>
               {c.docs}
             </Link>
@@ -537,7 +541,7 @@ export function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLink[]; s
 }
 
 export async function SiteFooter({ c, links }: { c: Chrome; links: NavLink[] }) {
-  const tc = await getTranslations("common");
+  const [tc, ti] = await Promise.all([getTranslations("common"), getTranslations("integrations")]);
   return (
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-8 text-sm text-muted-foreground">
@@ -549,6 +553,7 @@ export async function SiteFooter({ c, links }: { c: Chrome; links: NavLink[] }) 
               {l.label}
             </Link>
           ))}
+          <Link href="/integrations" className="inline-flex min-h-6 items-center hover:text-foreground">{ti("nav")}</Link>
           <a href={NPM_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center hover:text-foreground">{c.npm}</a>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center hover:text-foreground">{tc("github")}</a>
           <span>{c.license}</span>

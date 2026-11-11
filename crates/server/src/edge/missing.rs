@@ -10,6 +10,17 @@
 //!   "pages": [{"url": "/pricing", "seen": [{"hash": "…", "role": "h1"}]}]}`
 //! `auth: true` = the visitor has a session: nothing is discovered. `pages` (optional) = every segment the
 //! page rendered, for per-URL coverage (`edge_page_segments`).
+//!
+//! `"mode": "app"` (the app-mode patcher on pages behind sign-in, `auth: true`): accepted only when the project
+//! set `auth_pages = patcher` and `auth_discover`. Items are hash-only (`"text": ""`) unless the element is
+//! developer-marked UI text (`[data-glot-ui]`); a hash-only item is kept only when the server already knows
+//! that text from a public page (`edge_segments`), anything else is dropped unseen (a user's name never matches).
+//! Every new segment waits for a review (`pending`), the URL sample is the page template (no ids), `pages` is
+//! ignored.
+//!
+//! `"mode": "website"` (the universal website tag, `widget/glot.js`, public pages of any site builder): accepted
+//! only when `website_snippet.on` (independent of the Edge kill switch); same checks as any public report; new
+//! segments wait for a review when `website_snippet.auto_translate` is off.
 use axum::{
     Json, Router,
     body::Bytes,
@@ -45,7 +56,13 @@ pub struct Report {
     pub segments: Vec<Item>,
     #[serde(default)]
     pub pages: Vec<Page>,
+    /// `app` = app-mode patcher on a page behind sign-in (see the module doc).
+    #[serde(default)]
+    pub mode: Option<String>,
 }
+
+/// Longest UI text accepted from the app-mode patcher (labels, buttons, titles — not paragraphs).
+const MAX_APP_TEXT: usize = 120;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Item {
@@ -167,25 +184,56 @@ pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<O
     }
     let settings = Settings::load(&state.db, p.id).await?;
     let mut out = Outcome::default();
-    if !settings.enabled {
+    // The universal website tag answers to its own switch (it runs on sites with no Edge domain at all).
+    let website = r.mode.as_deref() == Some("website");
+    if website && !settings.website_snippet.on {
         out.skipped = Some("disabled");
         return Ok(out);
     }
-    if r.auth {
+    if !website && !settings.enabled {
+        out.skipped = Some("disabled");
+        return Ok(out);
+    }
+    let app = r.mode.as_deref() == Some("app");
+    if r.auth && !(app && settings.auth_pages == "patcher" && settings.auth_discover) {
         out.skipped = Some("auth");
         return Ok(out);
     }
     let mut locales = p.target_locales.clone();
     locales.push(p.source_locale.clone());
+    // App mode, hash-only items: the source text glot already learnt from a public page, if any.
+    let known_text: std::collections::HashMap<String, String> = if app {
+        let hashes: Vec<&str> = r
+            .segments
+            .iter()
+            .filter(|i| i.text.is_empty())
+            .map(|i| i.hash.as_str())
+            .collect();
+        sqlx::query_as(
+            "SELECT DISTINCT ON (hash) hash, source_text FROM edge_segments
+             WHERE project_id = $1 AND hash = ANY($2)",
+        )
+        .bind(p.id)
+        .bind(&hashes)
+        .fetch_all(&state.db)
+        .await?
+        .into_iter()
+        .collect()
+    } else {
+        Default::default()
+    };
 
     // Validated, deduplicated (hash, context, text, needs_review, path).
     let mut seen = BTreeSet::new();
     let mut items: Vec<(String, String, String, bool, String)> = vec![];
     for it in &r.segments {
-        let text = normalize(&it.text);
+        let text = match (app, it.text.is_empty()) {
+            (true, true) => known_text.get(&it.hash).cloned().unwrap_or_default(),
+            _ => normalize(&it.text),
+        };
         let path = path_only(&it.url);
         let ok = !text.is_empty()
-            && text.chars().count() <= MAX_TEXT
+            && text.chars().count() <= if app { MAX_APP_TEXT } else { MAX_TEXT }
             && text_hash(&p.source_locale, &text) == it.hash
             && !looks_personal(&text)
             && settings.discoverable(&path);
@@ -194,8 +242,15 @@ pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<O
             continue;
         }
         let ctx = context(&it.role, &path, &locales);
+        // Behind sign-in: always reviewed before being served; the sample is the template (`/u/:id`), not the URL.
+        let (review, sample) = if app {
+            (true, glot_core::edge::tm::template(&path, &locales))
+        } else {
+            let review = website && !settings.website_snippet.auto_translate;
+            (review || settings.sensitive(&path), path)
+        };
         if seen.insert((it.hash.clone(), ctx.clone())) {
-            items.push((it.hash.clone(), ctx, text, settings.sensitive(&path), path));
+            items.push((it.hash.clone(), ctx, text, review, sample));
         }
     }
 
@@ -248,7 +303,7 @@ pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<O
     out.accepted = res.rows_affected() as usize;
 
     // Page inventories (coverage per URL), discoverable paths only.
-    for page in &r.pages {
+    for page in r.pages.iter().filter(|_| !app) {
         let path = path_only(&page.url);
         if !settings.discoverable(&path) {
             continue;

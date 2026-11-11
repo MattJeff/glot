@@ -3,8 +3,8 @@
 // `<role>|<page template>`, framework payloads (hydration.ts), the SEO rewrite (port of glot_core::edge::seo),
 // then the page version and the client patcher tag (same-origin `/__glot/*`, served by edge.ts `own`).
 import { translateHtml, tokenize, collapseWs, hash16, template, type Attr } from "./segment.ts";
-import { translatePayloads, injectHead, patcherTag } from "./hydration.ts";
-import { lookup, type Missing, type TranslateResult, type Translator } from "./edge.ts";
+import { translatePayloads, injectHead, patcherTag, tmInline, TM_INLINE_MAX } from "./hydration.ts";
+import { lookup, type Missing, type Tm, type TranslateResult, type Translator } from "./edge.ts";
 
 export const translate: Translator = (html, tm, c) => {
   const tpl = template(c.path, tm.locale);
@@ -34,9 +34,23 @@ export const translate: Translator = (html, tm, c) => {
     tr: (s) => lookup(tm, hash16(`${c.source}\u0000${collapseWs(s)}`), `text|${tpl}`),
   });
   out = injectHead(out, `<meta name="glot-tm" content="${esc(`${tm.locale}@${tm.v}`)}">`);
+  out = injectHead(out, inlined(tm, c.skip));
   out = injectHead(out, patcherTag("/__glot/patcher.js", `/__glot/tm.json?locale=${encodeURIComponent(tm.locale)}`, c.source, c.discover ? "/__glot/missing" : undefined));
   return { html: out, total, translated, missing, seen } satisfies TranslateResult;
 };
+
+/** The inline TM tag of a snapshot (+ the project's excluded selectors, as `/__glot/tm.json` serves it), built
+ * once per snapshot (snapshots are immutable per version); "" for a TM too large to inline. */
+const inlineCache = new WeakMap<object, [string, string]>();
+function inlined(tm: Tm, skip: string[]): string {
+  const k = skip.join("\u0000");
+  const hit = inlineCache.get(tm);
+  if (hit?.[0] === k) return hit[1];
+  // cheap bound first: a TM with more entries than bytes allowed can't fit
+  const tag = Object.keys(tm.t).length > TM_INLINE_MAX / 8 ? "" : tmInline(JSON.stringify(skip.length ? { ...tm, skip } : tm));
+  inlineCache.set(tm, [k, tag]);
+  return tag;
+}
 
 // ------------------------------------------------------------------------------------------- SEO
 

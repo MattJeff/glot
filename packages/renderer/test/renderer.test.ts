@@ -1,20 +1,22 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { createServer, type Server } from "node:http";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { isSkeleton } from "../src/skeleton.ts";
 
 process.env.RENDERER_DIR = mkdtempSync(join(tmpdir(), "glot-renderer-"));
 process.env.RENDERER_TOKEN = "t0k";
-const { config, handle, publicHost, metricsJson } = await import("../src/server.ts");
+const { config, handle, publicHost, metricsJson, render, blockedRequest, stopBrowser } = await import("../src/server.ts");
+const { prerender, routeFile } = await import("../src/cli.ts");
 
 // a CSR app: empty shell, content rendered by JS after a fetch
 const SHELL = `<!DOCTYPE html><html><head><title>App</title></head><body><div id="root"></div><script>
 fetch("/data").then(r => r.json()).then(d => { document.getElementById("root").innerHTML = "<h1>" + d.title + "</h1><p>" + "Long enough paragraph. ".repeat(12) + "</p>"; });
 </script></body></html>`;
 const origin: Server = createServer((req, res) => {
+  if (req.url === "/hang") { res.setHeader("content-type", "text/html"); return res.end("<html><body><p>x</p><script>for(;;){}</script></body></html>"); }
   if (req.url === "/data") return res.end(JSON.stringify({ title: "Rendered by the browser" }));
   res.setHeader("content-type", "text/html");
   res.end(SHELL);
@@ -25,7 +27,7 @@ const api: Server = createServer((q, s) => void handle(q, s));
 await new Promise<void>((r) => api.listen(0, "127.0.0.1", r));
 const rbase = `http://127.0.0.1:${(api.address() as { port: number }).port}`;
 const auth = { authorization: "Bearer t0k" };
-after(() => { origin.close(); api.close(); setTimeout(() => process.exit(0), 50); });
+after(async () => { await stopBrowser(); origin.close(); api.close(); setTimeout(() => process.exit(0), 50); });
 
 test("skeleton heuristic", () => {
   assert.equal(isSkeleton(SHELL), true);
@@ -77,4 +79,58 @@ test("mount=append wraps the snapshot for apps that append to <body>", async () 
   }
   assert.match(html, /<div data-glot-prerender="" style="display: contents;"><div id="root"><h1>/);
   assert.match(html, /<\/div><script>/, "scripts stay outside the wrapper");
+});
+
+test("images, media, fonts, analytics are never fetched", () => {
+  for (const t of ["image", "media", "font", "websocket"]) assert.equal(blockedRequest(t, "cdn.example.com"), true, t);
+  for (const h of ["www.google-analytics.com", "www.googletagmanager.com", "static.hotjar.com", "us.i.posthog.com", "connect.facebook.net"]) assert.equal(blockedRequest("script", h), true, h);
+  assert.equal(blockedRequest("script", "cdn.example.com"), false);
+  assert.equal(blockedRequest("fetch", "api.example.com"), false);
+  assert.equal(blockedRequest("script", "notgoogle-analytics.com"), false, "suffix match on a label boundary only");
+});
+
+test("one browser, recycled after N renders, stopped when idle", async () => {
+  config.allowPrivate = true;
+  await stopBrowser(); // reset the render counter left by earlier tests
+  const before = metricsJson();
+  config.recycleAfter = 2;
+  await render(base + "/r1");
+  await render(base + "/r2");
+  assert.equal(metricsJson().recycles, before.recycles + 1, "recycled after 2 renders");
+  assert.equal(metricsJson().browser, "stopped");
+  config.recycleAfter = 50;
+  config.idleMs = 300;
+  const r = await fetch(`${rbase}/refresh`, { method: "POST", headers: { ...auth, "content-type": "application/json" }, body: JSON.stringify({ urls: [base + "/idle"] }) });
+  assert.deepEqual(await r.json(), { queued: 1 });
+  let up = false;
+  for (let i = 0; i < 100 && metricsJson().rendered === before.rendered; i++) { await new Promise((r) => setTimeout(r, 100)); up ||= metricsJson().browser === "up"; }
+  for (let i = 0; i < 30 && metricsJson().browser === "up"; i++) await new Promise((r) => setTimeout(r, 100));
+  const m = metricsJson();
+  assert.equal(m.browser, "stopped", "closed after the idle delay");
+  assert.ok(m.idleStops > before.idleStops && m.launches > before.launches);
+  config.idleMs = 60000;
+});
+
+test("a hung page is killed at the timeout and the next render starts clean", async () => {
+  config.timeoutMs = 1500;
+  const t0 = performance.now();
+  await assert.rejects(render(base + "/hang"));
+  assert.ok(performance.now() - t0 < 8000, "bounded by timeout + grace");
+  config.timeoutMs = 15000;
+  assert.match(await render(base + "/after-hang"), /Rendered by the browser/);
+});
+
+test("CLI prerender writes one file per route and a manifest", async () => {
+  assert.equal(routeFile("/"), "index.html");
+  assert.equal(routeFile("/pricing/"), join("pricing", "index.html"));
+  assert.equal(routeFile("/a/../etc"), null);
+  assert.equal(routeFile("/a?b=1"), null);
+  const out = mkdtempSync(join(tmpdir(), "glot-prerender-"));
+  const r = await prerender(base, ["/", "/pricing", "/../x"], out);
+  assert.deepEqual(r.snapshots.map((s) => s.path), ["/", "/pricing"]);
+  assert.equal(r.failed.length, 1);
+  assert.match(readFileSync(join(out, "pricing", "index.html"), "utf8"), /<h1>Rendered by the browser<\/h1>/);
+  const manifest = JSON.parse(readFileSync(join(out, "manifest.json"), "utf8"));
+  assert.equal(manifest.snapshots[1].file, join("pricing", "index.html"));
+  assert.equal(metricsJson().browser, "stopped", "the CLI closes the browser");
 });

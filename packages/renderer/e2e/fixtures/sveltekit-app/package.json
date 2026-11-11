@@ -1,0 +1,1 @@
+{"name":"hydration-sveltekit","private":true,"type":"module","scripts":{"build":"vite build","start":"node build"},"devDependencies":{"@sveltejs/kit":"^2","@sveltejs/adapter-node":"^5","@sveltejs/vite-plugin-svelte":"*","svelte":"^5","vite":"*"}}

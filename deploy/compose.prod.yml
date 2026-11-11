@@ -104,8 +104,13 @@ services:
     logging: *logging
 
   # glot Edge snapshots of SPA pages (packages/renderer). Own network: reaches the internet and the server, never Postgres.
+  # Sized for the 1.9 GB VPS: one chromium-headless-shell, one page at a time, started on demand and stopped after
+  # 60 s idle (~90 MB then), recycled every 50 renders or past 320 MB. Measured peak 298 MB (docker stats) rendering
+  # Vite React, Next export and a Leptos/WASM app (docs edge.md, "100 % JavaScript apps").
+  # Alternative without any browser here: `glot prerender --upload` in the CI (POST /edge/v1/{project}/snapshots).
   renderer:
-    # Opt-in (Chromium is heavy): `docker compose --profile renderer up -d`. Without it, Edge serves SPA origins as-is.
+    # Opt-in: `docker compose --profile renderer up -d` (+ GLOT_RENDERER_TOKEN in deploy/.env). Without it, Edge serves
+    # SPA origins as-is or the snapshots imported from the CI.
     profiles: [renderer]
     image: glot-renderer:latest
     build:
@@ -115,18 +120,23 @@ services:
     environment:
       RENDERER_TOKEN: ${GLOT_RENDERER_TOKEN:-}
       RENDERER_TTL_S: ${GLOT_RENDERER_TTL_S:-86400}
-      RENDERER_CONCURRENCY: ${GLOT_RENDERER_CONCURRENCY:-2}
+      RENDERER_IDLE_S: ${GLOT_RENDERER_IDLE_S:-60}
+      RENDERER_RECYCLE_AFTER: ${GLOT_RENDERER_RECYCLE_AFTER:-50}
+      RENDERER_RECYCLE_MB: ${GLOT_RENDERER_RECYCLE_MB:-320}
+      RENDERER_TIMEOUT_MS: ${GLOT_RENDERER_TIMEOUT_MS:-15000}
+      RENDERER_MAX_QUEUE: ${GLOT_RENDERER_MAX_QUEUE:-100}
     volumes:
       - renderer:/data
     networks: [render]
-    ipc: host  # Chromium needs more than Docker's 64 MB /dev/shm
-    init: true
+    init: true  # reaps Chromium's zombie processes (--disable-dev-shm-usage: no /dev/shm or ipc: host needed)
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8795/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5
-    mem_limit: 1g
+    mem_limit: 450m
+    memswap_limit: 450m
+    cpus: 1.0
     logging: *logging
 
   caddy:

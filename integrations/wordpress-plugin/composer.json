@@ -1,0 +1,8 @@
+{
+	"name": "glot/wordpress-plugin",
+	"description": "glot WordPress plugin (dev tooling only: the plugin itself has no Composer dependency).",
+	"license": "GPL-2.0-or-later",
+	"require-dev": { "phpunit/phpunit": "^9.6" },
+	"scripts": { "test": "phpunit tests" },
+	"config": { "platform": { "php": "7.4" } }
+}

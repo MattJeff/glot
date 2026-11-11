@@ -2,6 +2,7 @@ import { statSync } from "node:fs";
 import path from "node:path";
 import type { MetadataRoute } from "next";
 import { SLUGS } from "@/app/[locale]/docs/content";
+import { PLATFORMS } from "@/app/[locale]/integrations/data";
 import { languages, pageUrl, translatedLocales } from "@/lib/seo";
 
 // Marketing pages: one entry per translated locale, with reciprocal hreflang. Docs are English only (canonical en).
@@ -9,6 +10,8 @@ const PAGES = [
   { path: "", ns: "home", priority: 1 },
   { path: "/i18n", ns: "landing", priority: 0.9 },
   { path: "/pricing", ns: "pricing", priority: 0.7 },
+  { path: "/integrations", ns: "integrations", priority: 0.7 },
+  ...PLATFORMS.map((p) => ({ path: `/integrations/${p.id}`, ns: "integrations", priority: 0.5 })),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

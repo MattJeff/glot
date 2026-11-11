@@ -13,6 +13,8 @@ Everything that puts glot where developers and AI agents already are. Published 
 | [`ai-builders.md`](ai-builders.md), [`ai-builders-prompt.md`](ai-builders-prompt.md) | Lovable / Bolt / v0 / Replit guide and knowledge snippet |
 | [`workflows/glot-onboard.yml`](workflows/glot-onboard.yml) | One-click "Translate this app" workflow (init + i18nize + translate → PR) |
 | [`badge/glot-badge.sh`](badge/glot-badge.sh) | "translated by glot · N languages · X%" shields.io endpoint |
+| [`wordpress-plugin/`](wordpress-plugin) | WordPress plugin: website tag, switcher (shortcode, widget, block, Elementor), hreflang to glot Edge, WooCommerce data guard, "Connect to glot" |
+| [`shopify-app/`](shopify-app) | Shopify custom app with a theme app embed: website tag + switcher (Shopify languages or glot menu) |
 
 ## Coding agents
 

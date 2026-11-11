@@ -16,6 +16,7 @@ mod markets;
 mod measure;
 mod panel;
 mod parity;
+mod prerender;
 mod provenance;
 mod queue;
 mod render;
@@ -114,6 +115,8 @@ enum Cmd {
     Fit(fit::FitArgs),
     /// Record each key's pixel budget (box width, lines, font) from the running app into .glot/layout.json.
     Measure(measure::MeasureArgs),
+    /// Render a 100 % JavaScript app's pages in the CI (headless shell), optionally upload them to glot Edge.
+    Prerender(prerender::PrerenderArgs),
     /// Plural/select branch coverage per locale and CLDR category (`--render`: check each branch in a browser).
     #[command(hide = true)] // legacy spelling of `glot labs coverage`
     Coverage(coverage::CoverageArgs),
@@ -338,6 +341,8 @@ Server (experimental)
                 $ glot annotations list --route /pricing --locale de
   experiments  Segmented copy experiments: push/pull glot.experiments.toml, status, promote
                 $ glot experiments status hero-de --json
+  prerender   Render a 100 % JavaScript app's pages in CI and upload them to glot Edge
+                $ glot prerender --base-url http://localhost:4173 --routes /,/pricing --upload
 
 Labs
   labs        coverage, review, parity, seo, db, assets, unused, queue, tm, markets, store, distill, culture, panel, render:
@@ -476,6 +481,7 @@ async fn run(cmd: Cmd) -> Result<ExitCode> {
         }
         Cmd::Fit(a) => return fit::fit(a).await,
         Cmd::Measure(a) => return measure::run(a),
+        Cmd::Prerender(a) => return prerender::run(a).await,
         Cmd::Coverage(a) => return coverage::run(a),
         Cmd::Extract { json } => extract(json)?,
         Cmd::Compile => compile()?,

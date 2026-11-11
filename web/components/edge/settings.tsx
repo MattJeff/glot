@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useErrorMessage } from "@/lib/use-error-message";
-import { type AppAction, type EdgeSettings, edgeApi, edgeKeys, type Rendering, SUGGESTED_APP_PATHS } from "./api";
+import { type AppAction, type AuthPages, type EdgeSettings, edgeApi, edgeKeys, type Rendering, SUGGESTED_APP_PATHS } from "./api";
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 type ListField = "discover_include" | "discover_exclude" | "selectors_include" | "selectors_exclude" | "critical_patterns" | "sensitive_patterns" | "app_paths";
@@ -37,6 +37,8 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
     app_paths: settings.app_paths.join("\n"),
   }));
   const [appAction, setAppAction] = useState<AppAction>(settings.app_action);
+  const [authPages, setAuthPages] = useState<AuthPages>(settings.auth_pages ?? "server");
+  const [authDiscover, setAuthDiscover] = useState(settings.auth_discover ?? false);
 
   const save = useMutation({
     // Kill switch state comes from the cache: the header switch may have changed it since this form mounted.
@@ -56,6 +58,9 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
         sensitive_patterns: lines(text.sensitive_patterns),
         app_paths: lines(text.app_paths),
         app_action: appAction,
+        auth_pages: authPages,
+        auth_discover: authPages === "patcher" && authDiscover,
+        website_snippet: qc.getQueryData<EdgeSettings>(edgeKeys.settings(slug))?.website_snippet ?? settings.website_snippet,
       }),
     onSuccess: (r) => {
       qc.setQueryData(edgeKeys.settings(slug), r);
@@ -199,6 +204,42 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
                 ))}
               </SelectContent>
             </Select>,
+          )}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-medium">{t("auth.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("auth.body")}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {field(
+            "edge-auth-pages",
+            t("auth.mode"),
+            t(`auth.${authPages}Hint`),
+            <Select value={authPages} onValueChange={(v) => setAuthPages(v as AuthPages)}>
+              <SelectTrigger id="edge-auth-pages" aria-describedby="edge-auth-pages-hint" className="w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(["server", "patcher", "off"] as const).map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {t(`auth.${a}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>,
+          )}
+          {authPages === "patcher" && (
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2 font-normal">
+                <Switch checked={authDiscover} onCheckedChange={setAuthDiscover} aria-describedby="edge-auth-discover-hint" /> {t("auth.discover")}
+              </Label>
+              <p id="edge-auth-discover-hint" className="text-xs text-muted-foreground">
+                {t("auth.discoverHint")}
+              </p>
+            </div>
           )}
         </div>
       </section>

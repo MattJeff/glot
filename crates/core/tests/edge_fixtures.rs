@@ -41,3 +41,29 @@ fn fixtures() {
     }
     assert!(n >= 4);
 }
+
+/// Framework payloads: `fixtures/edge/hydration/*.html` (real SvelteKit, Nuxt, React Router, SolidStart, Astro
+/// pages + scanner edge cases) → `*.expected.html` with `tm.json`; same files in
+/// `packages/edge/test/hydration-fixtures.test.ts` (byte-identical output in Rust and JS).
+#[test]
+fn hydration_fixtures() {
+    use glot_core::edge::hydration::translate_payloads;
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/edge/hydration");
+    let tm: std::collections::HashMap<String, String> =
+        serde_json::from_str(&std::fs::read_to_string(dir.join("tm.json")).unwrap()).unwrap();
+    let mut n = 0;
+    for e in std::fs::read_dir(&dir).unwrap() {
+        let p = e.unwrap().path();
+        let name = p.file_name().unwrap().to_string_lossy().to_string();
+        if !name.ends_with(".html") || name.ends_with(".expected.html") {
+            continue;
+        }
+        n += 1;
+        let (got, _) = translate_payloads(&std::fs::read_to_string(&p).unwrap(), &|s: &str| {
+            tm.get(s).cloned()
+        });
+        let want = std::fs::read_to_string(dir.join(name.replace(".html", ".expected.html")));
+        assert_eq!(got, want.unwrap_or_default(), "{name}");
+    }
+    assert!(n >= 6);
+}

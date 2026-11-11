@@ -58,7 +58,7 @@ pub struct Limits {
     /// Live review annotations created per month (review_live).
     #[serde(default)]
     pub review_annotations: Option<i64>,
-    /// glot Edge pages served per month (Localisation SEO: Growth; Pro = a limited trial; Free = none).
+    /// glot Edge pages served per month (Localisation SEO: Growth; Pro = a limited trial; Free/Starter = none).
     #[serde(default)]
     pub edge_pages: Option<i64>,
     /// glot Edge domains (not monthly).
@@ -122,6 +122,11 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
             "free".into(),
             xp(l(1, 1, 50_000, 10_000, 500, 0, 500), Some(1), Some(0)),
         ),
+        // Starter: localize a site or app (CDN, switcher, GitHub sync, visual QA, CMS); no Edge, no segments.
+        (
+            "starter".into(),
+            xp(l(2, 1, 250_000, 50_000, 5_000, 5, 2_000), Some(1), Some(0)),
+        ),
         (
             "pro".into(),
             xp(
@@ -140,7 +145,7 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
         ),
     ]);
     // Live review: team = unlimited.
-    for (plan, max) in [("free", 200), ("pro", 10_000)] {
+    for (plan, max) in [("free", 200), ("starter", 1_000), ("pro", 10_000)] {
         if let Some(l) = plans.get_mut(plan) {
             l.review_annotations = Some(max);
         }
@@ -148,6 +153,7 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
     // Localisation SEO (glot Edge): Growth feature, a one-domain trial on Pro.
     for (plan, pages, domains) in [
         ("free", Some(0), Some(0)),
+        ("starter", Some(0), Some(0)),
         ("pro", Some(10_000), Some(1)),
         ("team", Some(2_000_000), None),
     ] {
@@ -276,18 +282,24 @@ fn title(plan: &str) -> String {
         .unwrap_or_default()
 }
 
-/// " Up to N on Pro." / " Unlimited on Growth.": the cheapest paid plan that lifts `max`, empty if none.
+/// Plans from cheapest to most complete (upgrade hints walk this order).
+const ORDER: [&str; 4] = ["free", "starter", "pro", "team"];
+
+/// " Up to N on Pro." / " Unlimited on Growth.": the cheapest higher plan that lifts `max`, empty if none.
 fn next_plan(cfg: &Config, plan: &str, max: i64, limit: impl Fn(&Limits) -> Option<i64>) -> String {
-    ["pro", "team"]
-        .into_iter()
-        .filter(|p| *p != plan)
-        .find_map(|p| match limit(cfg.plans.get(p)?) {
+    let above = ORDER.iter().position(|p| *p == plan).map_or(1, |i| i + 1);
+    ORDER[above..]
+        .iter()
+        .find_map(|p| match limit(cfg.plans.get(*p)?) {
             None => Some(format!(" Unlimited on {}.", title(p))),
             Some(n) if n > max => Some(format!(" Up to {n} on {}.", title(p))),
             _ => None,
         })
         .unwrap_or_default()
 }
+
+/// Free trial of Growth (`team`) offered at checkout, once per account.
+pub const TRIAL_DAYS: u32 = 14;
 
 fn quota_error(cfg: &Config, plan: &str, kind: &str, max: i64, hint: &str) -> AppError {
     let up = cfg.upgrade_url();
@@ -327,6 +339,8 @@ struct Account {
     current_period_end: Option<DateTime<Utc>>,
     cancel_at_period_end: bool,
     grace_until: Option<DateTime<Utc>>,
+    /// The Growth trial was used (or the account was on Growth): no second trial.
+    trial_used: bool,
 }
 
 impl Account {
@@ -338,7 +352,7 @@ impl Account {
 async fn account(db: &sqlx::PgPool, user: Uuid) -> ApiResult<Account> {
     Ok(sqlx::query_as(
         "SELECT stripe_customer_id, plan, status, stripe_subscription_id, base_item_id, metered,
-                current_period_end, cancel_at_period_end, grace_until
+                current_period_end, cancel_at_period_end, grace_until, trial_used_at IS NOT NULL AS trial_used
          FROM billing_accounts WHERE user_id = $1",
     )
     .bind(user)
@@ -534,6 +548,13 @@ pub fn uses_platform_key(p: &ProjectRow) -> bool {
 /// unless the subscription carries the usage-based price (then the overage is billed, see `after_job`).
 // ponytail: checked before the job, so one job can overshoot the allowance by its own size (bounded by llm.budget_usd).
 pub async fn check_llm(state: &AppState, p: &ProjectRow) -> ApiResult<()> {
+    // Every LLM job (dashboard, API, GitHub, Edge, on-demand) passes here: a project whose owner never confirmed
+    // their address spends nothing, even when the trigger is public (Edge reports, CDN on-demand).
+    if state.mailer.is_some()
+        && let Some(o) = owner(&state.db, p.id).await?
+    {
+        crate::auth::require_verified(state, o).await?;
+    }
     let Some(cfg) = &state.billing else {
         return Ok(());
     };
@@ -849,7 +870,7 @@ fn plan_of(price: &Value) -> Option<&'static str> {
     let tag = price["metadata"]["glot_plan"]
         .as_str()
         .or(price["lookup_key"].as_str())?;
-    ["team", "pro"]
+    ["team", "pro", "starter"]
         .into_iter()
         .find(|p| tag == *p || tag.starts_with(&format!("glot_{p}")))
 }
@@ -888,16 +909,19 @@ async fn apply_subscription(
             sub["status"].as_str().unwrap_or("none"),
         )
     };
+    // A trial or a Growth subscription uses up the one Growth trial of the account.
+    let trial_used = (sub["trial_end"].is_number() || plan == "team").then(Utc::now);
     // Ignore stale events (Stripe does not guarantee order) and the deletion of a subscription that was replaced.
     sqlx::query(
         "INSERT INTO billing_accounts AS b (user_id, stripe_customer_id, plan, status, stripe_subscription_id, base_item_id,
-                metered, current_period_end, cancel_at_period_end, sub_event_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                metered, current_period_end, cancel_at_period_end, sub_event_at, trial_used_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $12)
          ON CONFLICT (user_id) DO UPDATE SET stripe_customer_id = excluded.stripe_customer_id, plan = excluded.plan,
                 status = excluded.status, stripe_subscription_id = excluded.stripe_subscription_id,
                 base_item_id = excluded.base_item_id, metered = excluded.metered,
                 current_period_end = excluded.current_period_end, cancel_at_period_end = excluded.cancel_at_period_end,
                 sub_event_at = excluded.sub_event_at, updated_at = now(),
+                trial_used_at = coalesce(b.trial_used_at, excluded.trial_used_at),
                 grace_until = CASE WHEN excluded.status IN ('active', 'trialing') THEN NULL ELSE b.grace_until END
          WHERE (b.sub_event_at IS NULL OR b.sub_event_at <= excluded.sub_event_at)
            AND NOT ($11 AND b.stripe_subscription_id IS DISTINCT FROM excluded.stripe_subscription_id)",
@@ -913,6 +937,7 @@ async fn apply_subscription(
     .bind(sub["cancel_at_period_end"].as_bool().unwrap_or(false))
     .bind(created)
     .bind(deleted)
+    .bind(trial_used)
     .execute(&mut **tx)
     .await?;
     Ok(())
@@ -947,6 +972,8 @@ pub struct Summary {
     pub grace_until: Option<DateTime<Utc>>,
     pub metered: bool,
     pub has_customer: bool,
+    /// Checkout of Growth would start with a free trial (`TRIAL_DAYS`), offered once per account.
+    pub trial_available: bool,
     pub limits: Limits,
     /// Same keys as `limits`, this calendar month (UTC).
     pub usage: BTreeMap<String, i64>,
@@ -982,6 +1009,7 @@ async fn summary(
             grace_until: None,
             metered: false,
             has_customer: false,
+            trial_available: false,
             limits: Limits::default(),
             usage,
         }));
@@ -999,6 +1027,7 @@ async fn summary(
         grace_until: a.grace_until,
         metered: a.metered,
         has_customer: a.stripe_customer_id.is_some(),
+        trial_available: !a.trial_used,
         usage,
     }))
 }
@@ -1052,15 +1081,15 @@ fn month() -> String {
 /// `{url}` to redirect to: a Checkout Session, or (existing subscription) the billing page after a prorated swap.
 async fn checkout(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppJson(b): AppJson<CheckoutBody>,
 ) -> ApiResult<Json<Value>> {
     let cfg = enabled(&state)?;
-    if !matches!(b.plan.as_str(), "pro" | "team")
+    if !matches!(b.plan.as_str(), "starter" | "pro" | "team")
         || !matches!(b.interval.as_str(), "month" | "year")
     {
         return Err(AppError::bad_request(
-            "plan must be pro|team, interval month|year",
+            "plan must be starter|pro|team, interval month|year",
         ));
     }
     let lookup = format!("glot_{}_{}", b.plan, b.interval);
@@ -1107,6 +1136,12 @@ async fn checkout(
         ),
         ("allow_promotion_codes", "true".into()),
     ];
+    if b.plan == "team" && !a.trial_used {
+        form.push((
+            "subscription_data[trial_period_days]",
+            TRIAL_DAYS.to_string(),
+        ));
+    }
     // ponytail: usage price is monthly, so only monthly plans carry it (yearly plans stop at their allowance);
     // add a yearly-interval meter price if yearly customers ask for overage.
     if cfg.meter_event.is_some()
@@ -1199,7 +1234,9 @@ async fn invoices(
     ))
 }
 
-const PRICE_KEYS: [&str; 5] = [
+const PRICE_KEYS: [&str; 7] = [
+    "glot_starter_month",
+    "glot_starter_year",
     "glot_pro_month",
     "glot_pro_year",
     "glot_team_month",
@@ -1269,6 +1306,10 @@ mod tests {
         );
         assert_eq!(plan_of(&json!({"lookup_key": "glot_llm_strings"})), None);
         assert_eq!(
+            plan_of(&json!({"lookup_key": "glot_starter_month"})),
+            Some("starter")
+        );
+        assert_eq!(
             plan_of(&json!({"metadata": {"glot_plan": "pro"}})),
             Some("pro")
         );
@@ -1284,7 +1325,21 @@ mod tests {
         assert_eq!(next_plan(&cfg, "team", 1, xp), "");
         assert_eq!(
             next_plan(&cfg, "free", 1, |l| l.projects),
+            " Up to 2 on Starter."
+        );
+        assert_eq!(
+            next_plan(&cfg, "starter", 2, |l| l.projects),
             " Up to 5 on Pro."
+        );
+        // Edge is 0 on Free and Starter: the hint skips Starter and names Pro.
+        assert_eq!(
+            next_plan(&cfg, "free", 0, |l| l.edge_domains),
+            " Up to 1 on Pro."
+        );
+        // Never hint at a cheaper plan.
+        assert_eq!(
+            next_plan(&cfg, "pro", 5, |l| l.projects),
+            " Up to 25 on Growth."
         );
         assert_eq!(title("team"), "Growth");
     }

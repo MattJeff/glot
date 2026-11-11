@@ -86,7 +86,9 @@ export function glotEdge(o: ExpressEdgeOptions) {
       const fwd = new Headers(headers);
       fwd.set("x-glot-edge-origin", "1");
       fwd.set("x-glot-locale", r.locale);
-      fwd.delete("accept-encoding");
+      // Node's fetch adds `accept-encoding: gzip, deflate` itself and decodes the body but keeps `content-encoding`:
+      // a passthrough (asset, fail-open page) would reach the browser double-labelled. Ask for identity.
+      fwd.set("accept-encoding", "identity");
       const out = await edge(new Request(url, { method: req.method, headers }), r.locale, originUrl, (u) => fetch(u, { method: req.method, headers: fwd, redirect: "manual" }));
       await send(res, out);
     } catch (e) {

@@ -121,7 +121,7 @@ fn clean_origin(raw: &str) -> Option<Url> {
 
 async fn create(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(b): AppJson<NewDomain>,
 ) -> ApiResult<(StatusCode, Json<EdgeDomain>)> {
@@ -219,8 +219,8 @@ async fn remove(
 
 // ---------------------------------------------------------------------------------------------- DNS
 
-/// Records of `name` / `kind` (TXT, CNAME) over DNS-over-HTTPS; Err when no resolver answered.
-async fn doh(name: &str, kind: &str) -> Result<Vec<String>, ()> {
+/// Records of `name` / `kind` (TXT, CNAME, MX, A) over DNS-over-HTTPS; Err when no resolver answered.
+pub(crate) async fn doh(name: &str, kind: &str) -> Result<Vec<String>, ()> {
     let resolvers = match std::env::var("GLOT_DOH_URL") {
         Ok(u) => vec![u],
         Err(_) => vec![
@@ -233,7 +233,12 @@ async fn doh(name: &str, kind: &str) -> Result<Vec<String>, ()> {
         .redirect(reqwest::redirect::Policy::none())
         .build()
         .map_err(|_| ())?;
-    let code = if kind == "TXT" { 16 } else { 5 };
+    let code = match kind {
+        "TXT" => 16,
+        "MX" => 15,
+        "A" => 1,
+        _ => 5,
+    };
     for r in resolvers {
         let Ok(res) = client
             .get(&r)

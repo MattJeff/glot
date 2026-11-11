@@ -1,0 +1,2597 @@
+{
+  "note": "Platform guides for /integrations. Researched from each platform's official documentation (URLs in docs). Steps, plans, SEO notes and platform FAQs are English on purpose: they quote each platform's English menu names and stay close to the cited source. The page template (titles, intro, glot setup steps, generic FAQ) is translated in the 6 catalogs under 'integrations'. method: connector or plugin only when glot ships one with a dashboard card or install steps documented in web/content/docs/integrations.md (connectors in web/components/connectors, integrations/framer-plugin, integrations/wordpress-plugin); server connectors without a dashboard card yet stay on the tag; everything else is the universal tag. verified=false: the official doc could not be read or confirmed, and the page says so.",
+  "platforms": [
+    {
+      "id": "wix",
+      "name": "Wix",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Add the glot tag once in Settings → Custom Code, on All pages, placed in Head.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Go to Settings in your site's dashboard.",
+          "Under Development & integrations, click Custom Code.",
+          "Click + Add Custom Code at the top right.",
+          "Paste the glot tag in the text box and give it a name.",
+          "Under Add Code to Pages, select All pages and choose Load code on each new page.",
+          "Under Place Code in, select Head.",
+          "Click Apply, then check the live site."
+        ],
+        "plans": "The site has to be published and have a connected domain, and connecting a domain requires a Premium plan. Snippets are tied to the domain and get deleted if you assign a different domain.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records at your domain registrar. If the domain was bought from Wix or uses Wix nameservers, use Domains → Domain Actions → Manage DNS records → + Add Record instead. This is not possible on a wixsite.com address."
+      },
+      "faq": [
+        {
+          "q": "Why is Custom Code missing or greyed out?",
+          "a": "Wix only allows custom code on a published site with a connected domain, and connecting a domain requires a Premium plan."
+        },
+        {
+          "q": "My DNS records are not in Wix. Where do I add them?",
+          "a": "If the domain is connected to Wix by pointing, or uses custom nameservers, Wix says to manage DNS records with your DNS provider or domain host."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Wix: Embedding custom code on your site",
+          "url": "https://support.wix.com/en/article/embedding-custom-code-on-your-site"
+        },
+        {
+          "label": "Wix: Managing DNS records in your Wix account",
+          "url": "https://support.wix.com/en/article/managing-dns-records-in-your-wix-account"
+        }
+      ],
+      "verified": true,
+      "notes": "The Premium-plan requirement for connecting a domain comes from Wix search snippets (Connecting a domain / About domains articles), not from a page I fetched. In December 2025 Wix added frontend security measures for custom code that can block some snippets, so test the tag on the live site."
+    },
+    {
+      "id": "wix-studio",
+      "name": "Wix Studio",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Add the glot tag in the site dashboard under Settings → Custom Code, on All pages, placed in Head.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open the site's dashboard and go to Settings.",
+          "Click Custom Code (under Development & integrations).",
+          "Click + Add Custom Code.",
+          "Paste the glot tag and give it a name.",
+          "Under Add Code to Pages, select All pages.",
+          "Under Place Code in, select Head.",
+          "Click Apply, then check the live site."
+        ],
+        "plans": "Same rule as Wix: custom code needs a published site with a connected domain, and connecting a domain requires a paid (Studio/Premium) site plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records at your domain registrar. If the domain is managed in Wix, use Domains → Manage DNS records → + Add Record. This is not possible on a free Wix address."
+      },
+      "faq": [
+        {
+          "q": "Is the setup different from the classic Wix Editor?",
+          "a": "Custom code is added from the site dashboard, which Wix Studio shares with Wix. Wix has no Studio-specific article for it, so the menu labels could differ a little."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Wix: Embedding custom code on your site",
+          "url": "https://support.wix.com/en/article/embedding-custom-code-on-your-site"
+        },
+        {
+          "label": "Wix: Managing DNS records in your Wix account",
+          "url": "https://support.wix.com/en/article/managing-dns-records-in-your-wix-account"
+        }
+      ],
+      "verified": false,
+      "notes": "I could not find a Studio-specific custom code article (the guessed URL returned 404). These steps come from the Wix Editor dashboard article, which Wix search results say covers the same dashboard."
+    },
+    {
+      "id": "squarespace",
+      "name": "Squarespace",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into the Header field of the site-wide Code Injection panel.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open the Code Injection panel (Website → Website Tools → Code Injection).",
+          "Paste the glot tag into the Header field. Squarespace injects it into the <head> of every page.",
+          "Click Save."
+        ],
+        "plans": "Code injection is available on the Core, Plus and Advanced plans and on some legacy billing plans. It does not run on checkout pages.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "For a Squarespace domain, or a third-party domain using Nameserver Connect: go to Domains → your domain → DNS → DNS Settings → Custom Records → Add record. Add the CNAME (Name: es) and the TXT (Name: _glot.es). For DNS Connect, add the records at your registrar. This is not possible on a squarespace.com address."
+      },
+      "faq": [
+        {
+          "q": "Will Squarespace support help with the tag?",
+          "a": "No. Squarespace considers custom code outside its support scope. For DNS it can only show you where to add records."
+        },
+        {
+          "q": "Can I add a CNAME on a subdomain of a Squarespace domain?",
+          "a": "Yes. Use Custom Records in DNS Settings. The Name field takes only the subdomain part, because Squarespace appends your domain."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Squarespace: Customize parts of your site with code injection",
+          "url": "https://support.squarespace.com/hc/en-us/articles/205815908-Using-code-injection"
+        },
+        {
+          "label": "Squarespace: DNS records for web hosting",
+          "url": "https://support.squarespace.com/hc/en-us/articles/31119879125645-DNS-records-for-web-hosting"
+        },
+        {
+          "label": "Squarespace: Adding TXT records",
+          "url": "https://support.squarespace.com/hc/en-us/articles/31120980444429-Adding-TXT-records"
+        }
+      ],
+      "verified": true,
+      "notes": "The help article links to the panel but gives no click path. 'Website → Website Tools → Code Injection' is inferred from the panel URL (/pages/website-tools/code-injection), and Squarespace has moved this panel before."
+    },
+    {
+      "id": "webflow",
+      "name": "Webflow",
+      "category": "site-builder",
+      "method": "connector",
+      "summary": "Paste the glot tag into Site settings → Custom code → Head code, then publish.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open Site settings for your site.",
+          "Go to the Custom code tab.",
+          "Paste the glot tag into the Head code field (keep the async attribute).",
+          "Click Save changes.",
+          "Publish the site."
+        ],
+        "plans": "Site-wide custom code requires a paid Site plan or an eligible Workspace plan. Connecting a custom domain requires a paid Site plan for each site.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Webflow does not host DNS, so add the CNAME and TXT records at your domain registrar or DNS host. This needs a custom domain on a paid Site plan, and is not possible on a webflow.io address."
+      },
+      "faq": [
+        {
+          "q": "Why doesn't the tag run in the Designer?",
+          "a": "Custom code runs only on the published site. Publish, then check the live URL."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Webflow University: Site-level custom code",
+          "url": "https://university.webflow.com/course-lesson/custom-code-site-level-code"
+        }
+      ],
+      "verified": false,
+      "notes": "help.webflow.com returned 403 to WebFetch and curl. The field names (Custom code tab, Head code) and the paid Site plan rule for custom domains come from search snippets of help.webflow.com/hc/en-us/articles/33961357265299 and 33961239562387. The exact plan rule for custom code is not confirmed from a fetched page.",
+      "native": {
+        "steps": [
+          "In Webflow, enable Localization and add your secondary locales.",
+          "In Site settings → Apps & integrations → API access, create a site API token with read and write access to CMS, Pages, Components and Sites.",
+          "In glot, open your project → Integrations → Webflow and paste the token.",
+          "Click Sync now. glot writes CMS items, static page text and components into the secondary locales; static content goes live with your next site publish.",
+          "Optional: in Site settings → Apps & integrations → Webhooks, add the card's webhook URL for collection_item_created, collection_item_changed and site_publish."
+        ],
+        "doc": "/docs/integrations#webflow"
+      }
+    },
+    {
+      "id": "framer",
+      "name": "Framer",
+      "category": "site-builder",
+      "method": "plugin",
+      "summary": "Add the glot tag as a site-wide script in Site Settings → Custom Code, placed in the head.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open Site Settings (Project Settings) and select the Custom Code tab.",
+          "Click Add Script, or + if a script already exists.",
+          "Give it a name and paste the glot tag.",
+          "Choose the head placement (start or end of <head>) and keep it on all pages.",
+          "Set it to run on every page visit.",
+          "Publish the site. Custom code does not run on the canvas or in preview."
+        ],
+        "plans": "Access to custom code requires a paid Framer plan. Custom domains also require a paid plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records at your domain registrar. For a domain claimed through Framer's Hover offer, add them in Hover. This needs a paid plan with a custom domain, and is not possible on a framer.app/framer.website address."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the Free plan?",
+          "a": "No. Framer says custom code requires a paid plan."
+        },
+        {
+          "q": "Why don't I see the language menu in the editor?",
+          "a": "Framer runs custom code only on the published site. Open the live URL to check."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Framer Help: How to add custom code",
+          "url": "https://www.framer.com/help/articles/how-to-add-custom-code/"
+        },
+        {
+          "label": "Framer Academy: Custom Code",
+          "url": "https://www.framer.com/academy/lessons/custom-code"
+        },
+        {
+          "label": "Framer Help: Custom domains",
+          "url": "https://www.framer.com/help/articles/how-to-connect-a-custom-domain/"
+        },
+        {
+          "label": "Framer: Pricing",
+          "url": "https://www.framer.com/pricing"
+        },
+        {
+          "label": "Framer Help: Centering images in CMS text (custom code plan note)",
+          "url": "https://www.framer.com/help/articles/how-to-center-images-in-the-cms-formatted-text-field/"
+        }
+      ],
+      "verified": true,
+      "notes": "The help article says Project Settings and the Academy lesson says Site Settings. The start/end of head or body placement options come from the Academy lesson.",
+      "native": {
+        "steps": [
+          "In Framer, add your languages in the Localization panel.",
+          "In glot, create an API token (Settings → API tokens) and note your project slug.",
+          "Open the glot plugin in Framer (from integrations/framer-plugin in the glot repository: Plugins → Development → Open Development Plugin), then enter the token and the project slug.",
+          "Click Sync with glot. Machine translations are flagged Needs review in Framer; translations reviewed in glot are marked done.",
+          "To sync without the editor open, run the plugin's Server API script on a schedule with a Framer API key (Site settings → API Keys)."
+        ],
+        "doc": "/docs/integrations#framer"
+      }
+    },
+    {
+      "id": "carrd",
+      "name": "Carrd",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Add a hidden Embed element of type Code placed in Head, with the glot tag inside.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Click Add Element, then Embed.",
+          "Set Type to Code.",
+          "Paste the glot tag into the Code field and optionally add a Label.",
+          "Set Style to Hidden and choose Head as the location.",
+          "Publish the site. The embed shows nothing in the builder."
+        ],
+        "plans": "The Embed element and custom domains both require Pro Standard or higher.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Carrd does not manage DNS, so add the CNAME and TXT records at your domain registrar. This needs a custom domain (Pro Standard or higher), and is not possible on a carrd.co address."
+      },
+      "faq": [
+        {
+          "q": "Carrd is one page. Does the tag need to be on every page?",
+          "a": "A Carrd site is a single page, so one hidden Head embed covers the whole site."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Carrd: Embedding custom code",
+          "url": "https://carrd.com/docs/building/embedding-custom-code"
+        },
+        {
+          "label": "Carrd: Using a custom domain",
+          "url": "https://carrd.com/docs/sites/using-a-custom-domain"
+        }
+      ],
+      "verified": true,
+      "notes": ""
+    },
+    {
+      "id": "jimdo",
+      "name": "Jimdo",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "On Jimdo Creator, paste the glot tag into Menu → Settings → Edit Head and save.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open your Jimdo Creator website in edit mode.",
+          "Go to Menu → Settings → Edit Head.",
+          "Paste the glot tag at the top of the head field.",
+          "Click Save."
+        ],
+        "plans": "Edit Head is a Jimdo Creator feature, and third-party guides say it needs a paid plan. For Jimdo's newer website builder (Dolphin), Jimdo recommends its built-in tools, and I could not confirm a site-wide head-code option.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": false,
+        "how": "Jimdo says it does not support using or managing subdomains, and its domain settings only take TXT records for a few listed providers. Subdomain mode only works if your domain's DNS is at an outside registrar (domain connected to Jimdo by CNAME), where you can add the CNAME and TXT yourself. This is not possible on a jimdosite.com/jimdofree.com address."
+      },
+      "faq": [
+        {
+          "q": "I don't see Edit Head.",
+          "a": "Edit Head exists on Jimdo Creator, and third-party guides say it requires a paid plan. Jimdo's newer builder may not offer it."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Jimdo: How do I insert my own code?",
+          "url": "https://help.jimdo.com/hc/en-us/articles/115005505763-How-do-I-insert-my-own-code"
+        },
+        {
+          "label": "Jimdo: Can I use subdomains with my Jimdo Creator website?",
+          "url": "https://help.jimdo.com/hc/en-us/articles/115005537966-Can-I-use-subdomains-with-my-Jimdo-Creator-website"
+        },
+        {
+          "label": "Jimdo: How do I add a TXT record?",
+          "url": "https://help.jimdo.com/hc/en-us/articles/7632907436564-How-do-I-add-a-TXT-record"
+        }
+      ],
+      "verified": false,
+      "notes": "help.jimdo.com returned 403 to WebFetch and curl, so everything here comes from search snippets of the official pages. The paid-plan rule comes from third-party guides (iubenda). Whether Dolphin supports site-wide head code is unknown. seo.subdomain is false because a Jimdo-managed domain cannot do it. An external domain at a registrar can."
+    },
+    {
+      "id": "weebly-square",
+      "name": "Weebly (Square Online)",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Add the glot tag in Square Online → Settings → Tracking Tools with the head placement, then publish.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Sign in to the Square Dashboard and open the Square Online channel.",
+          "Go to Settings → Tracking Tools.",
+          "Select Add new code.",
+          "Enter a name and paste the glot tag.",
+          "Select head as the placement and save.",
+          "Publish the site from the site editor."
+        ],
+        "plans": "Tracking Tools custom code is available on Free, Plus and Premium. You must be the account owner or a team member with online permissions. A custom domain requires Plus or Premium.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records at your domain registrar. This needs a custom domain on a paid Square Online plan, and is not possible on a square.site address. Square's docs don't say whether domains bought through Square accept custom CNAME/TXT records."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the free Square Online plan?",
+          "a": "The tag does, since Tracking Tools is on all plans. Subdomain SEO mode needs a custom domain, which requires a paid plan."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Square: Add custom tracking codes to your Square Online site",
+          "url": "https://squareup.com/help/us/en/article/6957-add-custom-tracking-code-to-your-website"
+        },
+        {
+          "label": "Square: Connect a custom domain to your Square Online site",
+          "url": "https://squareup.com/help/us/en/article/6916-connect-your-domain-with-square-online-store"
+        }
+      ],
+      "verified": true,
+      "notes": "This covers the current Square Online editor. Classic Weebly sites had a Header Code field under Settings → SEO, which I did not verify. I could not confirm DNS editing for Square-registered domains."
+    },
+    {
+      "id": "duda",
+      "name": "Duda",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into the site-wide Head HTML field in the editor's Settings.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In the Duda editor, open the side panel and click More → Settings.",
+          "Open Header HTML (site-wide).",
+          "Paste the glot tag into the Head HTML field.",
+          "Save and republish the site."
+        ],
+        "plans": "Not confirmed. Agencies or white-label setups can restrict site-wide code for their clients.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records wherever the domain's DNS is hosted, usually your registrar. This is not possible on a free Duda preview/subdomain address."
+      },
+      "faq": [
+        {
+          "q": "Head HTML won't save my code.",
+          "a": "Duda's support says the head only accepts link, script and meta tags. If it is rejected, try Body End HTML in the same Settings screen."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Duda: Custom Code",
+          "url": "https://support.duda.co/hc/en-us/articles/26519250445079-Custom-Code"
+        },
+        {
+          "label": "Duda Developer: Site Wide HTML",
+          "url": "https://developer.duda.co/docs/site-wide-code"
+        }
+      ],
+      "verified": false,
+      "notes": "support.duda.co returned 403, so the steps come from search snippets of the official Custom Code article. Duda's developer docs advise against loading src scripts in HEAD, so body-end may be the better fit. Plan rules and Duda-managed DNS are unknown."
+    },
+    {
+      "id": "dorik",
+      "name": "Dorik",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into Site Settings → Advanced → Header Code, then publish.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "From the Dashboard, open Site Settings.",
+          "Go to the Advanced section.",
+          "Paste the glot tag into Header Code.",
+          "Save and publish the site."
+        ],
+        "plans": "Custom code requires a paid plan (Personal, Business or Agency).",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Dorik has you add records at your domain provider, so add the CNAME and TXT there. This is not possible on a free dorik.io address."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the free plan?",
+          "a": "No. Dorik says custom code requires a paid plan."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Dorik: Site Settings",
+          "url": "https://help.dorik.com/en/article/site-settings-1kln2if"
+        },
+        {
+          "label": "Dorik: Add custom code",
+          "url": "https://help.dorik.com/en/article/add-custom-code-19siwk8"
+        },
+        {
+          "label": "Dorik: Custom code feature",
+          "url": "https://dorik.com/feature/custom-code"
+        },
+        {
+          "label": "Dorik: Connect a custom domain",
+          "url": "https://help.dorik.com/en/article/how-to-connect-custom-domain-with-your-site-13z21uw/"
+        }
+      ],
+      "verified": true,
+      "notes": "The free-subdomain name (dorik.io) is an assumption. The custom-domain plan requirement is not stated in the fetched help article."
+    },
+    {
+      "id": "durable",
+      "name": "Durable",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into Website → Settings → Custom code → Head Code and save.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In the dashboard, click Website in the left menu and open the Settings tab.",
+          "Under Custom code, paste the glot tag into Head Code.",
+          "Click Save. The code applies to every page."
+        ],
+        "plans": "Not stated in Durable's help article.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Works when the domain's DNS is at your own registrar: add the CNAME and TXT there. Durable's own domain settings only document email records (Website → Domain → Email service provider), so a domain bought through Durable may not accept these records. This is not possible on a Durable subdomain."
+      },
+      "faq": [
+        {
+          "q": "I bought my domain through Durable. Can I add the CNAME?",
+          "a": "Durable's help center only documents email-related records for its domains. Ask Durable support whether a custom CNAME on a subdomain is possible."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Durable: Embed custom code in your website or page settings",
+          "url": "https://help.durable.com/en/articles/15199860-embed-custom-code-in-your-website-or-page-settings"
+        },
+        {
+          "label": "Durable: Authenticate your domain for a custom email address",
+          "url": "https://help.durable.com/en/articles/15199781-authenticate-your-domain-for-a-custom-email-address"
+        },
+        {
+          "label": "Durable: Get a custom domain through Durable",
+          "url": "https://help.durable.com/en/articles/15199784-get-a-custom-domain-through-durable"
+        }
+      ],
+      "verified": true,
+      "notes": "Plan rules for custom code and custom domains are unknown. Whether domains bought through Durable allow arbitrary CNAME/TXT records is unconfirmed."
+    },
+    {
+      "id": "wordpress",
+      "name": "WordPress (self-hosted)",
+      "category": "cms",
+      "method": "plugin",
+      "summary": "Install the glot WordPress plugin (script tag, switcher, hreflang for glot Edge), and optionally connect it so translations are written into Polylang Pro or WPML.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In WP Admin, go to Plugins → Add New and install and activate \"WPCode – Insert Headers and Footers + Custom Code Snippets\".",
+          "Go to Code Snippets → Header & Footer.",
+          "Paste the glot tag into the Header box.",
+          "Click Save Changes.",
+          "Clear any page cache (caching plugin or host) and check a few pages."
+        ],
+        "plans": "Available on any self-hosted WordPress install; you need an administrator account that can install plugins.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT records wherever your domain's DNS is managed (registrar, host or Cloudflare). Self-hosted WordPress always runs on a domain you control."
+      },
+      "faq": [
+        {
+          "q": "Can I edit header.php instead of using a plugin?",
+          "a": "It works, but theme updates overwrite edits to theme files unless you use a child theme. A header/footer plugin survives theme changes."
+        },
+        {
+          "q": "My cache plugin serves old pages without the tag.",
+          "a": "Purge the cache after saving the header code."
+        }
+      ],
+      "docs": [
+        {
+          "label": "WordPress.org: WPCode plugin",
+          "url": "https://wordpress.org/plugins/insert-headers-and-footers/"
+        },
+        {
+          "label": "WordPress.com: Add code to headers (same plugin steps)",
+          "url": "https://wordpress.com/support/adding-code-to-headers/"
+        },
+        {
+          "label": "WordPress Developer: Editing files",
+          "url": "https://developer.wordpress.org/advanced-administration/wordpress/edit-files/"
+        }
+      ],
+      "verified": true,
+      "notes": "The 'Code Snippets → Header & Footer' menu path comes from the WordPress.com guide for the same plugin; the wordpress.org plugin page only names the 'Code Snippets' menu and the 'Scripts in Header' field.",
+      "native": {
+        "steps": [
+          "Download glot.zip (built from integrations/wordpress-plugin in the glot repository; it isn't on WordPress.org yet). It needs WordPress 6.1+ and PHP 7.4+.",
+          "In WordPress, go to Plugins → Add New → Upload Plugin, upload glot.zip and activate it.",
+          "Open Settings → glot and enter your project slug, your public key (pk_…, never a secret glot_… key), the source language and your languages, then save. The plugin adds glot.js to every front-end page.",
+          "Optional: place the language switcher with the [glot_switcher] shortcode, the glot language switcher widget or block, or the Elementor widget; otherwise it sits in the corner you picked.",
+          "Optional: for translated URLs, set up glot Edge (subdomain or subdirectory) and choose it as the SEO mode, so the plugin adds hreflang links to the Edge pages.",
+          "Optional: click Connect to glot with a glot API token to link the WordPress connector, so translations are also written into Polylang Pro or WPML posts."
+        ],
+        "doc": "/docs/integrations#wordpress-plugin"
+      }
+    },
+    {
+      "id": "wordpress-com",
+      "name": "WordPress.com",
+      "category": "cms",
+      "method": "tag",
+      "summary": "On a paid WordPress.com plan, install the WPCode plugin and paste the glot tag into its Header box.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Install and activate the free WPCode (Insert Headers and Footers) plugin.",
+          "In your site's dashboard, go to Code Snippets → Header & Footer.",
+          "Paste the glot tag into the Header box.",
+          "Click Save Changes."
+        ],
+        "plans": "Header code and plugins are available on the Personal, Premium, Business and Commerce plans. Free sites must upgrade.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "If WordPress.com manages your domain's DNS, go to Domains → your domain → Settings → DNS records → Add record and add the CNAME (Name: es, Alias of: edge.glotlang.com) and the TXT (Name: _glot.es). If your name servers are elsewhere, add the records at that provider. Not possible on a wordpress.com address."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the free plan?",
+          "a": "No. Free sites cannot add header code or install plugins."
+        },
+        {
+          "q": "Do I type the full hostname in the DNS Name field?",
+          "a": "Enter only the label (es, _glot.es). WordPress.com strips the domain if you type it."
+        }
+      ],
+      "docs": [
+        {
+          "label": "WordPress.com: Add code to headers",
+          "url": "https://wordpress.com/support/adding-code-to-headers/"
+        },
+        {
+          "label": "WordPress.com: Plugins",
+          "url": "https://wordpress.com/support/plugins/"
+        },
+        {
+          "label": "WordPress.com: Manage DNS records",
+          "url": "https://wordpress.com/support/domains/custom-dns/"
+        },
+        {
+          "label": "WordPress.com: Add a new DNS record",
+          "url": "https://wordpress.com/support/add-a-new-dns-record/"
+        }
+      ],
+      "verified": true,
+      "notes": "Third-party guides and older copies of the headers page say Business/Commerce only; the live page fetched lists Personal, Premium, Business and Commerce."
+    },
+    {
+      "id": "elementor",
+      "name": "Elementor",
+      "category": "site-builder",
+      "method": "plugin",
+      "summary": "On a WordPress site built with Elementor, install the glot WordPress plugin; it ships an Elementor widget for the language switcher.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In WP Admin, go to Elementor → Custom Code.",
+          "Click Add New Custom Code.",
+          "Enter a Title, set Location to <head>, and paste the glot tag into the code editor.",
+          "In the Publish box, click Edit next to Conditions and set the snippet to show on the entire site.",
+          "Click Publish."
+        ],
+        "plans": "Custom Code is available on Advanced Solo, Advanced, Expert and Agency plans. It is not included in the Essential plan or in free Elementor. Without it, use a header/footer plugin as on any WordPress site.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your domain's DNS provider. On Elementor Hosting with a domain managed by Elementor, use Manage DNS → Add Record, which supports CNAME and TXT."
+      },
+      "faq": [
+        {
+          "q": "I only have free Elementor.",
+          "a": "Custom Code is a Pro feature. Install a header/footer code plugin like WPCode and paste the tag there instead."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Elementor: Add custom code",
+          "url": "https://elementor.com/help/custom-code-pro/"
+        },
+        {
+          "label": "Elementor: Pro plans & subscriptions",
+          "url": "https://elementor.com/help/elementor-pro-plans-subscriptions-2/"
+        },
+        {
+          "label": "Elementor: Manage your DNS records",
+          "url": "https://elementor.com/help/manage-your-dns-records/"
+        }
+      ],
+      "verified": true,
+      "notes": "The help article does not spell out the 'Entire Site' condition label; it links to the display conditions guide. DNS manager record types (CNAME, TXT) come from official help search results; the article body was truncated when fetched.",
+      "native": {
+        "steps": [
+          "Download glot.zip (built from integrations/wordpress-plugin in the glot repository; it isn't on WordPress.org yet). It needs WordPress 6.1+ and PHP 7.4+.",
+          "In WordPress, go to Plugins → Add New → Upload Plugin, upload glot.zip and activate it.",
+          "Open Settings → glot and enter your project slug, your public key (pk_…, never a secret glot_… key), the source language and your languages, then save. The plugin adds glot.js to every front-end page.",
+          "Optional: place the language switcher with the [glot_switcher] shortcode, the glot language switcher widget or block, or the Elementor widget; otherwise it sits in the corner you picked.",
+          "Optional: for translated URLs, set up glot Edge (subdomain or subdirectory) and choose it as the SEO mode, so the plugin adds hreflang links to the Edge pages.",
+          "Optional: click Connect to glot with a glot API token to link the WordPress connector, so translations are also written into Polylang Pro or WPML posts."
+        ],
+        "doc": "/docs/integrations#wordpress-plugin"
+      }
+    },
+    {
+      "id": "bubble",
+      "name": "Bubble",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into Settings → SEO / metatags → Script/meta tags in header, which applies to every page of the app.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In the Bubble editor, open the Settings tab.",
+          "Open the SEO / metatags section.",
+          "Paste the glot tag into the \"Script/meta tags in header\" field.",
+          "Deploy the app to Live."
+        ],
+        "plans": "The official page does not state a plan restriction for the header field. A custom domain requires a paid plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Requires a paid plan with a custom domain. Add the CNAME and TXT at your domain registrar. Not possible on a bubbleapps.io address."
+      },
+      "faq": [
+        {
+          "q": "Bubble apps render content with JavaScript. Will the tag still translate it?",
+          "a": "The tag translates text as it appears in the page, including content Bubble renders after load."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Bubble: SEO / metatags",
+          "url": "https://manual.bubble.io/core-resources/application-settings/seo-metatags.md"
+        },
+        {
+          "label": "Bubble: Settings tab",
+          "url": "https://manual.bubble.io/help-guides/getting-started/navigating-the-bubble-editor/tabs-and-sections/settings-tab.md"
+        },
+        {
+          "label": "Bubble: Custom domain and DNS",
+          "url": "https://manual.bubble.io/help-guides/getting-started/navigating-the-bubble-editor/tabs-and-sections/settings-tab/web-app/custom-domain-and-dns.md"
+        }
+      ],
+      "verified": true,
+      "notes": "Whether the header script field works on the Free plan is not stated in the docs. Bubble app pages are rendered client-side, so Edge SEO mode quality depends on glot's renderer handling the app."
+    },
+    {
+      "id": "softr",
+      "name": "Softr",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into the app-wide Custom Code header in the app's Settings.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open your app and click Settings in the left toolbar.",
+          "Go to the Custom Code section.",
+          "Paste the glot tag into the header code field (inserted before </head>).",
+          "Publish the app."
+        ],
+        "plans": "The docs do not state which plans include custom code. A custom domain requires a paid plan (Basic, Pro or Business include one).",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Requires a paid plan with a custom domain. Add the CNAME and TXT at your domain provider. Not possible on a softr.app address."
+      },
+      "faq": [
+        {
+          "q": "Should I use page settings custom code instead?",
+          "a": "No. Page-level custom code applies to one page only. Use the app-level Settings → Custom Code so the tag runs everywhere."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Softr: General settings",
+          "url": "https://docs.softr.io/application-settings/general-settings"
+        },
+        {
+          "label": "Softr: Add a custom domain",
+          "url": "https://docs.softr.io/publishing/add-a-custom-domain-to-your-app"
+        },
+        {
+          "label": "Softr: Pricing and plans",
+          "url": "https://docs.softr.io/workspace-and-billing/pricing-and-plans"
+        }
+      ],
+      "verified": true,
+      "notes": "Exact UI field labels in Custom Code are not given in the docs. Free-plan availability of custom code is not confirmed."
+    },
+    {
+      "id": "unstack",
+      "name": "Unstack",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Add the glot tag as a custom script integration that loads on all pages.",
+      "injection": {
+        "location": "body",
+        "steps": [
+          "Open the editor for your site.",
+          "Choose Integrations in the side menu.",
+          "Scroll to Custom and click + to add a custom script.",
+          "Enter a name, choose the page placement, paste the glot tag into the Script field, and click Save Integration."
+        ],
+        "plans": "Unknown; official docs could not be reached.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "If the site runs on your own domain, add the CNAME and TXT at your domain registrar."
+      },
+      "faq": [
+        {
+          "q": "Is Unstack still available?",
+          "a": "We could not reach unstack.com when checking. Confirm your site is still hosted there before setting up glot."
+        }
+      ],
+      "docs": [],
+      "verified": false,
+      "notes": "unstack.com and developer.unstack.com did not resolve (DNS failure) at research time; the product may be discontinued or renamed. Steps come from a third-party widget guide (widg.io), not official docs. Consider dropping this platform."
+    },
+    {
+      "id": "format",
+      "name": "Format",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "On a Pro or Pro Plus plan, paste the glot tag into Settings → Site → Custom Include.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open Settings and choose the Site tab.",
+          "Scroll to Custom Include and acknowledge the warning.",
+          "Paste the glot tag into the text area.",
+          "Click Save Changes."
+        ],
+        "plans": "The Custom Code Editor is on Pro and Pro Plus plans, not Basic.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Format connects your own domain with A/AAAA and www CNAME records at your registrar, so add the glot CNAME and TXT there too. Not possible on a format.com address."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the Basic plan?",
+          "a": "No. Custom code needs Pro or Pro Plus."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Format: Adding to the <head> element of your site",
+          "url": "https://help.format.com/hc/en-us/articles/28139512544915-Adding-to-the-head-element-of-your-site"
+        },
+        {
+          "label": "Format: How to connect a custom domain name",
+          "url": "https://help.format.com/hc/en-us/articles/28139519753619-How-to-connect-a-custom-domain-name"
+        },
+        {
+          "label": "Format: Pricing",
+          "url": "https://www.format.com/pricing"
+        }
+      ],
+      "verified": false,
+      "notes": "help.format.com returned 403 to fetching; steps are from official help-center search snippets, plan info from the fetched pricing page. Re-check menu names."
+    },
+    {
+      "id": "onepage",
+      "name": "Onepage",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into the Site Code <head> field so it applies to every page in the project.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open any page of the project.",
+          "Click the code icon in the left sidebar.",
+          "Select the Site Code column (applies to all pages within the project).",
+          "Paste the glot tag into the <head> field.",
+          "Save, then click Update or Publish."
+        ],
+        "plans": "The custom code article does not state a plan restriction. Connecting your own domain requires at least the Essential plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your registrar. If your domain uses Onepage name servers, add them in Settings → Project Settings → Domain settings → Edit → Add record. Onepage does not sell domains."
+      },
+      "faq": [
+        {
+          "q": "Page code or Site Code?",
+          "a": "Use Site Code. Page code only applies to one page."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Onepage: Embed custom code into your page/project",
+          "url": "https://help.onepage.io/en/articles/5335058-embed-custom-code-into-your-page-project"
+        },
+        {
+          "label": "Onepage: Modify DNS settings in Onepage",
+          "url": "https://help.onepage.io/en/articles/9188475-modify-dns-settings-in-onepage-caa-cname-txt-spf-mx"
+        }
+      ],
+      "verified": true,
+      "notes": "Essential plan requirement for custom domains is from an official help-center search snippet (9/10 Connect a custom domain), not a fetched page."
+    },
+    {
+      "id": "heyflow",
+      "name": "Heyflow",
+      "category": "site-builder",
+      "method": "tag",
+      "summary": "Paste the glot tag into the flow's Head Code editor and publish the flow.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Open the flow and go to the Build page.",
+          "Open the code editor on the left side and select Head Code.",
+          "Paste the glot tag and save.",
+          "Publish the flow."
+        ],
+        "plans": "Head code is a paid feature; the exact tier could not be confirmed from the official pricing page.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Possible: Heyflow connects your own domain with a CNAME (Connect → Domains), so you can point another subdomain such as es.example.com to glot at your DNS host. A flow is a single-page app, so there is little content for search engines to index; the tag is usually enough."
+      },
+      "faq": [
+        {
+          "q": "Does the tag run on every screen of the flow?",
+          "a": "Heyflow is a single-page app: head code runs once when the flow loads, and the tag then translates screens as they appear."
+        },
+        {
+          "q": "My flow is embedded on another site.",
+          "a": "Embedded flows do not run custom scripts from the host page; add the tag in Heyflow's Head Code."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Heyflow: Customize your funnel with Head Code",
+          "url": "https://help.heyflow.com/en/articles/11169848-customize-your-funnel-with-head-code"
+        },
+        {
+          "label": "Heyflow: Connect your own domain",
+          "url": "https://help.heyflow.com/en/articles/11064597-connect-your-own-domain-in-heyflow"
+        }
+      ],
+      "verified": false,
+      "notes": "help.heyflow.com and heyflow.com/pricing returned 403 to fetching; steps are from official help-center search snippets. seo.subdomain=false is a judgment call (SPA funnel), not a platform restriction; CNAME on your own domain is possible. Whether the tag can reach inside an embedded flow's iframe is unverified."
+    },
+    {
+      "id": "square-online",
+      "name": "Square Online",
+      "category": "e-commerce",
+      "method": "tag",
+      "summary": "Add the glot tag under Square Online → Settings → Tracking Tools with placement set to head.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In Square Dashboard, go to Channels → Square Online.",
+          "Select Settings, then Tracking Tools.",
+          "Select Add new code.",
+          "Enter a name, paste the glot tag into the code field, and choose head.",
+          "Select Save, then publish your site from the site editor."
+        ],
+        "plans": "Tracking Tools are available on Free, Plus and Premium plans. A custom domain requires Plus or Premium.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Requires Plus or Premium with a custom domain. For a domain bought through Square: Channels → Domains → Manage → Manage domain → Add DNS record. Otherwise add the records at your registrar. Not possible on a square.site address."
+      },
+      "faq": [
+        {
+          "q": "Does it work on the free plan?",
+          "a": "The tag yes. Subdomain SEO mode no, because the free plan only has a square.site address."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Square: Add custom tracking codes",
+          "url": "https://squareup.com/help/us/en/article/6957-add-custom-tracking-code-to-your-website"
+        },
+        {
+          "label": "Square: Connect a custom domain",
+          "url": "https://squareup.com/help/us/en/article/6916-connect-your-domain-with-square-online-store"
+        },
+        {
+          "label": "Square: Manage records for Square Online domains",
+          "url": "https://squareup.com/help/us/en/article/6962-manage-dns-records"
+        }
+      ],
+      "verified": true,
+      "notes": "The Square DNS article does not explicitly list TXT as a supported record type; community posts report adding TXT for Google verification, with one unresolved error report."
+    },
+    {
+      "id": "big-cartel",
+      "name": "Big Cartel",
+      "category": "e-commerce",
+      "method": "tag",
+      "summary": "On a paid plan, paste the glot tag into Shop designer → Code → Integration Code → Head.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Log in at app.bigcartel.com and click Shop designer in the sidebar.",
+          "Select the Code tab.",
+          "Under Integration Code, choose Head.",
+          "Paste the glot tag and click Done.",
+          "Click Publish."
+        ],
+        "plans": "Integration Code requires a paid plan. The free Gold plan does not have it.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Custom domains are a paid feature (Platinum, Diamond). Add the CNAME and TXT at your domain provider. Not possible on a bigcartel.com address."
+      },
+      "faq": [
+        {
+          "q": "Will the tag survive a theme change?",
+          "a": "Yes. Integration Code stays when you switch themes, but it is removed if you downgrade to Gold and is not included in theme downloads."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Big Cartel: Integration Code",
+          "url": "https://www.bigcartel.com/resources/help/article/integration-code"
+        },
+        {
+          "label": "Big Cartel: Use a custom domain",
+          "url": "https://www.bigcartel.com/resources/help/article/use-a-custom-domain"
+        }
+      ],
+      "verified": true,
+      "notes": "Platinum/Diamond for custom domains comes from the official plan comparison via search; the fetched custom domain article only shows 'Premium feature'. Whether domains bought through Big Cartel allow editing DNS records is unconfirmed."
+    },
+    {
+      "id": "shopwired",
+      "name": "ShopWired",
+      "category": "e-commerce",
+      "method": "tag",
+      "summary": "Paste the glot tag into Settings → Visitor Monitoring → Visitor Tracking, which outputs it on all pages, or into master.twig before </head>.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Go to Settings → Visitor Monitoring → Visitor Tracking.",
+          "Paste the glot tag into the Visitor Tracking Code box.",
+          "Save. ShopWired outputs it on all website pages.",
+          "Alternative: go to Themes → Installed Themes → Page Editor on your live theme, open Views → Templates → master.twig, paste the tag just above </head>, and save."
+        ],
+        "plans": "No plan restriction is stated in the docs.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "ShopWired does not manage DNS; your live domain's records are set at your registrar. Add the glot CNAME and TXT there."
+      },
+      "faq": [
+        {
+          "q": "Does the tag cover the checkout?",
+          "a": "The checkout is configured separately (Checkout → Platform Checkout → Custom JavaScript). The visitor tracking field covers the storefront pages."
+        }
+      ],
+      "docs": [
+        {
+          "label": "ShopWired: Visitor and conversion tracking",
+          "url": "https://help.shopwired.co.uk/manual/visitor-tracking/visitor-tracking"
+        },
+        {
+          "label": "ShopWired: Installing Google Tag Manager",
+          "url": "https://help.shopwired.co.uk/manual/visitor-tracking/installing-google-tag-manager"
+        },
+        {
+          "label": "ShopWired: Custom domain names & DNS",
+          "url": "https://help.shopwired.co.uk/getting-started/domain-names/custom-domain-names-and-dns"
+        }
+      ],
+      "verified": true,
+      "notes": "The visitor tracking guide is marked legacy and points to help.shopwired.io; it does not say whether the field outputs in head or body (the master template places account scripts via the global header tag in <head>)."
+    },
+    {
+      "id": "lovable",
+      "name": "Lovable",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Add the glot tag inside <head> of index.html, either in Code mode or by asking Lovable's chat to do it, then publish.",
+      "injection": {
+        "location": "index.html",
+        "steps": [
+          "Open your project and click the Code tab in the project toolbar.",
+          "In the left file panel, open index.html (or use Search code, Cmd+Shift+F / Ctrl+Shift+F).",
+          "Paste the glot tag just before </head>.",
+          "Click Save (Cmd+S / Ctrl+S).",
+          "Publish the project.",
+          "Alternative on any plan: ask the chat \"Add this script tag inside <head> of index.html, unchanged: <the glot tag>\", then publish."
+        ],
+        "plans": "Editing files in Code mode requires a paid plan; on the Free plan the editor is read-only. Asking the chat to add the tag works on any plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Connecting a custom domain requires a paid plan (Project → Settings → Domains). If the domain uses another provider's nameservers, add the CNAME and TXT at that provider. If it was bought through Lovable, add them in Workspace settings → Workspace domains → your domain → Advanced → DNS records → Add record (CNAME and TXT are supported). Not possible on a lovable.app address."
+      },
+      "faq": [
+        {
+          "q": "Can a later AI edit remove the tag?",
+          "a": "Yes, a regeneration can rewrite index.html. Check that the tag is still in <head> after large changes; each save is in version history."
+        },
+        {
+          "q": "Will the es. subdomain clash with my Lovable domain?",
+          "a": "No. You can connect different subdomains to different targets; es.example.com points to glot while example.com stays on Lovable."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Lovable: Custom domain",
+          "url": "https://docs.lovable.dev/features/custom-domain"
+        },
+        {
+          "label": "Lovable: Code mode",
+          "url": "https://docs.lovable.dev/features/code-mode"
+        }
+      ],
+      "verified": true,
+      "notes": "The prompt-the-AI method is not described in Lovable docs; it is the generic approach. Exact A/TXT values for Lovable's own domain connection are shown only in the Set up DNS window."
+    },
+    {
+      "id": "bolt",
+      "name": "Bolt.new",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Add the glot tag inside <head> of index.html in Bolt's Code view (or ask the AI), then publish.",
+      "injection": {
+        "location": "index.html",
+        "steps": [
+          "Click the code icon (<>) at the top center of the screen to show the Files list.",
+          "Click index.html to open it in the editor (desktop Chromium browser required for direct editing).",
+          "Paste the glot tag just before </head>.",
+          "Save the file, then publish the project.",
+          "Alternative: ask the AI to add the tag unchanged inside <head> of index.html."
+        ],
+        "plans": "Code view editing is available on the Free plan and does not use tokens. Custom domains require a paid plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Connect your domain on a paid plan in All project settings → Domains & Hosting. Add the glot CNAME and TXT at your domain's DNS provider. For a domain bought through Bolt, the help center does not document a DNS editor, so contact Bolt support. Not possible on a .bolt.host address."
+      },
+      "faq": [
+        {
+          "q": "Does the free plan work with glot?",
+          "a": "The tag works on the free plan. The SEO subdomain does not, because the free plan has no custom domains."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Bolt: Connect a domain",
+          "url": "https://support.bolt.new/cloud/domains/connect"
+        },
+        {
+          "label": "Bolt: Code view",
+          "url": "https://support.bolt.new/building/using-bolt/code-view"
+        }
+      ],
+      "verified": true,
+      "notes": "Code view and plan details come from official help-center pages seen via search results; the connect page was fetched directly. DNS editing for Bolt-bought domains is undocumented."
+    },
+    {
+      "id": "base44",
+      "name": "Base44",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Ask Base44's AI (or edit the layout in the Code tab) to load the glot script on every page, then publish.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Go to your app's dashboard and click Code.",
+          "Open the app's layout file in the Code files panel (the component that wraps every page).",
+          "Add code that loads the glot script once with all its data- attributes, or ask the AI chat: \"Load this script on every page, with these exact attributes: <the glot tag>\".",
+          "Click Save, check the preview, then click Publish."
+        ],
+        "plans": "The Code tab is documented without a plan requirement in the editing page; Base44 gates some developer tools to Builder and above. Custom domains require Starter or higher.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Connect your domain (Starter plan or higher) in Dashboard → Domains. Add the glot CNAME and TXT at your DNS provider. Domains bought through Base44 since September 2026 are registered with Wix and managed from the Wix domains dashboard (More actions → Manage Domain); older ones at GoDaddy or IONOS. Not possible on a base44.app address."
+      },
+      "faq": [
+        {
+          "q": "Can I paste the tag into index.html?",
+          "a": "Not reliably. Base44 has no documented head-code setting, and users report index.html is not editable or is overwritten on publish. Load the script from the layout instead."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Base44: Setting up your custom domain",
+          "url": "https://docs.base44.com/Setting-up-your-app/Setting-up-your-custom-domain"
+        },
+        {
+          "label": "Base44: Connecting an external domain",
+          "url": "https://docs.base44.com/fr/Setting-up-your-app/Connecting-an-external-domain.md"
+        },
+        {
+          "label": "Base44: Editing code",
+          "url": "https://docs.base44.com/documentation/building-your-app/editing-code"
+        }
+      ],
+      "verified": false,
+      "notes": "Domain parts verified on official docs. Script injection is not documented by Base44; the index.html limitation comes from posts on feedback.base44.com. Whether Wix-managed Base44 domains accept arbitrary CNAME/TXT was not confirmed."
+    },
+    {
+      "id": "v0",
+      "name": "v0 (Vercel)",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Add the glot tag to the <head> of the root layout (app/layout.tsx) in v0, or ask v0 to do it, then publish.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open your v0 project and ask v0: \"Add this script tag inside <head> in app/layout.tsx, unchanged: <the glot tag>\" (or edit app/layout.tsx in the code view yourself).",
+          "Check that the tag is in the root layout, so it runs on every route.",
+          "Publish the project."
+        ],
+        "plans": "Plan limits for code editing and custom domains are not stated in v0's custom domain doc. Vercel Hobby allows up to 50 custom domains per project.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add your domain via Publish → Customize Domain (or project menu → Settings → Domains), then configure it on Vercel. Add the glot CNAME and TXT at your registrar, or, if the domain uses Vercel nameservers, in your team's Domains page → your domain → DNS Records. Not possible on a vercel.app address."
+      },
+      "faq": [
+        {
+          "q": "Should I use next/script instead of a raw <script>?",
+          "a": "Either works if it loads on every route. A plain async <script> in the root layout's <head> is the simplest and keeps the data- attributes intact."
+        }
+      ],
+      "docs": [
+        {
+          "label": "v0: Custom domains",
+          "url": "https://v0.app/docs/custom-domains"
+        },
+        {
+          "label": "Vercel: Adding & configuring a custom domain",
+          "url": "https://vercel.com/docs/domains/working-with-domains/add-a-domain"
+        }
+      ],
+      "verified": true,
+      "notes": "The layout-edit step is standard Next.js, not a v0 doc page. v0 plan restrictions for custom domains were not found."
+    },
+    {
+      "id": "replit",
+      "name": "Replit",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Add the glot tag inside <head> of your app's HTML entry file (or ask Replit Agent), then republish.",
+      "injection": {
+        "location": "index.html",
+        "steps": [
+          "Open the app in the Project Editor.",
+          "Open the HTML entry file (for example index.html, or the root layout in a Next.js app), or ask Agent: \"Add this script tag inside <head> on every page, unchanged: <the glot tag>\".",
+          "Paste the glot tag just before </head>.",
+          "Republish the app so the published version includes the tag."
+        ],
+        "plans": "Code is editable on all plans. The free Starter plan includes one published app; the custom domain doc does not name a required plan.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Link your domain in Tools → Domains (under Replit Cloud). Add the glot CNAME and TXT at your registrar. For a domain bought through Replit, select it and choose Manage to edit records; the doc lists A, TXT and MX as examples, so confirm CNAME is accepted. Not possible on a replit.app address."
+      },
+      "faq": [
+        {
+          "q": "Do I need to republish after adding the tag?",
+          "a": "Yes. Published apps run a snapshot, so the tag only appears after you republish."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Replit: Custom domains",
+          "url": "https://docs.replit.com/cloud-services/deployments/custom-domains"
+        }
+      ],
+      "verified": true,
+      "notes": "Plan requirement for custom domains not found in official docs. CNAME support in Replit's DNS editor for Replit-bought domains not explicitly confirmed."
+    },
+    {
+      "id": "macaly",
+      "name": "Macaly",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Ask the Macaly agent in chat to add the glot script to every page, then publish.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open the chat in your Macaly project.",
+          "Ask the agent: \"Add this script to every page, inside <head>, unchanged: <the glot tag>\".",
+          "Check the preview, then publish."
+        ],
+        "plans": "Adding third-party scripts through the agent is available on all plans (per the GA4 guide). There is no documented built-in code editor. Custom domains need a paid plan (Starter includes one).",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Connect your domain on a paid plan in Settings → Domains. Add the glot CNAME and TXT at your domain registrar; Macaly's docs describe no DNS editor. Not possible on a macaly.app address."
+      },
+      "faq": [
+        {
+          "q": "Can I edit the code myself?",
+          "a": "Macaly documents changes through the agent chat and Visual edits, not a code editor. External agents can edit files through Macaly Cloud, and paid plans can download the code."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Macaly: Domains",
+          "url": "https://www.macaly.com/docs/en/features/domains"
+        },
+        {
+          "label": "Macaly: Google Analytics 4",
+          "url": "https://www.macaly.com/docs/en/integrations/google-analytics.md"
+        },
+        {
+          "label": "Macaly: FAQ",
+          "url": "https://www.macaly.com/docs/en/welcome/faq.md"
+        }
+      ],
+      "verified": true,
+      "notes": "Macaly sites are Next.js; the docs do not say where the agent places scripts. Where DNS is managed for domains bought in Macaly is undocumented."
+    },
+    {
+      "id": "brila",
+      "name": "Brila",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "Brila (brila.ai) generates one-page sites for local businesses from Google Maps or Yelp reviews; no documented way to add custom code.",
+      "injection": {
+        "location": "none",
+        "steps": [],
+        "plans": "Not documented.",
+        "available": false
+      },
+      "seo": {
+        "subdomain": false,
+        "how": "Brila does not document custom domains; sample sites use brila.ai subdomains."
+      },
+      "faq": [
+        {
+          "q": "Can I use glot on Brila?",
+          "a": "Not documented. Brila publishes no help center for custom code or domains; ask Brila (their FAQ link points to Discord)."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Brila home page",
+          "url": "https://brila.ai"
+        }
+      ],
+      "verified": false,
+      "notes": "Identified as brila.ai (AI site builder from Google Maps reviews). No official docs found; only the marketing page was read. Third-party listings mention a CMS with forms and analytics, unconfirmed."
+    },
+    {
+      "id": "emdash",
+      "name": "EmDash",
+      "category": "cms",
+      "method": "tag",
+      "summary": "EmDash is Cloudflare's open-source CMS built on Astro; add the glot tag to the <head> of the site's base Astro layout and redeploy.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open the Astro project that runs EmDash.",
+          "Open the base layout used by every page (the component that renders <head>).",
+          "Paste the glot tag just before </head>.",
+          "Redeploy (for example wrangler deploy on Cloudflare Workers)."
+        ],
+        "plans": "Open source (MIT); you own the code, so no plan restriction.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "You host EmDash yourself, so add the glot CNAME and TXT wherever your domain's DNS lives (on Cloudflare DNS if the site runs on Workers with a custom domain). Not possible on a workers.dev address."
+      },
+      "faq": [
+        {
+          "q": "Is there an admin field for head scripts?",
+          "a": "None found in EmDash docs. Add the tag in the Astro layout."
+        }
+      ],
+      "docs": [
+        {
+          "label": "EmDash: Deploy to Cloudflare",
+          "url": "https://docs.emdashcms.com/deployment/cloudflare/"
+        }
+      ],
+      "verified": false,
+      "notes": "Product identified (github.com/emdash-cms/emdash, docs.emdashcms.com). Deployment/custom domain verified; the layout-edit step is standard Astro, not covered by EmDash docs. Category set to cms rather than ai-builder."
+    },
+    {
+      "id": "openbuilder",
+      "name": "OpenBuilder",
+      "category": "ai-builder",
+      "method": "tag",
+      "summary": "OpenBuilder is a YC F25 vibe-coding platform built on VS Code (pitched as an open-source Lovable alternative); add the glot tag to the app's HTML <head>.",
+      "injection": {
+        "location": "index.html",
+        "steps": [
+          "Open your project in OpenBuilder.",
+          "Edit the HTML entry file or root layout, or ask the agent to add the glot tag unchanged inside <head> on every page.",
+          "Republish, or export the code and deploy it on your own hosting."
+        ],
+        "plans": "Not documented. The company says building is free and the codebase can be exported at any time.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": false,
+        "how": "Hosting and custom domains are not documented. If you export the code and host it on your own domain, add the CNAME and TXT at your DNS provider."
+      },
+      "faq": [
+        {
+          "q": "Does OpenBuilder host on a custom domain?",
+          "a": "Not documented. Exporting the code and hosting it yourself is the reliable path."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Y Combinator: OpenBuilder (EasyCode)",
+          "url": "https://www.ycombinator.com/companies/easycode"
+        }
+      ],
+      "verified": false,
+      "notes": "No official site or docs found; only the YC company page. Contact domain suggests theopenbuilder.com, unconfirmed. A separate GitHub project 'open-builder' exists and is unrelated."
+    },
+    {
+      "id": "thinkific",
+      "name": "Thinkific",
+      "category": "lms",
+      "method": "tag",
+      "summary": "Paste the glot tag in Site footer code (any paid plan), or in <head> of the theme's Default layout for earlier loading.",
+      "injection": {
+        "location": "body",
+        "steps": [
+          "From your Admin Dashboard, select Settings.",
+          "Select the Code & analytics tab; Site footer code appears at the top.",
+          "Paste the glot tag and save.",
+          "Head alternative (needs theme code access): Channels → Website → Theme Library → three-dot icon → Edit Code → Layout folder → Default, paste the tag between <head> and </head>, click Save."
+        ],
+        "plans": "Site footer code requires a paid plan (Basic or higher). Theme code requires theme code access. Scripts added this way do not run in the Course Player or on Performance Checkout.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Custom domains need a paid plan and must be a subdomain set with a CNAME. Add the glot CNAME and TXT at your domain host (Thinkific does not sell domains). Not possible on a thinkific.com address."
+      },
+      "faq": [
+        {
+          "q": "Will course lessons be translated?",
+          "a": "No. Thinkific site code does not run in the Course Player or Performance Checkout, so glot covers site and landing pages only."
+        },
+        {
+          "q": "Head or footer?",
+          "a": "Use theme <head> if you can, so the page is translated before it shows. Footer code works but loads at the end; it is also the only method that works on AI-generated landing pages."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Thinkific: Installing Google Tag Manager",
+          "url": "https://support.thinkific.com/hc/en-us/articles/360030368974"
+        },
+        {
+          "label": "Thinkific: Custom Domains",
+          "url": "https://support.thinkific.com/hc/en-us/articles/360030360074"
+        }
+      ],
+      "verified": true,
+      "notes": "Articles read through Thinkific's Zendesk API (web pages returned 403). The Settings → Code & analytics path comes from Thinkific's developer help center as shown in search results."
+    },
+    {
+      "id": "teachable",
+      "name": "Teachable",
+      "category": "lms",
+      "method": "tag",
+      "summary": "Paste the glot tag in Site → Code Snippets → Head Code Snippets (Builder plan and above).",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Log in to your Teachable school.",
+          "Select Site, then click Code Snippets.",
+          "Paste the glot tag into the Head Code Snippets section (applies to all users and pages).",
+          "Click Save."
+        ],
+        "plans": "Code Snippets require the Builder plan or above. With SSO, head snippets do not run on sso.teachable.com login or checkout pages.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Custom domains depend on your plan; add them under Site → Domains → New Domain. Add the glot CNAME and TXT at your domain registrar. Not possible on a teachable.com address."
+      },
+      "faq": [
+        {
+          "q": "Does it cover login and checkout?",
+          "a": "Not when SSO is on: head snippets don't run on sso.teachable.com pages."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Teachable: Code snippets and custom CSS",
+          "url": "https://support.teachable.com/en/articles/11682515-code-snippets-and-custom-css"
+        },
+        {
+          "label": "Teachable: Set up a custom subdomain",
+          "url": "https://support.teachable.com/en/articles/11682511-set-up-a-custom-subdomain"
+        }
+      ],
+      "verified": true,
+      "notes": "Which plans include custom domains was not stated in the fetched articles."
+    },
+    {
+      "id": "shopify",
+      "name": "Shopify",
+      "category": "e-commerce",
+      "method": "connector",
+      "summary": "Paste the glot tag into the theme's theme.liquid layout, just before </head>, so it loads on every storefront page (not checkout).",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "From your Shopify admin, go to Online Store.",
+          "Optional but recommended: duplicate your theme first so you can roll back.",
+          "Click the horizontal menu icon (three dots) next to your theme, then select Edit code.",
+          "In the Layout folder, open theme.liquid.",
+          "Paste the glot tag inside <head>, just before </head>.",
+          "Click Save."
+        ],
+        "plans": "Theme code editing is available on all plans, but only for a theme you own: a trial of a paid theme must be purchased before you can edit its code. The tag does not run on checkout, Thank you or Order status pages.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your domain registrar, or, if your domain is managed by Shopify, in Settings > Domains > (your domain) > DNS settings > Manage > Add custom record. Not possible on a myshopify.com address, and not shown if the domain uses custom nameservers (edit DNS where those nameservers are hosted)."
+      },
+      "faq": [
+        {
+          "q": "Will glot translate my Shopify checkout?",
+          "a": "No. Checkout steps, and since 2025 the Thank you and Order status pages, do not run theme code or custom scripts. Shopify translates checkout text itself based on the store languages."
+        },
+        {
+          "q": "Can I add glot without editing theme.liquid?",
+          "a": "Yes, on Online Store 2.0 themes: glot's theme app extension (integrations/shopify-app in the glot repository) adds glot.js and a language switcher as an app embed. It isn't on the Shopify App Store; you install it as your own custom app with Shopify CLI, then turn it on in the theme editor under App embeds. See the glot docs, Shopify app embed."
+        },
+        {
+          "q": "What happens if I switch themes?",
+          "a": "The tag lives in the theme's code, so you must add it again to theme.liquid of the new theme (app embeds also need to be re-enabled on a new theme)."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Shopify: Editing theme code",
+          "url": "https://help.shopify.com/en/manual/online-store/themes/theme-structure/extend/edit-theme-code"
+        },
+        {
+          "label": "Shopify: Apps in themes (app embeds)",
+          "url": "https://help.shopify.com/en/manual/online-store/themes/customizing-themes/apps"
+        },
+        {
+          "label": "Shopify: Theme layouts",
+          "url": "https://shopify.dev/docs/storefronts/themes/architecture/layouts"
+        },
+        {
+          "label": "Shopify: checkout.liquid (deprecation)",
+          "url": "https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid"
+        },
+        {
+          "label": "Shopify: Editing DNS settings",
+          "url": "https://help.shopify.com/en/manual/domains/managing-domains/edit-dns-settings"
+        },
+        {
+          "label": "glot docs: Shopify app embed",
+          "url": "https://glotlang.com/docs/integrations#shopify-app-embed"
+        }
+      ],
+      "verified": true,
+      "notes": "The Shopify help page does not name theme.liquid explicitly; shopify.dev confirms theme.liquid is the default layout for all non-checkout pages and that content_for_header sits in <head>. Script tags on Thank you / Order status are sunset for non-Plus stores on 2026-08-26 per shopify.dev.",
+      "native": {
+        "steps": [
+          "In Shopify admin → Settings → Apps and sales channels → Develop apps, create a custom app with the Admin API scopes read_translations, write_translations, read_products, read_content, read_online_store_pages, read_themes, read_locales and write_locales.",
+          "Install the app, then copy its Admin API access token (shpat_…) and your store domain (my-store.myshopify.com).",
+          "In glot, open your project → Integrations → Shopify and paste the domain and the token. Add the API secret key too if you want glot to register and verify webhooks.",
+          "Click Sync now. glot translates products, collections, pages, articles and the theme as edited in the admin, and registers each translation in Shopify.",
+          "A language missing from the store is added unpublished: publish it in Shopify under Settings → Languages when you're ready."
+        ],
+        "doc": "/docs/integrations#shopify"
+      }
+    },
+    {
+      "id": "woocommerce",
+      "name": "WooCommerce",
+      "category": "e-commerce",
+      "method": "plugin",
+      "summary": "WooCommerce runs on WordPress: install the glot WordPress plugin, which keeps customer data out of translation.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Do not edit the parent theme's files: theme updates overwrite them.",
+          "Either install a plugin that lets you add custom code (for example Code Snippets), or create a child theme.",
+          "In the child theme's functions.php (or a new snippet), hook a function on wp_head that echoes the glot tag.",
+          "Save or activate the snippet and clear any caching plugin.",
+          "Open your store in a private window and check that the language menu appears."
+        ],
+        "plans": "WooCommerce is self-hosted and free; any WordPress install where you can add plugins or edit a child theme can add the tag. On managed WordPress.com, plugins require a plan that allows them.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT wherever your domain's DNS is hosted (registrar, hosting provider or DNS service). You control your own domain on a self-hosted store."
+      },
+      "faq": [
+        {
+          "q": "Should I paste the tag in the theme editor's header.php?",
+          "a": "Not in the parent theme: an update erases it. WooCommerce's docs recommend a child theme's functions.php or a code-snippets plugin."
+        },
+        {
+          "q": "Does it work on the block checkout and cart?",
+          "a": "The tag runs on every page that prints wp_head, including cart and checkout pages of standard themes."
+        }
+      ],
+      "docs": [
+        {
+          "label": "WooCommerce: Theming snippets",
+          "url": "https://woocommerce.com/documentation/plugins/woocommerce/woocommerce-codex/snippets/snippets-theming/"
+        }
+      ],
+      "verified": true,
+      "notes": "WooCommerce docs confirm the child theme / Code Snippets approach but do not mention wp_head; the wp_head hook is standard WordPress, not taken from a fetched WooCommerce page. WordPress.com plan detail not fetched.",
+      "native": {
+        "steps": [
+          "Download glot.zip (built from integrations/wordpress-plugin in the glot repository; it isn't on WordPress.org yet). It needs WordPress 6.1+ and PHP 7.4+.",
+          "In WordPress, go to Plugins → Add New → Upload Plugin, upload glot.zip and activate it.",
+          "Open Settings → glot and enter your project slug, your public key (pk_…, never a secret glot_… key), the source language and your languages, then save. The plugin adds glot.js to every front-end page.",
+          "Optional: place the language switcher with the [glot_switcher] shortcode, the glot language switcher widget or block, or the Elementor widget; otherwise it sits in the corner you picked.",
+          "WooCommerce: cart, checkout and account forms are never read; customer details on order and address pages are marked so they are never translated or reported.",
+          "Optional: for translated URLs, set up glot Edge (subdomain or subdirectory) and choose it as the SEO mode, so the plugin adds hreflang links to the Edge pages.",
+          "Optional: click Connect to glot with a glot API token to link the WordPress connector, so translations are also written into Polylang Pro or WPML posts."
+        ],
+        "doc": "/docs/integrations#wordpress-plugin"
+      }
+    },
+    {
+      "id": "bigcommerce",
+      "name": "BigCommerce",
+      "category": "e-commerce",
+      "method": "connector",
+      "summary": "Create a script in Storefront > Script Manager with the glot tag, placed in the Head on All pages.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In the control panel, go to Storefront > Script Manager (Multi-Storefront: Channels > Channel Manager, then the storefront's Script Manager).",
+          "Click Create a Script.",
+          "Give it a name, choose the Head location and All pages.",
+          "Choose a script category (consent category) that matches your cookie banner setup.",
+          "Paste the glot tag as the script contents.",
+          "Click Save. Scripts can take about 20 seconds to appear because of caching."
+        ],
+        "plans": "Available on Stencil and Catalyst (v1.1+) storefronts; no plan restriction is documented. Not rendered on legacy Blueprint themes. Up to 50 control-panel scripts per channel.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your registrar, or in Settings > Email & DNS records > Web Hosts > Add another if the domain is bought through BigCommerce or uses BigCommerce nameservers (default storefront only). Not possible on a mybigcommerce.com address."
+      },
+      "faq": [
+        {
+          "q": "Will glot run on checkout?",
+          "a": "Use All pages only if you accept the PCI rule: scripts on checkout need an SRI hash and only render with Optimized One-Page Checkout. Choosing storefront pages only avoids checkout entirely."
+        },
+        {
+          "q": "My store uses Catalyst. Anything special?",
+          "a": "Catalyst 1.1+ renders Script Manager scripts, but client-side navigation may not re-run scripts on every page change."
+        }
+      ],
+      "docs": [
+        {
+          "label": "BigCommerce: Scripts (Script Manager and Scripts API)",
+          "url": "https://docs.bigcommerce.com/docs/integrations/scripts"
+        },
+        {
+          "label": "BigCommerce: Managing DNS",
+          "url": "https://support.bigcommerce.com/articles/en_US/Knowledge/Managing-DNS"
+        }
+      ],
+      "verified": true,
+      "notes": "The help-center Script Manager article did not load (CSS error page). Field labels (name, location, pages, category) come from the developer docs and a search snippet of the Stencil Themes article ('Storefront > Script Manager > Create a Script'); exact UI labels may differ slightly.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → BigCommerce and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#bigcommerce"
+      }
+    },
+    {
+      "id": "prestashop",
+      "name": "PrestaShop",
+      "category": "e-commerce",
+      "method": "connector",
+      "summary": "Add the glot tag to the head template of a child theme (templates/_partials/head.tpl) so it loads on every front-office page.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Create a child theme of your current theme: a folder in /themes/ with config/theme.yml containing name: (the folder name) and parent: (your theme's name).",
+          "In the child theme, create templates/_partials/head.tpl starting with {extends file='parent:_partials/head.tpl'}.",
+          "Override one of the head blocks (for example javascript_head), call the parent content, and add the glot tag.",
+          "Activate the child theme in the back office (Design > Theme & Logo).",
+          "Clear the cache and check a front-office page."
+        ],
+        "plans": "PrestaShop is self-hosted open source; available on any install where you can upload theme files. The back office has no built-in field for custom head scripts.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT wherever your domain's DNS is hosted (registrar or hosting provider)."
+      },
+      "faq": [
+        {
+          "q": "Can I use theme.yml assets or custom.js instead?",
+          "a": "custom.js loads at the end of the page, not in the head, and theme.yml assets do not carry the data-* attributes the glot tag needs. A template override keeps the tag exactly as given."
+        },
+        {
+          "q": "Why a child theme?",
+          "a": "Editing the parent theme directly is lost when it updates; a child theme overrides only the files you copy."
+        }
+      ],
+      "docs": [
+        {
+          "label": "PrestaShop: Head template",
+          "url": "https://devdocs.prestashop-project.org/8/themes/reference/templates/head/"
+        },
+        {
+          "label": "PrestaShop: Asset management",
+          "url": "https://devdocs.prestashop-project.org/8/themes/getting-started/asset-management/"
+        },
+        {
+          "label": "PrestaShop: Creating a child theme",
+          "url": "https://devdocs.prestashop-project.org/9/themes/create-a-theme/child-theme/"
+        }
+      ],
+      "verified": true,
+      "notes": "Design > Theme & Logo as the activation screen is from the user guide (search result), not a fetched page. The exact block name to override in head.tpl depends on the theme (Classic vs Hummingbird).",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → PrestaShop and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#prestashop"
+      }
+    },
+    {
+      "id": "magento",
+      "name": "Magento / Adobe Commerce",
+      "category": "e-commerce",
+      "method": "connector",
+      "summary": "Paste the glot tag in Content > Design > Configuration > (store view) > HTML Head > Scripts and Style Sheets.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "On the Admin sidebar, go to Content > Design > Configuration.",
+          "Find the store view and click Edit in the Action column.",
+          "Under Other Settings, expand HTML Head.",
+          "Paste the glot tag in the Scripts and Style Sheets field.",
+          "Click Save Configuration, then refresh caches if Magento asks you to."
+        ],
+        "plans": "Available in Magento Open Source and Adobe Commerce (on-premises and cloud). Headless/Edge Delivery storefronts do not use this field.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT wherever your domain's DNS is hosted (registrar, DNS provider or your Adobe Commerce Cloud DNS setup)."
+      },
+      "faq": [
+        {
+          "q": "Does the tag run on checkout?",
+          "a": "Only if you allow its domain in your Content Security Policy: scripts in this field are not whitelisted automatically and won't run on Checkout pages in restricted CSP mode."
+        },
+        {
+          "q": "I have several store views. Where do I add it?",
+          "a": "The setting is per scope: edit each store view (or the website/global row) that should load glot."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Adobe Commerce: Page setup (HTML Head)",
+          "url": "https://experienceleague.adobe.com/en/docs/commerce-admin/content-design/design/page-setup"
+        }
+      ],
+      "verified": true,
+      "notes": "Cache refresh step is not in the page; standard Magento admin behaviour.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Magento and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#magento-adobe-commerce"
+      }
+    },
+    {
+      "id": "shopware",
+      "name": "Shopware",
+      "category": "e-commerce",
+      "method": "connector",
+      "summary": "Extend the storefront template layout/meta.html.twig in a plugin or theme and add the glot tag inside the layout_head_javascript_hmr_mode block.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "In your plugin or theme, create src/Resources/views/storefront/layout/meta.html.twig.",
+          "Start it with {% sw_extends '@Storefront/storefront/layout/meta.html.twig' %}.",
+          "Override {% block layout_head_javascript_hmr_mode %}, keep {{ parent() }}, and add the glot tag after it.",
+          "Install/activate the extension and clear the cache (bin/console cache:clear)."
+        ],
+        "plans": "Works on self-hosted Shopware 6 (any edition). Shopware's docs offer no admin field for custom head scripts; on Shopware SaaS, plugin code cannot be uploaded and templates must ship as an app/theme.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your registrar or DNS provider. On Shopware SaaS, custom domains are added in Settings > System > Domains; the shopware.store default domain cannot be used."
+      },
+      "faq": [
+        {
+          "q": "Why must I keep {{ parent() }}?",
+          "a": "Without it the block's core Storefront JavaScript is removed and the shop stops working."
+        },
+        {
+          "q": "I'm on Shopware SaaS. Can I add the tag?",
+          "a": "Not from a settings field. You need an app or theme that extends the template; check with your Shopware partner."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Shopware: Add JavaScript as script tag",
+          "url": "https://developer.shopware.com/docs/guides/plugins/plugins/storefront/add-javascript-as-script-tag.html"
+        },
+        {
+          "label": "Shopware SaaS: Use your own domains",
+          "url": "https://docs.shopware.com/en/shopware-6-en/saas/domains"
+        }
+      ],
+      "verified": true,
+      "notes": "The script-tag guide covers plugins only; theme and SaaS (app) equivalence is my inference, not stated. Cache command is standard Shopware CLI, not from a fetched page.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Shopware and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#shopware"
+      }
+    },
+    {
+      "id": "zoho-commerce",
+      "name": "Zoho Commerce",
+      "category": "e-commerce",
+      "method": "tag",
+      "summary": "Paste the glot tag in Settings > Storefront > Code > Header Code, then publish.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Click Settings in the top right corner.",
+          "Under Storefront, click Code.",
+          "Paste the glot tag in the Header Code field.",
+          "Save and publish your changes."
+        ],
+        "plans": "The Zoho help page lists no plan restriction for Header Code; check your plan if the field is missing.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Requires your own domain mapped in Settings > Storefront > Domain and SSL. Add the glot CNAME and TXT at your registrar. Not possible on a zohocommerce address."
+      },
+      "faq": [
+        {
+          "q": "Can I add the tag to a single page only?",
+          "a": "Pages also have their own Header and Footer Code sections, but glot must run site-wide, so use Settings > Code."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Zoho Commerce: Storefront settings",
+          "url": "https://www.zoho.com/commerce/help/storefront-settings/"
+        }
+      ],
+      "verified": true,
+      "notes": "Plan eligibility for custom domains not confirmed. Whether a domain bought through Zoho allows arbitrary CNAME/TXT records was not verified."
+    },
+    {
+      "id": "salesforce-commerce-cloud",
+      "name": "Salesforce Commerce Cloud (B2C)",
+      "category": "enterprise",
+      "method": "tag",
+      "summary": "On SFRA, a developer adds the glot tag to the head template (htmlHead.isml) or the app.template.htmlHead hook in a custom cartridge.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Ask your developer or agency; this is a code change, not a Business Manager setting.",
+          "In a custom cartridge (never the base app_storefront_base cartridge), override the head template common/htmlHead.isml or register a script on the app.template.htmlHead hook in hooks.json.",
+          "Add the glot tag so it renders inside <head> on every page.",
+          "Make sure the custom cartridge is on the site's cartridge path, deploy the code version and activate it.",
+          "For PWA Kit / composable storefronts, add the tag to the app's document head component instead."
+        ],
+        "plans": "Requires code access to the storefront cartridges (developer or partner). No self-serve plan option.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your DNS provider. Enterprise storefronts run on your own domain, often behind eCDN; make sure the es. subdomain is not routed to SFCC."
+      },
+      "faq": [
+        {
+          "q": "Can a merchandiser add this in Business Manager?",
+          "a": "Not as documented here; SFRA head changes are done in a custom cartridge by a developer."
+        }
+      ],
+      "docs": [],
+      "verified": false,
+      "notes": "developer.salesforce.com returned 403 for every page. htmlHead.isml, app.template.htmlHead hook and the custom-cartridge rule come from search-result snippets of official Salesforce pages (Third-Party Applications, Customize SFRA), not fetched pages."
+    },
+    {
+      "id": "sap-commerce-cloud",
+      "name": "SAP Commerce Cloud",
+      "category": "enterprise",
+      "method": "tag",
+      "summary": "A developer adds the glot tag to the storefront's index.html head (composable storefront / Spartacus) or the master.tag template (Accelerator).",
+      "injection": {
+        "location": "index.html",
+        "steps": [
+          "Ask your developer or SAP partner; this is a code change.",
+          "Composable storefront: add the glot tag to the <head> of the Angular app's src/index.html, then rebuild and deploy (including the SSR build).",
+          "Accelerator (JSP) storefront: add the tag to the head output of the master.tag template in your custom storefront extension.",
+          "Deploy through Cloud Portal and check a page."
+        ],
+        "plans": "Requires code access to the storefront. No self-serve setting.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your DNS provider for your own storefront domain."
+      },
+      "faq": [
+        {
+          "q": "Does the tag work with server-side rendering?",
+          "a": "Yes, it's a plain script in index.html; it runs in the browser after the SSR page loads."
+        }
+      ],
+      "docs": [],
+      "verified": false,
+      "notes": "help.sap.com pages returned an empty shell when fetched. index.html (Qualtrics integration doc) and master.tag (Storefront Web Application Deconstructed) come from search-result snippets of official SAP help pages only."
+    },
+    {
+      "id": "adobe-experience-manager",
+      "name": "Adobe Experience Manager",
+      "category": "enterprise",
+      "method": "tag",
+      "summary": "A developer adds the glot tag to the page component's customheaderlibs.html (AEM Sites) or to head.html / scripts (Edge Delivery Services).",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Ask your AEM developer; this is a code change.",
+          "AEM Sites with Core Components: in /apps/<your-project>/components/page/customheaderlibs.html, add the glot tag. Deploy to Author and Publish.",
+          "Edge Delivery Services: add the tag to head.html (Adobe discourages this for performance) or load it from scripts after page load; the cache purges automatically when head.html changes.",
+          "Publish and check a page."
+        ],
+        "plans": "Requires code deployment access (Cloud Manager pipeline or repository). No author-level setting.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Add the CNAME and TXT at your DNS provider for your own site domain."
+      },
+      "faq": [
+        {
+          "q": "Adobe says not to add scripts to head.html. Is glot a problem?",
+          "a": "The tag is async, so it doesn't block rendering, but on Edge Delivery you can load it after page load to follow Adobe's guidance."
+        }
+      ],
+      "docs": [
+        {
+          "label": "AEM Edge Delivery: FAQ (performance)",
+          "url": "https://www.aem.live/docs/faq"
+        },
+        {
+          "label": "AEM Core Components: Including client libraries",
+          "url": "https://experienceleague.adobe.com/en/docs/experience-manager-core-components/using/developing/including-clientlibs"
+        }
+      ],
+      "verified": true,
+      "notes": "The customheaderlibs.html override path comes from search snippets of Adobe's Adaptive Forms docs; the fetched Core Components page does not mention it. Edge Delivery cache-purge detail is from a search snippet."
+    },
+    {
+      "id": "dealeron",
+      "name": "DealerOn",
+      "category": "enterprise",
+      "method": "tag",
+      "summary": "Ask DealerOn support or your account manager to add the glot tag to the site-wide head (custom code).",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Contact your DealerOn account manager or support.",
+          "Ask them to add the glot tag to the site-wide head section (custom code) on every page.",
+          "Confirm the language menu appears once they publish."
+        ],
+        "plans": "Unknown; no public DealerOn documentation found.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Possible if the dealership controls the DNS for its own domain: add the CNAME and TXT at the registrar or DNS provider. If DealerOn manages your DNS, ask them to add the records."
+      },
+      "faq": [
+        {
+          "q": "Can I add the tag myself?",
+          "a": "DealerOn has no public help doc for this; third-party vendors mention a Custom Code area in DealerOn's dealer tools, so ask DealerOn whether you have access."
+        }
+      ],
+      "docs": [],
+      "verified": false,
+      "notes": "No official DealerOn help docs found. 'DealerOn Services > Custom Code' (head and body-top sections) is only mentioned by a third-party vendor, so not used as a step."
+    },
+    {
+      "id": "hubspot-cms",
+      "name": "HubSpot CMS",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Paste the glot tag into Site Header HTML in HubSpot's page settings so it loads on every page of your domain.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Click the settings icon in the top navigation bar.",
+          "In the left sidebar, go to Content > Pages.",
+          "In the domain dropdown, choose your domain, or the default settings that apply to all domains.",
+          "If you picked a specific domain, click Override default settings in the Site Header HTML section.",
+          "Paste the glot tag into the Site Header HTML field.",
+          "Click Save."
+        ],
+        "plans": "HubSpot lists code snippets as available on all products and plans. You need the Website settings permission. Code set for a specific domain replaces the default header code for that domain.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "HubSpot does not sell domains or host DNS, so add the CNAME and TXT at your DNS provider. Your HubSpot site must be on a domain you connected (Settings > Content > Domains & URLs). Not possible on a HubSpot default hs-sites address."
+      },
+      "faq": [
+        {
+          "q": "I set the tag in default settings but it does not show on one domain. Why?",
+          "a": "If a domain has its own Site Header HTML (Override default settings), it replaces the default code. Add the glot tag to that domain's field too."
+        }
+      ],
+      "docs": [
+        {
+          "label": "HubSpot: Use code snippets with HubSpot content",
+          "url": "https://knowledge.hubspot.com/website-and-landing-pages/use-code-snippets-with-hubspot-content"
+        },
+        {
+          "label": "HubSpot: Connect a domain to HubSpot",
+          "url": "https://knowledge.hubspot.com/domains-and-urls/connect-a-domain-to-hubspot"
+        }
+      ],
+      "verified": true,
+      "notes": "Docs say code snippets are on all plans but do not state free tools explicitly. Default hs-sites hostname name is from general knowledge, not the fetched page.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → HubSpot CMS and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#hubspot-cms"
+      }
+    },
+    {
+      "id": "drupal",
+      "name": "Drupal",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Declare the glot script as an external library in your theme and attach it globally so it loads on every page.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "In your custom theme (or a sub-theme), open THEME.libraries.yml.",
+          "Add a library with header: true and the glot script URL under js: with type: external, and its attributes (async: true, data-glot-app: true, data-project, data-server, data-source, data-locales, data-key).",
+          "In THEME.info.yml, list the library under libraries: (for example - THEME/glot) so it loads on every page.",
+          "Clear the Drupal cache and check the page source for the glot script."
+        ],
+        "plans": "Drupal is self-hosted open source; no plan limits. You need access to the theme files. Core has no admin field for site-wide head code.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "You control your own domain and DNS, so add the CNAME and TXT at your DNS provider or registrar."
+      },
+      "faq": [
+        {
+          "q": "Can I just paste the tag into html.html.twig?",
+          "a": "It can work, but Drupal's documented way is a library in *.libraries.yml attached from *.info.yml. Edit a custom or sub-theme, not a contributed theme, or updates will overwrite it."
+        },
+        {
+          "q": "How do I add data- attributes in libraries.yml?",
+          "a": "Under the script's attributes: key. A value of true prints the attribute with no value, which suits data-glot-app."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Drupal: Adding assets (CSS, JS) to a Drupal theme via *.libraries.yml",
+          "url": "https://www.drupal.org/docs/develop/theming-drupal/adding-assets-css-js-to-a-drupal-theme-via-librariesyml"
+        }
+      ],
+      "verified": true,
+      "notes": "Contributed modules that add head code from the admin UI exist but were not checked.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Drupal and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#drupal"
+      }
+    },
+    {
+      "id": "typo3",
+      "name": "TYPO3",
+      "category": "cms",
+      "method": "tag",
+      "summary": "Add the glot script to every page with TypoScript (page.includeJS or page.headerData) in your site package or template.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open the TypoScript setup of your site (site package setup.typoscript or the site's TypoScript record).",
+          "Add the script with page.includeJS: set glot = https://glotlang.com/widget/glot-app.global.js, glot.async = 1, and the attributes under glot.data (glot.data.data-glot-app, glot.data.data-project, glot.data.data-server, glot.data.data-source, glot.data.data-locales, glot.data.data-key).",
+          "Or add it with page.headerData: 50 = TEXT and 50.value = the full glot tag.",
+          "Flush the TYPO3 caches and check the page source."
+        ],
+        "plans": "TYPO3 is self-hosted open source; no plan limits. You need access to the TypoScript setup.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "You control your own domain and DNS, so add the CNAME and TXT at your DNS provider or registrar."
+      },
+      "faq": [
+        {
+          "q": "includeJS or headerData?",
+          "a": "TYPO3 docs prefer includeJS for script files; headerData outputs raw markup and skips asset concatenation. Both put the tag in the head."
+        }
+      ],
+      "docs": [
+        {
+          "label": "TYPO3: PAGE object type in TypoScript",
+          "url": "https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/Setup/Page/Index.html"
+        }
+      ],
+      "verified": true,
+      "notes": "includeJS async = 1 follows the property description; the doc's example only shows the data array. Syntax may differ on old TYPO3 versions."
+    },
+    {
+      "id": "craft-cms",
+      "name": "Craft CMS",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Paste the glot tag in the <head> of your shared Twig layout (usually templates/_layout.twig) so every page gets it.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open the layout template your pages extend, usually templates/_layout.twig.",
+          "Paste the glot tag inside <head>, before </head>.",
+          "Deploy the template change."
+        ],
+        "plans": "Templates are your own code on every Craft edition; no plan limit.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Craft runs on your own hosting and domain, so add the CNAME and TXT at your DNS provider or registrar."
+      },
+      "faq": [
+        {
+          "q": "Some templates do not extend _layout. What then?",
+          "a": "Add the tag to every top-level layout that outputs <head>, or Craft's js tag with 'at head' in each."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Craft CMS tutorial: Blog Templates (_layout.twig)",
+          "url": "https://craftcms.com/docs/getting-started-tutorial/build/blog-templates.html"
+        }
+      ],
+      "verified": true,
+      "notes": "Layout file name depends on the project; _layout.twig is the tutorial's convention.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Craft CMS and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#craft-cms"
+      }
+    },
+    {
+      "id": "ghost",
+      "name": "Ghost",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Paste the glot tag in Settings > Code injection > Site header so it loads on every page.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "In Ghost Admin, open Settings.",
+          "Open Code injection.",
+          "Paste the glot tag into the Site header box.",
+          "Save."
+        ],
+        "plans": "Available in Ghost Admin on self-hosted Ghost. Ghost's docs and pricing page do not state a plan limit for Code injection on Ghost(Pro).",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Ghost(Pro) includes a custom domain on all plans. Add the CNAME and TXT at your DNS provider. Not possible on a ghost.io address."
+      },
+      "faq": [
+        {
+          "q": "Does Code injection apply to every page?",
+          "a": "Yes. Ghost injects the Site header code on every page of the site. Posts and pages also have their own code injection fields, which you do not need for glot."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Ghost: How to use Code Injection in Ghost",
+          "url": "https://ghost.org/tutorials/use-code-injection-in-ghost/"
+        },
+        {
+          "label": "Ghost(Pro) pricing",
+          "url": "https://ghost.org/pricing/"
+        }
+      ],
+      "verified": true,
+      "notes": "Menu path may show as Settings > Advanced > Code injection in newer Admin versions. Plan availability of Code injection on Ghost(Pro) Starter not confirmed. Domains bought through Ghost(Pro) are auto-configured; whether you can add your own records there was not checked.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Ghost and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#ghost"
+      }
+    },
+    {
+      "id": "sanity",
+      "name": "Sanity",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Sanity only stores content; add the glot tag to the root layout of your front-end site (for example the Next.js app).",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open your front-end project (for example app/layout.tsx in Next.js, or your framework's root HTML template).",
+          "Paste the glot tag in <head> (in Next.js, a Script component in the root layout also works).",
+          "Deploy the front end."
+        ],
+        "plans": "Not a Sanity setting; it is your front-end code. No Sanity plan limit.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "The custom domain belongs to your front-end host (Vercel, Netlify...), not Sanity. Add the CNAME and TXT at your DNS provider. Not possible on a host's free subdomain."
+      },
+      "faq": [
+        {
+          "q": "Do I change anything in Sanity Studio?",
+          "a": "No. glot translates the rendered pages of your front-end site. Sanity Studio is not touched."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Sanity: Next.js",
+          "url": "https://www.sanity.io/docs/nextjs"
+        }
+      ],
+      "verified": true,
+      "notes": "Sanity docs describe the front end as a separate app; layout path depends on the framework.",
+      "native": {
+        "steps": [
+          "Use a Sanity i18n model glot reads: field-level (language-filter objects or internationalized arrays) or document-level (document-internationalization).",
+          "In sanity.io/manage, copy the Project ID and dataset, and create an API token with Editor permissions (API → Tokens).",
+          "In glot, open your project → Integrations → Sanity and paste the Project ID, the dataset and the token.",
+          "Click Sync now. glot writes the translations into your localized fields or linked translation documents.",
+          "Optional: in sanity.io/manage → API → Webhooks, create a webhook on the card's webhook URL, triggered on create and update."
+        ],
+        "doc": "/docs/integrations#sanity"
+      }
+    },
+    {
+      "id": "contentful",
+      "name": "Contentful",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Contentful only delivers content by API; add the glot tag to the root layout of your front-end site.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open your front-end project (for example app/layout.tsx in Next.js, or your framework's root HTML template).",
+          "Paste the glot tag in <head>.",
+          "Deploy the front end."
+        ],
+        "plans": "Not a Contentful setting; it is your front-end code. No Contentful plan limit.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "The custom domain belongs to your front-end host, not Contentful. Add the CNAME and TXT at your DNS provider. Not possible on a host's free subdomain."
+      },
+      "faq": [
+        {
+          "q": "Does glot translate the content stored in Contentful?",
+          "a": "The tag translates the pages your front end renders. Entries in Contentful are not changed."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Contentful: Headless CMS explained",
+          "url": "https://www.contentful.com/headless-cms/"
+        }
+      ],
+      "verified": false,
+      "notes": "contentful.com returned HTTP 429 on every fetch; the headless setup (front end built and hosted by the customer) is not confirmed from a fetched page.",
+      "native": {
+        "steps": [
+          "In Contentful, add your languages in Settings → Locales, and switch on Enable localization of this field for the fields to translate.",
+          "Copy the Space ID (Settings → General settings) and create a personal access token (Settings → CMA tokens) for a user who can edit entries.",
+          "In glot, open your project → Integrations → Contentful and paste the Space ID, the token and the environment (master if empty).",
+          "Click Sync now. Translated entries stay drafts until you publish them.",
+          "Optional: in Settings → Webhooks, add the card's webhook URL with the triggers Entry: save, auto save, publish."
+        ],
+        "doc": "/docs/integrations#contentful"
+      }
+    },
+    {
+      "id": "strapi",
+      "name": "Strapi",
+      "category": "cms",
+      "method": "connector",
+      "summary": "Strapi is headless; add the glot tag to the root layout of the front-end site that displays your Strapi content.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "Open your front-end project (for example app/layout.tsx in Next.js, or your framework's root HTML template).",
+          "Paste the glot tag in <head>.",
+          "Deploy the front end."
+        ],
+        "plans": "Not a Strapi setting; it is your front-end code. Works with self-hosted Strapi and Strapi Cloud.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "The custom domain belongs to your front-end host, not Strapi. Add the CNAME and TXT at your DNS provider. Not possible on a host's free subdomain."
+      },
+      "faq": [
+        {
+          "q": "Do I put the tag in the Strapi admin panel?",
+          "a": "No. The admin panel is for editors. Visitors see your front end, so the tag goes there."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Strapi: CMS documentation intro",
+          "url": "https://docs.strapi.io/cms/intro"
+        }
+      ],
+      "verified": true,
+      "notes": "Strapi docs confirm it is headless; layout path depends on the framework.",
+      "native": {
+        "steps": [
+          "Enable localization on your content types (the i18n plugin, built into Strapi 5) and add your locales.",
+          "In Strapi, go to Settings → API Tokens and create a token (Full access is simplest).",
+          "In glot, open your project → Integrations → Strapi and paste the server URL and the token.",
+          "Click Sync now. On Strapi 5, translated locales are written as drafts unless you turn publishing on.",
+          "Optional: in Settings → Webhooks, add the card's webhook URL for the events Entry: create, update, publish."
+        ],
+        "doc": "/docs/integrations#strapi"
+      }
+    },
+    {
+      "id": "help-scout-docs",
+      "name": "Help Scout Docs",
+      "category": "help-center",
+      "method": "connector",
+      "summary": "Paste the glot tag in your Docs site's Custom Code, Insert <head> Code field.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Go to Settings (gear icon) > Docs Sites > your Docs site > Custom Code.",
+          "Paste the glot tag into the Insert <head> Code field.",
+          "Save."
+        ],
+        "plans": "Docs do not state a plan limit. You need the 'Docs: Create new, edit settings and collections' permission.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Help Scout Docs supports a custom subdomain (for example help.example.com) at no extra cost. Add the glot CNAME and TXT for es.help.example.com at your DNS provider. Not possible on a helpscoutdocs.com address."
+      },
+      "faq": [
+        {
+          "q": "Is JavaScript allowed in Custom Code?",
+          "a": "Yes, but Help Scout says it does not generally recommend it and cannot promise it won't break the page. Docs already loads jQuery."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Help Scout: Customize Your Docs Site",
+          "url": "https://docs.helpscout.com/article/1423-customize-your-docs-site"
+        },
+        {
+          "label": "Help Scout: Use Your Own Custom Domain With Docs",
+          "url": "https://docs.helpscout.com/article/42-use-your-own-custom-domain-with-docs"
+        }
+      ],
+      "verified": true,
+      "notes": "Custom domain article read via search summary, not a direct fetch.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Help Scout Docs and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#help-scout-docs"
+      }
+    },
+    {
+      "id": "zendesk-guide",
+      "name": "Zendesk Guide",
+      "category": "help-center",
+      "method": "connector",
+      "summary": "Edit your help center theme code and paste the glot tag in document_head.hbs.",
+      "injection": {
+        "location": "template",
+        "steps": [
+          "In Knowledge admin, click the Customize design icon in the sidebar.",
+          "Click Customize on your theme.",
+          "Click Edit code.",
+          "Under Templates, click document_head.hbs.",
+          "Paste the glot tag.",
+          "Click Save, then Publish the theme if it is not the live one."
+        ],
+        "plans": "Theme code editing needs Suite Growth, Professional, Enterprise or Enterprise Plus, or Support with Knowledge Professional or Enterprise. Not on Suite Team.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Use host mapping (subdomain only, for example support.example.com; available from Suite Team). Add the glot CNAME and TXT for es.support.example.com at your DNS provider. Not possible on a zendesk.com address."
+      },
+      "faq": [
+        {
+          "q": "Does editing the theme code have side effects?",
+          "a": "Yes. Zendesk treats it as a custom theme: it is not supported by Zendesk and does not get automatic theme updates."
+        },
+        {
+          "q": "I'm on Suite Team. Can I use glot?",
+          "a": "Not with the tag, because Team cannot edit theme code. Host mapping is available on Team, but glot still needs the tag on the pages."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Zendesk: Customizing your help center theme",
+          "url": "https://support.zendesk.com/hc/en-us/articles/4408839332250-Customizing-your-help-center-theme"
+        },
+        {
+          "label": "Zendesk: Host mapping",
+          "url": "https://support.zendesk.com/hc/en-us/articles/4408838571930-Host-mapping-Changing-the-URL-of-your-help-center"
+        }
+      ],
+      "verified": true,
+      "notes": "The 'Publish' step is not in the fetched article; editing the live theme applies on Save. Whether Edge SEO mode works without the tag on Suite Team was not assessed.",
+      "native": {
+        "steps": [
+          "In glot, open your project → Integrations → Zendesk Guide and fill in the connection form (the credentials and permissions it asks for are listed in the docs).",
+          "Click Test connection, then Sync now: glot pulls your content, translates it with your glossary and validation rules, and writes each language back.",
+          "Later changes sync automatically through the webhook URL shown on the card, or on the next scheduled sync."
+        ],
+        "doc": "/docs/integrations#zendesk-guide"
+      }
+    },
+    {
+      "id": "kajabi",
+      "name": "Kajabi",
+      "category": "lms",
+      "method": "tag",
+      "summary": "Paste the glot tag in Settings > Site details > Header Page Scripts.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "From the Dashboard, open Settings.",
+          "Under Site settings, click Site details.",
+          "Under Page scripts, paste the glot tag into the Header Page Scripts field.",
+          "Click Save."
+        ],
+        "plans": "Docs do not state a plan limit. Header Page Scripts are not loaded on offer checkout pages, upsell pages and the Account Creation page.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Kajabi is not a registrar; connect your own domain in Settings > Site settings > Domain. Add the glot CNAME and TXT at your DNS provider. Not possible on a mykajabi.com address."
+      },
+      "faq": [
+        {
+          "q": "Will checkout pages be translated?",
+          "a": "No. Kajabi does not load Header Page Scripts on offer checkout, upsell and account creation pages."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Kajabi: Add custom code to Pages",
+          "url": "https://help.kajabi.com/en/articles/17174964-add-custom-code-to-pages"
+        },
+        {
+          "label": "Kajabi: Connect a custom domain",
+          "url": "https://help.kajabi.com/articles/website/domains/connect-a-custom-domain"
+        }
+      ],
+      "verified": true,
+      "notes": "Plan requirements for Page scripts and custom domains are not stated in the fetched docs. Account Creation exclusion is from Kajabi's GTM article (search summary). mykajabi.com default domain name is from general knowledge."
+    },
+    {
+      "id": "podia",
+      "name": "Podia",
+      "category": "lms",
+      "method": "tag",
+      "summary": "Paste the glot tag in Settings > Analytics > Third-party code; Podia adds it at the end of the body on public pages.",
+      "injection": {
+        "location": "body",
+        "steps": [
+          "From your home feed, click your site name and select Admin.",
+          "Go to Settings > Analytics.",
+          "Click Edit next to Third-party code.",
+          "Paste the glot tag into the Website tracking code field.",
+          "Click Save."
+        ],
+        "plans": "Podia says the option may need a paid plan that includes custom code (not on trials) and a verified email. Code is placed before </body>; head code is not supported.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Connect your own domain in Settings > Domain (Podia uses a CNAME and does not host your DNS). Add the glot CNAME and TXT at your registrar. Not possible on a podia.com address."
+      },
+      "faq": [
+        {
+          "q": "Is the course area (logged-in pages) translated?",
+          "a": "No. Podia runs third-party code only on public pages, including checkout, not in logged-in areas."
+        }
+      ],
+      "docs": [
+        {
+          "label": "Podia: Installing third-party apps on your Podia site",
+          "url": "https://help.podia.com/en/articles/11371020-installing-third-party-apps-on-your-podia-site"
+        },
+        {
+          "label": "Podia: Setting up a custom domain",
+          "url": "https://help.podia.com/en/articles/11553457-setting-up-your-custom-domain-name"
+        }
+      ],
+      "verified": true,
+      "notes": "Exact plans for custom code and custom domain are not stated in the docs. A 'Purchasing a custom domain through Podia' article exists but was not read; DNS editing for such domains is unknown."
+    },
+    {
+      "id": "learnworlds",
+      "name": "LearnWorlds",
+      "category": "lms",
+      "method": "tag",
+      "summary": "Paste the glot tag in the Site custom code head slots (logged in and logged out) of your site template.",
+      "injection": {
+        "location": "head",
+        "steps": [
+          "Go to Website > Design > Edit Website.",
+          "Select Site > Site custom code.",
+          "Paste the glot tag into the <head> slot for logged out users.",
+          "Paste it into the <head> slot for logged in users too.",
+          "Save and publish."
+        ],
+        "plans": "The custom code docs do not state which plans include it. The head slot is not injected in the course player.",
+        "available": true
+      },
+      "seo": {
+        "subdomain": true,
+        "how": "Custom domains are on all plans (CNAME to LearnWorlds). Add the glot CNAME and TXT at your DNS provider. Not possible on the default learnworlds.com address."
+      },
+      "faq": [
+        {
+          "q": "Is the course player translated?",
+          "a": "No. LearnWorlds does not inject head custom code in the course player."
+        }
+      ],
+      "docs": [
+        {
+          "label": "LearnWorlds: General Overview: Custom Code",
+          "url": "https://support.learnworlds.com/support/solutions/articles/12000075682-custom-code"
+        },
+        {
+          "label": "LearnWorlds: How to add custom code in your LearnWorlds school",
+          "url": "https://support.learnworlds.com/support/solutions/articles/12000082908-how-to-add-custom-code-in-your-learnworlds-school"
+        },
+        {
+          "label": "LearnWorlds: General Overview: Custom Domains",
+          "url": "https://support.learnworlds.com/support/solutions/articles/12000080095-custom-domains"
+        },
+        {
+          "label": "LearnWorlds pricing",
+          "url": "https://www.learnworlds.com/pricing/"
+        }
+      ],
+      "verified": true,
+      "notes": "Plan requirement for custom code not found. The 'Save and publish' step and the exact UI labels for the slots may differ; the doc names them '<head> for logged in users' and '<head> for logged out users'."
+    }
+  ]
+}

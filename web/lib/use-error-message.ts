@@ -10,6 +10,7 @@ export function useErrorMessage() {
     if (err instanceof ApiError) {
       if (err.status === 0) return t("network");
       if (err.status === 404) return t("notFound");
+      if (err.code === "email_unverified") return t("emailUnverified");
       return err.message || t("generic");
     }
     return t("generic");

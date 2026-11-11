@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 import { ErrorState, PageHeader } from "@/components/common";
+import { VerifiedOnly } from "@/components/email-pages";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,6 +53,11 @@ function BillingContent() {
         }
       />
       {notice && <p role="status" className="rounded-md border bg-muted/40 px-3 py-2 text-sm">{notice}</p>}
+      {b.status === "trialing" && b.current_period_end && (
+        <p role="status" className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
+          {t("trialing", { plan: tp(`plans.${b.plan as "team"}.name`), date: date(b.current_period_end) })}
+        </p>
+      )}
       {b.grace_until && b.status === "past_due" && (
         <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
           {t("pastDue", { date: date(b.grace_until) })}
@@ -90,6 +96,7 @@ function BillingContent() {
 
       <PlanCards
         current={b.plan}
+        trial={b.trial_available}
         action={(plan, interval) =>
           plan === "free" ? (
             b.plan !== "free" && b.has_customer ? (
@@ -98,12 +105,14 @@ function BillingContent() {
               <PlanButton plan={plan} current={b.plan} />
             )
           ) : (
-            <PlanButton
-              plan={plan}
-              current={b.plan}
-              disabled={b.plan === plan || checkout.isPending}
-              onClick={() => checkout.mutate({ plan, interval })}
-            />
+            <VerifiedOnly className="flex w-full">
+              <PlanButton
+                plan={plan}
+                current={b.plan}
+                disabled={b.plan === plan || checkout.isPending}
+                onClick={() => checkout.mutate({ plan, interval })}
+              />
+            </VerifiedOnly>
           )
         }
       />

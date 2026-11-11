@@ -1,0 +1,1 @@
+{"name":"hydration-astro","private":true,"type":"module","scripts":{"build":"astro build"},"dependencies":{"astro":"*","@astrojs/react":"*","@astrojs/vue":"*","react":"^19","react-dom":"^19","vue":"^3"}}

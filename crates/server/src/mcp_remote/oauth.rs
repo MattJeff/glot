@@ -308,7 +308,7 @@ fn redirect_with(uri: &str, pairs: &[(&str, &str)]) -> String {
 async fn consent(
     State(state): State<AppState>,
     headers: HeaderMap,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppJson(b): AppJson<ConsentBody>,
 ) -> ApiResult<Json<Value>> {
     let p = b.params;

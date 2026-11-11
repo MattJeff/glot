@@ -11,12 +11,13 @@ import { Performance, SeoReportView } from "@/components/edge/seo";
 import { SegmentsEditor } from "@/components/edge/segments";
 import { EdgeSettingsForm } from "@/components/edge/settings";
 import { KillSwitch, Setup } from "@/components/edge/setup";
+import { WebsiteTag } from "@/components/edge/website";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "@/i18n/navigation";
 import { useProject, useSlug } from "@/lib/hooks";
 
-const TABS = ["setup", "coverage", "review", "seo", "performance", "settings"] as const;
+const TABS = ["setup", "website", "coverage", "review", "seo", "performance", "settings"] as const;
 type Tab = (typeof TABS)[number];
 
 function EdgeView() {
@@ -45,6 +46,9 @@ function EdgeView() {
         </TabsList>
         <TabsContent value="setup">
           <Setup project={project.data} />
+        </TabsContent>
+        <TabsContent value="website">
+          <WebsiteTag project={project.data} settings={settings.data} />
         </TabsContent>
         <TabsContent value="coverage">
           <Coverage project={project.data} settings={settings.data} />

@@ -42,6 +42,47 @@ pub struct Settings {
     /// Action of rules without one: redirect | proxy
     #[serde(default = "redirect")]
     pub app_action: String,
+    /// Requests carrying a session (dashboards, accounts): `server` = translated per response by the Edge
+    /// (`Cache-Control: private`, never cached nor discovered), `patcher` = origin untouched, the site's
+    /// `<script data-glot-app>` translates in the browser, `off` = origin untouched.
+    #[serde(default = "server")]
+    pub auth_pages: String,
+    /// App-mode patcher may report UI text (whitelisted selectors; every new segment waits for a review).
+    #[serde(default)]
+    pub auth_discover: bool,
+    /// The universal website tag (`widget/glot.js`): browser-side translation of public pages, any site builder.
+    #[serde(default)]
+    #[schema(value_type = WebsiteSnippet)]
+    pub website_snippet: sqlx::types::Json<WebsiteSnippet>,
+}
+
+/// `edge_settings.website_snippet` (migration 0161), read by `widget/glot.js` through `/edge/v1/{project}/status`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
+#[serde(default)]
+pub struct WebsiteSnippet {
+    /// Kill switch of the tag: off = it does nothing.
+    pub on: bool,
+    /// New segments it discovers are translated and served; false = they wait for a review.
+    pub auto_translate: bool,
+    /// bottom-right | bottom-left | top-right | top-left | none, or a CSS selector the switcher goes into.
+    pub position: String,
+    /// Languages offered (empty = every target locale).
+    pub locales: Vec<String>,
+}
+
+impl Default for WebsiteSnippet {
+    fn default() -> Self {
+        WebsiteSnippet {
+            on: false,
+            auto_translate: true,
+            position: "bottom-right".into(),
+            locales: vec![],
+        }
+    }
+}
+
+fn server() -> String {
+    "server".into()
 }
 
 fn suggested_app_paths() -> Vec<String> {
@@ -56,7 +97,8 @@ fn redirect() -> String {
 }
 
 const COLS: &str = "enabled, auto_translate, discover_include, discover_exclude, selectors_include, selectors_exclude,
-    critical_patterns, sensitive_patterns, critical_threshold, daily_cap, monthly_budget_usd, rendering, app_paths, app_action";
+    critical_patterns, sensitive_patterns, critical_threshold, daily_cap, monthly_budget_usd, rendering, app_paths, app_action,
+    auth_pages, auth_discover, website_snippet";
 
 impl Settings {
     /// The project's settings; the column defaults when it never saved any.
@@ -118,6 +160,9 @@ impl Default for Settings {
             rendering: "auto".into(),
             app_paths: suggested_app_paths(),
             app_action: redirect(),
+            auth_pages: server(),
+            auth_discover: false,
+            website_snippet: Default::default(),
         }
     }
 }
@@ -144,10 +189,23 @@ pub fn looks_personal(text: &str) -> bool {
 }
 
 pub fn routes() -> Router<AppState> {
-    Router::new().route(
-        "/api/projects/{slug}/edge/settings",
-        get(get_settings).put(put_settings),
-    )
+    Router::new()
+        .route(
+            "/api/projects/{slug}/edge/settings",
+            get(get_settings).put(put_settings),
+        )
+        .route("/api/projects/{slug}/edge/snippet", get(snippet))
+}
+
+/// The public key the website tag carries (`data-key`, same key as Insights; created on first use).
+async fn snippet(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath(slug): AppPath<String>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let p = projects::load(&state, user.id, &slug, Role::Translator).await?;
+    let key = crate::insights::public_key(&state, p.id).await?;
+    Ok(Json(serde_json::json!({ "public_key": key })))
 }
 
 async fn get_settings(
@@ -207,6 +265,11 @@ async fn put_settings(
         "proxy" => super::app_paths::Action::Proxy,
         _ => return Err(AppError::bad_request("app_action must be redirect|proxy")),
     };
+    if !["off", "patcher", "server"].contains(&s.auth_pages.as_str()) {
+        return Err(AppError::bad_request(
+            "auth_pages must be off|patcher|server",
+        ));
+    }
     if s.app_paths.len() > 200 {
         return Err(AppError::bad_request("at most 200 app path rules"));
     }
@@ -219,16 +282,28 @@ async fn put_settings(
         .map(|l| l.trim().to_string())
         .filter(|l| !l.is_empty())
         .collect();
+    let w = &s.website_snippet.0;
+    if w.position.trim().is_empty() || w.position.len() > 200 {
+        return Err(AppError::bad_request(
+            "website_snippet.position must be a corner, none or a CSS selector (1-200 chars)",
+        ));
+    }
+    if let Some(l) = w.locales.iter().find(|l| !p.target_locales.contains(l)) {
+        return Err(AppError::bad_request(format!(
+            "website_snippet.locales: '{l}' is not a target locale of this project"
+        )));
+    }
     let s = Settings { app_paths, ..s };
     sqlx::query(
         "INSERT INTO edge_settings (project_id, enabled, auto_translate, discover_include, discover_exclude,
             selectors_include, selectors_exclude, critical_patterns, sensitive_patterns, critical_threshold,
-            daily_cap, monthly_budget_usd, rendering, app_paths, app_action, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, now())
+            daily_cap, monthly_budget_usd, rendering, app_paths, app_action, auth_pages, auth_discover, website_snippet, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now())
          ON CONFLICT (project_id) DO UPDATE SET enabled = $2, auto_translate = $3, discover_include = $4,
             discover_exclude = $5, selectors_include = $6, selectors_exclude = $7, critical_patterns = $8,
             sensitive_patterns = $9, critical_threshold = $10, daily_cap = $11, monthly_budget_usd = $12,
-            rendering = $13, app_paths = $14, app_action = $15, updated_at = now()",
+            rendering = $13, app_paths = $14, app_action = $15, auth_pages = $16, auth_discover = $17,
+            website_snippet = $18, updated_at = now()",
     )
     .bind(p.id)
     .bind(s.enabled)
@@ -245,6 +320,9 @@ async fn put_settings(
     .bind(&s.rendering)
     .bind(&s.app_paths)
     .bind(&s.app_action)
+    .bind(&s.auth_pages)
+    .bind(s.auth_discover)
+    .bind(&s.website_snippet)
     .execute(&state.db)
     .await?;
     Ok(Json(s))

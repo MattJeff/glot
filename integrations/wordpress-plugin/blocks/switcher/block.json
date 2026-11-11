@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "glot/switcher",
+	"title": "glot language switcher",
+	"category": "widgets",
+	"icon": "translation",
+	"description": "Lets visitors pick a language.",
+	"keywords": [ "language", "translate" ],
+	"textdomain": "glot",
+	"supports": { "html": false, "multiple": false },
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

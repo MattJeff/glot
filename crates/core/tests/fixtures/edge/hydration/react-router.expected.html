@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><link rel="modulepreload" href="/assets/entry.client-BFW2SSy0.js"/><link rel="modulepreload" href="/assets/jsx-runtime-D_iQ0YLz.js"/><link rel="modulepreload" href="/assets/root-DIJA-hBs.js"/><link rel="modulepreload" href="/assets/home-eLjKU1fW.js"/></head><body><main><h1>Simple pricing for teams</h1><p class="Pro">Start for free today.</p><button>Add to cart</button><p>Cancel anytime</p><span data-n="0"></span></main><script>((storageKey2, restoreKey) => {
+    if (!window.history.state || !window.history.state.key) {
+      let key = Math.random().toString(32).slice(2);
+      window.history.replaceState({ key }, "");
+    }
+    try {
+      let positions = JSON.parse(sessionStorage.getItem(storageKey2) || "{}");
+      let storedY = positions[restoreKey || window.history.state.key];
+      if (typeof storedY === "number") {
+        window.scrollTo(0, storedY);
+      }
+    } catch (error) {
+      console.error(error);
+      sessionStorage.removeItem(storageKey2);
+    }
+  })("react-router-scroll-positions", null)</script><script>window.__reactRouterContext = {"basename":"/","future":{"unstable_optimizeDeps":false,"v8_passThroughRequests":false,"v8_trailingSlashAwareDataRequests":false,"unstable_previewServerPrerendering":false,"v8_middleware":false,"v8_splitRouteModules":false,"v8_viteEnvironmentApi":false},"routeDiscovery":{"mode":"lazy","manifestPath":"/__manifest"},"ssr":true,"isSpaMode":false};window.__reactRouterContext.stream = new ReadableStream({start(controller){window.__reactRouterContext.streamController = controller;}}).pipeThrough(new TextEncoderStream());</script><script type="module" async="">;
+import * as route0 from "/assets/root-DIJA-hBs.js";
+import * as route1 from "/assets/home-eLjKU1fW.js";
+  window.__reactRouterManifest = {
+  "entry": {
+    "module": "/assets/entry.client-BFW2SSy0.js",
+    "imports": [
+      "/assets/jsx-runtime-D_iQ0YLz.js"
+    ],
+    "css": []
+  },
+  "routes": {
+    "root": {
+      "id": "root",
+      "path": "",
+      "hasAction": false,
+      "hasLoader": false,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": true,
+      "hasErrorBoundary": false,
+      "module": "/assets/root-DIJA-hBs.js",
+      "imports": [
+        "/assets/jsx-runtime-D_iQ0YLz.js"
+      ],
+      "css": []
+    },
+    "routes/home": {
+      "id": "routes/home",
+      "parentId": "root",
+      "index": true,
+      "hasAction": false,
+      "hasLoader": true,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": true,
+      "hasErrorBoundary": false,
+      "module": "/assets/home-eLjKU1fW.js",
+      "imports": [
+        "/assets/jsx-runtime-D_iQ0YLz.js"
+      ],
+      "css": []
+    }
+  },
+  "url": "/assets/manifest-c7b2e010.js",
+  "version": "c7b2e010"
+};
+  window.__reactRouterRouteModules = {"root":route0,"routes/home":route1};
+
+import("/assets/entry.client-BFW2SSy0.js");</script><!--$--><script>window.__reactRouterContext.streamController.enqueue("[{\"_1\":2,\"_3\":-5,\"_4\":-5},\"loaderData\",{\"_5\":6},\"actionData\",\"errors\",\"routes/home\",{\"_7\":8,\"_9\":10},\"title\",\"Precios simples para equipos\",\"plans\",[11],{\"_12\":13,\"_14\":15,\"_16\":17},\"id\",\"pro\",\"plan\",\"Pro\",\"cta\",\"Empieza gratis hoy.\"]\n");</script><!--$--><script>window.__reactRouterContext.streamController.close();</script><!--/$--><!--/$--></body></html>

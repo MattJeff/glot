@@ -108,7 +108,8 @@ test("worker: glot Edge translates the rendered page (no keys), data-glot keys w
   const body = await res.text();
   assert.match(body, /<p>Statischer Text<\/p>/);
   assert.match(body, /<h1 data-glot="home.title">Willkommen/); // catalog key over the TM
-  assert.doesNotMatch(body, /Hallo/);
+  assert.doesNotMatch(body.replace(/<script type="application\/json" id="glot-tm">.*?<\/script>/, ""), /Hallo/); // shown text; the inline TM carries every value
+  assert.match(body, /<script type="application\/json" id="glot-tm">\{"v":3,"locale":"de"/); // small TM inlined for the patcher
   assert.match(body, /hreflang="de" href="https:\/\/s\/de\/pricing"/);
   assert.equal(res.headers.get("x-frame-options"), "DENY");
   assert.equal(res.headers.get("content-language"), "de");

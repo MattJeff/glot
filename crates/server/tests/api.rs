@@ -717,3 +717,73 @@ async fn openapi_and_health() {
     assert_eq!(e["error"]["code"], "not_found");
     ctx.finish().await;
 }
+
+/// `/api/plugin/…` (Framer plugin): CORS for any origin, API token only, same handlers as `/api/projects/…`.
+#[tokio::test]
+async fn framer_plugin_routes() {
+    let Some(ctx) = setup().await else { return };
+    let cookie = ctx.signup("framer@example.com").await;
+    let (_, _, created) = ctx
+        .call(
+            Method::POST,
+            "/api/tokens",
+            Some(&cookie),
+            Some(json!({"name": "framer"})),
+        )
+        .await;
+    let t = created["token"].as_str().unwrap().to_string();
+    ctx.project(&t, "fr-site").await;
+
+    let pre = Request::builder()
+        .method(Method::OPTIONS)
+        .uri("/api/plugin/projects/fr-site/sync/push")
+        .header(header::ORIGIN, "https://abc.plugins.framercdn.com")
+        .header("access-control-request-method", "POST")
+        .header(
+            "access-control-request-headers",
+            "authorization,content-type",
+        )
+        .body(Body::empty())
+        .unwrap();
+    let res = ctx.app.clone().oneshot(pre).await.unwrap();
+    assert!(res.status().is_success());
+    assert_eq!(res.headers()["access-control-allow-origin"], "*");
+    assert!(
+        res.headers()
+            .get("access-control-allow-credentials")
+            .is_none()
+    );
+
+    // A session cookie is never enough here.
+    let (s, _, _) = ctx
+        .call(
+            Method::GET,
+            "/api/plugin/projects/fr-site/sync/pull",
+            Some(&cookie),
+            None,
+        )
+        .await;
+    assert_eq!(s, StatusCode::UNAUTHORIZED);
+
+    let (s, _, r) = ctx
+        .call(
+            Method::POST,
+            "/api/plugin/projects/fr-site/sync/push",
+            Some(&t),
+            Some(json!({"catalogs": {"en": {"framer:page:p1:s1": "Hello"}}})),
+        )
+        .await;
+    assert_eq!(s, StatusCode::OK, "{r}");
+    assert_eq!(r["created"], 1);
+    let (s, _, r) = ctx
+        .call(
+            Method::GET,
+            "/api/plugin/projects/fr-site/sync/pull",
+            Some(&t),
+            None,
+        )
+        .await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(r["catalogs"]["en"]["framer:page:p1:s1"], "Hello");
+    ctx.finish().await;
+}

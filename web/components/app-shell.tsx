@@ -28,6 +28,7 @@ import {
   Languages,
   GitPullRequest,
   Globe,
+  Plug,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -71,6 +72,7 @@ const PROJECT_PAGES = [
   { seg: "/glossary", icon: BookOpenText, label: "glossary" },
   { seg: "/jobs", icon: ListChecks, label: "jobs" },
   { seg: "/github", icon: GitPullRequest, label: "github" },
+  { seg: "/integrations", icon: Plug, label: "integrations" },
   { seg: "/edge", icon: Globe, label: "edge" },
   { seg: "/settings", icon: Settings, label: "settings" },
   // Labs (heading before /insights): growth features, less proven than the core loop.

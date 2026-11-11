@@ -1,0 +1,12 @@
+---
+import Cart from "../components/Cart.jsx";
+import Note from "../components/Note.vue";
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Pricing</title></head>
+  <body>
+    <h1>Simple pricing for teams</h1>
+    <Cart client:load title="Start for free today." plans={[{ id: "pro", plan: "Pro", cta: "Add to cart" }]} />
+    <Note client:load label="Secure payment" kind="info" />
+  </body>
+</html>

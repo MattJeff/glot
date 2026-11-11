@@ -1,3 +1,103 @@
+// src/app-paths.ts
+var HOP_COOKIE = "glot_app_hop";
+function parseLine(line, def) {
+  const l = line.trim();
+  if (!l || l.startsWith("#")) return void 0;
+  const t = l.split(/\s+/);
+  const a = t[0].toLowerCase();
+  const [action, p, extra] = a === "redirect" || a === "proxy" ? [a, t[1], t[2]] : [def, t[0], t[1]];
+  if (!p?.startsWith("/") || extra !== void 0 || p.length > 200) return void 0;
+  return [action, p.toLowerCase()];
+}
+var unreserved = (c) => c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122 || c === 45 || c === 46 || c === 95 || c === 126;
+var ALLOWED = new Set([..."/!$&'()*+,;=:@"].map((c) => c.charCodeAt(0)));
+var hex2 = (v) => "%" + v.toString(16).toUpperCase().padStart(2, "0");
+function normalize(path) {
+  const b = new TextEncoder().encode(path);
+  const hx = (c) => c === void 0 ? NaN : parseInt(String.fromCharCode(c), 16);
+  let s = "";
+  for (let i = 0; i < b.length; i++) {
+    const c = b[i];
+    if (c === 37) {
+      const h = hx(b[i + 1]), l = hx(b[i + 2]);
+      if (!Number.isNaN(h) && !Number.isNaN(l)) {
+        const v = h * 16 + l;
+        s += unreserved(v) ? String.fromCharCode(v) : hex2(v);
+        i += 2;
+        continue;
+      }
+    }
+    s += c === 92 ? "/" : unreserved(c) || ALLOWED.has(c) ? String.fromCharCode(c) : hex2(c);
+  }
+  const trailing = s.endsWith("/") || s.endsWith("/.") || s.endsWith("/..");
+  const segs = [];
+  for (const seg of s.split("/")) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") segs.pop();
+    else segs.push(seg);
+  }
+  return "/" + segs.join("/") + (trailing && segs.length ? "/" : "");
+}
+function wild(p, s) {
+  let pi = 0, si = 0, star = -1, mark = 0;
+  while (si < s.length) {
+    if (pi < p.length && p[pi] === "*") star = pi++, mark = si;
+    else if (pi < p.length && p[pi] === s[si]) pi++, si++;
+    else if (star >= 0) pi = star + 1, si = ++mark;
+    else return false;
+  }
+  while (pi < p.length && p[pi] === "*") pi++;
+  return pi === p.length;
+}
+function matches(pattern, path) {
+  if (pattern === "/") return true;
+  if (pattern.includes("*")) return wild(pattern, path);
+  if (pattern.endsWith("/")) return path.length > pattern.length && path.startsWith(pattern);
+  return path === pattern || path.startsWith(pattern + "/");
+}
+function classify(rules, def, path) {
+  const p = normalize(path).toLowerCase();
+  if (p === "/sitemap.xml" || p === "/robots.txt" || p.startsWith("/__glot/")) return void 0;
+  for (const l of rules) {
+    const r = parseLine(l, def);
+    if (r && matches(r[1], p)) return r[0];
+  }
+  return void 0;
+}
+function decide(i) {
+  const action = classify(i.rules, i.action, i.path);
+  if (!action) return void 0;
+  if (action === "proxy") return { kind: "proxy" };
+  let base;
+  try {
+    base = new URL(i.origin);
+  } catch {
+    return { kind: "proxy" };
+  }
+  const norm = normalize(i.path);
+  const hop = norm.replace(/[^A-Za-z0-9/._~%-]/g, "_");
+  const bounced = i.cookie.split(";").some((raw) => {
+    const kv = raw.trim();
+    const at = kv.indexOf("=");
+    return at > 0 && kv.slice(0, at).trim() === HOP_COOKIE && kv.slice(at + 1) === hop;
+  });
+  const target = i.locale_style === "prefix" ? `/${i.locale}${norm}` : norm;
+  let q = i.query.split("&").filter(Boolean);
+  if (i.locale_style.startsWith("query:")) {
+    const param = i.locale_style.slice(6);
+    q = q.filter((kv) => kv.split("=")[0] !== param);
+    q.push(`${param}=${i.locale}`);
+  }
+  if (bounced || base.host.toLowerCase() === i.host.toLowerCase() && target === normalize(i.req_path)) return { kind: "proxy" };
+  const get = /^(get|head)$/i.test(i.method);
+  return {
+    kind: "redirect",
+    status: get ? 302 : 307,
+    location: base.origin + target + (q.length ? "?" + q.join("&") : ""),
+    cookie: `${HOP_COOKIE}=${hop}; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax`
+  };
+}
+
 // src/edge.ts
 function lookup(tm, hash, context) {
   const e = tm.t[hash];
@@ -54,7 +154,7 @@ function createEdge(o) {
       if (!res.ok) throw new Error(String(res.status));
       const v = await res.json();
       const ready = await get(`${base}/cdn/${proj}/locales.json`, 5e3).then((r) => r.ok ? r.json() : void 0).then((m) => m?.locales?.filter((l) => l.ready !== false).map((l) => l.code)).catch(() => void 0);
-      status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready } };
+      status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready, app: v.app, auth: v.auth } };
       void o.store?.put("status", JSON.stringify(status.v)).catch(() => {
       });
       await Promise.all([...tms.values()].filter((t) => (status.v.versions[t.locale] ?? 0) > t.v).map((t) => loadTm(t.locale, status.v.versions[t.locale])));
@@ -200,7 +300,91 @@ function createEdge(o) {
     else await p;
     return done;
   }
-  return Object.assign(serve, { own });
+  async function appRules(wait) {
+    await restore();
+    if (!status || now() - status.at >= statusTtl) {
+      const p = refreshStatus();
+      wait?.(p);
+      if (!status) await race(p, timeout);
+    }
+    return status?.v.app;
+  }
+  async function isApp(path, wait) {
+    const a = await appRules(wait);
+    return !!a?.rules?.length && classify(a.rules, a.action ?? "redirect", path) !== void 0;
+  }
+  async function app(req, locale, path, wait) {
+    const a = await appRules(wait);
+    if (!a?.rules?.length) return void 0;
+    const u = new URL(req.url);
+    const d = decide({ rules: a.rules, action: a.action ?? "redirect", locale_style: a.locale ?? "none", locale, origin: u.origin, host: u.host, req_path: u.pathname, path, query: u.search.slice(1), method: req.method, cookie: req.headers.get("cookie") ?? "" });
+    if (!d || d.kind === "proxy") return d && "proxy";
+    return new Response(null, { status: d.status, headers: { location: d.location, "set-cookie": d.cookie, "cache-control": "no-store", "x-glot-edge": "app-redirect" } });
+  }
+  async function bundle(req, locale, origin, wait) {
+    const t0 = now();
+    const js = (r) => r.status === 200 && /javascript|ecmascript/.test(r.headers.get("content-type") ?? "");
+    const revalidate = (r) => {
+      const res = new Response(r.body, r);
+      res.headers.set("cache-control", "public, no-cache");
+      res.headers.delete("expires");
+      return res;
+    };
+    const tm = locale === o.source || req.method !== "GET" ? void 0 : await snapshot(locale, new URL(req.url).hostname, wait).catch(() => void 0);
+    if (!tm || tm === "off" || !o.key) {
+      const r = await origin(req);
+      if (!js(r) && r.status !== 304) return r;
+      if (locale === o.source || tm === "off" || r.status === 304) return revalidate(r);
+      const res = revalidate(r);
+      for (const h of ["etag", "last-modified"]) res.headers.delete(h);
+      res.headers.set("cache-control", "no-store");
+      return timing(res, "fail-open", now() - t0, 0);
+    }
+    const key = `https://glot-edge.invalid/_bundle/${locale}.${tm.v}${new URL(req.url).pathname}${new URL(req.url).search}`;
+    const fresh = (r) => req.headers.get("if-none-match") === r.headers.get("etag") && r.headers.get("etag") ? new Response(null, { status: 304, headers: r.headers }) : r;
+    const hit = await o.pageCache?.match(key).catch(() => void 0);
+    if (hit) return timing(fresh(revalidate(hit)), "translated", now() - t0, 0, "hit");
+    const up = new Request(req);
+    up.headers.delete("if-none-match");
+    up.headers.delete("if-modified-since");
+    const page = await origin(up);
+    if (!js(page)) return page;
+    const tOrigin = now() - t0;
+    const body = await page.arrayBuffer();
+    const failOpen = () => {
+      const r = new Response(body, page);
+      for (const h of ["etag", "last-modified", "expires"]) r.headers.delete(h);
+      r.headers.set("cache-control", "no-store");
+      return timing(r, "fail-open", now() - t0 - tOrigin, tOrigin);
+    };
+    if (body.byteLength > 4 * 1024 * 1024) return failOpen();
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), Math.max(timeout, 2e3));
+    try {
+      const g = await f(`${base}/edge/v1/${proj}/${encodeURIComponent(locale)}/bundle`, { method: "POST", signal: ctl.signal, headers: { "content-type": "text/javascript", "x-glot-key": o.key }, body });
+      if (!g.ok) return failOpen();
+      const headers = new Headers(page.headers);
+      for (const h of [...HOP, "last-modified", "expires"]) headers.delete(h);
+      headers.set("cache-control", "public, no-cache");
+      for (const h of ["etag", "x-glot-bundle", "x-glot-version"]) {
+        const v = g.headers.get(h);
+        if (v) headers.set(h, v);
+      }
+      const out = await g.arrayBuffer();
+      if (o.pageCache) {
+        const copy = new Response(out, { headers });
+        copy.headers.set("cache-control", "public, max-age=31536000");
+        wait?.(o.pageCache.put(key, copy).catch(() => {
+        }));
+      }
+      return timing(fresh(new Response(out, { status: 200, headers })), "translated", now() - t0 - tOrigin, tOrigin, "miss");
+    } catch {
+      return failOpen();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return Object.assign(serve, { own, app, isApp, bundle });
   async function serve(req, locale, originUrl, origin, wait) {
     const url = new URL(req.url);
     const t0 = now();
@@ -220,6 +404,7 @@ function createEdge(o) {
     const page = got.ok;
     const tOrigin = got.ms;
     if (!translatable) return timing(page, "passthrough", 0, tOrigin);
+    if (!anon && tm !== "off" && (status?.v.auth?.pages ?? "server") !== "server") return timing(personal(new Response(page.body, page)), "auth", tGlot, tOrigin);
     if (tm === "off") return timing(sourceUnderLocale(page), "off", tGlot, tOrigin);
     if (quotaUntil > now()) return timing(sourceUnderLocale(page), "quota", tGlot, tOrigin);
     const type = page.headers.get("content-type") ?? "";
@@ -252,6 +437,7 @@ function createEdge(o) {
     headers.set("x-glot-version", `${locale}@${tm.v}`);
     headers.set("x-glot-coverage", `${out.translated}/${out.total}`);
     const res = new Response(out.html, { status: page.status, statusText: page.statusText, headers });
+    if (!anon) personal(res);
     const ttl = cacheKey ? cacheTtl(page.headers, o.pageTtl ?? 0) : 0;
     if (cacheKey && ttl > 0) {
       const copy = res.clone();
@@ -277,6 +463,11 @@ function cacheTtl(h, fallback) {
   if (/private|no-store|no-cache/.test(cc)) return 0;
   const m = /s-maxage=(\d+)/.exec(cc) ?? /max-age=(\d+)/.exec(cc);
   return m ? Number(m[1]) : fallback;
+}
+function personal(res) {
+  res.headers.set("cache-control", "private, no-cache");
+  res.headers.append("vary", "Cookie");
+  return res;
 }
 function sourceUnderLocale(page) {
   const res = new Response(page.body, page);

@@ -109,7 +109,7 @@ pub struct CreateBody {
 
 pub async fn create(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(b): AppJson<CreateBody>,
 ) -> ApiResult<(StatusCode, Json<Job>)> {
@@ -308,8 +308,8 @@ async fn run(state: AppState, mut job: JobRecord) {
     }
     save(state, &job).await;
     tracing::info!(job = %job.id, status = %job.status, cost_usd = job.cost_usd, "job finished");
-    // Edge jobs run in the background on traffic: no email per job.
-    if github || edge {
+    // Edge and CMS connector jobs run in the background: no email per job.
+    if github || edge || job.kind == crate::connectors::sync::JOB_KIND {
         return;
     }
     crate::email::job_finished(

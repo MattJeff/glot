@@ -137,7 +137,7 @@ function decide(req, config, o) {
   const counted = [];
   const overlay = {};
   const k = {};
-  const apply = (xp2, i) => {
+  const apply2 = (xp2, i) => {
     const v = xp2.arms[i].values?.[o.locale];
     if (v) Object.assign(overlay, v);
   };
@@ -147,7 +147,7 @@ function decide(req, config, o) {
     const xp2 = config.experiments.find((x) => x.id === id);
     const i = xp2 ? xp2.arms.findIndex((a) => a.arm === Number(arm)) : -1;
     if (!xp2 || i < 0) return NONE;
-    apply(xp2, i);
+    apply2(xp2, i);
     return finish(o.locale, [{ id, cell: "*", arm: xp2.arms[i].arm }], overlay, [], []);
   }
   let inHoldout = false;
@@ -181,7 +181,7 @@ function decide(req, config, o) {
       const live = cell.count && xp2.status === "running";
       if (live && !(prev && prev[0] === a.arm && prev[1] === a.cell)) counted.push(a);
       if (live && xp2.keys?.length) k[xp2.id] = xp2.keys;
-      apply(xp2, i);
+      apply2(xp2, i);
     }
   }
   const cookies = [];
@@ -272,6 +272,106 @@ function glotExperiments(o) {
   };
 }
 
+// src/app-paths.ts
+var HOP_COOKIE = "glot_app_hop";
+function parseLine(line, def) {
+  const l = line.trim();
+  if (!l || l.startsWith("#")) return void 0;
+  const t = l.split(/\s+/);
+  const a = t[0].toLowerCase();
+  const [action, p, extra] = a === "redirect" || a === "proxy" ? [a, t[1], t[2]] : [def, t[0], t[1]];
+  if (!p?.startsWith("/") || extra !== void 0 || p.length > 200) return void 0;
+  return [action, p.toLowerCase()];
+}
+var unreserved = (c) => c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122 || c === 45 || c === 46 || c === 95 || c === 126;
+var ALLOWED = new Set([..."/!$&'()*+,;=:@"].map((c) => c.charCodeAt(0)));
+var hex2 = (v) => "%" + v.toString(16).toUpperCase().padStart(2, "0");
+function normalize(path) {
+  const b2 = new TextEncoder().encode(path);
+  const hx = (c) => c === void 0 ? NaN : parseInt(String.fromCharCode(c), 16);
+  let s = "";
+  for (let i = 0; i < b2.length; i++) {
+    const c = b2[i];
+    if (c === 37) {
+      const h2 = hx(b2[i + 1]), l = hx(b2[i + 2]);
+      if (!Number.isNaN(h2) && !Number.isNaN(l)) {
+        const v = h2 * 16 + l;
+        s += unreserved(v) ? String.fromCharCode(v) : hex2(v);
+        i += 2;
+        continue;
+      }
+    }
+    s += c === 92 ? "/" : unreserved(c) || ALLOWED.has(c) ? String.fromCharCode(c) : hex2(c);
+  }
+  const trailing = s.endsWith("/") || s.endsWith("/.") || s.endsWith("/..");
+  const segs = [];
+  for (const seg of s.split("/")) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") segs.pop();
+    else segs.push(seg);
+  }
+  return "/" + segs.join("/") + (trailing && segs.length ? "/" : "");
+}
+function wild(p, s) {
+  let pi = 0, si = 0, star = -1, mark = 0;
+  while (si < s.length) {
+    if (pi < p.length && p[pi] === "*") star = pi++, mark = si;
+    else if (pi < p.length && p[pi] === s[si]) pi++, si++;
+    else if (star >= 0) pi = star + 1, si = ++mark;
+    else return false;
+  }
+  while (pi < p.length && p[pi] === "*") pi++;
+  return pi === p.length;
+}
+function matches2(pattern, path) {
+  if (pattern === "/") return true;
+  if (pattern.includes("*")) return wild(pattern, path);
+  if (pattern.endsWith("/")) return path.length > pattern.length && path.startsWith(pattern);
+  return path === pattern || path.startsWith(pattern + "/");
+}
+function classify(rules, def, path) {
+  const p = normalize(path).toLowerCase();
+  if (p === "/sitemap.xml" || p === "/robots.txt" || p.startsWith("/__glot/")) return void 0;
+  for (const l of rules) {
+    const r = parseLine(l, def);
+    if (r && matches2(r[1], p)) return r[0];
+  }
+  return void 0;
+}
+function decide2(i) {
+  const action = classify(i.rules, i.action, i.path);
+  if (!action) return void 0;
+  if (action === "proxy") return { kind: "proxy" };
+  let base2;
+  try {
+    base2 = new URL(i.origin);
+  } catch {
+    return { kind: "proxy" };
+  }
+  const norm = normalize(i.path);
+  const hop = norm.replace(/[^A-Za-z0-9/._~%-]/g, "_");
+  const bounced = i.cookie.split(";").some((raw) => {
+    const kv = raw.trim();
+    const at = kv.indexOf("=");
+    return at > 0 && kv.slice(0, at).trim() === HOP_COOKIE && kv.slice(at + 1) === hop;
+  });
+  const target = i.locale_style === "prefix" ? `/${i.locale}${norm}` : norm;
+  let q = i.query.split("&").filter(Boolean);
+  if (i.locale_style.startsWith("query:")) {
+    const param = i.locale_style.slice(6);
+    q = q.filter((kv) => kv.split("=")[0] !== param);
+    q.push(`${param}=${i.locale}`);
+  }
+  if (bounced || base2.host.toLowerCase() === i.host.toLowerCase() && target === normalize(i.req_path)) return { kind: "proxy" };
+  const get2 = /^(get|head)$/i.test(i.method);
+  return {
+    kind: "redirect",
+    status: get2 ? 302 : 307,
+    location: base2.origin + target + (q.length ? "?" + q.join("&") : ""),
+    cookie: `${HOP_COOKIE}=${hop}; Max-Age=30; Path=/; HttpOnly; Secure; SameSite=Lax`
+  };
+}
+
 // src/edge.ts
 function lookup(tm, hash2, context2) {
   const e = tm.t[hash2];
@@ -328,7 +428,7 @@ function createEdge(o) {
       if (!res.ok) throw new Error(String(res.status));
       const v = await res.json();
       const ready = await get2(`${base2}/cdn/${proj}/locales.json`, 5e3).then((r) => r.ok ? r.json() : void 0).then((m) => m?.locales?.filter((l) => l.ready !== false).map((l) => l.code)).catch(() => void 0);
-      status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready } };
+      status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready, app: v.app, auth: v.auth } };
       void o.store?.put("status", JSON.stringify(status.v)).catch(() => {
       });
       await Promise.all([...tms.values()].filter((t) => (status.v.versions[t.locale] ?? 0) > t.v).map((t) => loadTm(t.locale, status.v.versions[t.locale])));
@@ -474,7 +574,91 @@ function createEdge(o) {
     else await p;
     return done;
   }
-  return Object.assign(serve, { own });
+  async function appRules(wait) {
+    await restore();
+    if (!status || now() - status.at >= statusTtl) {
+      const p = refreshStatus();
+      wait?.(p);
+      if (!status) await race(p, timeout);
+    }
+    return status?.v.app;
+  }
+  async function isApp(path, wait) {
+    const a = await appRules(wait);
+    return !!a?.rules?.length && classify(a.rules, a.action ?? "redirect", path) !== void 0;
+  }
+  async function app(req, locale, path, wait) {
+    const a = await appRules(wait);
+    if (!a?.rules?.length) return void 0;
+    const u = new URL(req.url);
+    const d = decide2({ rules: a.rules, action: a.action ?? "redirect", locale_style: a.locale ?? "none", locale, origin: u.origin, host: u.host, req_path: u.pathname, path, query: u.search.slice(1), method: req.method, cookie: req.headers.get("cookie") ?? "" });
+    if (!d || d.kind === "proxy") return d && "proxy";
+    return new Response(null, { status: d.status, headers: { location: d.location, "set-cookie": d.cookie, "cache-control": "no-store", "x-glot-edge": "app-redirect" } });
+  }
+  async function bundle(req, locale, origin, wait) {
+    const t0 = now();
+    const js = (r) => r.status === 200 && /javascript|ecmascript/.test(r.headers.get("content-type") ?? "");
+    const revalidate = (r) => {
+      const res = new Response(r.body, r);
+      res.headers.set("cache-control", "public, no-cache");
+      res.headers.delete("expires");
+      return res;
+    };
+    const tm = locale === o.source || req.method !== "GET" ? void 0 : await snapshot(locale, new URL(req.url).hostname, wait).catch(() => void 0);
+    if (!tm || tm === "off" || !o.key) {
+      const r = await origin(req);
+      if (!js(r) && r.status !== 304) return r;
+      if (locale === o.source || tm === "off" || r.status === 304) return revalidate(r);
+      const res = revalidate(r);
+      for (const h2 of ["etag", "last-modified"]) res.headers.delete(h2);
+      res.headers.set("cache-control", "no-store");
+      return timing(res, "fail-open", now() - t0, 0);
+    }
+    const key = `https://glot-edge.invalid/_bundle/${locale}.${tm.v}${new URL(req.url).pathname}${new URL(req.url).search}`;
+    const fresh = (r) => req.headers.get("if-none-match") === r.headers.get("etag") && r.headers.get("etag") ? new Response(null, { status: 304, headers: r.headers }) : r;
+    const hit = await o.pageCache?.match(key).catch(() => void 0);
+    if (hit) return timing(fresh(revalidate(hit)), "translated", now() - t0, 0, "hit");
+    const up = new Request(req);
+    up.headers.delete("if-none-match");
+    up.headers.delete("if-modified-since");
+    const page = await origin(up);
+    if (!js(page)) return page;
+    const tOrigin = now() - t0;
+    const body = await page.arrayBuffer();
+    const failOpen = () => {
+      const r = new Response(body, page);
+      for (const h2 of ["etag", "last-modified", "expires"]) r.headers.delete(h2);
+      r.headers.set("cache-control", "no-store");
+      return timing(r, "fail-open", now() - t0 - tOrigin, tOrigin);
+    };
+    if (body.byteLength > 4 * 1024 * 1024) return failOpen();
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), Math.max(timeout, 2e3));
+    try {
+      const g = await f(`${base2}/edge/v1/${proj}/${encodeURIComponent(locale)}/bundle`, { method: "POST", signal: ctl.signal, headers: { "content-type": "text/javascript", "x-glot-key": o.key }, body });
+      if (!g.ok) return failOpen();
+      const headers = new Headers(page.headers);
+      for (const h2 of [...HOP, "last-modified", "expires"]) headers.delete(h2);
+      headers.set("cache-control", "public, no-cache");
+      for (const h2 of ["etag", "x-glot-bundle", "x-glot-version"]) {
+        const v = g.headers.get(h2);
+        if (v) headers.set(h2, v);
+      }
+      const out = await g.arrayBuffer();
+      if (o.pageCache) {
+        const copy = new Response(out, { headers });
+        copy.headers.set("cache-control", "public, max-age=31536000");
+        wait?.(o.pageCache.put(key, copy).catch(() => {
+        }));
+      }
+      return timing(fresh(new Response(out, { status: 200, headers })), "translated", now() - t0 - tOrigin, tOrigin, "miss");
+    } catch {
+      return failOpen();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return Object.assign(serve, { own, app, isApp, bundle });
   async function serve(req, locale, originUrl, origin, wait) {
     const url = new URL(req.url);
     const t0 = now();
@@ -494,6 +678,7 @@ function createEdge(o) {
     const page = got.ok;
     const tOrigin = got.ms;
     if (!translatable) return timing(page, "passthrough", 0, tOrigin);
+    if (!anon && tm !== "off" && (status?.v.auth?.pages ?? "server") !== "server") return timing(personal(new Response(page.body, page)), "auth", tGlot, tOrigin);
     if (tm === "off") return timing(sourceUnderLocale(page), "off", tGlot, tOrigin);
     if (quotaUntil > now()) return timing(sourceUnderLocale(page), "quota", tGlot, tOrigin);
     const type = page.headers.get("content-type") ?? "";
@@ -526,6 +711,7 @@ function createEdge(o) {
     headers.set("x-glot-version", `${locale}@${tm.v}`);
     headers.set("x-glot-coverage", `${out.translated}/${out.total}`);
     const res = new Response(out.html, { status: page.status, statusText: page.statusText, headers });
+    if (!anon) personal(res);
     const ttl = cacheKey ? cacheTtl(page.headers, o.pageTtl ?? 0) : 0;
     if (cacheKey && ttl > 0) {
       const copy = res.clone();
@@ -551,6 +737,11 @@ function cacheTtl(h2, fallback) {
   if (/private|no-store|no-cache/.test(cc)) return 0;
   const m = /s-maxage=(\d+)/.exec(cc) ?? /max-age=(\d+)/.exec(cc);
   return m ? Number(m[1]) : fallback;
+}
+function personal(res) {
+  res.headers.set("cache-control", "private, no-cache");
+  res.headers.append("vary", "Cookie");
+  return res;
 }
 function sourceUnderLocale(page) {
   const res = new Response(page.body, page);
@@ -1195,9 +1386,9 @@ var Segmenter = class {
     }
   }
   make(text, values, raw, role, key) {
-    let plain = stripPlaceholders(text);
-    for (const t of this.opts.dnt) if (t) plain = plain.split(t).join(" ");
-    if (!hasLetter(plain)) return;
+    let plain2 = stripPlaceholders(text);
+    for (const t of this.opts.dnt) if (t) plain2 = plain2.split(t).join(" ");
+    if (!hasLetter(plain2)) return;
     const discoverable = !values.some((v) => isPii(v.kind)) && !looksLikeAddress(raw);
     const seg = { hash: "", text, role, discoverable, values, tags: [], span: [0, 0] };
     if (key !== void 0) seg.key = key;
@@ -1398,9 +1589,9 @@ function check(seg, tr2) {
   }
   return !stack.length && seenTag.every((n) => n === 1) && seenVal.every((n) => n === 1) && (!seg.attr || !seg.tags.length) ? parts : void 0;
 }
-function splice(src, [lo, hi], edits) {
+function splice(src, [lo, hi], edits2) {
   let out = "", at = lo;
-  for (const [[s, e], v] of edits) if (s >= at && e <= hi) {
+  for (const [[s, e], v] of edits2) if (s >= at && e <= hi) {
     out += src.slice(at, s) + v;
     at = e;
   }
@@ -1420,7 +1611,7 @@ function translateHtml(html, opts, lookup2) {
     } else textTr.push([seg, parts]);
   }
   attrEdits.sort((a, b2) => a[0][0] - b2[0][0]);
-  const edits = textTr.map(([seg, parts]) => {
+  const edits2 = textTr.map(([seg, parts]) => {
     let out = "";
     for (const p of parts) {
       if (p.p === "text") out += escapeText(p.s);
@@ -1432,10 +1623,10 @@ function translateHtml(html, opts, lookup2) {
     }
     return [seg.span, out];
   });
-  const covered = edits.map((e) => e[0]);
-  for (const e of attrEdits) if (!covered.some(([s, t]) => s <= e[0][0] && e[0][1] <= t)) edits.push(e);
-  edits.sort((a, b2) => a[0][0] - b2[0][0]);
-  return splice(html, [0, html.length], edits);
+  const covered = edits2.map((e) => e[0]);
+  for (const e of attrEdits) if (!covered.some(([s, t]) => s <= e[0][0] && e[0][1] <= t)) edits2.push(e);
+  edits2.sort((a, b2) => a[0][0] - b2[0][0]);
+  return splice(html, [0, html.length], edits2);
 }
 
 // src/hydration.ts
@@ -1447,56 +1638,281 @@ function tr(s, lookup2) {
   const t = lookup2(fold(s));
   return t === void 0 || t === s ? void 0 : t;
 }
-function walk(v, lookup2, n, key = "") {
-  if (typeof v === "string") {
-    if (ID_KEYS.test(key)) return v;
-    const t = tr(v, lookup2);
-    if (t !== void 0) n.c++;
-    return t ?? v;
+var WS = /\s/;
+var isId0 = (c) => /[A-Za-z_$]/.test(c);
+var isId = (c) => /[\w$]/.test(c);
+function readStr(src, i, to) {
+  const q = src[i];
+  let s = "";
+  for (let j = i + 1; j < to; ) {
+    const c = src[j];
+    if (c === q) return [s, j + 1];
+    if (c === "\n" || c === "\r") return void 0;
+    if (c !== "\\") {
+      s += c;
+      j++;
+      continue;
+    }
+    const e = src[j + 1];
+    j += 2;
+    if (e === void 0) return void 0;
+    const hex = (n) => {
+      const h2 = src.slice(j, j + n);
+      if (h2.length < n || !/^[0-9a-fA-F]+$/.test(h2)) return void 0;
+      j += n;
+      return parseInt(h2, 16);
+    };
+    let cp;
+    switch (e) {
+      case "n":
+        s += "\n";
+        break;
+      case "r":
+        s += "\r";
+        break;
+      case "t":
+        s += "	";
+        break;
+      case "b":
+        s += "\b";
+        break;
+      case "f":
+        s += "\f";
+        break;
+      case "v":
+        s += "\v";
+        break;
+      case "0":
+        if (/[0-9]/.test(src[j] ?? "")) return void 0;
+        s += "\0";
+        break;
+      case "x":
+        if ((cp = hex(2)) === void 0) return void 0;
+        s += String.fromCharCode(cp);
+        break;
+      case "u":
+        if (src[j] === "{") {
+          const k = src.indexOf("}", j);
+          if (k < 0 || k - j > 7 || !/^[0-9a-fA-F]+$/.test(src.slice(j + 1, k))) return void 0;
+          cp = parseInt(src.slice(j + 1, k), 16);
+          j = k + 1;
+          if (cp > 1114111) return void 0;
+          s += String.fromCodePoint(cp);
+        } else {
+          if ((cp = hex(4)) === void 0) return void 0;
+          s += String.fromCharCode(cp);
+        }
+        break;
+      case "\r":
+        if (src[j] === "\n") j++;
+        break;
+      // line continuation
+      case "\n":
+      case "\u2028":
+      case "\u2029":
+        break;
+      default:
+        if (/[1-9]/.test(e)) return void 0;
+        s += e;
+    }
   }
-  if (Array.isArray(v)) return v.map((x) => walk(x, lookup2, n, key));
-  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x, lookup2, n, k)]));
-  return v;
+  return void 0;
 }
-function nextData(html, lookup2, n) {
-  return html.replace(/(<script\b[^>]*\bid="__NEXT_DATA__"[^>]*>)([\s\S]*?)(<\/script>)/, (all, open, body, close) => {
-    try {
-      return open + esc(JSON.stringify(walk(JSON.parse(body), lookup2, n))) + close;
-    } catch {
-      return all;
+function scan(src, from = 0, to = src.length, one = false) {
+  const out = [];
+  const st = [];
+  let prev = "";
+  const next = (j) => {
+    while (j < to && WS.test(src[j])) j++;
+    return src[j];
+  };
+  for (let i = from; i < to; ) {
+    const c = src[i];
+    const f = st[st.length - 1];
+    if (WS.test(c)) {
+      i++;
+      continue;
     }
-  });
-}
-function nuxtData(html, lookup2, n) {
-  return html.replace(/(<script\b[^>]*\bid="__NUXT_DATA__"[^>]*>)([\s\S]*?)(<\/script>)/, (all, open, body, close) => {
-    try {
-      const a = JSON.parse(body);
-      if (!Array.isArray(a)) return all;
-      const skip = /* @__PURE__ */ new Set();
-      for (const x of a) {
-        if (x && typeof x === "object" && !Array.isArray(x)) {
-          for (const [k, i] of Object.entries(x)) if (ID_KEYS.test(k) && typeof i === "number") skip.add(i);
-        }
-        if (Array.isArray(x) && typeof x[0] === "string") {
-          for (const i of x.slice(1)) if (typeof i === "number") skip.add(i);
-        }
+    if (c === '"' || c === "'") {
+      const r = readStr(src, i, to);
+      if (!r) return void 0;
+      if (f?.k === "{" && next(r[1]) === ":") f.pend = r[0];
+      else if (f && f.k !== "m") {
+        out.push({ a: i, b: r[1], s: r[0], key: f.k === "{" ? f.pend : f.k === "[" ? f.key : void 0, top: st.length === 1 && f.k === "[" ? f.i : void 0 });
+        if (f.k === "{") f.pend = void 0;
       }
-      const out = a.map((x, i) => {
-        if (typeof x !== "string" || skip.has(i)) return x;
-        const t = tr(x, lookup2);
-        if (t !== void 0) n.c++;
-        return t ?? x;
-      });
-      return open + esc(JSON.stringify(out)) + close;
+      prev = "v";
+      i = r[1];
+      continue;
+    }
+    if (isId0(c) || /[0-9]/.test(c)) {
+      let j = i + 1;
+      while (j < to && (isId(src[j]) || !isId0(c) && src[j] === ".")) j++;
+      if (isId0(c) && f?.k === "{" && next(j) === ":") f.pend = src.slice(i, j);
+      prev = "v";
+      i = j;
+      continue;
+    }
+    if (c === "`" || c === "/" || c === "?") return void 0;
+    if (c === "{" || c === "(") st.push({ k: c, i: 0 });
+    else if (c === "[") {
+      if (prev === "v" || prev === ")") st.push({ k: "m", i: 0 });
+      else {
+        st.push({ k: "[", i: 0, key: f?.k === "{" ? f.pend : f?.k === "[" ? f.key : void 0 });
+        if (f?.k === "{") f.pend = void 0;
+      }
+    } else if (c === "}" || c === "]" || c === ")") {
+      const open = st.pop()?.k;
+      if (open !== (c === "}" ? "{" : c === ")" ? "(" : open === "m" ? "m" : "[")) return void 0;
+      if (one && !st.length) return out;
+      prev = ")";
+      i++;
+      continue;
+    } else if (c === "," && f) {
+      f.i++;
+      if (f.k === "{") f.pend = void 0;
+    }
+    prev = c;
+    i++;
+  }
+  return !one && !st.length ? out : void 0;
+}
+function splice2(s, edits2) {
+  let o = "", at = 0;
+  for (const [a, b2, v] of edits2) o += s.slice(at, a) + v, at = b2;
+  return o + s.slice(at);
+}
+function edits(lits, lookup2, skip = () => false, enc = (v) => esc(JSON.stringify(v))) {
+  const e = [];
+  for (const l of lits) {
+    if (l.key !== void 0 && ID_KEYS.test(l.key) || skip(l)) continue;
+    const t = tr(l.s, lookup2);
+    if (t !== void 0) e.push([l.a, l.b, enc(t)]);
+  }
+  return e;
+}
+function scripts(html, f) {
+  return html.replace(/(<script\b[^>]*>)([\s\S]*?)(<\/script>)/g, (all, open, body, close) => {
+    if (/\ssrc\s*=/.test(open)) return all;
+    const b2 = f(body);
+    return b2 === void 0 ? all : open + b2 + close;
+  });
+}
+function jsonScript(html, id, f) {
+  const re = new RegExp(`(<script\\b[^>]*\\bid="${id}"[^>]*>)([\\s\\S]*?)(<\\/script>)`);
+  return html.replace(re, (all, open, body, close) => {
+    const b2 = f(body);
+    return b2 === void 0 ? all : open + b2 + close;
+  });
+}
+function apply(body, e, n) {
+  if (!e?.length) return void 0;
+  n.c += e.length;
+  return splice2(body, e);
+}
+var nextData = (html, lookup2, n) => jsonScript(html, "__NEXT_DATA__", (body) => {
+  const l = scan(body);
+  return l && apply(body, edits(l, lookup2), n);
+});
+function flatSkip(a, turbo) {
+  const skip = /* @__PURE__ */ new Set();
+  for (const x of a) {
+    if (x && typeof x === "object" && !Array.isArray(x))
+      for (const [k, i] of Object.entries(x)) {
+        const key = turbo ? /^_\d+$/.test(k) ? a[Number(k.slice(1))] : void 0 : k;
+        if (turbo && /^_\d+$/.test(k)) skip.add(Number(k.slice(1)));
+        if (typeof key === "string" && ID_KEYS.test(key) && typeof i === "number") skip.add(i);
+      }
+    if (!turbo && Array.isArray(x) && typeof x[0] === "string") {
+      for (const i of x.slice(1)) if (typeof i === "number") skip.add(i);
+    }
+  }
+  return skip;
+}
+function flat(json, lookup2, turbo, enc) {
+  let a;
+  try {
+    a = JSON.parse(json);
+  } catch {
+    return void 0;
+  }
+  if (!Array.isArray(a)) return void 0;
+  const l = scan(json);
+  if (!l) return void 0;
+  const skip = flatSkip(a, turbo);
+  return edits(l, lookup2, (x) => x.top === void 0 || skip.has(x.top), enc);
+}
+var nuxtData = (html, lookup2, n) => jsonScript(html, "__NUXT_DATA__", (body) => apply(body, flat(body, lookup2, false), n));
+var svelteKit = (html, lookup2, n) => scripts(html, (body) => {
+  const at = body.indexOf("kit.start(");
+  if (at < 0) return void 0;
+  const l = scan(body, at + "kit.start".length, body.length, true);
+  return l && apply(body, edits(l, lookup2), n);
+});
+var solid = (html, lookup2, n) => scripts(html, (body) => {
+  if (!body.includes("$R[")) return void 0;
+  const l = scan(body);
+  return l && apply(body, edits(l, lookup2), n);
+});
+var reactRouter = (html, lookup2, n) => scripts(
+  html,
+  (body) => body.replace(/(streamController\.enqueue\()("(?:[^"\\\n]|\\.)*")(\))/g, (all, pre, lit, post) => {
+    let stream;
+    try {
+      stream = JSON.parse(lit);
     } catch {
       return all;
     }
+    const nl = stream.indexOf("\n");
+    const line = nl < 0 ? stream : stream.slice(0, nl);
+    if (!line.startsWith("[")) return all;
+    const e = flat(line, lookup2, true, (v) => JSON.stringify(v));
+    if (!e?.length) return all;
+    n.c += e.length;
+    return pre + esc(JSON.stringify(splice2(line, e) + stream.slice(line.length))) + post;
+  })
+);
+var ENT = { quot: '"', amp: "&", lt: "<", gt: ">", apos: "'" };
+function unattr(v) {
+  let bad = false;
+  const s = v.replace(/&(#x[0-9a-fA-F]+|#[0-9]+|[A-Za-z]+);/g, (_, e) => {
+    if (e[0] !== "#") return ENT[e] ?? (bad = true, "");
+    const cp = e[1] === "x" ? parseInt(e.slice(2), 16) : Number(e.slice(1));
+    if (!(cp <= 1114111) || cp >= 55296 && cp <= 57343) return bad = true, "";
+    return String.fromCodePoint(cp);
   });
+  return bad ? void 0 : s;
+}
+function plain(before) {
+  let t = before.trimEnd();
+  if (!t.endsWith(",")) return false;
+  t = t.slice(0, -1).trimEnd();
+  return t.endsWith("0") && t.slice(0, -1).trimEnd().endsWith("[");
+}
+var reattr = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var astro = (html, lookup2, n) => html.replace(
+  /<astro-island\b[^>]*>/g,
+  (tag) => tag.replace(/(\sprops=")([^"]*)(")/, (all, pre, raw, post) => {
+    const json = unattr(raw);
+    const l = json === void 0 ? void 0 : scan(json);
+    if (!l) return all;
+    const e = edits(l, lookup2, (x) => !plain(json.slice(0, x.a)), (v) => JSON.stringify(v));
+    if (!e.length) return all;
+    n.c += e.length;
+    return pre + reattr(splice2(json, e)) + post;
+  })
+);
+function vueAllowMismatch(html) {
+  if (!/__NUXT_DATA__|id="__nuxt"|<astro-island\b/.test(html)) return html;
+  const m = /<html(?=[\s>])[^>]*>/i.exec(html);
+  if (!m || /\sdata-allow-mismatch\b/i.test(m[0])) return html;
+  const at = m.index + 5;
+  return html.slice(0, at) + ' data-allow-mismatch="text"' + html.slice(at);
 }
 var PUSH = /<script\b[^>]*>\s*self\.__next_f\.push\((\[1,"(?:[^"\\]|\\.)*"\])\)\s*<\/script>/g;
 var utf8Len = (s) => new TextEncoder().encode(s).length;
 function flightEdits(stream, lookup2) {
-  const edits = [];
+  const edits2 = [];
   let i = 0;
   while (i < stream.length) {
     if (stream[i] === "\n") {
@@ -1534,13 +1950,13 @@ function flightEdits(stream, lookup2) {
         key = "";
         if (ID_KEYS.test(k)) continue;
         const v = tr(s, lookup2);
-        if (v !== void 0) edits.push([j + t.index, j + t.index + t[0].length, JSON.stringify(v)]);
+        if (v !== void 0) edits2.push([j + t.index, j + t.index + t[0].length, JSON.stringify(v)]);
       }
     }
     if (end < 0) break;
     i = end + 1;
   }
-  return edits;
+  return edits2;
 }
 function flight(html, lookup2, n) {
   const pushes = [...html.matchAll(PUSH)];
@@ -1549,9 +1965,9 @@ function flight(html, lookup2, n) {
   const starts = [];
   let off = 0;
   for (const c of chunks) starts.push(off), off += c.length;
-  const edits = flightEdits(chunks.join(""), lookup2);
+  const edits2 = flightEdits(chunks.join(""), lookup2);
   const out = chunks.slice();
-  for (const [a, b2, v] of edits.reverse()) {
+  for (const [a, b2, v] of edits2.reverse()) {
     let k = starts.length - 1;
     while (starts[k] > a) k--;
     if (b2 > starts[k] + chunks[k].length) continue;
@@ -1570,8 +1986,14 @@ function translatePayloads(html, lookup2) {
   if (out.includes("__NEXT_DATA__")) out = nextData(out, lookup2, n);
   if (out.includes("__NUXT_DATA__")) out = nuxtData(out, lookup2, n);
   if (out.includes("self.__next_f.push")) out = flight(out, lookup2, n);
-  return { html: out, replaced: n.c };
+  if (out.includes("kit.start(")) out = svelteKit(out, lookup2, n);
+  if (out.includes("$R[")) out = solid(out, lookup2, n);
+  if (out.includes("streamController.enqueue(")) out = reactRouter(out, lookup2, n);
+  if (out.includes("<astro-island")) out = astro(out, lookup2, n);
+  return { html: vueAllowMismatch(out), replaced: n.c };
 }
+var TM_INLINE_MAX = 32768;
+var tmInline = (json) => new TextEncoder().encode(json).length <= TM_INLINE_MAX ? `<script type="application/json" id="glot-tm">${esc(json)}</script>` : "";
 var attr = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 var patcherTag = (scriptUrl, tmUrl, sourceLocale, missing) => `<script async src="${attr(scriptUrl)}" data-tm="${attr(tmUrl)}" data-source="${attr(sourceLocale)}"${missing ? ` data-missing="${attr(missing)}"` : ""}></script>`;
 function injectHead(html, tag) {
@@ -1607,9 +2029,19 @@ var translate = (html, tm, c) => {
     tr: (s) => lookup(tm, hash16(`${c.source}\0${collapseWs(s)}`), `text|${tpl}`)
   });
   out = injectHead(out, `<meta name="glot-tm" content="${esc2(`${tm.locale}@${tm.v}`)}">`);
+  out = injectHead(out, inlined(tm, c.skip));
   out = injectHead(out, patcherTag("/__glot/patcher.js", `/__glot/tm.json?locale=${encodeURIComponent(tm.locale)}`, c.source, c.discover ? "/__glot/missing" : void 0));
   return { html: out, total, translated, missing, seen };
 };
+var inlineCache = /* @__PURE__ */ new WeakMap();
+function inlined(tm, skip) {
+  const k = skip.join("\0");
+  const hit = inlineCache.get(tm);
+  if (hit?.[0] === k) return hit[1];
+  const tag = Object.keys(tm.t).length > TM_INLINE_MAX / 8 ? "" : tmInline(JSON.stringify(skip.length ? { ...tm, skip } : tm));
+  inlineCache.set(tm, [k, tag]);
+  return tag;
+}
 var subdirBases = (origin, source2, locales) => [source2, ...locales.filter((l) => l !== source2)].map((l) => [l, l === source2 ? origin : `${origin}/${l}`]);
 var RTL = /^(ar|he|iw|fa|ur|ps|sd|ug|yi|dv|ckb)$/;
 var dir = (l) => RTL.test(l.split(/[-_]/)[0]) ? "rtl" : "ltr";
@@ -1699,7 +2131,7 @@ function ld(v, s, key) {
   return v;
 }
 function seo(html, s) {
-  const edits = [];
+  const edits2 = [];
   const raw = (x) => {
     const m = /=\s*(?:"([^"]*)|'([^']*)|([^\s>]*))/.exec(html.slice(x.range[0], x.range[1]));
     return m ? m[1] ?? m[2] ?? m[3] : "";
@@ -1714,7 +2146,7 @@ function seo(html, s) {
     if (t.t === "text" && ldNext) {
       const src = html.slice(t.range[0], t.range[1]);
       try {
-        edits.push([t.range[0], t.range[1], JSON.stringify(ld(JSON.parse(src.trim()), s)).replace(/<\//g, "<\\/")]);
+        edits2.push([t.range[0], t.range[1], JSON.stringify(ld(JSON.parse(src.trim()), s)).replace(/<\//g, "<\\/")]);
       } catch {
       }
     }
@@ -1733,12 +2165,12 @@ function seo(html, s) {
       const rels = get2("rel").toLowerCase().split(/\s+/), href = get2("href"), lang = get2("hreflang");
       if (rels.includes("canonical")) {
         if (href !== void 0) canonical ??= sitePath(s, href) ?? s.path;
-        edits.push([t.range[0], t.range[1], ""]);
+        edits2.push([t.range[0], t.range[1], ""]);
         continue;
       }
       if (rels.includes("alternate") && lang !== void 0) {
         if (managed(lang)) {
-          edits.push([t.range[0], t.range[1], ""]);
+          edits2.push([t.range[0], t.range[1], ""]);
           continue;
         }
         if (href?.startsWith("/") && !href.startsWith("//")) set("href", originOf(base(s, s.source) ?? "") + href);
@@ -1763,18 +2195,18 @@ function seo(html, s) {
       return q(html.slice(x.range[0], x.range[0] + x.name.length), v);
     });
     for (const [n, v] of mods) parts.push(q(n, v));
-    edits.push([t.range[0], t.range[1], `<${html.slice(t.range[0] + 1, t.range[0] + 1 + t.name.length)}${parts.map((x) => " " + x).join("")}${t.selfClosing ? " />" : ">"}`]);
+    edits2.push([t.range[0], t.range[1], `<${html.slice(t.range[0] + 1, t.range[0] + 1 + t.name.length)}${parts.map((x) => " " + x).join("")}${t.selfClosing ? " />" : ">"}`]);
   }
   if (headEnd !== void 0) {
     const p = canonical ?? s.path, c = urlFor(s, s.locale, p);
     const alt = s.bases.map(([l]) => [l, urlFor(s, l, p)]);
     const x = urlFor(s, s.source, p);
     if (x !== void 0) alt.push(["x-default", x]);
-    edits.push([headEnd, headEnd, (c ? `<link rel="canonical" href="${esc2(c)}">` : "") + alt.map(([l, u]) => `<link rel="alternate" hreflang="${esc2(l)}" href="${esc2(u)}">`).join("")]);
+    edits2.push([headEnd, headEnd, (c ? `<link rel="canonical" href="${esc2(c)}">` : "") + alt.map(([l, u]) => `<link rel="alternate" hreflang="${esc2(l)}" href="${esc2(u)}">`).join("")]);
   }
-  edits.sort((x, y2) => x[0] - y2[0]);
+  edits2.sort((x, y2) => x[0] - y2[0]);
   let out = "", at = 0;
-  for (const [a, b2, v] of edits) if (a >= at) {
+  for (const [a, b2, v] of edits2) if (a >= at) {
     out += html.slice(at, a) + v;
     at = b2;
   }
@@ -1803,6 +2235,16 @@ function getEdge(env, source2, locales) {
     pageCache: c
   });
 }
+function refererLocale(req, url, o) {
+  try {
+    const ref = new URL(req.headers.get("referer") ?? "");
+    if (ref.host !== url.host) return o.source;
+    const r = route(ref, new Headers(), o);
+    return "locale" in r ? r.locale : o.source;
+  } catch {
+    return o.source;
+  }
+}
 var worker_default = {
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
@@ -1813,8 +2255,23 @@ var worker_default = {
       const own = await getEdge(env, source2, locales).own(req, wait);
       if (own) return own;
     }
-    const r = route(url, req.headers, { source: source2, locales });
+    const edgeOn = env.GLOT_EDGE !== "0";
+    if (edgeOn && /\.m?js$/.test(url.pathname)) {
+      const page2 = refererLocale(req, url, { source: source2, locales });
+      return getEdge(env, source2, locales).bundle(req, page2, (r2) => fetch(r2), wait);
+    }
+    let r = route(url, req.headers, { source: source2, locales });
+    if ("redirect" in r && edgeOn && await getEdge(env, source2, locales).isApp(url.pathname, wait)) r = { locale: source2, path: url.pathname };
     if ("redirect" in r) return new Response(null, { status: 302, headers: { location: r.redirect, vary: "Accept-Language, Cookie" } });
+    if (edgeOn && r.locale !== source2) {
+      const a = await getEdge(env, source2, locales).app(req, r.locale, r.path, wait);
+      if (a === "proxy") {
+        const u = new URL(url);
+        u.pathname = r.path;
+        return fetch(new Request(u, req));
+      }
+      if (a) return a;
+    }
     let d;
     if (env.GLOT_KEY && req.method === "GET" && req.headers.get("accept")?.includes("text/html")) {
       xp ??= glotExperiments({ server: env.GLOT_SERVER, project: env.GLOT_PROJECT, key: env.GLOT_KEY });
@@ -1828,7 +2285,7 @@ var worker_default = {
       if (d?.header) up.headers.set("x-glot-xp", d.header);
       return fetch(up);
     };
-    const useEdge = env.GLOT_EDGE !== "0" && r.locale !== source2;
+    const useEdge = edgeOn && r.locale !== source2;
     let page;
     if (useEdge) page = await getEdge(env, source2, locales)(req, r.locale, originUrl, origin, wait);
     else page = await origin(originUrl);
@@ -1859,5 +2316,6 @@ var worker_default = {
   }
 };
 export {
-  worker_default as default
+  worker_default as default,
+  refererLocale
 };

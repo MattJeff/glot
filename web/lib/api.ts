@@ -711,7 +711,7 @@ export type XpAction =
 export type QuotaKey = "projects" | "seats" | "cdn_requests" | "insights_events" | "mcp_calls" | "ondemand_jobs" | "llm_strings";
 /** `experiments` = text experiments live at once (not monthly). */
 export type Limits = Partial<Record<QuotaKey | "experiments", number | null>>;
-export type PlanId = "free" | "pro" | "team";
+export type PlanId = "free" | "starter" | "pro" | "team";
 export type BillingSummary = {
   enabled: boolean;
   plan: PlanId | "self_hosted";
@@ -722,6 +722,8 @@ export type BillingSummary = {
   grace_until: string | null;
   metered: boolean;
   has_customer: boolean;
+  /** Checkout of Growth starts with the 14-day trial (offered once per account). */
+  trial_available: boolean;
   limits: Limits;
   usage: Partial<Record<QuotaKey, number>>;
 };
@@ -739,7 +741,8 @@ export type PlanPrice = { unit_amount: number | null; unit_amount_decimal: strin
 export type PlansInfo = { enabled: boolean; plans: Partial<Record<PlanId, Limits>>; prices: Record<string, PlanPrice> };
 
 export const api = {
-  signup: (b: { email: string; password: string; name: string; locale?: string }) =>
+  /** `website` is the form's honeypot (hidden; a filled one is refused). */
+  signup: (b: { email: string; password: string; name: string; locale?: string; website?: string }) =>
     request<User>("POST", "/api/auth/signup", b),
   login: (b: { email: string; password: string }) => request<User>("POST", "/api/auth/login", b),
   logout: () => request<void>("POST", "/api/auth/logout"),
@@ -883,7 +886,7 @@ export const api = {
   billing: () => request<BillingSummary>("GET", "/api/billing"),
   billingPlans: () => request<PlansInfo>("GET", "/api/billing/plans"),
   invoices: () => request<Invoice[]>("GET", "/api/billing/invoices"),
-  checkout: (b: { plan: "pro" | "team"; interval: "month" | "year" }) => request<{ url: string }>("POST", "/api/billing/checkout", b),
+  checkout: (b: { plan: "starter" | "pro" | "team"; interval: "month" | "year" }) => request<{ url: string }>("POST", "/api/billing/checkout", b),
   billingPortal: () => request<{ url: string }>("POST", "/api/billing/portal"),
 };
 

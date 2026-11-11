@@ -333,7 +333,7 @@ function DomainCard({ slug, domain: d, source }: { slug: string; domain: EdgeDom
 }
 
 /** Subdomain mode: the source site is not behind glot, so it must carry the hreflang tags itself (reciprocity). */
-function HreflangSnippet({ slug }: { slug: string }) {
+export function HreflangSnippet({ slug }: { slug: string }) {
   const t = useTranslations("edge.setup.hreflang");
   const [path, setPath] = useState("/");
   const [asked, setAsked] = useState("/");

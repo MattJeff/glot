@@ -253,3 +253,21 @@ test("own routes: tm.json `since` (204 until newer) + project skip selectors; /_
   await nokey.edge.own(post());
   assert.equal(nokey.posted.length, 0);
 });
+
+test("signed-in requests: auth.pages server = translated, private, uncached; patcher/off = origin untouched, private", async () => {
+  const cache = new Map<string, Response>();
+  const pageCache: PageCache = { match: async (k) => cache.get(k)?.clone(), put: async (k, r) => void cache.set(k, r) };
+  for (const pages of [undefined, "server", "patcher", "off"] as const) {
+    const { edge, posted } = setup({ status: () => json({ enabled: true, off: [], versions: { es: 1 }, auth: pages && { pages } }), tm: () => json({ v: 1, t: { Hello: "Hola" } }) }, { pageCache });
+    const o = page(undefined, { "cache-control": "public, max-age=60", "set-cookie": "app_session=rotated; HttpOnly" });
+    const { res, body } = await run(edge, req("/es/pricing", { cookie: "app_session=abc" }), o);
+    const server = pages === undefined || pages === "server";
+    assert.equal(res.headers.get("x-glot-edge"), server ? "translated" : "auth", String(pages));
+    assert.match(body, server ? /<p>Hola<\/p>/ : /<p>Hello<\/p>/);
+    assert.equal(res.headers.get("cache-control"), "private, no-cache");
+    assert.match(res.headers.get("vary")!, /Cookie/);
+    assert.equal(res.headers.get("set-cookie"), "app_session=rotated; HttpOnly"); // the app's session, as is
+    assert.equal(cache.size, 0);
+    assert.deepEqual(posted, []);
+  }
+});

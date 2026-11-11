@@ -1,24 +1,47 @@
 {
   "name": "@glot/renderer",
-  "version": "0.1.0",
-  "private": true,
-  "description": "glot Edge renderer: headless-Chromium snapshots of SPA pages, cached and refreshed (never rendered per request).",
+  "version": "0.5.0",
+  "description": "glot Edge renderer: snapshots of 100 % JavaScript apps with chromium-headless-shell, as a small service (cached, refreshed in the background) or in CI (glot prerender).",
   "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/renderer"
+  },
   "type": "module",
+  "bin": {
+    "glot-renderer": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/server.ts",
     "test": "node --test 'test/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "e2e:cliponit": "node e2e/cliponit.e2e.ts",
     "e2e:next": "node e2e/hydration-next.e2e.ts",
-    "bench:ttfb": "node bench/ttfb.ts"
+    "e2e:bundles": "node e2e/bundles.e2e.ts",
+    "e2e:frameworks": "node e2e/hydration-frameworks.e2e.ts",
+    "bench:ttfb": "node bench/ttfb.ts",
+    "build": "rm -rf dist && esbuild src/cli.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=dist/cli.js",
+    "prepack": "npm run build",
+    "prerender": "node src/cli.ts prerender"
   },
   "dependencies": {
     "playwright": "1.64.1"
   },
   "devDependencies": {
     "@types/node": "^25",
-    "typescript": "^5.9"
+    "typescript": "^5.9",
+    "esbuild": "^0.25"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.18.3",
+  "publishConfig": {
+    "access": "public"
+  }
 }

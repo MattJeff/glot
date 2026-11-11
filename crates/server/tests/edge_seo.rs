@@ -269,16 +269,14 @@ async fn edge_seo() {
     let crit = es_entry["critical_coverage"].as_f64().unwrap();
     assert!(crit > 0.5 && crit < 0.98, "{m}");
     assert!(es_entry["version"].as_i64().unwrap() >= 1);
-    // Still offered to the language switcher (its catalog is complete): Edge readiness only gates SEO.
     let (_, _, m) = call(Method::GET, "/cdn/clip/locales.json", None, None).await;
-    let m = j(&m);
-    let es = m["locales"]
+    let codes: Vec<String> = j(&m)["locales"]
         .as_array()
         .unwrap()
         .iter()
-        .find(|l| l["code"] == "es")
-        .cloned();
-    assert_eq!(es.map(|l| l["ready"].clone()), Some(json!(false)), "{m}");
+        .map(|l| l["code"].as_str().unwrap().to_string())
+        .collect();
+    assert_eq!(codes, ["fr"], "not ready = not offered");
 
     // Coverage API: the page and its missing segment, clickable by hash/context/text.
     let (s, _, cov) = call(

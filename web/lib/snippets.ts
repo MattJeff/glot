@@ -32,3 +32,10 @@ export const DEMO = {
   ],
   file: "messages/fr.json",
 };
+
+/** The universal website tag (glot.js, packages/edge/src/website.global.ts): what the platform guides tell users to paste. */
+export const UNIVERSAL_TAG = `<script src="https://app.glotlang.com/widget/glot.js" data-project="your-project" data-key="pk_…" async></script>`;
+
+/** glot Edge subdomain records (docs/edge.md → Subdomain). */
+export const EDGE_DNS = `es.example.com.        CNAME  edge.glotlang.com.
+_glot.es.example.com.  TXT    "<token shown in the dashboard>"`;

@@ -3,7 +3,7 @@
 // Plan cards shared by /pricing and /app/settings/billing. Limits come from the server config and prices from
 // Stripe (GET /api/billing/plans), so changing either never needs a web deploy.
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -12,16 +12,21 @@ import { Link } from "@/i18n/navigation";
 import { api, type Limits, type PlanId, type PlansInfo, type QuotaKey } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-export const PLANS: PlanId[] = ["free", "pro", "team"];
+export const PLANS: PlanId[] = ["free", "starter", "pro", "team"];
 export const QUOTAS: QuotaKey[] = ["projects", "seats", "cdn_requests", "insights_events", "mcp_calls", "ondemand_jobs", "llm_strings"];
 /** Cards also show the live-experiment limit (not a monthly counter, so not on the usage list). */
 const CARD_QUOTAS: (QuotaKey | "experiments")[] = ["experiments", ...QUOTAS];
 /** Promise of each plan, as `pricing.plans.<plan>.features.<key>`. */
 const FEATURES = {
   free: ["oss", "project", "noCard"],
+  starter: ["projects", "dynamic", "sync", "qa", "cms", "quotas"],
   pro: ["sync", "qa", "review", "glossary", "matrix", "byok", "xp"],
   team: ["everything", "xp", "recommend", "launch", "volume"],
 } as const;
+/** What a plan leaves out, as `pricing.plans.<plan>.excluded.<key>` (only Starter, to tell it apart from Pro). */
+const EXCLUDED: Partial<Record<PlanId, readonly string[]>> = { starter: ["edge", "xp", "launch", "recommend"] };
+/** Days of the Growth trial (server: `billing::TRIAL_DAYS`). */
+export const TRIAL_DAYS = 14;
 export type Interval = "month" | "year";
 
 export function usePlans() {
@@ -46,9 +51,12 @@ function money(format: ReturnType<typeof useFormatter>, cents: number, currency:
 export function PlanCards({
   current,
   action,
+  trial = true,
 }: {
   /** Plan in force for the signed-in account (billing page). */
   current?: string;
+  /** Show the Growth trial on its card (false once the account used it). */
+  trial?: boolean;
   /** Button for a plan; receives the selected billing interval. */
   action: (plan: PlanId, interval: Interval) => React.ReactNode;
 }) {
@@ -96,7 +104,7 @@ export function PlanCards({
           </button>
         ))}
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {PLANS.map((plan) => {
           const limits: Limits = info?.plans[plan] ?? {};
           const { main, per, equiv } = price(plan);
@@ -116,12 +124,22 @@ export function PlanCards({
                 <span className="text-sm text-muted-foreground">{per}</span>
               </p>
               {equiv && <p className="text-xs text-muted-foreground">{equiv}</p>}
+              {plan === "team" && trial && <p className="mt-1 text-xs font-medium text-success">{t("trial", { days: TRIAL_DAYS })}</p>}
               <p className="mt-3 text-sm"><span className="font-medium">{t("forWho")}</span> {t(`plans.${plan}.for`)}</p>
               <ul className="mt-4 space-y-1.5 text-sm">
                 {FEATURES[plan].map((f) => (
                   <li key={f} className="flex gap-2">
                     <Check className="mt-0.5 size-4 shrink-0 text-success" />
                     {t(`plans.${plan}.features.${f}` as "plans.free.features.oss")}
+                  </li>
+                ))}
+                {EXCLUDED[plan]?.map((f) => (
+                  <li key={f} className="flex gap-2 text-muted-foreground">
+                    <X className="mt-0.5 size-4 shrink-0" aria-hidden />
+                    <span>
+                      <span className="sr-only">{t("excludedSr")} </span>
+                      {t(`plans.${plan}.excluded.${f}` as "plans.starter.excluded.edge")}
+                    </span>
                   </li>
                 ))}
               </ul>

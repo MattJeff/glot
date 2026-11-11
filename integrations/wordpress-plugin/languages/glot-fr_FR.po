@@ -1,0 +1,175 @@
+# French translations for PACKAGE package.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: glot 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 18:15+0100\n"
+"PO-Revision-Date: 2026-11-11 18:06+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: includes/admin.php:37
+msgid "Settings"
+msgstr "Réglages"
+
+#: includes/admin.php:74
+msgid "Connected. glot now syncs your posts and pages, and is notified when you save one."
+msgstr "Connecté. glot synchronise désormais vos articles et pages, et il est prévenu chaque fois que vous en enregistrez un."
+
+#: includes/admin.php:76
+msgid "Disconnected. The application password was revoked. Delete the WordPress card in glot as well."
+msgstr "Déconnecté. Le mot de passe d’application a été révoqué. Supprimez aussi la carte WordPress dans glot."
+
+#: includes/admin.php:83
+msgid "Project"
+msgstr "Projet"
+
+#: includes/admin.php:83
+msgid "Your glot project slug (dashboard URL: <code>/app/your-project</code>)."
+msgstr "L’identifiant de votre projet glot (URL du tableau de bord : <code>/app/votre-projet</code>)."
+
+#: includes/admin.php:84
+msgid "Public key"
+msgstr "Clé publique"
+
+#: includes/admin.php:84
+msgid "Starts with <code>pk_</code> (glot Edge → Website tag). Never paste a secret <code>glot_…</code> key here: this one is printed in your pages."
+msgstr "Commence par <code>pk_</code> (glot Edge → Balise site web). Ne collez jamais ici une clé secrète <code>glot_…</code> : celle-ci est imprimée dans vos pages."
+
+#: includes/admin.php:88
+msgid "Language switcher"
+msgstr "Sélecteur de langue"
+
+#: includes/admin.php:89
+msgid "A page with the <code>[glot_switcher]</code> shortcode, the widget or the block shows the menu there instead. Languages, and turning the tag on, are set in glot (glot Edge → Website tag)."
+msgstr "Une page qui contient le code court <code>[glot_switcher]</code>, le widget ou le bloc affiche le menu à cet endroit. Les langues et l’activation de la balise se règlent dans glot (glot Edge → Balise site web)."
+
+#: includes/admin.php:91
+msgid "As set in glot"
+msgstr "Comme réglé dans glot"
+
+#: includes/admin.php:92
+msgid "Floating, bottom right"
+msgstr "Flottant, en bas à droite"
+
+#: includes/admin.php:93
+msgid "Floating, bottom left"
+msgstr "Flottant, en bas à gauche"
+
+#: includes/admin.php:94
+msgid "Floating, top right"
+msgstr "Flottant, en haut à droite"
+
+#: includes/admin.php:95
+msgid "Floating, top left"
+msgstr "Flottant, en haut à gauche"
+
+#: includes/admin.php:96
+msgid "Hidden (my own switcher calls glot.setLocale)"
+msgstr "Masqué (mon propre sélecteur appelle glot.setLocale)"
+
+#: includes/admin.php:102
+msgid "SEO (glot Edge)"
+msgstr "SEO (glot Edge)"
+
+#: includes/admin.php:103
+msgid "When glot Edge serves your languages on their own URLs (es.example.com or example.com/es/), adds hreflang links to them in every page, for the languages glot reports as ready. Set up the domain first (glot Edge → Setup)."
+msgstr "Quand glot Edge sert vos langues sur leurs propres URL (es.example.com ou example.com/es/), ajoute dans chaque page les liens hreflang vers elles, pour les langues que glot déclare prêtes. Configurez d’abord le domaine (glot Edge → Installation)."
+
+#: includes/admin.php:105
+msgid "Off"
+msgstr "Désactivé"
+
+#: includes/admin.php:106
+msgid "hreflang to glot Edge"
+msgstr "hreflang vers glot Edge"
+
+#: includes/admin.php:109
+msgid "glot server"
+msgstr "Serveur glot"
+
+#: includes/admin.php:109 includes/admin.php:110
+msgid "Change only for a self-hosted glot."
+msgstr "À modifier uniquement pour un glot auto-hébergé."
+
+#: includes/admin.php:110
+msgid "Script URL"
+msgstr "URL du script"
+
+#: includes/admin.php:116
+msgid "Sync posts and pages (optional)"
+msgstr "Synchroniser les articles et les pages (facultatif)"
+
+#: includes/admin.php:117
+msgid "The script above translates pages in the browser. To also write translations into WordPress (Polylang Pro or WPML), connect the glot WordPress connector: this creates an application password for your account and registers it in your glot project. Your site must be reachable from the internet, with pretty permalinks."
+msgstr "Le script ci-dessus traduit les pages dans le navigateur. Pour écrire aussi les traductions dans WordPress (Polylang Pro ou WPML), connectez le connecteur WordPress de glot : cela crée un mot de passe d’application pour votre compte et l’enregistre dans votre projet glot. Votre site doit être accessible depuis Internet, avec des permaliens lisibles."
+
+#. translators: %s: connector id
+#: includes/admin.php:119
+#, php-format
+msgid "Connected (connector %s)."
+msgstr "Connecté (connecteur %s)."
+
+#: includes/admin.php:123
+msgid "Disconnect"
+msgstr "Déconnecter"
+
+#: includes/admin.php:130
+msgid "glot API token (used once, never stored)"
+msgstr "Jeton d’API glot (utilisé une fois, jamais enregistré)"
+
+#: includes/admin.php:133
+msgid "Connect to glot"
+msgstr "Connecter à glot"
+
+#: includes/admin.php:151 includes/admin.php:217
+msgid "You are not allowed to do this."
+msgstr "Vous n’avez pas l’autorisation de faire cela."
+
+#: includes/admin.php:157
+msgid "Save your project slug first."
+msgstr "Enregistrez d’abord l’identifiant de votre projet."
+
+#: includes/admin.php:160
+msgid "Paste a glot API token (glot_…) from your glot account settings."
+msgstr "Collez un jeton d’API glot (glot_…) issu des réglages de votre compte glot."
+
+#: includes/admin.php:164
+msgid "Application passwords are disabled on this site (they need HTTPS, or a security plugin turned them off)."
+msgstr "Les mots de passe d’application sont désactivés sur ce site (ils exigent HTTPS, ou une extension de sécurité les a désactivés)."
+
+#. translators: %s: error from the glot server
+#: includes/admin.php:196
+#, php-format
+msgid "glot refused the connection: %s"
+msgstr "glot a refusé la connexion : %s"
+
+#: includes/class-glot-elementor-widget.php:19
+#: includes/class-glot-widget.php:14
+msgid "glot language switcher"
+msgstr "Sélecteur de langue glot"
+
+#: includes/class-glot-widget.php:14
+msgid "Lets visitors pick a language."
+msgstr "Permet aux visiteurs de choisir une langue."
+
+#: includes/class-glot-widget.php:32
+msgid "Title:"
+msgstr "Titre :"
+
+#: blocks/switcher/index.js:8
+msgid "Language"
+msgstr "Langue"
+
+#: blocks/switcher/index.js:9
+msgid "Language switcher (shown on the site)"
+msgstr "Sélecteur de langue (affiché sur le site)"

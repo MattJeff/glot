@@ -1,0 +1,19 @@
+# glot for Shopify: a custom app whose only extension is the glot app embed (extensions/glot-embed).
+# Reference: https://shopify.dev/docs/apps/build/cli-for-apps/app-configuration
+# `shopify app config link` fills client_id with your own Dev Dashboard app; `shopify app deploy` releases it.
+name = "glot"
+client_id = "REPLACE_WITH_YOUR_CLIENT_ID"
+# No admin UI: the app only ships the theme app extension. This page explains it to whoever opens the app.
+application_url = "https://glotlang.com/docs/integrations#shopify-app-embed"
+embedded = false
+
+[access_scopes]
+# A theme app extension needs no Admin API scope. Add the glot connector's scopes here
+# (read_translations,write_translations,…) only if this same app also provides the connector's token.
+scopes = ""
+
+[auth]
+redirect_urls = ["https://glotlang.com/docs/integrations#shopify-app-embed"]
+
+[webhooks]
+api_version = "2025-10"

@@ -4,11 +4,43 @@
     "subtitle": "SEO-Lokalisierung: jede Sprache als übersetztes HTML unter eigener URL, ohne JavaScript indexierbar, ohne Pflicht-Schlüssel.",
     "tabs": {
       "setup": "Einrichtung",
+      "website": "Website-Tag",
       "coverage": "Abdeckung",
       "review": "Prüfwarteschlange",
       "seo": "SEO-Bericht",
       "performance": "Leistung",
       "settings": "Einstellungen"
+    },
+    "website": {
+      "title": "Website-Tag",
+      "body": "Ein einziges Script-Tag übersetzt jede öffentliche Website im Browser der Besucher – Wix, Squarespace, Bubble, Lovable, Carrd, Jimdo, Duda oder handgeschriebenes HTML. Es fügt einen Sprachumschalter hinzu, wendet Ihren Übersetzungsspeicher an und sendet neue öffentliche Texte an glot. Kein DNS, kein Proxy.",
+      "tagLabel": "In den Head jeder Seite einfügen (oder in den seitenweiten Custom Code Ihres Website-Baukastens)",
+      "tagHint": "Der Schlüssel ist öffentlich: Er erlaubt der Seite nur, zu übersetzende Texte zu melden. Nichts passiert, bevor das Tag unten aktiviert ist. Personenbezogene Daten, Formularinhalte und mit einem Session-Cookie aufgerufene Seiten werden nie gesendet.",
+      "on": "Tag aktiv",
+      "onHint": "Aus: Das Tag tut nichts und jede Seite bleibt wie veröffentlicht (innerhalb einer Minute).",
+      "auto": "Neue Texte automatisch übersetzen",
+      "autoHint": "Aus: Vom Tag entdeckte Texte warten in der Prüfwarteschlange, bevor Besucher sie übersetzt sehen.",
+      "position": "Sprachumschalter",
+      "positions": {
+        "bottom-right": "Schwebend, unten rechts",
+        "bottom-left": "Schwebend, unten links",
+        "top-right": "Schwebend, oben rechts",
+        "top-left": "Schwebend, oben links",
+        "none": "Ausgeblendet (eigener Umschalter)",
+        "selector": "In einem Element (CSS-Selektor)"
+      },
+      "selector": "CSS-Selektor",
+      "selectorHint": "Der Umschalter wird in das erste passende Element eingefügt, zum Beispiel das Menü Ihres Headers. Ein Element mit data-glot-switcher hat immer Vorrang.",
+      "locales": "Angebotene Sprachen",
+      "localesHint": "Keine ausgewählt = alle Zielsprachen des Projekts.",
+      "save": "Speichern",
+      "saved": "Website-Tag gespeichert",
+      "seo": {
+        "title": "Suchmaschinen",
+        "body": "Im Browser übersetzter Text wird von Google nicht zuverlässig indexiert. Für Seiten, die in anderen Sprachen gefunden werden sollen, fügen Sie eine Subdomain von glot Edge hinzu (es.ihre-seite.com, ein CNAME): Die Seiten werden auf dem Server übersetzt, mit hreflang, und der Umschalter leitet Besucher dorthin.",
+        "ready": "Ihre Edge-Subdomain ist verifiziert: Der Umschalter leitet Besucher dorthin und das Tag fügt hreflang-Links im Browser hinzu. Suchmaschinen sollten sie auch im HTML finden: Fügen Sie diese Tags in den Head Ihrer Website ein (Custom Code).",
+        "cta": "Subdomain einrichten"
+      }
     },
     "kill": {
       "labelOn": "Edge ist an",
@@ -205,6 +237,19 @@
         "proxy": "Unübersetzt durchreichen",
         "actionHint": "Weiterleiten: 302 (307 für Formulare) zur selben Seite auf Ihrer Domain, mit der Sprache so, wie Ihre Website sie erwartet. Durchreichen: die Antwort Ihres Servers unverändert, Cookies inklusive.",
         "suggest": "Vorgeschlagene Liste verwenden"
+      },
+      "auth": {
+        "title": "Seiten hinter der Anmeldung",
+        "body": "Dashboards, Konto, Rechnungen: Seiten, auf denen der Besucher eine Sitzung hat. glot erhält nie ihren Inhalt oder die Daten Ihrer Nutzer.",
+        "mode": "Angemeldete Seiten übersetzen",
+        "server": "Durch Edge, private Antwort",
+        "patcher": "Im Browser (Script-Tag)",
+        "off": "Nicht übersetzen",
+        "serverHint": "Edge übersetzt jede Seite nur für diesen Besucher aus dem Translation Memory: Cache-Control private, nie in einem gemeinsamen Cache, keine Erkennung. Die Cookies Ihrer Domain bleiben unverändert.",
+        "patcherHint": "Edge liefert Ihre Seite unverändert; das Script-Tag data-glot-app auf Ihren Seiten wendet das Translation Memory im Browser an, auf Ihrer Domain (Sitzung unverändert), mit Sprachauswahl.",
+        "offHint": "Angemeldete Besucher sehen Ihre Seiten in der Ausgangssprache.",
+        "discover": "Oberflächentexte erkennen",
+        "discoverHint": "Nur im Browser-Modus. Gesendet werden nur mit data-glot-ui markierte Texte und der Fingerabdruck von Texten, die glot bereits kennt; nie personenbezogene Daten. Jeder neue Text wartet vor der Auslieferung auf eine Prüfung."
       }
     },
     "seo": {
@@ -463,6 +508,7 @@
     "onThisPage": "Auf dieser Seite",
     "pages": {
       "edge": "glot Edge (SEO-Lokalisierung)",
+      "website": "Website-Tag (jeder Website-Baukasten)",
       "cli": "CLI-Referenz",
       "concepts": "Konzepte",
       "faq": "FAQ & Kosten",
@@ -473,6 +519,7 @@
       "integrations": "Integrationen",
       "mcp": "MCP-Server",
       "runtime": "Laufzeit-Fallback",
+      "mobile-ota": "Mobile Apps (OTA)",
       "self-hosting": "Selbst gehosteter Server",
       "benchmark": "Benchmark",
       "deploy-hetzner": "Auf einem VPS deployen",
@@ -590,6 +637,7 @@
     "subtitle": "Jede Übersetzung Schlüssel für Schlüssel bearbeiten, prüfen und freigeben."
   },
   "errors": {
+    "emailUnverified": "Bestätigen Sie zuerst Ihre E-Mail-Adresse: Öffnen Sie den Link, den wir Ihnen gesendet haben, oder senden Sie ihn über den Hinweis erneut.",
     "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
     "network": "Netzwerkfehler. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "notFound": "Nicht gefunden.",
@@ -977,7 +1025,8 @@
       "translate": "Übersetzen",
       "github_localize": "Repository lokalisieren",
       "github_update": "Pull Request aktualisieren",
-      "edge_translate": "Edge-Übersetzung"
+      "edge_translate": "Edge-Übersetzung",
+      "connector_translate": "CMS-Übersetzung"
     },
     "live": "Live",
     "progress": "{done} / {total}",
@@ -1517,7 +1566,8 @@
     "billing": "Abrechnung",
     "github": "GitHub",
     "mainNav": "Hauptnavigation",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "integrations": "Integrationen"
   },
   "status": {
     "machine": "Maschinell",
@@ -2060,6 +2110,7 @@
     "title": "Konto"
   },
   "billing": {
+    "trialing": "{plan}-Testphase bis {date}. Ohne Kündigung im Portal bis dahin startet das Abonnement und die erste Zahlung wird abgebucht.",
     "downgrade": "Im Abrechnungsportal kündigen",
     "endsOn": "Endet am {date}",
     "invoice": {
@@ -2084,10 +2135,18 @@
     "usage": "Nutzung in diesem Monat"
   },
   "emailAuth": {
+    "gate": {
+      "tooltip": "Bestätigen Sie Ihre E-Mail-Adresse, um diese Aktion freizuschalten."
+    },
+    "inbox": {
+      "title": "Prüfen Sie Ihr Postfach",
+      "body": "Wir haben einen Bestätigungslink an {email} gesendet. Öffnen Sie ihn, um Projekte zu erstellen.",
+      "hint": "Nach ein paar Minuten nichts angekommen? Prüfen Sie Ihren Spam-Ordner oder senden Sie die E-Mail erneut."
+    },
     "banner": {
       "resend": "E-Mail erneut senden",
       "sent": "Bestätigungs-E-Mail gesendet",
-      "text": "Bestätigen Sie Ihre E-Mail-Adresse ({email}), um Ihr Konto zu sichern."
+      "text": "Bestätigen Sie Ihre E-Mail-Adresse, um Projekte zu erstellen. Wir haben einen Link an {email} gesendet."
     },
     "confirmPassword": "Neues Passwort bestätigen",
     "email": "E-Mail",
@@ -2808,6 +2867,10 @@
         "q": "Was zählt zu den Kontingenten?",
         "a": "Nur was glot cloud ausliefert: CDN/OTA-Anfragen, Insights- und Experiment-Events, Remote-MCP-Aufrufe, Jobs für eine Sprache auf Abruf, Live-Review-Anmerkungen und Strings, die mit dem Schlüssel von glot übersetzt werden. Aktive Experimente und Cloud-Projekte zählen, solange sie bestehen. Nichts, was Sie lokal ausführen, und nichts, was mit Ihrem eigenen Schlüssel übersetzt wird, wird gezählt. Monatliche Zähler werden am 1. (UTC) zurückgesetzt."
       },
+      "trial": {
+        "q": "Kann ich Growth vor dem Bezahlen testen?",
+        "a": "Ja. Ihr erstes Growth-Abonnement beginnt mit einer 14-tägigen kostenlosen Testphase, einmal pro Konto. Ihre Zahlungsmethode wird bei der Anmeldung hinterlegt, aber vor Ende der Testphase wird nichts abgebucht; kündigen Sie vorher im Abrechnungsportal, zahlen Sie nichts. Starter und Pro haben keine Testphase."
+      },
       "cancel": {
         "q": "Kann ich jederzeit kündigen?",
         "a": "Ja, im Abrechnungsportal. Ihr Plan bleibt bis zum Ende des bezahlten Zeitraums aktiv, danach wechselt das Konto zu Kostenlos. Projekte und Daten bleiben erhalten."
@@ -2837,6 +2900,25 @@
           "oss": "Open-Source-CLI, MCP-Server und GitHub Action, unbegrenzt auf Ihrem Rechner",
           "project": "Ein Cloud-Projekt mit kleinen monatlichen Kontingenten",
           "noCard": "Keine Kreditkarte nötig"
+        }
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "Bringen Sie Ihre Website oder App in weitere Sprachen.",
+        "for": "Selbstständige, Shops und Apps, die ihre ersten Sprachen starten.",
+        "features": {
+          "projects": "Zwei Cloud-Projekte",
+          "dynamic": "Dynamische Lokalisierung: Kataloge über CDN und Sprachumschalter",
+          "sync": "GitHub-Synchronisierung: alle Sprachen in einem einzigen Pull Request",
+          "qa": "Visuelle QA: abgeschnittene, überlappende oder unübersetzte Texte finden",
+          "cms": "CMS-Integrationen (Shopify, WordPress, Webflow, Contentful, Sanity, Strapi)",
+          "quotas": "Überschaubare Monatskontingente für einen ersten Launch"
+        },
+        "excluded": {
+          "edge": "glot Edge (SEO-Lokalisierung)",
+          "xp": "Segmentierte Experimente",
+          "launch": "Messung von Sprach-Launches",
+          "recommend": "Sprachempfehlungen mit erwartetem Gewinn"
         }
       },
       "pro": {
@@ -2889,6 +2971,8 @@
     "yearly": "Jährlich",
     "yearlySave": "{n, plural, one {# Monat gratis} other {# Monate gratis}}",
     "yearlyEquiv": "{price} / Monat, jährliche Abrechnung",
+    "trial": "{days} Tage kostenlos testen, jederzeit kündbar",
+    "excludedSr": "Nicht enthalten:",
     "forWho": "Für wen:",
     "vat": "Preise zzgl. MwSt."
   },
@@ -3420,6 +3504,346 @@
         "saveError": "Ihre letzten Änderungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung; wir versuchen es erneut, sobald Sie wieder tippen."
       },
       "variantName": "Variante {letter}"
+    }
+  },
+  "connectors": {
+    "magento": {
+      "description": "Produkte und Kategorien über die REST API, eine Store View pro Sprache.",
+      "fields": {
+        "url": "Shop-URL",
+        "token": "Zugriffstoken",
+        "token_secret": "Zugriffstoken-Geheimnis",
+        "consumer_key": "Consumer-Schlüssel",
+        "consumer_secret": "Consumer Secret"
+      },
+      "hints": {
+        "token": "System → Erweiterungen → Integrationen: eine Integration mit den Ressourcen Katalog und Shops anlegen und aktivieren.",
+        "token_secret": "Mit Consumer-Schlüssel und Consumer Secret signiert glot die Anfragen mit OAuth 1.0a. Ohne sie wird das Token als Bearer gesendet, was Commerce 2.4.4+ nur akzeptiert, wenn die Option aktiviert ist."
+      }
+    },
+    "prestashop": {
+      "description": "Produkte, Kategorien, CMS-Seiten und Marken über die Webservice-API; HTML-Beschreibungen behalten ihre Tags.",
+      "fields": {
+        "url": "Shop-URL",
+        "api_key": "Webservice-Schlüssel"
+      },
+      "hints": {
+        "url": "Die Adresse des Shops, ohne /api.",
+        "api_key": "Erweiterte Einstellungen → Webservice: ein Schlüssel mit GET und PUT auf products, categories, content_management_system und manufacturers sowie GET auf languages und configurations."
+      }
+    },
+    "woocommerce": {
+      "description": "Produkte, Kategorien und Schlagwörter über die WooCommerce REST API; WPML (WooCommerce Multilingual) und Polylang for WooCommerce werden unterstützt.",
+      "fields": {
+        "url": "Shop-URL",
+        "consumer_key": "Consumer-Schlüssel",
+        "consumer_secret": "Consumer Secret",
+        "webhook_secret": "Webhook-Geheimnis"
+      },
+      "hints": {
+        "consumer_key": "WooCommerce → Einstellungen → Erweitert → REST-API → Schlüssel hinzufügen, Berechtigung Lesen/Schreiben.",
+        "webhook_secret": "Eine beliebige lange Zufallszeichenfolge: glot registriert damit die Produkt-Webhooks und prüft ihre Signatur."
+      }
+    },
+    "bigcommerce": {
+      "description": "Produkte, Kategorien und Marken über die Translations API, pro Kanal und Sprache.",
+      "fields": {
+        "store_hash": "Store-Hash",
+        "token": "Zugriffstoken",
+        "channel_id": "Kanal-ID",
+        "webhook_secret": "Webhook-Geheimnis"
+      },
+      "hints": {
+        "store_hash": "Der Code in Ihrem API-Pfad: api.bigcommerce.com/stores/STORE_HASH/v3.",
+        "token": "API-Konto auf Shop-Ebene mit Products (ändern), Store Information (lesen) und Channel Settings (ändern).",
+        "channel_id": "1 für die Standard-Storefront.",
+        "webhook_secret": "Eine beliebige Zufallszeichenfolge: glot registriert Produkt- und Kategorie-Webhooks und prüft sie bei jedem Aufruf."
+      }
+    },
+    "shopware": {
+      "description": "Produkte, Kategorien und Eigenschaften über die Admin API, in jede Shopware-Sprache geschrieben.",
+      "fields": {
+        "url": "Shop-URL",
+        "client_id": "Zugangsschlüssel-ID",
+        "client_secret": "Sicherheitsschlüssel",
+        "webhook_secret": "App-Secret (Webhook-Signatur)"
+      },
+      "hints": {
+        "client_id": "Einstellungen → System → Integrationen → Integration hinzufügen (Rolle Administrator).",
+        "client_secret": "Wird nur einmal beim Anlegen der Integration angezeigt.",
+        "webhook_secret": "Nur wenn eine Shopware-App die Webhooks sendet: glot prüft den Header shopware-shop-signature."
+      }
+    },
+    "contentful": {
+      "description": "Einträge aller Inhaltstypen: lokalisierte Felder Short text, Long text (Markdown) und Rich Text, über die Content Management API.",
+      "fields": {
+        "space_id": "Space-ID",
+        "token": "Persönliches Zugriffstoken",
+        "environment": "Umgebung",
+        "api_url": "API-URL"
+      },
+      "hints": {
+        "token": "Settings → CMA tokens. Lese- und Schreibzugriff auf den Space.",
+        "api_url": "Nur für EU-Datenresidenz: https://api.eu.contentful.com"
+      }
+    },
+    "sanity": {
+      "description": "Dokumente über die HTTP-API: i18n pro Feld (lokalisierte Objekte, internationalisierte Arrays) oder pro Dokument (document-internationalization), Portable Text bleibt erhalten.",
+      "fields": {
+        "project_id": "Projekt-ID",
+        "dataset": "Dataset",
+        "token": "API-Token",
+        "source_locale": "Code der Ausgangssprache",
+        "webhook_secret": "Webhook-Secret"
+      },
+      "hints": {
+        "token": "sanity.io/manage → API → Tokens, mit Editor-Rechten.",
+        "source_locale": "Der Sprachschlüssel Ihres Schemas (standardmäßig en).",
+        "webhook_secret": "Das Secret Ihres GROQ-Webhooks, um seine Signatur zu prüfen."
+      }
+    },
+    "strapi": {
+      "description": "Lokalisierte Collection- und Single-Types von Strapi 4 und 5 (i18n-Plugin): Text-, Markdown- und Blocks-Felder.",
+      "fields": {
+        "url": "Strapi-URL",
+        "token": "API-Token"
+      },
+      "hints": {
+        "token": "Settings → API Tokens, Vollzugriff (oder find, update und createLocalization auf Ihren Typen)."
+      }
+    },
+    "hubspot": {
+      "description": "Blogbeiträge, Website- und Landingpages (inklusive Rich-Text-Module), als mehrsprachige HubSpot-Varianten geschrieben.",
+      "fields": {
+        "token": "Zugriffstoken der privaten App",
+        "webhook_secret": "Client-Secret der App"
+      },
+      "hints": {
+        "token": "Einstellungen → Integrationen → Private Apps, mit dem Bereich content.",
+        "webhook_secret": "Optional: prüft X-HubSpot-Signature (v1) bei Webhooks."
+      }
+    },
+    "drupal": {
+      "description": "Nodes und Taxonomie-Begriffe über JSON:API im Core: Titel und formatierte Texte, in bestehende Übersetzungen geschrieben (Content Translation).",
+      "fields": {
+        "url": "Website-URL",
+        "username": "Benutzername",
+        "password": "Passwort",
+        "token": "OAuth-Token"
+      },
+      "hints": {
+        "username": "Mit dem Modul basic_auth. Oder leer lassen und ein OAuth-Token angeben.",
+        "token": "Bearer-Token (Simple OAuth) statt Benutzername und Passwort."
+      }
+    },
+    "ghost": {
+      "description": "Beiträge und Seiten über die Admin API. Jede Sprache ist ein Beitrag mit dem Tag #fr (slug-fr), das Routing-Muster von Ghost.",
+      "fields": {
+        "url": "Website-URL",
+        "admin_key": "Admin-API-Schlüssel",
+        "webhook_secret": "Webhook-Secret"
+      },
+      "hints": {
+        "admin_key": "Settings → Integrations → Add custom integration, id:secret.",
+        "webhook_secret": "Eine beliebige Zeichenfolge: glot registriert dann signierte Ghost-Webhooks."
+      }
+    },
+    "craft": {
+      "description": "Einträge über die GraphQL-API: Titel und Textfelder, gespeichert in der Craft-Site jeder Sprache.",
+      "fields": {
+        "url": "GraphQL-Endpunkt",
+        "token": "Schema-Token",
+        "sites": "Sites pro Sprache"
+      },
+      "hints": {
+        "token": "GraphQL → Tokens, mit einem Schema, das die Einträge in jeder Site lesen und speichern darf.",
+        "sites": "glot-Sprache: Handle der Craft-Site, durch Kommas getrennt. Standard: die Site mit dem Namen der Sprache."
+      }
+    },
+    "zendesk": {
+      "description": "Kategorien, Abschnitte und Beiträge des Help Centers, in jede Guide-Sprache übersetzt.",
+      "fields": {
+        "subdomain": "Zendesk-Subdomain",
+        "email": "E-Mail des Agenten",
+        "token": "API-Token",
+        "webhook_secret": "Signatur-Secret des Webhooks"
+      },
+      "hints": {
+        "token": "Admin Center → Apps und Integrationen → Zendesk API.",
+        "webhook_secret": "Optional: prüft X-Zendesk-Webhook-Signature."
+      }
+    },
+    "helpscout": {
+      "description": "Docs-Artikel, in eine Docs-Site pro Sprache geschrieben (so übersetzt Help Scout Docs).",
+      "fields": {
+        "api_key": "API-Schlüssel",
+        "collections": "Sammlungen pro Sprache"
+      },
+      "hints": {
+        "api_key": "Your Profile → Authentication → API Keys.",
+        "collections": "glot-Sprache: ID der Sammlung in der Docs-Site dieser Sprache, durch Kommas getrennt."
+      }
+    },
+    "page": {
+      "title": "Integrationen",
+      "subtitle": "Verbinde ein CMS oder einen Shop: glot holt die Inhalte, übersetzt sie mit dem Modell deines Projekts und schreibt geprüfte Übersetzungen zurück.",
+      "docs": "So funktioniert die Synchronisierung je CMS: <docs>Dokumentation der Integrationen</docs>."
+    },
+    "connect": "Verbinden",
+    "save": "Testen und speichern",
+    "testing": "Wird getestet…",
+    "cancel": "Abbrechen",
+    "optional": "optional",
+    "connected": "{name} verbunden. Erste Synchronisierung eingeplant.",
+    "localeMismatch": "Die Standardsprache des CMS ({locale}) weicht von der Quellsprache des Projekts ab.",
+    "webhooksError": "Verbunden, aber die Webhooks konnten nicht automatisch angelegt werden: Webhook-URL bitte manuell eintragen.",
+    "syncQueued": "Synchronisierung eingeplant",
+    "testOk": "{name} erreichbar. Sprachen: {locales}",
+    "lastSync": "synchronisiert {when}",
+    "stats": "{items, plural, one {# Feld} other {# Felder}} · {pushed} übertragen · {waiting} warten auf Übersetzung",
+    "webhook": "Webhook-URL",
+    "webhookHint": "Inhaltsänderungen an diese Adresse starten eine inkrementelle Synchronisierung. Geheim halten: Sie enthält ein Token.",
+    "sync": "Jetzt synchronisieren",
+    "syncing": "Synchronisiert…",
+    "test": "Testen",
+    "remove": "Trennen",
+    "removeConfirm": "{name} trennen? Die Übersetzungen bleiben in glot; im CMS wird nichts gelöscht.",
+    "status": {
+      "idle": "Nicht synchronisiert",
+      "queued": "Eingeplant",
+      "running": "Synchronisiert",
+      "ok": "Aktuell",
+      "error": "Fehler"
+    },
+    "shopify": {
+      "description": "Produkte, Kollektionen, Seiten, Blogartikel, Metafelder, Menüs und Theme-Texte über die Translations API.",
+      "fields": {
+        "shop": "Shop-Domain",
+        "token": "Admin-API-Zugriffstoken",
+        "webhook_secret": "API-Geheimschlüssel (Webhook-Signaturen)"
+      },
+      "hints": {
+        "token": "Benutzerdefinierte App mit Lese-/Schreibrechten für Übersetzungen, Produkte, Inhalte, Onlineshop-Seiten, Themes und Sprachen.",
+        "webhook_secret": "Damit prüft glot die Produkt- und Kollektions-Webhooks von Shopify."
+      }
+    },
+    "webflow": {
+      "description": "CMS-Collections (Klartext- und Rich-Text-Felder), statische Seiteninhalte und Komponenten in jeder sekundären Sprache der Website (Webflow Localization).",
+      "fields": {
+        "token": "Site-API-Token",
+        "site_id": "Site-ID",
+        "webhook_secret": "Signaturgeheimnis der Webhooks"
+      },
+      "hints": {
+        "token": "Site-Einstellungen → Apps & integrations → API access, mit Lese- und Schreibzugriff auf CMS, Pages, Components und Sites.",
+        "site_id": "Nur nötig, wenn das Token Zugriff auf mehrere Sites hat.",
+        "webhook_secret": "Nur für von Webflow signierte Webhooks (Client Secret einer OAuth-App). In den Site-Einstellungen angelegte Webhooks verwenden stattdessen die Webhook-URL unten."
+      }
+    },
+    "wordpress": {
+      "description": "Beiträge, Seiten, Kategorien, Schlagwörter und Menüs über die REST-API; WPML und Polylang werden unterstützt.",
+      "fields": {
+        "url": "Website-URL",
+        "username": "Benutzername",
+        "app_password": "Anwendungspasswort"
+      },
+      "hints": {
+        "app_password": "Benutzer → Profil → Anwendungspasswörter. Niemals dein Login-Passwort."
+      }
+    }
+  },
+  "integrations": {
+    "nav": "Integrationen",
+    "meta": {
+      "title": "Integrationen: Übersetzen Sie Ihre Website auf jeder Plattform",
+      "description": "Schritt-für-Schritt-Anleitungen, um eine Website mit glot auf {count} Plattformen zu übersetzen: Website-Baukästen, Shops, CMS, KI-App-Builder, Kursplattformen und Hilfecenter."
+    },
+    "title": "Integrationen",
+    "subtitle": "glot läuft auf jeder Website, auf der Sie jeder Seite ein Skript hinzufügen können. Wählen Sie Ihre Plattform für die genauen Schritte, den nötigen Tarif und übersetzte URLs für Suchmaschinen.",
+    "search": "Plattformen durchsuchen",
+    "searchPlaceholder": "Wix, Shopify, Ghost…",
+    "filter": "Nach Kategorie filtern",
+    "all": "Alle",
+    "count": "{count, plural, =0 {Keine Plattform} one {# Plattform} other {# Plattformen}}",
+    "empty": "Keine Plattform passt zu „{q}“. Wenn Ihre Website eigenen Code zulässt, funktioniert das universelle Tag auch dort.",
+    "categories": {
+      "site-builder": "Website-Baukästen",
+      "e-commerce": "E-Commerce",
+      "cms": "CMS",
+      "ai-builder": "KI-App-Builder",
+      "lms": "Kursplattformen",
+      "help-center": "Hilfecenter",
+      "enterprise": "Enterprise"
+    },
+    "methods": {
+      "connector": "Connector",
+      "plugin": "Plugin",
+      "tag": "Universelles Tag"
+    },
+    "generic": {
+      "title": "Ihre Plattform ist nicht dabei?",
+      "body": "Wenn sie ein Skript im head jeder Seite erlaubt, funktioniert das universelle Tag dort. Wenn Sie das DNS Ihrer Domain verwalten, kann glot Edge auch übersetzte URLs ausliefern.",
+      "cta": "Anleitung zum Website-Tag lesen"
+    },
+    "page": {
+      "metaTitle": "glot für {name}: Übersetzen Sie Ihre {name}-Website",
+      "metaDescription": "So übersetzen Sie eine {name}-Website mit glot: {method, select, connector {mit dem glot-Connector} plugin {mit dem glot-Plugin} other {mit einem einzigen Skript-Tag}}, der nötige Tarif und übersetzte URLs für Suchmaschinen, Schritt für Schritt.",
+      "breadcrumb": "Brotkrumennavigation",
+      "title": "glot für {name}",
+      "intro": {
+        "connector": "glot verbindet sich direkt mit {name}: Es liest Ihre Inhalte, übersetzt sie mit Ihrem Glossar und Ihren Prüfungen und schreibt die Übersetzungen in die Sprachen von {name} zurück.",
+        "plugin": "glot wird in {name} als Plugin installiert. Die Schritte unten richten es ein.",
+        "tag": "Auf {name} läuft glot über ein Skript-Tag, das jeder Seite hinzugefügt wird. Es übersetzt die Seite im Browser der Besucher und fügt ein Sprachmenü hinzu."
+      },
+      "unavailable": "{name} erlaubt kein Skript auf jeder Seite, daher kann das universelle Tag dort nicht laufen. Die Hinweise unten zeigen, was möglich ist.",
+      "unverified": "Wir konnten diese Schritte nicht in der offiziellen Dokumentation von {name} bestätigen. Prüfen Sie sie im Hilfecenter von {name}, bevor Sie sich darauf verlassen.",
+      "englishNote": "Die Schritte der Plattform sind auf Englisch, mit den Menünamen der Oberfläche von {name}.",
+      "nativeTitle": {
+        "connector": "{name} verbinden",
+        "plugin": "Das glot-Plugin installieren"
+      },
+      "nativeDoc": "Vollständige Connector-Dokumentation",
+      "tagDoc": "Anleitung zum Website-Tag",
+      "tagTitle": "Das glot-Tag hinzufügen",
+      "tagAltTitle": "Alternative: das universelle Tag",
+      "tagAltBody": "Um im Browser zu übersetzen, was die {name}-Integration nicht abdeckt, fügen Sie stattdessen das universelle Tag hinzu.",
+      "prep": {
+        "project": "Erstellen Sie in glot ein Projekt und fügen Sie Ihre Sprachen hinzu.",
+        "mode": "Öffnen Sie glot Edge → Website-Tag und schalten Sie das Tag ein.",
+        "copy": "Kopieren Sie Ihr Tag aus diesem Tab: Es enthält bereits Ihr Projekt und seinen öffentlichen Schlüssel (data-key). Das Tag unten zeigt seine Form."
+      },
+      "snippetLabel": "glot-Tag",
+      "plansTitle": "Erforderliche Tarife",
+      "glotPlan": "Was jeder glot-Tarif enthält, sehen Sie unter Preise. glot Edge (übersetzte URLs) ist Teil des Growth-Tarifs, mit einer begrenzten Testphase in Pro.",
+      "seoTitle": "Übersetzte URLs für Suchmaschinen",
+      "seoYes": "Für übersetzte Seiten, die Suchmaschinen ohne JavaScript indexieren, setzen Sie glot Edge auf eine Subdomain Ihrer Domain (es.example.com), mit zwei DNS-Einträgen:",
+      "seoNo": "Der Subdomain-Modus von glot Edge ist hier nicht möglich:",
+      "dnsLabel": "DNS-Einträge (das TXT-Token steht in glot Edge → Einrichtung)",
+      "edgeDoc": "So funktioniert glot Edge",
+      "faqTitle": "Fragen",
+      "faq": {
+        "partner": {
+          "q": "Ist glot ein Partner von {name}?",
+          "a": "Nein. glot ist unabhängig, weder mit {name} verbunden noch von {name} empfohlen. Diese Anleitung nutzt nur Standardfunktionen von {name}."
+        },
+        "content": {
+          "q": "Ändert glot meine Inhalte in {name}?",
+          "a": "{method, select, tag {Nein. Das Tag übersetzt die Seite im Browser der Besucher; Ihre Inhalte in {name} bleiben unverändert. Entfernen Sie das Tag, und die Website ist wieder in der Ausgangssprache.} plugin {Ihre Ausgangsinhalte bleiben unverändert. Das Plugin übersetzt Seiten im Browser und schreibt, wenn Sie es verbinden, Übersetzungen in Sprachfelder, die Sie vor dem Veröffentlichen prüfen.} other {Ihre Ausgangsinhalte bleiben unverändert. glot schreibt die Übersetzungen in die Sprachfelder von {name}, wo Sie sie vor dem Veröffentlichen prüfen können.}}"
+        },
+        "seo": {
+          "q": "Indexieren Suchmaschinen meine Übersetzungen?",
+          "a": "Mit dem Tag allein kaum: Es übersetzt im Browser, Suchmaschinen indexieren also vor allem Ihre Ausgangssprache. Übersetzte Seiten mit eigenen URLs brauchen glot Edge oder eine Plattform, die jede Sprache unter einer eigenen URL veröffentlicht."
+        }
+      },
+      "docsTitle": "Offizielle Dokumentation von {name}",
+      "trademark": "{name} ist eine Marke ihres Inhabers. glot ist nicht mit {name} verbunden.",
+      "cta": {
+        "title": "Übersetzen Sie Ihre {name}-Website",
+        "body": "Erstellen Sie ein Projekt, wählen Sie Ihre Sprachen und folgen Sie den Schritten oben.",
+        "start": "Projekt erstellen",
+        "docs": "Dokumentation lesen"
+      },
+      "related": "Weitere Integrationen: {category}"
     }
   }
 }

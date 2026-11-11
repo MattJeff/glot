@@ -64,6 +64,20 @@ function getEdge(env: Env, source: string, locales: string[]) {
   }));
 }
 
+/** Language of the same-site page that requested this subresource (`Referer`); none or foreign → the source. */
+// ponytail: `Referrer-Policy: no-referrer`/`origin` on the site hides the path → source chunks (the patcher still
+// re-applies the TM, React logs its recoverable #418 as before).
+export function refererLocale(req: Request, url: URL, o: { source: string; locales: string[] }): string {
+  try {
+    const ref = new URL(req.headers.get("referer") ?? "");
+    if (ref.host !== url.host) return o.source;
+    const r = route(ref, new Headers(), o);
+    return "locale" in r ? r.locale : o.source;
+  } catch {
+    return o.source;
+  }
+}
+
 export default {
   async fetch(req: Request, env: Env, ctx?: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(req.url);
@@ -75,6 +89,11 @@ export default {
       if (own) return own;
     }
     const edgeOn = env.GLOT_EDGE !== "0";
+    // JavaScript chunks (same URL for every language): localized for the language of the page that loads them.
+    if (edgeOn && /\.m?js$/.test(url.pathname)) {
+      const page = refererLocale(req, url, { source, locales });
+      return getEdge(env, source, locales).bundle(req, page, (r) => fetch(r), wait);
+    }
     let r = route(url, req.headers, { source, locales });
     // Application paths (login, account, API…) are never sent to a locale URL…
     if ("redirect" in r && edgeOn && (await getEdge(env, source, locales).isApp(url.pathname, wait))) r = { locale: source, path: url.pathname };

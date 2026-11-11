@@ -33,3 +33,9 @@ test("RSC flight rows: JSON rows translated and escaped, T rows and hrefs untouc
   assert.match(s, /8:T6,Add to9:/);
   assert.match(s, /"label":"Historia <larga>","href":"Add to cart"/);
 });
+
+test("tmInline: small TM inlined (script-safe), larger than TM_INLINE_MAX bytes → nothing", async () => {
+  const { tmInline, TM_INLINE_MAX } = await import("../src/hydration.ts");
+  assert.equal(tmInline(`{"v":1,"t":{"a":"</script>"}}`), `<script type="application/json" id="glot-tm">{"v":1,"t":{"a":"\\u003c/script\\u003e"}}</script>`);
+  assert.equal(tmInline(`"${"é".repeat(TM_INLINE_MAX / 2)}"`), ""); // bytes, not characters
+});

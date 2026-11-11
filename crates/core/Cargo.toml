@@ -27,5 +27,6 @@ oxc_allocator = "0.154"
 oxc_ast = "0.154"
 oxc_parser = "0.154"
 oxc_span = "0.154"
+oxc_ast_visit = "0.154"
 # glot Edge: streaming HTML rewriter (segments + SEO in one pass).
 lol_html = "3"

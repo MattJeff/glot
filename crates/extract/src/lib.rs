@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
+pub mod bundle;
 pub mod email;
 mod foreign;
 pub mod i18nize;

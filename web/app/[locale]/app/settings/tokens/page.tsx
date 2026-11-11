@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { VerifiedOnly } from "@/components/email-pages";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -62,9 +63,11 @@ export default function TokensPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus /> {t("create")}
-          </Button>
+          <VerifiedOnly>
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus /> {t("create")}
+            </Button>
+          </VerifiedOnly>
         }
       />
 

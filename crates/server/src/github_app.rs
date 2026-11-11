@@ -97,10 +97,7 @@ fn num_env(name: &str, default: u64) -> u64 {
 }
 
 fn is_admin(user: &User) -> bool {
-    std::env::var("GLOT_ADMIN_EMAILS").is_ok_and(|list| {
-        list.split(',')
-            .any(|e| e.trim().eq_ignore_ascii_case(&user.email))
-    })
+    crate::auth::is_admin_email(&user.email)
 }
 
 fn gh_error(msg: impl Into<String>) -> AppError {
@@ -517,7 +514,7 @@ async fn status(
 /// URLs carrying a fresh state: install the app (new account/repos) or authorize (already installed).
 async fn connect(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     crate::AppPath(slug): crate::AppPath<String>,
 ) -> ApiResult<Json<Value>> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
@@ -743,7 +740,7 @@ struct LinkBody {
 
 async fn link(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     crate::AppPath(slug): crate::AppPath<String>,
     AppJson(b): AppJson<LinkBody>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
@@ -808,7 +805,7 @@ async fn unlink(
 
 async fn run_now(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     crate::AppPath(slug): crate::AppPath<String>,
 ) -> ApiResult<(StatusCode, Json<Job>)> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;

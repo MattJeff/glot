@@ -7,6 +7,7 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { LocalePicker } from "@/components/onboarding/locale-picker";
 import { browserLocale } from "@/components/onboarding/locales";
+import { VerifiedOnly } from "@/components/email-pages";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -199,10 +200,12 @@ export function CreateProjectDialog({ open, onOpenChange }: { open: boolean; onO
                 <ArrowRight aria-hidden className="rtl:-scale-x-100" />
               </Button>
             ) : (
-              <Button type="submit" disabled={create.isPending || targets.length === 0} aria-busy={create.isPending}>
-                {create.isPending && <Loader2 aria-hidden className="animate-spin" />}
-                {targets.length === 0 ? t("pickOne") : t("submit", { count: targets.length })}
-              </Button>
+              <VerifiedOnly>
+                <Button type="submit" disabled={create.isPending || targets.length === 0} aria-busy={create.isPending}>
+                  {create.isPending && <Loader2 aria-hidden className="animate-spin" />}
+                  {targets.length === 0 ? t("pickOne") : t("submit", { count: targets.length })}
+                </Button>
+              </VerifiedOnly>
             )}
           </DialogFooter>
         </form>

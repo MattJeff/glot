@@ -11,7 +11,7 @@
 //! One snapshot = one version: a page is never translated with two versions mixed.
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Context of catalog translations (keys whose source is exactly the segment text): used for any context.
 pub const ANY: &str = "*";
@@ -31,6 +31,10 @@ pub struct Tm {
     pub v: i64,
     pub locale: String,
     pub t: BTreeMap<String, Entry>,
+    /// Hashes with a translation for a context seen in a rendered page (not only a catalog key): what bundle
+    /// localization may rewrite. Not on the wire (the patcher and the worker don't need it).
+    #[serde(skip)]
+    pub dom: BTreeSet<String>,
 }
 
 impl Tm {
@@ -42,6 +46,15 @@ impl Tm {
         }
     }
 
+    /// Translation valid in any context of a segment seen in a rendered page (bundle localization: a string
+    /// literal has no element context, so only unambiguous texts).
+    pub fn lookup_rendered(&self, hash: &str) -> Option<&str> {
+        match (self.dom.contains(hash), self.t.get(hash)?) {
+            (true, Entry::One(v)) => Some(v),
+            _ => None,
+        }
+    }
+
     /// Build a snapshot from `(hash, context, value)` rows; texts whose translations all agree collapse to one string.
     pub fn from_rows(
         locale: &str,
@@ -49,7 +62,11 @@ impl Tm {
         rows: impl IntoIterator<Item = (String, String, String)>,
     ) -> Self {
         let mut by_hash: BTreeMap<String, BTreeMap<String, String>> = BTreeMap::new();
+        let mut dom = BTreeSet::new();
         for (h, c, value) in rows {
+            if c != ANY {
+                dom.insert(h.clone());
+            }
             by_hash.entry(h).or_default().insert(c, value);
         }
         let t = by_hash
@@ -69,6 +86,7 @@ impl Tm {
             v,
             locale: locale.into(),
             t,
+            dom,
         }
     }
 }
@@ -195,7 +213,15 @@ mod tests {
         // Wire format round-trips.
         let json = serde_json::to_string(&t).unwrap();
         assert!(json.contains(r#""home":"Inicio""#), "{json}");
-        assert_eq!(serde_json::from_str::<Tm>(&json).unwrap(), t);
+        assert_eq!(serde_json::from_str::<Tm>(&json).unwrap().t, t.t);
+        assert!(!json.contains("dom"), "{json}");
+        // Bundle localization: rendered + unambiguous only (never a catalog-only text).
+        let mut t = t;
+        t.t.insert("cat".into(), Entry::One("Solo catálogo".into()));
+        assert_eq!(t.lookup_rendered("home"), Some("Inicio"));
+        assert_eq!(t.lookup_rendered("save"), None);
+        assert_eq!(t.lookup_rendered("ok"), None);
+        assert_eq!(t.lookup_rendered("cat"), None);
     }
 
     #[test]

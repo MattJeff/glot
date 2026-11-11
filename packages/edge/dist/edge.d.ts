@@ -1,3 +1,4 @@
+import { type AppRules } from "./app-paths.js";
 /** TM snapshot, wire format of `GET /edge/v1/{project}/{locale}/tm` (glot_core::edge::tm): segment hash →
  * one translation valid in any context, or per context (`<role>|<page template>`, `*` = catalog default). */
 export interface Tm {
@@ -20,6 +21,13 @@ export interface Status {
     };
     /** Locales ready to be listed (hreflang), from `/cdn/{project}/locales.json`; undefined = unknown (all listed). */
     ready?: string[];
+    /** Application paths (login, account, API…) kept on the origin's own URL (app-paths.ts). */
+    app?: AppRules;
+    /** Requests with a session: how they are served (default `server`) + app-mode patcher discovery. */
+    auth?: {
+        pages?: "off" | "patcher" | "server";
+        discover?: boolean;
+    };
 }
 /** A segment glot has no translation for (from the segmenter); `discoverable: false` ones are never sent. */
 export interface Missing {
@@ -94,6 +102,9 @@ type Wait = (p: Promise<unknown>) => void;
 export declare const SESSION_COOKIE: RegExp;
 export declare function createEdge(o: EdgeOptions): ((req: Request, locale: string, originUrl: URL, origin: (u: URL) => Promise<Response>, wait?: Wait) => Promise<Response>) & {
     own: (req: Request, wait?: Wait) => Promise<Response | undefined>;
+    app: (req: Request, locale: string, path: string, wait?: Wait) => Promise<Response | "proxy" | undefined>;
+    isApp: (path: string, wait?: Wait) => Promise<boolean>;
+    bundle: (req: Request, locale: string, origin: (r: Request) => Promise<Response>, wait?: Wait) => Promise<Response>;
 };
 /** Seconds the origin allows a shared cache to keep this page (0 = not shareable). */
 export declare function cacheTtl(h: Headers, fallback: number): number;

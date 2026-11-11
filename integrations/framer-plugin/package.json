@@ -1,0 +1,29 @@
+{
+  "name": "glot-framer",
+  "private": true,
+  "version": "0.1.0",
+  "description": "glot for Framer: a Framer plugin (Localization mode) and a Server API script that translate a Framer project's localization sources with glot.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "pack": "npx framer-plugin-tools@latest pack",
+    "sync": "node src/cli.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-api": "^5.1.0",
+    "framer-plugin": "^3.10.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "typescript": "^5.9",
+    "vite": "^7",
+    "vite-plugin-framer": "^1.1.1",
+    "vite-plugin-mkcert": "^1"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

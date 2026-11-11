@@ -315,9 +315,11 @@ pub async fn propagate(
         }]),
         ..Default::default()
     };
+    // Promoting creates an experiment: same gate as `POST …/experiments`.
+    crate::auth::require_verified(&state, user.id).await?;
     let (_, Json(created)) = api::create(
         State(state.clone()),
-        AuthUser(user.clone()),
+        crate::auth::VerifiedUser(user.clone()),
         AppPath(slug.clone()),
         AppJson(body),
     )
@@ -326,7 +328,7 @@ pub async fn propagate(
     if b.start.unwrap_or(true) {
         match api::start(
             State(state.clone()),
-            AuthUser(user),
+            crate::auth::VerifiedUser(user),
             AppPath((slug, created.id)),
         )
         .await

@@ -268,7 +268,7 @@ pub struct CreateBody {
 
 pub async fn create(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppJson(b): AppJson<CreateBody>,
 ) -> ApiResult<(StatusCode, Json<Project>)> {
     validate_slug(&b.slug)?;

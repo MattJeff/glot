@@ -699,7 +699,7 @@ async fn recommendation(
 
 pub async fn create(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(b): AppJson<NewLaunch>,
 ) -> ApiResult<(StatusCode, Json<Launch>)> {

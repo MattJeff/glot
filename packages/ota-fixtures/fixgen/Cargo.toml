@@ -1,0 +1,8 @@
+[package]
+name = "fixgen"
+version = "0.0.0"
+edition = "2024"
+[workspace]
+[dependencies]
+glot-core = { path = "../../../crates/core" }
+serde_json = "1"

@@ -156,6 +156,8 @@ async fn resolve(
         }) {
             return Ok(None);
         }
+        // OAuth grants follow the API-token rule (auth::authenticate): unverified owner, refused.
+        crate::auth::require_verified(state, uid).await?;
         return Ok(Some(McpAuth {
             user: User {
                 id: uid,
@@ -618,7 +620,7 @@ impl Remote {
         done(async {
             let (s, u, slug, _) = self.ctx(&parts)?;
             let body = from(json!({ "kind": "translate", "locales": p.locales, "keys": p.keys, "force": p.force.unwrap_or(false) }))?;
-            let (_, job) = jobs::create(s.clone(), AuthUser(u.0.clone()), slug, AppJson(body)).await.map_err(e)?;
+            let (_, job) = jobs::create(s.clone(), crate::auth::VerifiedUser(u.0.clone()), slug, AppJson(body)).await.map_err(e)?;
             let mut job = job.0;
             let deadline = Instant::now() + std::time::Duration::from_secs(p.wait_seconds.unwrap_or(20).min(50));
             while matches!(job.status.as_str(), "queued" | "running") && Instant::now() < deadline {
@@ -772,7 +774,7 @@ impl Remote {
         done(async {
             let (s, u, slug, _) = self.ctx(&parts)?;
             let body = from(json!({ "locale": p.locale, "keys": p.keys, "refresh": p.refresh.unwrap_or(false) }))?;
-            review::review_many(s, u, slug, AppJson(body)).await.map(|j| j.0).map_err(e)
+            review::review_many(s, crate::auth::VerifiedUser(u.0), slug, AppJson(body)).await.map(|j| j.0).map_err(e)
         }.await)
     }
 

@@ -38,9 +38,11 @@ async fn main() -> anyhow::Result<()> {
     state.billing = glot_server::billing::Config::from_env(&web_origin)?.map(std::sync::Arc::new);
     jobs::spawn_worker(state.clone());
     email::spawn_worker(state.clone());
+    glot_server::auth::spawn_pruner(state.clone());
     glot_server::experiments::rebalance::spawn_worker(state.clone());
     glot_server::layout_rum::spawn_worker(state.clone());
     glot_server::launches::spawn_worker(state.clone());
+    glot_server::connectors::sync::spawn_worker(state.clone());
     glot_server::edge::domains::spawn_caddy_sync(state.clone());
 
     let listener = tokio::net::TcpListener::bind(&bind).await?;

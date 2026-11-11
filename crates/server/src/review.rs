@@ -45,7 +45,7 @@ pub struct LocaleQuery {
 
 pub async fn review_many(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath(slug): AppPath<String>,
     AppJson(b): AppJson<ReviewBody>,
 ) -> ApiResult<Json<Vec<Review>>> {

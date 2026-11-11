@@ -161,7 +161,7 @@ fn rule_text(p: &Predicate) -> String {
 
 pub async fn generate(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath((slug, id)): AppPath<(String, Uuid)>,
     AppJson(b): AppJson<GenerateBody>,
 ) -> ApiResult<Json<GenerateResult>> {
@@ -458,7 +458,7 @@ pub struct PersonalizeBody {
 /// counted (no test). Same checks as `start` (readiness, policy, live keys, plan quota). Ended with `stop`.
 pub async fn personalize(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    crate::auth::VerifiedUser(user): crate::auth::VerifiedUser,
     AppPath((slug, id)): AppPath<(String, Uuid)>,
     AppJson(b): AppJson<PersonalizeBody>,
 ) -> ApiResult<Json<Experiment>> {

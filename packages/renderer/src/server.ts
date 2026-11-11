@@ -8,7 +8,11 @@
 //   GET  /metrics                          JSON counters + render p50/p95      GET /healthz
 // Auth: `Authorization: Bearer $RENDERER_TOKEN` on everything but /healthz (internal service, glot server only).
 // SSRF: http(s) only, no credentials in URLs, the page and every subresource must resolve to public IPs
-// (RENDERER_ALLOW_PRIVATE=1 for local tests); images/media/fonts are never fetched.
+// (RENDERER_ALLOW_PRIVATE=1 for local tests); images/media/fonts/analytics are never fetched.
+// Small-VPS budget (≤ 450 MB peak for the container, measured with docker stats, see docs edge.md): one
+// chromium-headless-shell, one page at a time, started on demand, closed after RENDERER_IDLE_S idle, recycled
+// after RENDERER_RECYCLE_AFTER renders or when the container's anonymous memory passes RENDERER_RECYCLE_MB,
+// killed if a render overruns its timeout. Refreshes only run from the queue, never inside a visitor request.
 // ponytail: the IP check runs in Node before Chromium resolves again (DNS-rebinding window); the renderer runs
 // on its own network without access to the DB, which caps the blast radius. Pin with --host-resolver-rules if needed.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
@@ -25,10 +29,12 @@ export const config = {
   token: env.RENDERER_TOKEN ?? "",
   dir: env.RENDERER_DIR ?? "./snapshots",
   ttlMs: Number(env.RENDERER_TTL_S ?? 86400) * 1000,
-  concurrency: Number(env.RENDERER_CONCURRENCY ?? 2),
-  timeoutMs: Number(env.RENDERER_TIMEOUT_MS ?? 20000),
+  timeoutMs: Number(env.RENDERER_TIMEOUT_MS ?? 15000),
   maxBytes: Number(env.RENDERER_MAX_BYTES ?? 5 * 1024 * 1024),
-  maxQueue: Number(env.RENDERER_MAX_QUEUE ?? 500),
+  maxQueue: Number(env.RENDERER_MAX_QUEUE ?? 100),
+  recycleAfter: Number(env.RENDERER_RECYCLE_AFTER ?? 50),
+  recycleMb: Number(env.RENDERER_RECYCLE_MB ?? 320),
+  idleMs: Number(env.RENDERER_IDLE_S ?? 60) * 1000,
   allowPrivate: env.RENDERER_ALLOW_PRIVATE === "1",
 };
 
@@ -53,11 +59,76 @@ export type Mount = "replace" | "append";
 interface Meta { url: string; mount: Mount; renderedAt: number; ms: number }
 const key = (url: string, mount: Mount) => createHash("sha256").update(`${mount}\0${url}`).digest("hex").slice(0, 32);
 
-export const metrics = { requests: 0, fresh: 0, stale: 0, misses: 0, queued: 0, rendered: 0, failed: 0, rejected: 0, renderMs: [] as number[] };
+export const metrics = { requests: 0, fresh: 0, stale: 0, misses: 0, queued: 0, rendered: 0, failed: 0, rejected: 0, launches: 0, recycles: 0, idleStops: 0, timeouts: 0, renderMs: [] as number[] };
 const queue: { url: string; mount: Mount }[] = [];
 const pending = new Set<string>();
 let running = 0;
+
+// ---- the one browser: launched on demand, recycled, stopped when idle ----
+// chromium-headless-shell (Playwright's default headless binary, installed alone with `--only-shell`).
+// Flags trade isolation for memory: one renderer process (site isolation off: one trusted page at a time,
+// no cookies, no logins), no GPU, no extensions/background services, a capped V8 heap.
+const ARGS = [
+  "--disable-dev-shm-usage", "--disable-gpu", "--disable-extensions", "--disable-background-networking",
+  "--disable-component-update", "--disable-default-apps", "--disable-sync", "--no-first-run", "--mute-audio",
+  "--disable-features=site-per-process,IsolateOrigins,Translate,BackForwardCache,MediaRouter,OptimizationHints",
+  "--renderer-process-limit=1", "--js-flags=--max-old-space-size=256",
+];
 let browser: Promise<Browser> | undefined;
+let renders = 0;
+let idle: ReturnType<typeof setTimeout> | undefined;
+
+function getBrowser(): Promise<Browser> {
+  if (idle) { clearTimeout(idle); idle = undefined; }
+  if (!browser) {
+    metrics.launches++;
+    const b = chromium.launch({ args: ARGS });
+    browser = b;
+    b.then((x) => x.on("disconnected", () => { if (browser === b) browser = undefined; }), () => { if (browser === b) browser = undefined; });
+  }
+  return browser;
+}
+
+/** Close the browser (next render relaunches it). */
+export async function stopBrowser(): Promise<void> {
+  const b = browser;
+  browser = undefined;
+  renders = 0;
+  if (b) await (await b.catch(() => null))?.close().catch(() => {});
+}
+
+/** Anonymous (non-reclaimable) memory of this container in MB, from cgroup v2/v1; null outside a container. */
+export async function containerMb(): Promise<number | null> {
+  for (const [f, k] of [["/sys/fs/cgroup/memory.stat", "anon"], ["/sys/fs/cgroup/memory/memory.stat", "total_rss"]]) {
+    try {
+      const m = new RegExp(`^${k} (\\d+)$`, "m").exec(await readFile(f, "utf8"));
+      if (m) return Math.round(Number(m[1]) / 1048576);
+    } catch { /* not this cgroup version */ }
+  }
+  return null;
+}
+
+/** After a render: recycle when the browser has rendered enough pages or the container grew past the threshold. */
+async function afterRender() {
+  renders++;
+  const mb = await containerMb();
+  if (renders >= config.recycleAfter || (mb !== null && mb > config.recycleMb)) {
+    metrics.recycles++;
+    await stopBrowser();
+  }
+}
+
+function armIdle() {
+  if (idle) clearTimeout(idle);
+  idle = setTimeout(() => { idle = undefined; if (browser && !running) { metrics.idleStops++; void stopBrowser(); } }, config.idleMs);
+  idle.unref?.();
+}
+
+// Analytics, ads, chat widgets and session recorders: never needed for the DOM, often the heaviest scripts.
+const TRACKERS = /(^|\.)(google-analytics\.com|googletagmanager\.com|doubleclick\.net|googlesyndication\.com|googleadservices\.com|facebook\.net|connect\.facebook\.com|hotjar\.com|clarity\.ms|segment\.(io|com)|mixpanel\.com|amplitude\.com|posthog\.com|plausible\.io|matomo\.cloud|intercom(cdn)?\.(io|com)|crisp\.chat|tawk\.to|fullstory\.com|heap(analytics)?\.(io|com)|sentry\.io|datadoghq\.com|nr-data\.net|newrelic\.com|tiktok\.com|snap\.licdn\.com|ads-twitter\.com|youtube\.com|ytimg\.com|vimeo\.com)$/;
+const BLOCKED_TYPES = new Set(["image", "media", "font", "texttrack", "manifest", "eventsource", "websocket"]);
+/** Requests a snapshot never needs. */
+export const blockedRequest = (type: string, host: string) => BLOCKED_TYPES.has(type) || TRACKERS.test(host);
 
 function enqueue(url: string, mount: Mount): boolean {
   const k = key(url, mount);
@@ -70,26 +141,47 @@ function enqueue(url: string, mount: Mount): boolean {
   return true;
 }
 
+// One page at a time: the whole point on a 2 GB VPS.
 async function drain() {
-  while (running < config.concurrency && queue.length) {
-    const job = queue.shift()!;
-    running++;
-    renderAndStore(job.url, job.mount)
-      .catch((e) => { metrics.failed++; console.error(JSON.stringify({ msg: "render failed", url: job.url, error: String(e?.message ?? e) })); })
-      .finally(() => { running--; pending.delete(key(job.url, job.mount)); void drain(); });
+  if (running || !queue.length) return;
+  const job = queue.shift()!;
+  running = 1;
+  try {
+    await renderAndStore(job.url, job.mount);
+  } catch (e) {
+    metrics.failed++;
+    console.error(JSON.stringify({ msg: "render failed", url: job.url, error: String((e as Error)?.message ?? e) }));
+  } finally {
+    running = 0;
+    pending.delete(key(job.url, job.mount));
+    if (queue.length) void drain(); else armIdle();
   }
 }
 
-/** Render `url` in a fresh context, wait for network idle + a quiet DOM (500 ms without mutations), return the DOM. */
+/** Render `url`, then recycle the browser if due. A render that overruns its timeout (+5 s grace for a hung
+ * page) kills the browser: the next one starts clean. */
 export async function render(url: string, mount: Mount = "replace"): Promise<string> {
-  browser ??= chromium.launch({ args: ["--disable-dev-shm-usage"] }).catch((e) => { browser = undefined; throw e; });
-  const ctx = await (await browser).newContext({ reducedMotion: "reduce", serviceWorkers: "block", userAgent: "Mozilla/5.0 (compatible; glot-renderer/1.0; +https://glotlang.com/docs/edge)" });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const hard = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => { metrics.timeouts++; void stopBrowser(); reject(new Error("render timeout")); }, config.timeoutMs + 5000);
+  });
+  try {
+    return await Promise.race([renderPage(url, mount), hard]);
+  } finally {
+    clearTimeout(timer);
+    await afterRender();
+  }
+}
+
+/** Fresh context, wait for network idle + a quiet DOM (500 ms without mutations), return the DOM. */
+async function renderPage(url: string, mount: Mount): Promise<string> {
+  const ctx = await (await getBrowser()).newContext({ reducedMotion: "reduce", serviceWorkers: "block", viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, userAgent: "Mozilla/5.0 (compatible; glot-renderer/1.0; +https://glotlang.com/docs/edge)" });
   try {
     await ctx.route("**/*", async (route) => {
       const r = route.request();
       const u = new URL(r.url());
       if (u.protocol === "data:" || u.protocol === "blob:") return route.continue();
-      if (["image", "media", "font"].includes(r.resourceType()) || !/^https?:$/.test(u.protocol) || !(await publicHost(u.hostname))) return route.abort();
+      if (blockedRequest(r.resourceType(), u.hostname) || !/^https?:$/.test(u.protocol) || !(await publicHost(u.hostname))) return route.abort();
       return route.continue();
     });
     const page = await ctx.newPage();
@@ -117,7 +209,7 @@ export async function render(url: string, mount: Mount = "replace"): Promise<str
     if (Buffer.byteLength(html) > config.maxBytes) throw new Error("snapshot too large");
     return html;
   } finally {
-    await ctx.close();
+    await ctx.close().catch(() => {});
   }
 }
 
@@ -160,7 +252,7 @@ const pct = (xs: number[], p: number) => { if (!xs.length) return null; const s 
 export function metricsJson() {
   const { renderMs, ...counters } = metrics;
   const served = counters.fresh + counters.stale;
-  return { ...counters, queue: queue.length, running, hitRatio: counters.requests ? served / counters.requests : null, renderP50: pct(renderMs, 50), renderP95: pct(renderMs, 95) };
+  return { ...counters, queue: queue.length, running, browser: browser ? "up" : "stopped", hitRatio: counters.requests ? served / counters.requests : null, renderP50: pct(renderMs, 50), renderP95: pct(renderMs, 95) };
 }
 
 function authorized(req: IncomingMessage): boolean {
@@ -209,11 +301,12 @@ export async function handle(req: IncomingMessage, res: ServerResponse) {
   json(res, 404, { error: "not found" });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// The CLI (src/cli.ts, also bundled into dist/cli.js) imports this module: only start when run as the server.
+if (import.meta.url === `file://${process.argv[1]}` && /server\.[jt]s$/.test(process.argv[1])) {
   if (!config.token && env.NODE_ENV === "production") { console.error("RENDERER_TOKEN is required (GLOT_RENDERER_TOKEN in deploy/.env)"); process.exit(1); }
   const srv = createServer((req, res) => void handle(req, res).catch((e) => { console.error(e); if (!res.headersSent) json(res, 500, { error: "internal" }); }));
   srv.listen(config.port, () => console.log(JSON.stringify({ msg: "glot renderer listening", port: config.port, dir: config.dir })));
-  const stop = async () => { srv.close(); await (await browser)?.close().catch(() => {}); process.exit(0); };
+  const stop = async () => { srv.close(); await stopBrowser(); process.exit(0); };
   process.on("SIGTERM", stop);
   process.on("SIGINT", stop);
 }

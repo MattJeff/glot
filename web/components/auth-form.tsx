@@ -46,13 +46,22 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
-    mutationFn: (f: { name: string; email: string; password: string }) =>
+    mutationFn: (f: { name: string; email: string; password: string; website: string }) =>
       mode === "login" ? api.login(f) : api.signup({ ...f, locale }),
-    onSuccess: (user) => {
+    onSuccess: async (user) => {
       qc.setQueryData(qk.me, user);
       const next = params.get("next");
+      const safeNext = next?.startsWith("/") && !next.startsWith("//") ? next : null;
+      let dest = safeNext ?? "/app";
+      // Where the server requires a confirmed address, a new account lands on "check your inbox" first.
+      if (mode === "signup") {
+        const me = await api.me().catch(() => null);
+        if (me?.email_enabled && !me.email_verified)
+          dest = `/verify-email?sent=1${safeNext ? `&next=${encodeURIComponent(safeNext)}` : ""}`;
+      }
       // Full navigation so the proxy sees the fresh session cookie. Only same-site paths are allowed.
-      window.location.assign(next?.startsWith("/") && !next.startsWith("//") ? next : "/app");
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a router push would keep the pre-login cache
+      window.location.assign(dest);
     },
     onError: (err) =>
       setError(err instanceof ApiError && err.status === 401 ? t("errors.invalid") : errorMessage(err)),
@@ -65,12 +74,21 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const password = String(f.get("password"));
     if (mode === "signup" && password.length < 8) return setError(t("errors.passwordTooShort"));
     setError(null);
-    mutation.mutate({ name: String(f.get("name") ?? ""), email: String(f.get("email")), password });
+    mutation.mutate({
+      name: String(f.get("name") ?? ""),
+      email: String(f.get("email")),
+      password,
+      website: String(f.get("website") ?? ""),
+    });
   }
 
   return (
     <AuthShell title={t(`${mode}.title`)} subtitle={t(`${mode}.subtitle`)}>
       <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate={false}>
+        {mode === "signup" && (
+          // Honeypot: invisible to people and screen readers, filled by form bots (the server refuses those).
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
+        )}
         {mode === "signup" && (
           <div className="space-y-1.5">
             <Label htmlFor="name">{t("fields.name")}</Label>

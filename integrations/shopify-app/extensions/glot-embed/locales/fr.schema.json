@@ -1,0 +1,34 @@
+{
+  "embed": {
+    "name": "glot",
+    "project": {
+      "label": "Projet",
+      "info": "L’identifiant de votre projet glot. Les langues et l’activation de la balise se règlent dans glot (glot Edge → Balise site web)."
+    },
+    "key": {
+      "label": "Clé publique",
+      "info": "Commence par pk_ (glot Edge → Balise site web). Jamais une clé secrète glot_."
+    },
+    "switcher": {
+      "label": "Sélecteur de langue",
+      "shopify": "Langues de la boutique (URL Shopify, /es/)",
+      "glot": "Menu glot (même URL)",
+      "none": "Aucun"
+    },
+    "position": {
+      "label": "Position du sélecteur",
+      "bottom_right": "En bas à droite",
+      "bottom_left": "En bas à gauche",
+      "top_right": "En haut à droite",
+      "top_left": "En haut à gauche"
+    },
+    "server": {
+      "label": "Serveur glot",
+      "info": "À modifier uniquement pour un glot auto-hébergé."
+    },
+    "script": {
+      "label": "URL du script",
+      "info": "À modifier uniquement pour un glot auto-hébergé."
+    }
+  }
+}

@@ -11,6 +11,11 @@
 //   project / this host; off → passthrough to the origin in < 1 min, no redeploy.
 // - Discovery: untranslated segments are reported (hash/text/context + URL path, never query string, cookies or
 //   anything about the visitor), only for anonymous requests, deduplicated per isolate, batched in `waitUntil`.
+// - Pages behind sign-in (a session cookie or `Authorization`), status `auth.pages`: `server` (default) =
+//   translated from the TM for this response only — `Cache-Control: private`, `Vary: Cookie`, never in the page
+//   cache, never discovered, nothing about the page sent to glot; `patcher` / `off` = the origin's page untouched
+//   (the site's own `<script data-glot-app>` tag translates it in the browser, or nobody does). The request
+//   (cookies included) reaches the origin as is and its `Set-Cookie` comes back as is: same domain, same session.
 // - Application paths (status `app`: login, account, API…): never translated, cached or discovered; the runtimes
 //   call `app()` first: a redirect to the source URL (locale as the site expects it) or the origin untouched.
 // - `Server-Timing: glot;dur=…` = time spent in glot code (TM + rewrite), `origin;dur=…` = the origin fetch.
@@ -41,6 +46,8 @@ export interface Status {
   ready?: string[];
   /** Application paths (login, account, API…) kept on the origin's own URL (app-paths.ts). */
   app?: AppRules;
+  /** Requests with a session: how they are served (default `server`) + app-mode patcher discovery. */
+  auth?: { pages?: "off" | "patcher" | "server"; discover?: boolean };
 }
 /** A segment glot has no translation for (from the segmenter); `discoverable: false` ones are never sent. */
 export interface Missing {
@@ -112,7 +119,7 @@ export interface EdgeOptions {
 }
 
 type Wait = (p: Promise<unknown>) => void;
-type State = "translated" | "source" | "off" | "quota" | "fail-open" | "passthrough";
+type State = "translated" | "source" | "off" | "quota" | "fail-open" | "passthrough" | "auth";
 
 export const SESSION_COOKIE = /(?:^|;\s*)[^=;]*(sess|auth|token|sid|jwt|login|logged|user|account)[^=;]*=/i;
 const HOP = ["content-length", "content-encoding", "transfer-encoding", "connection", "keep-alive", "etag"];
@@ -180,7 +187,7 @@ export function createEdge(o: EdgeOptions) {
           .then((r) => (r.ok ? r.json() : undefined))
           .then((m: { locales?: { code: string; ready?: boolean }[] } | undefined) => m?.locales?.filter((l) => l.ready !== false).map((l) => l.code))
           .catch(() => undefined);
-        status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready, app: v.app } };
+        status = { at: now(), v: { enabled: v.enabled !== false, off: v.off ?? [], versions: v.versions ?? {}, selectors: v.selectors, ready: ready ?? status?.v.ready, app: v.app, auth: v.auth } };
         void o.store?.put("status", JSON.stringify(status.v)).catch(() => {});
         // Prefetch newer TMs of the locales we serve: the next request gets the new version, whole.
         await Promise.all([...tms.values()].filter((t) => (status!.v.versions[t.locale] ?? 0) > t.v).map((t) => loadTm(t.locale, status!.v.versions[t.locale])));
@@ -385,7 +392,76 @@ export function createEdge(o: EdgeOptions) {
     return new Response(null, { status: d.status, headers: { location: d.location, "set-cookie": d.cookie, "cache-control": "no-store", "x-glot-edge": "app-redirect" } });
   }
 
-  return Object.assign(serve, { own, app, isApp });
+  /**
+   * A JavaScript chunk, one URL for every language (subdirectory mode): served in `locale` (the page's, from its
+   * `Referer`) with its hard-coded strings translated, so client components hydrate on the translated HTML
+   * (no React #418). The rewrite is glot's (`POST /edge/v1/{project}/{locale}/bundle`, a real JS parser), cached
+   * per (URL, locale, version) in `pageCache`. While Edge is on, no chunk is `immutable` in the browser (the same
+   * URL changes with the language and the version): `public, no-cache` + ETag, revalidated with a 304.
+   * Fail-open: the origin chunk, `no-store` (the next load retries).
+   */
+  async function bundle(req: Request, locale: string, origin: (r: Request) => Promise<Response>, wait?: Wait): Promise<Response> {
+    const t0 = now();
+    const js = (r: Response) => r.status === 200 && /javascript|ecmascript/.test(r.headers.get("content-type") ?? "");
+    const revalidate = (r: Response) => {
+      const res = new Response(r.body, r);
+      res.headers.set("cache-control", "public, no-cache");
+      res.headers.delete("expires");
+      return res;
+    };
+    const tm = locale === o.source || req.method !== "GET" ? undefined : await snapshot(locale, new URL(req.url).hostname, wait).catch(() => undefined);
+    if (!tm || tm === "off" || !o.key) {
+      const r = await origin(req);
+      if (!js(r) && r.status !== 304) return r;
+      if (locale === o.source || tm === "off" || r.status === 304) return revalidate(r);
+      const res = revalidate(r); // glot unreachable on a localized page: the source chunk, kept nowhere
+      for (const h of ["etag", "last-modified"]) res.headers.delete(h);
+      res.headers.set("cache-control", "no-store");
+      return timing(res, "fail-open", now() - t0, 0);
+    }
+    const key = `https://glot-edge.invalid/_bundle/${locale}.${tm.v}${new URL(req.url).pathname}${new URL(req.url).search}`;
+    const fresh = (r: Response) => (req.headers.get("if-none-match") === r.headers.get("etag") && r.headers.get("etag") ? new Response(null, { status: 304, headers: r.headers }) : r);
+    const hit = await o.pageCache?.match(key).catch(() => undefined);
+    if (hit) return timing(fresh(revalidate(hit)), "translated", now() - t0, 0, "hit");
+    // The browser's validators are for whichever language it saw last: never let the origin answer 304 here.
+    const up = new Request(req);
+    up.headers.delete("if-none-match");
+    up.headers.delete("if-modified-since");
+    const page = await origin(up);
+    if (!js(page)) return page;
+    const tOrigin = now() - t0;
+    const body = await page.arrayBuffer();
+    const failOpen = () => {
+      const r = new Response(body, page);
+      for (const h of ["etag", "last-modified", "expires"]) r.headers.delete(h);
+      r.headers.set("cache-control", "no-store");
+      return timing(r, "fail-open", now() - t0 - tOrigin, tOrigin);
+    };
+    if (body.byteLength > 4 * 1024 * 1024) return failOpen();
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), Math.max(timeout, 2000));
+    try {
+      const g = await f(`${base}/edge/v1/${proj}/${encodeURIComponent(locale)}/bundle`, { method: "POST", signal: ctl.signal, headers: { "content-type": "text/javascript", "x-glot-key": o.key }, body });
+      if (!g.ok) return failOpen();
+      const headers = new Headers(page.headers);
+      for (const h of [...HOP, "last-modified", "expires"]) headers.delete(h);
+      headers.set("cache-control", "public, no-cache");
+      for (const h of ["etag", "x-glot-bundle", "x-glot-version"]) { const v = g.headers.get(h); if (v) headers.set(h, v); }
+      const out = await g.arrayBuffer();
+      if (o.pageCache) {
+        const copy = new Response(out, { headers });
+        copy.headers.set("cache-control", "public, max-age=31536000"); // the key holds locale + version
+        wait?.(o.pageCache.put(key, copy).catch(() => {}));
+      }
+      return timing(fresh(new Response(out, { status: 200, headers })), "translated", now() - t0 - tOrigin, tOrigin, "miss");
+    } catch {
+      return failOpen();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return Object.assign(serve, { own, app, isApp, bundle });
 
   async function serve(req: Request, locale: string, originUrl: URL, origin: (u: URL) => Promise<Response>, wait?: Wait): Promise<Response> {
     const url = new URL(req.url);
@@ -408,6 +484,8 @@ export function createEdge(o: EdgeOptions) {
     const page = got.ok;
     const tOrigin = got.ms;
     if (!translatable) return timing(page, "passthrough", 0, tOrigin);
+    // Signed in, project says "not by the Edge": the origin's page, untouched, never shared.
+    if (!anon && tm !== "off" && (status?.v.auth?.pages ?? "server") !== "server") return timing(personal(new Response(page.body, page)), "auth", tGlot, tOrigin);
     if (tm === "off") return timing(sourceUnderLocale(page), "off", tGlot, tOrigin);
     if (quotaUntil > now()) return timing(sourceUnderLocale(page), "quota", tGlot, tOrigin);
     const type = page.headers.get("content-type") ?? "";
@@ -441,6 +519,7 @@ export function createEdge(o: EdgeOptions) {
     headers.set("x-glot-version", `${locale}@${tm.v}`);
     headers.set("x-glot-coverage", `${out.translated}/${out.total}`);
     const res = new Response(out.html, { status: page.status, statusText: page.statusText, headers });
+    if (!anon) personal(res); // translated for this visitor only
     const ttl = cacheKey ? cacheTtl(page.headers, o.pageTtl ?? 0) : 0;
     if (cacheKey && ttl > 0) {
       const copy = res.clone();
@@ -468,6 +547,13 @@ export function cacheTtl(h: Headers, fallback: number): number {
   if (/private|no-store|no-cache/.test(cc)) return 0;
   const m = /s-maxage=(\d+)/.exec(cc) ?? /max-age=(\d+)/.exec(cc);
   return m ? Number(m[1]) : fallback;
+}
+
+/** A response built for one signed-in visitor: a browser may keep it, a shared cache (CDN, proxy) never. */
+function personal(res: Response) {
+  res.headers.set("cache-control", "private, no-cache");
+  res.headers.append("vary", "Cookie");
+  return res;
 }
 
 /** The source page served under a localized URL (glot off / not ready): never cached as if it were translated. */
