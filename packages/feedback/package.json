@@ -1,6 +1,6 @@
 {
   "name": "@glot/feedback",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Let native speakers flag a wrong, awkward or unclear translation in production (< 4 kB, Shadow DOM, accessible). Feeds glot's feedback loop.",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",

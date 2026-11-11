@@ -1,6 +1,6 @@
 {
   "name": "@glot/runtime",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Long-tail locales at zero cost: on-device UI translation (Chrome Translator API) with glot's guarantees — masked placeholders, glossary, plural structure, WASM validation, source fallback.",
   "license": "MIT",
   "homepage": "https://github.com/MattJeff/glot",

@@ -1123,7 +1123,7 @@ checksum = "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
 
 [[package]]
 name = "glot-bench"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1139,7 +1139,7 @@ dependencies = [
 
 [[package]]
 name = "glot-cli"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anstream",
  "anstyle",
@@ -1178,7 +1178,7 @@ dependencies = [
 
 [[package]]
 name = "glot-core"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "brotli-decompressor",
  "fixed_decimal",
@@ -1204,7 +1204,7 @@ dependencies = [
 
 [[package]]
 name = "glot-extract"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "glob",
  "glot-core",
@@ -1220,7 +1220,7 @@ dependencies = [
 
 [[package]]
 name = "glot-llm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1244,7 +1244,7 @@ dependencies = [
 
 [[package]]
 name = "glot-mcp"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -1264,7 +1264,7 @@ dependencies = [
 
 [[package]]
 name = "glot-server"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "aes-gcm",
  "anyhow",
@@ -1301,7 +1301,7 @@ dependencies = [
 
 [[package]]
 name = "glot-wasm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "glot-core",
  "serde",
