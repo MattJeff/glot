@@ -1023,8 +1023,10 @@ async fn exec(
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
-        .kill_on_drop(true)
-        .process_group(0);
+        .kill_on_drop(true);
+    // Own process group so a timeout kills glot and every child it spawned (Unix; Windows relies on kill_on_drop).
+    #[cfg(unix)]
+    cmd.process_group(0);
     for (k, v) in env {
         cmd.env(k, v);
     }
