@@ -1483,6 +1483,20 @@
       "title": "LLM",
       "workspaceId": "ID de l’espace de travail Anthropic",
       "workspaceIdHint": "Requis avec les clés au niveau de l’organisation (sk-ant-usr-…). Remplace ANTHROPIC_WORKSPACE_ID.",
+      "test": {
+        "button": "Tester la clé",
+        "ok": "Le fournisseur a accepté la clé.",
+        "missing_key": "Aucune clé à tester : collez-en une d'abord.",
+        "invalid_key": "Le fournisseur a refusé cette clé. Recopiez la clé entière (Anthropic : console.anthropic.com → API Keys) ou créez-en une nouvelle.",
+        "revoked_or_wrong_workspace": "La clé est reconnue mais n'est pas autorisée ici : révoquée ou désactivée, ou rattachée à un autre espace de travail que celui renseigné.",
+        "workspace_required": "Clé d'organisation (sk-ant-usr-…) : renseignez l'ID d'espace de travail ci-dessous.",
+        "oauth_token_needs_bearer": "Jeton OAuth refusé : il a peut-être expiré. Reconnectez-vous ou utilisez une clé API.",
+        "network": "Impossible de joindre le fournisseur. Vérifiez l'URL de base, puis réessayez.",
+        "provider_error": "Le fournisseur a répondu par une erreur (détails ci-dessous).",
+        "config": "Les paramètres LLM sont incomplets (détails ci-dessous).",
+        "kind": "Détecté : {kind, select, oauth {jeton OAuth} org-user {clé d'organisation} other {clé API}}",
+        "savedFailed": "Paramètres enregistrés, mais le test de la clé a échoué : {reason}"
+      },
       "modelHint": "Identifiant du modèle tel que votre fournisseur le nomme, par ex. claude-haiku-5-5.",
       "styleHint": "Règles de ton et de formulation envoyées avec chaque traduction, par ex. « Informel, libellés courts, noms de produits en anglais »."
     },
@@ -2529,7 +2543,7 @@
     "linked": {
       "change": "Changer de dépôt",
       "failed": "La dernière exécution a échoué",
-      "badKey": "Votre fournisseur d'IA a refusé la clé API. Collez une clé valide dans <link>Paramètres</link>, puis relancez.",
+      "badKey": "Votre fournisseur d'IA a refusé la clé API. Ouvrez <link>Paramètres → LLM</link>, collez une clé valide, cliquez sur « Tester la clé », puis relancez.",
       "prHint": "Chaque push sur {branch} met à jour cette pull request.",
       "prReady": "La pull request #{n} est prête à être fusionnée",
       "rerun": "Relancer",

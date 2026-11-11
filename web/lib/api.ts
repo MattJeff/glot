@@ -46,6 +46,25 @@ export type LlmSettings = {
   /** Non-secret headers; absent keeps. */
   extra_headers?: Record<string, string>;
 };
+/** `POST /llm/test`: cheapest authenticated call (GET /v1/models); never contains the key. */
+export type LlmTestCode =
+  | "ok"
+  | "missing_key"
+  | "invalid_key"
+  | "revoked_or_wrong_workspace"
+  | "workspace_required"
+  | "oauth_token_needs_bearer"
+  | "network"
+  | "provider_error"
+  | "config";
+export type LlmTest = {
+  ok: boolean;
+  code: LlmTestCode;
+  status: number | null;
+  provider_message: string | null;
+  hint: string;
+  key_kind: "api" | "oauth" | "org-user" | null;
+};
 export type ProjectPatch = {
   name?: string;
   source_locale?: string;
@@ -764,6 +783,11 @@ export const api = {
     request<Project>("POST", "/api/projects", b),
   project: (slug: string) => request<Project>("GET", p(slug)),
   updateProject: (slug: string, b: ProjectPatch) => request<Project>("PATCH", p(slug), b),
+  /** Tests the typed `api_key` when given, else the stored one. */
+  testLlm: (
+    slug: string,
+    b: { api_key?: string; provider?: Provider; base_url?: string; anthropic_workspace_id?: string },
+  ) => request<LlmTest>("POST", `${p(slug)}/llm/test`, b),
   deleteProject: (slug: string) => request<void>("DELETE", p(slug)),
 
   keys: (slug: string, q: KeyQuery) => request<KeyPage>("GET", `${p(slug)}/keys${qs(q)}`),

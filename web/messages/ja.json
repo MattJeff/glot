@@ -1483,6 +1483,20 @@
       "title": "LLM",
       "workspaceId": "Anthropic ワークスペース ID",
       "workspaceIdHint": "組織レベルのキー（sk-ant-usr-…）を使用する場合は必須です。ANTHROPIC_WORKSPACE_ID より優先されます。",
+      "test": {
+        "button": "キーをテスト",
+        "ok": "プロバイダーがキーを受け付けました。",
+        "missing_key": "テストするキーがありません。先にキーを貼り付けてください。",
+        "invalid_key": "プロバイダーがこのキーを拒否しました。キー全体をもう一度コピーする（Anthropic：console.anthropic.com → API Keys）か、新しいキーを作成してください。",
+        "revoked_or_wrong_workspace": "キーは認識されましたが、ここでは許可されていません。無効化・取り消し済みか、設定したものとは別のワークスペースのキーです。",
+        "workspace_required": "組織キー（sk-ant-usr-…）です。下にワークスペース ID を入力してください。",
+        "oauth_token_needs_bearer": "OAuth トークンが拒否されました。有効期限切れの可能性があります。再ログインするか、API キーを使用してください。",
+        "network": "プロバイダーに接続できません。ベース URL を確認して、もう一度お試しください。",
+        "provider_error": "プロバイダーがエラーを返しました（詳細は下記）。",
+        "config": "LLM 設定が不完全です（詳細は下記）。",
+        "kind": "検出：{kind, select, oauth {OAuth トークン} org-user {組織キー} other {API キー}}",
+        "savedFailed": "設定は保存されましたが、キーのテストに失敗しました：{reason}"
+      },
       "modelHint": "プロバイダーが定める通りのモデル ID を入力してください。例: claude-haiku-5-5。",
       "styleHint": "すべての翻訳に送られるトーンと文言のルール。例: 「カジュアル、短い UI ラベル、製品名は英語のまま」"
     },
@@ -2529,7 +2543,7 @@
     "linked": {
       "change": "リポジトリを変更",
       "failed": "前回の実行に失敗しました",
-      "badKey": "AI プロバイダーが API キーを拒否しました。<link>設定</link>で有効なキーを貼り付けてから、再実行してください。",
+      "badKey": "AI プロバイダーが API キーを拒否しました。<link>設定 → LLM</link> を開いて有効なキーを貼り付け、「キーをテスト」をクリックしてから再実行してください。",
       "prHint": "{branch} へのプッシュのたびに、このプルリクエストが更新されます。",
       "prReady": "プルリクエスト #{n} はマージできる状態です",
       "rerun": "再実行",

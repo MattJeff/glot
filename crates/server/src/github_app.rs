@@ -1290,7 +1290,19 @@ async fn localize(
         ("NO_COLOR".into(), "1".into()),
         ("GLOT_BIN_PATH".into(), bin.clone()),
     ];
-    let key = api_key.unwrap_or_default();
+    let key = api_key
+        .map(|k| glot_llm::provider::clean_key(&k))
+        .unwrap_or_default();
+    // Org user keys (sk-ant-usr…) must name the workspace: the CLI reads ANTHROPIC_WORKSPACE_ID.
+    if let Some(ws) = p
+        .llm
+        .0
+        .anthropic_workspace_id
+        .as_ref()
+        .filter(|w| !w.is_empty())
+    {
+        env.push(("ANTHROPIC_WORKSPACE_ID".into(), ws.clone()));
+    }
     if !key.is_empty() {
         let var = glot_core::config::Config::load(dir)
             .ok()

@@ -441,7 +441,7 @@ function Linked({ slug, status, onChangeRepo }: { slug: string; status: GithubSt
           <p>
             {t.rich("linked.badKey", {
               link: (c) => (
-                <Link href={`/app/${slug}/settings`} className="font-medium underline underline-offset-4">
+                <Link href={`/app/${slug}/settings#s-key`} className="font-medium underline underline-offset-4">
                   {c}
                 </Link>
               ),

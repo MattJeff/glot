@@ -39,6 +39,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import {
   api,
   type LlmSettings,
+  type LlmTest,
   type MessageSyntax,
   type PreviewSettings,
   SYNTAXES,
@@ -47,6 +48,7 @@ import {
   qk,
 } from "@/lib/api";
 import { useOrigin, useProject, useSlug } from "@/lib/hooks";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 /** One catalog line per syntax, as glot.toml would hold it (code, not translated). */
 const SYNTAX_EXAMPLES: Record<MessageSyntax, string> = {
@@ -204,6 +206,18 @@ function SettingsForm({
   const [nextSource, setNextSource] = useState<string | null>(null);
   const set = <K extends keyof LlmSettings>(k: K, v: LlmSettings[K]) =>
     setLlm((s) => ({ ...s, [k]: v }));
+  // Typed key (never logged) or, when empty, the stored one; with the unsaved provider/workspace.
+  const testKey = useMutation({
+    mutationFn: (typed: string) =>
+      api.testLlm(p.slug, {
+        provider: llm.provider,
+        anthropic_workspace_id: llm.anthropic_workspace_id ?? "",
+        ...(typed ? { api_key: typed } : {}),
+        ...(llm.base_url ? { base_url: llm.base_url } : {}),
+      }),
+  });
+  const errorMessage = useErrorMessage();
+  const keyMessage = (r: LlmTest) => t(`llm.test.${r.code}`);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -248,8 +262,17 @@ function SettingsForm({
     onSuccess: (next) => {
       qc.setQueryData(qk.project(p.slug), next);
       qc.invalidateQueries({ queryKey: qk.projects });
+      const newKey = !!llm.api_key?.trim();
       set("api_key", "");
       toast.success(t("saved"));
+      // A new key is checked right away: a bad paste shows now, not on the next job.
+      if (newKey)
+        testKey.mutate("", {
+          onSuccess: (r) => {
+            if (!r.ok)
+              toast.warning(t("llm.test.savedFailed", { reason: keyMessage(r) }));
+          },
+        });
     },
   });
 
@@ -548,12 +571,62 @@ function SettingsForm({
             type="password"
             autoComplete="off"
             value={llm.api_key ?? ""}
-            onChange={(e) => set("api_key", e.target.value)}
+            onChange={(e) => {
+              set("api_key", e.target.value);
+              testKey.reset();
+            }}
             placeholder={p.llm.has_api_key ? "••••••••••••" : ""}
             dir="ltr"
             className="font-mono"
           />
         </Field>
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => testKey.mutate(llm.api_key?.trim() ?? "")}
+            disabled={testKey.isPending}
+          >
+            {testKey.isPending && (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            )}
+            {t("llm.test.button")}
+          </Button>
+          <div aria-live="polite">
+            {testKey.data && (
+              <div
+                role={testKey.data.ok ? "status" : "alert"}
+                className={
+                  testKey.data.ok
+                    ? "rounded-lg border border-success/30 bg-success/8 p-3 text-sm"
+                    : "rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm"
+                }
+              >
+                <p className="font-medium">{keyMessage(testKey.data)}</p>
+                {testKey.data.key_kind && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("llm.test.kind", { kind: testKey.data.key_kind })}
+                  </p>
+                )}
+                {testKey.data.provider_message && (
+                  <p
+                    className="mt-1 font-mono text-xs break-words text-muted-foreground"
+                    dir="ltr"
+                  >
+                    {testKey.data.status ? `HTTP ${testKey.data.status}: ` : ""}
+                    {testKey.data.provider_message}
+                  </p>
+                )}
+              </div>
+            )}
+            {testKey.error && (
+              <p role="alert" className="text-sm text-destructive">
+                {errorMessage(testKey.error)}
+              </p>
+            )}
+          </div>
+        </div>
         {llm.provider === "openai-compatible" && (
           <Field
             id="s-base"

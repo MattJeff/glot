@@ -70,6 +70,11 @@ const ROUTES: &[(&str, &str, &str)] = &[
     ),
     ("DELETE", "/api/projects/{slug}", "Delete project"),
     (
+        "POST",
+        "/api/projects/{slug}/llm/test",
+        "Test the LLM key (admin) {api_key?,provider?,base_url?,anthropic_workspace_id?} -> {ok,code,status,provider_message,hint,key_kind}: GET /v1/models with the same auth; code ok|missing_key|invalid_key|revoked_or_wrong_workspace|workspace_required|oauth_token_needs_bearer|network|provider_error|config",
+    ),
+    (
         "GET",
         "/api/projects/{slug}/keys",
         "List keys ?q=&locale=&status=&page=&per_page= -> KeyPage",

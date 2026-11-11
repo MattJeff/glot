@@ -4,7 +4,7 @@ use axum::{
     Json, Router,
     body::Body,
     http::{HeaderMap, Method, Request, StatusCode, header},
-    routing::post,
+    routing::{get, post},
 };
 use glot_llm::provider::{CompletionRequest, Provider};
 use http_body_util::BodyExt;
@@ -38,6 +38,33 @@ async fn fake_anthropic() -> (String, Seen) {
             Json(json!({"model": b["model"], "stop_reason": "end_turn",
                 "content": [{"type": "text", "text": c.text}],
                 "usage": {"input_tokens": 10, "output_tokens": 10}}))
+        }),
+    );
+    // `/v1/models` = the key test: good api / oauth keys pass, org keys need wrkspc_ok.
+    let app = app.route(
+        "/v1/models",
+        get(|h: HeaderMap| async move {
+            let hv = |n: &str| h.get(n).and_then(|v| v.to_str().ok()).unwrap_or_default();
+            let err = |s: StatusCode, m: &str| {
+                (s, Json(json!({"type": "error", "error": {"type": "authentication_error", "message": m}})))
+            };
+            if hv("authorization") == "Bearer sk-ant-oat01-good"
+                && hv("anthropic-beta") == "oauth-2025-04-20"
+                && !h.contains_key("x-api-key")
+            {
+                return (StatusCode::OK, Json(json!({"data": []})));
+            }
+            match hv("x-api-key") {
+                "sk-ant-api03-good" => (StatusCode::OK, Json(json!({"data": []}))),
+                k if k.starts_with("sk-ant-usr") && hv("anthropic-workspace-id") == "wrkspc_ok" => {
+                    (StatusCode::OK, Json(json!({"data": []})))
+                }
+                k if k.starts_with("sk-ant-usr") => err(
+                    StatusCode::BAD_REQUEST,
+                    "anthropic-workspace-id does not match a workspace of this key",
+                ),
+                _ => err(StatusCode::UNAUTHORIZED, "invalid x-api-key"),
+            }
         }),
     );
     let l = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
@@ -159,6 +186,74 @@ async fn project_llm_headers() {
     assert_eq!(h["anthropic-workspace-id"], "wrkspc_123");
     assert_eq!(h["x-team"], "growth");
     assert_eq!(h["x-api-key"], "sk-ant-usr-test");
+
+    // Key test (never the real API): stored org key + wrong workspace.
+    let t = "/api/projects/hdr/llm/test";
+    let (s, v) = call(Method::POST, t, json!({})).await;
+    assert_eq!(s, StatusCode::OK, "{v}");
+    assert_eq!(v["code"], "revoked_or_wrong_workspace", "{v}");
+    assert_eq!(v["status"], 400);
+    assert_eq!(v["key_kind"], "org-user");
+    let (_, v) = call(
+        Method::POST,
+        t,
+        json!({"anthropic_workspace_id": "wrkspc_ok"}),
+    )
+    .await;
+    assert_eq!(v["code"], "ok", "{v}");
+    if std::env::var_os("ANTHROPIC_WORKSPACE_ID").is_none() {
+        let (_, v) = call(
+            Method::POST,
+            t,
+            json!({"api_key": "sk-ant-usr-x", "anthropic_workspace_id": ""}),
+        )
+        .await;
+        assert_eq!(v["code"], "workspace_required", "{v}");
+    }
+    // Typed (unsaved) keys, copy-paste damage included.
+    let (_, v) = call(
+        Method::POST,
+        t,
+        json!({"api_key": " Bearer sk-ant-api03-good\n"}),
+    )
+    .await;
+    assert_eq!(
+        (v["ok"].clone(), v["key_kind"].clone()),
+        (json!(true), json!("api")),
+        "{v}"
+    );
+    let (_, v) = call(Method::POST, t, json!({"api_key": "sk-ant-api03-bad"})).await;
+    assert_eq!(v["code"], "invalid_key", "{v}");
+    assert_eq!(v["status"], 401);
+    assert_eq!(v["provider_message"], "invalid x-api-key");
+    assert!(
+        !v.to_string().contains("sk-ant-api03-bad"),
+        "never echo the key"
+    );
+    let (_, v) = call(Method::POST, t, json!({"api_key": "sk-ant-oat01-good"})).await;
+    assert_eq!(
+        (v["code"].clone(), v["key_kind"].clone()),
+        (json!("ok"), json!("oauth")),
+        "{v}"
+    );
+    let (_, v) = call(
+        Method::POST,
+        t,
+        json!({"api_key": "sk-ant-api03-good", "base_url": "http://127.0.0.1:1"}),
+    )
+    .await;
+    assert_eq!(v["code"], "network", "{v}");
+    // Saved with a trailing newline: stored cleaned, so the stored key passes.
+    let (s, _) = call(
+        Method::PATCH,
+        "/api/projects/hdr",
+        json!({"llm": {"provider": "anthropic", "model": "claude-haiku-5-5", "base_url": base,
+            "api_key": "  sk-ant-api03-good\n", "anthropic_workspace_id": ""}}),
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    let (_, v) = call(Method::POST, t, json!({})).await;
+    assert_eq!(v["code"], "ok", "{v}");
 
     pool.close().await;
     let _ = sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))

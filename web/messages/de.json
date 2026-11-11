@@ -1483,6 +1483,20 @@
       "title": "LLM",
       "workspaceId": "Anthropic-Arbeitsbereichs-ID",
       "workspaceIdHint": "Erforderlich bei Schlüsseln auf Organisationsebene (sk-ant-usr-…). Überschreibt ANTHROPIC_WORKSPACE_ID.",
+      "test": {
+        "button": "Schlüssel testen",
+        "ok": "Der Anbieter hat den Schlüssel akzeptiert.",
+        "missing_key": "Kein Schlüssel zum Testen: Fügen Sie zuerst einen ein.",
+        "invalid_key": "Der Anbieter hat diesen Schlüssel abgelehnt. Kopieren Sie den vollständigen Schlüssel erneut (Anthropic: console.anthropic.com → API Keys) oder erstellen Sie einen neuen.",
+        "revoked_or_wrong_workspace": "Der Schlüssel ist bekannt, aber hier nicht zugelassen: widerrufen oder deaktiviert, oder aus einem anderen Arbeitsbereich als dem angegebenen.",
+        "workspace_required": "Organisationsschlüssel (sk-ant-usr-…): Tragen Sie unten die Arbeitsbereich-ID ein.",
+        "oauth_token_needs_bearer": "OAuth-Token abgelehnt: evtl. abgelaufen. Neu anmelden oder API-Schlüssel nutzen.",
+        "network": "Der Anbieter ist nicht erreichbar. Prüfen Sie die Basis-URL und versuchen Sie es erneut.",
+        "provider_error": "Der Anbieter hat mit einem Fehler geantwortet (Details unten).",
+        "config": "Die LLM-Einstellungen sind unvollständig (Details unten).",
+        "kind": "Erkannt: {kind, select, oauth {OAuth-Token} org-user {Organisationsschlüssel} other {API-Schlüssel}}",
+        "savedFailed": "Gespeichert, aber Schlüsseltest fehlgeschlagen: {reason}"
+      },
       "modelHint": "Modell-ID exakt so, wie Ihr Anbieter sie benennt, z. B. claude-haiku-5-5.",
       "styleHint": "Ton- und Formulierungsregeln für jede Übersetzung, z. B. „Informell, kurze UI-Labels, Produktnamen auf Englisch behalten“."
     },
@@ -2529,7 +2543,7 @@
     "linked": {
       "change": "Repository wechseln",
       "failed": "Der letzte Lauf ist fehlgeschlagen",
-      "badKey": "Ihr KI-Anbieter hat den API-Schlüssel abgelehnt. Fügen Sie in den <link>Einstellungen</link> einen gültigen Schlüssel ein und starten Sie erneut.",
+      "badKey": "Ihr KI-Anbieter hat den API-Schlüssel abgelehnt. Öffnen Sie <link>Einstellungen → LLM</link>, fügen Sie einen gültigen Schlüssel ein, klicken Sie auf „Schlüssel testen“ und starten Sie erneut.",
       "prHint": "Jeder Push auf {branch} aktualisiert diesen Pull Request.",
       "prReady": "Pull Request #{n} ist bereit zum Mergen",
       "rerun": "Erneut ausführen",

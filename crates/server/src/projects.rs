@@ -450,9 +450,10 @@ pub async fn update(
         if l.budget_usd.is_some_and(|b| !b.is_finite() || b < 0.0) {
             return Err(AppError::bad_request("budget_usd must be >= 0"));
         }
-        match l.api_key.as_deref() {
-            Some("") => p.api_key_enc = None,
-            Some(k) => p.api_key_enc = Some(crate::auth::encrypt(&state.secret, k)),
+        // Pasted keys: stored cleaned (trailing newline, quotes, "Bearer "…); blank clears.
+        match l.api_key.as_deref().map(glot_llm::provider::clean_key) {
+            Some(k) if k.is_empty() => p.api_key_enc = None,
+            Some(k) => p.api_key_enc = Some(crate::auth::encrypt(&state.secret, &k)),
             None => {}
         }
         let nonempty = |s: Option<String>| s.filter(|s| !s.trim().is_empty());
@@ -508,6 +509,61 @@ pub async fn update(
     .await?;
     tx.commit().await?;
     Ok(Json(view(&state, p).await?))
+}
+
+#[derive(Deserialize)]
+pub struct LlmTestBody {
+    /// Key typed but not saved yet; absent tests the stored key. Never logged nor echoed.
+    api_key: Option<String>,
+    provider: Option<String>,
+    base_url: Option<String>,
+    anthropic_workspace_id: Option<String>,
+}
+
+/// `POST /api/projects/{slug}/llm/test` (admin): cheapest real call with the project's (or the
+/// typed) credentials, `GET /v1/models`. Returns `glot_llm::provider::Probe` (code, hint, key kind).
+pub async fn llm_test(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    AppPath(slug): AppPath<String>,
+    AppJson(b): AppJson<LlmTestBody>,
+) -> ApiResult<Json<glot_llm::provider::Probe>> {
+    let p = load(&state, user.id, &slug, Role::Admin).await?;
+    let mut llm = p.llm.0.clone();
+    if let Some(pr) = b.provider.filter(|x| !x.trim().is_empty()) {
+        if !PROVIDERS.contains(&pr.as_str()) {
+            return Err(AppError::bad_request(format!(
+                "provider must be one of {}",
+                PROVIDERS.join(", ")
+            )));
+        }
+        llm.provider = pr;
+    }
+    if let Some(u) = b.base_url {
+        llm.base_url = Some(u.trim().to_string()).filter(|u| !u.is_empty());
+    }
+    if let Some(ws) = b.anthropic_workspace_id {
+        llm.anthropic_workspace_id = Some(ws.trim().to_string()).filter(|w| !w.is_empty());
+    }
+    let api_key = match b.api_key.filter(|k| !k.trim().is_empty()) {
+        Some(k) => Some(k),
+        None => match &p.api_key_enc {
+            Some(enc) => Some(crate::auth::decrypt(&state.secret, enc).ok_or_else(|| {
+                AppError::bad_request("cannot decrypt the project API key: paste it again")
+            })?),
+            None => None,
+        },
+    };
+    let cfg = glot_core::config::LlmConfig {
+        provider: llm.provider.clone(),
+        model: llm.model.clone(),
+        base_url: llm.base_url.clone(),
+        api_key_env: None,
+        ..Default::default()
+    };
+    Ok(Json(
+        glot_llm::provider::probe(&cfg, api_key, &llm.headers()).await,
+    ))
 }
 
 /// Re-root every key on `new`: its `new` translation (stale or not) becomes the source text and the

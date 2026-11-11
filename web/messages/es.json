@@ -1483,6 +1483,20 @@
       "title": "LLM",
       "workspaceId": "ID de espacio de trabajo de Anthropic",
       "workspaceIdHint": "Obligatorio con claves de nivel de organización (sk-ant-usr-…). Sustituye a ANTHROPIC_WORKSPACE_ID.",
+      "test": {
+        "button": "Probar la clave",
+        "ok": "El proveedor aceptó la clave.",
+        "missing_key": "No hay ninguna clave que probar: pega una primero.",
+        "invalid_key": "El proveedor rechazó esta clave. Vuelve a copiar la clave completa (Anthropic: console.anthropic.com → API Keys) o crea una nueva.",
+        "revoked_or_wrong_workspace": "La clave existe pero no está autorizada aquí: revocada o desactivada, o de otro espacio de trabajo distinto al indicado.",
+        "workspace_required": "Clave de organización (sk-ant-usr-…): indica abajo el ID del espacio de trabajo.",
+        "oauth_token_needs_bearer": "Token OAuth rechazado: puede haber caducado. Vuelve a iniciar sesión o usa una clave API.",
+        "network": "No se pudo contactar con el proveedor. Revisa la URL base y vuelve a intentarlo.",
+        "provider_error": "El proveedor respondió con un error (detalles abajo).",
+        "config": "La configuración del LLM está incompleta (detalles abajo).",
+        "kind": "Detectado: {kind, select, oauth {token OAuth} org-user {clave de organización} other {clave API}}",
+        "savedFailed": "Ajustes guardados, pero la prueba de la clave falló: {reason}"
+      },
       "modelHint": "ID del modelo tal como lo nombra su proveedor, p. ej. claude-haiku-5-5.",
       "styleHint": "Reglas de tono y redacción enviadas con cada traducción, p. ej. “Informal, etiquetas de interfaz cortas, mantener los nombres de producto en inglés”."
     },
@@ -2529,7 +2543,7 @@
     "linked": {
       "change": "Cambiar repositorio",
       "failed": "La última ejecución falló",
-      "badKey": "Tu proveedor de IA rechazó la clave API. Pega una clave válida en <link>Ajustes</link> y vuelve a ejecutar.",
+      "badKey": "Tu proveedor de IA rechazó la clave API. Abre <link>Ajustes → LLM</link>, pega una clave válida, haz clic en «Probar la clave» y vuelve a ejecutar.",
       "prHint": "Cada push a {branch} actualiza este pull request.",
       "prReady": "El pull request #{n} está listo para fusionarse",
       "rerun": "Ejecutar de nuevo",

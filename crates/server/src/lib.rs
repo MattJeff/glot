@@ -111,6 +111,7 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
                 .patch(projects::update)
                 .delete(projects::delete),
         )
+        .route(&format!("{p}/llm/test"), post(projects::llm_test))
         .route(&format!("{p}/keys"), get(keys::list).post(keys::create))
         .route(
             &format!("{p}/keys/{{key}}"),
