@@ -462,6 +462,12 @@ pub async fn update(
             None => prev.anthropic_workspace_id,
             Some(ws) => {
                 let ws = ws.trim().to_string();
+                // ponytail: a pasted API key here would be stored in clear and sent as a header.
+                if ws.starts_with("sk-") {
+                    return Err(AppError::bad_request(
+                        "anthropic_workspace_id: this is an API key, not a workspace ID (wrkspc_…). Paste the key in the API key field.",
+                    ));
+                }
                 if ws.len() > 128
                     || !ws
                         .bytes()

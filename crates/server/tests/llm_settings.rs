@@ -143,6 +143,14 @@ async fn project_llm_headers() {
     )
     .await;
     assert_eq!(s, StatusCode::BAD_REQUEST, "{v}");
+    // An API key pasted into the workspace field is refused (it would be stored in clear).
+    let (s, v) = call(
+        Method::PATCH,
+        "/api/projects/hdr",
+        json!({"llm": {"provider": "anthropic", "model": "claude-haiku-5-5", "anthropic_workspace_id": "sk-ant-usr-oops"}}),
+    )
+    .await;
+    assert_eq!(s, StatusCode::BAD_REQUEST, "{v}");
 
     let (s, p) = call(
         Method::PATCH,
