@@ -80,7 +80,10 @@ fn ts_dictionaries_end_to_end() {
 
     // Own runtime with a module-level t(): i18nize rewrites through it (no next-intl added).
     let (ok, log) = glot(r, &["i18nize", "--dry-run"]);
-    assert!(ok && log.contains("the app's own t() (src/i18n/t)"), "{log}");
+    assert!(
+        ok && log.contains("the app's own t() (src/i18n/t)"),
+        "{log}"
+    );
     assert!(log.contains("{t(\"home.contact_sales_today\")}"), "{log}");
     assert!(!log.contains("next-intl"), "{log}");
 
