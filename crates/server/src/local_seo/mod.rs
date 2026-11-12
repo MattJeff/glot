@@ -1317,15 +1317,6 @@ async fn search_console(
     }))
 }
 
-fn public_url() -> String {
-    let var = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
-    var("GLOT_PUBLIC_URL")
-        .or_else(|| var("GLOT_WEB_ORIGIN"))
-        .unwrap_or_else(|| "http://localhost:3100".into())
-        .trim_end_matches('/')
-        .to_string()
-}
-
 fn web_origin() -> String {
     std::env::var("GLOT_WEB_ORIGIN")
         .ok()
@@ -1335,8 +1326,10 @@ fn web_origin() -> String {
         .to_string()
 }
 
+/// On the dashboard origin (proxied to the API): the session cookie lives there, and the callback checks that the
+/// signed-in user is the one who started the connection (no login-CSRF).
 fn redirect_uri() -> String {
-    format!("{}/api/local-seo/gsc/callback", public_url())
+    format!("{}/api/local-seo/gsc/callback", web_origin())
 }
 
 fn sign(secret: &[u8; 32], payload: &str) -> String {

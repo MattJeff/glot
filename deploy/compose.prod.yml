@@ -66,7 +66,7 @@ services:
       GLOT_WEBFLOW_CLIENT_SECRET: ${GLOT_WEBFLOW_CLIENT_SECRET:-}
       GLOT_HUBSPOT_CLIENT_ID: ${GLOT_HUBSPOT_CLIENT_ID:-}
       GLOT_HUBSPOT_CLIENT_SECRET: ${GLOT_HUBSPOT_CLIENT_SECRET:-}
-      # Local SEO: Google Search Console (OAuth web client; redirect https://api.<domain>/api/local-seo/gsc/callback).
+      # Local SEO: Google Search Console (OAuth web client; redirect https://app.<domain>/api/local-seo/gsc/callback).
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
       GLOT_RENDERER_URL: http://renderer:8795

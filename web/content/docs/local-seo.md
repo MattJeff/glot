@@ -32,7 +32,7 @@ Not used, on purpose: Google Autocomplete (an unpublished endpoint; automated qu
 
 In **Local SEO**, click **Connect Search Console** and accept the read-only request with a Google account that owns the property. glot picks the property that covers your site (the domain property first).
 
-Self-hosting: create an OAuth client (type "Web application") in Google Cloud, enable the *Google Search Console API*, add the redirect URI `https://YOUR_GLOT_HOST/api/local-seo/gsc/callback`, then set:
+Self-hosting: create an OAuth client (type "Web application") in Google Cloud, enable the *Google Search Console API*, add the redirect URI `https://YOUR_GLOT_DASHBOARD_HOST/api/local-seo/gsc/callback` (the dashboard origin, `GLOT_WEB_ORIGIN`: the callback needs your session), then set:
 
 ```sh
 GOOGLE_OAUTH_CLIENT_ID=...
