@@ -43,14 +43,21 @@ pub struct AgentPromptArgs {
     pub target: String,
 }
 
+/// Extra variable for the steps (`GLOT_CATALOGS_FROM_GLOT`, see `run`).
+static CHILD_ENV: std::sync::OnceLock<(&str, &str)> = std::sync::OnceLock::new();
+
 /// One step = this same binary with other arguments, output streamed as is.
 fn step(label: &str, args: &[String]) -> Result<bool> {
     anstream::eprintln!(
         "\n{BOLD}▸ {label}{BOLD:#} {DIM}glot {}{DIM:#}",
         args.join(" ")
     );
-    let status = Command::new(std::env::current_exe()?)
-        .args(args)
+    let mut cmd = Command::new(std::env::current_exe()?);
+    cmd.args(args);
+    if let Some((k, v)) = CHILD_ENV.get() {
+        cmd.env(k, v);
+    }
+    let status = cmd
         .status()
         .with_context(|| format!("running glot {label}"))?;
     Ok(status.success())
@@ -96,6 +103,13 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
     // Incremental runs: start from the previous output (ignored when unreadable: a full run then).
     let carried: Vec<String> = match (&a.carry_from, a.dry_run) {
         (Some(prev), false) => {
+            // No catalog on the base yet: the ones carried are glot's own output, not an i18n
+            // runtime the app already had (`glot i18nize` reads this).
+            if glot_llm::engine::Workspace::open(&root)
+                .is_ok_and(|ws| ws.source().entries.is_empty())
+            {
+                let _ = CHILD_ENV.set(("GLOT_CATALOGS_FROM_GLOT", "1"));
+            }
             match glot_llm::engine::Workspace::open(&root).and_then(|mut ws| ws.carry_from(prev)) {
                 Ok(keys) => keys,
                 Err(e) => {

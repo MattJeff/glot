@@ -70,8 +70,34 @@ struct Cx<'a> {
     errors: usize,
     /// Depth inside `view!` bodies: outside, a `format!` builds anything (a URL, a log line).
     in_view: usize,
+    /// Functions and closures whose parameters are rendered (see [`TextParam`]): callee => params.
+    text_params: BTreeMap<String, Vec<(usize, TextParam)>>,
+    /// Render-site edits of a [`TextParam::Key`] callee, applied once one call site carries a key.
+    key_edits: BTreeMap<String, Vec<(usize, usize, String)>>,
+    /// Same-file functions returning texts as `&'static str` (candidates on the first pass,
+    /// proven ones on the second): their texts become keys, their calls `t(f(…))`.
+    ret_fns: BTreeSet<String>,
+    /// First pass: count the rendered calls instead of rewriting.
+    classify: bool,
+    rendered_calls: BTreeMap<String, usize>,
     out: Found,
 }
+
+/// A parameter of a function or closure of the file that reaches a rendered position.
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum TextParam {
+    /// `label: &'static str`, only ever rendered (`{label}`, `title=label`): call sites pass a
+    /// key literal instead of the text (same type) and the render sites read `t(label)`.
+    Key,
+    /// `label: impl Into<String>` / `String`: a literal argument becomes `t("key")`.
+    Owned,
+    /// `label: impl Fn() -> String`: the closure's literal becomes `t("key")` (still reactive).
+    Thunk,
+}
+
+/// Placeholder for the app's translation function in the render-site edits (`t` or its path),
+/// filled in by the rewrite.
+pub const T_FN: &str = "\u{1}t\u{1}";
 
 /// `None` when the file does not tokenize (the caller falls back to the literal scanner).
 pub(crate) fn analyze(path: &str, src: &str) -> Option<Found> {
@@ -83,6 +109,53 @@ pub(crate) fn analyze(path: &str, src: &str) -> Option<Found> {
 }
 
 fn run<'a>(path: &'a str, src: &'a str, tokens: TokenStream) -> Cx<'a> {
+    let file = syn::parse_file(src).ok();
+    let cands = file.as_ref().map(ret_candidates).unwrap_or_default();
+    if cands.is_empty() {
+        return pass(path, src, tokens, &file, BTreeSet::new(), false);
+    }
+    // A function whose every use is a rendered call: its texts can become keys.
+    let first = pass(
+        path,
+        src,
+        tokens.clone(),
+        &file,
+        cands.keys().cloned().collect(),
+        true,
+    );
+    let proven: BTreeSet<String> = cands
+        .iter()
+        .filter(|(n, tail)| {
+            // Every outcome a literal or an inline translation, one of them copy.
+            let mut leaves = vec![];
+            first.leaves(tail, true, false, &mut leaves);
+            let plain = leaves
+                .iter()
+                .all(|(l, _)| matches!(l, Leaf::Lit { owned: false, .. } | Leaf::Pair { .. }));
+            let copy = leaves.iter().any(|(l, _)| match l {
+                Leaf::Lit { text, .. } => is_copy(text),
+                Leaf::Pair { .. } => true,
+                _ => false,
+            });
+            let uses = occurrences(tokens.clone(), n);
+            plain && copy && uses > 0 && first.rendered_calls.get(*n) == Some(&uses)
+        })
+        .map(|(n, _)| n.clone())
+        .collect();
+    drop(first);
+    // ponytail: a non-copy outcome (`""`, an id) is passed to `t()` as is; hand-rolled tables
+    // fall back to the key itself (`unwrap_or(key)`), so it shows unchanged.
+    pass(path, src, tokens, &file, proven, false)
+}
+
+fn pass<'a>(
+    path: &'a str,
+    src: &'a str,
+    tokens: TokenStream,
+    file: &Option<syn::File>,
+    ret_fns: BTreeSet<String>,
+    classify: bool,
+) -> Cx<'a> {
     let (source, targets) = crate::i18nize::locales();
     let mut cx = Cx {
         path,
@@ -93,18 +166,121 @@ fn run<'a>(path: &'a str, src: &'a str, tokens: TokenStream) -> Cx<'a> {
         seen: BTreeSet::new(),
         errors: 0,
         in_view: 0,
+        text_params: BTreeMap::new(),
+        key_edits: BTreeMap::new(),
+        ret_fns,
+        classify,
+        rendered_calls: BTreeMap::new(),
         out: Found::default(),
     };
+    if let Some(file) = file {
+        let (local, edits) = text_params(file, src);
+        cx.text_params = local;
+        cx.text_params.extend(SHARED_PARAMS.read().unwrap().clone());
+        cx.key_edits = edits;
+        // The texts a proven function returns become keys (same type, `&'static str`).
+        if !classify {
+            for (name, tail) in ret_candidates(file) {
+                if !cx.ret_fns.contains(&name) {
+                    continue;
+                }
+                let mut leaves = vec![];
+                cx.leaves(&tail, true, false, &mut leaves);
+                for (leaf, _) in leaves {
+                    match leaf {
+                        Leaf::Lit {
+                            span,
+                            text,
+                            owned: false,
+                        } if is_copy(&text) => {
+                            cx.seen.insert(span.start);
+                            cx.push(span, text, "text", Wrap::Key, Ok(()), BTreeMap::new(), None);
+                        }
+                        Leaf::Pair {
+                            span, mut texts, ..
+                        } => {
+                            cx.seen.insert(span.start);
+                            if let Some(text) = texts.remove(&cx.source) {
+                                cx.push(span, text, "text", Wrap::Key, Ok(()), texts, None);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
     // The whole file through syn: `view!` bodies, and the pair helpers called anywhere else.
-    match syn::parse_file(src) {
-        Ok(file) => Other {
+    match file {
+        Some(file) => Other {
             cx: &mut cx,
             calls: 1,
         }
-        .visit_file(&file),
-        Err(_) => cx.walk(tokens),
+        .visit_file(file),
+        None => cx.walk(tokens),
     }
     cx
+}
+
+/// Private functions of the file returning `&'static str` whose every outcome is a literal or
+/// an inline translation, at least one of them copy (`fn status_label(k) -> &'static str {
+/// match k { "paid" => tr("Payé", "Paid"), _ => "?" } }`): name => tail expression.
+/// A file declaring an external submodule (`mod x;`) is skipped: it could call them.
+fn ret_candidates(file: &syn::File) -> BTreeMap<String, Expr> {
+    use quote::ToTokens as _;
+    if file
+        .items
+        .iter()
+        .any(|i| matches!(i, syn::Item::Mod(m) if m.content.is_none()))
+    {
+        return BTreeMap::new();
+    }
+    let mut out = BTreeMap::new();
+    let mut seen = BTreeSet::new();
+    for item in &file.items {
+        let syn::Item::Fn(f) = item else { continue };
+        let name = f.sig.ident.to_string();
+        if !seen.insert(name.clone()) {
+            out.remove(&name);
+            continue;
+        }
+        let ret = match &f.sig.output {
+            syn::ReturnType::Type(_, t) => t.to_token_stream().to_string().replace(' ', ""),
+            _ => continue,
+        };
+        let body = f.block.to_token_stream().to_string();
+        if !matches!(f.vis, syn::Visibility::Inherited)
+            || ret != "&'staticstr"
+            || body.contains("return")
+            || !f.sig.generics.params.is_empty()
+        {
+            continue;
+        }
+        if let Some(Stmt::Expr(tail, None)) = f.block.stmts.last() {
+            out.insert(name, tail.clone());
+        }
+    }
+    out
+}
+
+/// Every mention of `name` as a value in `ts` (calls, `.map(name)`), its definition excluded.
+fn occurrences(ts: TokenStream, name: &str) -> usize {
+    let tt: Vec<TokenTree> = ts.into_iter().collect();
+    let mut n = 0;
+    for (i, t) in tt.iter().enumerate() {
+        match t {
+            TokenTree::Ident(id) if id == name => {
+                let before = i.checked_sub(1).and_then(|k| tt.get(k));
+                let def = matches!(before, Some(TokenTree::Ident(f)) if f == "fn");
+                if !def && !punct(before, '.') {
+                    n += 1;
+                }
+            }
+            TokenTree::Group(g) => n += occurrences(g.stream(), name),
+            _ => {}
+        }
+    }
+    n
 }
 
 /// `en`, `fr`, `pt` (a parameter or variable named like a language).
@@ -140,6 +316,311 @@ pub(crate) fn register(path: &str, src: &str) {
     for (name, pair) in local_pair_fns(src, &source, &targets) {
         shared.insert((stem.to_string(), name), pair);
     }
+    // `SideLink::new(href, label, icon)` called from every page: its rendered parameters.
+    if let Ok(file) = syn::parse_file(src) {
+        let (local, _) = text_params(&file, src);
+        let mut params = SHARED_PARAMS.write().unwrap();
+        for (name, ps) in local {
+            let ps: Vec<_> = ps
+                .into_iter()
+                .filter(|(_, k)| *k != TextParam::Key)
+                .collect();
+            if name.contains("::") && !ps.is_empty() {
+                params.insert(name, ps);
+            }
+        }
+    }
+}
+
+/// `Type::method` => rendered parameters, from every file (see [`register`]).
+static SHARED_PARAMS: std::sync::RwLock<BTreeMap<String, Vec<(usize, TextParam)>>> =
+    std::sync::RwLock::new(BTreeMap::new());
+
+/// `ident` at `tt[i]` is a value, not part of a name (`aria-label`, `x.label`, `label=`, `Foo::label`).
+fn value_ident(tt: &[TokenTree], i: usize) -> bool {
+    let before = i.checked_sub(1).and_then(|k| tt.get(k));
+    let after = tt.get(i + 1);
+    !(punct(before, '-') || punct(before, '.') || punct(before, ':') || punct(before, '\''))
+        && !(punct(after, '=') && !punct(tt.get(i + 2), '='))
+        && !punct(after, ':')
+        && !punct(after, '!')
+}
+
+/// Rendered attribute right before `tt[eq]` (`=`): `title`, `aria-label`…
+fn rendered_attr(tt: &[TokenTree], eq: usize) -> bool {
+    let mut k = eq;
+    let mut name = String::new();
+    while k > 0 {
+        match &tt[k - 1] {
+            TokenTree::Ident(id) => name.insert_str(0, &id.to_string()),
+            TokenTree::Punct(p) if p.as_char() == '-' => name.insert(0, '-'),
+            _ => break,
+        }
+        k -= 1;
+        if k > 0
+            && !matches!(&tt[k - 1], TokenTree::Punct(p) if p.as_char() == '-')
+            && let TokenTree::Ident(_) = &tt[k]
+        {
+            break;
+        }
+    }
+    scan::attr_role(&name).is_some()
+}
+
+/// Uses of `name` in `ts`: (rendered uses with the edit that translates them, other uses).
+/// Rendered: `{name}` and `attr=name` (a visible attribute) inside a `view!`.
+fn uses_of(
+    ts: TokenStream,
+    name: &str,
+    in_view: bool,
+    out: &mut (Vec<(usize, usize, String)>, usize),
+) {
+    let tt: Vec<TokenTree> = ts.into_iter().collect();
+    for (i, t) in tt.iter().enumerate() {
+        match t {
+            TokenTree::Ident(id) if id == name && value_ident(&tt, i) => {
+                if in_view
+                    && punct(i.checked_sub(1).and_then(|k| tt.get(k)), '=')
+                    && rendered_attr(&tt, i - 1)
+                {
+                    let r = id.span().byte_range();
+                    out.0
+                        .push((r.start, r.end, format!("move || {T_FN}({name})")));
+                } else {
+                    out.1 += 1;
+                }
+            }
+            TokenTree::Group(g) => {
+                let inner: Vec<TokenTree> = g.stream().into_iter().collect();
+                let view_body = i >= 2
+                    && matches!(&tt[i - 2], TokenTree::Ident(v) if v == "view")
+                    && punct(tt.get(i - 1), '!');
+                if in_view
+                    && g.delimiter() == Delimiter::Brace
+                    && matches!(inner.as_slice(), [TokenTree::Ident(id)] if id == name)
+                {
+                    let r = g.span().byte_range();
+                    out.0
+                        .push((r.start, r.end, format!("{{move || {T_FN}({name})}}")));
+                } else {
+                    uses_of(g.stream(), name, in_view || view_body, out);
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+/// Names rendered by a `view!` of the file: `{label}`, `{move || label.get()}`, `{label()}`,
+/// `title=label`, `title=move || label.get()` (the struct field / parameter they come from).
+fn rendered_names(ts: TokenStream, in_view: bool, out: &mut BTreeSet<String>) {
+    let tt: Vec<TokenTree> = ts.into_iter().collect();
+    // `move || label.get()`, `move || label()`, `label`: the name read.
+    let read = |xs: &[TokenTree]| -> Option<String> {
+        let mut xs = xs;
+        if let [TokenTree::Ident(m), rest @ ..] = xs
+            && m == "move"
+        {
+            xs = rest;
+        }
+        if let [TokenTree::Punct(a), TokenTree::Punct(b), rest @ ..] = xs
+            && a.as_char() == '|'
+            && b.as_char() == '|'
+        {
+            xs = rest;
+        }
+        match xs {
+            [TokenTree::Ident(id)] => Some(id.to_string()),
+            [TokenTree::Ident(id), TokenTree::Group(g)] if g.stream().is_empty() => {
+                Some(id.to_string())
+            }
+            [
+                TokenTree::Ident(id),
+                TokenTree::Punct(d),
+                TokenTree::Ident(m),
+                TokenTree::Group(g),
+            ] if d.as_char() == '.'
+                && (m == "get" || m == "with" || m == "read")
+                && g.stream().is_empty() =>
+            {
+                Some(id.to_string())
+            }
+            _ => None,
+        }
+    };
+    for (i, t) in tt.iter().enumerate() {
+        if let TokenTree::Group(g) = t {
+            let inner: Vec<TokenTree> = g.stream().into_iter().collect();
+            let view_body = i >= 2
+                && matches!(&tt[i - 2], TokenTree::Ident(v) if v == "view")
+                && punct(tt.get(i - 1), '!');
+            if in_view
+                && g.delimiter() == Delimiter::Brace
+                && let Some(n) = read(&inner)
+            {
+                out.insert(n);
+            }
+            rendered_names(g.stream(), in_view || view_body, out);
+        }
+        if in_view
+            && punct(Some(t), '=')
+            && !punct(tt.get(i + 1), '=')
+            && i > 0
+            && rendered_attr(&tt, i)
+        {
+            // The attribute value runs to the next attribute (`ident=`), `>` or `/`.
+            let end = (i + 1..tt.len())
+                .find(|&k| {
+                    punct(tt.get(k), '>')
+                        || (punct(tt.get(k), '/') && punct(tt.get(k + 1), '>'))
+                        || (matches!(tt.get(k), Some(TokenTree::Ident(_)))
+                            && k > i + 1
+                            && (punct(tt.get(k + 1), '=')
+                                || punct(tt.get(k + 1), '-')
+                                || punct(tt.get(k + 1), ':'))
+                            && !punct(tt.get(k - 1), '.'))
+                })
+                .unwrap_or(tt.len());
+            if let Some(n) = read(&tt[i + 1..end]) {
+                out.insert(n);
+            }
+        }
+    }
+}
+
+/// Kind of a parameter type that can carry text.
+fn param_kind(ty: &syn::Type) -> Option<TextParam> {
+    use quote::ToTokens as _;
+    let t = ty.to_token_stream().to_string().replace(' ', "");
+    match t.as_str() {
+        "&'staticstr" => Some(TextParam::Key),
+        "String" | "implInto<String>" => Some(TextParam::Owned),
+        t if t.starts_with("implFn()->String") => Some(TextParam::Thunk),
+        _ => None,
+    }
+}
+
+/// Callee => its rendered parameters (index, kind).
+type Params = BTreeMap<String, Vec<(usize, TextParam)>>;
+/// (start, end, replacement) in the source.
+type Edit = (usize, usize, String);
+
+/// Rendered parameters of the file's functions, methods (`Type::name`) and `let f = |…|` closures,
+/// with the render-site edits of the [`TextParam::Key`] ones.
+fn text_params(file: &syn::File, src: &str) -> (Params, BTreeMap<String, Vec<Edit>>) {
+    use quote::ToTokens as _;
+    let tokens: TokenStream = src.parse().unwrap_or_default();
+    let mut rendered = BTreeSet::new();
+    rendered_names(tokens, false, &mut rendered);
+    struct Fns<'r> {
+        rendered: &'r BTreeSet<String>,
+        out: BTreeMap<String, Vec<(usize, TextParam)>>,
+        edits: BTreeMap<String, Vec<(usize, usize, String)>>,
+    }
+    impl Fns<'_> {
+        fn params(&mut self, name: String, params: Vec<(String, TextParam)>, body: TokenStream) {
+            let mut found = vec![];
+            for (i, (p, kind)) in params.into_iter().enumerate() {
+                match kind {
+                    TextParam::Key => {
+                        let mut u = (vec![], 0);
+                        uses_of(body.clone(), &p, false, &mut u);
+                        // Only ever rendered: the parameter can carry a key instead of the text.
+                        if !u.0.is_empty() && u.1 == 0 {
+                            self.edits.entry(name.clone()).or_default().extend(u.0);
+                            found.push((i, kind));
+                        }
+                    }
+                    _ if self.rendered.contains(&p) => found.push((i, kind)),
+                    _ => {}
+                }
+            }
+            if !found.is_empty() {
+                self.out.insert(name, found);
+            }
+        }
+    }
+    impl<'ast> Visit<'ast> for Fns<'_> {
+        fn visit_local(&mut self, l: &'ast syn::Local) {
+            if let (syn::Pat::Ident(name), Some(init)) = (&l.pat, &l.init)
+                && let Expr::Closure(c) = &*init.expr
+            {
+                let pats: Vec<&syn::Pat> = c.inputs.iter().collect();
+                let params = typed_pats(&pats);
+                self.params(name.ident.to_string(), params, c.body.to_token_stream());
+            }
+            syn::visit::visit_local(self, l);
+        }
+    }
+    fn typed_pats(pats: &[&syn::Pat]) -> Vec<(String, TextParam)> {
+        pats.iter()
+            .map(|p| match p {
+                syn::Pat::Type(t) => match (&*t.pat, param_kind(&t.ty)) {
+                    (syn::Pat::Ident(i), Some(k)) => (i.ident.to_string(), k),
+                    _ => ("\u{0}".into(), TextParam::Owned),
+                },
+                _ => ("\u{0}".into(), TextParam::Owned),
+            })
+            .collect()
+    }
+    fn sig_params(sig: &syn::Signature) -> Vec<(String, TextParam)> {
+        sig.inputs
+            .iter()
+            .filter_map(|a| match a {
+                syn::FnArg::Typed(t) => Some(match (&*t.pat, param_kind(&t.ty)) {
+                    (syn::Pat::Ident(i), Some(k)) => (i.ident.to_string(), k),
+                    _ => ("\u{0}".into(), TextParam::Owned),
+                }),
+                syn::FnArg::Receiver(_) => None,
+            })
+            .collect()
+    }
+    let mut v = Fns {
+        rendered: &rendered,
+        out: BTreeMap::new(),
+        edits: BTreeMap::new(),
+    };
+    for item in &file.items {
+        match item {
+            syn::Item::Fn(f) => {
+                v.params(
+                    f.sig.ident.to_string(),
+                    sig_params(&f.sig),
+                    f.block.to_token_stream(),
+                );
+            }
+            syn::Item::Impl(i) => {
+                let ty = match &*i.self_ty {
+                    syn::Type::Path(p) => p.path.segments.last().map(|s| s.ident.to_string()),
+                    _ => None,
+                };
+                for it in &i.items {
+                    if let (syn::ImplItem::Fn(f), Some(ty)) = (it, &ty) {
+                        // A method keeps only owned / thunk params: its call sites are elsewhere.
+                        let params: Vec<_> = sig_params(&f.sig)
+                            .into_iter()
+                            .map(|(n, k)| {
+                                if k == TextParam::Key {
+                                    ("\u{0}".into(), k)
+                                } else {
+                                    (n, k)
+                                }
+                            })
+                            .collect();
+                        v.params(
+                            format!("{ty}::{}", f.sig.ident),
+                            params,
+                            f.block.to_token_stream(),
+                        );
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    v.visit_file(file);
+    let Fns { out, edits, .. } = v;
+    (out, edits)
 }
 
 /// Helpers taking one string per language, named after the languages: defined in this file, or
@@ -258,6 +739,12 @@ enum Leaf {
     },
     /// Already a `String`.
     Str,
+    /// A call to a same-file function whose returned texts become keys ([`ret_candidates`]):
+    /// rendered as `t(f(…))`, a `String`.
+    Wrapped {
+        span: Range<usize>,
+        name: String,
+    },
     Unknown,
 }
 
@@ -500,11 +987,22 @@ impl<'a> Cx<'a> {
         });
         let copy = |l: &(Leaf, bool)| match &l.0 {
             Leaf::Lit { text, .. } => is_copy(text),
-            Leaf::Pair { .. } => true,
+            Leaf::Pair { .. } | Leaf::Wrapped { .. } => true,
             _ => false,
         };
+        let unknown = leaves.iter().any(|l| matches!(l.0, Leaf::Unknown));
+        // First pass: which calls of a returning-text function provably reach the screen.
+        if self.classify {
+            for (l, _) in &leaves {
+                if let Leaf::Wrapped { name, .. } = l
+                    && matches!(ctx, Ctx::Rendered(_))
+                    && !unknown
+                {
+                    *self.rendered_calls.entry(name.clone()).or_default() += 1;
+                }
+            }
+        }
         if leaves.iter().any(copy) {
-            let unknown = leaves.iter().any(|l| matches!(l.0, Leaf::Unknown));
             let (role, why) = match ctx {
                 Ctx::Rendered(r) if unknown => (
                     r,
@@ -523,6 +1021,7 @@ impl<'a> Cx<'a> {
             let retyped = leaves.iter().any(|l| match &l.0 {
                 Leaf::Lit { owned, text, .. } => !owned && is_copy(text),
                 Leaf::Pair { ret, .. } => *ret != Ret::String,
+                Leaf::Wrapped { .. } => true,
                 _ => false,
             });
             for (leaf, direct) in leaves {
@@ -569,7 +1068,14 @@ impl<'a> Cx<'a> {
                             None,
                         );
                     }
-                    Leaf::Str | Leaf::Unknown => {}
+                    // `f(x)` returns a key now: `t(f(x))`.
+                    Leaf::Wrapped { span, .. } if why.is_none() && !self.classify => {
+                        self.out
+                            .aux
+                            .push((span.start, span.start, format!("{T_FN}(")));
+                        self.out.aux.push((span.end, span.end, ")".into()));
+                    }
+                    Leaf::Wrapped { .. } | Leaf::Str | Leaf::Unknown => {}
                 }
             }
         }
@@ -688,7 +1194,22 @@ impl<'a> Cx<'a> {
         let last = |p: &syn::Path| p.segments.last().map(|s| s.ident.to_string());
         let pair_call = |c: &syn::ExprCall| -> Option<Leaf> {
             let Expr::Path(p) = &*c.func else { return None };
-            let pair = self.pairs.get(&last(&p.path)?)?;
+            let segs: Vec<String> = p
+                .path
+                .segments
+                .iter()
+                .map(|s| s.ident.to_string())
+                .collect();
+            // `super::social_links::tr("Publier", "Publish")`: a qualified call, no `use` needed.
+            let qualified = match segs.as_slice() {
+                [.., m, n] => SHARED.read().unwrap().get(&(m.clone(), n.clone())).cloned(),
+                _ => None,
+            };
+            let pair = match qualified {
+                Some(q) => q,
+                None if segs.len() == 1 => self.pairs.get(&last(&p.path)?)?.clone(),
+                None => return None,
+            };
             let (a, b) = (str_of(c.args.first()?)?, str_of(c.args.get(1)?)?);
             (c.args.len() == 2).then(|| Leaf::Pair {
                 span: span(c),
@@ -712,7 +1233,10 @@ impl<'a> Cx<'a> {
             Expr::Paren(p) => return self.leaves(&p.expr, in_closure, direct, out),
             Expr::Group(g) => return self.leaves(&g.expr, in_closure, direct, out),
             Expr::MethodCall(m)
-                if m.args.is_empty() && (m.method == "to_string" || m.method == "to_owned") =>
+                if m.args.is_empty()
+                    && (m.method == "to_string"
+                        || m.method == "to_owned"
+                        || m.method == "into") =>
             {
                 match &*m.receiver {
                     r @ Expr::Lit(_) => match str_of(r) {
@@ -758,6 +1282,20 @@ impl<'a> Cx<'a> {
                         if last(&p.path).is_some_and(|n| STRING_FNS.contains(&n.as_str())) =>
                     {
                         Leaf::Str
+                    }
+                    Expr::Path(p)
+                        if p.path
+                            .get_ident()
+                            .is_some_and(|n| self.ret_fns.contains(&n.to_string())) =>
+                    {
+                        Leaf::Wrapped {
+                            span: span(c),
+                            name: p
+                                .path
+                                .get_ident()
+                                .map(|n| n.to_string())
+                                .unwrap_or_default(),
+                        }
                     }
                     _ => Leaf::Unknown,
                 },
@@ -890,6 +1428,64 @@ impl<'ast> Visit<'ast> for Other<'_, '_> {
     }
 
     fn visit_expr_call(&mut self, c: &'ast syn::ExprCall) {
+        // `item("hub", "Hub créateurs", Icon::Share2)`: the parameter that reaches a rendered
+        // position is text, the others (ids, routes) are not touched.
+        let callee = match &*c.func {
+            Expr::Path(p) => {
+                let segs: Vec<String> = p
+                    .path
+                    .segments
+                    .iter()
+                    .map(|s| s.ident.to_string())
+                    .collect();
+                match segs.as_slice() {
+                    [.., ty, m] if ty.starts_with(|c: char| c.is_ascii_uppercase()) => {
+                        Some(format!("{ty}::{m}"))
+                    }
+                    [.., name] => Some(name.clone()),
+                    [] => None,
+                }
+            }
+            _ => None,
+        };
+        let callee = callee.unwrap_or_default();
+        let params = self
+            .cx
+            .text_params
+            .get(&callee)
+            .cloned()
+            .unwrap_or_default();
+        for (i, kind) in params {
+            let Some(arg) = c.args.iter().nth(i) else {
+                continue;
+            };
+            match kind {
+                TextParam::Key => {
+                    if let Expr::Lit(l) = arg
+                        && let syn::Lit::Str(v) = &l.lit
+                        && is_copy(&v.value())
+                    {
+                        let span = l.span().byte_range();
+                        if self.cx.seen.insert(span.start) {
+                            self.cx.push(
+                                span,
+                                v.value(),
+                                "text",
+                                Wrap::Key,
+                                Ok(()),
+                                BTreeMap::new(),
+                                None,
+                            );
+                            if let Some(e) = self.cx.key_edits.remove(&callee) {
+                                self.cx.out.aux.extend(e);
+                            }
+                        }
+                    }
+                }
+                TextParam::Owned => self.cx.value(arg, Ctx::Rendered("text"), false),
+                TextParam::Thunk => self.cx.value(arg, Ctx::Rendered("text"), true),
+            }
+        }
         self.calls += 1;
         syn::visit::visit_expr_call(self, c);
         self.calls -= 1;

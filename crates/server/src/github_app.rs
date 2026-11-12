@@ -1395,6 +1395,8 @@ struct Done {
     /// What `glot translate` planned and spent (its `Plan:` and `Cost:` lines), for the PR.
     plan: Option<String>,
     cost: Option<String>,
+    /// Files of the pull request that are not catalogs (filled from the actual diff).
+    code_files: Vec<String>,
     /// `glot i18nize` report (`GLOT_REPORT`): strings left with a suggestion, files restored after
     /// a failed verification. `Null` when the step did not run.
     report: Value,
@@ -1529,6 +1531,7 @@ async fn localize(
             .find_map(|l| l.trim().strip_prefix("Cost: "))
             .map(|s| s.trim().to_string()),
         log,
+        code_files: vec![],
         report: std::fs::read_to_string(home.join("report.json"))
             .ok()
             .and_then(|t| serde_json::from_str(&t).ok())
@@ -1691,7 +1694,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     let keys_before = glot_llm::engine::Workspace::open(&app_root)
         .map(|ws| ws.source().entries.len())
         .unwrap_or(0);
-    let done = localize(
+    let mut done = localize(
         &app_root,
         &home,
         &p,
@@ -1936,6 +1939,17 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     )
     .await
     .unwrap_or(stat);
+    // What the pull request really changes, catalogs apart: the summary is computed from it.
+    let names = git(
+        &dir,
+        &home,
+        &token,
+        &["diff", "--name-only", &base_sha, "HEAD"],
+        t,
+    )
+    .await
+    .unwrap_or_default();
+    done.code_files = non_catalog_files(&names, &ws.config.files, &app_rel);
     let blob = format!(
         "{}/{}/blob/{branch}/{}",
         web_base(),
@@ -2217,6 +2231,70 @@ fn coverage_table(status: &glot_llm::engine::Status) -> String {
     s
 }
 
+/// Files of `git diff --name-only` that are not catalogs or glot's own bookkeeping
+/// (`glot.lock`, `glossary.toml`, `.glot/`), for the summary.
+fn non_catalog_files(names: &str, patterns: &[String], app_rel: &str) -> Vec<String> {
+    let rel = |p: &str| {
+        if app_rel.is_empty() {
+            p.to_string()
+        } else {
+            format!("{app_rel}/{p}")
+        }
+    };
+    let globs: Vec<glob::Pattern> = patterns
+        .iter()
+        .map(|p| rel(&p.replace("{locale}", "*").replace("{ns}", "*")))
+        .chain(["glot.lock", "glossary.toml", ".glot/**"].map(rel))
+        .filter_map(|p| glob::Pattern::new(&p).ok())
+        .collect();
+    names
+        .lines()
+        .map(str::trim)
+        .filter(|n| !n.is_empty() && !globs.iter().any(|g| g.matches(n)))
+        .map(String::from)
+        .collect()
+}
+
+/// "What changed", from the files the pull request actually changes.
+fn what_changed(code: &[String], kept: u64) -> String {
+    let kept = if kept > 0 {
+        format!(
+            " {kept} translation{} already written in the code {} kept as is, not re-translated.",
+            if kept == 1 { "" } else { "s" },
+            if kept == 1 { "was" } else { "were" }
+        )
+    } else {
+        String::new()
+    };
+    if code.is_empty() {
+        return format!("**What changed**: catalogs only, no source file is modified.{kept}\n\n");
+    }
+    let list: String = code
+        .iter()
+        .take(200)
+        .map(|f| format!("- `{}`\n", cell(f)))
+        .collect();
+    let more = code.len().saturating_sub(200);
+    let list = if more > 0 {
+        format!("{list}- … and {more} more\n")
+    } else {
+        list
+    };
+    let body = if code.len() > 12 {
+        format!(
+            "<details><summary>{} files</summary>\n\n{list}\n</details>\n",
+            code.len()
+        )
+    } else {
+        list
+    };
+    format!(
+        "**What changed**: {} file{} besides the catalogs.{kept} Every rewritten file was parsed again before this commit, and every key it uses exists in the source catalog.\n\n{body}\n",
+        code.len(),
+        if code.len() == 1 { "" } else { "s" },
+    )
+}
+
 /// Strings glot did not move, from the i18nize report: where (linked), why, and the code to write.
 fn left_section(report: &Value, blob: &str) -> String {
     let left = report["left"].as_array().cloned().unwrap_or_default();
@@ -2296,25 +2374,10 @@ fn pr_body(
             .join(", ")
     );
     let r = &done.report;
-    if let (Some(files), Some(kept)) = (
-        r["files_rewritten"].as_u64(),
-        r["imported_translations"].as_u64(),
-    ) {
-        s.push_str(&format!(
-            "**What changed**: {files} source file{} now call{} the translation function instead of holding text{}. Every rewritten file was parsed again before this commit, and every key it uses exists in the source catalog.\n\n",
-            if files == 1 { "" } else { "s" },
-            if files == 1 { "s" } else { "" },
-            if kept > 0 {
-                format!(
-                    "; {kept} translation{} already written in the code {} kept as is, not re-translated",
-                    if kept == 1 { "" } else { "s" },
-                    if kept == 1 { "was" } else { "were" }
-                )
-            } else {
-                String::new()
-            }
-        ));
-    }
+    s.push_str(&what_changed(
+        &done.code_files,
+        r["imported_translations"].as_u64().unwrap_or(0),
+    ));
     s.push_str(&coverage_table(status));
     s.push_str(&format!(
         "\nSource `{}`: **{} keys**. Synced with the glot project [`{}`]({web}/app/{}): {} strings added, {} updated, {} reviewed translations kept.\n",
@@ -2525,6 +2588,19 @@ mod tests {
         ] {
             assert_eq!(diagnose(error), class, "{error}");
         }
+    }
+
+    #[test]
+    fn summary_comes_from_the_diff() {
+        let names = "web/messages/en.json\nweb/messages/fr.json\nweb/glot.lock\nweb/.glot/tm.json\nweb/app/page.tsx\nweb/glot.toml\n";
+        let code = non_catalog_files(names, &["messages/{locale}.json".to_string()], "web");
+        assert_eq!(code, ["web/app/page.tsx", "web/glot.toml"]);
+        let s = what_changed(&code, 0);
+        assert!(
+            s.contains("2 files besides the catalogs") && s.contains("- `web/app/page.tsx`"),
+            "{s}"
+        );
+        assert!(what_changed(&[], 0).contains("catalogs only"));
     }
 
     #[test]

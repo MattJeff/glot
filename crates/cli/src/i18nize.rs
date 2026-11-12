@@ -104,6 +104,34 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
             },
         },
     };
+    let all: Vec<Source> = glot_extract::i18nize::source_files(&ws.root, &ws.config.extract)?
+        .into_iter()
+        .filter_map(|path| {
+            let src = std::fs::read_to_string(ws.root.join(&path)).ok()?;
+            Some(Source { path, src })
+        })
+        .collect();
+    // A repository that already runs i18n never gets a second library, provider or config.
+    let existing = matches!(args.lib, LibArg::Auto)
+        .then(|| existing_runtime(&ws, lib, custom.as_ref(), &all))
+        .flatten();
+
+    // The files this run may rewrite: the paths given (a scope), else `[extract]`.
+    let cwd = std::env::current_dir()?;
+    let paths: Vec<String> = args
+        .paths
+        .iter()
+        .map(|p| cwd.join(p).to_string_lossy().into_owned())
+        .collect();
+    let mut files = i18nize::list_files(&ws, &paths)?;
+    // The dictionaries themselves are catalogs, not code to rewrite.
+    files.retain(|f| !ws.config.files.contains(f));
+    if files.is_empty() {
+        bail!("no source files to convert (check the paths or [extract].include in glot.toml)");
+    }
+    if let Some(why) = existing {
+        return report_only(ws, &files, &why).await;
+    }
     if let Some(p) = &project {
         anstream::eprintln!(
             "{DIM}{} detected, target library: {}{DIM:#}",
@@ -113,15 +141,17 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
     }
 
     // Project-wide passes: text props of local components, module configs -> hooks.
-    let all: Vec<Source> = glot_extract::i18nize::source_files(&ws.root, &ws.config.extract)?
-        .into_iter()
-        .filter_map(|path| {
-            let src = std::fs::read_to_string(ws.root.join(&path)).ok()?;
-            Some(Source { path, src })
-        })
-        .collect();
     glot_extract::i18nize::set_text_props(refactor::text_props(&all));
-    let cfg = refactor::config_hooks(&all);
+    let mut cfg = refactor::config_hooks(&all);
+    // Every rewrite stays inside the scope: a refactor touching a file outside it is not done.
+    if let Some(out) = cfg.files.iter().find(|(p, ..)| !files.contains(p)) {
+        anstream::eprintln!(
+            "{DIM}module-level configs left as is: the refactor would touch {}, outside the files to convert{DIM:#}",
+            out.0
+        );
+        cfg.files.clear();
+        cfg.converted.clear();
+    }
     for w in &cfg.warnings {
         anstream::eprintln!("{YELLOW}warning:{YELLOW:#} {w}");
     }
@@ -151,18 +181,6 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         }
     }
 
-    let cwd = std::env::current_dir()?;
-    let paths: Vec<String> = args
-        .paths
-        .iter()
-        .map(|p| cwd.join(p).to_string_lossy().into_owned())
-        .collect();
-    let mut files = i18nize::list_files(&ws, &paths)?;
-    // The dictionaries themselves are catalogs, not code to rewrite.
-    files.retain(|f| !ws.config.files.contains(f));
-    if files.is_empty() {
-        bail!("no source files to convert (check the paths or [extract].include in glot.toml)");
-    }
     anstream::eprintln!(
         "{DIM}Scanning {} files, naming keys with {}…{DIM:#}",
         files.len(),
@@ -208,6 +226,16 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
             return Ok(());
         }
         let reverted = i18nize::apply(&mut ws, &plan)?;
+        // A module config turned into a hook whose copy was not translated: back to the constant
+        // (a `use*` function has the rules of hooks, and it gained nothing).
+        for (path, old, _) in &cfg.files {
+            let translated = plan.changed_files().any(|f| {
+                &f.path == path && f.converted > 0 && !reverted.iter().any(|(r, _)| r == path)
+            });
+            if !translated {
+                std::fs::write(ws.root.join(path), old)?;
+            }
+        }
         for (path, why) in &reverted {
             anstream::println!(
                 "warning: {path} left untouched: the rewritten file did not pass verification ({why})"
@@ -236,7 +264,11 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
                         line: s.line,
                         text: s.text.clone(),
                         reason: s.reason.clone(),
-                        suggestion: "t(\"<key>\")".into(),
+                        // The key the rewrite would have used: paste it as is.
+                        suggestion: format!(
+                            "t({:?})",
+                            glot_extract::rust::suggest_key(&f.path, &s.text, "text")
+                        ),
                     })
                 })
                 .collect(),
@@ -275,6 +307,126 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
         crate::init::cli_name(),
         ws.config.target_locales.join(", ")
     );
+    Ok(())
+}
+
+/// Why this repository already has an i18n runtime that the chosen library is not part of:
+/// its own provider / `t()`, another known library, or catalogs already in use. `None`: a fresh
+/// app (or the library is already wired), the rewrite may set it up.
+fn existing_runtime(
+    ws: &glot_llm::engine::Workspace,
+    lib: Lib,
+    custom: Option<&glot_extract::i18nize::CustomRuntime>,
+    all: &[Source],
+) -> Option<String> {
+    let pkgs: &[&str] = match lib {
+        Lib::NextIntl => &["next-intl"],
+        Lib::ReactI18next => &["react-i18next", "i18next"],
+        Lib::Custom => return None,
+    };
+    let deps = setup::deps(&ws.root).0;
+    let imported = |p: &str| {
+        all.iter().any(|s| {
+            s.src.contains(&format!("from \"{p}")) || s.src.contains(&format!("from '{p}"))
+        })
+    };
+    if pkgs.iter().any(|p| deps.contains(*p) || imported(p)) {
+        return None;
+    }
+    const KNOWN: &[&str] = &[
+        "next-intl",
+        "react-i18next",
+        "i18next",
+        "next-i18next",
+        "react-intl",
+        "@lingui/core",
+        "@lingui/react",
+        "vue-i18n",
+        "@nuxtjs/i18n",
+        "svelte-i18n",
+        "@ngx-translate/core",
+        "@inlang/paraglide-js",
+        "typesafe-i18n",
+        "rosetta",
+        "polyglot",
+    ];
+    if let Some(c) = custom {
+        return Some(format!(
+            "its own provider (`{}()` from `{}`)",
+            c.hook, c.module
+        ));
+    }
+    if let Some(other) = KNOWN.iter().find(|k| deps.contains(**k)) {
+        return Some(format!("`{other}`"));
+    }
+    // Catalogs brought back from glot's own open pull request are not the app's runtime.
+    let ours = std::env::var_os("GLOT_CATALOGS_FROM_GLOT").is_some();
+    (!ours && !ws.source().entries.is_empty()).then(|| {
+        format!(
+            "its own catalogs ({}), read by the app's code",
+            ws.config.files.join(", ")
+        )
+    })
+}
+
+/// The repository has its own runtime: no library, provider or config is added and no code is
+/// rewritten. Every string found in scope is reported with the catalog row to add (the key the
+/// rewrite would use), so the PR lists it and the existing runtime can read it.
+async fn report_only(
+    mut ws: glot_llm::engine::Workspace,
+    files: &[String],
+    why: &str,
+) -> Result<()> {
+    // Key names only: never spend on a plan nobody applies.
+    ws.config.llm.provider = "mock".into();
+    let plan = i18nize::plan(&ws, files, Lib::NextIntl).await?;
+    let reason = format!(
+        "this repository already has {why}: glot adds no other library; add the row to the source catalog and read it the way this code reads the others"
+    );
+    let left: Vec<rust::Left> = plan
+        .files
+        .iter()
+        .flat_map(|f| {
+            let reason = reason.clone();
+            let rows = f
+                .keys
+                .iter()
+                .filter(|k| !k.reused)
+                .map(move |k| rust::Left {
+                    path: f.path.clone(),
+                    line: k.line,
+                    text: k.value.clone(),
+                    reason: reason.clone(),
+                    suggestion: format!("{:?}: {:?}", k.key, k.value),
+                });
+            let skipped = f.skipped.iter().map(move |s| rust::Left {
+                path: f.path.clone(),
+                line: s.line,
+                text: s.text.clone(),
+                reason: s.reason.clone(),
+                suggestion: format!(
+                    "{:?}: {:?}",
+                    glot_extract::rust::suggest_key(&f.path, &s.text, "text"),
+                    s.text
+                ),
+            });
+            rows.chain(skipped)
+        })
+        .collect();
+    anstream::println!(
+        "{YELLOW}no code rewritten{YELLOW:#}: this repository already has {why}. {} strings found in {} files are listed with the catalog row to add.",
+        left.len(),
+        files.len()
+    );
+    for l in left.iter().take(20) {
+        anstream::println!("    {DIM}{}:{}{DIM:#}  {}", l.path, l.line, l.suggestion);
+    }
+    rust::Report {
+        files_scanned: files.len(),
+        left,
+        ..Default::default()
+    }
+    .save();
     Ok(())
 }
 

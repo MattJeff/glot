@@ -218,6 +218,9 @@ pub enum Wrap {
     Attr,
     /// A string expression: `t("key")` (`closure`: the whole value, kept reactive with `move ||`).
     Call { closure: bool },
+    /// The argument of a `&'static str` parameter that is only rendered: the key literal
+    /// (`"sidebar_hub"`), its render sites read `t(label)` ([`crate::rust_view::T_FN`] edits).
+    Key,
 }
 
 /// A hardcoded literal (or an inline-translation expression) and its byte span.
@@ -266,6 +269,7 @@ impl Spot {
             Wrap::Attr | Wrap::Call { closure: true } => format!("move || {call}"),
             Wrap::Call { closure: false } if edges => spaced(),
             Wrap::Call { closure: false } => call,
+            Wrap::Key => format!("{key:?}"),
         }
     }
 }
@@ -320,6 +324,8 @@ pub fn analyze(path: &str, src: &str) -> Analysis {
 pub fn suggest_key(path: &str, text: &str, role: &str) -> String {
     scan::suggest_key(path, text, role)
 }
+
+pub use crate::rust_view::T_FN;
 
 /// Remember the `pub fn tr(fr, en)`-style helpers of a file before analyzing the others.
 pub fn register_pairs(path: &str, src: &str) {
@@ -487,6 +493,9 @@ pub fn Login() -> impl IntoView {
         assert_eq!(r.hardcoded[0].at.line, 17);
     }
 
+    /// Tests that set the process-wide project locales run one at a time.
+    static LOCALES: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     /// Apply every clean spot (key = `k<n>`) and the edits that go with them.
     fn rewritten(src: &str) -> String {
         let a = super::analyze("web/src/pages/a.rs", src);
@@ -496,7 +505,11 @@ pub fn Login() -> impl IntoView {
             .filter(|s| s.clean)
             .enumerate()
             .map(|(n, s)| (s.start, s.end, s.replacement("t", &format!("k{n}"))))
-            .chain(a.aux.clone())
+            .chain(
+                a.aux
+                    .iter()
+                    .map(|(x, y, w)| (*x, *y, w.replace(super::T_FN, "t"))),
+            )
             .collect();
         edits.sort();
         let (mut out, mut pos) = (String::new(), 0);
@@ -582,6 +595,7 @@ pub fn Login() -> impl IntoView {
 
     #[test]
     fn inline_translations_become_one_key() {
+        let _serial = LOCALES.lock().unwrap_or_else(|e| e.into_inner());
         crate::i18nize::set_locales("fr", &["en".to_string()]);
         let src = r#"use crate::i18n::Locale;
 fn tr(fr: &'static str, en: &'static str) -> &'static str { if is_en() { en } else { fr } }
@@ -661,6 +675,146 @@ fn f() {
             ]
         );
         assert_eq!(spots[0].replacement("t", "k"), r#"" "{move || t("k")}"#);
+    }
+
+    #[test]
+    fn closure_parameter_rendered_carries_a_key() {
+        // cliponit's product sidebar: the label reaches `title=`, `aria-label=` and a text node.
+        let src = r#"fn sidebar(product: &'static str) -> impl IntoView {
+    let item = move |p: &'static str, label: &'static str, icon: Icon| {
+        view! { <a href=home_of(p) title=label aria-label=label data-track=format!("sidebar-{p}")>{icon.view()}<span>{label}</span></a> }
+    };
+    view! { <nav>{item("montage", "Montage", Icon::Layers)}{item("hub", "Hub créateurs", Icon::Share2)}{move || ok.then(|| item("promo", "Pub SaaS", Icon::Film))}</nav> }
+}"#;
+        let out = rewritten(src);
+        assert!(
+            out.contains(r#"title=move || t(label) aria-label=move || t(label)"#),
+            "{out}"
+        );
+        assert!(out.contains(r#"<span>{move || t(label)}</span>"#), "{out}");
+        // Ids and routes passed alongside are untouched; only the label becomes a key.
+        assert!(
+            out.contains(r#"item("montage", "k0", Icon::Layers)"#),
+            "{out}"
+        );
+        assert!(out.contains(r#"item("hub", "k1", Icon::Share2)"#), "{out}");
+        assert!(out.contains(r#"item("promo", "k2", Icon::Film)"#), "{out}");
+        assert!(out.contains(r#"format!("sidebar-{p}")"#), "{out}");
+        super::verify(src, &out).unwrap();
+        let texts: Vec<String> = super::spots("a.rs", src)
+            .into_iter()
+            .map(|s| s.copy.text)
+            .collect();
+        assert_eq!(texts, ["Montage", "Hub créateurs", "Pub SaaS"]);
+    }
+
+    #[test]
+    fn fn_parameters_owned_and_negative_cases() {
+        let src = r#"fn card(title: &'static str) -> impl IntoView { view! { <h2>{title}</h2> } }
+fn chip(label: impl Into<String>) -> impl IntoView { let label = label.into(); view! { <b>{label}</b> } }
+// `href` is not rendered; `name` is also used as data: neither is text.
+fn link(href: &'static str, name: &'static str) -> impl IntoView { log(name); view! { <a href=href>{name}</a> } }
+fn page() -> impl IntoView {
+    view! { {card("Mes vidéos")} {chip("Nouveau")} {link("/hub", "Hub créateurs")} }
+}"#;
+        let out = rewritten(src);
+        assert!(out.contains(r#"<h2>{move || t(title)}</h2>"#), "{out}");
+        assert!(out.contains(r#"card("k0")"#), "{out}");
+        assert!(out.contains(r#"chip(t("k1"))"#), "{out}");
+        assert!(out.contains(r#"link("/hub", "Hub créateurs")"#), "{out}");
+        assert!(out.contains(r#"<a href=href>{name}</a>"#), "{out}");
+        super::verify(src, &out).unwrap();
+    }
+
+    #[test]
+    fn struct_signal_label_built_in_another_file() {
+        let _serial = LOCALES.lock().unwrap_or_else(|e| e.into_inner());
+        crate::i18nize::set_locales("fr", &["en".to_string()]);
+        let sidebar = r#"pub struct SideLink { pub href: &'static str, pub label: Signal<String> }
+impl SideLink {
+    pub fn new(href: &'static str, label: impl Fn() -> String + Send + Sync + 'static) -> Self { Self { href, label: Signal::derive(label) } }
+}
+fn side_link(l: SideLink) -> impl IntoView {
+    let label = l.label;
+    view! { <a href=l.href title=move || label.get()><span>{move || label.get()}</span></a> }
+}"#;
+        crate::rust_view::register("web/src/components/product_sidebar.rs", sidebar);
+        // A pair helper called by its path, without `use`.
+        crate::rust_view::register(
+            "web/src/components/social_links.rs",
+            "pub fn tr(fr: &'static str, en: &'static str) -> &'static str { fr }",
+        );
+        let nav = r#"fn nav() -> impl IntoView { view! { <span>{move || super::social_links::tr("Publier", "Publish")}</span> } }"#;
+        let out = rewritten(nav);
+        assert!(out.contains(r#"<span>{move || t("k0")}</span>"#), "{out}");
+        let page = r#"fn links() -> Vec<SideLink> {
+    vec![
+        SideLink::new("/partners#pt-open", || "Campagnes ouvertes".into()),
+        SideLink::new("/partners#pt-mine", || "Mes campagnes".to_string()),
+    ]
+}"#;
+        let out = rewritten(page);
+        assert!(
+            out.contains(r#"SideLink::new("/partners#pt-open", || t("k0"))"#),
+            "{out}"
+        );
+        assert!(
+            out.contains(r#"SideLink::new("/partners#pt-mine", || t("k1"))"#),
+            "{out}"
+        );
+        super::verify(page, &out).unwrap();
+        crate::i18nize::set_locales("", &[]);
+    }
+
+    #[test]
+    fn returned_texts_become_keys_when_every_call_is_rendered() {
+        let _serial = LOCALES.lock().unwrap_or_else(|e| e.into_inner());
+        crate::i18nize::set_locales("fr", &["en".to_string()]);
+        let src = r#"fn tr(fr: &'static str, en: &'static str) -> &'static str { if is_en() { en } else { fr } }
+fn status_label(k: &str) -> &'static str { match k { "paid" => tr("Payé", "Paid"), "late" => "En retard", _ => "" } }
+// Also compared with `==`: data, not only text.
+fn plan_name(k: &str) -> &'static str { match k { "pro" => "Offre Pro", _ => "Offre gratuite" } }
+fn page(st: String, k: String) -> impl IntoView {
+    let free = plan_name(&k) == "Offre gratuite";
+    view! {
+        <span>{status_label(&st)}</span>
+        <b title=move || status_label(&st)>{move || if late { "Correction demandée" } else { status_label(&st) }}</b>
+        <i>{plan_name(&k)}</i>
+    }
+}"#;
+        let out = rewritten(src);
+        assert!(
+            out.contains(r#""paid" => "k0", "late" => "k1", _ => """#),
+            "{out}"
+        );
+        assert!(
+            out.contains(r#"<span>{t(status_label(&st))}</span>"#),
+            "{out}"
+        );
+        assert!(
+            out.contains(r#"title=move || t(status_label(&st))"#),
+            "{out}"
+        );
+        assert!(
+            out.contains(r#"{ t("k2") } else { t(status_label(&st)) }"#),
+            "{out}"
+        );
+        // Used as data too: untouched.
+        assert!(
+            out.contains(r#"match k { "pro" => "Offre Pro", _ => "Offre gratuite" }"#),
+            "{out}"
+        );
+        assert!(out.contains(r#"<i>{plan_name(&k)}</i>"#), "{out}");
+        super::verify(src, &out).unwrap();
+        let paid = super::spots("a.rs", src)
+            .into_iter()
+            .find(|s| s.copy.text == "Payé")
+            .unwrap();
+        assert_eq!(
+            paid.translations.get("en").map(String::as_str),
+            Some("Paid")
+        );
+        crate::i18nize::set_locales("", &[]);
     }
 
     #[test]

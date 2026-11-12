@@ -90,7 +90,7 @@ fn rewrite(
     let mut edits: Vec<(usize, usize, String)> = spots
         .iter()
         .map(|(s, key)| (s.start, s.end, s.replacement(f, key)))
-        .chain(aux.iter().cloned())
+        .chain(aux.iter().map(|(a, b, w)| (*a, *b, w.replace(rx::T_FN, f))))
         .collect();
     edits.sort_by_key(|e| e.0);
     let (mut out, mut pos) = (String::new(), 0);
