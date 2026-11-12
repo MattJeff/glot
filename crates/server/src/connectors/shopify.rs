@@ -1,10 +1,18 @@
-//! Shopify: GraphQL Admin API with a custom app's Admin API access token.
+//! Shopify: GraphQL Admin API. The access token comes from [`super::oauth`]: glot's app (one-click OAuth,
+//! expiring offline token), the merchant's own Dev Dashboard app (`client_id` + `client_secret`, 24 h tokens
+//! renewed automatically), or a legacy custom app's static `shpat_` token.
 //!
 //! - Pull: `translatableResources(resourceType:, first:, after:)` per resource type (products, collections,
 //!   pages, blogs, articles, metafields, metaobjects, menus/links, shop, policies, online store theme), cursor
 //!   pagination. Every `translatableContent` (key, value, digest, type) is a field; links, URLs, file
 //!   references, JSON and handles (URL slugs) are skipped. HTML / INLINE_RICH_TEXT → `Format::Html`,
-//!   RICH_TEXT_FIELD (metafield JSON) → `Format::RichText`.
+//!   RICH_TEXT_FIELD (metafield JSON) → `Format::RichText`. SEO fields (`meta_title`, `meta_description`),
+//!   image alt texts (`MEDIA_IMAGE`, `COLLECTION_IMAGE`, `ARTICLE_IMAGE`) and metafields are fields like the
+//!   others; `handle` (the URL slug) only with `settings.translate_handles`. A type the token cannot read
+//!   (missing scope) or the API version does not know is skipped, and named by the diagnosis.
+//! - Human edits and rollback: `translatableResourcesByIds { translations(locale:) }` reads what the store
+//!   holds before a write, `translationsRemove` deletes what a rolled-back run had created.
+//! - Diagnosis: granted scopes (`currentAppInstallation.accessScopes`) against what each feature needs.
 //! - Push: `translationsRegister(resourceId:, translations:)` with the source `translatableContentDigest`
 //!   kept from the pull (Shopify rejects a translation whose digest no longer matches the source). A target
 //!   locale missing from `shopLocales` is added with `shopLocaleEnable` (unpublished: the merchant publishes it).
@@ -16,6 +24,11 @@
 //! Docs: https://shopify.dev/docs/apps/build/markets/manage-translated-content,
 //! https://shopify.dev/docs/api/admin-graphql/latest/queries/translatableResources,
 //! https://shopify.dev/docs/api/admin-graphql/latest/mutations/translationsRegister,
+//! https://shopify.dev/docs/api/admin-graphql/latest/enums/TranslatableResourceType,
+//! https://shopify.dev/docs/api/admin-graphql/latest/queries/translatableResourcesByIds,
+//! https://shopify.dev/docs/api/admin-graphql/latest/objects/TranslatableResource,
+//! https://shopify.dev/docs/api/admin-graphql/latest/mutations/translationsRemove,
+//! https://shopify.dev/docs/api/admin-graphql/latest/queries/currentAppInstallation,
 //! https://shopify.dev/docs/api/usage/limits, https://shopify.dev/docs/apps/build/webhooks/subscribe/https
 use async_trait::async_trait;
 use axum::http::HeaderMap;
@@ -23,11 +36,13 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use std::time::Duration;
 
-use super::{AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem};
+use super::{
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, oauth,
+};
 
 pub struct Shopify;
 
-pub const API_VERSION: &str = "2025-10";
+pub const API_VERSION: &str = "2026-07";
 
 /// Synced by default (`settings.resources` overrides).
 pub const RESOURCES: &[&str] = &[
@@ -40,11 +55,29 @@ pub const RESOURCES: &[&str] = &[
     "ARTICLE",
     "METAFIELD",
     "METAOBJECT",
+    "MEDIA_IMAGE",
+    "COLLECTION_IMAGE",
+    "ARTICLE_IMAGE",
     "MENU",
     "LINK",
+    "FILTER",
     "SHOP",
     "SHOP_POLICY",
+    "DELIVERY_METHOD_DEFINITION",
+    "PAYMENT_GATEWAY",
+    "SELLING_PLAN",
+    "SELLING_PLAN_GROUP",
     "ONLINE_STORE_THEME",
+];
+
+/// Scope the token needs to read each kind of content (what the diagnosis names when a type is missing).
+const READ_SCOPES: &[(&str, &str)] = &[
+    ("read_products", "products, collections, options, images"),
+    ("read_content", "blogs and articles"),
+    ("read_online_store_pages", "pages"),
+    ("read_online_store_navigation", "menus"),
+    ("read_themes", "theme texts"),
+    ("read_metaobjects", "metaobjects"),
 ];
 
 const PAGE: u32 = 50;
@@ -193,9 +226,11 @@ fn items_of(rtype: &str, node: &Value, translate_handles: bool) -> Vec<SourceIte
         else {
             continue;
         };
+        // `handle` is a URI: translated only when asked (a translated slug changes the localized URL).
+        let handle = key == "handle";
         if value.trim().is_empty()
-            || SKIP_TYPES.contains(&ty)
-            || (key == "handle" && !translate_handles)
+            || (handle && !translate_handles)
+            || (!handle && SKIP_TYPES.contains(&ty))
         {
             continue;
         }
@@ -261,7 +296,7 @@ impl Connector for Shopify {
             .and_then(|l| l["locale"].as_str())
             .map(str::to_string);
         let mut notes = vec![];
-        if creds.opt("webhook_secret").is_none() {
+        if oauth::signing_secret("shopify", creds).is_none() {
             notes.push(
                 "No API secret key: webhooks are not registered; sync manually or periodically."
                     .into(),
@@ -294,12 +329,22 @@ impl Connector for Shopify {
         };
         let handles = creds.setting("translate_handles") == Some(&Value::Bool(true));
         while i < types.len() {
-            let d = gql(
+            let d = match gql(
                 creds,
                 LIST,
                 json!({"type": types[i], "first": PAGE, "after": after}),
             )
-            .await?;
+            .await
+            {
+                Ok(d) => d,
+                // A type this token may not read, or this API version does not have: the rest still syncs.
+                Err(e) if type_unavailable(&format!("{e:#}")) => {
+                    i += 1;
+                    after = None;
+                    continue;
+                }
+                Err(e) => return Err(e),
+            };
             let tr = &d["translatableResources"];
             let items: Vec<SourceItem> = tr["nodes"]
                 .as_array()
@@ -426,7 +471,7 @@ impl Connector for Shopify {
 
     async fn register_webhooks(&self, creds: &Creds, url: &str) -> anyhow::Result<()> {
         anyhow::ensure!(
-            creds.opt("webhook_secret").is_some(),
+            oauth::signing_secret("shopify", creds).is_some(),
             "no API secret key: Shopify webhooks could not be verified, none registered"
         );
         let existing = gql(
@@ -472,6 +517,149 @@ impl Connector for Shopify {
     fn push_batch(&self) -> usize {
         100
     }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let mut ids: Vec<&str> = items.iter().map(|i| i.external_id.as_str()).collect();
+        ids.sort_unstable();
+        ids.dedup();
+        let d = gql(
+            creds,
+            "query($ids: [ID!]!, $first: Int!, $locale: String!) {
+               translatableResourcesByIds(resourceIds: $ids, first: $first) {
+                 nodes { resourceId translations(locale: $locale) { key value } } } }",
+            json!({"ids": ids, "first": ids.len(), "locale": locale}),
+        )
+        .await?;
+        let mut found: BTreeMap<(&str, &str), &str> = BTreeMap::new();
+        for n in d["translatableResourcesByIds"]["nodes"]
+            .as_array()
+            .into_iter()
+            .flatten()
+        {
+            for t in n["translations"].as_array().into_iter().flatten() {
+                if let (Some(id), Some(k), Some(v)) = (
+                    n["resourceId"].as_str(),
+                    t["key"].as_str(),
+                    t["value"].as_str(),
+                ) {
+                    found.insert((id, k), v);
+                }
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|i| {
+                    found
+                        .get(&(i.external_id.as_str(), i.field.as_str()))
+                        .filter(|v| !v.is_empty())
+                        .map(|v| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn remove(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        let mut by_resource: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+        for it in items {
+            by_resource
+                .entry(&it.external_id)
+                .or_default()
+                .push(&it.field);
+        }
+        for (id, keys) in by_resource {
+            let d = gql(
+                creds,
+                "mutation($id: ID!, $keys: [String!]!, $locales: [String!]!) {
+                   translationsRemove(resourceId: $id, translationKeys: $keys, locales: $locales) {
+                     userErrors { field message } } }",
+                json!({"id": id, "keys": keys, "locales": [locale]}),
+            )
+            .await?;
+            if let Some(e) = d["translationsRemove"]["userErrors"]
+                .as_array()
+                .and_then(|e| e.first())
+            {
+                anyhow::bail!("{id}: {}", e["message"].as_str().unwrap_or("refused"));
+            }
+        }
+        Ok(true)
+    }
+
+    /// Granted scopes against what glot needs: the two it cannot work without, then what each missing read
+    /// scope leaves untranslated.
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let d = match gql(
+            creds,
+            "{ currentAppInstallation { accessScopes { handle } } }",
+            json!({}),
+        )
+        .await
+        {
+            Ok(d) => d,
+            Err(e) => return vec![Check::fail("scopes", format!("{e:#}"))],
+        };
+        let granted: Vec<&str> = d["currentAppInstallation"]["accessScopes"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|s| s["handle"].as_str())
+            .collect();
+        // A write scope includes its read scope.
+        let has = |scope: &str| {
+            granted.contains(&scope)
+                || granted.contains(&scope.replacen("read_", "write_", 1).as_str())
+        };
+        let mut out = vec![];
+        let required: Vec<&str> = ["read_translations", "write_translations", "read_locales"]
+            .into_iter()
+            .filter(|s| !has(s))
+            .collect();
+        out.push(if required.is_empty() {
+            Check::ok(
+                "scopes",
+                "read_translations, write_translations, read_locales",
+            )
+        } else {
+            Check {
+                fix: Some("permissions"),
+                ..Check::fail("scopes", format!("missing scope: {}", required.join(", ")))
+            }
+        });
+        if !has("write_locales") {
+            out.push(Check::warn(
+                "scope_locales",
+                "write_locales",
+                Some("enable_locale"),
+            ));
+        }
+        for (scope, what) in READ_SCOPES {
+            if !has(scope) {
+                out.push(Check::warn(
+                    "scope_content",
+                    format!("{scope}: {what}"),
+                    Some("permissions"),
+                ));
+            }
+        }
+        out
+    }
+}
+
+/// GraphQL refusal that concerns one resource type only (scope missing, enum value unknown to this version).
+fn type_unavailable(error: &str) -> bool {
+    let e = error.to_lowercase();
+    e.contains("access denied") || e.contains("translatableresourcetype")
 }
 
 #[cfg(test)]
@@ -500,6 +688,13 @@ mod tests {
         assert_eq!(items[0].key, "shopify:product:42:title");
         assert_eq!(items[1].format, Format::Html);
         assert_eq!(items[1].meta["digest"], "d2");
+        let with_handle = items_of("PRODUCT", &node, true);
+        assert_eq!(
+            with_handle.len(),
+            3,
+            "handle (URI) is translated when asked"
+        );
+        assert_eq!(with_handle[2].key, "shopify:product:42:handle");
         assert!(items[0].context.contains("Shirt"));
     }
 

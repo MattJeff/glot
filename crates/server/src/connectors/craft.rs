@@ -14,6 +14,11 @@
 //!   translatable per site).
 //! - Webhooks: Craft has none built in; the first-party Webhooks plugin calls the card URL (token included)
 //!   or sends `X-Glot-Webhook-Secret`.
+//! - Read back (`current`): the same entries queried in the target site and in the source site. Craft
+//!   propagates an entry to every site with the source content, so a value identical to the source site's
+//!   is "no translation". `remove` is not implemented: a site's field value cannot be unset, only overwritten.
+//! - Diagnosis (`doctor`): every mapped site answers with entries, and the token's schema exposes
+//!   `save_…_Entry` mutations (introspection of the mutation type).
 //!
 //! Docs: https://craftcms.com/docs/5.x/development/graphql.html (queries, `site` argument, mutations),
 //! https://craftcms.com/docs/5.x/reference/element-types/entries.html, https://plugins.craftcms.com/webhooks
@@ -24,7 +29,8 @@ use std::collections::{BTreeMap, HashMap};
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Craft;
@@ -134,6 +140,66 @@ async fn text_fields(api: &Api, ty: &str) -> anyhow::Result<Vec<String>> {
         .collect())
 }
 
+/// Text field values of `list` (entries with `id` and `__typename`) in `site`, by entry id. `fields_of`
+/// caches the text fields of each entry type.
+async fn typed_values(
+    api: &Api,
+    site: &Value,
+    list: &[Value],
+    fields_of: &mut HashMap<String, Vec<String>>,
+) -> anyhow::Result<HashMap<String, Value>> {
+    let mut by_type: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
+    for e in list {
+        if let Some(t) = e["__typename"].as_str().filter(|t| ident_ok(t)) {
+            by_type.entry(t.to_string()).or_default().push(&e["id"]);
+        }
+    }
+    let mut values = HashMap::new();
+    for (ty, ids) in &by_type {
+        if !fields_of.contains_key(ty) {
+            fields_of.insert(ty.clone(), text_fields(api, ty).await?);
+        }
+        let fields = &fields_of[ty];
+        if fields.is_empty() {
+            continue;
+        }
+        let q = format!(
+            "query($s: [String], $ids: [QueryArgument]) {{ entries(site: $s, id: $ids) {{ id ... on {ty} {{ {} }} }} }}",
+            fields.join(" ")
+        );
+        let r = api.gql(&q, json!({"s": site, "ids": ids})).await?;
+        for e in r["entries"].as_array().into_iter().flatten() {
+            if let Some(id) = cms::id_str(&e["id"]) {
+                values.insert(id, e.clone());
+            }
+        }
+    }
+    Ok(values)
+}
+
+/// `title` and text fields of the entries `ids` in `site`, by entry id.
+async fn entries_in(
+    api: &Api,
+    site: &Value,
+    ids: &[&str],
+    fields_of: &mut HashMap<String, Vec<String>>,
+) -> anyhow::Result<HashMap<String, Value>> {
+    let d = api
+        .gql(
+            "query($s: [String], $ids: [QueryArgument]) { entries(site: $s, id: $ids) { id __typename title } }",
+            json!({"s": site, "ids": ids}),
+        )
+        .await?;
+    let list = d["entries"].as_array().cloned().unwrap_or_default();
+    let mut values = typed_values(api, site, &list, fields_of).await?;
+    for e in &list {
+        if let Some(id) = cms::id_str(&e["id"]) {
+            values.entry(id).or_insert_with(|| json!({}))["title"] = e["title"].clone();
+        }
+    }
+    Ok(values)
+}
+
 fn looks_html(s: &str) -> bool {
     s.contains('<') && s.contains("</") || s.contains("<br") || s.contains("<img")
 }
@@ -199,31 +265,8 @@ impl Connector for Craft {
             )
             .await?;
         let list = d["entries"].as_array().cloned().unwrap_or_default();
-        let mut by_type: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
-        for e in &list {
-            if let Some(t) = e["__typename"].as_str().filter(|t| ident_ok(t)) {
-                by_type.entry(t.to_string()).or_default().push(e);
-            }
-        }
-        let mut values: HashMap<String, Value> = HashMap::new();
         let mut fields_of: HashMap<String, Vec<String>> = HashMap::new();
-        for (ty, es) in &by_type {
-            let fields = text_fields(&api, ty).await?;
-            if !fields.is_empty() {
-                let ids: Vec<&Value> = es.iter().map(|e| &e["id"]).collect();
-                let q = format!(
-                    "query($s: [String], $ids: [QueryArgument]) {{ entries(site: $s, id: $ids) {{ id ... on {ty} {{ {} }} }} }}",
-                    fields.join(" ")
-                );
-                let r = api.gql(&q, json!({"s": vars["s"], "ids": ids})).await?;
-                for e in r["entries"].as_array().into_iter().flatten() {
-                    if let Some(id) = cms::id_str(&e["id"]) {
-                        values.insert(id, e.clone());
-                    }
-                }
-            }
-            fields_of.insert(ty.clone(), fields);
-        }
+        let values = typed_values(&api, &vars["s"], &list, &mut fields_of).await?;
         let mut items = vec![];
         for e in &list {
             let (Some(id), Some(ty)) = (cms::id_str(&e["id"]), e["__typename"].as_str()) else {
@@ -323,6 +366,104 @@ impl Connector for Craft {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let mut ids: Vec<&str> = items.iter().filter_map(|i| i.meta["id"].as_str()).collect();
+        ids.sort_unstable();
+        ids.dedup();
+        let mut fields_of = HashMap::new();
+        let site = json!([site_for(creds, locale)]);
+        let there = entries_in(&api, &site, &ids, &mut fields_of).await?;
+        let source_site = json!(source_site(creds).map(|s| vec![s]));
+        let source = entries_in(&api, &source_site, &ids, &mut fields_of).await?;
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let id = it.meta["id"].as_str()?;
+                    let v = there.get(id)?[it.field.as_str()].as_str()?;
+                    // Still the content propagated from the source site: not translated.
+                    let propagated =
+                        source.get(id).and_then(|e| e[it.field.as_str()].as_str()) == Some(v);
+                    (!v.trim().is_empty() && !propagated).then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("sites", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        let sites = cms::pairs(creds, "sites");
+        let mut empty = vec![];
+        for (locale, handle) in &sites {
+            let r = api
+                .gql(
+                    "query($s: [String]) { entries(site: $s, limit: 1) { siteId } }",
+                    json!({"s": [handle]}),
+                )
+                .await;
+            if !r.is_ok_and(|d| d["entries"].as_array().is_some_and(|a| !a.is_empty())) {
+                empty.push(format!("{handle} ({locale})"));
+            }
+        }
+        out.push(if sites.is_empty() {
+            Check::warn(
+                "sites",
+                "no locale → site mapping (settings.sites): Craft needs one site per language",
+                Some("enable_locale"),
+            )
+        } else if !empty.is_empty() {
+            Check::warn(
+                "sites",
+                format!(
+                    "no entry readable in the site: {} (create the site, enable the sections in it and allow it in the token's schema)",
+                    empty.join(", ")
+                ),
+                Some("enable_locale"),
+            )
+        } else {
+            Check::ok("sites", sites.values().cloned().collect::<Vec<_>>().join(", "))
+        });
+        out.push(
+            match api
+                .gql("{ __schema { mutationType { fields { name } } } }", json!({}))
+                .await
+            {
+                Ok(d) => {
+                    let n = d["__schema"]["mutationType"]["fields"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter_map(|f| f["name"].as_str())
+                        .filter(|n| n.starts_with("save_") && n.ends_with("_Entry"))
+                        .count();
+                    if n == 0 {
+                        Check {
+                            fix: Some("permissions"),
+                            ..Check::fail(
+                                "mutations",
+                                "the token's GraphQL schema allows no entry mutation: allow saving entries of the sections to translate (GraphQL → Schemas)",
+                            )
+                        }
+                    } else {
+                        Check::ok("mutations", format!("{n} entry mutation(s)"))
+                    }
+                }
+                Err(e) => Check::warn("mutations", format!("schema not readable: {e:#}"), None),
+            },
+        );
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, _body: &[u8], secret: &str) -> bool {

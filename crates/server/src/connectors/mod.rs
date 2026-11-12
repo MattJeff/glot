@@ -26,7 +26,9 @@ pub mod ghost;
 pub mod helpscout;
 pub mod hubspot;
 pub mod magento;
+pub mod oauth;
 pub mod prestashop;
+pub mod quality;
 pub mod rich;
 pub mod sanity;
 pub mod shopify;
@@ -91,7 +93,7 @@ pub enum Format {
 }
 
 impl Format {
-    pub(crate) fn name(&self) -> &'static str {
+    pub fn name(&self) -> &'static str {
         match self {
             Format::Plain => "plain",
             Format::Html => "html",
@@ -171,6 +173,114 @@ pub trait Connector: Send + Sync {
     fn push_batch(&self) -> usize {
         50
     }
+    /// The platform's current translation of each item in `locale` (same order; `None` = none yet).
+    /// `Ok(None)` = this connector cannot read translations back: no human-edit protection, no rollback.
+    async fn current(
+        &self,
+        _creds: &Creds,
+        _locale: &str,
+        _items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        Ok(None)
+    }
+    /// Deletes the translations of `items` in `locale` (rollback of a first write). `false` = unsupported.
+    async fn remove(
+        &self,
+        _creds: &Creds,
+        _locale: &str,
+        _items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        Ok(false)
+    }
+    /// Platform-specific diagnosis (granted scopes, plugins, API capabilities), on top of the generic checks
+    /// of `api::doctor` (auth, languages, read, translations readable, webhooks).
+    async fn doctor(&self, _creds: &Creds) -> Vec<Check> {
+        vec![]
+    }
+}
+
+/// One line of the connection diagnosis ("Test connection").
+#[derive(Debug, Clone, Serialize)]
+pub struct Check {
+    pub id: String,
+    /// `ok` | `warn` | `fail`
+    pub status: &'static str,
+    pub detail: String,
+    /// What to do about it ([`fix_code`]), translated by the dashboard.
+    pub fix: Option<&'static str>,
+}
+
+impl Check {
+    pub fn ok(id: &str, detail: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            status: "ok",
+            detail: detail.into(),
+            fix: None,
+        }
+    }
+    pub fn warn(id: &str, detail: impl Into<String>, fix: Option<&'static str>) -> Self {
+        Self {
+            status: "warn",
+            fix,
+            ..Self::ok(id, detail)
+        }
+    }
+    pub fn fail(id: &str, detail: impl Into<String>) -> Self {
+        let detail = detail.into();
+        Self {
+            status: "fail",
+            fix: fix_code(&detail),
+            ..Self::ok(id, detail)
+        }
+    }
+}
+
+/// The fix a platform error calls for, as a code the dashboard translates (`connectors.fix.<code>`).
+pub fn fix_code(error: &str) -> Option<&'static str> {
+    let e = error.to_lowercase();
+    let has = |words: &[&str]| words.iter().any(|w| e.contains(w));
+    Some(
+        if has(&[
+            "reconnect",
+            "http 401",
+            "invalid api key",
+            "unauthorized",
+            "invalid_token",
+        ]) {
+            "reconnect"
+        } else if has(&[
+            "http 403",
+            "scope",
+            "access denied",
+            "forbidden",
+            "permission",
+            "not allowed",
+        ]) {
+            "permissions"
+        } else if has(&["http 429", "throttled", "rate limit"]) {
+            "rate_limit"
+        } else if has(&["placeholder", "variable"]) {
+            "placeholders"
+        } else if has(&["markup"]) {
+            "markup"
+        } else if has(&["digest", "http 409", "version", "conflict"]) {
+            "resync"
+        } else if has(&["http 404", "not found"]) {
+            "not_found"
+        } else if has(&["locale", "language"]) {
+            "enable_locale"
+        } else if has(&[
+            "timeout",
+            "unreachable",
+            "cannot resolve",
+            "not a public address",
+        ]) {
+            "unreachable"
+        } else {
+            return None;
+        },
+    )
 }
 
 /// Every connector kind, for the dashboard and the API.
@@ -217,6 +327,13 @@ pub fn registry(kind: &str) -> Option<Box<dyn Connector>> {
         // Agents G / H: "webflow" | "framer" | "contentful" | "sanity" | "strapi" => Some(Box::new(…)),
         _ => None,
     }
+}
+
+/// Whether `key` mirrors CMS content (`{kind}:{resource}:{id}:{field}`): validated as plain text with `{0}`
+/// placeholders, never as an ICU message (`{{ shop.name }}`, a lone `{` or `<` are just text there).
+pub fn is_key(key: &str) -> bool {
+    key.split_once(':')
+        .is_some_and(|(kind, _)| KINDS.contains(&kind))
 }
 
 /// Stable glot key of a field.

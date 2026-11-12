@@ -169,7 +169,7 @@ export function domSegments(root: Element, source: string, skip = ""): DomSegmen
 }
 
 /** Write `parts` (a checked translation) into the live nodes of `seg`; false if its placeholder order differs. */
-function write(seg: DomSegment, parts: Part[], mine: WeakMap<object, string>): boolean {
+export function write(seg: DomSegment, parts: Part[], mine: WeakMap<object, string>): boolean {
   const val = (x: Part) => (x.p === "text" ? x.s : x.p === "val" ? seg.values[x.n].value : "");
   if (seg.el) {
     const v = parts.map(val).join("");
@@ -239,6 +239,10 @@ export interface PatcherOptions {
   all?: boolean;
   /** Extra fields of the discovery report (`key`, `auth`, `mode`). */
   report?: Record<string, unknown>;
+  /** Website tag: paths where discovery is allowed (project zones, private-looking paths refused). */
+  zone?: (path: string) => unknown;
+  /** Called each time a TM has been applied to the page (the tag un-hides it). */
+  ready?: () => void;
 }
 
 export function startPatcher(o: PatcherOptions) {
@@ -261,11 +265,14 @@ export function startPatcher(o: PatcherOptions) {
   // Only text the app rendered on the client (nodes added/changed after boot): the Edge reported the server HTML's.
   const fresh = (n: Node | null) => { for (; n; n = n.parentNode) if (dyn.has(n)) return true; };
   const discover = (seg: DomSegment) => {
-    if (!o.missing || !seg.discoverable || seg.el || outs.has(seg.text) || sent.has(seg.hash + seg.role)) return;
-    const nodes = seg.gaps.flat(), host = nodes.find((n) => /\S/.test(n.nodeValue!))?.parentElement;
+    // Attributes (alt, placeholder, title…): only the website tag reports them (the Edge saw the server HTML's).
+    if (!o.missing || !seg.discoverable || (seg.el && !o.all) || outs.has(seg.text) || sent.has(seg.hash + seg.role)) return;
+    if (o.zone && !o.zone(location.pathname)) return;
+    const nodes = seg.gaps.flat(), host = seg.el ?? nodes.find((n) => /\S/.test(n.nodeValue!))?.parentElement;
     if (nodes.some((n) => /\S/.test(n.nodeValue!) && mine.get(n) === n.nodeValue)) return; // ours
     if (o.app ? !host?.closest(o.app.allow) : !o.all && !nodes.some(fresh)) return; // not a UI candidate / not the app's
-    if (o.all && host?.closest("form") && !host.closest("label,legend,button")) return; // a form: its labels only
+    // A form: its labels, legends, buttons and placeholders only (what the site wrote, never what a visitor types).
+    if (o.all && host?.closest("form") && !host.closest("label,legend,button") && !/^[pv]/.test(seg.attr ?? "")) return;
     if (!o.app && SESSION_COOKIE.test(document.cookie)) return; // signed in: never discovered (the runtime re-checks HttpOnly ones)
     const text = !o.app || host?.closest("[data-glot-ui]") ? seg.text : "";
     if (!text && !(seg.hash in tm!.t)) return; // hash-only: only a text glot already serves (never a user's own text)
@@ -317,6 +324,7 @@ export function startPatcher(o: PatcherOptions) {
     // late or new TM: catch up on everything rendered so far
     dirty.add(document.documentElement);
     flush();
+    o.ready?.();
     return true;
   };
   const key = `glot-tm:${o.tmUrl}`;
@@ -328,7 +336,12 @@ export function startPatcher(o: PatcherOptions) {
   if (!tm && o.tmUrl) {
     let cached: PatcherTm | null = null;
     try { cached = JSON.parse(o.storage?.getItem(key) ?? "null"); } catch { /* storage blocked */ }
-    load(o.tmUrl).catch(() => use(cached)); // glot unreachable: last good copy, only if not older than the page
+    // The last good copy right away (no wait, and it is all there is when glot is unreachable), if not older
+    // than the page; a newer one replaces it when it arrives.
+    use(cached);
+    load(o.tmUrl).catch(() => {});
   }
-  return { mo, get tm() { return tm; }, flush, send };
+  /** Look at the whole page again (the website tag, once the document has finished loading). */
+  const scan = () => { dirty.add(document.documentElement); flush(); };
+  return { mo, get tm() { return tm; }, flush, send, scan };
 }

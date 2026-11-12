@@ -18,7 +18,29 @@ export type GithubStatus = {
   installations: { id: number; account: string }[];
   link: GithubLink | null;
   job: GithubJob | null;
+  /** Class of the last failure (`diagnose` in github_app.rs): one cause and one fix per class. */
+  failure?: GithubFailure | null;
 };
+export const GITHUB_FAILURES = [
+  "ai_key_missing",
+  "ai_key_invalid",
+  "ai_workspace",
+  "ai_quota",
+  "ai_unavailable",
+  "repo_too_large",
+  "timeout",
+  "branch_missing",
+  "unlinked",
+  "config_invalid",
+  "no_framework",
+  "push_rejected",
+  "repo_access",
+  "pr_conflict",
+  "source_mismatch",
+  "mock_output",
+  "unknown",
+] as const;
+export type GithubFailure = (typeof GITHUB_FAILURES)[number];
 export type GithubRepo = { full_name: string; default_branch: string; private: boolean };
 export type GithubAppStatus = {
   configured: boolean;

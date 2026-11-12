@@ -53,6 +53,7 @@ import { api, ApiError, qk, type Project, type VisualIssue } from "@/lib/api";
 import { useMediaQuery, useOrigin, useProject, useSlug } from "@/lib/hooks";
 import { BRIDGE_SNIPPET } from "@/lib/preview-bridge";
 import { cn } from "@/lib/utils";
+import { LiveCheckAlert } from "@/components/live-check";
 import {
   buildUrl,
   issueLabel,
@@ -240,6 +241,7 @@ function Matrix({ project: p }: { project: Project }) {
   return (
     <div className="-mx-4 -my-6 flex h-[calc(100dvh-3rem)] flex-col sm:-mx-6 lg:-mx-8">
       <div className="space-y-2 border-b px-4 py-2.5 sm:px-6">
+        <LiveCheckAlert slug={p.slug} />
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <h1 className="text-base font-semibold">{t("title")}</h1>

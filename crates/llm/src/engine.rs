@@ -125,6 +125,9 @@ pub struct Proposal {
     pub key_exists: bool,
 }
 
+/// (key, source text, note, translations found in the code by locale).
+pub type NewSource = (Key, String, Option<String>, BTreeMap<Locale, String>);
+
 impl Workspace {
     /// Find root from `start` (walk up to glot.toml) and load everything.
     pub fn open(start: &Path) -> Result<Self> {
@@ -1064,6 +1067,353 @@ impl Workspace {
         Ok(issues)
     }
 
+    /// Target values written by the offline mock provider (`⟦fr⟧ Text`, [`crate::mock`]): removed
+    /// with their lock entries so the next translation redoes them. Source values are left (they
+    /// cannot be guessed back); returns how many target values were dropped.
+    pub fn drop_mock_values(&mut self) -> Result<usize> {
+        let mut n = 0;
+        for loc in self.config.target_locales.clone() {
+            let marker = format!("⟦{loc}⟧");
+            let gone: Vec<(Key, Option<String>)> = self
+                .catalogs
+                .get(&loc)
+                .map(|c| {
+                    c.entries
+                        .iter()
+                        .filter(|(_, v)| v.contains(&marker))
+                        .map(|(k, _)| (k.clone(), None))
+                        .collect()
+                })
+                .unwrap_or_default();
+            if gone.is_empty() {
+                continue;
+            }
+            n += gone.len();
+            for (k, _) in &gone {
+                self.lock.remove(&loc, k);
+            }
+            self.write_entries(&loc, &gone)?;
+        }
+        if n > 0 {
+            self.lock.save(&self.root)?;
+        }
+        // Same placeholders remembered by the translation memory would come straight back.
+        if let Ok(mut tm) = crate::tm::Tm::load(&self.root) {
+            let before = tm.units.len();
+            tm.units
+                .retain(|u| !u.target.contains(&format!("⟦{}⟧", u.target_locale)));
+            if tm.units.len() != before {
+                tm.save(&self.root)?;
+            }
+        }
+        Ok(n)
+    }
+
+    /// `write_entries` appends the keys a file lacks in key order; keep the order given instead
+    /// (a carried catalog must come out byte for byte as it was). Existing keys go in one write.
+    fn write_ordered(&mut self, locale: &str, changes: &[(Key, Option<String>)]) -> Result<()> {
+        let have = self
+            .catalogs
+            .get(locale)
+            .map(|c| c.entries.clone())
+            .unwrap_or_default();
+        let (known, new): (Vec<_>, Vec<_>) = changes
+            .iter()
+            .cloned()
+            .partition(|(k, _)| have.contains_key(k));
+        self.write_entries(locale, &known)?;
+        let mut sorted = new.clone();
+        sorted.sort();
+        if sorted == new {
+            return self.write_entries(locale, &new);
+        }
+        for c in new {
+            self.write_entries(locale, std::slice::from_ref(&c))?;
+        }
+        Ok(())
+    }
+
+    /// Many new source strings at once, each with the translations already found in the code
+    /// (`tr("fr", "en")`, `if en { … }`): one write per catalog instead of one per key.
+    /// Found translations are recorded as `imported`, so `glot translate` does not pay to redo them.
+    pub fn add_sources(&mut self, items: &[NewSource]) -> Result<()> {
+        let src = self.config.source_locale.clone();
+        let sources: Vec<(Key, Option<String>)> = items
+            .iter()
+            .map(|(k, v, ..)| (k.clone(), Some(v.clone())))
+            .collect();
+        self.write_ordered(&src, &sources)?;
+        for (k, _, note, _) in items {
+            if let Some(n) = note.as_ref().filter(|n| !n.trim().is_empty()) {
+                self.lock.notes.insert(k.clone(), n.clone());
+            }
+        }
+        for loc in self.config.target_locales.clone() {
+            let found: Vec<(&String, &String, &String)> = items
+                .iter()
+                .filter_map(|(k, v, _, tr)| Some((k, v, tr.get(&loc)?)))
+                .collect();
+            let changes: Vec<(Key, Option<String>)> = found
+                .iter()
+                .map(|(k, _, t)| ((*k).clone(), Some((*t).clone())))
+                .collect();
+            self.write_ordered(&loc, &changes)?;
+            for (k, source, t) in found {
+                self.lock.record(&loc, k, source, t, Origin::Imported, None);
+            }
+        }
+        self.lock.save(&self.root)?;
+        Ok(())
+    }
+
+    /// Start from the previous output of glot (the open pull request's branch, checked out in
+    /// `prev`) instead of from scratch: every key it added and every translation still valid for
+    /// the current source text is brought back, with its lock entry. A re-run on an unchanged
+    /// repository then writes the same files (no diff, no LLM call), and a human edit of a
+    /// translation on that branch survives. Returns the keys that exist only there (candidates
+    /// for pruning once the code no longer uses them).
+    pub fn carry_from(&mut self, prev: &Path) -> Result<Vec<Key>> {
+        let old = Self::open(prev)?;
+        // No catalog on the base yet (the first pull request is still open): start from the
+        // previous files themselves, byte for byte, rather than rebuilding them in another order.
+        if old.config.files == self.config.files && self.source().entries.is_empty() {
+            let mut copied = false;
+            for loc in self.config.all_locales() {
+                if self
+                    .catalogs
+                    .get(&loc)
+                    .is_some_and(|c| !c.entries.is_empty())
+                {
+                    continue;
+                }
+                for (path, _) in self.config.catalog_files(&self.root, &loc) {
+                    let Ok(rel) = path.strip_prefix(&self.root) else {
+                        continue;
+                    };
+                    let from = old.root.join(rel);
+                    if from.is_file() && !rel.to_string_lossy().contains("..") {
+                        if let Some(dir) = path.parent() {
+                            std::fs::create_dir_all(dir).map_err(|e| glot_core::Error::Io {
+                                path: dir.to_path_buf(),
+                                source: e,
+                            })?;
+                        }
+                        std::fs::copy(&from, &path).map_err(|e| glot_core::Error::Io {
+                            path: path.clone(),
+                            source: e,
+                        })?;
+                        copied = true;
+                    }
+                }
+            }
+            if copied {
+                let lock = std::mem::take(&mut self.lock);
+                self.reload()?;
+                self.lock = lock;
+            }
+        }
+        // Physical order of the previous source catalog: appended rows keep their place.
+        let text: String = old
+            .config
+            .catalog_files(&old.root, &old.config.source_locale)
+            .iter()
+            .filter_map(|(p, _)| std::fs::read_to_string(p).ok())
+            .collect();
+        let mut only: Vec<(usize, Key)> = old
+            .source()
+            .entries
+            .keys()
+            .filter(|k| !self.source().entries.contains_key(*k))
+            .map(|k| {
+                (
+                    text.find(&format!("\"{k}\"")).unwrap_or(usize::MAX),
+                    k.clone(),
+                )
+            })
+            .collect();
+        only.sort();
+        let only: Vec<Key> = only.into_iter().map(|(_, k)| k).collect();
+        let fresh = |lock: &Lockfile, loc: &str, key: &str, source: &str| {
+            lock.entries
+                .get(loc)
+                .and_then(|m| m.get(key))
+                .is_some_and(|e| e.source_hash == glot_core::hash::hash(source))
+        };
+        let mut items = vec![];
+        let keys: Vec<Key> = only
+            .iter()
+            .cloned()
+            .chain(self.source().entries.keys().cloned())
+            .collect();
+        for key in &keys {
+            let Some(old_src) = old.source().entries.get(key) else {
+                continue;
+            };
+            let source = self.source().entries.get(key).unwrap_or(old_src).clone();
+            if &source != old_src {
+                continue; // the text changed on the base branch: retranslate.
+            }
+            let mut found = BTreeMap::new();
+            for loc in &self.config.target_locales {
+                let prev_value = old
+                    .catalogs
+                    .get(loc)
+                    .and_then(|c| c.entries.get(key))
+                    .filter(|v| !v.trim().is_empty());
+                let here = self.catalogs.get(loc).and_then(|c| c.entries.get(key));
+                if let Some(v) = prev_value
+                    && here != Some(v)
+                    && (here.is_none_or(|h| h.trim().is_empty())
+                        || !fresh(&self.lock, loc, key, &source))
+                {
+                    found.insert(loc.clone(), v.clone());
+                }
+            }
+            if !found.is_empty() || !self.source().entries.contains_key(key) {
+                items.push((key.clone(), source, old.lock.notes.get(key).cloned(), found));
+            }
+        }
+        self.add_sources(&items)?;
+        // Same provenance as before (machine + score, human review), not "imported".
+        for (key, _, _, found) in &items {
+            for (loc, v) in found {
+                if let Some(e) = old.lock.entries.get(loc).and_then(|m| m.get(key))
+                    && e.target_hash == glot_core::hash::hash(v)
+                {
+                    self.lock
+                        .entries
+                        .entry(loc.clone())
+                        .or_default()
+                        .insert(key.clone(), e.clone());
+                }
+            }
+        }
+        // Translations the two sides already share keep their lock entry too (adopted ones are
+        // only recorded when something is translated): the lock file comes out identical.
+        for (loc, entries) in &old.lock.entries {
+            let Some(cat) = self.catalogs.get(loc) else {
+                continue;
+            };
+            for (key, e) in entries {
+                let same =
+                    |v: Option<&String>, h: &str| v.is_some_and(|v| glot_core::hash::hash(v) == h);
+                if same(self.source().entries.get(key), &e.source_hash)
+                    && same(cat.entries.get(key), &e.target_hash)
+                    && !self
+                        .lock
+                        .entries
+                        .get(loc)
+                        .is_some_and(|m| m.contains_key(key))
+                {
+                    self.lock
+                        .entries
+                        .entry(loc.clone())
+                        .or_default()
+                        .insert(key.clone(), e.clone());
+                }
+            }
+        }
+        for (k, n) in &old.lock.notes {
+            if self.source().entries.contains_key(k) {
+                self.lock
+                    .notes
+                    .entry(k.clone())
+                    .or_insert_with(|| n.clone());
+            }
+        }
+        self.lock.save(&self.root)?;
+        // The translation memory written by the previous run: same file, and free exact matches.
+        let tm = Path::new(crate::tm::TM_FILE);
+        if !self.root.join(tm).exists()
+            && let Ok(text) = std::fs::read_to_string(old.root.join(tm))
+        {
+            if let Some(dir) = self.root.join(tm).parent() {
+                let _ = std::fs::create_dir_all(dir);
+            }
+            let _ = std::fs::write(self.root.join(tm), text);
+        }
+        Ok(only)
+    }
+
+    /// Renamed keys keep their translations, deleted keys leave the target catalogs: a target key
+    /// absent from the source moves to the untranslated source key with the same text (per the
+    /// lock), otherwise it is removed. Only keys glot has tracked (a lock entry) are touched. Plural forms a language needs beyond the source
+    /// (`items_few`) are left alone. Returns (renamed, pruned) counts.
+    pub fn reconcile(&mut self) -> Result<(usize, usize)> {
+        const PLURAL: &[&str] = &["_zero", "_one", "_two", "_few", "_many", "_other"];
+        let source = self.source().clone();
+        let (mut renamed, mut pruned) = (0, 0);
+        for loc in self.config.target_locales.clone() {
+            let target = self.target(&loc);
+            // An unreadable or empty source, or most of a catalog "orphaned": a config problem,
+            // not deleted strings. Touch nothing.
+            let orphans = target
+                .entries
+                .keys()
+                .filter(|k| !source.entries.contains_key(*k))
+                .count();
+            if source.entries.is_empty() || orphans * 2 > target.entries.len() {
+                continue;
+            }
+            // Untranslated source keys by text hash.
+            let mut wanting: BTreeMap<String, Vec<&Key>> = BTreeMap::new();
+            for (k, v) in &source.entries {
+                if target.entries.get(k).is_none_or(|t| t.trim().is_empty()) {
+                    wanting.entry(glot_core::hash::hash(v)).or_default().push(k);
+                }
+            }
+            let mut changes: Vec<(Key, Option<String>)> = vec![];
+            for (old, value) in &target.entries {
+                if source.entries.contains_key(old) {
+                    continue;
+                }
+                let plural_form = PLURAL.iter().any(|s| {
+                    old.strip_suffix(s).is_some_and(|base| {
+                        PLURAL
+                            .iter()
+                            .any(|t| source.entries.contains_key(&format!("{base}{t}")))
+                    })
+                });
+                if plural_form {
+                    continue;
+                }
+                let entry = self
+                    .lock
+                    .entries
+                    .get(&loc)
+                    .and_then(|m| m.get(old))
+                    .cloned();
+                // Never tracked by glot: not ours to delete (a target-only key the app relies on).
+                if entry.is_none() {
+                    continue;
+                }
+                let new = entry
+                    .as_ref()
+                    .and_then(|e| wanting.get_mut(&e.source_hash))
+                    .and_then(|v| v.pop());
+                if let (Some(new), Some(mut e)) = (new, entry) {
+                    changes.push((new.clone(), Some(value.clone())));
+                    e.target_hash = glot_core::hash::hash(value);
+                    self.lock
+                        .entries
+                        .entry(loc.clone())
+                        .or_default()
+                        .insert(new.clone(), e);
+                    renamed += 1;
+                } else {
+                    pruned += 1;
+                }
+                changes.push((old.clone(), None));
+                self.lock.remove(&loc, old);
+            }
+            self.write_entries(&loc, &changes)?;
+        }
+        if renamed + pruned > 0 {
+            self.lock.save(&self.root)?;
+        }
+        Ok((renamed, pruned))
+    }
+
     pub fn propose(&self, text: &str, suggested_key: Option<&str>) -> Proposal {
         let key = match suggested_key.map(normalize_key).filter(|k| !k.is_empty()) {
             Some(k) => k,
@@ -1177,5 +1527,127 @@ mod tests {
             normalize_text("  Save   Changes! "),
             normalize_text("save changes")
         );
+    }
+
+    /// A json-flat project in a temp dir: `en` source, `fr` + `de` targets.
+    fn project(name: &str, en: &str, fr: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!("glot-engine-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("messages")).unwrap();
+        std::fs::write(
+            dir.join("glot.toml"),
+            "source_locale = \"en\"\ntarget_locales = [\"fr\", \"de\"]\nfiles = [\"messages/{locale}.json\"]\nformat = \"json-flat\"\nsyntax = \"icu\"\n[llm]\nprovider = \"mock\"\nmodel = \"mock\"\n",
+        )
+        .unwrap();
+        std::fs::write(dir.join("messages/en.json"), en).unwrap();
+        std::fs::write(dir.join("messages/fr.json"), fr).unwrap();
+        std::fs::write(dir.join("messages/de.json"), "{}").unwrap();
+        dir
+    }
+
+    #[test]
+    fn carry_from_makes_reruns_free_and_keeps_human_edits() {
+        // Previous output (the PR branch): two keys glot added, `home.cta` fixed by a person.
+        let prev = project(
+            "prev",
+            r#"{"home.title":"Welcome","home.cta":"Start free trial","home.gone":"Old banner"}"#,
+            r#"{"home.title":"Bienvenue","home.cta":"Essai gratuit (corrigé à la main)","home.gone":"Ancienne bannière"}"#,
+        );
+        let mut p = Workspace::open(&prev).unwrap();
+        for (k, en, fr) in [
+            ("home.title", "Welcome", "Bienvenue"),
+            ("home.cta", "Start free trial", "Essayer"),
+            ("home.gone", "Old banner", "Ancienne bannière"),
+        ] {
+            p.lock.record(
+                "fr",
+                k,
+                en,
+                fr,
+                Origin::Machine {
+                    model: "mock".into(),
+                },
+                Some(90),
+            );
+        }
+        p.lock.save(&prev).unwrap();
+        // The base branch: only `home.title`, its text changed there since.
+        let base = project("base", r#"{"home.title":"Welcome back"}"#, "{}");
+        let mut ws = Workspace::open(&base).unwrap();
+        let only = ws.carry_from(&prev).unwrap();
+        assert_eq!(
+            only,
+            ["home.cta", "home.gone"],
+            "in the order of the previous file"
+        );
+        let ws = Workspace::open(&base).unwrap();
+        let fr = &ws.catalogs["fr"].entries;
+        assert_eq!(fr["home.cta"], "Essai gratuit (corrigé à la main)");
+        assert!(
+            !fr.contains_key("home.title"),
+            "text changed on the base: retranslated"
+        );
+        let plan = ws.plan();
+        assert!(
+            !plan
+                .missing
+                .contains(&("fr".to_string(), "home.cta".to_string())),
+            "carried: nothing to pay for"
+        );
+        // A second carry changes nothing (idempotent).
+        let before = std::fs::read_to_string(base.join("messages/fr.json")).unwrap();
+        let lock = std::fs::read_to_string(base.join("glot.lock")).unwrap();
+        Workspace::open(&base).unwrap().carry_from(&prev).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(base.join("messages/fr.json")).unwrap(),
+            before
+        );
+        assert_eq!(
+            std::fs::read_to_string(base.join("glot.lock")).unwrap(),
+            lock
+        );
+        for d in [prev, base] {
+            std::fs::remove_dir_all(d).unwrap();
+        }
+    }
+
+    #[test]
+    fn renamed_keys_keep_translations_and_deleted_ones_leave() {
+        let dir = project(
+            "rename",
+            r#"{"nav.home":"Home","billing.upgrade":"Upgrade now","items_one":"{count} item","items_other":"{count} items"}"#,
+            r#"{"nav.home":"Accueil","plan.upgrade":"Passer au plan supérieur","old.banner":"Vieille bannière","items_one":"{count} article","items_other":"{count} articles","items_many":"{count} d'articles"}"#,
+        );
+        let mut ws = Workspace::open(&dir).unwrap();
+        // `plan.upgrade` was translated from the text `billing.upgrade` now holds.
+        ws.lock.record(
+            "fr",
+            "plan.upgrade",
+            "Upgrade now",
+            "Passer au plan supérieur",
+            Origin::Human,
+            None,
+        );
+        ws.lock.record(
+            "fr",
+            "old.banner",
+            "Old banner",
+            "Vieille bannière",
+            Origin::Imported,
+            None,
+        );
+        assert_eq!(ws.reconcile().unwrap(), (1, 1));
+        let ws = Workspace::open(&dir).unwrap();
+        let fr = &ws.catalogs["fr"].entries;
+        assert_eq!(fr["billing.upgrade"], "Passer au plan supérieur");
+        assert!(!fr.contains_key("plan.upgrade") && !fr.contains_key("old.banner"));
+        assert!(
+            fr.contains_key("items_many"),
+            "a plural form French needs is not an orphan"
+        );
+        let e = &ws.lock.entries["fr"]["billing.upgrade"];
+        assert!(e.reviewed, "the human review follows the key");
+        assert_eq!(Workspace::open(&dir).unwrap().reconcile().unwrap(), (0, 0));
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

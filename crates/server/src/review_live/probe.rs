@@ -176,7 +176,7 @@ pub(crate) async fn fetch_with(
     })
 }
 
-async fn body(mut resp: reqwest::Response) -> String {
+pub(crate) async fn body(mut resp: reqwest::Response) -> String {
     let mut buf = Vec::new();
     while let Ok(Some(c)) = tokio::time::timeout(TIMEOUT, resp.chunk())
         .await
@@ -317,7 +317,7 @@ fn widget(html: &str) -> Widget {
 }
 
 /// An attribute's value in one start tag (`name=` preceded by whitespace; quoted or bare).
-fn attr(tag: &str, name: &str) -> Option<String> {
+pub(crate) fn attr(tag: &str, name: &str) -> Option<String> {
     let lower = tag.to_ascii_lowercase();
     let pat = format!("{name}=");
     let (i, _) = lower

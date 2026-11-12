@@ -5,6 +5,7 @@ pub mod distill;
 pub mod engine;
 pub mod i18nize;
 pub mod judge;
+pub mod live_stream;
 pub mod mine;
 pub mod mock;
 pub mod panel;

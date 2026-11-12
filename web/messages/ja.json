@@ -1,4 +1,81 @@
 {
+  "textGraph": {
+    "title": "センテンス",
+    "subtitle": "コード、ウェブサイト、CMS など、表示されるすべての文を出現場所ごとに確認できます。翻訳を一度直せば、すべての場所に反映されます。",
+    "refresh": "更新",
+    "apply": "{count, plural, other {# か所を補完}}",
+    "applyHint": "異論のない翻訳を、翻訳がない場所にコピーします。二つの翻訳のどちらかを自動で選ぶことはありません。",
+    "applied": "{count, plural, =0 {書き込む内容はありません} other {# 件の翻訳を書き込みました}}",
+    "searchPlaceholder": "文、キー、ページのパスで検索",
+    "noResults": "「{q}」に一致する文はありません。",
+    "pick": "文を選ぶと、出現場所と翻訳がすべて表示されます。",
+    "places": "{count, plural, other {# か所}}",
+    "seen": "{count, plural, other {# 回表示}}",
+    "open": "この場所を開く",
+    "inherited": "{count, plural, other {# ページがカタログの翻訳を使用}}",
+    "useEverywhere": "すべての場所で使う",
+    "custom": "または、すべての場所で使う翻訳を入力",
+    "empty": {
+      "title": "まだ文がありません",
+      "body": "glot はカタログのキー、glot Edge が翻訳するページ、接続した CMS のコンテンツを読み取ります。キーをプッシュするかサイトを接続してから、ここに戻ってください。"
+    },
+    "stats": {
+      "sentences": "文",
+      "places": "出現場所",
+      "shared": "複数の場所に出現",
+      "unsettled": "翻訳が二通り",
+      "crossSurface": "{count, plural, =0 {コード・サイト・CMS をまたぐ文はありません} other {コード・サイト・CMS をまたぐ文: #}}"
+    },
+    "surface": {
+      "catalog": "コード",
+      "connector": "CMS",
+      "edge": "ウェブサイト"
+    },
+    "context": {
+      "action": "ボタンまたはリンク",
+      "actionHint": "ボタンやリンクのラベルとしての文です。同じ語が本文として使われる場合は別の文として扱います。"
+    },
+    "unsettled": {
+      "title": "翻訳が二通り",
+      "body": "同じ文が一つの言語で二通りに訳されています。残す翻訳を選んでください。"
+    },
+    "reworded": {
+      "title": "一部の場所だけ文言が変更されました",
+      "item": "「{from}」は {moved, plural, other {# か所}}で「{to}」に変わりました。{remaining, plural, other {# か所}}はまだ古い文言のままです。"
+    },
+    "detail": {
+      "places": "{count, plural, other {# か所に出現}}",
+      "translations": "翻訳",
+      "related": "関連する文",
+      "moved": "その後の文言変更"
+    },
+    "state": {
+      "consistent": "すべて同じ",
+      "partial": "{count, plural, other {# か所で未翻訳}}",
+      "missing": "未翻訳",
+      "inconsistent": "翻訳が二通り",
+      "conflict": "レビュー済みの翻訳が二つあり一致しません"
+    },
+    "related": {
+      "context": "同じテキスト、別の文脈",
+      "near": "同じ語句",
+      "fuzzy": "ほぼ同じ"
+    },
+    "reason": {
+      "reviewed_conflict": "人がレビューした別の翻訳があります",
+      "machine_disagrees": "別の機械翻訳があります",
+      "needs_review": "人によるレビュー待ちです",
+      "placeholders": "プレースホルダーが一致しません",
+      "validation": "この場所では翻訳が検証を通りません"
+    },
+    "confirm": {
+      "title": "この翻訳をすべての場所で使いますか？",
+      "writes": "{count, plural, other {# か所が変更されます。}}",
+      "none": "この翻訳を受け取れる場所は、すでにすべてこの翻訳を表示しています。",
+      "conflicts": "{count, plural, other {# か所には人がレビューした別の翻訳があり、そのまま残ります。}}",
+      "force": "人がレビューした翻訳も置き換える"
+    }
+  },
   "edge": {
     "title": "glot Edge",
     "subtitle": "SEO ローカライズ：各言語を独自の URL で翻訳済み HTML として配信。JavaScript なしでインデックス可能、キーは不要です。",
@@ -31,6 +108,86 @@
       },
       "selector": "CSS セレクター",
       "selectorHint": "最初に一致した要素 (ヘッダーのメニューなど) の中に追加されます。data-glot-switcher 属性を持つ要素が常に優先されます。",
+      "flags": "切り替えメニューに国旗を表示",
+      "flagsHint": "オフ：言語名のみを表示します。言語は国ではないため、国旗は任意です。",
+      "private": "タグは有効ですが、このプロジェクトの翻訳は非公開です。訪問者のブラウザーが翻訳を読み込めないため、何も翻訳されません。",
+      "makePublic": "翻訳を公開する",
+      "optionsTitle": "タグとオプション",
+      "usage": "今月の翻訳済みページビュー：{limit} 件中 {used} 件。上限を超えると、翌月またはプラン変更まで、タグはサイトを公開時のまま表示します。",
+      "setup": {
+        "title": "3 ステップでサイトを翻訳",
+        "intro": "サイトのアドレスを入力してください。glot が公開ページを読み取って翻訳し、何もインストールしないうちに結果をお見せします。",
+        "step1": "サイトを分析する",
+        "step2": "翻訳を確認して修正する",
+        "step3": "1 行を貼り付けて公開する",
+        "urlLabel": "サイトのアドレス",
+        "analyze": "分析して翻訳",
+        "analyzing": "サイトを読み取っています…",
+        "errors": {
+          "invalid": "有効なウェブアドレスではありません。",
+          "private": "このアドレスはプライベートネットワーク上にあります。glot が読み取れるのは公開サイトだけです。",
+          "unreachable": "glot はこのサイトに接続できませんでした。アドレスと、サイトが公開されているかを確認してください。",
+          "timeout": "サイトの応答に時間がかかりすぎました。少し待ってからもう一度お試しください。",
+          "not_html": "このアドレスはウェブページを返しません。"
+        },
+        "detected": "検出されたプラットフォーム：{platform}",
+        "unknownPlatform": "プラットフォームを特定できませんでした。タグはカスタムコードを追加できるサイトならどこでも動作します。",
+        "language": "サイトの言語：{language}",
+        "crawled": "読み取ったページ：{pages} · 見つかったテキスト：{segments}",
+        "translating": "{languages} に翻訳しています… 下のプレビューは自動的に更新されます。",
+        "upToDate": "翻訳は最新です。",
+        "suggest": "次によく追加される言語：",
+        "add": "{language} を追加",
+        "warn": {
+          "otherTools": "このページには別の翻訳スクリプト（{tools}）があります。公開する前に削除してください。2 つのツールが同じテキストを書き換えると競合します。",
+          "jsOnly": "このページは JavaScript でテキストを生成するため、下のプレビューが空に見えることがあります。訪問者のブラウザーではタグが通常どおり翻訳します。",
+          "csp": "サイトのセキュリティポリシー（CSP）がタグをブロックしています。次のディレクティブで {hosts} を許可してください：{directives}"
+        },
+        "exclude": {
+          "title": "非公開エリア",
+          "body": "アカウント、カート、チェックアウトのページは、セッション Cookie がスクリプトから見えない場合でも、訪問者から学習されることはありません。サイト内の次のリンクも非公開のようです：",
+          "none": "アカウント、カート、チェックアウトのページは、セッション Cookie がスクリプトから見えない場合でも、訪問者から学習されることはありません。ほかに非公開らしいリンクは見つかりませんでした。",
+          "apply": "これらのパスを除外",
+          "done": "パスを除外しました"
+        },
+        "previewLater": "まずサイトを分析してください。翻訳されたプレビューがここに表示されます。",
+        "install": {
+          "copy": "この 1 行をコピー",
+          "where": "{platform} での貼り付け先",
+          "generic": "すべてのページの head、またはサイトビルダーのサイト全体のカスタムコードに貼り付けてください。",
+          "guide": "{platform} の詳しいガイド",
+          "allGuides": "お使いのプラットフォームのガイドを探す"
+        },
+        "verify": {
+          "button": "サイトを確認",
+          "found": "タグはインストールされています。有効にすると公開されます。",
+          "live": "タグはインストール済みで有効です。訪問者にはそれぞれの言語でサイトが表示されます。",
+          "notFound": "{url} にタグが見つかりませんでした。1 行を貼り付けたあとサイトを公開し、もう一度確認してください。タグマネージャー経由で追加したタグは、この確認では検出できません。",
+          "wrongProject": "glot のタグはインストールされていますが、別のプロジェクト（{project}）のものです。上の 1 行をもう一度コピーしてください。",
+          "noKey": "インストールされたタグが不完全なため、何も動作しません。上の 1 行をもう一度コピーしてください。",
+          "notHead": "タグがページの head にありません。訪問者に元のテキストが一瞬表示されることがあります。head に移動してください。",
+          "turnOn": "タグを有効にする"
+        }
+      },
+      "editor": {
+        "locale": "言語",
+        "page": "ページ",
+        "open": "開く",
+        "count": "このページのテキスト {total} 件中 {translated} 件を翻訳済み",
+        "hint": "テキストをクリックすると、翻訳を修正したり、そのブロックを除外したりできます。これは静的なプレビューで、メニューやアニメーションは動作しません。",
+        "empty": "このページの翻訳はまだありません。サイトを分析した直後なら、1 分以内に届きます。",
+        "frame": "{language} でのサイトのプレビュー",
+        "source": "原文",
+        "translation": "翻訳",
+        "save": "保存",
+        "cancel": "キャンセル",
+        "saved": "翻訳を保存しました",
+        "exclude": "このブロックを翻訳しない",
+        "excludeHint": "翻訳をやめる対象を選んでください：",
+        "matches": "このページでの一致数：{count}",
+        "excluded": "翻訳から除外しました",
+        "noSelector": "このブロックには、glot が除外に使える安定した名前がありません。サイトビルダーでクラス notranslate を追加してください。"
+      },
       "locales": "提供する言語",
       "localesHint": "何も選択しない場合はプロジェクトのすべての対象言語。",
       "save": "保存",
@@ -194,6 +351,16 @@
         "budget": "月間予算（USD）",
         "budgetHint": "空欄：ジョブごとのプロジェクト予算のみ。"
       },
+      "seo": {
+        "title": "検索エンジン",
+        "body": "翻訳ページがインデックスされるように glot が行うこと：訪問者より先にサイトを読み込み、言語ごとに専用のアドレスを用意します。",
+        "prewarm": "訪問者より先にサイトを翻訳する",
+        "prewarmHint": "glot はサイトマップとそこからリンクされたページを、1 日 1 回まで、1 秒に 1 ページの速さで読み込みます。ページは誰かが開く前に翻訳済みになります。新しいテキストは上記の 1 日の上限と予算に含まれます。",
+        "pages": "1 回あたりの読み込みページ数",
+        "pagesHint": "まずトップページとサイトマップ、次にリンク先のページ。",
+        "slugs": "ページのアドレスを翻訳する",
+        "slugsHint": "スペイン語サイトでは /pricing が /precios になります。元のアドレスはそこへリダイレクトされ、hreflang とサイトマップにも使われます。ブラウザ側で遷移するサイト（シングルページアプリ）では先にテストしてください。"
+      },
       "rendering": {
         "label": "レンダリング",
         "auto": "自動",
@@ -274,6 +441,27 @@
       "indexNowDone": "{n, plural, other {# 件の URL}}を IndexNow に送信しました。",
       "running": "ページを取得中…",
       "issuesTitle": "検出された問題",
+      "export": "エクスポート（CSV）",
+      "outcome": {
+        "title": "検索エンジンがインデックスできるページ",
+        "body": "タイトルと本文の 95 % 以上が翻訳されたページだけが、検索エンジンに通知されます（canonical、hreflang、サイトマップ）。それまでは配信しつつ、ソースページの複製として宣言します。",
+        "run": "今すぐサイト全体を翻訳",
+        "running": "サイトを読み込み中… {done} / {total}",
+        "advertised": "通知済み",
+        "notAdvertised": "未通知",
+        "pages": "インデックス可能なページ / 読み込んだページ",
+        "last": "前回の実行 {date}：{pages} ページを読み込み、{skipped} ページをスキップ、新しいテキスト {segments} 件。",
+        "failed": "前回の実行は失敗しました：{error}"
+      },
+      "slugs": {
+        "title": "翻訳されたアドレス（{n}）",
+        "body": "アドレスが自動で変わることはありません。ここで置き換えると、古いアドレスは新しいアドレスへリダイレクトされます。",
+        "source": "ソースページ",
+        "locale": "言語",
+        "address": "アドレス",
+        "addressOf": "{locale} での {path} のアドレス",
+        "saved": "アドレスを保存しました。"
+      },
       "sitemaps": "言語別サイトマップ",
       "critical": "重要",
       "notReciprocal": "hreflang が相互でない",
@@ -304,6 +492,8 @@
         "advertised_but_not_ready": "リンク済みだが未完了",
         "title_missing": "タイトルなし",
         "title_untranslated": "タイトルが未翻訳",
+        "title_duplicate": "他のページと同じタイトル",
+        "description_missing": "説明がありません",
         "description_untranslated": "説明が未翻訳",
         "og_title_untranslated": "og:title が未翻訳",
         "jsonld_language": "JSON-LD が別の言語",
@@ -519,17 +709,24 @@
       "integrations": "インテグレーション",
       "mcp": "MCP サーバー",
       "runtime": "ランタイムのフォールバック",
+      "text-graph": "あらゆる場所の文（テキストグラフ）",
+      "live-stream": "ライブストリーム翻訳",
       "mobile-ota": "モバイルアプリ（OTA）",
+      "local-seo": "ローカルSEO(検索に合わせたページ)",
+      "two-way": "顧客との会話",
+      "languages-live-check": "言語はサイトで表示されていますか",
       "self-hosting": "セルフホストサーバー",
       "benchmark": "ベンチマーク",
       "deploy-hetzner": "VPS にデプロイ",
       "labs": "Labs の概要",
+      "render": "レンダー API（メール、通知、ドキュメント）",
       "mcp-remote": "リモート MCP (OAuth)",
       "provenance": "AI の出所 (EU AI Act)",
       "quality": "品質とレビュー",
       "review": "ライブレビュー",
       "skills": "エージェントスキル",
-      "github": "GitHub に接続"
+      "github": "GitHub に接続",
+      "autopilot": "Autopilot（市場ごとの収益）"
     },
     "search": {
       "label": "ドキュメントを検索",
@@ -1553,6 +1750,10 @@
     "subtitle": "このプロジェクトの名前、ロケール、翻訳モデル、配信設定。変更は次のジョブから適用されます。"
   },
   "shell": {
+    "liveStream": "ライブストリーム",
+    "localSeo": "ローカルSEO",
+    "render": "レンダー API",
+    "textGraph": "センテンス",
     "edge": "glot Edge",
     "apiTokens": "API トークン",
     "experiments": "実験的機能",
@@ -1581,7 +1782,9 @@
     "github": "GitHub",
     "mainNav": "メイン",
     "skipToContent": "コンテンツへスキップ",
-    "integrations": "連携"
+    "conversations": "会話",
+    "integrations": "連携",
+    "autopilot": "Autopilot"
   },
   "status": {
     "machine": "機械翻訳",
@@ -2517,6 +2720,81 @@
       "subtitle": "リポジトリを選ぶと、glot がアプリのローカライズを含むプルリクエストを開きます。そのままマージできます。ターミナルは不要です。",
       "title": "GitHub を接続"
     },
+    "failure": {
+      "mock_output": {
+        "cause": "この実行では本物の翻訳ではなく、仮の翻訳(⟦xx⟧ …)が生成されました。",
+        "fix": "何もプッシュも同期もされていません。設定 → LLM でプロジェクトが有効なキーを持つ実際の AI プロバイダーを使っているか確認してから再実行してください。仮の値は翻訳し直されます。"
+      },
+      "source_mismatch": {
+        "cause": "リポジトリは {repo} で書かれていますが、この glot プロジェクトのソース言語は {project} です。",
+        "fix": "glot は別の言語から翻訳したカタログをソースとして保存することはありません。下のボタンで {repo} をプロジェクトのソース言語にするか、リポジトリの glot.toml に source_locale = \"{project}\" を設定してから再実行してください。"
+      },
+      "useRepoSource": "{repo} をプロジェクトのソース言語にする",
+      "access": "リポジトリへのアクセスを管理",
+      "ai_key_invalid": {
+        "cause": "AI プロバイダーが API キーを拒否しました。",
+        "fix": "設定 → LLM に有効なキーを貼り付け、「キーをテスト」をクリックしてから再実行してください。"
+      },
+      "ai_key_missing": {
+        "cause": "このプロジェクトには AI キーが設定されていません。",
+        "fix": "glot はお使いの AI プロバイダーのキーで翻訳します。設定 → LLM でキーを追加し、「キーをテスト」をクリックしてから再実行してください。"
+      },
+      "ai_quota": {
+        "cause": "AI プロバイダーがリクエストを拒否しました:クォータ、クレジット、または予算の上限に達しています。",
+        "fix": "プロバイダー側のクレジットを確認するか、設定 → LLM で予算を引き上げてから再実行してください。すでに書き込まれた翻訳は保持されます。"
+      },
+      "ai_unavailable": {
+        "cause": "AI プロバイダーが一時的に利用できません。",
+        "fix": "お客様側で修正することはありません。数分後に再実行してください。すでに書き込まれた翻訳は保持されます。"
+      },
+      "ai_workspace": {
+        "cause": "Anthropic のワークスペースがキーと一致しません。",
+        "fix": "組織キー(sk-ant-usr…)にはワークスペース ID(wrkspc_…)が必要です。設定 → LLM で入力し、キーをテストしてから再実行してください。"
+      },
+      "branch_missing": {
+        "cause": "ベースブランチがこのリポジトリに存在しなくなりました。",
+        "fix": "リポジトリを選び直し、存在するブランチを選択してください。"
+      },
+      "config_invalid": {
+        "cause": "このリポジトリの glot.toml が有効ではありません。",
+        "fix": "技術的な詳細に示された行を修正して(パスはリポジトリ内に収める必要があります)プッシュしてください。glot が自動的に再実行します。"
+      },
+      "details": "技術的な詳細",
+      "no_framework": {
+        "cause": "このリポジトリには glot がローカライズできるアプリが見つかりませんでした。",
+        "fix": "対応:React、Next.js、Vue、Svelte、Leptos、SwiftUI、および独自の t() 関数を持つアプリ。モノレポの場合は、アプリのフォルダーで glot init を実行し、glot.toml をコミットしてプッシュしてください。"
+      },
+      "openPr": "プルリクエストを開く",
+      "pr_conflict": {
+        "cause": "glot のブランチにプッシュされたコミットが、最新のベースブランチと競合しています。",
+        "fix": "何も上書きされていません。ベースブランチをプルリクエストにマージして競合を解決するか、プルリクエストを閉じてください。次回の実行で glot が新しいものを作成します。"
+      },
+      "push_rejected": {
+        "cause": "GitHub が glot のブランチまたはプルリクエストを拒否しました。",
+        "fix": "ブランチ保護ルールが glot/* に適用されている可能性があります。glot アプリが glot/* ブランチにプッシュできるよう許可してから再実行してください。"
+      },
+      "repo_access": {
+        "cause": "glot はこのリポジトリを読み取れなくなりました。",
+        "fix": "GitHub App がアンインストールされたか、このリポジトリへのアクセスを失った可能性があります。GitHub でアクセスを再度許可してから再実行してください。"
+      },
+      "repo_too_large": {
+        "cause": "このリポジトリは 1 回の実行でクローンできるサイズを超えています。",
+        "fix": "メディアと 2 MB を超えるファイルはすでに除外されています。アプリを専用のリポジトリに移すか、上限の引き上げについてお問い合わせください。"
+      },
+      "settings": "LLM 設定を開く",
+      "timeout": {
+        "cause": "実行に時間がかかりすぎたため停止されました。",
+        "fix": "再実行してください。翻訳済みの文字列はやり直されません。毎回発生する場合は、glot.toml の [extract] include で解析範囲を絞ってください。"
+      },
+      "unknown": {
+        "cause": "予期しないエラーで実行が停止しました。",
+        "fix": "再実行してください。同じように失敗する場合は、下の技術的な詳細をお送りください。"
+      },
+      "unlinked": {
+        "cause": "このプロジェクトはリポジトリにリンクされていません。",
+        "fix": "リポジトリを選択して再度リンクしてください。"
+      }
+    },
     "how": {
       "pr": {
         "body": "文字列はカタログに移動し、翻訳は検証され、すべてが1つのプルリクエストにまとめられます。レビューしてマージしてください。",
@@ -2542,8 +2820,6 @@
     },
     "linked": {
       "change": "リポジトリを変更",
-      "failed": "前回の実行に失敗しました",
-      "badKey": "AI プロバイダーが API キーを拒否しました。<link>設定 → LLM</link> を開いて有効なキーを貼り付け、「キーをテスト」をクリックしてから再実行してください。",
       "prHint": "{branch} へのプッシュのたびに、このプルリクエストが更新されます。",
       "prReady": "プルリクエスト #{n} はマージできる状態です",
       "rerun": "再実行",
@@ -3722,6 +3998,101 @@
     "test": "テスト",
     "remove": "接続を解除",
     "removeConfirm": "{name} の接続を解除しますか？翻訳は glot に残り、CMS からは何も削除されません。",
+    "oneClick": "ワンクリックで接続",
+    "oneClickHint": "アクセスの許可は {name} 側で行います。glot がパスワードを見ることはなく、許可はいつでも {name} 側で取り消せます。",
+    "manual": "認証情報を手動で入力する",
+    "redirecting": "{name} を開いています…",
+    "connectError": "接続できませんでした：{error}",
+    "connectedPreview": "{name} を接続しました。glot がコンテンツを読み込んでプレビューを準備しています。まだ何も翻訳・変更されていません。",
+    "reconnect": "再接続",
+    "pause": "一時停止",
+    "publish": "公開",
+    "published": "公開しました",
+    "review": "変更内容を確認",
+    "ready": "公開待ち：{count}",
+    "kept": "{name} で手動編集されたため、そのまま残した翻訳：{count}",
+    "overwrite": "{name} に既にある翻訳を置き換える",
+    "reviewFirst": "公開前に自分で確認する",
+    "webhookActive": "自動同期は動作しています（最後に変更を受信：{when}）。",
+    "webhookNone": "まだ自動で受信した変更はありません。glot は 1 日 1 回、変更の確認も行います。",
+    "issues": "未公開：{count}",
+    "tenant": {
+      "shopify": "ストアのドメイン",
+      "wordpress": "サイトのアドレス",
+      "woocommerce": "サイトのアドレス"
+    },
+    "hold": {
+      "translate": "承認待ち",
+      "push": "手動で公開"
+    },
+    "preview": {
+      "title": "翻訳を始める前に",
+      "summary": "アイテム：{resources, number} · テキスト：{fields, number} · 言語：{languages, number} · 翻訳する単語数：約 {words, number}",
+      "cost": "翻訳費用の見積もり：{cost}",
+      "types": "翻訳するコンテンツ",
+      "nothing": "{name} にはまだ何も書き込まれていません。この先はあなたが決めます。",
+      "approve": "翻訳して公開",
+      "approveReview": "翻訳のみ（公開は自分で行う）"
+    },
+    "progress": {
+      "pull": "コンテンツを読み込んでいます… 読み込んだテキスト：{count, number}",
+      "translate": "翻訳中… {done, number} / {total, number}"
+    },
+    "diff": {
+      "new": "新規",
+      "update": "更新",
+      "blocked": "未書き込み",
+      "empty": "公開待ちのものはありません。",
+      "more": "…ほか {count, number} 件。"
+    },
+    "doctor": {
+      "title": "接続チェック",
+      "run": "接続をテスト",
+      "running": "確認中…",
+      "allGood": "glot に必要なものはすべて揃っています。",
+      "problems": "glot を完全に動かすには、対応が必要な項目があります。",
+      "status": {
+        "ok": "正常",
+        "warn": "注意",
+        "fail": "問題"
+      },
+      "check": {
+        "auth": "サインイン",
+        "source_locale": "ソース言語がプロジェクトと異なります",
+        "note": "メモ",
+        "languages": "言語",
+        "read": "コンテンツの読み取り（最初のページのテキスト数）",
+        "translations": "既存の翻訳の読み取り",
+        "webhooks": "自動同期",
+        "scopes": "権限",
+        "scope_locales": "言語を追加する権限",
+        "scope_content": "glot が読み取れないコンテンツ"
+      }
+    },
+    "fix": {
+      "reconnect": "アクセスの有効期限が切れたか、取り消されました。再接続すると再開できます。",
+      "permissions": "権限が不足しています。プラットフォーム側でアプリまたはトークンに権限を付与してから、もう一度テストしてください。",
+      "rate_limit": "プラットフォームがリクエストを制限しています。glot が自動で再試行するため、対応は不要です。",
+      "placeholders": "翻訳で変数またはテンプレートコードが変わっています。エディターで修正すると、glot がすぐに公開します。",
+      "markup": "翻訳で書式またはリンクが変わっています。エディターで修正すると、glot がすぐに公開します。",
+      "resync": "その間にコンテンツが変更されました。同期を実行してください。",
+      "not_found": "このコンテンツはプラットフォーム上にもう存在しません。同期を実行してください。",
+      "enable_locale": "プラットフォームの設定でこの言語を追加してから、もう一度テストしてください。",
+      "unreachable": "サイトから応答がありません。オンラインで、インターネットからアクセスできることを確認してください。",
+      "install_plugin": "翻訳を保存するには、プラットフォームに多言語プラグインが必要です。インストールしてから、もう一度テストしてください。",
+      "no_content": "翻訳できるコンテンツはまだ見つかっていません。",
+      "no_readback": "このプラットフォームでは glot が翻訳を読み戻せません。プラットフォーム側で手動で行った変更は検出できず、取り消しても復元できません。",
+      "webhook_manual": "自動同期を設定できませんでした。下の Webhook の URL をプラットフォームに追加するか、1 日 1 回の確認をご利用ください。"
+    },
+    "history": {
+      "title": "履歴",
+      "empty": "まだ何も公開されていません。",
+      "run": "公開した翻訳：{count, number}",
+      "rollback": "取り消す",
+      "rolledBack": "取り消し済み",
+      "confirm": "この公開を取り消しますか？テキストは {name} の以前の状態に戻ります。その後、再開するまで公開は一時停止されます。",
+      "done": "復元：{restored} · 削除：{removed} · 保持（手動編集）：{kept}"
+    },
     "status": {
       "idle": "未同期",
       "queued": "予約済み",
@@ -3733,11 +4104,14 @@
       "description": "商品、コレクション、ページ、ブログ記事、メタフィールド、メニュー、テーマのテキストを Translations API で翻訳します。",
       "fields": {
         "shop": "ストアのドメイン",
+        "client_id": "クライアント ID",
+        "client_secret": "クライアントシークレット",
         "token": "Admin API アクセストークン",
         "webhook_secret": "API シークレットキー（Webhook 署名）"
       },
       "hints": {
-        "token": "翻訳、商品、コンテンツ、オンラインストアのページ、テーマ、言語の読み書き権限を持つカスタムアプリ。",
+        "client_id": "Shopify Dev Dashboard（設定）にあるご自身のアプリのものです。24 時間有効のアクセストークンは glot が自動で更新します。",
+        "token": "2026 年より前にストア管理画面で作成したカスタムアプリの場合のみ。それ以外は空欄のままにしてください。",
         "webhook_secret": "Shopify の商品・コレクション Webhook を glot が検証するために使います。"
       }
     },
@@ -3823,7 +4197,7 @@
       "tagAltBody": "{name} 連携で対応していない部分をブラウザで翻訳するには、ユニバーサルタグを追加します。",
       "prep": {
         "project": "glot でプロジェクトを作成し、言語を追加します。",
-        "mode": "glot Edge → サイト用タグを開き、タグをオンにします。",
+        "mode": "glot Edge → サイト用タグを開き、サイトのアドレスを入力します。glot がサイトを翻訳してプレビューを表示します。タグを貼り付けたら、同じ画面でインストールを確認し、タグをオンにします。",
         "copy": "そのタブからタグをコピーします。プロジェクトと公開キー（data-key）はすでに入っています。下のタグはその形式の例です。"
       },
       "snippetLabel": "glot タグ",
@@ -3858,6 +4232,619 @@
         "docs": "ドキュメントを読む"
       },
       "related": "その他の連携：{category}"
+    }
+  },
+  "liveCheck": {
+    "title": "サイトでの表示",
+    "description": "ここで翻訳が完了していても、サイト側のコードが glot の送る言語コードを受け付けないと、サイトには表示されません。glot は各言語をサイト上で確認し、変更すべき点をお知らせします。",
+    "recheck": "再確認",
+    "checking": "サイトを確認中…",
+    "willCheck": "保存と翻訳が完了したら、サイトに表示されるかを確認します。",
+    "checked": "確認: {date}",
+    "state": {
+      "live": "翻訳済み · サイトで表示中",
+      "not_displayed": "翻訳済みですが、サイトに表示されていません",
+      "unknown": "翻訳済み · サイトでの表示は未確認",
+      "unchecked": "サイトでは未確認",
+      "no_site": "サイトでは未確認"
+    },
+    "badge": {
+      "live": "サイトで表示中",
+      "notDisplayed": "サイトに未表示"
+    },
+    "evidence": {
+      "visitors": "過去 7 日間にこの言語を選んだ訪問者によって確認されました。"
+    },
+    "mapped": "glot はこの言語について、<c>{locale}</c> の代わりに <c>{code}</c> をサイトに送ります。",
+    "mappedAuto": "サイトは <c>{locale}</c> を無視し、<c>{code}</c> には応答します。glot がこれを検出し、自動的に <c>{code}</c> を送るようにしました。",
+    "cause": {
+      "visitors": "訪問者がこの言語を選びました。言語スイッチャーが <c>{code}</c> をサイトに送りましたが、ページは変わりませんでした。サイト側のコードが <c>{code}</c> を受け付けていません。",
+      "visitorsLang": "訪問者がこの言語を選びました。言語スイッチャーが <c>{code}</c> をサイトに送りましたが、ページは <c>{lang}</c> のままでした。サイト側のコードが <c>{code}</c> を受け付けていません。",
+      "probe": "<c>{url}</c> を開いたところ、サイトが未知の言語に対して表示するのと同じページが返されました。サイト側のコードが <c>{code}</c> を受け付けていません。",
+      "worksWith": "<c>{code}</c> なら、この言語で応答します。"
+    },
+    "fix": {
+      "title": "修正方法",
+      "alias": "サイトで {code} を使う",
+      "aliasConfirmed": "glot は <c>{locale}</c> の代わりに <c>{code}</c> を送ります。サイトのコードを変更する必要はありません。",
+      "dev": "または <c>{locale}</c> のまま、サイトが言語を読み取る箇所でこのコードを受け付けるようにします(<docs>ガイド</docs>):",
+      "send": "開発者に送る",
+      "message": "サイトにまだ {language} が表示されていません。翻訳は glot で用意できており、言語スイッチャーはコード「{locale}」をサイトに送っています(例: ?lang={locale})。しかしサイトはこれを無視し、既定の言語のままです。サイトのコードは「en」や「fr」のような短いコードしか受け付けていないと思われます。\n\n修正方法は 2 つあります:\n1. サイトが言語を読み取る箇所で「{locale}」を受け付ける(英字のみ、または長さのチェックで弾かれています)。\n2. または、この言語についてサイトが想定しているコードを教えてください。glot 側で設定します(設定、ロケール)。\n\nサイト: {site}\nガイド: {docs}"
+    },
+    "unknown": {
+      "csr": "サイトは言語に関係なく同じ HTML を返すため(言語はブラウザーで切り替わります)、glot のサーバーからは判断できません。この言語を最初に選んだ訪問者によって確認されます。",
+      "http": "サイトは <c>{url}</c> でエラー({status})を返しました。下の「あなたのサイト」でサイト URL と URL パターンを確認してください。",
+      "unreachable": "glot のサーバーから <c>{url}</c> に接続できませんでした。"
+    },
+    "noSiteHint": "下の「あなたのサイト」にサイト URL を追加すると、そこでこの言語を確認します。glot の言語スイッチャーを使う訪問者によっても確認されます。",
+    "codeLabel": "サイトでのコード",
+    "reset": "{locale} に戻す"
+  },
+  "autopilot": {
+    "title": "Autopilot",
+    "subtitle": "次に開くべき市場とその価値、そしてコンバージョンに応じて自ら改善する文言。すべての数値はあなたのトラフィックから算出されます。",
+    "docs": "計算方法",
+    "footnote": "直近 {days} 日間のうち {dataDays} 日分、{visits} 件の訪問に基づいています。日数が増えるほど推定は安定します。",
+    "noConversions": "この期間に「{goal}」イベントを受信していません。市場は需要だけで順位付けされ、増加分は推定されません。コンバージョンと金額の推定を得るにはイベントを送信してください。",
+    "empty": {
+      "title": "まだ訪問が記録されていません",
+      "body": "Autopilot はインサイトタグの匿名カウンターを読み取ります。タグを設置すると、最初の市場がここに表示されます。実際の訪問が届くまで何も推定しません。",
+      "track": "次にコンバージョンを送信します。金額は任意で、コンバージョンを金額に換算します。",
+      "posthog": "すでに PostHog をお使いですか？下で接続すると、glot タグを待たずに既存の履歴で市場を順位付けできます。"
+    },
+    "settings": {
+      "title": "コンバージョン 1 件の価値",
+      "subtitle": "追加のコンバージョンを金額に換算するために使います。空欄にすると、イベントと一緒に送信された金額の平均を使います。",
+      "goal": "目標イベント",
+      "value": "コンバージョンあたりの価値",
+      "valuePlaceholder": "実測値",
+      "currency": "通貨",
+      "mode": "文言が勝ったとき",
+      "approval": "採用する前に確認する",
+      "auto": "自動で採用する",
+      "save": "保存",
+      "saved": "保存しました"
+    },
+    "value": {
+      "declared": "「{goal}」1 件を {amount} として計算します（あなたの設定）。",
+      "measured": "「{goal}」1 件を {amount} として計算します。90 日間の金額付きイベント {events} 件の平均です。",
+      "none": "「{goal}」の価値が不明なため、推定はコンバージョン数のままです。ここで価値を設定するか、イベントと一緒に送信してください。"
+    },
+    "opp": {
+      "title": "開くべき市場",
+      "subtitle": "訪問者が求めているのにまだ提供していない言語を、見込まれる増加分の順に表示します。",
+      "none": "訪問者が希望する言語はすべて提供済みです。開く市場はありません。",
+      "headline": "{language}：訪問者の {share} が自分の言語で表示されていません",
+      "headlineFinish": "{language}：訪問者の {share}、翻訳済みは {coverage} のみ",
+      "gap": "自分の言語で表示された訪問者よりコンバージョンが {gap} 低くなっています（{fallback} 対 {native}）。",
+      "gapNone": "自分の言語で表示された訪問者と同じ水準でコンバージョンしています（{fallback} 対 {native}）。",
+      "revenue": "月あたり {mid}",
+      "conversions": "月あたり「{goal}」{mid} 件",
+      "range": "おそらく {low}〜{high} の範囲",
+      "uncertain": "範囲にゼロが含まれるため、増加はまだ確定していません。",
+      "insufficient": "増加分を推定するにはデータが足りません。",
+      "missingVisits": "この訪問者の訪問があと {count} 件必要です。",
+      "missingNative": "比較のために、自分の言語で表示された訪問があと {count} 件必要です。",
+      "missingConversions": "信頼できる推定には、コンバージョンがあと {count} 件必要です。",
+      "cost": "{keys} 件のテキストの翻訳に {cost}",
+      "payback": "約 {days} 日で回収",
+      "paybackFast": "1 日未満で回収",
+      "method": "計算方法",
+      "formula": "月 {visits} 件の訪問 × （{native} − {fallback}）＝ 月あたり {gain} 件の追加コンバージョン",
+      "formulaMoney": "× {value} ＝ 月あたり {revenue}",
+      "caveat": "90 % 区間。この訪問者が、すでに自分の言語で表示されている訪問者と同じようにコンバージョンすると仮定しています。これは推定であり、約束ではありません。開いた後の測定が実際の結果を示します。",
+      "open": "この市場を開く",
+      "locked": "見込まれる増加分は Growth に含まれます。",
+      "bounce": "このセッションの {rate} が 1 ページで終了しています（全訪問者では {all}）。"
+    },
+    "confidence": {
+      "insufficient": "データ不足",
+      "indicative": "参考値",
+      "solid": "信頼できる"
+    },
+    "open": {
+      "title": "{language} を開きますか？",
+      "body": "glot が言語を追加し、{keys} 件のテキストを翻訳して（約 {cost}、上限 {cap}）、翻訳が終わりしだい測定を開始します。",
+      "mode": "測定",
+      "holdout": "ホールドアウト（実際の効果を測定）",
+      "holdoutHint": "この訪問者の 20 % を 14 日間現在の言語のままにし、その後は全員に新しい言語を表示します。実行時に読み込む翻訳（glot CDN または glot Edge）が必要です。",
+      "before_after": "前後比較",
+      "before_afterHint": "同じ訪問者を前後で比較します。証明にはなりません。季節やキャンペーンでも数値は動きます。",
+      "confirm": "市場を開く",
+      "cancel": "キャンセル",
+      "started": "{language}：翻訳を開始しました"
+    },
+    "openings": {
+      "title": "開いている途中の市場",
+      "status": {
+        "translating": "翻訳中",
+        "measuring": "測定中",
+        "failed": "失敗"
+      },
+      "progress": "{total} 件中 {done} 件",
+      "predicted": "予測：{gain}、{range}",
+      "predictedNone": "予測なし：開いた時点でこの言語のデータがありませんでした。",
+      "measured": "実測：{lift}（{low}〜{high}）",
+      "causal": "ホールドアウトとの比較で測定：実際の効果です。",
+      "notCausal": "前後比較：相関であり、証明ではありません。",
+      "details": "測定を見る"
+    },
+    "misrouted": {
+      "title": "違う言語で表示されている訪問者",
+      "subtitle": "これらの言語はすでにありますが、訪問者の一部には別の言語が表示されています。翻訳は不要です。ブラウザーの言語を検出するか、言語切り替えを目立たせてください。",
+      "headline": "{language}：この言語を希望する訪問者の {share} に {instead} が表示されています（{count} 件の訪問）",
+      "rates": "コンバージョン：別の言語で表示された場合は {mismatched}、自分の言語では {matched}。",
+      "gain": "見込み：月あたり「{goal}」{mid} 件（{low}〜{high}）。",
+      "missing": "2 つのグループを比較するには、コンバージョンがあと {count} 件必要です。",
+      "caveat": "自分でその言語を選んだ訪問者も含まれる可能性があります。"
+    },
+    "copy": {
+      "title": "自ら最適化される文言",
+      "subtitle": "見出し、ボタン、料金のテキストについて、glot が別の文言を作成して訪問者に表示し、最もコンバージョンの高いものを残します。法的な文章には一切触れません。",
+      "candidates": "最適化する価値のあるテキスト",
+      "noCandidates": "翻訳済みの見出し、ボタン、料金テキストはまだ見つかっていません。",
+      "optimize": "最適化",
+      "started": "{key} のテストを開始しました",
+      "lowTraffic": "トラフィックが少ないため、30 日以内に結果が出る可能性は低いです",
+      "noTraffic": "この言語の訪問はまだありません",
+      "noConversions": "この言語ではまだ「{goal}」がありません。テストは結論を出せません",
+      "estDays": "最初の結果まで約 {days} 日",
+      "kind": {
+        "headline": "見出し",
+        "cta": "ボタン",
+        "pricing": "料金",
+        "other": "テキスト"
+      },
+      "status": {
+        "running": "テスト中",
+        "awaiting_approval": "勝者が確認待ちです",
+        "promoted": "採用済み",
+        "rolled_back": "取り消し済み",
+        "no_winner": "勝者なし",
+        "stopped": "停止済み"
+      },
+      "reason": {
+        "official_best": "現在の翻訳が最もコンバージョンしています。変更はありません。",
+        "no_difference": "{days} 日経っても測定できる差がありません。現在の翻訳を維持します。",
+        "all_variants_worse": "新しい文言はすべてコンバージョンが低下しました。取り下げられ、現在の翻訳を維持します。",
+        "source_changed": "ソーステキストが変更されたため、テストを停止しました。",
+        "stopped_manually": "メンバーが停止しました。",
+        "promoted_manually": "実験ページから採用されました。",
+        "approver_missing": "glot は自動で採用できませんでした。ご自身で承認してください。"
+      },
+      "lift": "コンバージョン（{low}〜{high}）",
+      "worth": "効果が続けば月あたり約 {amount}",
+      "winner": "勝った文言",
+      "leader": "現時点で最良の文言",
+      "current": "現在の翻訳",
+      "sample": "訪問者 {views} 人・コンバージョン {conversions} 件（現在の翻訳は訪問者 {cviews} 人・コンバージョン {cconversions} 件）",
+      "dropped": "コンバージョンが低かったため取り下げ：「{value}」",
+      "refused": "訪問者に表示される前に却下（{why}）：「{value}」",
+      "why": {
+        "new_number": "数字が追加されていた",
+        "new_price": "価格またはパーセンテージが追加されていた",
+        "new_link": "リンクが追加されていた",
+        "new_claim": "約束する表現が追加されていた",
+        "validation": "検証に失敗した"
+      },
+      "approve": "この文言を採用",
+      "stop": "停止",
+      "approved": "文言を採用しました",
+      "stopped": "テストを停止しました",
+      "caveat": "勝者の伸びは過大評価されがちです。リードしている時点で選ばれたためです。下限が安全な数値です。",
+      "none": "テストはまだありません。下からテキストを選んでください。"
+    },
+    "collected": {
+      "title": "収集するデータ",
+      "body": "カウンターのみです。訪問者、Cookie、IP アドレス、ページは記録しません。",
+      "insights": "日ごとの訪問とイベント。希望言語、表示言語、国、テストグループ別。",
+      "variants": "文言ごとの表示回数とコンバージョン数。",
+      "revenue": "日・イベント・通貨ごとのイベント件数と金額の合計。",
+      "posthog": "任意の PostHog インポート：日・ブラウザー言語・ページの言語・国ごとのセッション数、ページビュー数、1 ページのみのセッション数、訪問者数、コンバージョンイベントのあるセッション数。"
+    },
+    "source": {
+      "label": "データソース：{source}・データのある日数：{days}",
+      "insights": "glot タグ",
+      "posthog": "PostHog",
+      "switch": "代わりに {source} を表示",
+      "synced": "{date}にインポート"
+    },
+    "posthog": {
+      "title": "データソース：PostHog",
+      "subtitle": "PostHog の履歴（読み取り専用、日ごとの集計のみ）をインポートすると、glot タグを待たずに市場を順位付けできます。文言テストとローンチ測定には引き続き glot タグが必要です。",
+      "connected": "{host} のプロジェクト {project} に接続済みです。",
+      "notConnected": "未接続です。",
+      "synced": "{from}〜{to} をインポート済み、最終同期 {when}。",
+      "never": "まだ何もインポートしていません。",
+      "error": "前回のインポートに失敗しました：{error}",
+      "host": "リージョン",
+      "us": "US クラウド",
+      "eu": "EU クラウド",
+      "custom": "セルフホスト",
+      "url": "インスタンスの URL",
+      "project": "プロジェクト ID",
+      "key": "個人 API キー",
+      "keyPlaceholder": "phx_…",
+      "keySaved": "保存済みです。変更しない場合は空欄のままにしてください。",
+      "event": "コンバージョンイベント",
+      "eventNone": "なし（訪問のみ）",
+      "eventHint": "接続をテストすると、プロジェクトの実際のイベント（直近 30 日）から選べます。",
+      "locale": "言語コードのないページの言語",
+      "localeHint": "URL に /nl/ や nl. の接頭辞がない場合に使われます。不明なら空欄にしてください。",
+      "backfill": "インポートする履歴（日数）",
+      "test": "接続をテスト",
+      "tested": "接続済み：30 日間で {pageviews} ページビュー、うち {share} にブラウザー言語があります。",
+      "save": "保存してインポート",
+      "sync": "今すぐインポート",
+      "syncing": "インポート中…",
+      "imported": "インポート完了：{rows} 件のカウンター（{queries} クエリ）。",
+      "disconnect": "接続を解除",
+      "disconnected": "PostHog の接続を解除しました。キーとインポートしたカウンターは削除されました。",
+      "steps": "キーの取得方法",
+      "step1": "PostHog でアバターメニュー → Settings → Personal API keys を開き、キーを作成します（Create personal API key）。",
+      "step2": "スコープ：Query → Read のみ（query:read）、このプロジェクトに限定します。",
+      "step3": "プロジェクト ID：Project settings → General → Project ID（数字）。",
+      "step4": "リージョン：us.posthog.com でログインする場合は US、eu.posthog.com なら EU。",
+      "privacy": "glot が PostHog に求めるのは、日・ブラウザー言語・ページの言語・国ごとの件数だけです。個人、IP アドレス、URL は取得しません。キーは暗号化して保存され、二度と表示されません。"
+    }
+  },
+  "renderProtocol": {
+    "title": "レンダー API",
+    "subtitle": "コンテンツと受信者のロケールを送ると、その言語で返ります。メール、通知、請求書、ページに同じ用語集、同じメモリ、同じ検証を使います。",
+    "docs": "ドキュメントを読む",
+    "play": {
+      "title": "プレイグラウンド",
+      "hint": "{source}で書いたコンテンツを貼り付けてください。既知の内容はメモリから返り、新しい内容はプロジェクトのモデルで翻訳して記憶します。",
+      "content": "コンテンツ",
+      "contentPlaceholder": "メール本文、通知、段落を貼り付け…",
+      "type": "種類",
+      "variables": "変数（JSON、任意）",
+      "variablesHint": "翻訳後に挿入されます。モデルには送信されず、保存もされません。",
+      "noLocales": "試すには、プロジェクト設定でターゲット言語を追加してください。",
+      "languages": "言語",
+      "run": "レンダー",
+      "badJson": "変数は JSON オブジェクトで指定してください。",
+      "units": "メモリから {cached} · 新規 {translated} · 合計 {total}",
+      "preview": "プレビュー、{locale}"
+    },
+    "types": {
+      "html": "HTML",
+      "text": "プレーンテキスト",
+      "markdown": "Markdown",
+      "template": "ICU テンプレート"
+    },
+    "status": {
+      "translated": "翻訳済み",
+      "source": "ソース言語",
+      "partial": "一部翻訳済み",
+      "fallback": "ソース言語で返却"
+    },
+    "usage": {
+      "title": "利用状況（過去 30 日）",
+      "empty": "まだドキュメントはレンダーされていません。上のプレイグラウンドを使うか、キーを付けて POST /v1/render を呼び出すと、最初の呼び出しからここに件数が表示されます。",
+      "documents": "ドキュメント",
+      "hitRate": "メモリから提供",
+      "translated": "翻訳したユニット",
+      "fallbacks": "ソースへのフォールバック",
+      "memory": "メモリ内のユニット: {entries} · 言語: {locales}",
+      "day": "日",
+      "fromMemory": "メモリからのユニット"
+    },
+    "keys": {
+      "title": "キー",
+      "create": "新しいキー",
+      "createHint": "キーはこのプロジェクト専用です。表示は一度だけです。",
+      "emptyTitle": "レンダーキーがありません",
+      "emptyBody": "バックエンドから POST /v1/render を呼び出すには、キーを作成してください。",
+      "name": "名前",
+      "scope": "アクセス",
+      "scopeRender": "新しいコンテンツを翻訳",
+      "scopeCached": "メモリのみ（モデルを呼び出しません）",
+      "month": "今月のドキュメント",
+      "of": "{used} / {limit}",
+      "revoke": "取り消す",
+      "revokeNamed": "{name} を取り消す",
+      "revoked": "キーを取り消しました",
+      "limit": "月間上限（ドキュメント）",
+      "limitHint": "空欄の場合はプランの上限のみ適用されます。",
+      "revealTitle": "今すぐキーをコピーしてください",
+      "revealBody": "再表示はできません。サーバーのシークレットと一緒に保管してください。"
+    }
+  },
+  "twoWay": {
+    "title": "会話",
+    "subtitle": "顧客が書いた内容を、原文の隣にあなたの言語で表示します。あなたは自分の言語で返信し、顧客は自分の言語で読みます。",
+    "attention": "対応が必要です",
+    "mode": {
+      "suggest": {
+        "name": "提案",
+        "hint": "glot は返信を翻訳しますが、送信はしません。コピーするか、お使いのツールから送信してください。"
+      },
+      "one_click": {
+        "name": "ワンクリック送信",
+        "hint": "返信の「送信」を押すまで、何も送信されません。"
+      },
+      "auto": {
+        "name": "自動",
+        "hint": "返信は翻訳され次第送信されます。glot が確信を持てないものは除きます。"
+      }
+    },
+    "channel": {
+      "api": "API / Webhook",
+      "helpscout": "Help Scout",
+      "form": "お問い合わせフォーム",
+      "email": "メール"
+    },
+    "settings": {
+      "open": "設定",
+      "title": "会話の設定",
+      "saved": "設定を保存しました",
+      "mode": "送信モード",
+      "team": "チームの言語",
+      "review": "この値未満で確認を求める (%)",
+      "reviewHint": "逆翻訳が元の文とこの値より一致しない返信は、人の確認を待ちます。",
+      "webhook": "署名付き Webhook",
+      "secretOnce": "このシークレットを今コピーしてください。表示は一度だけです。",
+      "secretSet": "シークレットは設定済みです。更新すると以前のものは無効になります。",
+      "secretNone": "シークレットがまだありません。生成するまで Webhook はすべてのリクエストを拒否します。",
+      "rotate": "シークレットを更新",
+      "generate": "シークレットを生成",
+      "replyUrl": "返信 URL（任意）",
+      "replyUrlHint": "送信された返信は、同じシークレットで署名してここに POST されます。空欄の場合は API レスポンスから取得してください。",
+      "form": "お問い合わせフォームヘルパー",
+      "formEnabled": "フォームのメッセージに言語と翻訳を付ける",
+      "formStore": "フォームのメッセージもこの受信トレイに保存する",
+      "formHint": "オフの場合、言語ごとの件数以外は何も保存しません。スクリプトが送信を妨げることはありません。",
+      "hsAppId": "アプリ ID",
+      "hsAppSecret": "アプリシークレット",
+      "hsWebhookSecret": "Webhook シークレット",
+      "hsHint": "Help Scout でアプリを作成し（Your Profile → My Apps）、上記 URL への Webhook を「Conversation created」「Customer replied」「Note created」のイベントで作成してください。",
+      "forward": "翻訳済みメールの転送先",
+      "forwardHint": "受信メールは翻訳され、原文を下に付けてこのアドレスに転送されます。"
+    },
+    "empty": {
+      "title": "顧客からのメッセージはまだありません",
+      "body": "この受信トレイには実際のメッセージだけが表示されます。チャネルを接続すると、最初のメッセージが翻訳され、原文と並んでここに表示されます。",
+      "docs": "ガイドを読む",
+      "api": "任意のツールから：API 呼び出し 1 回",
+      "form": "サイト上で：お問い合わせフォーム用スクリプト",
+      "formOff": "サイト上で：お問い合わせフォーム用スクリプト（先に設定で有効にしてください）",
+      "helpdesk": "Help Scout と受信メールは設定で構成します。"
+    },
+    "stats": {
+      "title": "過去 {days, plural, other {# 日間}}の顧客メッセージ：{count, plural, other {# 件}}",
+      "unknown": "未検出",
+      "unserved": "未対応の言語",
+      "hint": "未対応の言語ですでに顧客が書いていることは、次の市場を示す最も強いシグナルです。"
+    },
+    "flag": {
+      "pii": "{count, plural, other {個人データ # 件を非表示}}",
+      "piiTip": "メールアドレス、電話番号、注文番号、カード番号は、モデルに送信する前にプレースホルダーに置き換えられ、その後元に戻されます。",
+      "language_uncertain": "言語が不確か",
+      "low_confidence": "この翻訳を確認してください",
+      "pii_lost": "非表示のデータが正しく復元されませんでした",
+      "mixed": "複数の言語が混在：{languages}",
+      "untranslated": "未翻訳",
+      "validation": "品質チェックに失敗"
+    },
+    "thread": {
+      "language": "顧客の言語：{language}",
+      "languageUnknown": "顧客の言語が不明",
+      "fixLabel": "顧客の言語（コード）",
+      "fix": "言語を設定",
+      "customer": "顧客",
+      "team": "あなたのチーム",
+      "original": "原文（{language}）",
+      "translation": "翻訳（{language}）",
+      "sameLanguage": "すでにあなたの言語です。翻訳は不要です。"
+    },
+    "status": {
+      "received": "受信済み",
+      "draft": "下書き",
+      "needs_review": "要確認",
+      "sent": "送信済み",
+      "failed": "失敗"
+    },
+    "reply": {
+      "sent": "返信を送信しました",
+      "failed": "返信を送信できませんでした",
+      "saved": "翻訳を下書きとして保存しました",
+      "back": "逆翻訳：",
+      "confidence": "一致度 {percent}%",
+      "label": "あなたの言語で返信",
+      "placeholder": "返信を入力…",
+      "checking": "翻訳して確認中…",
+      "review": "逆翻訳が入力内容と異なります。送信前に確認してください。",
+      "hint": "入力を止めると、顧客が読む内容を逆翻訳で確認できます。",
+      "save": "翻訳",
+      "send": "送信"
+    }
+  },
+  "localSeo": {
+    "title": "ローカルSEO",
+    "subtitle": "翻訳したキーワードは、人々が実際に検索する言葉とは限りません。glot はページと市場ごとに、タイトル・説明文・見出しを実際の検索クエリに合わせます。本文は忠実な翻訳のままで、承認なしに公開されるものはありません。",
+    "warnings": "実行できなかった項目",
+    "dismiss": "閉じる",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saved": "下書きを保存しました",
+    "approved": "承認しました:この市場で公開中",
+    "rejected": "却下しました:翻訳のままです",
+    "approve": "承認",
+    "reject": "却下",
+    "takeDown": "取り下げる",
+    "edit": "編集",
+    "edited": "あなたの版",
+    "proposed": "提案",
+    "current": "現在の表示",
+    "why": "この市場で検索されている言葉",
+    "slug": "スラッグ",
+    "blocked": "承認する前に下のエラーを修正してください",
+    "volumeUnknown": "検索数不明",
+    "needsDemand": "{locale} の検索データはまだありません。Search Console を接続するか、この市場について既にご存じのキーワードを追加してください。glot がキーワードや検索数を作り出すことはありません。",
+    "editTitle": "{locale} の {path}",
+    "editBody": "あなたの版が提案を置き換え、同じチェックを受けます。",
+    "saveDraft": "下書きを保存",
+    "saveApprove": "保存して承認",
+    "scan": {
+      "action": "ページをスキャン",
+      "running": "ページを読み込み中…",
+      "done": "読み込んだページ:{pages} · 提案:{proposed}"
+    },
+    "empty": {
+      "title": "スキャンしたページはまだありません",
+      "body": "glot は {site} の公開ページを読み、各市場の現在の表示を確認し、実際の検索データがある場合に検索向けの内容を提案します。",
+      "noSite": "ページをスキャンするには、上でサイトの URL を glot に教えてください。"
+    },
+    "site": {
+      "title": "サイト",
+      "missing": "glot はまだサイトの URL を知りません。"
+    },
+    "auto": {
+      "off": "レビューモード:提案を一つずつ承認します",
+      "on": "自動モード:すべてのチェックに合格した提案が公開されます",
+      "confirmTitle": "提案を自動的に適用しますか?",
+      "confirmBody": "警告なしですべてのチェックに合格した提案は、誰も事前に読むことなく公開されます。エラーや警告のある提案は引き続き承認を待ちます。いつでも元に戻せます。",
+      "confirm": "自動モードをオンにする"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "notConnected": "未接続です。接続すると(読み取り専用)、各国で実際に検索されている言葉が分かり、変更後の表示回数・クリック数・掲載順位を測定できます。",
+      "notConfigured": "このサーバーではまだ利用できません。運用者が Google OAuth クライアントを追加する必要があります。それまでは、既にご存じのキーワードを追加してください。",
+      "connect": "Search Console を接続",
+      "disconnect": "接続を解除",
+      "result": {
+        "connected": "Search Console を接続しました",
+        "denied": "Search Console は接続されませんでした:アクセスが拒否されました",
+        "no_property": "この Google アカウントには、このサイトの Search Console プロパティがありません",
+        "failed": "Search Console を接続できませんでした。もう一度お試しください。"
+      }
+    },
+    "metrics": {
+      "refresh": "検索データを更新",
+      "refreshed": "保存した検索データの日数:{days}",
+      "none": "このページの Search Console データはまだ保存されていません。",
+      "notConnected": "効果を測定するには Search Console を接続してください。",
+      "window": "{days} 日 · 表示 {impressions} 回 · クリック {clicks} 回 · 掲載順位 {position}",
+      "noRows": "データなし",
+      "before": "公開前の 28 日間",
+      "after": "公開後"
+    },
+    "keywords": {
+      "title": "お持ちのキーワード",
+      "hint": "各市場について既にご存じの検索クエリ(お使いのツールのデータ)。",
+      "saved": "保存したキーワード:{count}",
+      "dialogTitle": "{locale} のキーワード",
+      "dialogBody": "1 行に 1 つ、この市場で実際に入力される検索クエリを記入します。月間検索数が分かる場合は、カンマと数字を追加してください。"
+    },
+    "engine": {
+      "google": "Google",
+      "baidu": "Baidu",
+      "yandex": "Yandex",
+      "naver": "Naver"
+    },
+    "status": {
+      "proposed": "要確認",
+      "approved": "公開中",
+      "auto": "公開中(自動)",
+      "rejected": "却下",
+      "stale": "ページ変更あり",
+      "needs_demand": "検索データなし"
+    },
+    "source": {
+      "manual": "あなたのリスト",
+      "gsc": "Search Console",
+      "gsc_site": "Search Console(サイト全体)"
+    },
+    "field": {
+      "title": "タイトル",
+      "description": "メタディスクリプション",
+      "h1": "メイン見出し(H1)",
+      "slug": "URL スラッグ(提案)"
+    }
+  },
+  "liveStream": {
+    "title": "ライブストリーム",
+    "subtitle": "まだ存在しないテキスト（AI の回答、通知、チャットのメッセージ）を、届くそばから翻訳します。用語集と翻訳メモリがそのまま使われます。",
+    "ms": "{n} ミリ秒",
+    "optIn": {
+      "title": "これはユーザーのコンテンツです",
+      "sent": "AI プロバイダーに送られるもの：翻訳する文、その文に含まれる用語集の用語、会話の直近の文。コード、リンク、翻訳しない用語は事前にプレースホルダーに置き換えられます。メールアドレスと長い番号（電話、カード）も、マスキングをオフにしない限り置き換えられます。人名と住所は検出されません。",
+      "stored": "glot が保存するもの：文ごとの鍵付きフィンガープリントとカウンター、日別の合計。下のキャッシュをオンにしない限り、テキストは保存されません。",
+      "on": "オン",
+      "off": "オフ"
+    },
+    "settings": {
+      "mask_pii": {
+        "label": "個人データをマスクする",
+        "help": "メールアドレスと 7 桁以上の番号はプロバイダーに届きません。翻訳結果に戻されます。"
+      },
+      "store": {
+        "label": "翻訳をキャッシュする",
+        "help": "マスク済みの翻訳を保持します。同じ文は即座に、無料で返ります。オフにすると削除されます。"
+      },
+      "browser": {
+        "label": "ブラウザーからのアクセス",
+        "help": "Web ページからプロジェクトの公開キーを受け付けます。オフの場合は、API トークンを使うサーバーからのみ利用できます。"
+      }
+    },
+    "provider": {
+      "mock": "このプロジェクトはモックプロバイダーを使っています。下の出力はタグを付けた原文で、翻訳ではありません。",
+      "missing": "AI キーが設定されていません。翻訳メモリにすでにある文だけが翻訳され、残りはそのまま通過します。",
+      "fix": "<link>プロジェクト設定</link>でプロバイダーとキーを設定してください。"
+    },
+    "playground": {
+      "title": "自分のテキストで試す",
+      "body": "メッセージを入力するか貼り付けてください。選んだ速度で、アプリが呼び出すのと同じパイプラインに流されます。このプロジェクトの用語集（{terms, plural, =0 {用語はまだありません} other {# 語}}）と翻訳メモリが使われます。下の時間は、この実行についてブラウザーで計測した値です。",
+      "enableFirst": "試すには、上でライブストリームをオンにしてください。",
+      "noLocale": "先にこのプロジェクトに翻訳先の言語を追加してください。",
+      "placeholder": "ここにメッセージを入力するか貼り付けてください（Markdown、コードブロック、リンクも使えます）…",
+      "input": "ストリームするテキスト",
+      "to": "翻訳先",
+      "speed": "速度",
+      "cps": "毎秒 {n} 文字",
+      "atOnce": "一度にすべて",
+      "start": "ストリームする",
+      "stop": "停止",
+      "source": "届くテキスト",
+      "output": "ユーザーが読むテキスト（{locale}）"
+    },
+    "via": {
+      "tm": "翻訳メモリから",
+      "cache": "この会話またはキャッシュで翻訳済み"
+    },
+    "reason": {
+      "no_provider": "未翻訳：AI プロバイダーが設定されていません。",
+      "provider_error": "未翻訳：AI プロバイダーがエラーを返しました。",
+      "provider_timeout": "未翻訳：AI プロバイダーが時間内に応答しませんでした。",
+      "provider_down": "未翻訳：AI プロバイダーが直前に失敗したため、再度呼び出しませんでした。",
+      "invalid_output": "未翻訳：回答が保護された要素（コード、リンク、個人データ）を失ったか書式を壊したため、原文を残しました。",
+      "glossary": "翻訳済みですが、用語集の用語が守られていません。",
+      "live_stream_disabled": "未翻訳：このプロジェクトではライブストリームがオフです。",
+      "live_stream_daily_cap": "未翻訳：プロジェクトの 1 日の上限に達しました。",
+      "other": "未翻訳：glot に接続できませんでした。"
+    },
+    "metric": {
+      "first": "最初の翻訳テキスト",
+      "lag": "遅延の中央値",
+      "lagMax": "最長の遅延",
+      "llm": "AI が翻訳",
+      "known": "メモリから"
+    },
+    "code": {
+      "title": "アプリに組み込む",
+      "body": "AI SDK が返すストリームを 1 行で包みます。glot が応答できない場合、ユーザーには原文がそのまま全文届きます。<link>ガイドを読む</link>。"
+    },
+    "usage": {
+      "title": "過去 30 日間",
+      "empty": {
+        "title": "まだ何も翻訳されていません",
+        "body": "このプロジェクトで最初のストリームが翻訳されると（上の試用またはアプリから）、ここに数値が表示されます。"
+      },
+      "chars": "文字数",
+      "units": "文",
+      "failed": "未翻訳",
+      "repeats": "異なる {distinct} 文のうち {repeats, plural, other {# 文}}が 2 回以上現れました。キャッシュに {stored} 件あります。"
     }
   }
 }

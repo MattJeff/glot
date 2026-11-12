@@ -155,7 +155,67 @@ const ROUTES: &[(&str, &str, &str)] = &[
     (
         "GET",
         "/cdn/{slug}/{locale}.json",
-        "OTA nested JSON catalog (ETag, Cache-Control)",
+        "OTA nested JSON catalog (ETag, Cache-Control); {locale} also resolves aliases (zh, zh_CN, zh-Hans -> zh-CN)",
+    ),
+    (
+        "GET",
+        "/api/projects/{slug}/live-check",
+        "Per target locale: is it really shown on the site (live, not_displayed, unknown), why, and the site code to use",
+    ),
+    (
+        "POST",
+        "/api/projects/{slug}/live-check",
+        "Probe the site now {locale?} -> same as GET",
+    ),
+    (
+        "PUT",
+        "/api/projects/{slug}/site-codes",
+        "Replace the map glot locale -> code used on the site, e.g. {\"zh-CN\":\"zh\"}",
+    ),
+    (
+        "POST",
+        "/cdn/{slug}/live-check",
+        "Switcher report {locale,code,html_lang,applied,origin}: did the page take the language (no identifiers)",
+    ),
+    (
+        "GET",
+        "/api/projects/{slug}/text-graph",
+        "Text graph overview: sentences, places, inconsistencies",
+    ),
+    (
+        "GET",
+        "/api/projects/{slug}/text-graph/search",
+        "Search sentences ?q&limit -> {anchors}",
+    ),
+    (
+        "GET",
+        "/api/projects/{slug}/text-graph/anchors/{id}",
+        "One sentence: every place, translations per locale, related sentences",
+    ),
+    (
+        "POST",
+        "/api/projects/{slug}/text-graph/anchors/{id}/unify",
+        "One translation everywhere {locale,value?,force?,dry_run?}",
+    ),
+    (
+        "POST",
+        "/api/projects/{slug}/text-graph/propagate",
+        "Apply undisputed translations to the places that lack them {dry_run?}",
+    ),
+    (
+        "POST",
+        "/api/projects/{slug}/text-graph/sync",
+        "Re-read catalog, connector and Edge places",
+    ),
+    (
+        "POST",
+        "/api/projects/{slug}/text-graph/import",
+        "Importer contract {surface,replace?,items:[{locator,text,role?,context?,url?,translations?}]}",
+    ),
+    (
+        "GET",
+        "/api/projects/{slug}/text-graph/export",
+        "What a surface should show ?surface&locale -> {strings,missing}",
     ),
     ("GET", "/healthz", "Health check"),
 ];

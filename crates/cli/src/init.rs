@@ -613,7 +613,7 @@ pub fn custom_runtime(root: &Path) -> Option<glot_extract::i18nize::CustomRuntim
         .into_iter()
         .filter_map(|r| Some((r.clone(), std::fs::read_to_string(root.join(&r)).ok()?)))
         .collect();
-    let (hook, file, text) = files.iter().find_map(|(rel, text)| {
+    let hooked = files.iter().find_map(|(rel, text)| {
         if !text.contains("createContext") && !text.contains("translations") {
             return None;
         }
@@ -632,7 +632,10 @@ pub fn custom_runtime(root: &Path) -> Option<glot_extract::i18nize::CustomRuntim
                         .then(|| (format!("use{rest}"), rel.clone(), text))
                 })
             })
-    })?;
+    });
+    let Some((hook, file, text)) = hooked else {
+        return module_t(&files);
+    };
     let call = format!("{hook}(");
     let destructures_t = |l: &str| {
         ["{ t }", "{ t,", ", t }", ", t,"]
@@ -663,6 +666,50 @@ pub fn custom_runtime(root: &Path) -> Option<glot_extract::i18nize::CustomRuntim
         .rsplit_once('.')
         .map_or(file.clone(), |(m, _)| m.to_string());
     Some(glot_extract::i18nize::CustomRuntime { hook, module, spec })
+}
+
+/// A `t` exported by an i18n module and imported by the components (`import { t } from "../i18n/t"`):
+/// no hook to call, the rewrite only adds the import.
+fn module_t(files: &[(String, String)]) -> Option<glot_extract::i18nize::CustomRuntime> {
+    let (file, _) = files.iter().find(|(rel, text)| {
+        let l = rel.to_ascii_lowercase();
+        ["i18n", "locale", "lang", "transl"]
+            .iter()
+            .any(|w| l.contains(w))
+            && ["export function t(", "export const t ="]
+                .iter()
+                .any(|p| text.contains(p))
+    })?;
+    let stem = file.rsplit('/').next()?.rsplit_once('.')?.0;
+    let imports_t = |l: &str| {
+        let l = l.trim();
+        l.starts_with("import ")
+            && ["{ t }", "{ t,", ", t }", ", t,"]
+                .iter()
+                .any(|p| l.contains(p))
+            && l.rsplit_once(" from ").is_some_and(|(_, from)| {
+                let from = from.trim().trim_end_matches(';').trim_matches(['"', '\'']);
+                from.ends_with(stem) || from.ends_with("i18n")
+            })
+    };
+    let users: Vec<&str> = files
+        .iter()
+        .flat_map(|(_, t)| t.lines().filter(|l| imports_t(l)))
+        .collect();
+    if users.is_empty() {
+        return None;
+    }
+    // An alias the app already uses (`@/i18n/t`), else a relative path per file.
+    let spec = users.iter().find_map(|l| {
+        let s = l.rsplit_once(" from ")?.1.trim().trim_end_matches(';');
+        let s = s.trim_matches(['"', '\'']);
+        (!s.starts_with('.')).then(|| s.to_string())
+    });
+    Some(glot_extract::i18nize::CustomRuntime {
+        hook: String::new(),
+        module: file.rsplit_once('.')?.0.to_string(),
+        spec,
+    })
 }
 
 /// First conventional directory holding `{locale}.json` files or `{locale}/*.json` folders.

@@ -1,26 +1,27 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Gauge, Loader2, Play, SearchCheck } from "lucide-react";
+import { Download, Gauge, Loader2, Play, SearchCheck, Zap } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CodeBlock, EmptyState, ErrorState } from "@/components/common";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import type { Project } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { cn } from "@/lib/utils";
-import { edgeApi, edgeKeys, type SeoLocaleResult, type SeoReportPage } from "./api";
+import { edgeApi, edgeKeys, type EdgeSlug, type SeoLocaleResult, type SeoReport, type SeoReportPage } from "./api";
 
 /** Issue codes of seo_report.rs, worst first (unknown codes are shown as is). */
 const ISSUES = [
   "fetch_failed", "http_error", "noindex", "robots_txt_blocked", "redirected", "canonical_missing", "canonical_multiple",
   "canonical_to_source", "canonical_not_self", "html_lang", "html_dir", "content_language", "hreflang_self_missing",
   "hreflang_x_default_missing", "hreflang_not_reciprocal", "advertised_but_not_ready", "title_missing", "title_untranslated",
-  "description_untranslated", "og_title_untranslated", "jsonld_language", "untranslated_segments",
+  "title_duplicate", "description_missing", "description_untranslated", "og_title_untranslated", "jsonld_language", "untranslated_segments",
 ] as const;
 type IssueCode = (typeof ISSUES)[number];
 const known = (c: string): c is IssueCode => (ISSUES as readonly string[]).includes(c);
@@ -38,6 +39,146 @@ const pill = (ok: boolean | null, label: string) => (
     {label}
   </Badge>
 );
+
+/** The report as a spreadsheet: one row per page and language (opens in Excel / Sheets). */
+function downloadCsv(r: SeoReport) {
+  const cell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const head = ["path", "locale", "url", "status", "indexable", "canonical", "title", "description", "untranslated", "issues"];
+  const rows = r.pages.flatMap((p) =>
+    p.locales.map((l) => [p.path, l.locale, l.url, l.status, l.technically_indexable, l.canonical, l.title, l.description, l.untranslated.count, l.issues.join(" ")]),
+  );
+  const csv = [head, ...rows].map((x) => x.map(cell).join(",")).join("\r\n");
+  const a = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })),
+    download: `seo-report-${r.generated_at.slice(0, 10)}.csv`,
+  });
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/**
+ * The outcome first: per language, the pages a search engine is told about (complete pages only), and the
+ * pre-warm that fills them — one click translates what is still missing, within the project's caps.
+ */
+function SeoOutcome({ slug }: { slug: string }) {
+  const t = useTranslations("edge.seo.outcome");
+  const format = useFormatter();
+  const qc = useQueryClient();
+  const message = useErrorMessage();
+  const coverage = useQuery({ queryKey: edgeKeys.coverage(slug), queryFn: () => edgeApi.coverage(slug) });
+  const prewarm = useQuery({
+    queryKey: edgeKeys.prewarm(slug),
+    queryFn: () => edgeApi.prewarm(slug),
+    refetchInterval: (q) => (q.state.data?.status === "running" ? 2000 : false),
+  });
+  const run = useMutation({
+    mutationFn: () => edgeApi.runPrewarm(slug),
+    onSuccess: (r) => qc.setQueryData(edgeKeys.prewarm(slug), r),
+    onError: (e) => toast.error(message(e)),
+  });
+  const p = prewarm.data;
+  const running = p?.status === "running" || run.isPending;
+  return (
+    <section className="space-y-3 rounded-xl border p-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="font-medium">{t("title")}</h2>
+        <Button className="ms-auto" size="sm" onClick={() => run.mutate()} disabled={running}>
+          {running ? <Loader2 className="animate-spin" /> : <Zap />}
+          {running ? t("running", { done: p?.pages_done ?? 0, total: p?.pages_total ?? 0 }) : t("run")}
+        </Button>
+      </div>
+      <p className="text-sm text-muted-foreground">{t("body")}</p>
+      {coverage.data && (
+        <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {coverage.data.locales.map((l) => (
+            <div key={l.locale} className="rounded-lg border p-3">
+              <dt className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="font-mono">{l.locale}</span>
+                {pill(l.ready, l.ready ? t("advertised") : t("notAdvertised"))}
+              </dt>
+              <dd className="mt-1 text-xl font-semibold tabular-nums">
+                {format.number(l.pages_indexable)} <span className="text-sm font-normal text-muted-foreground">/ {format.number(l.pages_seen)}</span>
+              </dd>
+              <dd className="text-xs text-muted-foreground">{t("pages")}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {p && p.status !== "never" && (
+        <p className={cn("text-xs text-muted-foreground", p.status === "failed" && "text-destructive")}>
+          {p.status === "failed"
+            ? t("failed", { error: p.error ?? "" })
+            : t("last", {
+                pages: p.pages_done ?? 0,
+                skipped: p.skipped ?? 0,
+                segments: p.segments ?? 0,
+                date: format.dateTime(new Date(p.finished_at ?? p.started_at ?? 0), { dateStyle: "medium", timeStyle: "short" }),
+              })}
+        </p>
+      )}
+    </section>
+  );
+}
+
+/** Translated page addresses (opt-in in the settings): each one can be replaced; the old address redirects. */
+function SeoSlugs({ slug }: { slug: string }) {
+  const t = useTranslations("edge.seo.slugs");
+  const qc = useQueryClient();
+  const message = useErrorMessage();
+  const slugs = useQuery({ queryKey: edgeKeys.slugs(slug), queryFn: () => edgeApi.slugs(slug) });
+  const put = useMutation({
+    mutationFn: (b: { locale: string; source_path: string; slug: string }) => edgeApi.putSlug(slug, b),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: edgeKeys.slugs(slug) });
+      toast.success(t("saved"));
+    },
+    onError: (e) => toast.error(message(e)),
+  });
+  if (!slugs.data?.enabled) return null;
+  const save = (row: EdgeSlug, value: string) => {
+    const v = value.trim();
+    if (v && v !== row.slug) put.mutate({ locale: row.locale, source_path: row.source_path, slug: v });
+  };
+  return (
+    <details className="rounded-xl border p-4">
+      <summary className="cursor-pointer font-medium">{t("title", { n: slugs.data.slugs.length })}</summary>
+      <p className="mt-2 text-sm text-muted-foreground">{t("body")}</p>
+      {slugs.data.slugs.length > 0 && (
+        <table className="mt-3 w-full text-sm">
+          <thead className="text-xs text-muted-foreground">
+            <tr>
+              <th className="py-1 text-start font-normal">{t("source")}</th>
+              <th className="py-1 text-start font-normal">{t("locale")}</th>
+              <th className="py-1 text-start font-normal">{t("address")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {slugs.data.slugs.map((row) => (
+              <tr key={row.locale + row.source_path} className="border-t">
+                <td dir="ltr" translate="no" className="py-1.5 font-mono text-xs">
+                  {row.source_path}
+                </td>
+                <td className="py-1.5 font-mono text-xs">{row.locale}</td>
+                <td className="py-1.5">
+                  <Input
+                    key={row.slug}
+                    defaultValue={row.slug}
+                    aria-label={t("addressOf", { path: row.source_path, locale: row.locale })}
+                    dir="ltr"
+                    translate="no"
+                    className="h-8 font-mono text-xs"
+                    onBlur={(e) => save(row, e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </details>
+  );
+}
 
 /**
  * International SEO report = "View as Google": each advertised locale of up to 20 pages fetched raw (no JavaScript),
@@ -67,21 +208,40 @@ export function SeoReportView({ project }: { project: Project }) {
     </Button>
   );
 
+  const outcome = (
+    <>
+      <SeoOutcome slug={project.slug} />
+      <SeoSlugs slug={project.slug} />
+    </>
+  );
   if (report.isPending) return <Skeleton className="h-64 rounded-xl" />;
   if (report.isError) return <ErrorState error={report.error} onRetry={() => report.refetch()} />;
   const r = report.data;
-  if (!r) return <EmptyState icon={SearchCheck} title={t("empty.title")} body={t("empty.body")} action={button} />;
+  if (!r)
+    return (
+      <div className="space-y-6">
+        {outcome}
+        <EmptyState icon={SearchCheck} title={t("empty.title")} body={t("empty.body")} action={button} />
+      </div>
+    );
   const rows = r.pages.flatMap((p) => p.locales);
   const indexable = rows.filter((l) => l.technically_indexable).length;
   const totals = Object.entries(r.issues).sort((a, b) => b[1] - a[1]);
 
   return (
     <div className="space-y-6">
+      {outcome}
       <div className="flex flex-wrap items-center gap-3">
         <p className="text-sm text-muted-foreground">
           {t("summary", { indexable, total: rows.length })} · {format.dateTime(new Date(r.generated_at), { dateStyle: "medium", timeStyle: "short" })}
         </p>
-        <div className="ms-auto">{button}</div>
+        <div className="ms-auto flex gap-2">
+          <Button variant="outline" onClick={() => downloadCsv(r)}>
+            <Download />
+            {t("export")}
+          </Button>
+          {button}
+        </div>
       </div>
       <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">{t("indexedNote")}</p>
       {totals.length > 0 && (

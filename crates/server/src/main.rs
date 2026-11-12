@@ -42,6 +42,7 @@ async fn main() -> anyhow::Result<()> {
     glot_server::experiments::rebalance::spawn_worker(state.clone());
     glot_server::layout_rum::spawn_worker(state.clone());
     glot_server::launches::spawn_worker(state.clone());
+    glot_server::autopilot::spawn_worker(state.clone());
     glot_server::connectors::sync::spawn_worker(state.clone());
     glot_server::edge::domains::spawn_caddy_sync(state.clone());
 

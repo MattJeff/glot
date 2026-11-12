@@ -14,8 +14,19 @@
 //!     WPML may need the translation created once in WPML, glot then keeps it updated).
 //!   - No plugin: nothing to write translations into: the push fails with an explicit message.
 //! - New translations are created with `settings.new_status` (default `draft`; `same` = the source's status).
+//! - Human edits and rollback ([`read_back`]): the sources are re-read by id (`include`, fresh translation
+//!   links), then their translations (`include` again; an id the list leaves out is read alone). The raw
+//!   field of the translated object is the current translation; an empty value, or one identical to the
+//!   source (a duplicated post nobody translated), counts as none. Nothing is ever deleted: a translation is
+//!   a whole post or term that may hold more than what glot wrote, so `remove` is not implemented.
+//! - Diagnosis: capabilities of the application password's user (`GET /wp/v2/users/me?context=edit`:
+//!   `edit_posts`, `edit_others_posts`, `edit_pages`, `edit_others_pages`, then `publish_*` and
+//!   `manage_categories`), and the multilingual plugin: without a REST one, the active plugins
+//!   (`GET /wp/v2/plugins?status=active`, needs `activate_plugins`) tell free Polylang (no REST API) apart.
 //!
-//! Docs: https://developer.wordpress.org/rest-api/reference/posts/,
+//! Docs: https://developer.wordpress.org/rest-api/reference/posts/ (`include`, `status`),
+//! https://developer.wordpress.org/rest-api/reference/users/ (`capabilities`, context `edit`),
+//! https://developer.wordpress.org/rest-api/reference/plugins/,
 //! https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/#basic-authentication-with-application-passwords
 use async_trait::async_trait;
 use axum::http::HeaderMap;
@@ -23,7 +34,9 @@ use base64::Engine;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-use super::{AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem};
+use super::{
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem,
+};
 
 pub struct WordPress;
 
@@ -101,6 +114,55 @@ impl Site {
 
     pub(crate) async fn get(&self, path: &str) -> anyhow::Result<(Value, HeaderMap)> {
         self.call(reqwest::Method::GET, path, None).await
+    }
+
+    /// Objects of a collection (`/wp/v2/posts`, `/wc/v3/products`) by id: one `include` request per 100,
+    /// then one GET per id the list left out (another language under WPML, a status the list hides).
+    pub(crate) async fn by_ids(
+        &self,
+        collection: &str,
+        ids: &[i64],
+    ) -> anyhow::Result<BTreeMap<i64, Value>> {
+        // Posts and pages list published content only by default; WooCommerce products list every status.
+        let status = if collection.starts_with("/wp/v2/p") {
+            "&status=publish,future,draft,pending,private"
+        } else {
+            ""
+        };
+        let mut out = BTreeMap::new();
+        for chunk in ids.chunks(100) {
+            let list: Vec<String> = chunk.iter().map(i64::to_string).collect();
+            let q = format!(
+                "{collection}?context=edit&per_page=100&include={}{status}",
+                list.join(",")
+            );
+            // A refused list is not fatal: every id is then read alone.
+            if let Ok((v, _)) = self.get(&q).await {
+                for o in v.as_array().into_iter().flatten() {
+                    if let Some(id) = o["id"].as_i64().filter(|id| chunk.contains(id)) {
+                        out.insert(id, o.clone());
+                    }
+                }
+            }
+            for id in chunk {
+                if !out.contains_key(id) {
+                    let (o, _) = self.get(&format!("{collection}/{id}?context=edit")).await?;
+                    out.insert(*id, o);
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// Active plugins that matter (`plugin` file, lowercased), from a plugin list (`wp/v2/plugins` or
+    /// WooCommerce's `system_status.active_plugins`: both have `plugin`).
+    pub(crate) fn plugin_files(list: &Value) -> Vec<String> {
+        list.as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|p| p["plugin"].as_str())
+            .map(str::to_ascii_lowercase)
+            .collect()
     }
 
     pub(crate) async fn plugin(&self, creds: &Creds) -> anyhow::Result<Plugin> {
@@ -224,6 +286,98 @@ pub(crate) fn translation_for(map: &BTreeMap<String, i64>, locale: &str) -> Opti
 pub(crate) fn raw(o: &Value, field: &str) -> Option<String> {
     let v = &o[field];
     v["raw"].as_str().or(v.as_str()).map(str::to_string)
+}
+
+/// What the site holds for `items` in `locale` (see the module doc), in the same order. `place` gives the
+/// REST collection and id of an item's source from its meta. Shared with WooCommerce.
+pub(crate) async fn read_back(
+    site: &Site,
+    locale: &str,
+    items: &[PushItem],
+    place: impl Fn(&Value) -> Option<(String, i64)>,
+) -> anyhow::Result<Vec<Option<String>>> {
+    let places: Vec<Option<(String, i64)>> = items.iter().map(|i| place(&i.meta)).collect();
+    let mut by_collection: BTreeMap<&str, Vec<i64>> = BTreeMap::new();
+    for (c, id) in places.iter().flatten() {
+        let ids = by_collection.entry(c).or_default();
+        if !ids.contains(id) {
+            ids.push(*id);
+        }
+    }
+    // (collection, source id) → (source, translation).
+    let mut found: BTreeMap<(&str, i64), (Value, Value)> = BTreeMap::new();
+    for (c, ids) in by_collection {
+        let mut sources = site.by_ids(c, &ids).await?;
+        let links: Vec<(i64, i64)> = sources
+            .iter()
+            .filter_map(|(id, o)| {
+                let t = translation_for(&translations(o), locale).filter(|t| t != id)?;
+                Some((*id, t))
+            })
+            .collect();
+        let targets: Vec<i64> = links.iter().map(|l| l.1).collect();
+        let mut translated = site.by_ids(c, &targets).await?;
+        for (id, t) in links {
+            if let (Some(s), Some(o)) = (sources.remove(&id), translated.remove(&t)) {
+                found.insert((c, id), (s, o));
+            }
+        }
+    }
+    Ok(items
+        .iter()
+        .zip(&places)
+        .map(|(it, p)| {
+            let (c, id) = p.as_ref()?;
+            let (source, tr) = found.get(&(c.as_str(), *id))?;
+            raw(tr, &it.field)
+                .filter(|v| !v.trim().is_empty() && Some(v) != raw(source, &it.field).as_ref())
+        })
+        .collect())
+}
+
+/// The multilingual plugin as a diagnosis line; `plugins` = active plugin files when they could be listed.
+/// `woo` = the WooCommerce companion plugin is needed too.
+pub(crate) fn plugin_check(plugin: Plugin, plugins: Option<&[String]>, woo: bool) -> Check {
+    let has = |slug: &str| plugins.is_some_and(|l| l.iter().any(|p| p.starts_with(slug)));
+    let missing = |detail: &str| Check {
+        fix: Some("install_plugin"),
+        ..Check::fail("plugin", detail)
+    };
+    let (wpml, pll) = if woo {
+        (
+            "WPML with WooCommerce Multilingual",
+            "Polylang Pro with Polylang for WooCommerce",
+        )
+    } else {
+        ("WPML", "Polylang Pro")
+    };
+    match plugin {
+        Plugin::Wpml if woo && plugins.is_some() && !has("woocommerce-multilingual/") => {
+            Check::warn(
+                "plugin",
+                "WPML is active without WooCommerce Multilingual: install WooCommerce Multilingual",
+                Some("install_plugin"),
+            )
+        }
+        Plugin::Polylang if woo && plugins.is_some() && !has("polylang-wc/") => Check::warn(
+            "plugin",
+            "Polylang Pro is active without Polylang for WooCommerce: install Polylang for WooCommerce",
+            Some("install_plugin"),
+        ),
+        Plugin::Wpml => Check::ok("plugin", wpml),
+        Plugin::Polylang => Check::ok("plugin", pll),
+        Plugin::None if has("sitepress-multilingual-cms/") => Check::warn(
+            "plugin",
+            "WPML is active but absent from the REST index: set the connection's plugin setting to wpml",
+            None,
+        ),
+        Plugin::None if has("polylang/") => missing(&format!(
+            "Polylang (free) is active but has no REST API: install {pll}, or {wpml}"
+        )),
+        Plugin::None => missing(&format!(
+            "no multilingual plugin with a REST API: install {pll}, or {wpml}"
+        )),
+    }
 }
 
 fn items_of(kind: &str, fields: &[(&str, bool)], o: &Value) -> Vec<SourceItem> {
@@ -441,6 +595,80 @@ impl Connector for WordPress {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let site = Site::new(creds).await?;
+        let place =
+            |m: &Value| Some((format!("/wp/v2/{}", m["type"].as_str()?), m["id"].as_i64()?));
+        Ok(Some(read_back(&site, locale, items, place).await?))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let site = match Site::new(creds).await {
+            Ok(s) => s,
+            Err(e) => return vec![Check::fail("permissions", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        match site.get("/wp/v2/users/me?context=edit").await {
+            Ok((me, _)) => {
+                let lacks = |caps: &[&'static str]| -> Vec<&'static str> {
+                    caps.iter()
+                        .copied()
+                        .filter(|c| me["capabilities"][*c] != true)
+                        .collect()
+                };
+                let edit = lacks(&[
+                    "edit_posts",
+                    "edit_others_posts",
+                    "edit_pages",
+                    "edit_others_pages",
+                ]);
+                let more = lacks(&["publish_posts", "publish_pages", "manage_categories"]);
+                if !edit.is_empty() {
+                    out.push(Check {
+                        fix: Some("permissions"),
+                        ..Check::fail(
+                            "permissions",
+                            format!(
+                                "the user lacks {}: use an Editor or Administrator",
+                                edit.join(", ")
+                            ),
+                        )
+                    });
+                } else if !more.is_empty() {
+                    out.push(Check::warn(
+                        "permissions",
+                        format!("the user lacks {}", more.join(", ")),
+                        Some("permissions"),
+                    ));
+                } else {
+                    out.push(Check::ok(
+                        "permissions",
+                        "edit and publish posts, pages, terms",
+                    ));
+                }
+            }
+            Err(e) => out.push(Check::fail("permissions", format!("{e:#}"))),
+        }
+        match site.plugin(creds).await {
+            Ok(plugin) => {
+                let plugins = match plugin {
+                    // Only worth a call when there is something to explain.
+                    Plugin::None => site.get("/wp/v2/plugins?status=active").await.ok(),
+                    _ => None,
+                }
+                .map(|(l, _)| Site::plugin_files(&l));
+                out.push(plugin_check(plugin, plugins.as_deref(), false));
+            }
+            Err(e) => out.push(Check::fail("plugin", format!("{e:#}"))),
+        }
+        out
     }
 
     /// WordPress core has no webhooks: plugins (WP Webhooks, a `save_post` hook…) call the account's webhook

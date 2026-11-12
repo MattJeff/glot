@@ -31,6 +31,54 @@ struct Fake {
     log: Vec<(String, String, Value)>,
     /// PR number -> state
     prs: HashMap<i64, String>,
+    /// `GET pulls/{n}/commits`.
+    commits: Value,
+    /// Issue comments: (id, body).
+    comments: Vec<(i64, String)>,
+    /// `POST /v1/messages` (the "real" Anthropic provider of the project) and the API key seen.
+    llm_calls: usize,
+    llm_key: String,
+    /// The provider answers with mock placeholders (`⟦fr⟧ …`) instead of translations.
+    llm_placeholders: bool,
+}
+
+/// Anthropic Messages API: the offline mock's answer, made to look like real translations
+/// (`⟦fr⟧ Text` => `«fr» Text`) unless `llm_placeholders`.
+async fn fake_anthropic(f: &Shared, key: String, b: &Value) -> axum::response::Response {
+    use glot_llm::provider::Provider as _;
+    let placeholders = {
+        let mut f = f.lock().unwrap();
+        f.llm_calls += 1;
+        f.llm_key = key;
+        f.llm_placeholders
+    };
+    let req = glot_llm::provider::CompletionRequest {
+        model: b["model"].as_str().unwrap_or_default().into(),
+        system: b["system"][0]["text"].as_str().unwrap_or_default().into(),
+        user: b["messages"][0]["content"]
+            .as_array()
+            .and_then(|c| c.last())
+            .and_then(|c| c["text"].as_str())
+            .or_else(|| b["messages"][0]["content"].as_str())
+            .unwrap_or_default()
+            .into(),
+        max_tokens: 1000,
+        json: true,
+        images: vec![],
+    };
+    let c = glot_llm::mock::MockProvider.complete(req).await.unwrap();
+    let mut text = c.text;
+    if !placeholders {
+        for l in ["fr", "de", "en"] {
+            text = text.replace(&format!("⟦{l}⟧"), &format!("«{l}»"));
+        }
+    }
+    axum::Json(json!({
+        "model": b["model"], "stop_reason": "end_turn",
+        "content": [{"type": "text", "text": text}],
+        "usage": {"input_tokens": 50, "output_tokens": c.output_tokens},
+    }))
+    .into_response()
 }
 type Shared = Arc<Mutex<Fake>>;
 
@@ -42,8 +90,16 @@ async fn fake_github(State(f): State<Shared>, req: Request<Body>) -> axum::respo
         .get(header::AUTHORIZATION)
         .map(|v| v.to_str().unwrap().to_string())
         .unwrap_or_default();
+    let key = req
+        .headers()
+        .get("x-api-key")
+        .map(|v| v.to_str().unwrap().to_string())
+        .unwrap_or_default();
     let bytes = req.into_body().collect().await.unwrap().to_bytes();
     let body: Value = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
+    if method == "POST" && path == "/v1/messages" {
+        return fake_anthropic(&f, key, &body).await;
+    }
     let mut f = f.lock().unwrap();
     f.log.push((method.clone(), path.clone(), body.clone()));
     let r = |v: Value| axum::Json(v).into_response();
@@ -83,6 +139,34 @@ async fn fake_github(State(f): State<Shared>, req: Request<Body>) -> axum::respo
             f.prs.insert(n, "open".into());
             r(json!({ "number": n, "html_url": format!("https://github.com/acme/app/pull/{n}") }))
         }
+        ("GET", p) if p.starts_with("/repos/acme/app/pulls/") && p.ends_with("/commits") => {
+            r(if f.commits.is_null() {
+                json!([])
+            } else {
+                f.commits.clone()
+            })
+        }
+        ("GET", p) if p.starts_with("/repos/acme/app/issues/") && p.ends_with("/comments") => {
+            r(Value::Array(
+                f.comments
+                    .iter()
+                    .map(|(id, b)| json!({ "id": id, "body": b }))
+                    .collect(),
+            ))
+        }
+        ("PATCH", p) if p.starts_with("/repos/acme/app/issues/comments/") => {
+            let id: i64 = p.rsplit('/').next().unwrap().parse().unwrap();
+            if let Some(c) = f.comments.iter_mut().find(|c| c.0 == id) {
+                c.1 = body["body"].as_str().unwrap_or_default().to_string();
+            }
+            r(json!({ "id": id }))
+        }
+        ("POST", p) if p.starts_with("/repos/acme/app/issues/") => {
+            let id = f.comments.len() as i64 + 1;
+            f.comments
+                .push((id, body["body"].as_str().unwrap_or_default().to_string()));
+            r(json!({ "id": id }))
+        }
         (m, p) if p.starts_with("/repos/acme/app/pulls/") => {
             let n: i64 = p.rsplit('/').next().unwrap().parse().unwrap();
             let state = f.prs.get(&n).cloned().unwrap_or("closed".into());
@@ -90,7 +174,6 @@ async fn fake_github(State(f): State<Shared>, req: Request<Body>) -> axum::respo
                 json!({ "number": n, "state": state, "html_url": format!("https://github.com/acme/app/pull/{n}"), "method": m }),
             )
         }
-        ("POST", p) if p.starts_with("/repos/acme/app/issues/") => r(json!({ "id": 1 })),
         _ => StatusCode::IM_A_TEAPOT.into_response(),
     }
 }
@@ -543,6 +626,132 @@ async fn connect_github_end_to_end() {
             && b["body"].as_str().unwrap().contains("glot")));
     }
 
+    // 4b. The same push again: nothing changed, so nothing is pushed and nobody is notified.
+    let head = |branch: &str| sh(&remote, &["rev-parse", &format!("refs/heads/{branch}")]);
+    let calls =
+        |f: &Fake, m: &str, p: &str| f.log.iter().filter(|(a, b, _)| a == m && b == p).count();
+    macro_rules! run_push {
+        () => {{
+            call(
+                post.clone(),
+                "/api/github/webhook",
+                Value::String(push.clone()),
+                &hook("push", &push),
+            )
+            .await;
+            let (_, v, _) = call(get.clone(), "/api/projects/web/github", Value::Null, &[]).await;
+            v["job"]["id"].as_str().unwrap().to_string()
+        }};
+    }
+    let (before, patches) = {
+        let f = fake.lock().unwrap();
+        (
+            head("glot/localize"),
+            calls(&f, "PATCH", "/repos/acme/app/pulls/1"),
+        )
+    };
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+    {
+        let f = fake.lock().unwrap();
+        assert_eq!(
+            head("glot/localize"),
+            before,
+            "idempotent re-run: no new commit"
+        );
+        assert_eq!(calls(&f, "PATCH", "/repos/acme/app/pulls/1"), patches);
+        assert_eq!(f.comments.len(), 1, "one status comment, edited in place");
+    }
+
+    // 4c. A person pushes a commit to the glot branch, then main moves: the branch is rebuilt on
+    // the new main and the person's commit is still there, under their name.
+    let human = tmp.join("human");
+    sh(
+        &tmp,
+        &[
+            "clone",
+            "-q",
+            "-b",
+            "glot/localize",
+            remote.to_str().unwrap(),
+            human.to_str().unwrap(),
+        ],
+    );
+    std::fs::write(human.join("REVIEW.md"), "Checked the French copy.\n").unwrap();
+    sh(&human, &["add", "REVIEW.md"]);
+    sh(&human, &["commit", "-qm", "review notes"]);
+    sh(&human, &["push", "-q", "origin", "glot/localize"]);
+    let human_sha = sh(&human, &["rev-parse", "HEAD"]).trim().to_string();
+    fake.lock().unwrap().commits = json!([
+        { "sha": before.trim(), "author": { "login": "glot-test[bot]" }, "commit": { "author": { "name": "glot-test[bot]", "email": "42+glot-test[bot]@users.noreply.github.com" } }, "parents": [{}] },
+        { "sha": human_sha, "author": { "login": "dev" }, "commit": { "author": { "name": "dev", "email": "dev@example.com" } }, "parents": [{}] },
+    ]);
+    std::fs::write(
+        work.join("README.md"),
+        "# app\n\nmain moved while the pull request was open\n",
+    )
+    .unwrap();
+    sh(&work, &["add", "README.md"]);
+    sh(&work, &["commit", "-qm", "readme"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+    let log = sh(&remote, &["log", "--format=%an|%s", "glot/localize"]);
+    assert!(
+        log.contains("dev|review notes"),
+        "human commit kept:\n{log}"
+    );
+    assert!(
+        log.contains("dev|readme"),
+        "rebuilt on the latest main:\n{log}"
+    );
+    assert_eq!(
+        sh(&remote, &["show", "glot/localize:REVIEW.md"]),
+        "Checked the French copy.\n"
+    );
+    assert_eq!(fake.lock().unwrap().comments.len(), 1);
+
+    // 4d. Their commit stops applying (main rewrote the same file): nothing is overwritten, the
+    // run says why, the pull request gets the explanation.
+    std::fs::write(human.join("README.md"), "# app\n\nreviewer wording\n").unwrap();
+    sh(&human, &["fetch", "-q", "origin"]);
+    sh(&human, &["reset", "-q", "--hard", "origin/glot/localize"]);
+    std::fs::write(human.join("README.md"), "# app\n\nreviewer wording\n").unwrap();
+    sh(&human, &["commit", "-qam", "reword readme"]);
+    sh(&human, &["push", "-q", "origin", "glot/localize"]);
+    let conflicting = sh(&human, &["rev-parse", "HEAD"]).trim().to_string();
+    fake.lock().unwrap().commits = json!([
+        { "sha": conflicting, "author": { "login": "dev" }, "commit": { "author": { "name": "dev", "email": "dev@example.com" } }, "parents": [{}] },
+    ]);
+    std::fs::write(work.join("README.md"), "# app\n\nmaintainer wording\n").unwrap();
+    sh(&work, &["commit", "-qam", "readme again"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let kept = head("glot/localize");
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "failed", "{j}");
+    assert!(j["error"].as_str().unwrap().contains("pr_conflict"), "{j}");
+    assert_eq!(head("glot/localize"), kept, "the branch was not touched");
+    let (_, v, _) = call(get.clone(), "/api/projects/web/github", Value::Null, &[]).await;
+    assert_eq!(v["failure"], "pr_conflict");
+    {
+        let f = fake.lock().unwrap();
+        assert_eq!(f.comments.len(), 1);
+        assert!(
+            f.comments[0].1.contains("Nothing was overwritten"),
+            "{}",
+            f.comments[0].1
+        );
+    }
+    // Back to a clean state for the merge below: the person drops their commit.
+    sh(&human, &["reset", "-q", "--hard", "HEAD~1"]);
+    sh(
+        &human,
+        &["push", "-q", "--force", "origin", "glot/localize"],
+    );
+    fake.lock().unwrap().commits = json!([]);
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+
     // 5. PR merged (closed webhook) → next push opens `glot/update`.
     sh(&work, &["fetch", "-q", "origin"]);
     sh(&work, &["merge", "-q", "--no-edit", "origin/glot/localize"]);
@@ -606,6 +815,108 @@ async fn connect_github_end_to_end() {
         !page.contains("Made in Lyon</footer>"),
         "new string converted:\n{page}"
     );
+
+    // 6. The Orizn case. The repository's glot.toml says `provider = "mock"` (committed by the
+    // first run); the project uses a real provider with a key. The run must translate with the
+    // project's provider, and the placeholders already on the branch are translated again.
+    let toml = std::fs::read_to_string(work.join("glot.toml")).unwrap();
+    assert!(toml.contains("provider = \"mock\""), "{toml}");
+    let (s, v, _) = call(
+        Method::PATCH,
+        "/api/projects/web",
+        json!({"llm": {"provider": "anthropic", "model": "claude-haiku-5-5", "base_url": gh_url, "api_key": "sk-ant-api03-test"}}),
+        &[],
+    )
+    .await;
+    assert!(s.is_success(), "{v}");
+    std::fs::write(
+        work.join("app/page.tsx"),
+        std::fs::read_to_string(work.join("app/page.tsx"))
+            .unwrap()
+            .replace("</main>", "  <p>Invoices sync every night</p>\n    </main>"),
+    )
+    .unwrap();
+    sh(&work, &["commit", "-qam", "sync copy"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+    assert!(
+        fake.lock().unwrap().llm_calls > 0,
+        "the project's provider translated"
+    );
+    assert_eq!(fake.lock().unwrap().llm_key, "sk-ant-api03-test");
+    let branch = |file: &str| sh(&remote, &["show", &format!("glot/update:{file}")]);
+    for loc in ["fr", "de"] {
+        let cat = branch(&format!("messages/{loc}.json"));
+        assert!(!cat.contains('⟦'), "no placeholder ships in {loc}:\n{cat}");
+        assert!(
+            cat.contains(&format!("«{loc}» Invoices sync every night")),
+            "{cat}"
+        );
+    }
+    let (_, v, _) = call(
+        get.clone(),
+        "/api/projects/web/keys?locale=fr",
+        Value::Null,
+        &[],
+    )
+    .await;
+    assert!(!v.to_string().contains('⟦'), "nothing fake synced: {v}");
+    let synced = v["total"].clone();
+
+    // 7. A provider answering with placeholders: nothing is synced, nothing is pushed.
+    fake.lock().unwrap().llm_placeholders = true;
+    std::fs::write(
+        work.join("app/page.tsx"),
+        std::fs::read_to_string(work.join("app/page.tsx"))
+            .unwrap()
+            .replace(
+                "</main>",
+                "  <p>Exports are kept for a year</p>\n    </main>",
+            ),
+    )
+    .unwrap();
+    sh(&work, &["commit", "-qam", "exports copy"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let kept = head("glot/update");
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "failed", "{j}");
+    assert!(j["error"].as_str().unwrap().contains("mock_output"), "{j}");
+    assert_eq!(head("glot/update"), kept, "nothing pushed");
+    let (_, v, _) = call(get.clone(), "/api/projects/web/github", Value::Null, &[]).await;
+    assert_eq!(v["failure"], "mock_output");
+    let (_, v, _) = call(
+        get.clone(),
+        "/api/projects/web/keys?locale=fr",
+        Value::Null,
+        &[],
+    )
+    .await;
+    assert_eq!(v["total"], synced, "nothing synced");
+    fake.lock().unwrap().llm_placeholders = false;
+
+    // 8. The repository's source language differs from the project's: stop before translating.
+    std::fs::write(
+        work.join("glot.toml"),
+        toml.replace("source_locale = \"en\"", "source_locale = \"fr\""),
+    )
+    .unwrap();
+    sh(&work, &["commit", "-qam", "repo in french"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let calls = fake.lock().unwrap().llm_calls;
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "failed", "{j}");
+    assert!(
+        j["error"]
+            .as_str()
+            .unwrap()
+            .contains("source_mismatch: repo=fr project=en:"),
+        "{j}"
+    );
+    assert_eq!(head("glot/update"), kept, "nothing pushed");
+    assert_eq!(fake.lock().unwrap().llm_calls, calls, "nothing translated");
+    let (_, v, _) = call(get.clone(), "/api/projects/web/github", Value::Null, &[]).await;
+    assert_eq!(v["failure"], "source_mismatch");
 
     // Scratch dirs cleaned up.
     let jobs: Vec<String> = sqlx::query_scalar("SELECT id::text FROM jobs")

@@ -36,6 +36,10 @@ pub struct JobParams {
     /// Cap for this job, on top of the project budget (the stricter wins), e.g. a recommendation's estimate.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub budget_usd: Option<f64>,
+    /// Message syntax of this job's keys when it is not the project's: CMS content (connectors) is plain text
+    /// with `{0}` placeholders, never ICU, whatever the project's catalogs use.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub syntax: Option<glot_core::validate::Syntax>,
 }
 
 #[derive(Debug, Clone, FromRow)]
@@ -308,6 +312,10 @@ async fn run(state: AppState, mut job: JobRecord) {
     }
     save(state, &job).await;
     tracing::info!(job = %job.id, status = %job.status, cost_usd = job.cost_usd, "job finished");
+    // New translations may have made a language ready: check that the site really shows it.
+    if !github && job.status == "done" {
+        crate::live_check::after_job(state, job.project_id);
+    }
     // Edge and CMS connector jobs run in the background: no email per job.
     if github || edge || job.kind == crate::connectors::sync::JOB_KIND {
         return;
@@ -385,6 +393,7 @@ pub(crate) async fn setup(
 async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
     let params = job.params.0.clone();
     let (p, config, translator, glossary) = setup(state, job.project_id, params.budget_usd).await?;
+    let syntax = params.syntax.unwrap_or(p.syntax);
 
     let all_keys: Vec<KeyRecord> = sqlx::query_as(
         "SELECT id, key, source, description, refs, ui_role, component FROM keys WHERE project_id = $1 ORDER BY key",
@@ -449,7 +458,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
                     })
                     .collect(),
                 glossary: glossary_terms,
-                syntax: config.syntax,
+                syntax,
                 style: p.style.clone(),
             };
             let (results, usage) = translator.translate(req).await?;
@@ -481,7 +490,7 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
                         score: r.score,
                         extra_issues: low_score,
                         author: None,
-                        syntax: p.syntax,
+                        syntax,
                     },
                 )
                 .await

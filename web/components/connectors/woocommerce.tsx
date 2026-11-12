@@ -4,6 +4,7 @@ export const woocommerce: ConnectorDef = {
   kind: "woocommerce",
   title: "WooCommerce",
   docs: "woocommerce",
+  oneClick: { tenant: { placeholder: "https://shop.example.com" } },
   fields: [
     { name: "url", type: "url", placeholder: "https://shop.example.com" },
     { name: "consumer_key", type: "text", placeholder: "ck_…" },

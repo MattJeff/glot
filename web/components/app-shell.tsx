@@ -16,11 +16,14 @@ import {
   X,
   Menu,
   MessageSquareWarning,
+  MessagesSquare,
+  Network,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
   Radar,
+  Radio,
   ScanEye,
   Search,
   Settings,
@@ -29,6 +32,8 @@ import {
   GitPullRequest,
   Globe,
   Plug,
+  TrendingUp,
+  Send,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -74,11 +79,17 @@ const PROJECT_PAGES = [
   { seg: "/github", icon: GitPullRequest, label: "github" },
   { seg: "/integrations", icon: Plug, label: "integrations" },
   { seg: "/edge", icon: Globe, label: "edge" },
+  { seg: "/local-seo", icon: Search, label: "localSeo" },
+  { seg: "/render", icon: Send, label: "render" },
   { seg: "/settings", icon: Settings, label: "settings" },
   // Labs (heading before /insights): growth features, less proven than the core loop.
   { seg: "/insights", icon: Radar, label: "insights" },
+  { seg: "/autopilot", icon: TrendingUp, label: "autopilot" },
   { seg: "/experiments", icon: FlaskConical, label: "experiments" },
   { seg: "/feedback", icon: MessageSquareWarning, label: "feedback" },
+  { seg: "/live-stream", icon: Radio, label: "liveStream" },
+  { seg: "/conversations", icon: MessagesSquare, label: "conversations" },
+  { seg: "/text-graph", icon: Network, label: "textGraph" },
 ] as const;
 
 function SidebarNav({

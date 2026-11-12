@@ -134,7 +134,50 @@ Dashboard → **Integrations** connects a CMS or a store to a project. Every con
 2. **Keys**: each translatable field becomes a glot key `{cms}:{resource}:{id}:{field}` (`shopify:product:42:title`). The content type and title go into the key description, so the translator gets context. HTML and rich text are never sent whole: they are split into text segments (inline tags become `<0>…</0>`, rich text marks stay on their nodes), one key `{key}#{hash}` per segment. Markup, attributes, Gutenberg block comments and rich text structure are rebuilt byte for byte.
 3. **Translate**: a `connector_translate` job (Jobs page: *CMS translation*) translates missing and stale keys with the project's model, validators and glossary. It sends no email.
 4. **Push**: a field is written back only when **every** segment has a valid translation (`machine` or `reviewed`, never `stale`), so a page is never half-translated. glot stores a hash of each value pushed per locale. Running a sync again with nothing changed writes nothing, and a source change re-sends only the fields that changed.
-5. **Triggers**: **Sync now** on the card, a webhook from the CMS, and a periodic push every 10 minutes that picks up translations reviewed in glot since the last push. The periodic push compares hashes first, so it makes no CMS calls when nothing changed.
+5. **Triggers**: **Sync now** on the card, a webhook from the CMS, a periodic push every 10 minutes that picks up translations reviewed in glot since the last push, and an incremental pull once a day for platforms that send no webhook (or missed one). The periodic push compares hashes first, so it makes no CMS calls when nothing changed.
+
+### Connect in one click
+
+Where the platform allows it, the card has a **Connect** button instead of a form: you approve the access on the platform and come back connected. No token to copy.
+
+| Platform | How | What the glot server needs |
+| --- | --- | --- |
+| Shopify | OAuth install of the glot app ([authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant), expiring offline token renewed by glot) | `GLOT_SHOPIFY_CLIENT_ID`, `GLOT_SHOPIFY_CLIENT_SECRET` |
+| Webflow | [OAuth app](https://developers.webflow.com/data/reference/oauth-app) | `GLOT_WEBFLOW_CLIENT_ID`, `GLOT_WEBFLOW_CLIENT_SECRET` |
+| HubSpot | [OAuth app](https://developers.hubspot.com/docs/api/working-with-oauth), access token renewed by glot | `GLOT_HUBSPOT_CLIENT_ID`, `GLOT_HUBSPOT_CLIENT_SECRET` |
+| WordPress | WordPress's own [application password approval screen](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/): you enter the site address, approve in wp-admin | nothing |
+| WooCommerce | WooCommerce's own [key approval screen](https://woocommerce.github.io/woocommerce-rest-api-docs/#rest-api-keys) (`/wc-auth/v1/authorize`) | nothing (the glot server must be reachable over HTTPS) |
+
+When a client isn't configured on the server, the card falls back to the credentials form; **Enter credentials by hand instead** opens it at any time. The redirect URL to register in each developer app is `https://<your glot site>/api/connectors/oauth/<shopify|webflow|hubspot>/callback`. The approval link is valid 30 minutes and only for the glot user who started it. If the platform later refuses the credentials (app uninstalled, token revoked), the card says so and shows **Reconnect**: same account, same history, new access.
+
+### Preview, approval, pause
+
+A connection made in the dashboard starts with a **preview**: glot reads the content and stops. The card shows what it found (items and texts per content type, languages, words to translate, estimated cost). Nothing is translated and nothing is written to the platform until you choose:
+
+- **Translate and publish**: the automatic loop above.
+- **Translate, I publish myself**: translations are prepared, **Review changes** lists what would be written (source, translation, new or update), and nothing reaches the platform until you click **Publish**.
+- Untick a content type to leave it out (`settings.exclude`, e.g. `["page", "menu"]`): it is neither translated nor written.
+- **Pause** at any time: glot keeps reading changes but translates and writes nothing until you approve again.
+
+Connections made through the API keep the automatic behaviour unless you pass `"preview": true`.
+
+### Human edits are kept
+
+Before glot writes a translation, it reads what the platform currently holds (on the platforms where the API allows it; **Test connection** tells you). A translation someone edited on the platform since glot wrote it, or one that existed before glot, is **kept**: the card counts them. Turn on **Replace translations that already exist** (`settings.overwrite`) to write over them anyway.
+
+### Quality gate
+
+A translation is not written when it would break something: Liquid / HubL / Twig code (`{{ … }}`, `{% … %}`), variables (`{name}`, `%s`, `%1$s`, `${x}`, `%{x}`), WordPress shortcodes (`[gallery ids="1"]`), HTML tags, or link and image targets (`href`, `src`) that differ from the source. The item appears under **Not published** with what to fix; correct it in the glot editor and the next push writes it. The project's glossary and brand terms are applied by the translation job itself, as for every glot key.
+
+### History and undo
+
+Every publication that wrote something is listed under **History**. **Undo** puts back what the platform had before (previous translations are restored, translations glot had created are deleted where the platform's API can delete them), except texts a human edited since. Publications are undone newest first, and publishing is then paused until you resume it. Undo needs a platform whose translations glot can read back.
+
+### Test connection
+
+**Test connection** runs a read-only diagnosis and lists each point with what to do: sign-in, languages (your target languages against the platform's), reading content, reading existing translations, automatic sync (webhooks), then platform-specific checks (granted scopes, multilingual plugin, permissions). Run it after connecting: it names the missing scope or plugin instead of letting a sync fail.
+
+Self-hosting or checking a platform before a customer does: the same read-only diagnosis runs from a terminal against any real account, `GLOT_REAL_KIND=shopify GLOT_REAL_SECRETS='{"shop":"…","client_id":"…","client_secret":"…"}' cargo test -p glot-server --test connectors_real -- --ignored --nocapture`. It prints one line per check and never prints a secret.
 
 Locales: each glot target locale is written to the CMS locale with the same code. Map them differently with `PATCH /api/projects/{slug}/connectors/{id}` and `{"settings": {"locale_map": {"pt-BR": "pt-br"}}}`.
 
@@ -142,20 +185,26 @@ Webhooks: every card shows a webhook URL that carries its own token. Paste it in
 
 Security: credentials are encrypted at rest (AES-256-GCM, server key `GLOT_SECRET_KEY`). They are never logged and never sent back to the browser: the dashboard only lists which fields are set. CMS URLs must resolve to public addresses (no internal network), with no redirects. glot waits and retries on `429`/`503`, following `Retry-After`.
 
-API: `GET/POST /api/projects/{slug}/connectors`, `PATCH/DELETE …/connectors/{id}`, `POST …/{id}/test` (credentials, CMS locales), `POST …/{id}/sync` (`{"incremental": true}` for changes since the last sync only), `GET …/{id}/status` (job progress, fields pushed per locale).
+API: `GET/POST /api/projects/{slug}/connectors`, `PATCH/DELETE …/connectors/{id}`, `POST …/{id}/test` (credentials, CMS locales), `POST …/{id}/doctor` (the diagnosis), `POST …/{id}/sync` (`{"incremental": true}` for changes since the last sync only), `POST …/{id}/hold` (`{"hold": null | "translate" | "push"}`), `GET …/{id}/diff` (what the next publication would write), `POST …/{id}/publish`, `GET …/{id}/runs` and `POST …/{id}/runs/{run}/rollback`, `GET …/{id}/status` (job progress, fields pushed per locale).
 
-Limits: deleting content in the CMS removes it from sync on the next full sync, but its glot keys stay. glot does not translate URL slugs, images or references.
+Limits: deleting content in the CMS removes it from sync on the next full sync, but its glot keys stay. glot does not translate images or references, and URL slugs only where a connector says so (Shopify handles, opt-in). Leaving content out is per content type, not per collection or tag. A human edit made on the platform is kept there but not imported back into glot.
 
 ## Shopify
 
-Dashboard → **Integrations** → Shopify. glot uses the GraphQL Admin API ([`translatableResources`](https://shopify.dev/docs/api/admin-graphql/latest/queries/translatableResources), [`translationsRegister`](https://shopify.dev/docs/api/admin-graphql/latest/mutations/translationsRegister), [guide](https://shopify.dev/docs/apps/build/markets/manage-translated-content)), API version `2025-10` (`settings.api_version` overrides it).
+Dashboard → **Integrations** → Shopify. glot uses the GraphQL Admin API ([`translatableResources`](https://shopify.dev/docs/api/admin-graphql/latest/queries/translatableResources), [`translationsRegister`](https://shopify.dev/docs/api/admin-graphql/latest/mutations/translationsRegister), [guide](https://shopify.dev/docs/apps/build/markets/manage-translated-content)), API version `2026-07` (`settings.api_version` overrides it).
 
-- **Credentials**: in Shopify admin → Settings → Apps and sales channels → Develop apps, create a custom app. Give it the Admin API scopes `read_translations`, `write_translations`, `read_products`, `read_content`, `read_online_store_pages`, `read_themes` and `read_locales`/`write_locales`, install it, then copy the **Admin API access token** (`shpat_…`) and the store domain (`my-store.myshopify.com`). The **API secret key** is optional: with it, glot registers webhooks and verifies them.
-- **What is translated**: products, product options and values, collections, pages, blogs, articles, metafields, metaobjects, menus and links, shop, policies and the online store theme (`ONLINE_STORE_THEME`). `settings.resources` (`["PRODUCT", "COLLECTION"]`) limits the list. HTML fields (`body_html`, `HTML`, `INLINE_RICH_TEXT`) keep their tags. Rich text metafields (JSON) keep their nodes. URLs, file references, JSON values and handles (URL slugs) are skipped. Set `settings.translate_handles: true` to translate handles.
+- **Connect**, three ways:
+  1. **One click** (when the glot server has its Shopify app configured): enter the store domain, approve in Shopify. glot receives an [expiring offline token](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/offline-access-tokens) (1 hour, refreshed automatically with a 90-day rotating refresh token) and verifies the install callback's HMAC.
+  2. **Your own app** (the form): since January 1, 2026, a merchant's custom app is created in the [Dev Dashboard](https://dev.shopify.com/dashboard/) and has no permanent token. Create the app, give it the scopes below, install it on your store, then paste its **Client ID** and **Client secret** with the store domain. glot gets its tokens through the [client credentials grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/client-credentials-grant) (valid 24 hours) and renews them before they expire. The app and the store must belong to the same Shopify organization.
+  3. **Legacy token**: a custom app created in the store admin before 2026 keeps its **Admin API access token** (`shpat_…`); paste it with the store domain. The **API secret key** is optional: with it, glot registers webhooks and verifies them.
+- **Scopes**: `read_translations`, `write_translations` and `read_locales` are required; `write_locales` lets glot add a missing language; each read scope opens a kind of content: `read_products` (products, collections, options, images), `read_content` (blogs, articles), `read_online_store_pages` (pages), `read_online_store_navigation` (menus), `read_themes` (theme texts), `read_metaobjects`. A missing read scope doesn't fail the sync: that content is skipped, and **Test connection** names the scope ([`currentAppInstallation.accessScopes`](https://shopify.dev/docs/api/admin-graphql/latest/queries/currentAppInstallation)).
+- **What is translated**: products, product options and values, collections, pages, blogs, articles, metafields, metaobjects, image alt texts (`MEDIA_IMAGE`, `COLLECTION_IMAGE`, `ARTICLE_IMAGE`), menus and links, filters, shop, policies, delivery methods, payment gateways, selling plans and the online store theme (`ONLINE_STORE_THEME`), including their SEO fields (`meta_title`, `meta_description`) ([resource types](https://shopify.dev/docs/api/admin-graphql/latest/enums/TranslatableResourceType)). `settings.resources` (`["PRODUCT", "COLLECTION"]`) limits the list. HTML fields (`body_html`, `HTML`, `INLINE_RICH_TEXT`) keep their tags. Rich text metafields (JSON) keep their nodes. URLs, file references and JSON values are skipped. Handles (URL slugs) are skipped unless `settings.translate_handles: true`. Email and packing slip templates are not in the default list (they are mostly Liquid): add `EMAIL_TEMPLATE` to `settings.resources` if you want them; the quality gate refuses any translation that alters their Liquid.
+- **Human edits and undo**: glot reads the store's current translations ([`translatableResourcesByIds`](https://shopify.dev/docs/api/admin-graphql/latest/queries/translatableResourcesByIds)) before writing, and deletes with [`translationsRemove`](https://shopify.dev/docs/api/admin-graphql/latest/mutations/translationsRemove) when a publication that created them is undone.
 - **Digests**: each translation is registered with the `translatableContentDigest` of the source it was made from. If the merchant edits the source in between, Shopify refuses the translation. The next sync then re-translates the new source.
 - **Locales**: a glot target locale missing from the store is added with `shopLocaleEnable`, unpublished. You publish it in Shopify (Settings → Languages) when you're ready.
 - **Rate limits**: glot follows the [calculated query cost](https://shopify.dev/docs/api/usage/limits). Before the next call, it waits until the bucket has refilled enough for it, and it retries `THROTTLED` responses.
-- **Webhooks**: with the API secret key, glot subscribes `PRODUCTS_CREATE`, `PRODUCTS_UPDATE`, `COLLECTIONS_CREATE` and `COLLECTIONS_UPDATE` to the card's webhook URL, and checks `X-Shopify-Hmac-Sha256` (base64 HMAC-SHA256 of the body). Pages, articles and theme edits are picked up by **Sync now** or the next webhook.
+- **Webhooks**: glot subscribes `PRODUCTS_CREATE`, `PRODUCTS_UPDATE`, `COLLECTIONS_CREATE` and `COLLECTIONS_UPDATE` to the card's webhook URL, and checks `X-Shopify-Hmac-Sha256` (base64 HMAC-SHA256 of the body, keyed with the app's client secret, or the API secret key of a legacy app). Pages, articles and theme edits are picked up by **Sync now**, the next webhook or the daily check.
+- **App webhooks** (one-click connections): `POST /api/connectors/shopify/webhooks` receives `app/uninstalled` (the card then asks to reconnect) and the three [mandatory compliance topics](https://shopify.dev/docs/apps/build/compliance/privacy-law-compliance). glot stores no customer data, so `customers/data_request` and `customers/redact` are acknowledged; `shop/redact` deletes the store's connection. A bad HMAC gets `401`.
 - **Theme files**: if your theme lives in Git, glot can already translate `locales/*.json` there (CLI, GitHub). The Shopify connector covers what isn't in theme files: store content and the theme as edited in the admin. Use one path for theme strings, not both: drop `ONLINE_STORE_THEME` from `settings.resources` when the theme's locale files are handled in Git.
 
 ## Shopify app embed
@@ -180,11 +229,13 @@ Switcher modes:
 
 Customer data: the embed is off on customer account templates (`customers/*`) and the password page, and Shopify never renders app embeds on checkout. Form values are never read by glot.js.
 
-Limits: the connector still needs an Admin API access token (`shpat_…`) from a custom app created in the store admin. Since January 1, 2026, new custom apps are created in the Dev Dashboard ([Shopify Help](https://help.shopify.com/en/manual/apps/app-types/custom-apps)), and those get their tokens through the [client credentials grant](https://shopify.dev/docs/apps/build/authentication-authorization/client-credentials-grant), valid 24 hours. glot's connector doesn't renew these tokens yet. Stores with a legacy custom app keep using its token. `pnpm test` renders the embed with liquidjs, with Shopify's own tags stubbed. It hasn't been deployed to a real store.
+Limits: the embed and the connector are separate. The connector connects in one click or with your own Dev Dashboard app's Client ID and secret (see [Shopify](#shopify)); the same Dev Dashboard app can provide both the embed and the connector's credentials if you add the connector's scopes to `shopify.app.toml`. `pnpm test` renders the embed with liquidjs, with Shopify's own tags stubbed. It hasn't been deployed to a real store.
 
 ## WordPress
 
 Dashboard → **Integrations** → WordPress. glot uses the [REST API](https://developer.wordpress.org/rest-api/reference/posts/) with an [application password](https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/#basic-authentication-with-application-passwords) (Users → Profile → Application passwords). Use an Editor account. Never give glot your login password.
+
+- **Connect**: enter the site address and click **Connect**: WordPress shows its own approval screen and sends the application password to glot (the site must be on HTTPS, which application passwords require). The form (address, user name, application password) stays available, and so does the plugin's **Connect to glot** button below.
 
 - **What is translated**: posts and pages (title, content, excerpt, every status except trash), categories and tags (name, description). Menu items (title) are opt-in with `settings.menus: true`. Content is read raw (`context=edit`). Gutenberg HTML keeps its block comments (`<!-- wp:paragraph {…} -->`), attributes and markup: only the text between tags is translated.
 - **Multilingual plugin**: WordPress has no translations of its own, so glot writes into the site's plugin. It detects the plugin from the REST index (`settings.plugin: "polylang" | "wpml"` forces one).
@@ -295,7 +346,8 @@ Dashboard → **Integrations** → Strapi, for Strapi **4** and **5** with the [
 
 Dashboard → **Integrations** → WooCommerce. glot uses the [REST API `wc/v3`](https://developer.woocommerce.com/docs/apis/rest-api/v3/products/) with a REST API key ([HTTP Basic auth](https://woocommerce.github.io/woocommerce-rest-api-docs/#authentication), so the store must be on HTTPS). WooCommerce stores no translations of its own: as with WordPress, glot writes them into the site's multilingual plugin.
 
-- **Credentials**: WooCommerce → Settings → Advanced → REST API → Add key, permission **Read/Write**, for a Shop manager or an Administrator. Copy the **consumer key** (`ck_…`) and **consumer secret** (`cs_…`). The **webhook secret** is optional: with it, glot registers webhooks and verifies them.
+- **Connect**: enter the store address and click **Connect**: WooCommerce shows its own approval screen and sends a Read/Write REST API key to glot.
+- **Credentials** (the form, instead): WooCommerce → Settings → Advanced → REST API → Add key, permission **Read/Write**, for a Shop manager or an Administrator. Copy the **consumer key** (`ck_…`) and **consumer secret** (`cs_…`). The **webhook secret** is optional: glot generates one when you leave it empty, registers the product webhooks with it and verifies them.
 - **What is translated**: products (name, short description, description), product categories and tags (name, description). Values are read raw (`context=edit`). HTML descriptions keep their tags, attributes and shortcodes, and only the text between tags is translated. SKUs, slugs, prices, attributes and variations are not touched: WooCommerce Multilingual syncs variations from the translated product.
 - **Multilingual plugin**: detected from the REST index (`settings.plugin: "polylang" | "wpml"` forces one). glot pulls only the source language (`?lang=en`).
   - **WPML + WooCommerce Multilingual**: existing translations come from the `translations` map of each product or term. A missing one is created with `POST /wc/v3/products` and `"lang": "fr", "translation_of": 12` in the body, as [WPML documents it](https://wpml.org/documentation/related-projects/woocommerce-multilingual/using-wordpress-rest-api-woocommerce-multilingual/). WPML has no languages endpoint: set `settings.languages` and `settings.source_lang`.

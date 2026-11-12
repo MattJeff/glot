@@ -83,7 +83,7 @@ fn var(a: f64, b: f64) -> f64 {
     a * b / ((a + b).powi(2) * (a + b + 1.0))
 }
 
-#[derive(Serialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct Interval {
     pub mid: f64,
     pub low: f64,
@@ -370,16 +370,27 @@ pub async fn for_project(
     days: i64,
     goal: &str,
 ) -> ApiResult<Recommendations> {
+    for_table(state, p, days, goal, "insight_daily").await
+}
+
+/// Same, over another table of the same shape (Autopilot's imported PostHog counters).
+pub async fn for_table(
+    state: &AppState,
+    p: &ProjectRow,
+    days: i64,
+    goal: &str,
+    table: &str,
+) -> ApiResult<Recommendations> {
     let days = days.clamp(1, 365);
     let half = (days / 2) as i32;
-    let raw: Vec<(String, String, bool, bool, i64)> = sqlx::query_as(
+    let raw: Vec<(String, String, bool, bool, i64)> = sqlx::query_as(&format!(
         "SELECT preferred, served, event <> '$view', day > (now() AT TIME ZONE 'utc')::date - $3::int,
                 sum(n)::bigint
-         FROM insight_daily
+         FROM {table}
          WHERE project_id = $1 AND day > (now() AT TIME ZONE 'utc')::date - $2::int
            AND (event = '$view' OR event = $4)
-         GROUP BY 1, 2, 3, 4",
-    )
+         GROUP BY 1, 2, 3, 4"
+    ))
     .bind(p.id)
     .bind(days as i32)
     .bind(half)

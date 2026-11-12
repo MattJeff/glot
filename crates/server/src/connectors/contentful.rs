@@ -10,6 +10,17 @@
 //! the locale's values set, and `PUT` with `X-Contentful-Version` (retried once on a version conflict).
 //! Webhooks: the webhook URL shown in the dashboard (token included), or a secret header
 //! `X-Glot-Webhook-Secret` set on the Contentful webhook.
+//!
+//! Read back (`current`): one `GET /entries?sys.id[in]=…`; the CMA returns `fields.{id}.{locale}` only for the
+//! locales that are set (no fallback), so a missing key is "no translation". Removed (`remove`): the entry
+//! is `PUT` without the locale's key of those fields (an update replaces every field). Diagnosis (`doctor`):
+//! a secondary locale exists and is editable through the CMA, every content type has localized text fields.
+//! The CMA has no read-only way to tell whether the token's role may edit entries: a refused write shows
+//! as a failed push.
+//!
+//! Docs: https://www.contentful.com/developers/docs/references/content-management-api/ (entries, content
+//! types, search parameters), https://www.contentful.com/developers/docs/references/content-management-api/locales
+//! (`contentManagementApi`).
 use async_trait::async_trait;
 use axum::http::HeaderMap;
 use serde_json::{Value, json};
@@ -17,7 +28,8 @@ use std::collections::{BTreeMap, HashMap};
 
 use super::cms::{self, param, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Contentful;
@@ -234,12 +246,138 @@ impl Connector for Contentful {
         }
         let mut report = PushReport::default();
         for (id, its) in by_entry {
-            match push_entry(&api, id, locale, &its, publish).await {
+            match push_entry(&api, id, locale, &its, publish, false).await {
                 Ok(()) => report.ok += its.len(),
                 Err(e) => report.failed.push((id.to_string(), format!("{e:#}"))),
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let mut ids: Vec<&str> = items.iter().map(|i| i.external_id.as_str()).collect();
+        ids.sort_unstable();
+        ids.dedup();
+        for id in &ids {
+            anyhow::ensure!(id_ok(id), "invalid entry id");
+        }
+        let page = api
+            .get(&format!(
+                "/entries?skip=0&limit=1000&sys.id%5Bin%5D={}",
+                ids.join(",")
+            ))
+            .await?;
+        let entries: HashMap<&str, &Value> = page["items"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|e| Some((e["sys"]["id"].as_str()?, e)))
+            .collect();
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let e = entries.get(it.external_id.as_str())?;
+                    read_back(&e["fields"][it.field.as_str()][locale], &it.format)
+                })
+                .collect(),
+        ))
+    }
+
+    async fn remove(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        let api = Api::new(creds).await?;
+        let (def, _) = api.default_locale().await?;
+        anyhow::ensure!(locale != def, "{locale} is the default locale");
+        let publish = creds.setting("publish") == Some(&Value::Bool(true));
+        let mut by_entry: BTreeMap<&str, Vec<&PushItem>> = BTreeMap::new();
+        for it in items {
+            by_entry.entry(&it.external_id).or_default().push(it);
+        }
+        for (id, its) in by_entry {
+            push_entry(&api, id, locale, &its, publish, true).await?;
+        }
+        Ok(true)
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("environment", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        match api.get("/locales?limit=1000").await {
+            Ok(l) => {
+                let items = l["items"].as_array().cloned().unwrap_or_default();
+                let code = |i: &Value| i["code"].as_str().unwrap_or_default().to_string();
+                let secondary: Vec<String> = items
+                    .iter()
+                    .filter(|i| i["default"] != true)
+                    .map(code)
+                    .collect();
+                // `contentManagementApi: false` = the locale cannot be edited through the API.
+                let closed: Vec<String> = items
+                    .iter()
+                    .filter(|i| i["default"] != true && i["contentManagementApi"] == false)
+                    .map(code)
+                    .collect();
+                out.push(if secondary.is_empty() {
+                    Check::warn(
+                        "locales",
+                        "only the default locale exists: add the target locales (Settings → Locales)",
+                        Some("enable_locale"),
+                    )
+                } else if !closed.is_empty() {
+                    Check::warn(
+                        "locales",
+                        format!(
+                            "editing through the Content Management API is disabled for: {}",
+                            closed.join(", ")
+                        ),
+                        Some("enable_locale"),
+                    )
+                } else {
+                    Check::ok("locales", secondary.join(", "))
+                });
+            }
+            Err(e) => out.push(Check::fail("locales", format!("{e:#}"))),
+        }
+        match content_types(&api).await {
+            Ok(types) => {
+                let mut none: Vec<&str> = types
+                    .values()
+                    .filter(|t| t.2.is_empty())
+                    .map(|t| t.0.as_str())
+                    .collect();
+                none.sort_unstable();
+                out.push(if types.is_empty() {
+                    Check::warn("localized_fields", "no content type in this environment", None)
+                } else if none.is_empty() {
+                    Check::ok("localized_fields", format!("{} content type(s)", types.len()))
+                } else {
+                    Check::warn(
+                        "localized_fields",
+                        format!(
+                            "no localized text field (enable \"Enable localization of this field\") in: {}",
+                            none.join(", ")
+                        ),
+                        Some("enable_locale"),
+                    )
+                });
+            }
+            Err(e) => out.push(Check::fail("localized_fields", format!("{e:#}"))),
+        }
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, _body: &[u8], secret: &str) -> bool {
@@ -251,18 +389,41 @@ impl Connector for Contentful {
     }
 }
 
+fn id_ok(id: &str) -> bool {
+    !id.is_empty()
+        && id
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
+}
+
+/// A value read back from a CMS, in the shape `push` receives it ([`PushItem::value`]): text as is, Markdown
+/// and rich text as the serialized document of [`cms::md_doc`] / [`cms::protect_code`]. `None` = nothing set.
+// ponytail: lives here because cms.rs is shared; move it there with the other headless CMS helpers.
+pub(super) fn read_back(v: &Value, like: &Format) -> Option<String> {
+    match (like, v) {
+        (Format::RichText(d), Value::String(s)) if cms::is_md(d) => {
+            (!s.is_empty()).then(|| cms::md_doc(s).to_string())
+        }
+        (Format::RichText(_), Value::Object(_) | Value::Array(_)) => {
+            let mut d = v.clone();
+            cms::protect_code(&mut d);
+            Some(d.to_string())
+        }
+        (Format::Plain | Format::Html, Value::String(s)) if !s.is_empty() => Some(s.clone()),
+        _ => None,
+    }
+}
+
+/// Sets (or, with `remove`, deletes) the `locale` values of `its` on one entry.
 async fn push_entry(
     api: &Api,
     id: &str,
     locale: &str,
     its: &[&PushItem],
     publish: bool,
+    remove: bool,
 ) -> anyhow::Result<()> {
-    anyhow::ensure!(
-        id.chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c)),
-        "invalid entry id"
-    );
+    anyhow::ensure!(id_ok(id), "invalid entry id");
     let path = format!("/entries/{id}");
     for attempt in 0..2 {
         let mut e = api.get(&path).await?;
@@ -275,6 +436,12 @@ async fn push_entry(
             .as_object_mut()
             .ok_or_else(|| anyhow::anyhow!("entry without fields"))?;
         for it in its {
+            if remove {
+                if let Some(o) = fields.get_mut(&it.field).and_then(Value::as_object_mut) {
+                    o.remove(locale);
+                }
+                continue;
+            }
             let v = match &it.format {
                 Format::RichText(doc) => cms::pushed_value(doc),
                 _ => Value::String(it.value.clone()),
@@ -299,11 +466,15 @@ async fn push_entry(
         let updated: Value = res.json().await?;
         if publish && was_live {
             let v = updated["sys"]["version"].as_u64().unwrap_or(version + 1);
-            send(|| {
+            let res = send(|| {
                 api.req(reqwest::Method::PUT, &format!("{path}/published"))
                     .header("x-contentful-version", v)
             })
-            .await?;
+            .await;
+            // A removed required value cannot be published: the draft is rolled back, the live entry stays.
+            if !remove {
+                res?;
+            }
         }
         return Ok(());
     }

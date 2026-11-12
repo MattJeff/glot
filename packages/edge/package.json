@@ -38,7 +38,7 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts src/experiments.ts src/edge.ts src/express.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --external:node:* --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak && esbuild src/patcher.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/edge-patcher.global.js && esbuild src/app.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/glot-app.global.js && esbuild src/website.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/glot.js && npm run size",
+    "build": "rm -rf dist && esbuild src/route.ts src/worker.ts src/next-proxy.ts src/experiments.ts src/edge.ts src/express.ts --bundle --format=esm --platform=neutral --target=es2022 --external:next --external:node:* --outdir=dist && tsc -p tsconfig.build.json && sed -i.bak 's/\\.ts\";$/.js\";/' dist/*.d.ts && rm dist/*.bak && esbuild src/patcher.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/edge-patcher.global.js && esbuild src/app.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/glot-app.global.js && esbuild src/website.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/glot.js && esbuild src/editor.global.ts --bundle --minify --format=iife --target=es2022 --outfile=../../web/public/widget/glot-editor.js && npm run size",
     "prepack": "npm run build",
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc --noEmit",

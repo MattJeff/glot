@@ -17,14 +17,28 @@
 //! marks protected). Drafts are left to the editors: the published document is written (and its draft, if any).
 //! Webhooks: GROQ-powered webhooks signed with a secret (`sanity-webhook-signature`, put the same secret in
 //! the connector's `webhook_secret`), or the dashboard URL with its token.
+//!
+//! Read back (`current`): field mode reads `{path}.{locale}` / the `{_key: locale}` item of the documents
+//! (one query per batch); document mode reads the linked translation, where a value identical to the
+//! source document's is the copy made when the translation was created, not a translation. Removed
+//! (`remove`): field mode only, `unset` of `{path}.{locale}` / `{path}[_key=="locale"]` (document mode would
+//! have to delete a whole document: unsupported). Diagnosis (`doctor`): the token may write (a mutation sent
+//! with `dryRun=true`, validated but never executed) and the i18n model the connector expects is in place
+//! (documents with a language field and `translation.metadata`, or localized objects / arrays).
+//!
+//! Docs: https://www.sanity.io/docs/http-reference/query, https://www.sanity.io/docs/http-reference/mutation
+//! (`dryRun`, `unset`), https://www.sanity.io/docs/content-lake/http-patches,
+//! https://github.com/sanity-io/document-internationalization
 use async_trait::async_trait;
 use axum::http::HeaderMap;
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 
 use super::cms::{self, param, required};
+use super::contentful::read_back;
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Sanity;
@@ -80,6 +94,14 @@ impl Api {
     async fn mutate(&self, mutations: Vec<Value>) -> anyhow::Result<()> {
         let url = format!("{}/mutate/{}?visibility=async", self.base, self.dataset);
         let body = json!({ "mutations": mutations });
+        send(|| self.http.post(&url).bearer_auth(&self.token).json(&body)).await?;
+        Ok(())
+    }
+    /// Whether the token may write: a `create` sent with `dryRun=true` (validated, never executed).
+    async fn can_write(&self) -> anyhow::Result<()> {
+        let url = format!("{}/mutate/{}?dryRun=true", self.base, self.dataset);
+        let body =
+            json!({"mutations": [{"create": {"_id": "glot.doctor", "_type": "glot.doctor"}}]});
         send(|| self.http.post(&url).bearer_auth(&self.token).json(&body)).await?;
         Ok(())
     }
@@ -520,6 +542,179 @@ impl Connector for Sanity {
         Ok(report)
     }
 
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let mut ids: Vec<&str> = items
+            .iter()
+            .filter(|i| i.meta["mode"] != "document")
+            .map(|i| i.external_id.as_str())
+            .collect();
+        ids.sort_unstable();
+        ids.dedup();
+        // Field mode: the documents themselves. Document mode: (source, linked translation) per document.
+        let mut docs: BTreeMap<String, Value> = BTreeMap::new();
+        if !ids.is_empty() {
+            let r = api.query("*[_id in $ids]", json!({ "ids": ids })).await?;
+            for d in r.as_array().into_iter().flatten() {
+                docs.insert(d["_id"].as_str().unwrap_or_default().to_string(), d.clone());
+            }
+        }
+        let mut linked_docs: BTreeMap<&str, (Value, Value)> = BTreeMap::new();
+        let mut out = vec![];
+        for it in items {
+            let path = segs_of(&it.meta["path"]);
+            if it.meta["mode"] != "document" {
+                let v = docs
+                    .get_mut(&it.external_id)
+                    .and_then(|d| at_mut(d, &path))
+                    .map(|v| match it.meta["array_item"].as_str() {
+                        None => v[locale].clone(),
+                        Some(_) => v
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                            .find(|x| x["_key"] == locale)
+                            .map(|x| x["value"].clone())
+                            .unwrap_or(Value::Null),
+                    });
+                out.push(v.and_then(|v| read_back(&v, &it.format)));
+                continue;
+            }
+            if !linked_docs.contains_key(it.external_id.as_str()) {
+                let l = linked(&api, &it.external_id, locale).await?;
+                let tr = match &l.target {
+                    Some(t) => api.query("*[_id == $id][0]", json!({ "id": t })).await?,
+                    None => Value::Null,
+                };
+                linked_docs.insert(&it.external_id, (l.src, tr));
+            }
+            let (src, tr) = linked_docs
+                .get_mut(it.external_id.as_str())
+                .expect("just inserted");
+            let v = at_mut(tr, &path).map(|v| v.clone());
+            // Still the copy of the source made with the translation document: not translated.
+            let copied = v.is_some() && v.as_ref() == at_mut(src, &path).map(|v| &*v);
+            out.push(
+                v.filter(|_| !copied)
+                    .and_then(|v| read_back(&v, &it.format)),
+            );
+        }
+        Ok(Some(out))
+    }
+
+    async fn remove(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        // Document mode: the translation is a whole document, never deleted here.
+        if items.iter().any(|i| i.meta["mode"] == "document") {
+            return Ok(false);
+        }
+        anyhow::ensure!(locale != src_locale(creds), "{locale} is the source locale");
+        let api = Api::new(creds).await?;
+        let mut by_doc: BTreeMap<&str, Vec<Value>> = BTreeMap::new();
+        for it in items {
+            by_doc
+                .entry(&it.external_id)
+                .or_default()
+                .push(Value::String(locale_path(it, locale)));
+        }
+        let ids: Vec<String> = by_doc.keys().map(|i| i.to_string()).collect();
+        let existing_drafts = drafts(&api, &ids).await?;
+        let mut mutations = vec![];
+        for (id, unset) in by_doc {
+            mutations.push(json!({"patch": {"id": id, "unset": unset}}));
+            let draft = format!("drafts.{id}");
+            if existing_drafts.contains(&draft) {
+                mutations.push(json!({"patch": {"id": draft, "unset": unset}}));
+            }
+        }
+        api.mutate(mutations).await?;
+        Ok(true)
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("write_access", format!("{e:#}"))],
+        };
+        let mut out = vec![match api.can_write().await {
+            Ok(()) => Check::ok("write_access", "mutation dry run accepted"),
+            Err(e) => {
+                let e = format!("{e:#}");
+                if e.starts_with("HTTP 401") || e.starts_with("HTTP 403") {
+                    Check {
+                        fix: Some("permissions"),
+                        ..Check::fail(
+                            "write_access",
+                            format!(
+                                "the token cannot write ({e}): create a token with the Editor role"
+                            ),
+                        )
+                    }
+                } else {
+                    Check::warn("write_access", format!("could not be checked: {e}"), None)
+                }
+            }
+        }];
+        let i18n = async {
+            if mode(&api, creds).await? == "document" {
+                let lang = lang_field(creds)?;
+                let n = api
+                    .query(
+                        &format!("count(*[{BASE_FILTER} && defined({lang})])"),
+                        json!({}),
+                    )
+                    .await?;
+                anyhow::Ok(if n.as_u64().unwrap_or(0) == 0 {
+                    Check::warn(
+                        "i18n_setup",
+                        format!(
+                            "document-level i18n but no document has a '{lang}' field: set language_field, or configure @sanity/document-internationalization"
+                        ),
+                        Some("install_plugin"),
+                    )
+                } else {
+                    Check::ok(
+                        "i18n_setup",
+                        format!("document-level, language field '{lang}'"),
+                    )
+                })
+            } else if list(creds, "locales").is_some() {
+                Ok(Check::ok(
+                    "i18n_setup",
+                    "field-level, locales from settings",
+                ))
+            } else {
+                let found = self.locales(creds).await?;
+                Ok(if found.len() < 2 {
+                    Check::warn(
+                        "i18n_setup",
+                        format!(
+                            "no localized field found in the first {PAGE} documents (objects {{{src}, fr}}, internationalized arrays) and no translation.metadata: install sanity-plugin-internationalized-array or @sanity/document-internationalization, or set source_locale / locales",
+                            src = src_locale(creds)
+                        ),
+                        Some("install_plugin"),
+                    )
+                } else {
+                    Check::ok("i18n_setup", format!("field-level: {}", found.join(", ")))
+                })
+            }
+        };
+        out.push(match i18n.await {
+            Ok(c) => c,
+            Err(e) => Check::fail("i18n_setup", format!("{e:#}")),
+        });
+        out
+    }
+
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {
         cms::shared_secret_ok(headers, secret)
             || cms::header(headers, "sanity-webhook-signature")
@@ -610,6 +805,43 @@ async fn drafts(api: &Api, ids: &[String]) -> anyhow::Result<Vec<String>> {
         .collect())
 }
 
+/// Field mode: path of an item's value for `locale` (`title.fr`, `tagline[_key=="fr"]`).
+fn locale_path(it: &PushItem, locale: &str) -> String {
+    let path = path_str(&segs_of(&it.meta["path"]));
+    match it.meta["array_item"].as_str() {
+        None => format!("{path}.{locale}"),
+        Some(_) => format!("{path}[_key=={}]", Value::String(locale.into())),
+    }
+}
+
+/// Document mode: the source document, its `translation.metadata` and the linked `locale` translation.
+struct Linked {
+    src: Value,
+    meta_id: Option<String>,
+    target: Option<String>,
+}
+
+async fn linked(api: &Api, id: &str, locale: &str) -> anyhow::Result<Linked> {
+    let r = api
+        .query(
+            "{\"doc\": *[_id == $id][0], \"meta\": *[_type == \"translation.metadata\" && references($id)][0]{_id, translations}}",
+            json!({ "id": id }),
+        )
+        .await?;
+    anyhow::ensure!(r["doc"].is_object(), "document {id} not found");
+    Ok(Linked {
+        src: r["doc"].clone(),
+        meta_id: r["meta"]["_id"].as_str().map(String::from),
+        target: r["meta"]["translations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|t| t["_key"] == locale)
+            .and_then(|t| t["value"]["_ref"].as_str())
+            .map(String::from),
+    })
+}
+
 /// Field mode: one patch on the document (and on its draft).
 async fn push_fields(api: &Api, id: &str, locale: &str, its: &[&PushItem]) -> anyhow::Result<()> {
     let mut set = Map::new();
@@ -619,13 +851,10 @@ async fn push_fields(api: &Api, id: &str, locale: &str, its: &[&PushItem]) -> an
         let path = path_str(&segs_of(&it.meta["path"]));
         match it.meta["array_item"].as_str() {
             None => {
-                set.insert(format!("{path}.{locale}"), value_of(it));
+                set.insert(locale_path(it, locale), value_of(it));
             }
             Some(item_type) => {
-                unset.push(Value::String(format!(
-                    "{path}[_key=={}]",
-                    Value::String(locale.into())
-                )));
+                unset.push(Value::String(locale_path(it, locale)));
                 inserts.push(json!({"insert": {"after": format!("{path}[-1]"),
                     "items": [{"_key": locale, "_type": item_type, "value": value_of(it)}]}}));
             }
@@ -657,21 +886,11 @@ async fn push_document(
     its: &[&PushItem],
 ) -> anyhow::Result<()> {
     let lang = lang_field(creds)?;
-    let r = api
-        .query(
-            "{\"doc\": *[_id == $id][0], \"meta\": *[_type == \"translation.metadata\" && references($id)][0]{_id, translations}}",
-            json!({ "id": id }),
-        )
-        .await?;
-    let src = r["doc"].clone();
-    anyhow::ensure!(src.is_object(), "document {id} not found");
-    let existing = r["meta"]["translations"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .find(|t| t["_key"] == locale)
-        .and_then(|t| t["value"]["_ref"].as_str())
-        .map(String::from);
+    let Linked {
+        src,
+        meta_id,
+        target: existing,
+    } = linked(api, id, locale).await?;
     if let Some(target) = existing {
         let mut set = Map::new();
         for it in its {
@@ -707,7 +926,7 @@ async fn push_document(
                "value": {"_type": "reference", "_ref": r, "_weak": true}})
     };
     let mut mutations = vec![json!({ "createOrReplace": copy })];
-    match r["meta"]["_id"].as_str() {
+    match meta_id.as_deref() {
         Some(meta) => mutations.push(json!({"patch": {"id": meta,
             "insert": {"after": "translations[-1]", "items": [reference(locale, &new_id)]}}})),
         None => mutations.push(json!({"createIfNotExists": {

@@ -6,7 +6,19 @@ One script tag translates any public website in the visitor's browser: Wix, Squa
 <script src="https://app.glotlang.com/widget/glot.js" data-project="your-project" data-key="pk_…" async></script>
 ```
 
-Copy the exact tag (with your public key) from **glot Edge → Website tag** in the dashboard, then turn the tag **on** there. Until it's on, the tag does nothing.
+Copy the exact line (with your public key) from **glot Edge → Website tag** in the dashboard. The line you copy there starts with a short inline script that [prevents a flash of untranslated text](#no-flash-of-untranslated-text). Until the tag is turned **on**, it does nothing.
+
+## Set up in 3 steps
+
+You don't need a developer. In **glot Edge → Website tag**:
+
+1. **Analyze your site.** Enter its address. glot reads the page and up to 20 public pages it links to or lists in `sitemap.xml`, detects your platform (Wix, Squarespace, Webflow, Shopify, WordPress, Bubble, Framer and others) and translates the text it finds into your languages. Nothing is installed yet, and the tag is still off.
+2. **See and correct the translation.** A preview shows your own page, translated. Click any text to correct its translation, or choose **Never translate this block** to exclude it for good.
+3. **Paste one line and go live.** The dashboard shows where the line goes on your platform, then **Check my site** looks for it on your live site. If it's missing, installed for another project, placed outside the head or blocked by your site's security policy (CSP), the check says so. Then turn the tag on.
+
+The analysis runs from glot's servers without any cookie, so it only ever sees what an anonymous visitor sees. It never fetches private or local network addresses. It uses the same daily cap and translation budget as text discovered by visitors (**Settings → Discovery**).
+
+The preview is static: your site's scripts don't run in it, so menus and animations don't work, and a page that builds all its text with JavaScript looks empty. On your live site the tag translates that text normally.
 
 > **Note:** Text translated in the browser is not reliably indexed by search engines. For pages you want found in other languages, add the [SEO subdomain mode](#seo-subdomain-mode) too. It takes one CNAME.
 
@@ -32,8 +44,19 @@ If your plan has no custom code, the tag can't be installed there. Use the [SEO 
 - **Language**: it uses `?lang=es` if present, then the visitor's saved choice (`localStorage`), then the browser language. It sets `<html lang dir>` to match.
 - **Translation in place**: the tag applies your translation memory to the text, `<title>` and meta description. It uses the same segmenter and hashes as glot Edge, so a text translated once is translated everywhere. Switching languages from the source needs no reload. Going back to the source reloads the page.
 - **SPA navigation**: text the site renders later (route changes through `history.pushState`, late content) is translated as it appears.
+- **Images and forms**: image `alt` text, `title`, `aria-label` and field placeholders are translated, along with the text of submit buttons.
+- **Right-to-left languages**: the tag sets `<html dir="rtl">` for Arabic, Hebrew and other right-to-left languages, so a site styled with logical CSS properties flips its layout.
 - **Never blocks rendering**: the tag loads `async`. If glot can't be reached, the page stays as published. The last good status, language list and translation memory are kept locally.
 - **Off switch**: turn the tag off in the dashboard and visitors see your original site again on their next page view.
+
+## No flash of untranslated text
+
+- **Returning visitors** are translated from the copy of your translations kept in their browser, while the page is still being parsed. No request to glot is needed, so this works even when glot is unreachable.
+- **The inline part of the line** you copy from the dashboard runs before the page paints. If the visitor reads one of your languages, it hides the page until the cached translations are applied. It makes no request and it removes itself after 1 second whatever happens.
+- **First visits** have nothing cached. If the page is still loading when the tag starts, the tag hides it until the translations arrive, for at most `data-wait` milliseconds (default `1000`; `0` disables hiding). A page that is already on screen is never blanked: it is translated in place.
+- **New pages** are translated before anyone visits them when you run the analysis again. Text first seen by a visitor is usually translated within seconds. The tag checks again after 4 s, 15 s, 1 min and 5 min.
+
+If you use the short `<script … async>` form without the inline part, a returning visitor on a fast page may see the original text for the time it takes to load the script.
 
 ## Switcher
 
@@ -45,7 +68,11 @@ You can also change these on the tag itself:
 |---|---|
 | `data-position` | `bottom-right`, `bottom-left`, `top-right`, `top-left`, `none`, or a CSS selector |
 | `data-switcher="none"` | No switcher. Call `glot.setLocale("es")` from your own controls. |
+| `data-flags="off"` | No flags, language names only (also a dashboard setting) |
+| `data-wait` | Longest time in milliseconds the page may stay hidden on a first visit (default `1000`, `0` = never) |
 | `data-server` | glot API for self-hosted servers (default: `api.` + the host the script is served from) |
+
+A floating switcher takes your site's own font, text color and background color. Inside an element of your page it inherits that element's styles. It is fixed to its corner, so it never shifts your layout, and it works with the keyboard and screen readers.
 
 The languages offered are your project's target languages, or the subset you check in the dashboard.
 
@@ -54,12 +81,28 @@ The languages offered are your project's target languages, or the subset you che
 When a visitor views a page in another language, text that's missing from the translation memory is reported to glot (`POST /edge/v1/{project}/missing`, `mode: "website"`). Depending on the **Translate new text automatically** setting, it is either translated automatically or held in the review queue. What is never sent:
 
 - personal data (emails, phone numbers, card numbers, IBANs, street addresses, long numbers): masked or skipped by the tag, and checked again by the server;
-- anything inside a form except its labels, legends and buttons, and never what visitors type;
+- anything inside a form except its labels, legends, buttons and field placeholders, and never what visitors type;
+- anything on a private-looking path: `/account`, `/my-account`, `/members`, `/profile`, `/cart`, `/basket`, `/checkout`, `/orders`, `/dashboard`, `/admin`, `/wp-admin`, `/billing`, `/settings`, `/user`, `/customer`. These pages are still translated with what glot already knows. To let the tag learn text on one of them, list it in **Settings → Discovery → include**;
 - text in `translate="no"`, `.notranslate`, `[data-glot-skip]`, `[data-glot-user]`, editable areas or the project's excluded selectors;
 - anything at all when the visitor has a session cookie (signed-in members);
 - query strings (only the path is sent), cookies, or the visitor's identity. glot requests are sent without credentials.
 
-The `data-key` is public. All it lets a page do is report text to translate, within your discovery zones and daily cap.
+The `data-key` is public. All it lets a page do is report text to translate, within your discovery zones and daily cap, and count page views. A tag without `data-key` does nothing.
+
+Turning the tag on makes your project's translations publicly readable, because visitors' browsers have to fetch them.
+
+## Usage and quota
+
+Each page a visitor loads in a language other than your source language counts as one **website page view** for the month. These are not counted: pages viewed in the source language, navigation inside a single-page site, pages served by a glot Edge domain (they count as Edge pages), and the dashboard preview.
+
+| Plan | Website page views per month |
+|---|---|
+| Free | 2,500 |
+| Starter | 25,000 |
+| Pro | 250,000 |
+| Growth | 2,000,000 |
+
+Past the limit, the tag leaves your site as published and tries again 10 minutes later. Nothing breaks, and translation resumes once the quota allows it. Each translated page view also makes up to two CDN requests (language list and translations), which browsers cache for a minute.
 
 ## SEO subdomain mode
 
@@ -73,6 +116,8 @@ Pages served by glot Edge are left to the Edge: on those pages the tag only show
 
 ## Limits
 
-- The first visitor in a new language may see the source text for a few seconds until the new text is translated (the tag fetches the translation memory again after 30 s, 2 min and 10 min).
-- Some sites set their session cookie as `HttpOnly`, which the tag can't see. On builders with member areas, exclude those paths in **Settings → Discovery** (for example `/account/*`).
+- Text that appears on your site after the last analysis is shown in the source language to its first visitor, then translated within seconds. Run the analysis again after a large update.
+- Some sites set their session cookie as `HttpOnly`, which the tag can't see. The built-in list of private paths covers the usual account, cart and checkout pages. If your member area lives elsewhere (for example `/espace-client`), exclude it in **Settings → Discovery**. The setup suggests the private-looking links it finds.
+- The installation check reads your page's HTML. It can't see a tag added through a tag manager.
+- Images themselves are not swapped per language, only their `alt` text.
 - Platforms that don't allow custom code on your plan can't run the tag.

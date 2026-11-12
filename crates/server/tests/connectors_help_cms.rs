@@ -1307,3 +1307,507 @@ async fn helpscout_site_per_language() {
         "no collection for de"
     );
 }
+
+// ---------------------------------------------------------------------------------------------- current / remove / doctor
+
+fn item(ext: &str, field: &str, meta: Value) -> PushItem {
+    PushItem {
+        external_id: ext.into(),
+        field: field.into(),
+        value: String::new(),
+        format: Format::Plain,
+        meta,
+    }
+}
+
+fn statuses(checks: &[glot_server::connectors::Check]) -> Vec<(&str, &str, Option<&str>)> {
+    checks
+        .iter()
+        .map(|k| (k.id.as_str(), k.status, k.fix))
+        .collect()
+}
+
+/// Zendesk with List / Delete Translation, and a configurable role and locale list.
+fn zendesk_read(
+    f: &mut Fake,
+    m: &Method,
+    path: &str,
+    q: &HashMap<String, String>,
+    body: &Value,
+    h: &HeaderMap,
+) -> (StatusCode, Value) {
+    let p = path.strip_prefix("/api/v2").unwrap_or("");
+    if p == "/users/me.json" && f.data["role"].is_string() {
+        return (
+            StatusCode::OK,
+            json!({"user": {"id": 42, "role": f.data["role"]}}),
+        );
+    }
+    if p == "/help_center/locales.json" && f.data["locales"].is_array() {
+        return (
+            StatusCode::OK,
+            json!({"locales": f.data["locales"], "default_locale": "en-us"}),
+        );
+    }
+    let parts: Vec<&str> = p
+        .strip_prefix("/help_center/")
+        .unwrap_or("")
+        .split('/')
+        .collect();
+    match (m.as_str(), &parts[..]) {
+        ("GET", [res, id, "translations.json"]) => {
+            let prefix = format!("{res}:{id}:");
+            let list: Vec<Value> = f.data["translations"]
+                .as_object()
+                .unwrap()
+                .iter()
+                .filter(|(k, _)| k.starts_with(&prefix))
+                .map(|(_, t)| t.clone())
+                .collect();
+            (StatusCode::OK, json!({"translations": list}))
+        }
+        ("DELETE", ["translations", id]) => {
+            let id: i64 = id.trim_end_matches(".json").parse().unwrap();
+            f.data["translations"]
+                .as_object_mut()
+                .unwrap()
+                .retain(|_, t| t["id"] != id);
+            (StatusCode::NO_CONTENT, Value::Null)
+        }
+        _ => zendesk(f, m, path, q, body, h),
+    }
+}
+
+#[tokio::test]
+async fn zendesk_current_remove_doctor() {
+    init();
+    let data = json!({"categories": [], "sections": [], "articles": [], "translations": {
+        "articles:10:en-us": {"id": 1, "locale": "en-us", "title": "Reset your password", "body": "<p>Click</p>"},
+        "articles:10:fr": {"id": 2, "locale": "fr", "title": "Réinitialiser", "body": "<p>Cliquez</p>"},
+        "sections:2:fr": {"id": 3, "locale": "fr", "title": "FAQ (fr)", "body": ""},
+        "articles:11:fr": {"id": 4, "locale": "fr", "title": "Facturation", "body": "<p>Écrit par un humain</p>"}}});
+    let (url, s) = serve(data, zendesk_read).await;
+    let c = registry("zendesk").unwrap();
+    let cr = creds(
+        json!({"subdomain": url, "email": "ed@acme.io", "token": "zt"}),
+        json!({}),
+    );
+    let meta = |res: &str, id: i64| json!({"resource": res, "id": id});
+    let items = [
+        item("articles:10", "title", meta("articles", 10)),
+        item("articles:10", "body", meta("articles", 10)),
+        item("sections:2", "name", meta("sections", 2)),
+        item("sections:2", "description", meta("sections", 2)),
+        item("categories:1", "name", meta("categories", 1)),
+    ];
+    assert_eq!(
+        c.current(&cr, "fr-FR", &items).await.unwrap().unwrap(),
+        [
+            Some("Réinitialiser".to_string()),
+            Some("<p>Cliquez</p>".to_string()),
+            Some("FAQ (fr)".to_string()),
+            None,
+            None
+        ],
+        "empty description and missing translation: none"
+    );
+    assert!(
+        c.current(&cr, "de", &items).await.is_err(),
+        "locale not enabled: nothing is assumed"
+    );
+
+    // A body glot wrote into a translation whose title it did not write: the translation stays.
+    let body_only = [item("articles:10", "body", meta("articles", 10))];
+    assert!(!c.remove(&cr, "fr", &body_only).await.unwrap());
+    // A title glot wrote, but the body was written by someone else: stays too.
+    let title_only = [item("articles:11", "title", meta("articles", 11))];
+    assert!(!c.remove(&cr, "fr", &title_only).await.unwrap());
+    assert_eq!(
+        s.lock().unwrap().data["translations"]
+            .as_object()
+            .unwrap()
+            .len(),
+        4
+    );
+    // Translations glot created as a whole: deleted, and only those.
+    assert!(c.remove(&cr, "fr", &items).await.unwrap());
+    {
+        let f = s.lock().unwrap();
+        let left: Vec<&String> = f.data["translations"].as_object().unwrap().keys().collect();
+        assert_eq!(left, ["articles:10:en-us", "articles:11:fr"]);
+        let deletes: Vec<&str> = f
+            .log
+            .iter()
+            .filter(|l| l.0 == "DELETE")
+            .map(|l| l.1.as_str())
+            .collect();
+        assert_eq!(
+            deletes,
+            [
+                "/api/v2/help_center/translations/2.json",
+                "/api/v2/help_center/translations/3.json"
+            ]
+        );
+    }
+
+    assert_eq!(
+        statuses(&c.doctor(&cr).await),
+        [("role", "ok", None), ("help_center_locales", "ok", None)]
+    );
+    {
+        let mut f = s.lock().unwrap();
+        f.data["role"] = json!("agent");
+        f.data["locales"] = json!(["en-us"]);
+        f.log.clear();
+    }
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        statuses(&checks),
+        [
+            ("role", "warn", Some("permissions")),
+            ("help_center_locales", "warn", Some("enable_locale"))
+        ]
+    );
+    assert!(checks[1].detail.starts_with("only en-us is enabled"));
+    assert!(s.lock().unwrap().log.iter().all(|l| l.0 == "GET"));
+}
+
+/// HubSpot with the private app token info endpoint (`data.scopes`).
+fn hubspot_token(
+    f: &mut Fake,
+    m: &Method,
+    path: &str,
+    q: &HashMap<String, String>,
+    body: &Value,
+    h: &HeaderMap,
+) -> (StatusCode, Value) {
+    if *m == Method::POST && path == "/oauth/v2/private-apps/get/access-token-info" {
+        assert_eq!(body["tokenKey"], "pat-na1-x");
+        return (
+            StatusCode::OK,
+            json!({"userId": 1, "hubId": 2, "appId": 3, "scopes": f.data["scopes"]}),
+        );
+    }
+    hubspot(f, m, path, q, body, h)
+}
+
+#[tokio::test]
+async fn hubspot_current_doctor() {
+    init();
+    let post = |id: &str, name: &str, from: Value, lang: &str, tr: Value| {
+        json!({"id": id, "name": name, "htmlTitle": format!("{name} | Blog"), "metaDescription": "", "postSummary": "",
+            "postBody": "<p>Hello <strong>you</strong></p>",
+            "language": lang, "translatedFromId": from, "translations": tr, "archivedInDashboard": false})
+    };
+    let data = json!({
+        "scopes": ["content", "oauth"],
+        "/cms/v3/blogs/posts": [
+            post("100", "Hello", Value::Null, "en", json!({"fr": {"id": "101"}})),
+            // The variation HubSpot cloned from the source: only its name and title were translated.
+            post("101", "Bonjour", json!("100"), "fr", json!({})),
+            post("102", "Second post", Value::Null, "en", json!({}))],
+        "/cms/v3/pages/site-pages": [], "/cms/v3/pages/landing-pages": []});
+    let (url, s) = serve(data, hubspot_token).await;
+    let c = registry("hubspot").unwrap();
+    let cr = creds(json!({"token": "pat-na1-x"}), json!({"api_url": url}));
+    let meta = |id: &str| json!({"resource": "blog_posts", "id": id});
+    let items = [
+        item("blog_posts:100", "name", meta("100")),
+        item("blog_posts:100", "htmlTitle", meta("100")),
+        item("blog_posts:100", "postBody", meta("100")),
+        item("blog_posts:102", "name", meta("102")),
+    ];
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [
+            Some("Bonjour".to_string()),
+            Some("Bonjour | Blog".to_string()),
+            None,
+            None
+        ],
+        "the cloned body is not a translation; 102 has no variation"
+    );
+    assert!(!c.remove(&cr, "fr", &items).await.unwrap());
+    assert_eq!(
+        s.lock().unwrap().data["/cms/v3/blogs/posts"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3,
+        "current creates no variation"
+    );
+
+    assert_eq!(
+        statuses(&c.doctor(&cr).await),
+        [("scopes", "ok", None), ("multi_language", "ok", None)]
+    );
+    s.lock().unwrap().data["scopes"] = json!(["crm.objects.contacts.read"]);
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        (checks[0].status, checks[0].fix, checks[0].detail.as_str()),
+        (
+            "fail",
+            Some("permissions"),
+            "missing scope: content (CMS pages and blog posts)"
+        )
+    );
+}
+
+#[tokio::test]
+async fn ghost_current_doctor() {
+    init();
+    let lexical = json!({"root": {"type": "root", "children": [{"type": "paragraph", "children": [
+        {"type": "extended-text", "text": "Installez avec ", "format": 0},
+        {"type": "extended-text", "text": "npm i glot", "format": 16}]}]}});
+    let data = json!({
+        "posts": [
+            {"id": "p1", "slug": "hello", "title": "Hello", "custom_excerpt": "Short intro", "tags": [{"name": "News"}]},
+            {"id": "p2", "slug": "hello-fr", "title": "Bonjour", "custom_excerpt": null, "lexical": lexical.to_string(), "tags": [{"name": "#fr"}]}],
+        "pages": [], "webhooks": []});
+    let (url, s) = serve(data, ghost).await;
+    let c = registry("ghost").unwrap();
+    let cr = creds(json!({"url": url, "admin_key": GHOST_KEY}), json!({}));
+    let meta = |slug: &str| json!({"resource": "posts", "id": "x", "slug": slug, "tags": []});
+    let mut body = item("posts:p1", "lexical", meta("hello"));
+    body.format = Format::RichText(json!({}));
+    let items = [
+        item("posts:p1", "title", meta("hello")),
+        item("posts:p1", "custom_excerpt", meta("hello")),
+        body,
+        item("posts:p3", "title", meta("second")),
+    ];
+    let cur = c.current(&cr, "fr", &items).await.unwrap().unwrap();
+    assert_eq!(cur[0].as_deref(), Some("Bonjour"));
+    assert_eq!(cur[1], None, "no excerpt on the translated post");
+    // The Lexical document in the shape push receives: inline code protected, restored on push.
+    let doc: Value = serde_json::from_str(cur[2].as_deref().unwrap()).unwrap();
+    let nodes = &doc["root"]["children"][0]["children"];
+    assert_eq!(nodes[0]["type"], "extended-text");
+    assert_eq!(nodes[1]["type"], "glot:code:extended-text");
+    assert_eq!(cur[3], None, "no second-fr post");
+    assert!(!c.remove(&cr, "fr", &items).await.unwrap());
+
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        statuses(&checks),
+        [("version", "ok", None), ("language_tags", "ok", None)]
+    );
+    assert_eq!(
+        (checks[0].detail.as_str(), checks[1].detail.as_str()),
+        ("Ghost 5.100", "#fr")
+    );
+    assert!(s.lock().unwrap().log.iter().all(|l| l.0 == "GET"));
+}
+
+#[tokio::test]
+async fn drupal_current_doctor() {
+    init();
+    let node = |lang: &str, title: &str, body: &str| {
+        json!({"type": "node--article", "id": "aaaa-0001", "attributes": {"langcode": lang, "title": title,
+            "content_translation_source": "en", "content_translation_outdated": false,
+            "body": {"value": body, "format": "basic_html", "summary": ""}}})
+    };
+    let mut other = node("en", "Untranslated", "<p>Text</p>");
+    other["id"] = json!("bbbb-0002");
+    let data = json!({
+        // The fr translation was added in the Translate tab: its title was translated, its body is still the source's.
+        "node--article": [{"en": node("en", "Hello", "<p>Hello</p>"), "fr": node("fr", "Bonjour", "<p>Hello</p>")}, {"en": other}],
+        // Content Translation is not enabled for taxonomy terms: no content_translation_* field.
+        "taxonomy_term--tags": [{"en": {"type": "taxonomy_term--tags", "id": "cccc-0003", "attributes": {"langcode": "en", "name": "Travel"}}}]});
+    let (url, s) = serve(data, drupal).await;
+    let c = registry("drupal").unwrap();
+    let cr = creds(
+        json!({"url": url, "username": "editor", "password": "pw"}),
+        json!({}),
+    );
+    let meta =
+        |id: &str| json!({"type": "node--article", "id": id, "formats": {"body": "basic_html"}});
+    let items = [
+        item("node--article:aaaa-0001", "title", meta("aaaa-0001")),
+        item("node--article:aaaa-0001", "body.value", meta("aaaa-0001")),
+        item("node--article:aaaa-0001", "body.summary", meta("aaaa-0001")),
+        item("node--article:bbbb-0002", "title", meta("bbbb-0002")),
+    ];
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [Some("Bonjour".to_string()), None, None, None],
+        "source text left in the translation, and Drupal's fallback to English, are not translations"
+    );
+    assert!(!c.remove(&cr, "fr", &items).await.unwrap());
+
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        statuses(&checks),
+        [
+            ("language_modules", "ok", None),
+            ("content_translation", "warn", Some("install_plugin"))
+        ]
+    );
+    assert!(
+        checks[1]
+            .detail
+            .starts_with("Content Translation is not enabled for: taxonomy_term "),
+        "{}",
+        checks[1].detail
+    );
+    assert!(s.lock().unwrap().log.iter().all(|l| l.0 == "GET"));
+}
+
+/// Craft with per-site content (`data.french` = overrides by entry id), and the schema's mutations.
+fn craft_sites_mock(
+    f: &mut Fake,
+    m: &Method,
+    path: &str,
+    q: &HashMap<String, String>,
+    body: &Value,
+    h: &HeaderMap,
+) -> (StatusCode, Value) {
+    let query = body["query"].as_str().unwrap_or("");
+    let v = &body["variables"];
+    let site = v["s"][0].as_str().unwrap_or("default");
+    if query.contains("__schema") {
+        return (
+            StatusCode::OK,
+            json!({"data": {"__schema": {"mutationType": {"fields": f.data["mutations"]}}}}),
+        );
+    }
+    if query.contains("limit: 1") && site != "default" {
+        let known = site == "french";
+        return (
+            StatusCode::OK,
+            json!({"data": {"entries": if known { json!([{"siteId": 2}]) } else { json!([]) }}}),
+        );
+    }
+    if query.contains("$ids") {
+        let ids = v["ids"].as_array().unwrap();
+        let out: Vec<Value> = f.data["entries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|e| ids.contains(&e["id"]))
+            .map(|e| {
+                let mut e = e.clone();
+                let over = &f.data[site][e["id"].as_str().unwrap()];
+                for (k, val) in over.as_object().into_iter().flatten() {
+                    e[k] = val.clone();
+                }
+                e["__typename"] = json!("blog_article_Entry");
+                e
+            })
+            .collect();
+        return (StatusCode::OK, json!({"data": {"entries": out}}));
+    }
+    craft(f, m, path, q, body, h)
+}
+
+#[tokio::test]
+async fn craft_current_doctor() {
+    init();
+    let entry = |id: &str| json!({"id": id, "title": format!("Post {id}"), "summary": "Plain summary", "body": "<p>Body</p>"});
+    let data = json!({"entries": [entry("1"), entry("2")], "saved": [],
+        // Entry 1 is translated in the French site, except its body; entry 2 only holds the propagated content.
+        "french": {"1": {"title": "Article 1", "summary": "Résumé"}},
+        "mutations": [{"name": "save_blog_article_Entry"}, {"name": "deleteEntry"}]});
+    let (url, s) = serve(data, craft_sites_mock).await;
+    let c = registry("craft").unwrap();
+    let cr = creds(
+        json!({"url": format!("{url}/api"), "token": "craft-token"}),
+        json!({"sites": {"fr": "french", "de": "german"}}),
+    );
+    let meta = |id: &str| json!({"id": id, "section": "blog", "type": "article"});
+    let items = [
+        item("entry:1", "title", meta("1")),
+        item("entry:1", "summary", meta("1")),
+        item("entry:1", "body", meta("1")),
+        item("entry:2", "title", meta("2")),
+    ];
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [
+            Some("Article 1".to_string()),
+            Some("Résumé".to_string()),
+            None,
+            None
+        ],
+        "content propagated from the source site is not a translation"
+    );
+    assert!(!c.remove(&cr, "fr", &items).await.unwrap());
+
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        statuses(&checks),
+        [
+            ("sites", "warn", Some("enable_locale")),
+            ("mutations", "ok", None)
+        ]
+    );
+    assert!(checks[0].detail.contains("german (de)") && !checks[0].detail.contains("french"));
+    s.lock().unwrap().data["mutations"] = json!([{"name": "deleteEntry"}]);
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        (checks[1].id.as_str(), checks[1].status, checks[1].fix),
+        ("mutations", "fail", Some("permissions"))
+    );
+    assert_eq!(s.lock().unwrap().data["saved"], json!([]), "nothing saved");
+}
+
+#[tokio::test]
+async fn helpscout_current_doctor() {
+    init();
+    let data = json!({"articles": [
+        {"id": "a1", "collectionId": "cen", "slug": "getting-started", "name": "Getting started", "text": "<p>Open</p>"},
+        {"id": "f1", "collectionId": "cfr", "slug": "getting-started", "name": "Bien démarrer", "text": "<p>Ouvrez</p>"}]});
+    let (url, s) = serve(data, helpscout).await;
+    let c = registry("helpscout").unwrap();
+    let cr = creds(
+        json!({"api_key": "hskey", "collections": "fr: cfr"}),
+        json!({"api_url": url}),
+    );
+    let meta = |slug: &str| json!({"id": "x", "slug": slug, "collection": "cen"});
+    let items = [
+        item("article:a1", "name", meta("getting-started")),
+        item("article:a1", "text", meta("getting-started")),
+        item("article:a2", "name", meta("billing")),
+    ];
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [
+            Some("Bien démarrer".to_string()),
+            Some("<p>Ouvrez</p>".to_string()),
+            None
+        ]
+    );
+    assert!(
+        c.current(&cr, "de", &items).await.is_err(),
+        "no collection for de"
+    );
+    assert!(!c.remove(&cr, "fr", &items).await.unwrap());
+    assert!(
+        s.lock()
+            .unwrap()
+            .log
+            .iter()
+            .any(|l| l.1 == "/v1/articles/f1?draft=true"),
+        "the draft holds the last write"
+    );
+
+    assert_eq!(
+        statuses(&c.doctor(&cr).await),
+        [("collections", "ok", None)]
+    );
+    let unmapped = creds(json!({"api_key": "hskey"}), json!({"api_url": url}));
+    assert_eq!(
+        statuses(&c.doctor(&unmapped).await),
+        [("collections", "warn", Some("enable_locale"))]
+    );
+    let wrong = creds(
+        json!({"api_key": "hskey", "collections": "fr: cfr, de: gone"}),
+        json!({"api_url": url}),
+    );
+    let checks = c.doctor(&wrong).await;
+    assert_eq!(
+        (checks[0].status, checks[0].fix, checks[0].detail.as_str()),
+        ("fail", Some("not_found"), "collection not found: de → gone")
+    );
+    assert!(s.lock().unwrap().log.iter().all(|l| l.0 == "GET"));
+}

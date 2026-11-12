@@ -9,6 +9,14 @@
 //!   resource type, ids `bc/store/{product|category|brand}/{id}`, `bc/store/channel/{channel_id}`,
 //!   `bc/store/locale/{code}`. A target locale missing from the channel is added with `addLocale` (INACTIVE:
 //!   the merchant activates it). The default locale is never written (BigCommerce forbids it).
+//! - Human edits and rollback: `store.translations(filters: {resourceType, channelId, localeId, resourceIds})`
+//!   returns `fields { fieldName original translation }` per resource (50 results per request, a push batch);
+//!   a `translation` that is empty or equal to `original` (the API falls back to the default value) counts as
+//!   none. `translation.deleteTranslations(input: {…, resources: [{resourceId, fields}]})` deletes exactly
+//!   the fields a rolled-back run had created.
+//! - Diagnosis: the channel's locales (a channel with its default locale only has nothing to translate into)
+//!   and the *Store Translations* OAuth scope, proven by reading; BigCommerce exposes no list of a token's
+//!   scopes, so `modify` (needed to write) shows on the first push only.
 //! - Web pages (`/v3/content/pages`) have no translation API: not synced.
 //! - Rate limits: on `429` waits `X-Rate-Limit-Time-Reset-Ms` then retries; when
 //!   `X-Rate-Limit-Requests-Left` reaches 0, waits for the window reset before the next call.
@@ -20,6 +28,8 @@
 //! https://docs.bigcommerce.com/developer/docs/admin/store-configuration/translations/products,
 //! https://docs.bigcommerce.com/developer/docs/admin/store-configuration/translations/product-listings,
 //! https://docs.bigcommerce.com/developer/api-reference/graphql/admin/mutations/translation/update-translations,
+//! https://docs.bigcommerce.com/developer/api-reference/graphql/admin/mutations/translation/delete-translations,
+//! https://docs.bigcommerce.com/developer/api-reference/graphql/admin/types/inputs/translation-filters-input,
 //! https://docs.bigcommerce.com/developer/docs/admin/store-configuration/settings/locales-configuration,
 //! https://docs.bigcommerce.com/docs/rest-catalog/category-trees/categories,
 //! https://docs.bigcommerce.com/docs/start/best-practices/api-rate-limits,
@@ -31,7 +41,7 @@ use std::collections::BTreeMap;
 use std::time::Duration;
 
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
 };
 
 pub struct BigCommerce;
@@ -269,6 +279,26 @@ const UPDATE: &str = "mutation($input: UpdateTranslationsInput!) {
   translation { updateTranslations(input: $input) { __typename errors { __typename ... on Error { message } } } }
 }";
 
+const READ: &str = "query($filters: TranslationFiltersInput!) {
+  store { translations(filters: $filters, first: 50) { edges { node { resourceId fields { fieldName original translation } } } } }
+}";
+
+const DELETE: &str = "mutation($input: DeleteTranslationsInput!) {
+  translation { deleteTranslations(input: $input) { __typename errors { __typename ... on Error { message } } } }
+}";
+
+/// Items by GraphQL resourceType then resourceId; an item without metadata is an error (never skipped).
+fn by_type(items: &[PushItem]) -> anyhow::Result<BTreeMap<&str, BTreeMap<&str, Vec<&PushItem>>>> {
+    let mut out: BTreeMap<&str, BTreeMap<&str, Vec<&PushItem>>> = BTreeMap::new();
+    for it in items {
+        let (Some(t), Some(rid)) = (it.meta["type"].as_str(), it.meta["rid"].as_str()) else {
+            anyhow::bail!("{}: missing metadata, sync again", it.external_id);
+        };
+        out.entry(t).or_default().entry(rid).or_default().push(it);
+    }
+    Ok(out)
+}
+
 #[async_trait]
 impl Connector for BigCommerce {
     fn kind(&self) -> &'static str {
@@ -428,6 +458,137 @@ impl Connector for BigCommerce {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let s = Store::new(creds).await?;
+        // (resourceId, fieldName) → translation.
+        let mut found: BTreeMap<(String, String), String> = BTreeMap::new();
+        for (rtype, entities) in by_type(items)? {
+            let d = s
+                .gql(
+                    READ,
+                    json!({"filters": {
+                        "resourceType": rtype,
+                        "channelId": s.channel_gid(),
+                        "localeId": format!("bc/store/locale/{locale}"),
+                        "resourceIds": entities.keys().collect::<Vec<_>>(),
+                    }}),
+                )
+                .await?;
+            for e in d["store"]["translations"]["edges"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
+                let Some(rid) = e["node"]["resourceId"].as_str() else {
+                    continue;
+                };
+                for f in e["node"]["fields"].as_array().into_iter().flatten() {
+                    if let (Some(name), Some(t)) =
+                        (f["fieldName"].as_str(), f["translation"].as_str())
+                        && !t.is_empty()
+                        && f["original"] != f["translation"]
+                    {
+                        found.insert((rid.to_string(), name.to_string()), t.to_string());
+                    }
+                }
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let rid = it.meta["rid"].as_str()?.to_string();
+                    found.get(&(rid, it.field.clone())).cloned()
+                })
+                .collect(),
+        ))
+    }
+
+    async fn remove(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        let s = Store::new(creds).await?;
+        for (rtype, entities) in by_type(items)? {
+            let input = json!({
+                "resourceType": rtype,
+                "channelId": s.channel_gid(),
+                "localeId": format!("bc/store/locale/{locale}"),
+                "resources": entities.iter().map(|(rid, fs)| json!({
+                    "resourceId": rid,
+                    "fields": fs.iter().map(|f| f.field.as_str()).collect::<Vec<_>>(),
+                })).collect::<Vec<_>>(),
+            });
+            let d = s.gql(DELETE, json!({"input": input})).await?;
+            if let Some(e) = d["translation"]["deleteTranslations"]["errors"]
+                .as_array()
+                .and_then(|e| e.first())
+            {
+                anyhow::bail!("{rtype}: {}", e["message"].as_str().unwrap_or("refused"));
+            }
+        }
+        Ok(true)
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let s = match Store::new(creds).await {
+            Ok(s) => s,
+            Err(e) => return vec![Check::fail("channel", format!("{e:#}"))],
+        };
+        let locales = match s.locales().await {
+            Ok(l) => l,
+            Err(e) => return vec![Check::fail("channel", format!("{e:#}"))],
+        };
+        let targets: Vec<&str> = locales
+            .iter()
+            .filter(|l| !l.1)
+            .map(|l| l.0.as_str())
+            .collect();
+        let default = locales.iter().find(|l| l.1).map_or("?", |l| l.0.as_str());
+        let mut out = vec![if targets.is_empty() {
+            Check::warn(
+                "channel",
+                format!(
+                    "channel {} has its default locale only ({default}): add a locale to it",
+                    s.channel
+                ),
+                Some("enable_locale"),
+            )
+        } else {
+            Check::ok(
+                "channel",
+                format!("channel {}: {default} → {}", s.channel, targets.join(", ")),
+            )
+        }];
+        // Any locale proves the scope (the default one is read, never written).
+        let filters = json!({
+            "resourceType": "PRODUCTS",
+            "channelId": s.channel_gid(),
+            "localeId": format!("bc/store/locale/{}", targets.first().copied().unwrap_or(default)),
+        });
+        out.push(match s.gql(READ, json!({"filters": filters})).await {
+            Ok(_) => Check::ok(
+                "permissions",
+                "Store Translations readable (writing needs its modify permission)",
+            ),
+            Err(e) => Check {
+                fix: Some("permissions"),
+                ..Check::fail(
+                    "permissions",
+                    format!("the API account lacks the Store Translations (modify) scope: {e:#}"),
+                )
+            },
+        });
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, _body: &[u8], secret: &str) -> bool {

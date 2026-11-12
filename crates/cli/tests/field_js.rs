@@ -78,9 +78,11 @@ fn ts_dictionaries_end_to_end() {
     let (ok, log) = glot(r, &["status"]);
     assert!(ok && log.contains("3 keys in source locale en"), "{log}");
 
-    // Own runtime: i18nize refuses instead of adding next-intl.
+    // Own runtime with a module-level t(): i18nize rewrites through it (no next-intl added).
     let (ok, log) = glot(r, &["i18nize", "--dry-run"]);
-    assert!(!ok && log.contains("own i18n runtime"), "{log}");
+    assert!(ok && log.contains("the app's own t() (src/i18n/t)"), "{log}");
+    assert!(log.contains("{t(\"home.contact_sales_today\")}"), "{log}");
+    assert!(!log.contains("next-intl"), "{log}");
 
     // translate (mock) patches fr.ts in place: function value and type import untouched.
     let (ok, log) = glot(r, &["translate", "--yes"]);

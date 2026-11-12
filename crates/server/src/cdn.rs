@@ -24,17 +24,19 @@ pub async fn serve(
     let not_found = || AppError::not_found("catalog not found");
     let locale = file.strip_suffix(".json").ok_or_else(not_found)?;
     let p = readable(&state, &slug, &headers).await?;
-    if locale != p.source_locale
-        && !p.target_locales.iter().any(|l| l == locale)
-        && let Some(res) = crate::ondemand::gate(
-            &state,
-            &p,
-            locale,
-            q.get("ondemand").is_some_and(|v| v == "1"),
-        )
-        .await?
-    {
-        return Ok(res);
+    // Not exactly a project locale: an on-demand catalog under that very code wins (exact match), else the
+    // code's alias among the project's locales (`zh`, `zh_CN`, `zh-Hans` → `zh-CN`; crate::locale_alias).
+    // A code with an alias never starts an on-demand translation.
+    let alias;
+    let mut locale = locale;
+    if locale != p.source_locale && !p.target_locales.iter().any(|l| l == locale) {
+        alias = crate::locale_alias::resolve_project(locale, &p.source_locale, &p.target_locales);
+        let trigger = alias.is_none() && q.get("ondemand").is_some_and(|v| v == "1");
+        match crate::ondemand::gate(&state, &p, locale, trigger).await {
+            Ok(Some(res)) => return Ok(res),
+            Ok(None) => {}
+            Err(e) => locale = alias.as_deref().ok_or(e)?,
+        }
     }
 
     let rows: Vec<(String, String)> = if locale == p.source_locale {
@@ -325,6 +327,17 @@ pub async fn locales(
                 r.ready(min),
                 r.version,
             ));
+        }
+    }
+    // `site_code`: the code the site itself uses for the locale, when it differs (Settings → Languages;
+    // crate::live_check). The switcher writes it in the URL / cookie / event instead of `code`.
+    let site_codes = crate::live_check::site_codes(&state.db, p.id).await?;
+    for l in &mut list {
+        let site_code = l["code"]
+            .as_str()
+            .and_then(|c| site_codes.get(c).filter(|s| *s != c));
+        if let Some(s) = site_code {
+            l["site_code"] = json!(s);
         }
     }
     let updated_at = updated_at

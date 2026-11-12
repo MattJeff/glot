@@ -3,7 +3,8 @@
 // Also `glot.loadCatalog(locale)` for client-rendered apps that load their strings at runtime.
 // Built as an IIFE (web/public/widget/locale-switcher.global.js); the pure helpers are exported for tests.
 
-export type Loc = { code: string; name: string; dir: "ltr" | "rtl"; coverage: number };
+/** `site_code`: the code the site itself uses for the locale, when it differs from glot's (`zh` for `zh-CN`). */
+export type Loc = { code: string; name: string; dir: "ltr" | "rtl"; coverage: number; site_code?: string };
 export type Manifest = { source: string; locales: Loc[]; updated_at: string | null };
 type Json = { [k: string]: unknown };
 
@@ -16,6 +17,11 @@ export function match(tag: string | null | undefined, codes: string[]): string |
   const base = (c: string) => c.toLowerCase().split(/[-_]/)[0];
   return codes.find((c) => c.toLowerCase() === t) ?? codes.find((c) => base(c) === base(t));
 }
+
+const sc = (l: Loc) => l.site_code ?? l.code;
+/** The manifest locale a URL / cookie value names: the site's own code first, then glot's (exact, then base language). */
+const named = (tag: string | null | undefined, m: Manifest) =>
+  (tag && m.locales.find((l) => sc(l).toLowerCase() === tag.toLowerCase())?.code) || match(tag, m.locales.map((l) => l.code));
 
 /** `auto` resolves to `query:lang` when the URL has `?lang=`, `prefix` when the path starts with a locale, else `event`. */
 export function resolveStrategy(strategy: string, url: URL, codes: string[]): string {
@@ -30,9 +36,10 @@ export function currentLocale(strategy: string, url: URL, cookie: string, htmlLa
   const codes = m.locales.map((l) => l.code);
   const [kind, name = "lang"] = strategy.split(":");
   let found: string | undefined;
-  if (kind === "query") found = match(url.searchParams.get(name), codes);
-  else if (kind === "prefix") found = codes.find((c) => c === url.pathname.split("/")[1]) ?? m.source;
-  else if (kind === "cookie") found = match(new URLSearchParams(cookie.replace(/;\s*/g, "&")).get(name), codes);
+  const seg = url.pathname.split("/")[1];
+  if (kind === "query") found = named(url.searchParams.get(name), m);
+  else if (kind === "prefix") found = m.locales.find((l) => sc(l) === seg || l.code === seg)?.code ?? m.source;
+  else if (kind === "cookie") found = named(new URLSearchParams(cookie.replace(/;\s*/g, "&")).get(name), m);
   else found = match(saved, codes); // event: the app may cancel the change, the saved choice is what the user picked
   return found ?? match(htmlLang, codes) ?? match(saved, codes) ?? m.source;
 }
@@ -41,15 +48,17 @@ export function currentLocale(strategy: string, url: URL, cookie: string, htmlLa
 export function targetUrl(strategy: string, url: URL, code: string, m: Manifest): string | null {
   const [kind, opt = "lang"] = strategy.split(":");
   const next = new URL(url.href);
+  const loc = m.locales.find((l) => l.code === code);
+  const out = loc ? sc(loc) : code; // what the site reads
   if (kind === "query") {
-    next.searchParams.set(opt, code);
+    next.searchParams.set(opt, out);
     return next.href;
   }
   if (kind === "prefix") {
     const parts = next.pathname.split("/");
-    if (m.locales.some((l) => l.code === parts[1])) parts.splice(1, 1);
+    if (m.locales.some((l) => l.code === parts[1] || sc(l) === parts[1])) parts.splice(1, 1);
     // ponytail: "as-needed" by default (source unprefixed); `prefix:always` prefixes it too.
-    if (code !== m.source || opt === "always") parts.splice(1, 0, code);
+    if (code !== m.source || opt === "always") parts.splice(1, 0, out);
     next.pathname = parts.join("/") || "/";
     return next.href;
   }
@@ -139,6 +148,56 @@ export async function loadCatalog(locale: string, opts: { project?: string; cdn?
   return messages;
 }
 
+// Live check: after the switcher sends the visitor to a language, the next page load tells glot whether the page
+// took it — a site whose own code ignores the locale code stays as it was (crates/server/src/live_check.rs).
+// One report per (project, locale, result) per browser per day; no URL path, cookie or identifier.
+// ponytail: navigating strategies only (query, prefix, cookie); with `event` the app swaps strings itself.
+const LIVE = "glot-live";
+type Armed = { c: string; j: string; l: string; p: number; t: number };
+/** A cheap fingerprint of what the visitor reads. */
+const print = () => {
+  let h = 0;
+  const s = document.title + (document.body?.innerText ?? "").slice(0, 4000);
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+};
+/** Did the page take the language? `<html lang>` names it; or the site keeps `lang` as it was and the text changed. */
+export function applied(lang: string, loc: Pick<Loc, "code" | "site_code">, before: { l: string; p: number }, now: number, source: string): boolean {
+  const t = lang.toLowerCase();
+  const b = (c: string) => c.toLowerCase().split(/[-_]/)[0];
+  if (t && (t === loc.code.toLowerCase() || t === loc.site_code?.toLowerCase() || (b(t) === b(loc.code) && b(t) !== b(source)))) return true;
+  return t === before.l.toLowerCase() && now !== before.p;
+}
+const arm = (project: string, code: string) => {
+  try {
+    sessionStorage.setItem(LIVE, JSON.stringify({ c: code, j: project, l: document.documentElement.lang, p: print(), t: Date.now() } satisfies Armed));
+  } catch {}
+};
+let checked = false;
+function liveCheck(m: Manifest, project: string, cdn: string) {
+  if (checked) return;
+  checked = true;
+  let a: Armed | null;
+  try {
+    a = JSON.parse(sessionStorage.getItem(LIVE)!);
+    sessionStorage.removeItem(LIVE);
+  } catch {
+    return;
+  }
+  const loc = a && m.locales.find((l) => l.code === a.c);
+  if (!a || !loc || a.j !== project || Date.now() - a.t > 60000) return;
+  // Client-rendered sites apply the language after their catalog loads.
+  setTimeout(() => {
+    const lang = document.documentElement.lang;
+    const ok = applied(lang, loc, a, print(), m.source);
+    const key = `${LIVE}:${project}:${loc.code}:${+ok}`;
+    const day = new Date().toISOString().slice(0, 10);
+    if (store(key) === day) return;
+    store(key, day);
+    navigator.sendBeacon?.(`${cdn}/cdn/${encodeURIComponent(project)}/live-check`, JSON.stringify({ locale: loc.code, code: sc(loc), html_lang: lang, applied: ok, origin: location.origin }));
+  }, 3000);
+}
+
 const CSS = `:host{--l:color-mix(in srgb,currentColor 20%,transparent);display:inline-block;font:inherit;font-size:var(--glot-font-size,.875rem)}
 [part=list]{display:inline-flex;gap:var(--glot-gap,2px);padding:var(--glot-list-padding,2px);border:1px solid var(--glot-border,currentColor);border-radius:var(--glot-radius,999px);background:var(--glot-list-bg,transparent)}
 button,select{font:inherit;color:var(--glot-fg,inherit);cursor:pointer}
@@ -224,7 +283,8 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
       const m = this.#m!;
       const url = new URL(location.href);
       const codes = m.locales.map((l) => l.code);
-      this.#strategy = resolveStrategy(this.getAttribute("strategy") ?? "auto", url, codes);
+      this.#strategy = resolveStrategy(this.getAttribute("strategy") ?? "auto", url, [...codes, ...m.locales.map(sc)]);
+      liveCheck(m, this.getAttribute("project") ?? defaults.project, base(this.getAttribute("cdn") ?? ""));
       let saved: string | null = null;
       try {
         saved = localStorage.getItem(STORE);
@@ -416,14 +476,18 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
       try {
         localStorage.setItem(STORE, code);
       } catch {}
-      const ev = new CustomEvent("glot:locale-change", { detail: { locale: code, previous, dir: loc.dir }, bubbles: true, composed: true, cancelable: true });
+      // `locale` is the site's code when it has its own (`zh`), `glotLocale` always glot's (`zh-CN`).
+      const ev = new CustomEvent("glot:locale-change", { detail: { locale: sc(loc), glotLocale: code, previous, dir: loc.dir }, bubbles: true, composed: true, cancelable: true });
       if (!this.dispatchEvent(ev)) return this.#render(); // the app handled it
       const [kind, name = "lang"] = this.#strategy.split(":");
+      const project = this.getAttribute("project") ?? defaults.project;
       if (kind === "cookie") {
-        document.cookie = `${name}=${encodeURIComponent(code)}; path=/; max-age=31536000; samesite=lax`;
+        document.cookie = `${name}=${encodeURIComponent(sc(loc))}; path=/; max-age=31536000; samesite=lax`;
+        if (code !== m.source) arm(project, code);
         return location.reload();
       }
       const to = targetUrl(this.#strategy, new URL(location.href), code, m);
+      if (to && code !== m.source) arm(project, code);
       if (to) return location.assign(to);
       // `event`: the app swaps strings itself (e.g. with glot.loadCatalog); keep <html> and the pills in sync.
       document.documentElement.lang = code;

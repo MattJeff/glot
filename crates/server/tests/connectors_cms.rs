@@ -181,7 +181,16 @@ fn contentful(
                 {"id": "hero", "name": "Hero", "type": "Link", "linkType": "Asset", "localized": true}]}]}),
         ),
         ("GET", "/entries") => {
-            let all = f.data["entries"].as_array().unwrap().clone();
+            let mut all = f.data["entries"].as_array().unwrap().clone();
+            if let Some(ids) = q.get("sys.id[in]") {
+                // Read back by ids (`current`): one call, every locale of each entry.
+                let ids: Vec<&str> = ids.split(',').collect();
+                all.retain(|e| ids.contains(&e["sys"]["id"].as_str().unwrap()));
+                return (
+                    StatusCode::OK,
+                    json!({"sys": {"type": "Array"}, "total": all.len(), "skip": 0, "limit": 1000, "items": all}),
+                );
+            }
             let skip: usize = q["skip"].parse().unwrap();
             // The server caps pages at 2 entries here: the connector must follow `total`.
             let items: Vec<Value> = all.iter().skip(skip).take(2).cloned().collect();
@@ -373,6 +382,23 @@ fn sanity(
     if h.get("authorization").and_then(|v| v.to_str().ok()) != Some("Bearer sktoken") {
         return (StatusCode::UNAUTHORIZED, json!({"error": "Unauthorized"}));
     }
+    if m == "POST"
+        && path == "/v2025-02-19/data/mutate/production"
+        && q.get("dryRun").map(String::as_str) == Some("true")
+    {
+        // Validated, never executed; a Viewer token is refused.
+        return if f.data["viewer"] == true {
+            (
+                StatusCode::FORBIDDEN,
+                json!({"error": {"description": "Insufficient permissions; permission \"create\" required"}}),
+            )
+        } else {
+            (
+                StatusCode::OK,
+                json!({"transactionId": "dry", "results": []}),
+            )
+        };
+    }
     if m == "POST" && path == "/v2025-02-19/data/mutate/production" {
         f.data["mutations"]
             .as_array_mut()
@@ -410,6 +436,15 @@ fn sanity(
                 .map(|d| d["_id"].clone())
                 .collect::<Vec<_>>()
         )
+    } else if query == "*[_id in $ids]" {
+        let ids: Vec<Value> = p["ids"].as_array().unwrap().clone();
+        json!(
+            docs.iter()
+                .filter(|d| ids.contains(&d["_id"]))
+                .collect::<Vec<_>>()
+        )
+    } else if query == "*[_id == $id][0]" {
+        json!(docs.iter().find(|d| d["_id"] == p["id"]))
     } else if query.starts_with("{\"doc\"") {
         let id = &p["id"];
         let meta = docs.iter().find(|d| {
@@ -1048,4 +1083,391 @@ async fn contentful_end_to_end() {
     let _ = sqlx::query(&format!("DROP DATABASE IF EXISTS {db} WITH (FORCE)"))
         .execute(&admin)
         .await;
+}
+
+// ---------------------------------------------------------------------------------------------- current / remove / doctor
+
+/// A Contentful environment with nothing set up for translation: one locale, no localized field.
+fn contentful_bare(
+    f: &mut Fake,
+    m: &Method,
+    path: &str,
+    q: &HashMap<String, String>,
+    body: &Value,
+    h: &HeaderMap,
+) -> (StatusCode, Value) {
+    match path.strip_prefix("/spaces/sp1/environments/master") {
+        Some("/locales") => (
+            StatusCode::OK,
+            json!({"items": [{"code": "en-US", "default": true, "contentManagementApi": true}]}),
+        ),
+        Some("/content_types") => (
+            StatusCode::OK,
+            json!({"items": [{"sys": {"id": "page"}, "name": "Page", "displayField": "title",
+                "fields": [{"id": "title", "type": "Symbol", "localized": false}]}]}),
+        ),
+        _ => contentful(f, m, path, q, body, h),
+    }
+}
+
+#[tokio::test]
+async fn contentful_current_remove_doctor() {
+    init();
+    let mut e1 = cf_entry("e1", 5, Some(4), "Free shipping");
+    e1["fields"]["title"]["fr"] = json!("Livraison offerte");
+    e1["fields"]["summary"]["fr"] = json!("## Pourquoi\n\n- Rapide");
+    e1["fields"]["body"]["fr"] = json!({"nodeType": "document", "data": {}, "content": [
+        {"nodeType": "paragraph", "data": {}, "content": [
+            {"nodeType": "text", "value": "npm i glot", "marks": [{"type": "code"}], "data": {}}]}]});
+    // The first PUT of e1 is answered with a version conflict by the mock: not what is tested here.
+    let data = json!({"conflicted": true, "entries": [e1, cf_entry("e2", 3, None, "Draft post")]});
+    let (url, s) = serve(data, contentful).await;
+    let c = registry("contentful").unwrap();
+    let cr = creds(
+        json!({"space_id": "sp1", "token": "cfpat"}),
+        json!({"api_url": url}),
+    );
+    let pulled = pull_all(c.as_ref(), &cr).await;
+    let items: Vec<PushItem> = translate(&pulled);
+    let cur = c.current(&cr, "fr", &items).await.unwrap().unwrap();
+    assert_eq!(cur.len(), 6);
+    assert_eq!(cur[0].as_deref(), Some("Livraison offerte"));
+    // Markdown and rich text come back in the shape push receives: restoring them writes the same content.
+    let restore: Vec<PushItem> = items[..3]
+        .iter()
+        .zip(&cur)
+        .map(|(it, v)| {
+            let value = v.clone().unwrap();
+            PushItem {
+                format: match &it.format {
+                    Format::RichText(_) => Format::RichText(serde_json::from_str(&value).unwrap()),
+                    f => f.clone(),
+                },
+                value,
+                ..it.clone()
+            }
+        })
+        .collect();
+    assert!(
+        cur[2].as_deref().unwrap().contains("glot:code"),
+        "code protected like a pulled document"
+    );
+    assert_eq!(
+        cur[3..],
+        [None, None, None],
+        "e2 has no fr value: the CMA does not fall back to the default locale"
+    );
+    let before = s.lock().unwrap().data["entries"][0]["fields"].clone();
+    assert_eq!(c.push(&cr, "fr", &restore).await.unwrap().ok, 3);
+    assert_eq!(s.lock().unwrap().data["entries"][0]["fields"], before);
+
+    // Rollback of a first write: only the fr values of those fields go.
+    assert!(c.remove(&cr, "fr", &items[..2]).await.unwrap());
+    {
+        let f = s.lock().unwrap();
+        let fields = &f.data["entries"][0]["fields"];
+        assert_eq!(fields["title"], json!({"en-US": "Free shipping"}));
+        assert!(fields["summary"].get("fr").is_none());
+        assert!(fields["body"].get("fr").is_some(), "not rolled back: kept");
+        assert_eq!(fields["slug"], json!({"en-US": "free-shipping"}));
+    }
+    assert!(
+        c.remove(&cr, "en-US", &items[..1]).await.is_err(),
+        "never the default locale"
+    );
+
+    let checks = c.doctor(&cr).await;
+    assert!(checks.iter().all(|k| k.status == "ok"), "{checks:?}");
+    let (url, s) = serve(json!({"entries": []}), contentful_bare).await;
+    let cr = creds(
+        json!({"space_id": "sp1", "token": "cfpat"}),
+        json!({"api_url": url}),
+    );
+    let checks = c.doctor(&cr).await;
+    let got: Vec<(&str, &str, Option<&str>)> = checks
+        .iter()
+        .map(|k| (k.id.as_str(), k.status, k.fix))
+        .collect();
+    assert_eq!(
+        got,
+        [
+            ("locales", "warn", Some("enable_locale")),
+            ("localized_fields", "warn", Some("enable_locale"))
+        ]
+    );
+    assert!(checks[0].detail.contains("only the default locale"));
+    assert!(
+        checks[1].detail.ends_with("in: Page"),
+        "{}",
+        checks[1].detail
+    );
+    assert!(
+        s.lock().unwrap().log.iter().all(|l| l.0 == "GET"),
+        "doctor only reads"
+    );
+}
+
+#[tokio::test]
+async fn sanity_field_current_remove_doctor() {
+    init();
+    let data = json!({"mutations": [], "docs": [
+        {"_id": "post-1", "_type": "post",
+         "title": {"_type": "localeString", "en": "Hello world", "fr": "Bonjour", "de": ""},
+         "body": {"_type": "localeBlockContent", "en": [
+            {"_type": "block", "_key": "b1", "children": [{"_type": "span", "_key": "s1", "text": "Read the docs", "marks": []}]}]},
+         "tagline": [{"_key": "en", "_type": "internationalizedArrayStringValue", "value": "Ship faster"},
+                     {"_key": "fr", "_type": "internationalizedArrayStringValue", "value": "Livrez plus vite"}]},
+        {"_id": "drafts.post-1", "_type": "post", "title": {"en": "Hello world (draft)"}}]});
+    let (url, s) = serve(data, sanity).await;
+    let c = registry("sanity").unwrap();
+    let cr = creds(
+        json!({"project_id": "abc123", "dataset": "production", "token": "sktoken"}),
+        json!({"api_host": url}),
+    );
+    let items = translate(&pull_all(c.as_ref(), &cr).await);
+    let fields: Vec<&str> = items.iter().map(|i| i.field.as_str()).collect();
+    assert_eq!(fields, ["title", "body", "tagline"]);
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [
+            Some("Bonjour".to_string()),
+            None,
+            Some("Livrez plus vite".to_string())
+        ]
+    );
+    assert_eq!(
+        c.current(&cr, "de", &items).await.unwrap().unwrap(),
+        [None, None, None],
+        "an empty value is not a translation"
+    );
+
+    assert!(
+        c.remove(&cr, "fr", &[items[0].clone(), items[2].clone()])
+            .await
+            .unwrap()
+    );
+    {
+        let f = s.lock().unwrap();
+        let unset = json!(["title.fr", "tagline[_key==\"fr\"]"]);
+        assert_eq!(
+            f.data["mutations"],
+            json!([{"patch": {"id": "post-1", "unset": unset}}, {"patch": {"id": "drafts.post-1", "unset": unset}}]),
+            "the fr values only, on the document and its draft"
+        );
+    }
+    assert!(
+        c.remove(&cr, "en", &items[..1]).await.is_err(),
+        "never the source locale"
+    );
+
+    let checks = c.doctor(&cr).await;
+    assert!(checks.iter().all(|k| k.status == "ok"), "{checks:?}");
+    assert_eq!(checks[1].detail, "field-level: de, en, fr");
+    // A Viewer token, on a dataset with no i18n model at all.
+    let (url, s) = serve(
+        json!({"viewer": true, "mutations": [], "docs": [{"_id": "a", "_type": "page", "title": "Plain"}]}),
+        sanity,
+    )
+    .await;
+    let cr = creds(
+        json!({"project_id": "abc123", "dataset": "production", "token": "sktoken"}),
+        json!({"api_host": url}),
+    );
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        (checks[0].id.as_str(), checks[0].status, checks[0].fix),
+        ("write_access", "fail", Some("permissions"))
+    );
+    assert!(
+        checks[0].detail.contains("Editor role"),
+        "{}",
+        checks[0].detail
+    );
+    assert_eq!(
+        (checks[1].id.as_str(), checks[1].status, checks[1].fix),
+        ("i18n_setup", "warn", Some("install_plugin"))
+    );
+    assert_eq!(
+        s.lock().unwrap().data["mutations"],
+        json!([]),
+        "doctor writes nothing"
+    );
+}
+
+#[tokio::test]
+async fn sanity_document_current() {
+    init();
+    let page = |id: &str, lang: &str, title: &str, label: &str| json!({"_id": id, "_type": "page", "language": lang, "title": title, "cta": {"label": label, "href": "/signup"}});
+    let reference =
+        |k: &str, r: &str| json!({"_key": k, "value": {"_type": "reference", "_ref": r}});
+    let data = json!({"mutations": [], "docs": [
+        page("about", "en", "About us", "Start now"),
+        // Created by the plugin as a copy of the source; only the title was translated since.
+        page("about-fr", "fr", "À propos", "Start now"),
+        page("pricing", "en", "Pricing", "Start now"),
+        {"_id": "meta1", "_type": "translation.metadata", "translations": [reference("en", "about"), reference("fr", "about-fr")]}]});
+    let (url, _s) = serve(data, sanity).await;
+    let c = registry("sanity").unwrap();
+    let cr = creds(
+        json!({"project_id": "abc123", "dataset": "production", "token": "sktoken"}),
+        json!({"api_host": url}),
+    );
+    let mut items = translate(&pull_all(c.as_ref(), &cr).await);
+    items.sort_by(|a, b| (&a.external_id, &a.field).cmp(&(&b.external_id, &b.field)));
+    let ids: Vec<String> = items
+        .iter()
+        .map(|i| format!("{}/{}", i.external_id, i.field))
+        .collect();
+    assert_eq!(
+        ids,
+        [
+            "about/cta.label",
+            "about/title",
+            "pricing/cta.label",
+            "pricing/title"
+        ]
+    );
+    assert_eq!(
+        c.current(&cr, "fr", &items).await.unwrap().unwrap(),
+        [None, Some("À propos".to_string()), None, None],
+        "the copied label is not a translation; pricing has no fr document"
+    );
+    assert!(
+        !c.remove(&cr, "fr", &items).await.unwrap(),
+        "a translated document is never deleted"
+    );
+    let checks = c.doctor(&cr).await;
+    assert_eq!(
+        checks[1].detail,
+        "document-level, language field 'language'"
+    );
+}
+
+/// Strapi with the read endpoints of `current` and `doctor`; `data.fr` = attributes of the fr versions by id.
+fn strapi_read(
+    f: &mut Fake,
+    m: &Method,
+    path: &str,
+    q: &HashMap<String, String>,
+    body: &Value,
+    h: &HeaderMap,
+) -> (StatusCode, Value) {
+    let v5 = f.data["v5"] == true;
+    let not_found = (
+        StatusCode::NOT_FOUND,
+        json!({"data": null, "error": {"status": 404, "name": "NotFoundError"}}),
+    );
+    if m != "GET" || h.get("authorization").is_none() {
+        return strapi(f, m, path, q, body, h);
+    }
+    if let Some(api) = path
+        .strip_prefix("/api/")
+        .filter(|p| !q.contains_key("locale") && !p.contains('/'))
+    {
+        if f.data["forbidden"] == api {
+            return (
+                StatusCode::FORBIDDEN,
+                json!({"data": null, "error": {"status": 403, "name": "ForbiddenError"}}),
+            );
+        }
+        if api == "articles" {
+            return (StatusCode::OK, json!({"data": [], "meta": {}}));
+        }
+    }
+    let Some(id) = path.strip_prefix("/api/articles/") else {
+        return strapi(f, m, path, q, body, h);
+    };
+    if v5 {
+        assert_eq!(q["status"], "draft", "the draft holds the last write");
+        return match f.data["fr"].get(id).filter(|_| q["locale"] == "fr") {
+            Some(a) => (StatusCode::OK, json!({"data": a, "meta": {}})),
+            None => not_found,
+        };
+    }
+    if q.get("populate").map(String::as_str) == Some("localizations") {
+        // The source entry: article 2 got its fr localization (id 12) after the last pull.
+        let loc = if id == "2" {
+            json!({"data": [{"id": 12, "attributes": {"locale": "fr"}}]})
+        } else {
+            json!({"data": []})
+        };
+        return (
+            StatusCode::OK,
+            json!({"data": {"id": id, "attributes": {"locale": "en", "localizations": loc}}}),
+        );
+    }
+    match f.data["fr"].get(id) {
+        Some(a) => (StatusCode::OK, json!({"data": {"id": id, "attributes": a}})),
+        None => not_found,
+    }
+}
+
+async fn strapi_current(v5: bool) {
+    init();
+    // The fr versions: the first article's (v5 document d1, v4 localization 9), then the second's.
+    let (a, b) = if v5 { ("d1", "d2") } else { ("9", "12") };
+    let mut data = json!({"v5": v5, "writes": [], "fr": {}});
+    data["fr"][a] = json!({"locale": "fr", "title": "Premier article", "content": "# Titre\n\nDu *texte*.", "body": null});
+    data["fr"][b] = json!({"locale": "fr", "title": "", "content": null, "body": [
+        {"type": "paragraph", "children": [{"type": "text", "text": "Aller sur "}]},
+        {"type": "code", "children": [{"type": "text", "text": "npm run build"}]}]});
+    let (url, s) = serve(data, strapi_read).await;
+    let c = registry("strapi").unwrap();
+    let cr = creds(json!({"url": url, "token": "strapitok"}), json!({}));
+    let items = translate(&pull_all(c.as_ref(), &cr).await);
+    let cur = c.current(&cr, "fr", &items).await.unwrap().unwrap();
+    assert_eq!(cur.len(), 7);
+    assert_eq!(cur[0].as_deref(), Some("Premier article"));
+    // Markdown comes back as the document push receives.
+    let md: Value = serde_json::from_str(cur[1].as_deref().unwrap()).unwrap();
+    assert_eq!(
+        glot_server::connectors::cms::md_text(&md),
+        "# Titre\n\nDu *texte*."
+    );
+    assert_eq!(cur[2], None, "null field");
+    assert_eq!((&cur[3], &cur[4]), (&None, &None), "empty and null");
+    let blocks = cur[5].as_deref().unwrap();
+    assert!(
+        blocks.contains("Aller sur") && blocks.contains("glot:code"),
+        "{blocks}"
+    );
+    assert_eq!(
+        cur[6], None,
+        "the homepage answers in the default locale: not a translation"
+    );
+    assert!(
+        !c.remove(&cr, "fr", &items).await.unwrap(),
+        "Strapi only deletes whole locale versions"
+    );
+
+    let checks = c.doctor(&cr).await;
+    assert!(checks.iter().all(|k| k.status == "ok"), "{checks:?}");
+    s.lock().unwrap().data["forbidden"] = json!("articles");
+    let checks = c.doctor(&cr).await;
+    let bad: Vec<_> = checks.iter().filter(|k| k.status != "ok").collect();
+    assert_eq!(bad.len(), 1, "{checks:?}");
+    assert_eq!(
+        (bad[0].id.as_str(), bad[0].status, bad[0].fix),
+        ("permissions", "fail", Some("permissions"))
+    );
+    assert!(
+        bad[0].detail.contains("cannot read articles"),
+        "{}",
+        bad[0].detail
+    );
+    assert_eq!(
+        s.lock().unwrap().data["writes"],
+        json!([]),
+        "nothing written"
+    );
+}
+
+#[tokio::test]
+async fn strapi_v5_current_doctor() {
+    strapi_current(true).await;
+}
+
+#[tokio::test]
+async fn strapi_v4_current_doctor() {
+    strapi_current(false).await;
 }

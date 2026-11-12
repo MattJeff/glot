@@ -11,6 +11,16 @@
 //! - Languages: `POST /api/search/language` with the `locale` association (`locale.code`, `de-DE`).
 //! - Push: `PATCH /api/{entity}/{id}` with `{"translations": {"<languageId>": {field: value}}}`: the DAL's
 //!   translations association, indexed by language id; only the given language's translation row is written.
+//! - Human edits and rollback: `POST /api/search/{entity}` with `ids` and the `translations` association
+//!   filtered on `languageId` returns the target language's translation row, the very fields the push writes
+//!   (`null` = inherited, no translation). `remove` is not implemented: deleting the row
+//!   (`{entity}_translation`) would also drop fields glot does not manage (custom fields, slot config), and
+//!   the docs do not confirm that writing `null` resets a single field.
+//! - Diagnosis: the integration's own record (`POST /api/search/integration`, `accessKey` = the access key
+//!   ID, `aclRoles` association): `admin`, else the roles' privileges against what glot needs (`{entity}:read`
+//!   and `:update`, `{entity}_translation:read`, `language:read`, `locale:read`; a translation write is
+//!   checked against its parent entity's privilege); and the languages no sales channel offers
+//!   (`sales_channel.languages`).
 //! - Webhooks: Shopware sends them from apps (`shopware-shop-signature`, hex HMAC-SHA256 of the body with the
 //!   app secret) or from Flow Builder's *Call webhook* action (Evolve / Beyond plans): no API to register one,
 //!   the user pastes the card's URL. Verified by that signature, `X-Glot-Webhook-Secret` / Bearer, or
@@ -22,6 +32,9 @@
 //! https://developer.shopware.com/docs/guides/integrations-api/general-concepts/request-headers.html,
 //! https://developer.shopware.com/docs/resources/references/adr/2022-03-29-specify-priority-of-translations-in-dal-write-payloads.html,
 //! https://developer.shopware.com/docs/resources/references/core-reference/dal-reference/filters-reference.html,
+//! https://github.com/shopware/shopware/blob/trunk/src/Core/System/Integration/IntegrationDefinition.php,
+//! https://github.com/shopware/shopware/blob/trunk/src/Core/Framework/Api/Acl/AclCriteriaValidator.php and
+//! `AclWriteValidator.php` (privileges checked on associations and translation writes),
 //! https://developer.shopware.com/docs/guides/plugins/apps/webhook.html,
 //! https://docs.shopware.com/en/shopware-6-en/features/webhook-actions-in-flow-builder
 use async_trait::async_trait;
@@ -30,7 +43,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
 };
 
 pub struct Shopware;
@@ -349,6 +362,159 @@ impl Connector for Shopware {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let langs = api.languages().await?;
+        let Some(lang) = language_for(&langs, locale).filter(|l| *l != SYSTEM_LANGUAGE) else {
+            return Ok(Some(vec![None; items.len()]));
+        };
+        let place = |it: &PushItem| {
+            Some((
+                it.meta["entity"].as_str()?.to_string(),
+                it.meta["id"].as_str()?.to_string(),
+            ))
+        };
+        let mut by_entity: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        for (entity, id) in items.iter().filter_map(place) {
+            let ids = by_entity.entry(entity).or_default();
+            if !ids.contains(&id) {
+                ids.push(id);
+            }
+        }
+        // (entity, id) → translation row.
+        let mut found: BTreeMap<(String, String), Value> = BTreeMap::new();
+        for (entity, ids) in by_entity {
+            let Some(fields) = ENTITIES.iter().find(|e| e.0 == entity).map(|e| e.1) else {
+                anyhow::bail!("unknown entity {entity}");
+            };
+            let mut include = vec!["languageId"];
+            include.extend(fields.iter().map(|f| f.0));
+            let v = api
+                .search(
+                    &entity,
+                    &json!({
+                        "ids": ids,
+                        "limit": ids.len(),
+                        "associations": {"translations": {
+                            "filter": [{"type": "equals", "field": "languageId", "value": lang}]}},
+                        "includes": {entity.as_str(): ["id", "translations"], format!("{entity}_translation"): include},
+                    }),
+                )
+                .await?;
+            for o in v["data"].as_array().into_iter().flatten() {
+                let row = o["translations"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .find(|t| t["languageId"] == lang);
+                if let (Some(id), Some(row)) = (o["id"].as_str(), row) {
+                    found.insert((entity.clone(), id.to_string()), row.clone());
+                }
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    found.get(&place(it)?)?[it.field.as_str()]
+                        .as_str()
+                        .filter(|v| !v.trim().is_empty())
+                        .map(str::to_string)
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("permissions", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        let me = api
+            .search(
+                "integration",
+                &json!({"limit": 1, "associations": {"aclRoles": {}},
+                    "filter": [{"type": "equals", "field": "accessKey", "value": creds.opt("client_id")}]}),
+            )
+            .await;
+        out.push(match me.as_ref().map(|v| &v["data"][0]) {
+            Ok(i) if i["admin"] == true => Check::ok("permissions", "administrator integration"),
+            Ok(i) if i.is_object() => {
+                let has = |p: &str| {
+                    i["aclRoles"].as_array().into_iter().flatten().any(|r| {
+                        r["privileges"].as_array().into_iter().flatten().any(|x| x == p)
+                    })
+                };
+                let mut needed = vec!["language:read".to_string(), "locale:read".into()];
+                for (e, _) in ENTITIES {
+                    needed.extend([format!("{e}:read"), format!("{e}:update"), format!("{e}_translation:read")]);
+                }
+                needed.retain(|p| !has(p));
+                if needed.is_empty() {
+                    Check::ok("permissions", "read and update products, categories, properties")
+                } else {
+                    Check {
+                        fix: Some("permissions"),
+                        ..Check::fail(
+                            "permissions",
+                            format!("the integration's role lacks: {}", needed.join(", ")),
+                        )
+                    }
+                }
+            }
+            // A least-privilege integration cannot read its own record: not a failure.
+            _ => Check::warn(
+                "permissions",
+                "the integration cannot read its own privileges (integration:read, acl_role:read): not verified",
+                None,
+            ),
+        });
+        // Languages no sales channel offers are translated for nobody. Unreadable (sales_channel:read) = not checked.
+        let channels = api
+            .search(
+                "sales_channel",
+                &json!({"limit": 500, "associations": {"languages": {}},
+                    "includes": {"sales_channel": ["id", "active", "languages"], "language": ["id"]}}),
+            )
+            .await;
+        if let (Ok(ch), Ok(langs)) = (channels, api.languages().await) {
+            let offered = |id: &str| {
+                ch["data"].as_array().into_iter().flatten().any(|c| {
+                    c["active"] != false
+                        && c["languages"]
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                            .any(|l| l["id"] == id)
+                })
+            };
+            let unused: Vec<&str> = langs
+                .iter()
+                .filter(|(id, _)| id != SYSTEM_LANGUAGE && !offered(id))
+                .map(|(_, code)| code.as_str())
+                .collect();
+            out.push(if unused.is_empty() {
+                Check::ok(
+                    "sales_channels",
+                    "every language is offered by a sales channel",
+                )
+            } else {
+                Check::warn(
+                    "sales_channels",
+                    format!("offered by no sales channel: {}", unused.join(", ")),
+                    Some("enable_locale"),
+                )
+            });
+        }
+        out
     }
 
     /// App webhooks (`shopware-shop-signature`, hex HMAC-SHA256 of the body, key = app secret given as

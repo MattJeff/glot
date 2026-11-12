@@ -18,6 +18,7 @@ export declare const dir: (l: string) => "rtl" | "ltr";
 export declare function sitePath(s: SeoCtx, href0: string): string | undefined;
 /** Internal link for the served locale: root-relative stays root-relative (subdirectory: gains the prefix). */
 export declare function localizeHref(s: SeoCtx, href: string): string | undefined;
+export declare function ogLocale(locale: string): string;
 /**
  * International SEO of one page (glot_core::edge::seo::rewrite): `<html lang dir>`, one canonical (the origin's,
  * localized), reciprocal hreflang for every ready locale + x-default, og:locale / og:url, JSON-LD texts through the

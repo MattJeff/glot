@@ -135,6 +135,13 @@ function ld(v: unknown, s: SeoCtx, key?: string): unknown {
   return v;
 }
 
+/** Open Graph wants `language_TERRITORY` (glot_core::edge::seo::og_locale): `es` → `es_ES`, `pt-BR` → `pt_BR`. */
+const OG_REGION: Record<string, string> = { en: "US", ja: "JP", ko: "KR", zh: "CN", ar: "AR", he: "IL", el: "GR", da: "DK", sv: "SE", cs: "CZ", uk: "UA", hi: "IN", vi: "VN", fa: "IR", nb: "NO", no: "NO", pt: "PT" };
+export function ogLocale(locale: string): string {
+  const [l, r] = locale.split(/[-_]/), lang = l.toLowerCase();
+  return `${lang}_${r ? r.toUpperCase() : (OG_REGION[lang] ?? lang.toUpperCase())}`;
+}
+
 /**
  * International SEO of one page (glot_core::edge::seo::rewrite): `<html lang dir>`, one canonical (the origin's,
  * localized), reciprocal hreflang for every ready locale + x-default, og:locale / og:url, JSON-LD texts through the
@@ -171,7 +178,7 @@ export function seo(html: string, s: SeoCtx): string {
       }
     } else if (t.name === "meta") {
       const p = get("property"), c = get("content");
-      if (p === "og:locale") set("content", s.locale.replace(/-/g, "_"));
+      if (p === "og:locale") set("content", ogLocale(s.locale));
       else if (p === "og:url" && c !== undefined) { const sp = sitePath(s, c), u = sp === undefined ? undefined : urlFor(s, s.locale, sp); if (u) set("content", u); }
     } else if (t.name === "a" && get("hreflang") === undefined && get("data-glot-skip") === undefined) {
       const h = get("href"), l = h === undefined ? undefined : localizeHref(s, h);
@@ -190,10 +197,12 @@ export function seo(html: string, s: SeoCtx): string {
     edits.push([t.range[0], t.range[1], `<${html.slice(t.range[0] + 1, t.range[0] + 1 + t.name.length)}${parts.map((x) => " " + x).join("")}${t.selfClosing ? " />" : ">"}`]);
   }
   if (headEnd !== undefined) {
-    const p = canonical ?? s.path, c = urlFor(s, s.locale, p);
-    const alt = s.bases.map(([l]) => [l, urlFor(s, l, p)!]);
-    const x = urlFor(s, s.source, p);
-    if (x !== undefined) alt.push(["x-default", x]);
+    const p = canonical ?? s.path, x = urlFor(s, s.source, p);
+    // A locale that is not published: a duplicate of the source page for now (canonical to it, no alternates).
+    const own = s.locale === s.source || base(s, s.locale) !== undefined;
+    const c = own ? urlFor(s, s.locale, p) : x;
+    const alt = own ? s.bases.map(([l]) => [l, urlFor(s, l, p)!]) : [];
+    if (own && x !== undefined) alt.push(["x-default", x]);
     edits.push([headEnd, headEnd, (c ? `<link rel="canonical" href="${esc(c)}">` : "") + alt.map(([l, u]) => `<link rel="alternate" hreflang="${esc(l)}" href="${esc(u)}">`).join("")]);
   }
   edits.sort((x, y) => x[0] - y[0]);

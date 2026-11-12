@@ -50,6 +50,11 @@ pub struct Site {
     pub bases: Vec<(String, String)>,
     /// Fixed origin to fetch source pages / sitemap / robots.txt from (never taken from a request).
     pub origin: Option<String>,
+    /// Per advertised locale, the pages complete enough to be advertised (`seo_report::page_ready`).
+    /// `None` = not computed (`ready_only: false`): every page of every listed locale.
+    pub ready_pages: Option<super::seo_report::ReadyPages>,
+    /// Translated URL paths (empty unless `edge_settings.translated_slugs`).
+    pub slugs: glot_core::edge::seo::Slugs,
 }
 
 impl Site {
@@ -62,7 +67,7 @@ impl Site {
 
     /// The SEO rewrite context of one page of this site.
     pub fn seo_ctx<'a>(
-        &self,
+        &'a self,
         locale: &str,
         path: &str,
         tr: &'a dyn Fn(&str) -> Option<String>,
@@ -73,7 +78,21 @@ impl Site {
             bases: self.bases.clone(),
             path: path.into(),
             tr,
+            page_locales: self.page_locales(path),
+            slugs: Some(&self.slugs),
         }
+    }
+
+    /// The locales whose version of `path` is complete (`None` = not computed: all of them). A URL with a
+    /// query string is never measured (no discovery, no pre-warm on those), so it is never advertised.
+    pub fn page_locales(&self, path: &str) -> Option<Vec<String>> {
+        let page = glot_core::edge::tm::path_only(path);
+        self.ready_pages.as_ref().map(|r| {
+            r.iter()
+                .filter(|(_, pages)| !path.contains('?') && pages.contains(&page))
+                .map(|(l, _)| l.clone())
+                .collect()
+        })
     }
 }
 
@@ -104,18 +123,32 @@ pub async fn site(state: &AppState, p: &ProjectRow, ready_only: bool) -> ApiResu
     .bind(p.id)
     .fetch_all(&state.db)
     .await?;
-    let ready: Vec<String> = if ready_only {
-        super::seo_report::readiness(state, p)
-            .await?
-            .into_iter()
-            .filter(|r| r.ready(SEO_MIN))
-            .map(|r| r.locale)
-            .collect()
+    let (ready, ready_pages): (Vec<String>, _) = if ready_only {
+        let (r, pages) = super::seo_report::readiness_pages(state, p).await?;
+        (
+            r.into_iter()
+                .filter(|r| r.ready(SEO_MIN))
+                .map(|r| r.locale)
+                .collect(),
+            Some(pages),
+        )
     } else {
-        p.target_locales.clone()
+        (p.target_locales.clone(), None)
     };
+    let slugs_on: bool = sqlx::query_scalar(
+        "SELECT coalesce((SELECT translated_slugs AND enabled FROM edge_settings WHERE project_id = $1), false)",
+    )
+    .bind(p.id)
+    .fetch_one(&state.db)
+    .await?;
     let mut site = Site {
         source_locale: p.source_locale.clone(),
+        ready_pages,
+        slugs: if slugs_on {
+            super::slugs::load(&state.db, p.id).await?.current
+        } else {
+            Default::default()
+        },
         ..Default::default()
     };
     let mut source_base: Option<String> = None;
@@ -330,6 +363,10 @@ pub fn urlset(site: &Site, locale: &str, paths: &[String]) -> String {
     );
     for path in paths {
         let ctx = site.seo_ctx(locale, path, &noop);
+        // Only pages complete in this language: an incomplete one is a duplicate of the source for now.
+        if !ctx.advertised(locale) {
+            continue;
+        }
         let Some(loc) = ctx.url_for(locale, path) else {
             continue;
         };
@@ -539,10 +576,18 @@ async fn indexnow(
         }
         let Ok(u) = Url::parse(b) else { continue };
         let host = u.host_str().unwrap_or_default().to_string();
-        let urls = paths.iter().map(|path| format!("{b}{path}"));
+        // What the sitemap lists: complete pages, at their translated address.
+        let urls: Vec<String> = paths
+            .iter()
+            .filter_map(|path| {
+                let noop = |_: &str| None;
+                let ctx = site.seo_ctx(l, path, &noop);
+                ctx.advertised(l).then(|| ctx.url_for(l, path)).flatten()
+            })
+            .collect();
         match by_host.iter_mut().find(|(h, _)| *h == host) {
             Some((_, v)) => v.extend(urls),
-            None => by_host.push((host, urls.collect())),
+            None => by_host.push((host, urls)),
         }
     }
     let client = reqwest::Client::builder()
@@ -582,6 +627,7 @@ mod tests {
                 ("es".into(), "https://es.cliponit.app".into()),
             ],
             origin: Some("https://cliponit.app".into()),
+            ..Default::default()
         }
     }
 

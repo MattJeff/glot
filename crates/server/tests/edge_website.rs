@@ -121,7 +121,7 @@ async fn edge_website_snippet() {
     let (_, _, mut settings) = call(Method::GET, "/api/projects/ed/edge/settings", c, None).await;
     assert_eq!(
         settings["website_snippet"],
-        json!({"on": false, "auto_translate": true, "position": "bottom-right", "locales": []})
+        json!({"on": false, "auto_translate": true, "position": "bottom-right", "locales": [], "flags": true, "site": ""})
     );
     settings["website_snippet"] =
         json!({"on": true, "auto_translate": false, "position": "#nav", "locales": ["de"]});
@@ -146,7 +146,7 @@ async fn edge_website_snippet() {
     let (_, _, st) = call(Method::GET, "/edge/v1/ed/status", None, None).await;
     assert_eq!(
         st["website"],
-        json!({"on": true, "auto_translate": false, "position": "#nav", "locales": ["es"]})
+        json!({"on": true, "auto_translate": false, "position": "#nav", "locales": ["es"], "flags": true, "site": ""})
     );
 
     let (s, _, out) = report(vec![seg("Our story"), seg("Write to hello@shop.test")]).await;

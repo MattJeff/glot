@@ -62,7 +62,7 @@ For an app that ships an empty HTML shell, your CI can also render its pages its
 
 **Setup → View as Google** fetches one translated URL once, without JavaScript: HTTP status, `lang` and `dir`, `Content-Language`, title, canonical, hreflang (and whether each one links back), `Server-Timing`, segments still untranslated, and the start of the raw HTML.
 
-The **SEO report** tab does the same for every language and page: raw HTML without JavaScript, canonical, reciprocal hreflang, metadata, untranslated segments, HTTP errors, and the difference between the raw HTML and the page rendered in a browser.
+The **SEO report** tab does the same for every language and page: raw HTML without JavaScript, canonical, reciprocal hreflang, metadata, untranslated segments, HTTP errors, and the difference between the raw HTML and the page rendered in a browser. It starts with the outcome: per language, how many pages are indexable out of the pages glot has read. It also flags pages that share a title or have no description, and exports as CSV.
 
 The report separates two things:
 
@@ -71,7 +71,52 @@ The report separates two things:
 
 ### Sitemaps and IndexNow
 
-glot publishes one sitemap per language plus a sitemap index, and announces them in `robots.txt`. Google discovers the localized URLs from the sitemaps and the hreflang links. IndexNow pings are sent to Bing and Yandex only: Google does not use IndexNow. A language is listed in hreflang links and sitemaps only once it is ready (95 % coverage and every critical page above its threshold). Until then its pages are served translated, without hreflang or canonical, so search engines don't index a half-translated version.
+glot publishes one sitemap per language plus a sitemap index, and announces them in `robots.txt`. Google discovers the localized URLs from the sitemaps and the hreflang links. IndexNow pings are sent to Bing and Yandex only: Google does not use IndexNow. A language is listed in hreflang links and sitemaps only once it is ready (95 % coverage and every critical page above its threshold), and within a ready language, only the pages that are themselves complete (next section).
+
+## Indexed pages, not just translated pages
+
+Search engines treat a translated URL whose text is still in the source language as a duplicate. glot Edge decides page by page what it tells them.
+
+### A page is announced only when it is complete
+
+A page is **ready** once its `<title>` is translated and at least 95 % of its text is. Every translated response says which it is in `x-glot-index`:
+
+| | `ready` | `pending` |
+|---|---|---|
+| Served to visitors | translated | translated as far as it goes, source text for the rest |
+| `<link rel="canonical">` | the page's own URL in that language | the source page: "this is a copy for now" |
+| hreflang | this page and every language where it is ready, plus `x-default` | none, and no other page lists it |
+| Sitemap of the language | listed, with its alternates | not listed |
+
+A page goes from `pending` to `ready` by itself when its translations arrive, and back to `pending` if you publish new text, until that text is translated. Text glot never reads (personal data, protected zones) does not hold a page back. When glot cannot translate at all (fail-open, kill switch, quota), the untranslated page carries a `Link: <source URL>; rel="canonical"` header.
+
+Everything a crawler reads is translated with the page: title, meta description, Open Graph and Twitter titles and descriptions, `alt`, `aria-label`, and the texts of JSON-LD structured data (URLs localized, `inLanguage` set, prices and types untouched). A sentence that only exists in JSON-LD, such as a FAQ answer, is discovered and translated like any other text. `og:locale` uses the `language_TERRITORY` form (`es_ES`). Titles and descriptions are translated first when many texts wait.
+
+### Pre-warm: translated before the first visit
+
+Without it, the first visitor or crawler of a page triggers its translation and sees the source text. With **Translate the site ahead of visitors** (on by default, **Settings → Search engines**), glot reads the site itself:
+
+- your sitemap first (`robots.txt` `Sitemap:` lines, else `/sitemap.xml`), then the pages those link to;
+- when a domain is verified, then at most once a day for sites with traffic, or on demand with **SEO report → Translate the whole site now**;
+- one page per second, one page at a time, up to **Pages read per run** (200 by default);
+- never a path `robots.txt` disallows, an [application path](#application-pages-sign-in-oauth-api), a path outside your [discovery zones](#discovery-zones), a URL with a query string or a `noindex` page.
+
+What it finds goes through the same rules as a page a visitor rendered: personal data is never sent, new texts count toward the daily limit, translation stops at your monthly budget, sensitive pages wait for a review. The run ends when the translations it asked for are done.
+
+### Translated addresses (optional)
+
+With **Translate page addresses**, `/pricing` becomes `/precios` on the Spanish site:
+
+- the words of each address are translated with the page text (same model, glossary, limits); ids, numbers and file names are kept. A navigation link "Pricing" you already translated gives the address for free;
+- `es.example.com/pricing` answers 301 to `/precios`; canonical, hreflang (in every language, so the cluster stays reciprocal), internal links, JSON-LD URLs and sitemaps use the translated address;
+- an address never changes by itself. You can replace one in **SEO report → Translated addresses**: the old address redirects to the new one. Turning the option off redirects every translated address back to the original;
+- addresses are ASCII: accents are folded (`précios` → `precios`), and languages written in another script keep the original address.
+
+Only page navigations are redirected, so your app's own data requests keep working. If your site routes in the browser by reading the address (a single-page app), try it on one language first: the app must accept an address it does not know.
+
+### Conditional requests
+
+Translated pages carry an `ETag`. A crawler that already has the page and sends `If-None-Match` gets a `304` without a body, which saves crawl budget on large sites. Your origin's `Cache-Control` is kept as is, and responses with a session are never shared.
 
 ## Coverage by critical page
 

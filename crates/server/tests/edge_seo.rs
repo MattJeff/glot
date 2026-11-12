@@ -114,6 +114,8 @@ async fn edge_seo() {
             bases: bases.clone(),
             path: path.into(),
             tr: &noop,
+            page_locales: None,
+            slugs: None,
         };
         seo::rewrite(&t, &ctx)
     };
@@ -136,6 +138,8 @@ async fn edge_seo() {
             bases: bases.clone(),
             path: path.into(),
             tr: &noop,
+            page_locales: None,
+            slugs: None,
         };
         seo::rewrite(html, &ctx)
     };

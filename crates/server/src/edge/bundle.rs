@@ -186,8 +186,11 @@ async fn endpoint(
     }
     let p = crate::projects::load_public(&state, &slug)
         .await?
-        .filter(|p| p.target_locales.contains(&locale))
         .ok_or_else(|| AppError::not_found("unknown project or locale"))?;
+    // `zh`, `zh_CN`, `zh-Hans` → the project's `zh-CN` (crate::locale_alias); exact match first.
+    let locale = crate::locale_alias::resolve(&locale, &p.target_locales)
+        .ok_or_else(|| AppError::not_found("unknown project or locale"))?
+        .to_string();
     let deadline = Instant::now() + Duration::from_secs(2);
     let tm = super::proxy::tm_for(&state, &p, &locale, deadline)
         .await

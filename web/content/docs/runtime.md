@@ -99,6 +99,8 @@ The source locale, then every target locale that is **ready**:
 - `critical_coverage`: the worst critical page (home, pricing, signup, checkout… set in Edge settings) — each must reach its threshold (98 % by default). "95 % of the keys" is not "95 % of the experience": one untranslated pricing page keeps the language out. It is `null` while glot Edge has not seen any page (key-only projects: only `coverage` counts);
 - `version`: the locale's catalog version, the same one the CDN catalogs, the Edge translation memory and pre-rendered pages use.
 
+A locale whose code differs on your site also carries `site_code` (`{ "code": "zh-CN", "site_code": "zh" }`): the element writes that one in the URL, the cookie and the event, and glot checks that each language really shows on your site. See [Is a language live on your site?](/docs/languages-live-check).
+
 Add `&all=1` to also list the locales that are not ready (`"ready": false`), e.g. for a dashboard. It is served with an ETag, `Cache-Control: public, max-age=60, stale-while-revalidate=600` and `Access-Control-Allow-Origin: *`. Add a language in glot and translate it: within about a minute of becoming ready it appears in every visitor's switcher.
 
 ### Attributes
@@ -152,7 +154,7 @@ Strategies decide how the current locale is read and what a click does:
 - `event`: navigates nowhere. Sets `<html lang dir>`; your app swaps its strings.
 - `auto`: `query:lang` when the URL has `?lang=`, `prefix` when the path starts with a locale, `event` otherwise.
 
-Every strategy first dispatches a cancelable, bubbling `glot:locale-change` event (`detail: { locale, previous, dir }`); call `preventDefault()` to handle the change yourself. The choice is saved in `localStorage["glot-locale"]`. When nothing in the URL or cookie names a locale (or with `event`, which starts from the saved choice), the element uses `<html lang>`, then the saved choice, then the source.
+Every strategy first dispatches a cancelable, bubbling `glot:locale-change` event (`detail: { locale, glotLocale, previous, dir }`; `locale` is your site's code when it has its own, `glotLocale` always glot's); call `preventDefault()` to handle the change yourself. The choice is saved in `localStorage["glot-locale"]`. When nothing in the URL or cookie names a locale (or with `event`, which starts from the saved choice), the element uses `<html lang>`, then the saved choice, then the source.
 
 Styling: shadow DOM with parts `trigger`, `flag`, `menu`, `search`, `option`, `option-current` (menu), `list`, `pill`, `pill-current` (pills), `select`, and custom properties `--glot-gap`, `--glot-radius`, `--glot-padding`, `--glot-font-size`, `--glot-fg`, `--glot-bg`, `--glot-border`, `--glot-list-bg`, `--glot-active-bg`, `--glot-active-fg`, `--glot-focus`, and for the menu `--glot-menu-bg`, `--glot-menu-fg` (default: the system `Canvas` / `CanvasText` pair), `--glot-menu-radius`, `--glot-menu-max-height`, `--glot-hover-bg`, `--glot-shadow`, `--glot-z`. The trigger inherits the page's color and font. Pills are buttons with `aria-current`; arrow keys (mirrored in RTL), Home and End move between them. Each label carries its own `lang` and `dir`.
 

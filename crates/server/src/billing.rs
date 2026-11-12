@@ -37,6 +37,11 @@ pub const REVIEW: &str = "review_annotations";
 /// Pages served translated by glot Edge (Localisation SEO), counted by the proxy / worker.
 pub const EDGE_PAGES: &str = "edge_pages";
 pub const EDGE_DOMAINS: &str = "edge_domains";
+/// Page views translated in the visitor's browser by the website tag (`widget/glot.js`), reported by the tag
+/// (`POST /edge/v1/{project}/usage`, `mode: "website"`): one per document load in a non-source language.
+pub const WEBSITE_PAGES: &str = "website_pages";
+/// Documents localized by the render protocol (`POST /v1/render`, one per item), cache hits included.
+pub const RENDER: &str = "render_requests";
 
 /// Monthly limits of a plan; `null` = unlimited. Overridable with `GLOT_PLAN_LIMITS` (JSON, per plan).
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
@@ -64,6 +69,13 @@ pub struct Limits {
     /// glot Edge domains (not monthly).
     #[serde(default)]
     pub edge_domains: Option<i64>,
+    /// Page views translated by the website tag per month (every plan: it costs glot a cached TM read, not a
+    /// server-rendered page; Growth gets the same volume as Edge pages).
+    #[serde(default)]
+    pub website_pages: Option<i64>,
+    /// Documents localized by the render protocol per month (`render_protocol.rs`).
+    #[serde(default)]
+    pub render_requests: Option<i64>,
 }
 
 impl Limits {
@@ -78,6 +90,8 @@ impl Limits {
             REVIEW => self.review_annotations,
             EDGE_PAGES => self.edge_pages,
             EDGE_DOMAINS => self.edge_domains,
+            WEBSITE_PAGES => self.website_pages,
+            RENDER => self.render_requests,
             _ => None,
         }
     }
@@ -93,6 +107,8 @@ fn label(kind: &str) -> &'static str {
         REVIEW => "Live review annotations",
         EDGE_PAGES => "glot Edge pages served",
         EDGE_DOMAINS => "glot Edge domains",
+        WEBSITE_PAGES => "Page views translated by the website tag",
+        RENDER => "Documents localized by the render API",
         _ => "Cloud projects",
     }
 }
@@ -111,6 +127,8 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
         review_annotations: None,
         edge_pages: None,
         edge_domains: None,
+        website_pages: None,
+        render_requests: None,
     };
     let xp = |l: Limits, experiments, xp_cells| Limits {
         experiments,
@@ -160,6 +178,28 @@ pub fn default_plans() -> BTreeMap<String, Limits> {
         if let Some(l) = plans.get_mut(plan) {
             l.edge_pages = pages;
             l.edge_domains = domains;
+        }
+    }
+    // Website tag (browser-side translation, any site builder): on every plan, by volume.
+    for (plan, pages) in [
+        ("free", 2_500),
+        ("starter", 25_000),
+        ("pro", 250_000),
+        ("team", 2_000_000),
+    ] {
+        if let Some(l) = plans.get_mut(plan) {
+            l.website_pages = Some(pages);
+        }
+    }
+    // Render protocol (emails, notifications, documents): on every plan, by volume.
+    for (plan, docs) in [
+        ("free", 1_000),
+        ("starter", 20_000),
+        ("pro", 200_000),
+        ("team", 2_000_000),
+    ] {
+        if let Some(l) = plans.get_mut(plan) {
+            l.render_requests = Some(docs);
         }
     }
     plans

@@ -2130,6 +2130,11 @@ function ld(v, s, key) {
   }
   return v;
 }
+var OG_REGION = { en: "US", ja: "JP", ko: "KR", zh: "CN", ar: "AR", he: "IL", el: "GR", da: "DK", sv: "SE", cs: "CZ", uk: "UA", hi: "IN", vi: "VN", fa: "IR", nb: "NO", no: "NO", pt: "PT" };
+function ogLocale(locale) {
+  const [l, r] = locale.split(/[-_]/), lang = l.toLowerCase();
+  return `${lang}_${r ? r.toUpperCase() : OG_REGION[lang] ?? lang.toUpperCase()}`;
+}
 function seo(html, s) {
   const edits2 = [];
   const raw = (x) => {
@@ -2177,7 +2182,7 @@ function seo(html, s) {
       }
     } else if (t.name === "meta") {
       const p = get2("property"), c = get2("content");
-      if (p === "og:locale") set("content", s.locale.replace(/-/g, "_"));
+      if (p === "og:locale") set("content", ogLocale(s.locale));
       else if (p === "og:url" && c !== void 0) {
         const sp = sitePath(s, c), u = sp === void 0 ? void 0 : urlFor(s, s.locale, sp);
         if (u) set("content", u);
@@ -2198,10 +2203,11 @@ function seo(html, s) {
     edits2.push([t.range[0], t.range[1], `<${html.slice(t.range[0] + 1, t.range[0] + 1 + t.name.length)}${parts.map((x) => " " + x).join("")}${t.selfClosing ? " />" : ">"}`]);
   }
   if (headEnd !== void 0) {
-    const p = canonical ?? s.path, c = urlFor(s, s.locale, p);
-    const alt = s.bases.map(([l]) => [l, urlFor(s, l, p)]);
-    const x = urlFor(s, s.source, p);
-    if (x !== void 0) alt.push(["x-default", x]);
+    const p = canonical ?? s.path, x = urlFor(s, s.source, p);
+    const own = s.locale === s.source || base(s, s.locale) !== void 0;
+    const c = own ? urlFor(s, s.locale, p) : x;
+    const alt = own ? s.bases.map(([l]) => [l, urlFor(s, l, p)]) : [];
+    if (own && x !== void 0) alt.push(["x-default", x]);
     edits2.push([headEnd, headEnd, (c ? `<link rel="canonical" href="${esc2(c)}">` : "") + alt.map(([l, u]) => `<link rel="alternate" hreflang="${esc2(l)}" href="${esc2(u)}">`).join("")]);
   }
   edits2.sort((x, y2) => x[0] - y2[0]);

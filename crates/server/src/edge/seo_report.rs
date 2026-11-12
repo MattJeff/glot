@@ -89,6 +89,8 @@ pub struct PageCoverage {
     pub segments: usize,
     pub translated: usize,
     pub coverage: f64,
+    /// Complete enough to be advertised to search engines ([`page_ready`]).
+    pub ready: bool,
     pub missing: Vec<Missing>,
 }
 
@@ -129,6 +131,7 @@ fn coverage_of(
             segments: 0,
             translated: 0,
             coverage: 0.0,
+            ready: false,
             missing: vec![],
         });
         pc.segments += 1;
@@ -150,13 +153,43 @@ fn coverage_of(
             } else {
                 p.translated as f64 / p.segments as f64
             };
+            let known: Vec<&Missing> = p.missing.iter().filter(|m| m.text.is_some()).collect();
+            // `missing` is capped: a page that hit the cap is far from complete anyway.
+            p.ready = p.missing.len() < MAX_MISSING
+                && page_ready(
+                    p.segments,
+                    known.len(),
+                    known.iter().any(|m| m.context.starts_with("title|")),
+                );
             p
         })
         .collect()
 }
 
+/// Per locale, the pages complete enough to be advertised to search engines ([`page_ready`]).
+pub type ReadyPages = BTreeMap<String, BTreeSet<String>>;
+
+/// A page is advertised (self canonical, hreflang, sitemap) once its `<title>` is translated and at most
+/// `1 - SEO_MIN` of its segments still wait for a translation. `missing` = segments glot knows and has not
+/// translated yet (text it never accepted — personal data, outside the discovery zones — does not block).
+pub fn page_ready(segments: usize, missing: usize, title_missing: bool) -> bool {
+    !title_missing
+        && segments > 0
+        && (segments - missing.min(segments)) as f64 + 1e-9
+            >= super::sitemap::SEO_MIN * segments as f64
+}
+
 /// Readiness of every target locale (TM snapshot per locale: exactly what the edge serves).
 pub async fn readiness(state: &AppState, p: &ProjectRow) -> ApiResult<Vec<Readiness>> {
+    Ok(readiness_pages(state, p).await?.0)
+}
+
+/// [`readiness`] and, from the same rows and snapshots, each locale's complete pages.
+pub async fn readiness_pages(
+    state: &AppState,
+    p: &ProjectRow,
+) -> ApiResult<(Vec<Readiness>, ReadyPages)> {
+    let mut ready_pages = ReadyPages::new();
     let settings = Settings::load(&state.db, p.id).await?;
     let keys: i64 = sqlx::query_scalar("SELECT count(*) FROM keys WHERE project_id = $1")
         .bind(p.id)
@@ -184,10 +217,20 @@ pub async fn readiness(state: &AppState, p: &ProjectRow) -> ApiResult<Vec<Readin
                 .iter()
                 .filter(|(h, c)| tm.lookup(h, c).is_some())
                 .count() as i64;
-            let critical = coverage_of(&rows, &tm, &settings, false)
+            let pages = coverage_of(&rows, &tm, &settings, true);
+            let critical = pages
                 .iter()
+                .filter(|c| c.critical)
                 .map(|c| c.coverage)
                 .reduce(f64::min);
+            ready_pages.insert(
+                l.clone(),
+                pages
+                    .into_iter()
+                    .filter(|c| c.ready)
+                    .map(|c| c.path)
+                    .collect(),
+            );
             (tm, segs_done, critical)
         };
         let version = if tm.v > 0 {
@@ -206,7 +249,7 @@ pub async fn readiness(state: &AppState, p: &ProjectRow) -> ApiResult<Vec<Readin
             version,
         });
     }
-    Ok(out)
+    Ok((out, ready_pages))
 }
 
 pub fn routes() -> Router<AppState> {
@@ -250,6 +293,9 @@ async fn coverage(
         locales.push(json!({
             "locale": r.locale, "coverage": round(r.coverage()), "critical_coverage": r.critical_coverage,
             "critical_threshold": r.critical_threshold, "ready": r.ready(super::sitemap::SEO_MIN),
+            // Pages a search engine is told about: complete, in a language that is itself ready.
+            "pages_seen": pages.len(),
+            "pages_indexable": if r.ready(super::sitemap::SEO_MIN) { pages.iter().filter(|p| p.ready).count() } else { 0 },
             "version": r.version, "pages": pages,
         }));
     }
@@ -366,7 +412,7 @@ async fn fetch_page(url: String) -> Fetched {
 
 /// `Disallow` rules of robots.txt for `*` / Googlebot (prefix match, `Allow` longer wins).
 // ponytail: prefix rules only; `*` / `$` wildcards inside paths are treated literally.
-fn robots_blocks(robots: &str, path: &str) -> bool {
+pub(super) fn robots_blocks(robots: &str, path: &str) -> bool {
     let mut applies = false;
     let mut in_group = false;
     let (mut allow, mut disallow) = (0usize, 0usize);
@@ -500,6 +546,8 @@ async fn crawl(state: &AppState, p: &ProjectRow) -> ApiResult<Value> {
 
     let mut pages_out = Vec::new();
     let mut totals: BTreeMap<&str, usize> = BTreeMap::new();
+    // (locale, title) → where it was seen: the same title on two pages of a language competes with itself.
+    let mut titles: HashMap<(String, String), Vec<(usize, usize)>> = HashMap::new();
     for path in &paths {
         // Every locale of this page, concurrently.
         let urls: Vec<(String, String)> = all
@@ -666,6 +714,15 @@ async fn crawl(state: &AppState, p: &ProjectRow) -> ApiResult<Value> {
             if !desc_tr && f.seo.description.is_some() {
                 issues.push("description_untranslated");
             }
+            if ok_status && f.seo.description.is_none() {
+                issues.push("description_missing");
+            }
+            if ok_status && let Some(t) = &f.seo.title {
+                titles
+                    .entry((locale.clone(), t.clone()))
+                    .or_default()
+                    .push((pages_out.len(), i));
+            }
             if !og_tr && f.seo.og_title.is_some() {
                 issues.push("og_title_untranslated");
             }
@@ -759,7 +816,31 @@ async fn crawl(state: &AppState, p: &ProjectRow) -> ApiResult<Value> {
         pages_out.push(json!({"path": path, "critical": settings.critical(path), "render": render, "locales": locales_out}));
     }
 
+    for at in titles.values().filter(|v| v.len() > 1) {
+        for (page, locale) in at {
+            if let Some(issues) = pages_out[*page]["locales"][*locale]["issues"].as_array_mut() {
+                issues.push(json!("title_duplicate"));
+                *totals.entry("title_duplicate").or_default() += 1;
+            }
+        }
+    }
+    // The outcome per language: pages a search engine can index, out of the pages checked.
+    let mut summary: BTreeMap<String, (usize, usize)> = BTreeMap::new();
+    for l in pages_out
+        .iter()
+        .filter_map(|p| p["locales"].as_array())
+        .flatten()
+    {
+        let e = summary
+            .entry(l["locale"].as_str().unwrap_or_default().to_string())
+            .or_default();
+        e.0 += 1;
+        e.1 += usize::from(l["technically_indexable"] == true);
+    }
+
     Ok(json!({
+        "summary": summary.iter().map(|(l, (pages, indexable))|
+            json!({"locale": l, "pages": pages, "indexable": indexable})).collect::<Vec<_>>(),
         "generated_at": chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
         "javascript": false,
         "indexed": {"status": "unknown", "reason": "search_console_not_connected"},

@@ -54,6 +54,23 @@ pub struct Settings {
     #[serde(default)]
     #[schema(value_type = WebsiteSnippet)]
     pub website_snippet: sqlx::types::Json<WebsiteSnippet>,
+    /// Pre-warm (`prewarm.rs`): crawl the origin's sitemap so pages are translated before they are visited.
+    #[serde(default = "yes")]
+    pub prewarm: bool,
+    /// Pages fetched per pre-warm run.
+    #[serde(default = "prewarm_pages")]
+    pub prewarm_pages: i32,
+    /// Translated URL paths (`slugs.rs`), opt-in.
+    #[serde(default)]
+    pub translated_slugs: bool,
+}
+
+fn yes() -> bool {
+    true
+}
+
+fn prewarm_pages() -> i32 {
+    200
 }
 
 /// `edge_settings.website_snippet` (migration 0161), read by `widget/glot.js` through `/edge/v1/{project}/status`.
@@ -68,6 +85,10 @@ pub struct WebsiteSnippet {
     pub position: String,
     /// Languages offered (empty = every target locale).
     pub locales: Vec<String>,
+    /// Flags in the switcher (off: language names and codes only).
+    pub flags: bool,
+    /// Origin of the site set up from the dashboard (`website_setup`): what the preview may fetch. "" = none.
+    pub site: String,
 }
 
 impl Default for WebsiteSnippet {
@@ -77,6 +98,8 @@ impl Default for WebsiteSnippet {
             auto_translate: true,
             position: "bottom-right".into(),
             locales: vec![],
+            flags: true,
+            site: String::new(),
         }
     }
 }
@@ -98,7 +121,7 @@ fn redirect() -> String {
 
 const COLS: &str = "enabled, auto_translate, discover_include, discover_exclude, selectors_include, selectors_exclude,
     critical_patterns, sensitive_patterns, critical_threshold, daily_cap, monthly_budget_usd, rendering, app_paths, app_action,
-    auth_pages, auth_discover, website_snippet";
+    auth_pages, auth_discover, website_snippet, prewarm, prewarm_pages, translated_slugs";
 
 impl Settings {
     /// The project's settings; the column defaults when it never saved any.
@@ -163,6 +186,9 @@ impl Default for Settings {
             auth_pages: server(),
             auth_discover: false,
             website_snippet: Default::default(),
+            prewarm: true,
+            prewarm_pages: prewarm_pages(),
+            translated_slugs: false,
         }
     }
 }
@@ -293,17 +319,29 @@ async fn put_settings(
             "website_snippet.locales: '{l}' is not a target locale of this project"
         )));
     }
+    if !(1..=2000).contains(&s.prewarm_pages) {
+        return Err(AppError::bad_request("prewarm_pages must be 1-2000"));
+    }
+    if !w.site.is_empty()
+        && (w.site.len() > 200
+            || !reqwest::Url::parse(&w.site).is_ok_and(|u| matches!(u.scheme(), "http" | "https")))
+    {
+        return Err(AppError::bad_request(
+            "website_snippet.site must be an http(s) origin",
+        ));
+    }
     let s = Settings { app_paths, ..s };
     sqlx::query(
         "INSERT INTO edge_settings (project_id, enabled, auto_translate, discover_include, discover_exclude,
             selectors_include, selectors_exclude, critical_patterns, sensitive_patterns, critical_threshold,
-            daily_cap, monthly_budget_usd, rendering, app_paths, app_action, auth_pages, auth_discover, website_snippet, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now())
+            daily_cap, monthly_budget_usd, rendering, app_paths, app_action, auth_pages, auth_discover, website_snippet,
+            prewarm, prewarm_pages, translated_slugs, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, now())
          ON CONFLICT (project_id) DO UPDATE SET enabled = $2, auto_translate = $3, discover_include = $4,
             discover_exclude = $5, selectors_include = $6, selectors_exclude = $7, critical_patterns = $8,
             sensitive_patterns = $9, critical_threshold = $10, daily_cap = $11, monthly_budget_usd = $12,
             rendering = $13, app_paths = $14, app_action = $15, auth_pages = $16, auth_discover = $17,
-            website_snippet = $18, updated_at = now()",
+            website_snippet = $18, prewarm = $19, prewarm_pages = $20, translated_slugs = $21, updated_at = now()",
     )
     .bind(p.id)
     .bind(s.enabled)
@@ -323,6 +361,9 @@ async fn put_settings(
     .bind(&s.auth_pages)
     .bind(s.auth_discover)
     .bind(&s.website_snippet)
+    .bind(s.prewarm)
+    .bind(s.prewarm_pages)
+    .bind(s.translated_slugs)
     .execute(&state.db)
     .await?;
     Ok(Json(s))

@@ -39,6 +39,9 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
   const [appAction, setAppAction] = useState<AppAction>(settings.app_action);
   const [authPages, setAuthPages] = useState<AuthPages>(settings.auth_pages ?? "server");
   const [authDiscover, setAuthDiscover] = useState(settings.auth_discover ?? false);
+  const [prewarm, setPrewarm] = useState(settings.prewarm ?? true);
+  const [prewarmPages, setPrewarmPages] = useState(String(settings.prewarm_pages ?? 200));
+  const [slugs, setSlugs] = useState(settings.translated_slugs ?? false);
 
   const save = useMutation({
     // Kill switch state comes from the cache: the header switch may have changed it since this form mounted.
@@ -61,6 +64,9 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
         auth_pages: authPages,
         auth_discover: authPages === "patcher" && authDiscover,
         website_snippet: qc.getQueryData<EdgeSettings>(edgeKeys.settings(slug))?.website_snippet ?? settings.website_snippet,
+        prewarm,
+        prewarm_pages: Number(prewarmPages),
+        translated_slugs: slugs,
       }),
     onSuccess: (r) => {
       qc.setQueryData(edgeKeys.settings(slug), r);
@@ -135,6 +141,37 @@ export function EdgeSettingsForm({ slug, settings }: { slug: string; settings: E
               </SelectContent>
             </Select>,
           )}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-medium">{t("seo.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("seo.body")}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label className="flex items-center gap-2 font-normal">
+              <Switch checked={prewarm} onCheckedChange={setPrewarm} aria-describedby="edge-prewarm-hint" /> {t("seo.prewarm")}
+            </Label>
+            <p id="edge-prewarm-hint" className="text-xs text-muted-foreground">
+              {t("seo.prewarmHint")}
+            </p>
+          </div>
+          {field(
+            "edge-prewarm-pages",
+            t("seo.pages"),
+            t("seo.pagesHint"),
+            <Input id="edge-prewarm-pages" type="number" min={1} max={2000} value={prewarmPages} onChange={(e) => setPrewarmPages(e.target.value)} className="w-28 font-mono" />,
+          )}
+          <div className="space-y-1.5">
+            <Label className="flex items-center gap-2 font-normal">
+              <Switch checked={slugs} onCheckedChange={setSlugs} aria-describedby="edge-slugs-hint" /> {t("seo.slugs")}
+            </Label>
+            <p id="edge-slugs-hint" className="text-xs text-muted-foreground">
+              {t("seo.slugsHint")}
+            </p>
+          </div>
         </div>
       </section>
 

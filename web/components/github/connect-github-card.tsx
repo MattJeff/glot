@@ -25,7 +25,15 @@ import { Link } from "@/i18n/navigation";
 import { api } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { cn } from "@/lib/utils";
-import { ghKey, githubApi, STEPS, type GithubJob, type GithubStatus } from "./api";
+import {
+  GITHUB_FAILURES,
+  ghKey,
+  githubApi,
+  STEPS,
+  type GithubFailure,
+  type GithubJob,
+  type GithubStatus,
+} from "./api";
 
 /** GitHub mark (brand logo of the integration; lucide has no brand icons). */
 export function GitHubMark({ className }: { className?: string }) {
@@ -393,6 +401,83 @@ function Steps({ job }: { job: GithubJob }) {
   );
 }
 
+/** A failed run: what happened, what to do, one action. The raw error stays one click away. */
+function RunFailure({ slug, status }: { slug: string; status: GithubStatus }) {
+  const t = useTranslations("github");
+  const known = (GITHUB_FAILURES as readonly string[]).includes(status.failure ?? "");
+  const code: GithubFailure = known ? (status.failure as GithubFailure) : "unknown";
+  const pr = status.link?.pr_url;
+  const qc = useQueryClient();
+  const message = useErrorMessage();
+  // `source_mismatch: repo=en project=fr`: the repository's glot.toml is the truth for the code.
+  const mismatch = /source_mismatch: repo=(\S+) project=(\S+?):/.exec(status.job?.error ?? "");
+  const locales = { repo: mismatch?.[1] ?? "?", project: mismatch?.[2] ?? "?" };
+  const useRepoSource = useMutation({
+    mutationFn: async () => {
+      await api.updateProject(slug, { source_locale: locales.repo });
+      return githubApi.run(slug);
+    },
+    onSuccess: (job) => qc.setQueryData<GithubStatus>(ghKey.status(slug), (s) => (s ? { ...s, job } : s)),
+  });
+  const external = (href: string, label: string) => (
+    <Button asChild size="sm" variant="outline">
+      <a href={href} target="_blank" rel="noreferrer">
+        {label}
+        <ExternalLink className="rtl:-scale-x-100" aria-hidden />
+        <span className="sr-only">{t("newTab")}</span>
+      </a>
+    </Button>
+  );
+  let action: React.ReactNode = null;
+  if (code.startsWith("ai_") && code !== "ai_unavailable") {
+    action = (
+      <Button asChild size="sm" variant="outline">
+        <Link href={`/app/${slug}/settings#s-key`}>{t("failure.settings")}</Link>
+      </Button>
+    );
+  } else if ((code === "repo_access" || code === "push_rejected") && status.app) {
+    action = external(`${status.app.html_url}/installations/new`, t("failure.access"));
+  } else if (code === "pr_conflict" && pr) {
+    action = external(pr, t("failure.openPr"));
+  } else if (code === "source_mismatch" && mismatch) {
+    action = (
+      <Button size="sm" variant="outline" onClick={() => useRepoSource.mutate()} disabled={useRepoSource.isPending}>
+        {useRepoSource.isPending && <Loader2 className="animate-spin" />}
+        {t("failure.useRepoSource", locales)}
+      </Button>
+    );
+  } else if (code === "mock_output") {
+    action = (
+      <Button asChild size="sm" variant="outline">
+        <Link href={`/app/${slug}/settings#s-key`}>{t("failure.settings")}</Link>
+      </Button>
+    );
+  }
+  return (
+    <div role="alert" className="space-y-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
+      <p className="flex items-start gap-2 font-medium">
+        <TriangleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />
+        {t(`failure.${code}.cause`, locales)}
+      </p>
+      <p className="text-muted-foreground">{t(`failure.${code}.fix`, locales)}</p>
+      {action}
+      {useRepoSource.isError && (
+        <p role="alert" className="text-destructive">
+          {message(useRepoSource.error)}
+        </p>
+      )}
+      {status.job?.error && (
+        <details className="text-xs text-muted-foreground">
+          <summary className="cursor-pointer select-none">{t("failure.details")}</summary>
+          <pre dir="ltr" className="mt-2 max-h-60 overflow-auto font-mono break-words whitespace-pre-wrap">
+            {status.job.error}
+          </pre>
+        </details>
+      )}
+    </div>
+  );
+}
+
 function Linked({ slug, status, onChangeRepo }: { slug: string; status: GithubStatus; onChangeRepo: () => void }) {
   const t = useTranslations("github");
   const message = useErrorMessage();
@@ -432,27 +517,7 @@ function Linked({ slug, status, onChangeRepo }: { slug: string; status: GithubSt
   if (active(job)) {
     main = <Steps job={job!} />;
   } else if (job?.status === "failed") {
-    main = (
-      <div role="alert" className="space-y-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
-        <p className="flex items-center gap-2 font-medium">
-          <TriangleAlert className="size-4 text-destructive" aria-hidden /> {t("linked.failed")}
-        </p>
-        {/HTTP 401|invalid.?api.?key|authentication_error/i.test(job.error ?? "") && (
-          <p>
-            {t.rich("linked.badKey", {
-              link: (c) => (
-                <Link href={`/app/${slug}/settings#s-key`} className="font-medium underline underline-offset-4">
-                  {c}
-                </Link>
-              ),
-            })}
-          </p>
-        )}
-        <p className="font-mono text-xs break-words text-muted-foreground" dir="ltr">
-          {job.error}
-        </p>
-      </div>
-    );
+    main = <RunFailure slug={slug} status={status} />;
   } else if (link.pr_url) {
     main = (
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-success/30 bg-success/8 p-3 motion-safe:animate-rise">

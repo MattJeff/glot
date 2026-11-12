@@ -20,7 +20,11 @@
 //!
 //! `"mode": "website"` (the universal website tag, `widget/glot.js`, public pages of any site builder): accepted
 //! only when `website_snippet.on` (independent of the Edge kill switch); same checks as any public report; new
-//! segments wait for a review when `website_snippet.auto_translate` is off.
+//! segments wait for a review when `website_snippet.auto_translate` is off. Private-looking paths
+//! (`website_setup::PRIVATE_PATHS`: `/account`, `/cart`, `/checkout`…) are refused unless the project lists them in
+//! `discover_include`: a session cookie may be HttpOnly, invisible to the tag. The setup crawl
+//! (`website_setup`, anonymous server-side fetch) reports through [`record_trusted`]: same checks, but it may run
+//! before the tag is switched on and may read the public shell of those paths.
 use axum::{
     Json, Router,
     body::Bytes,
@@ -176,6 +180,20 @@ async fn ingest(
 
 /// Store a report (also called in-process by the Rust proxy) and queue the auto-translation.
 pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<Outcome> {
+    record_as(state, p, r, false).await
+}
+
+/// [`record`] for glot's own anonymous crawl of the site at setup (never reachable from a request body).
+pub async fn record_trusted(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<Outcome> {
+    record_as(state, p, r, true).await
+}
+
+async fn record_as(
+    state: &AppState,
+    p: &ProjectRow,
+    r: &Report,
+    trusted: bool,
+) -> ApiResult<Outcome> {
     if !p.target_locales.contains(&r.locale) {
         return Err(AppError::bad_request(format!(
             "'{}' is not a target locale of this project",
@@ -186,7 +204,7 @@ pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<O
     let mut out = Outcome::default();
     // The universal website tag answers to its own switch (it runs on sites with no Edge domain at all).
     let website = r.mode.as_deref() == Some("website");
-    if website && !settings.website_snippet.on {
+    if website && !trusted && !settings.website_snippet.on {
         out.skipped = Some("disabled");
         return Ok(out);
     }
@@ -236,7 +254,11 @@ pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<O
             && text.chars().count() <= if app { MAX_APP_TEXT } else { MAX_TEXT }
             && text_hash(&p.source_locale, &text) == it.hash
             && !looks_personal(&text)
-            && settings.discoverable(&path);
+            && settings.discoverable(&path)
+            && (!website
+                || trusted
+                || !super::website_setup::private_path(&path)
+                || super::discover::matches_any(&settings.discover_include, &path));
         if !ok {
             out.rejected += 1;
             continue;

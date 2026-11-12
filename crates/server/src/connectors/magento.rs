@@ -13,6 +13,15 @@
 //!   `updated_at gteq` filter. SKU, `url_key` and other attributes are never read or written.
 //! - Push: `PUT /rest/{store_code}/V1/products/{sku}` and `PUT /rest/{store_code}/V1/categories/{id}` with only
 //!   the translated attributes, so only those get store-view values (everything else keeps inheriting).
+//! - Human edits and rollback: the batch's entities are read twice with an `entity_id in (…)` search, in the
+//!   target store view and in the global scope (`/rest/all/V1/…`). A store view without its own value
+//!   returns the inherited one, so a value equal to the global one counts as no translation. With several
+//!   store views for one locale, the first is read. `remove` is not implemented: the REST API has no
+//!   documented way to put an attribute back to *Use Default Value*.
+//! - Diagnosis: one store view per language (a shop whose store views all share the source locale has
+//!   nothing to write into), and the integration's ACL: `Magento_Catalog::products` and
+//!   `Magento_Backend::store` are proven by the connection test, `Magento_Catalog::categories` by a
+//!   one-item read (the same resource guards the GET and the PUT routes).
 //! - CMS pages and blocks are not synced: they are assigned to store views as whole entities (one page per
 //!   language), they have no per-store-view values to write into.
 //! - Webhooks: none in Magento Open Source (Adobe Commerce webhooks are synchronous plugins): an extension or
@@ -23,14 +32,17 @@
 //! https://developer.adobe.com/commerce/webapi/rest/use-rest/performing-searches/,
 //! https://developer.adobe.com/commerce/webapi/rest/use-rest/bulk-endpoints/ (store code scopes),
 //! https://developer.adobe.com/commerce/webapi/rest/tutorials/image/product-image-store-scope,
-//! https://developer.adobe.com/commerce/webapi/get-started/rate-limiting
+//! https://developer.adobe.com/commerce/webapi/rest/ (store view code in the URL, `all` = global scope),
+//! https://developer.adobe.com/commerce/webapi/rest/use-rest/retrieve-filtered-responses/ (`fields=`),
+//! https://github.com/magento/magento2/blob/2.4-develop/app/code/Magento/Catalog/etc/webapi.xml (ACL resource
+//! of each route), https://developer.adobe.com/commerce/webapi/get-started/rate-limiting
 use async_trait::async_trait;
 use axum::http::HeaderMap;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
 };
 
 pub struct Magento;
@@ -222,6 +234,40 @@ impl Api {
                     s["locale"].as_str().unwrap_or_default().to_string(),
                 ))
             })
+            .collect())
+    }
+}
+
+impl Api {
+    /// Entities of one resource by id in one scope (a store view code, or `all`): id → object.
+    async fn by_ids(
+        &self,
+        store: &str,
+        resource: &str,
+        ids: &[i64],
+    ) -> anyhow::Result<BTreeMap<i64, Value>> {
+        let path = RESOURCES
+            .iter()
+            .find(|r| r.0 == resource)
+            .ok_or_else(|| anyhow::anyhow!("unknown resource {resource}"))?
+            .1;
+        let f = "searchCriteria[filter_groups][0][filters][0]";
+        let list: Vec<String> = ids.iter().map(i64::to_string).collect();
+        let q = [
+            (format!("{f}[field]"), "entity_id".to_string()),
+            (format!("{f}[value]"), list.join(",")),
+            (format!("{f}[condition_type]"), "in".into()),
+            ("searchCriteria[pageSize]".into(), ids.len().to_string()),
+            ("fields".into(), "items[id,name,custom_attributes]".into()),
+        ];
+        let v = self
+            .call(reqwest::Method::GET, Some(store), path, &q, None)
+            .await?;
+        Ok(v["items"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|o| Some((o["id"].as_i64()?, o.clone())))
             .collect())
     }
 }
@@ -505,6 +551,105 @@ impl Connector for Magento {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let stores = api.stores().await?;
+        let src = source_store(creds, &stores)?;
+        // ponytail: several store views for one locale are written alike, the first one is read.
+        let Some(target) = targets(&stores, src, locale).first().copied() else {
+            return Ok(Some(vec![None; items.len()]));
+        };
+        let place = |it: &PushItem| {
+            Some((
+                it.meta["type"].as_str()?.to_string(),
+                it.meta["id"].as_i64()?,
+            ))
+        };
+        let mut by_resource: BTreeMap<String, Vec<i64>> = BTreeMap::new();
+        for (resource, id) in items.iter().filter_map(place) {
+            let ids = by_resource.entry(resource).or_default();
+            if !ids.contains(&id) {
+                ids.push(id);
+            }
+        }
+        // (resource, id) → (store view object, global object).
+        let mut found: BTreeMap<(String, i64), (Value, Option<Value>)> = BTreeMap::new();
+        for (resource, ids) in by_resource {
+            let mut global = api.by_ids("all", &resource, &ids).await?;
+            for (id, o) in api.by_ids(target, &resource, &ids).await? {
+                found.insert((resource.clone(), id), (o, global.remove(&id)));
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let (local, global) = found.get(&place(it)?)?;
+                    let v = attr(local, &it.field).filter(|v| !v.trim().is_empty())?;
+                    (global.as_ref().and_then(|g| attr(g, &it.field)) != Some(v))
+                        .then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("permissions", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        match api.stores().await {
+            Ok(stores) => {
+                let src = source_store(creds, &stores).unwrap_or_default();
+                let locale = |code: &str| stores.iter().find(|s| s.0 == code).map(|s| s.1.as_str());
+                let others: Vec<String> = stores
+                    .iter()
+                    .filter(|(c, l)| c != src && Some(l.as_str()) != locale(src))
+                    .map(|(c, l)| format!("{c} ({l})"))
+                    .collect();
+                out.push(if others.is_empty() {
+                    Check::warn(
+                        "store_views",
+                        format!(
+                            "every store view is in {}: create one store view per language",
+                            locale(src).unwrap_or("the source locale")
+                        ),
+                        Some("enable_locale"),
+                    )
+                } else {
+                    Check::ok("store_views", others.join(", "))
+                });
+            }
+            Err(e) => out.push(Check::fail("store_views", format!("{e:#}"))),
+        }
+        let one = [("searchCriteria[pageSize]".to_string(), "1".to_string())];
+        out.push(
+            match api
+                .call(reqwest::Method::GET, None, "/categories/list", &one, None)
+                .await
+            {
+                Ok(_) => Check::ok(
+                    "permissions",
+                    "Magento_Catalog::products, Magento_Catalog::categories, Magento_Backend::store",
+                ),
+                Err(e) => Check {
+                    fix: Some("permissions"),
+                    ..Check::fail(
+                        "permissions",
+                        format!("the integration lacks the resource Magento_Catalog::categories: {e:#}"),
+                    )
+                },
+            },
+        );
+        out
     }
 
     /// No native webhooks: an extension or cron calls the URL with its token, a shared-secret header, or

@@ -1,0 +1,39 @@
+{
+  "name": "@glot/render",
+  "version": "0.5.0",
+  "description": "Client of the glot render API: any content, in the recipient's language. Zero dependencies, fails open to the source.",
+  "license": "MIT",
+  "homepage": "https://github.com/MattJeff/glot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattJeff/glot.git",
+    "directory": "packages/render"
+  },
+  "bugs": "https://github.com/MattJeff/glot/issues",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && esbuild src/index.ts --format=esm --target=es2020 --outdir=dist && tsc",
+    "test": "node --test 'test/*.test.ts'",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "esbuild": "^0.25",
+    "typescript": "^5.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

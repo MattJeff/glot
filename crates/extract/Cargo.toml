@@ -16,3 +16,7 @@ oxc_ast_visit = "0.154"
 oxc_parser = "0.154"
 oxc_span = "0.154"
 oxc_syntax = "0.154"
+# Rust `view!` bodies: token trees with byte spans, expressions parsed like rustc reads them.
+proc-macro2 = { version = "1", features = ["span-locations"] }
+quote = "1"
+syn = { version = "2", features = ["full", "visit"] }

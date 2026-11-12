@@ -8,9 +8,9 @@ import { GITHUB_URL } from "@/lib/snippets";
 export const NAV = [
   { section: "start", pages: ["getting-started", "concepts"] },
   { section: "agents", pages: ["mcp", "integrations", "skills"] },
-  { section: "guides", pages: ["github", "frameworks", "runtime", "mobile-ota", "edge", "website", "quality", "review", "provenance"] },
+  { section: "guides", pages: ["github", "frameworks", "runtime", "languages-live-check", "mobile-ota", "live-stream", "edge", "local-seo", "website", "render", "quality", "review", "two-way", "provenance"] },
   { section: "reference", pages: ["cli", "faq", "benchmark"] },
-  { section: "labs", pages: ["labs", "insights", "experiments", "self-hosting", "deploy-hetzner", "mcp-remote"] },
+  { section: "labs", pages: ["labs", "insights", "autopilot", "experiments", "text-graph", "self-hosting", "deploy-hetzner", "mcp-remote"] },
 ] as const;
 
 export type Slug = (typeof NAV)[number]["pages"][number];

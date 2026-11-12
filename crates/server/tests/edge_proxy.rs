@@ -28,7 +28,8 @@ const PAGE: &str = r#"<!doctype html><html lang="en"><head><title>Simple pricing
 <meta name="description" content="Plans for every team">
 <link rel="canonical" href="https://cliponit.test/pricing"></head>
 <body><h1>Simple pricing</h1><p>Start free, upgrade when you grow.</p><button>Save</button>
-<a href="/signup">Create an account</a><p>Brand new paragraph</p></body></html>"#;
+<a href="/signup">Create an account</a><p>Brand new paragraph</p>
+<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li><li>Item 4</li><li>Item 5</li><li>Item 6</li><li>Item 7</li><li>Item 8</li><li>Item 9</li><li>Item 10</li><li>Item 11</li><li>Item 12</li><li>Item 13</li><li>Item 14</li><li>Item 15</li><li>Item 16</li><li>Item 17</li><li>Item 18</li><li>Item 19</li><li>Item 20</li></ul></body></html>"#;
 
 /// An SPA shell: no content until JavaScript runs (`rendering: auto` → the renderer's snapshot).
 const SHELL: &str = r#"<!doctype html><html lang="en"><head><title>App</title></head><body><div id="root"></div><script>boot()</script></body></html>"#;
@@ -207,6 +208,8 @@ async fn edge_proxy() {
         "Start free, upgrade when you grow." => "Empieza gratis, mejora cuando crezcas.",
         "Save" => "Guardar",
         "Create an account" => "Crear una cuenta",
+        // Enough translated text for the page to be complete (≥ 95 %) with one paragraph still missing.
+        t if t.starts_with("Item ") => "Elemento",
         _ => "",
     };
     let locales = vec!["es".to_string(), "fr".into(), "de".into(), "en".into()];
@@ -221,6 +224,9 @@ async fn edge_proxy() {
         let ctx = format!("{}|{tpl}", s.ctx.role);
         sqlx::query("INSERT INTO edge_segments (project_id, hash, context, source_text) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING")
             .bind(project).bind(&s.hash).bind(&ctx).bind(&s.text).execute(&pool).await.unwrap();
+        // The page inventory (what a previous render reported): hreflang lists a locale per complete page.
+        sqlx::query("INSERT INTO edge_page_segments (project_id, path, hash, context) VALUES ($1, '/pricing', $2, $3) ON CONFLICT DO NOTHING")
+            .bind(project).bind(&s.hash).bind(&ctx).execute(&pool).await.unwrap();
         for (l, v) in [
             ("es", es(&s.text).to_string()),
             ("fr", format!("FR {}", s.text)),

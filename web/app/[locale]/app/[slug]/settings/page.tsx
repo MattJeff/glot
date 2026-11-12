@@ -12,6 +12,7 @@ import {
   useLocaleName,
 } from "@/components/common";
 import { parseLocales } from "@/components/create-project-dialog";
+import { LiveCheckNotice, LiveCheckPanel } from "@/components/live-check";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -472,7 +473,9 @@ function SettingsForm({
               <Plus /> {t("locales.add")}
             </Button>
           </div>
+          {targets.some((l) => !p.target_locales.includes(l)) && <LiveCheckNotice />}
         </div>
+        <LiveCheckPanel slug={p.slug} editable />
         <Field
           id="s-syntax"
           label={t("locales.syntaxLabel")}

@@ -7,6 +7,7 @@ import { ErrorState, PageHeader, ProgressBar, useLocaleName } from "@/components
 import { AnimatedNumber } from "@/components/gamification/progress-ring";
 import { HealthScore } from "@/components/health-score";
 import { isActive, JobRow } from "@/components/job-row";
+import { LiveBadge } from "@/components/live-check";
 import { NextLanguageCard } from "@/components/markets/next-language";
 import { OnboardingOverview } from "@/components/onboarding/overview";
 import { VerifiedOnly } from "@/components/email-pages";
@@ -92,6 +93,7 @@ export default function OverviewPage() {
                         <span className="font-mono text-xs">{l}</span>
                         <span className="text-muted-foreground capitalize">{localeName(l)}</span>
                         <span className="ms-auto flex items-center gap-3 text-xs text-muted-foreground">
+                          <LiveBadge slug={slug} locale={l} />
                           {s.stale > 0 && <span className="text-warning-foreground">{t("staleCount", { count: s.stale })}</span>}
                           {s.issues > 0 && <span className="text-destructive">{t("issuesCount", { count: s.issues })}</span>}
                           <span className="font-mono tabular-nums">

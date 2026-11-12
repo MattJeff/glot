@@ -29,7 +29,8 @@ pub enum Lib {
     Custom,
 }
 
-/// Hand-rolled runtime used by [`Lib::Custom`]: `const { t } = <hook>()`.
+/// Hand-rolled runtime used by [`Lib::Custom`]: `const { t } = <hook>()`, or a `t` exported by a
+/// module (`hook` empty: `import { t } from "<module>"`).
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct CustomRuntime {
     /// `useLanguage`
@@ -53,6 +54,10 @@ pub fn set_custom_runtime(rt: Option<CustomRuntime>) {
 /// become one key with its existing translations.
 pub fn set_locales(source: &str, targets: &[String]) {
     *LOCALES.write().unwrap() = (source.to_string(), targets.to_vec());
+}
+
+pub(crate) fn locales() -> (String, Vec<String>) {
+    LOCALES.read().unwrap().clone()
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -2066,6 +2071,15 @@ pub fn rewrite(
             Lib::Custom => {
                 need_use = true;
                 let hook = custom_hook()?.hook;
+                // A module-level `t` (`import { t } from "./i18n/t"`): nothing to call first.
+                if hook.is_empty() {
+                    if t != "t" {
+                        return Err(
+                            "a local named `t` hides the app's t() in this component".into()
+                        );
+                    }
+                    continue;
+                }
                 if t == "t" {
                     format!("const {{ t }} = {hook}();")
                 } else {
@@ -2108,7 +2122,10 @@ pub fn rewrite(
             }
         }
         Lib::Custom => {
-            let rt = custom_hook()?;
+            let mut rt = custom_hook()?;
+            if rt.hook.is_empty() {
+                rt.hook = "t".into();
+            }
             if need_use && !fa.imported.contains(&rt.hook) {
                 let dir = fa.path.rsplit_once('/').map_or("", |(d, _)| d);
                 let spec = rt
@@ -2597,6 +2614,23 @@ export default function InvoicesPage({ user, invoices }: Props) {
             "{out}"
         );
         assert!(out.contains("const { t } = useLanguage();"), "{out}");
+        // A `t` exported by a module: only the import is added, no hook call.
+        set_custom_runtime(Some(CustomRuntime {
+            hook: String::new(),
+            module: "src/i18n/t".into(),
+            spec: None,
+        }));
+        let (_, out) = run(
+            "src/shell/Toasts.tsx",
+            "export function Toasts() {\n  return <p>Welcome back</p>;\n}\n",
+            Lib::Custom,
+        );
+        assert!(out.contains("import { t } from \"../i18n/t\";"), "{out}");
+        assert!(
+            out.contains("<p>{t(") && !out.contains("const { t }"),
+            "{out}"
+        );
+        parses("x.tsx", &out).unwrap();
         set_custom_runtime(None);
 
         // TanStack Start: `component: () => <…/>` in createFileRoute is a component.

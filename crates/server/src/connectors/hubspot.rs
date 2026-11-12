@@ -16,8 +16,16 @@
 //!   draft (`PATCH …/{id}/draft`), and with `publish` pushed live (`POST …/{id}/draft/push-live`).
 //! - Webhooks: no CMS content webhooks for private apps; a workflow "Send a webhook" action or any caller
 //!   uses the card URL with its token, a `X-Glot-Webhook-Secret` header, or `X-HubSpot-Signature` v1.
+//! - Read back (`current`): the variation's draft (`GET …/{variation id}/draft`), compared with the source
+//!   it was cloned from: a value identical to the source's is the clone, not a translation. `remove` is not
+//!   implemented: a translation is a whole page / post variation, never deleted by glot.
+//! - Diagnosis (`doctor`): the token's scopes (`POST /oauth/v2/private-apps/get/access-token-info`, else
+//!   `GET /oauth/v1/access-tokens/{token}` for OAuth tokens) must include `content`; a source language must
+//!   be set for HubSpot to create variations.
 //!
-//! Docs: https://developers.hubspot.com/docs/api-reference/cms-posts-v3/guide,
+//! Docs: https://developers.hubspot.com/docs/guides/apps/private-apps/overview (access token info),
+//! https://developers.hubspot.com/docs/api-reference/legacy/authentication/oauth-tokens/v1/guide,
+//! https://developers.hubspot.com/docs/api-reference/cms-posts-v3/guide,
 //! https://developers.hubspot.com/docs/api-reference/cms-pages-v3/guide,
 //! https://developers.hubspot.com/docs/guides/apps/authentication/validating-requests
 use async_trait::async_trait;
@@ -27,7 +35,8 @@ use std::collections::BTreeMap;
 
 use super::cms::{self, param, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct HubSpot;
@@ -205,6 +214,35 @@ async fn seen_languages(api: &Api, c: &Creds) -> anyhow::Result<(Vec<String>, Op
     Ok((langs, source))
 }
 
+fn api_path(res: &str) -> anyhow::Result<&'static str> {
+    RESOURCES
+        .iter()
+        .find(|r| r.0 == res)
+        .map(|r| r.1)
+        .ok_or_else(|| anyhow::anyhow!("unknown resource {res}"))
+}
+
+/// Id of the `locale` variation of a source object (its `translations` map), if it exists.
+fn variation(src: &Value, id: &str, locale: &str) -> Option<String> {
+    let langs: Vec<String> = src["translations"]
+        .as_object()
+        .map(|m| m.keys().cloned().collect())
+        .unwrap_or_default();
+    cms::match_locale(&langs, locale)
+        .and_then(|l| cms::id_str(&src["translations"][l]["id"]))
+        .filter(|t| t != id)
+}
+
+/// A field of a page / post: top-level name, or JSON pointer into its modules.
+fn field<'a>(o: &'a Value, name: &str) -> Option<&'a str> {
+    if name.starts_with('/') {
+        o.pointer(name)
+    } else {
+        o.get(name)
+    }
+    .and_then(Value::as_str)
+}
+
 fn configured(c: &Creds) -> Vec<String> {
     c.setting("languages")
         .and_then(Value::as_array)
@@ -301,21 +339,10 @@ impl Connector for HubSpot {
                 let (Some(res), Some(id)) = (meta["resource"].as_str(), meta["id"].as_str()) else {
                     anyhow::bail!("missing metadata, sync again");
                 };
-                let path = RESOURCES
-                    .iter()
-                    .find(|r| r.0 == res)
-                    .map(|r| r.1)
-                    .ok_or_else(|| anyhow::anyhow!("unknown resource {res}"))?;
+                let path = api_path(res)?;
                 // Fresh translations map: a variation created by an earlier batch is not in the pulled data.
                 let src = api.get(&format!("{path}/{id}")).await?;
-                let langs: Vec<String> = src["translations"]
-                    .as_object()
-                    .map(|m| m.keys().cloned().collect())
-                    .unwrap_or_default();
-                let target = match cms::match_locale(&langs, locale)
-                    .and_then(|l| cms::id_str(&src["translations"][l]["id"]))
-                    .filter(|t| t != id)
-                {
+                let target = match variation(&src, id, locale) {
                     Some(t) => t,
                     None => {
                         let v = api
@@ -373,6 +400,100 @@ impl Connector for HubSpot {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        // (source, draft of its `locale` variation) per source object.
+        let mut seen: BTreeMap<&str, (Value, Option<Value>)> = BTreeMap::new();
+        for it in items {
+            if seen.contains_key(it.external_id.as_str()) {
+                continue;
+            }
+            let (Some(res), Some(id)) = (it.meta["resource"].as_str(), it.meta["id"].as_str())
+            else {
+                anyhow::bail!("missing metadata, sync again");
+            };
+            let path = api_path(res)?;
+            let src = api.get(&format!("{path}/{id}")).await?;
+            let draft = match variation(&src, id, locale) {
+                Some(t) => Some(api.get(&format!("{path}/{t}/draft")).await?),
+                None => None,
+            };
+            seen.insert(&it.external_id, (src, draft));
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let (src, draft) = &seen[it.external_id.as_str()];
+                    let v = field(draft.as_ref()?, &it.field)?;
+                    // Still the content cloned from the source: not translated.
+                    (!v.trim().is_empty() && field(src, &it.field) != Some(v))
+                        .then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("scopes", format!("{e:#}"))],
+        };
+        // Private app token, else OAuth access token.
+        let info = match api
+            .call(
+                reqwest::Method::POST,
+                "/oauth/v2/private-apps/get/access-token-info",
+                Some(&json!({"tokenKey": api.token})),
+            )
+            .await
+        {
+            Ok(i) => Ok(i),
+            Err(_) => {
+                api.get(&format!("/oauth/v1/access-tokens/{}", cms::pct(&api.token)))
+                    .await
+            }
+        };
+        let mut out = vec![match info {
+            Ok(i) => {
+                let has = i["scopes"]
+                    .as_array()
+                    .is_some_and(|s| s.iter().any(|x| x == "content"));
+                if has {
+                    Check::ok("scopes", "content")
+                } else {
+                    Check {
+                        fix: Some("permissions"),
+                        ..Check::fail(
+                            "scopes",
+                            "missing scope: content (CMS pages and blog posts)",
+                        )
+                    }
+                }
+            }
+            Err(e) => Check::warn(
+                "scopes",
+                format!("token scopes could not be read: {e:#}"),
+                None,
+            ),
+        }];
+        out.push(match seen_languages(&api, creds).await {
+            Ok((_, None)) if cms::param(creds, "source_lang").is_none() => Check::warn(
+                "multi_language",
+                "no source page or post has a language set: HubSpot cannot create language variations",
+                Some("enable_locale"),
+            ),
+            Ok((langs, _)) => Check::ok("multi_language", langs.join(", ")),
+            Err(e) => Check::fail("multi_language", format!("{e:#}")),
+        });
+        out
     }
 
     /// Shared secret (header or token in the URL), or `X-HubSpot-Signature` v1: hex SHA-256 of

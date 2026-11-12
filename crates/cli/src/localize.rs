@@ -29,6 +29,11 @@ pub struct LocalizeArgs {
     /// Print the agent prompt for this project and exit (like i18next-cli `--print-agent-prompt`).
     #[arg(long)]
     pub print_agent_prompt: bool,
+    /// Directory holding glot's previous output for this repository (the open pull request's
+    /// branch): its keys and still-valid translations are reused, so an unchanged string costs
+    /// nothing and produces no diff; keys it added that the code no longer uses are dropped.
+    #[arg(long, value_name = "DIR")]
+    pub carry_from: Option<std::path::PathBuf>,
 }
 
 #[derive(clap::Args)]
@@ -68,6 +73,8 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
         .flat_map(|p| [s("--provider"), p.clone()])
         .collect();
 
+    // A glot.toml written by the developer (not by this run) decides the scope.
+    let scope = configured_scope(&root);
     if !root.join("glot.toml").exists() {
         let mut args = vec![s("init"), s("--yes")];
         if !a.targets.is_empty() {
@@ -86,6 +93,22 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
         }
     }
 
+    // Incremental runs: start from the previous output (ignored when unreadable: a full run then).
+    let carried: Vec<String> = match (&a.carry_from, a.dry_run) {
+        (Some(prev), false) => {
+            match glot_llm::engine::Workspace::open(&root).and_then(|mut ws| ws.carry_from(prev)) {
+                Ok(keys) => keys,
+                Err(e) => {
+                    anstream::eprintln!(
+                        "{YELLOW}previous output ignored{YELLOW:#} {DIM}({e}){DIM:#}"
+                    );
+                    vec![]
+                }
+            }
+        }
+        _ => vec![],
+    };
+
     let dry: Vec<String> = if a.dry_run {
         vec![s("--dry-run")]
     } else {
@@ -97,11 +120,32 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
         if a.no_install {
             args.push(s("--no-install"));
         }
+        if let Some(dir) = &scope {
+            anstream::eprintln!(
+                "{DIM}scope: {dir} (the catalogs of glot.toml live there and it sets no [extract] include){DIM:#}"
+            );
+            args.push(dir.clone());
+        }
         // ponytail: unsupported framework / nothing to rewrite is not fatal, catalogs may already be complete.
         if !step("i18nize", &args)? {
             anstream::eprintln!(
                 "{YELLOW}i18nize skipped{YELLOW:#} {DIM}(see above; continuing with the catalogs as they are){DIM:#}"
             );
+        }
+    }
+
+    if !a.dry_run {
+        match tidy(&root, &carried) {
+            Ok((dropped, renamed, pruned)) if dropped + renamed + pruned > 0 => {
+                anstream::eprintln!(
+                    "{DIM}catalogs tidied: {renamed} renamed keys kept their translations, {} deleted strings removed{DIM:#}",
+                    dropped + pruned
+                )
+            }
+            Ok(_) => {}
+            Err(e) => {
+                anstream::eprintln!("{YELLOW}catalogs not tidied{YELLOW:#} {DIM}({e}){DIM:#}")
+            }
         }
     }
 
@@ -126,6 +170,109 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
         );
         ExitCode::FAILURE
     })
+}
+
+/// The code a hand-written glot.toml is about, when it does not say (`[extract]` absent): the
+/// feature folder holding its catalogs. `files = ["src/app/visa-api/landing/messages/{locale}.json"]`
+/// => `src/app/visa-api/landing`. Without it, the default include (`src/**`) would move every
+/// string of the repository into the landing page's catalogs. `None`: the whole default scope.
+fn configured_scope(root: &Path) -> Option<String> {
+    let text = std::fs::read_to_string(root.join("glot.toml")).ok()?;
+    if text
+        .lines()
+        .any(|l| l.trim_start().starts_with("[extract]"))
+    {
+        return None;
+    }
+    let c = glot_core::config::Config::load(root).ok()?;
+    let dirs: std::collections::BTreeSet<String> = c
+        .files
+        .iter()
+        .map(|f| {
+            let dir = &f[..f.find(['{', '*']).unwrap_or(f.len())];
+            let dir = dir.rsplit_once('/').map_or("", |(d, _)| d);
+            // `…/messages`, `…/locales`, `…/i18n`: the feature is the folder above.
+            match dir.rsplit_once('/') {
+                Some((up, leaf))
+                    if [
+                        "messages",
+                        "locales",
+                        "locale",
+                        "i18n",
+                        "lang",
+                        "translations",
+                    ]
+                    .contains(&leaf) =>
+                {
+                    up.to_string()
+                }
+                _ => dir.to_string(),
+            }
+        })
+        .collect();
+    if dirs.len() != 1 {
+        return None;
+    }
+    let dir = dirs.into_iter().next()?;
+    // Only a nested feature folder narrows anything (`src`, `app`, the root: same as the default).
+    (dir.matches('/').count() >= 2 && root.join(&dir).is_dir() && !dir.contains(".."))
+        .then_some(dir)
+}
+
+/// Before translating: keys the previous run added that the code no longer uses are dropped,
+/// renamed keys keep their translations, target entries of deleted source keys are removed.
+/// Returns (dropped, renamed, pruned).
+fn tidy(root: &Path, carried: &[String]) -> Result<(usize, usize, usize)> {
+    let mut ws = glot_llm::engine::Workspace::open(root)?;
+    crate::forced_llm(&mut ws.config.llm);
+    // Placeholder values of the offline mock (`⟦fr⟧ Text`) left by an earlier run: with a real
+    // provider they are translated again instead of shipped.
+    if ws.config.llm.provider != "mock" {
+        let purged = ws.drop_mock_values()?;
+        if purged > 0 {
+            anstream::eprintln!(
+                "{YELLOW}{purged} placeholder translations (`⟦xx⟧ …`) from the mock provider will be translated again{YELLOW:#}"
+            );
+        }
+    }
+    let mut dropped = 0;
+    if !carried.is_empty() {
+        let report = ws.extract()?;
+        // Nothing seen in the code at all: the extractor does not know this stack, drop nothing.
+        if !report.usages.is_empty() {
+            let unused = glot_extract::unused_keys(&report, ws.source());
+            let gone: Vec<String> = carried
+                .iter()
+                .filter(|k| unused.contains(k))
+                .cloned()
+                .collect();
+            dropped = gone.len();
+            if !gone.is_empty() {
+                ws.remove_keys(&gone)?;
+            }
+        }
+    }
+    let (renamed, pruned) = ws.reconcile()?;
+    // Last check of the rewrite: a key called in the code must exist in the source catalog.
+    let ws = glot_llm::engine::Workspace::open(root)?;
+    let report = ws.extract()?;
+    let missing = glot_extract::missing_keys(&report, ws.source());
+    // Most usages "missing": the catalog is keyed another way (source text as key), not a bug.
+    if !missing.is_empty() && missing.len() * 2 < report.usages.len() {
+        anstream::println!(
+            "warning: {} key{} used in the code {} missing from the source catalog: {}",
+            missing.len(),
+            if missing.len() == 1 { "" } else { "s" },
+            if missing.len() == 1 { "is" } else { "are" },
+            missing
+                .iter()
+                .take(8)
+                .map(|k| format!("`{k}`"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+    }
+    Ok((dropped, renamed, pruned))
 }
 
 pub fn agent_prompt_cmd(a: AgentPromptArgs) -> Result<ExitCode> {
@@ -166,7 +313,13 @@ pub fn agent_prompt(root: &Path, target: &str) -> String {
         // A hand-rolled runtime: keep it, never a second one (i18next / next-intl).
         let hook = custom.as_ref().map_or_else(
             || "the app's own `t()`".to_string(),
-            |c| format!("`const {{ t }} = {}()` from `{}`", c.hook, c.module),
+            |c| {
+                if c.hook.is_empty() {
+                    format!("`import {{ t }}` from `{}`", c.module)
+                } else {
+                    format!("`const {{ t }} = {}()` from `{}`", c.hook, c.module)
+                }
+            },
         );
         let style = std::fs::read_to_string(root.join(&source_file))
             .ok()
@@ -294,6 +447,33 @@ mod tests {
         .unwrap();
         let p = super::agent_prompt(&dir, "lovable");
         assert!(p.contains("useTranslation()") && p.contains("outside this builder"));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn hand_written_config_scopes_the_rewrite() {
+        let dir = std::env::temp_dir().join(format!("glot-scope-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("src/app/visa-api/landing/messages")).unwrap();
+        let toml = "source_locale = \"en\"\ntarget_locales = [\"fr\"]\nfiles = [\"src/app/visa-api/landing/messages/{locale}.json\"]\n";
+        std::fs::write(dir.join("glot.toml"), toml).unwrap();
+        assert_eq!(
+            super::configured_scope(&dir).as_deref(),
+            Some("src/app/visa-api/landing")
+        );
+        // An explicit [extract] include is the developer's choice.
+        std::fs::write(
+            dir.join("glot.toml"),
+            format!("{toml}[extract]\ninclude = [\"src/**/*.tsx\"]\n"),
+        )
+        .unwrap();
+        assert_eq!(super::configured_scope(&dir), None);
+        // Root-level catalogs: nothing to narrow.
+        std::fs::write(
+            dir.join("glot.toml"),
+            toml.replace("src/app/visa-api/landing/messages/", "messages/"),
+        )
+        .unwrap();
+        assert_eq!(super::configured_scope(&dir), None);
         std::fs::remove_dir_all(&dir).unwrap();
     }
 }

@@ -12,6 +12,8 @@ use tokio::sync::{Notify, broadcast};
 use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
 
 pub mod auth;
+pub mod autopilot;
+pub mod autopilot_posthog;
 pub mod billing;
 pub mod cdn;
 pub mod connectors;
@@ -27,6 +29,10 @@ pub mod jobs;
 pub mod keys;
 pub mod launches;
 pub mod layout_rum;
+pub mod live_check;
+pub mod live_stream;
+pub mod local_seo;
+pub mod locale_alias;
 pub mod markets;
 pub mod mcp_remote;
 pub mod onboarding;
@@ -34,9 +40,12 @@ pub mod ondemand;
 pub mod openapi;
 pub mod projects;
 pub mod recommend;
+pub mod render_protocol;
 pub mod review;
 pub mod review_live;
 pub mod sync;
+pub mod text_graph;
+pub mod two_way;
 pub mod variants;
 pub mod visual;
 
@@ -145,8 +154,12 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route("/api/openapi.json", get(openapi::spec))
         .merge(visual::routes())
         .merge(insights::routes())
+        .merge(autopilot::routes())
+        .merge(autopilot_posthog::routes())
         .merge(launches::routes())
         .merge(layout_rum::routes())
+        .merge(live_check::routes())
+        .merge(local_seo::routes())
         .merge(markets::routes())
         .merge(recommend::routes())
         .merge(variants::routes())
@@ -155,6 +168,9 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(feedback::routes())
         .merge(github_app::routes())
         .merge(ondemand::routes())
+        .merge(live_stream::routes())
+        .merge(render_protocol::routes())
+        .merge(two_way::routes())
         .merge(onboarding::routes())
         .merge(billing::routes())
         .merge(review_live::routes())
@@ -165,7 +181,11 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(edge::domains::routes())
         .merge(edge::sitemap::routes())
         .merge(edge::snapshots::routes())
+        .merge(edge::prewarm::routes())
+        .merge(edge::slugs::routes())
+        .merge(edge::website_setup::routes())
         .merge(connectors::api::routes())
+        .merge(text_graph::routes())
         .layer(cors);
 
     Router::new()
@@ -173,15 +193,20 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .merge(insights::public_routes())
         .merge(launches::public_routes())
         .merge(layout_rum::public_routes())
+        .merge(live_check::public_routes())
+        .merge(local_seo::public_routes())
         .merge(feedback::public_routes())
         .merge(github_app::public_routes())
         .merge(billing::public_routes())
+        .merge(render_protocol::public_routes())
         .merge(onboarding::public_routes())
+        .merge(two_way::public_routes())
         .merge(edge::tm::public_routes())
         .merge(edge::missing::public_routes())
         .merge(edge::bundle::public_routes())
         .merge(edge::sitemap::public_routes())
         .merge(edge::ask::public_routes())
+        .merge(live_stream::public_routes())
         .merge(connectors::api::public_routes())
         .merge(framer_plugin::public_routes())
         .merge(

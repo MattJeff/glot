@@ -1,7 +1,7 @@
 // <glot-locale-switcher> helpers: strategy resolution, current locale, navigation target.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { currentLocale, flagFor, match, resolveStrategy, targetUrl, type Manifest } from "../src/locale-switcher.ts";
+import { applied, currentLocale, flagFor, match, resolveStrategy, targetUrl, type Manifest } from "../src/locale-switcher.ts";
 
 const m: Manifest = {
   source: "en",
@@ -298,6 +298,113 @@ test("menu variant in a real browser: open/close, keyboard, search, selection, f
     assert.equal((await wt.textContent())?.trim(), "FR");
     await wt.click();
     assert.equal(await win.locator("glot-locale-switcher [role=option]").nth(1).locator("[part~=flag]").textContent(), "FR");
+  } finally {
+    await browser.close();
+    server.close();
+  }
+});
+
+// Site codes (Settings → Languages in glot): the site reads `zh`, glot calls the locale `zh-CN`.
+test("site_code: written in the URL, both codes recognized as the current language", () => {
+  const s: Manifest = { source: "fr", updated_at: null, locales: [
+    { code: "fr", name: "Français", dir: "ltr", coverage: 1 },
+    { code: "zh-CN", name: "中文", dir: "ltr", coverage: 1, site_code: "zh" },
+  ] };
+  assert.equal(targetUrl("query:lang", u("/?lang=fr"), "zh-CN", s), "https://site.test/?lang=zh");
+  assert.equal(targetUrl("prefix", u("/pricing"), "zh-CN", s), "https://site.test/zh/pricing");
+  assert.equal(targetUrl("prefix", u("/zh/pricing"), "fr", s), "https://site.test/pricing");
+  assert.equal(targetUrl("prefix", u("/zh-CN/pricing"), "fr", s), "https://site.test/pricing");
+  for (const q of ["zh", "zh-CN", "ZH"]) assert.equal(currentLocale("query:lang", u(`/?lang=${q}`), "", "fr", null, s), "zh-CN", q);
+  assert.equal(currentLocale("prefix", u("/zh/pricing"), "", "", null, s), "zh-CN");
+  assert.equal(currentLocale("prefix", u("/zh-CN/pricing"), "", "", null, s), "zh-CN");
+  assert.equal(currentLocale("cookie:L", u("/"), "a=1; L=zh", "", null, s), "zh-CN");
+  // Without a site code nothing changes.
+  assert.equal(targetUrl("query:lang", u("/"), "pt-BR", m), "https://site.test/?lang=pt-BR");
+});
+
+test("live check verdict: did the page take the language?", () => {
+  const zh = { code: "zh-CN" };
+  const before = { l: "fr", p: 1 };
+  // The cliponit case: ?lang=zh-CN, the page stays French (same lang, same text).
+  assert.equal(applied("fr", zh, before, 1, "fr"), false);
+  // <html lang> names the language (glot's code, the site's code, or the same language).
+  assert.equal(applied("zh-CN", zh, before, 1, "fr"), true);
+  assert.equal(applied("zh", zh, before, 1, "fr"), true);
+  assert.equal(applied("ZH-hans", zh, before, 1, "fr"), true);
+  assert.equal(applied("cmn", { code: "zh-CN", site_code: "cmn" }, before, 1, "fr"), true);
+  // A site that never updates <html lang> but did change its text.
+  assert.equal(applied("fr", zh, before, 2, "fr"), true);
+  assert.equal(applied("", zh, { l: "", p: 1 }, 2, "fr"), true);
+  assert.equal(applied("", zh, { l: "", p: 1 }, 1, "fr"), false);
+  // The site fell back to another language than the one asked for (lang moved, not to zh).
+  assert.equal(applied("fr", zh, { l: "en", p: 1 }, 2, "fr"), false);
+  // Same base language as the source: only the exact code counts as proof.
+  assert.equal(applied("pt", { code: "pt-BR" }, { l: "pt", p: 1 }, 1, "pt"), false);
+  assert.equal(applied("pt-BR", { code: "pt-BR" }, { l: "pt", p: 1 }, 1, "pt"), true);
+});
+
+// The cliponit incident, end to end in a real browser: glot lists zh-CN, the site's own code only accepts
+// 2-3 letter codes. The visitor picks 中文, the page stays French → one "not applied" report. Once the project
+// maps zh-CN to the site code `zh`, the switcher writes ?lang=zh, the page turns Chinese → "applied".
+test("live check in a real browser: a site that ignores zh-CN but honors zh", async () => {
+  const { chromium } = await import("playwright");
+  const { createServer } = await import("node:http");
+  const { readFileSync } = await import("node:fs");
+  const js = readFileSync(new URL("../dist/locale-switcher.global.js", import.meta.url), "utf8"); // needs `pnpm build`
+  let mapped = false;
+  const beacons: Record<string, unknown>[] = [];
+  let got = () => {};
+  const server = createServer((req, res) => {
+    const path = new URL(req.url!, "http://x").pathname;
+    if (path === "/s.js") return res.writeHead(200, { "content-type": "text/javascript" }).end(js);
+    if (path === "/cdn/clip/locales.json")
+      return res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ source: "fr", updated_at: null, locales: [
+        { code: "fr", name: "Français", dir: "ltr", coverage: 1 },
+        { code: "zh-CN", name: "中文", dir: "ltr", coverage: 1, ...(mapped ? { site_code: "zh" } : {}) },
+      ] }));
+    if (path === "/cdn/clip/live-check" && req.method === "POST") {
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => (beacons.push(JSON.parse(body)), res.writeHead(204).end(), got()));
+      return;
+    }
+    // The site: client-rendered strings, and a language guard like cliponit's.
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(`<html lang="fr"><script src="/s.js" data-project="clip" defer></script>
+<h1 id="h">Crée tes vidéos</h1><glot-locale-switcher strategy="query:lang" variant="pills"></glot-locale-switcher>
+<script>const l = new URLSearchParams(location.search).get("lang") || "";
+if (/^[a-z]{2,3}$/.test(l) && l === "zh") { document.documentElement.lang = l; h.textContent = "创建你的视频"; }</script>`);
+  });
+  await new Promise<void>((r) => server.listen(0, r));
+  const base = `http://localhost:${(server.address() as { port: number }).port}`;
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage();
+    const pick = async (url: RegExp) => {
+      await page.goto(`${base}/pricing?lang=fr`);
+      const pills = page.locator("glot-locale-switcher button");
+      await pills.first().waitFor();
+      const beacon = new Promise<void>((r) => (got = r));
+      await Promise.all([page.waitForURL(url), pills.nth(1).click()]);
+      await pills.first().waitFor();
+      await beacon;
+      return pills;
+    };
+    await pick(/lang=zh-CN/);
+    assert.equal(await page.textContent("h1"), "Crée tes vidéos"); // translated in glot, not on the site
+    assert.deepEqual(beacons, [{ locale: "zh-CN", code: "zh-CN", html_lang: "fr", applied: false, origin: base }]);
+
+    mapped = true; // Settings → Languages: "use zh on my site"
+    const pills = await pick(/lang=zh$/);
+    assert.equal(await page.textContent("h1"), "创建你的视频");
+    assert.equal(await pills.nth(1).getAttribute("aria-current"), "true"); // ?lang=zh is zh-CN
+    assert.deepEqual(beacons[1], { locale: "zh-CN", code: "zh", html_lang: "zh", applied: true, origin: base });
+
+    // Once per (project, locale, result) per browser per day: the same outcome again sends nothing.
+    await page.goto(`${base}/pricing?lang=fr`);
+    await page.locator("glot-locale-switcher button").nth(1).click();
+    await page.waitForURL(/lang=zh$/);
+    await page.waitForTimeout(4000);
+    assert.equal(beacons.length, 2);
   } finally {
     await browser.close();
     server.close();

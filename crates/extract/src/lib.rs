@@ -17,6 +17,7 @@ pub mod email;
 mod foreign;
 pub mod i18nize;
 pub mod rust;
+mod rust_view;
 mod scan;
 pub use scan::looks_like_css_classes;
 pub mod svg;

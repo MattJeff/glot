@@ -413,7 +413,28 @@ fn open() -> Result<Workspace> {
     if let Some(p) = PROVIDER.get() {
         ws.config.llm.provider = p.clone();
     }
+    forced_llm(&mut ws.config.llm);
     Ok(ws)
+}
+
+/// `GLOT_LLM_PROVIDER` / `GLOT_LLM_MODEL` / `GLOT_LLM_BASE_URL`: set by the glot server for a
+/// GitHub run, they win over the repository's `[llm]` (a committed `provider = "mock"` must never
+/// ship fake translations) and over `--provider`. Inherited by every child glot.
+pub(crate) fn forced_llm(llm: &mut glot_core::config::LlmConfig) {
+    let var = |k: &str| std::env::var(k).ok().filter(|v| !v.trim().is_empty());
+    if let Some(p) = var("GLOT_LLM_PROVIDER") {
+        llm.provider = p;
+        // The repo's model belongs to the repo's provider (`mock`, another vendor).
+        llm.base_url = var("GLOT_LLM_BASE_URL");
+        if let Some(m) = var("GLOT_LLM_MODEL") {
+            llm.model = m;
+        }
+        llm.fallback_model = var("GLOT_LLM_FALLBACK_MODEL");
+        llm.judge_model = var("GLOT_LLM_JUDGE_MODEL");
+        llm.fallback_provider = None;
+        llm.fallback_base_url = None;
+        llm.fallback_api_key_env = None;
+    }
 }
 
 fn compile() -> Result<()> {

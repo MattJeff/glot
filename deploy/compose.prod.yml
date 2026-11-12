@@ -59,6 +59,13 @@ services:
       RUST_LOG: ${RUST_LOG:-glot_server=info,tower_http=info}
       GLOT_LOG_FORMAT: json
       GLOT_ADMIN_EMAILS: ${GLOT_ADMIN_EMAILS:-}
+      # One-click connect of the CMS connectors (empty = manual credentials form for that platform).
+      GLOT_SHOPIFY_CLIENT_ID: ${GLOT_SHOPIFY_CLIENT_ID:-}
+      GLOT_SHOPIFY_CLIENT_SECRET: ${GLOT_SHOPIFY_CLIENT_SECRET:-}
+      GLOT_WEBFLOW_CLIENT_ID: ${GLOT_WEBFLOW_CLIENT_ID:-}
+      GLOT_WEBFLOW_CLIENT_SECRET: ${GLOT_WEBFLOW_CLIENT_SECRET:-}
+      GLOT_HUBSPOT_CLIENT_ID: ${GLOT_HUBSPOT_CLIENT_ID:-}
+      GLOT_HUBSPOT_CLIENT_SECRET: ${GLOT_HUBSPOT_CLIENT_SECRET:-}
       GLOT_RENDERER_URL: http://renderer:8795
       GLOT_RENDERER_TOKEN: ${GLOT_RENDERER_TOKEN:-}
       # glot Edge proxy: last known domains/TMs on disk (served if Postgres is down, survives restarts).

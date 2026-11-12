@@ -326,6 +326,14 @@ pub async fn ingest(
     .bind(event)
     .execute(&state.db)
     .await?;
+    crate::autopilot::on_revenue(
+        &state,
+        project_id,
+        event,
+        hit.value,
+        hit.currency.as_deref(),
+    )
+    .await?;
     let variants =
         crate::variants::on_hit(&state, project_id, &hit.served, event, &hit.variants).await?;
     if !hit.exposures.is_empty() && !crate::experiments::ingest::is_bot(&headers) {

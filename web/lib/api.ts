@@ -584,6 +584,148 @@ export type FeedbackSettings = {
 };
 /** github_token: write-only, "" clears, absent keeps. github_repo: "" clears. */
 export type FeedbackSettingsInput = Partial<Omit<FeedbackSettings, "public_key" | "has_github_token">> & { github_token?: string };
+// Autopilot (autopilot.rs): markets to open with their money estimate, and self-optimising wordings.
+export type Interval = { mid: number; low: number; high: number };
+export type AutopilotSettings = { goal: string; value_per_conversion: number | null; currency: string; mode: "approval" | "auto" };
+export type AutopilotValue = { amount: number; currency: string; basis: "declared" | "measured"; events: number };
+export type AutopilotOpportunity = Recommendation & {
+  rank: number;
+  conversion_gap: number | null;
+  revenue_monthly: Interval | null;
+  cost: number | null;
+  payback_days: number | null;
+  visits_missing: number;
+  native_visits_missing: number;
+  conversions_missing: number;
+  bounce_rate: number | null;
+};
+export type AutopilotMisrouted = {
+  language: string;
+  visits: number;
+  elsewhere: number;
+  share: number;
+  served_instead: string | null;
+  matched: RecoRate;
+  mismatched: RecoRate;
+  gain_monthly: Interval | null;
+  revenue_monthly: Interval | null;
+  confidence: "insufficient" | "indicative" | "solid";
+  conversions_missing: number;
+};
+export type AutopilotOpening = {
+  id: string;
+  locale: string;
+  mode: "holdout" | "before_after";
+  days: number;
+  goal: string;
+  status: "translating" | "measuring" | "failed";
+  job_id: string | null;
+  launch_id: string | null;
+  estimate: AutopilotOpportunity | null;
+  error: string | null;
+  created_at: string;
+  job_done: number | null;
+  job_total: number | null;
+  launch: Launch | null;
+};
+export type AutopilotCandidate = {
+  key: string;
+  locale: string;
+  kind: "headline" | "cta" | "pricing";
+  weight: number;
+  source: string;
+  current: string;
+  monthly_visits: number;
+  monthly_conversions: number;
+  est_days: number | null;
+  low_traffic: boolean;
+};
+export type AutopilotReport = {
+  arm: number;
+  value: string;
+  control: [number, number];
+  variant: [number, number];
+  lift: number;
+  lift_low: number;
+  lift_high: number;
+  p_better: number;
+  extra_conversions_monthly: Interval | null;
+  revenue_monthly: Interval | null;
+};
+export type AutopilotDropped = { arm?: number; value: string; why: "worse" | "validation" | "new_number" | "new_price" | "new_link" | "new_claim" };
+export type AutopilotOptimization = {
+  id: string;
+  key: string;
+  locale: string;
+  goal: string;
+  kind: "headline" | "cta" | "pricing" | "other";
+  mode: "approval" | "auto";
+  status: "running" | "awaiting_approval" | "promoted" | "rolled_back" | "no_winner" | "stopped";
+  reason:
+    | "official_best"
+    | "no_difference"
+    | "all_variants_worse"
+    | "source_changed"
+    | "stopped_manually"
+    | "promoted_manually"
+    | "approver_missing"
+    | null;
+  min_n: number;
+  max_days: number;
+  dropped: AutopilotDropped[];
+  result: AutopilotReport | null;
+  created_at: string;
+  decided_at: string | null;
+  experiment: VariantExperiment | null;
+};
+export type AutopilotOverview = {
+  days: number;
+  settings: AutopilotSettings;
+  public_key: string;
+  total_visits: number;
+  data_days: number;
+  conversions_tracked: boolean;
+  gain_locked: boolean;
+  value: AutopilotValue | null;
+  opportunities: AutopilotOpportunity[];
+  misrouted: AutopilotMisrouted[];
+  openings: AutopilotOpening[];
+  candidates: AutopilotCandidate[];
+  optimizations: AutopilotOptimization[];
+  /** Where every number comes from: the glot tag or the imported PostHog history. */
+  source: AutopilotSource;
+  bounce_rate_all: number | null;
+  posthog: PosthogView;
+};
+export type AutopilotSource = {
+  kind: "insights" | "posthog";
+  goal: string;
+  days: number;
+  visits: ["insights" | "posthog", number][];
+  synced_at: string | null;
+};
+/** PostHog import (autopilot_posthog.rs). The key is write-only: never returned. */
+export type PosthogView = {
+  connected: boolean;
+  host: string | null;
+  project_id: string | null;
+  conversion_event: string | null;
+  default_locale: string | null;
+  backfill_days: number;
+  synced_from: string | null;
+  synced_to: string | null;
+  last_sync_at: string | null;
+  last_error: string | null;
+};
+export type PosthogConnect = {
+  host: string;
+  project_id: string;
+  api_key?: string;
+  conversion_event: string | null;
+  default_locale: string | null;
+  backfill_days: number;
+};
+export type PosthogTested = { events: [string, number][]; suggested_event: string | null; pageviews_30d: number; with_language_30d: number };
 // Copy experiments (variants.rs): arm 0 = official translation.
 export type VariantArm = {
   arm: number;
@@ -829,6 +971,18 @@ export const api = {
     request<InsightExperiment>("POST", `${p(slug)}/insights/experiments`, b),
   decideExperiment: (slug: string, id: string, status: "kept" | "removed") =>
     request<void>("PATCH", `${p(slug)}/insights/experiments/${enc(id)}`, { status }),
+  autopilot: (slug: string, q: { source?: string } = {}) => request<AutopilotOverview>("GET", `${p(slug)}/autopilot${qs(q)}`),
+  posthogTest: (slug: string, b: PosthogConnect) => request<PosthogTested>("POST", `${p(slug)}/autopilot/posthog/test`, b),
+  posthogSave: (slug: string, b: PosthogConnect) => request<PosthogView>("PUT", `${p(slug)}/autopilot/posthog`, b),
+  posthogSync: (slug: string) => request<{ from: string; to: string; queries: number; rows: number }>("POST", `${p(slug)}/autopilot/posthog/sync`),
+  posthogDisconnect: (slug: string) => request<void>("DELETE", `${p(slug)}/autopilot/posthog`),
+  autopilotSettings: (slug: string, b: AutopilotSettings) => request<AutopilotSettings>("PUT", `${p(slug)}/autopilot/settings`, b),
+  autopilotOpen: (slug: string, b: { locale: string; mode: "holdout" | "before_after" }) =>
+    request<AutopilotOpening>("POST", `${p(slug)}/autopilot/open`, b),
+  autopilotOptimize: (slug: string, b: { key: string; locale: string }) =>
+    request<AutopilotOptimization>("POST", `${p(slug)}/autopilot/optimizations`, b),
+  autopilotDecide: (slug: string, id: string, action: "approve" | "stop") =>
+    request<unknown>("POST", `${p(slug)}/autopilot/optimizations/${enc(id)}/${action}`),
   launches: (slug: string) => request<Launch[]>("GET", `${p(slug)}/launches`),
   launch: (slug: string, id: string) => request<Launch>("GET", `${p(slug)}/launches/${enc(id)}`),
   createLaunch: (slug: string, b: NewLaunch) => request<Launch>("POST", `${p(slug)}/launches`, b),
@@ -929,6 +1083,7 @@ export const qk = {
   visualReport: (slug: string, id: string) => ["visual-reports", slug, id] as const,
   preview: (slug: string) => ["preview", slug] as const,
   insights: (slug: string) => ["insights", slug] as const,
+  autopilot: (slug: string) => ["autopilot", slug] as const,
   launches: (slug: string) => ["launches", slug] as const,
   recommendations: (slug: string) => ["recommendations", slug] as const,
   feedback: (slug: string) => ["feedback", slug] as const,

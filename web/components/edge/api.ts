@@ -36,10 +36,56 @@ export type EdgeSettings = {
   auth_discover: boolean;
   /** Universal website tag (`widget/glot.js`). */
   website_snippet: WebsiteSnippet;
+  /** Pre-warm (prewarm.rs): the site is read and translated before its first visitor; pages fetched per run. */
+  prewarm: boolean;
+  prewarm_pages: number;
+  /** Translated URL paths (slugs.rs), opt-in. */
+  translated_slugs: boolean;
 };
 
 /** edge::discover::WebsiteSnippet. `position`: a corner, `none`, or a CSS selector the switcher goes into. */
-export type WebsiteSnippet = { on: boolean; auto_translate: boolean; position: string; locales: string[] };
+export type WebsiteSnippet = {
+  on: boolean;
+  auto_translate: boolean;
+  position: string;
+  locales: string[];
+  /** Flags in the switcher. */
+  flags: boolean;
+  /** Origin of the site set up from the dashboard ("" = none): what the preview may fetch. */
+  site: string;
+};
+
+/** edge::website_setup::Scan — one server-side fetch of the public page. */
+export type WebsiteScan = {
+  url: string;
+  status: number | null;
+  error: "invalid" | "private" | "unreachable" | "timeout" | "not_html" | null;
+  /** Platform id in content/integrations/platforms.json. */
+  platform: string | null;
+  lang: string | null;
+  title: string | null;
+  tag: { found: boolean; project: string | null; right_project: boolean; key: boolean; in_head: boolean };
+  /** CSP directives of the site that block the tag. */
+  csp_blocked: string[];
+  other_tools: string[];
+  /** Private-looking paths linked from the page, as exclusion globs. */
+  suggested_exclude: string[];
+  js_only: boolean;
+};
+/** edge::website_setup::Crawl — pre-translation before go-live. */
+export type WebsiteCrawl = {
+  found: number;
+  pages: number;
+  segments: number;
+  accepted: number;
+  known: number;
+  rejected: number;
+  queued: string[];
+  locales: string[];
+  error: WebsiteScan["error"];
+};
+/** edge::website_setup page: source HTML + the locale's TM, rendered by /widget/glot-editor.js. */
+export type WebsitePage = { url: string; path: string; status: number; html: string; source: string; skip: string[]; tm: { v: number; locale: string; t: Record<string, unknown> } };
 export const SNIPPET_CORNERS = ["bottom-right", "bottom-left", "top-right", "top-left", "none"] as const;
 
 export type AuthPages = "off" | "patcher" | "server";
@@ -71,7 +117,7 @@ export type NewEdgeDomain = { host: string; mode: EdgeMode; locale: string; orig
 
 /** GET /edge/coverage (seo_report.rs): readiness per locale with every page's coverage, critical pages first. */
 export type MissingSegment = { hash: string; context: string; text: string | null };
-export type EdgePage = { path: string; critical: boolean; segments: number; translated: number; coverage: number; missing: MissingSegment[] };
+export type EdgePage = { path: string; critical: boolean; segments: number; translated: number; coverage: number; /** Advertised to search engines. */ ready: boolean; missing: MissingSegment[] };
 export type EdgeLocale = {
   locale: string;
   /** 0..1, keys + segments. */
@@ -81,9 +127,26 @@ export type EdgeLocale = {
   critical_threshold: number;
   /** Shown in the switcher / locales.json manifest. */
   ready: boolean;
+  /** Pages glot has read / those a search engine is told about (complete, in a ready language). */
+  pages_seen: number;
+  pages_indexable: number;
   version: number;
   pages: EdgePage[];
 };
+
+/** GET|POST /edge/prewarm (prewarm.rs). */
+export type EdgePrewarm = {
+  status: "never" | "running" | "done" | "failed";
+  pages_total?: number;
+  pages_done?: number;
+  skipped?: number;
+  segments?: number;
+  error?: string | null;
+  started_at?: string;
+  finished_at?: string | null;
+};
+/** GET /edge/slugs (slugs.rs): the current translated path of each page and language. */
+export type EdgeSlug = { locale: string; source_path: string; slug: string; origin: "machine" | "human" };
 export type EdgeCoverage = { seo_min: number; locales: EdgeLocale[] };
 
 /** GET /edge/segments (tm.rs): one locale, `status` = missing when there is no translation yet. */
@@ -167,6 +230,9 @@ export const edgeApi = {
   putSettings: (slug: string, b: EdgeSettings) => request<EdgeSettings>("PUT", `${e(slug)}/settings`, b),
   /** Public key for the website tag's `data-key`. */
   snippet: (slug: string) => request<{ public_key: string }>("GET", `${e(slug)}/snippet`),
+  websiteScan: (slug: string, url: string) => request<WebsiteScan>("POST", `${e(slug)}/website/scan`, { url }),
+  websiteCrawl: (slug: string, url: string) => request<WebsiteCrawl>("POST", `${e(slug)}/website/crawl`, { url }),
+  websitePage: (slug: string, url: string, locale: string) => request<WebsitePage>("GET", `${e(slug)}/website/page${qs({ url, locale })}`),
   // ponytail: domains + metrics are the dashboard contract; no server route yet (see report).
   domains: (slug: string) => request<EdgeDomain[]>("GET", `${e(slug)}/domains`),
   addDomain: (slug: string, b: NewEdgeDomain) => request<EdgeDomain>("POST", `${e(slug)}/domains`, b),
@@ -189,6 +255,11 @@ export const edgeApi = {
   /** Submits the ready locales' sitemap URLs to IndexNow (Bing, Yandex; Google reads the sitemaps). */
   indexNow: (slug: string) =>
     request<{ hosts: { host: string; urls: number; status: number | null }[] }>("POST", `${e(slug)}/indexnow`),
+  prewarm: (slug: string) => request<EdgePrewarm>("GET", `${e(slug)}/prewarm`),
+  runPrewarm: (slug: string) => request<EdgePrewarm>("POST", `${e(slug)}/prewarm`),
+  slugs: (slug: string) => request<{ enabled: boolean; slugs: EdgeSlug[] }>("GET", `${e(slug)}/slugs`),
+  /** 400 when the address is taken by another page. `slug` = `source_path` pins "no translated address". */
+  putSlug: (slug: string, b: { locale: string; source_path: string; slug: string }) => request<EdgeSlug>("PUT", `${e(slug)}/slugs`, b),
   /** `<link rel="alternate">` tags the source site must carry itself (subdomain mode). */
   hreflang: (slug: string, path: string) => request<{ path: string; tags: string[] }>("GET", `${e(slug)}/hreflang${qs({ path })}`),
 };
@@ -202,6 +273,8 @@ export const edgeKeys = {
   segments: (slug: string) => ["edge", slug, "segments"] as const,
   seo: (slug: string) => ["edge", slug, "seo"] as const,
   metrics: (slug: string) => ["edge", slug, "metrics"] as const,
+  prewarm: (slug: string) => ["edge", slug, "prewarm"] as const,
+  slugs: (slug: string) => ["edge", slug, "slugs"] as const,
 };
 
 /** Split a segment context `<role>|<template>` for display. */

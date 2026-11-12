@@ -12,8 +12,15 @@
 //!   `POST /api/v2/help_center/{resource}/{id}/translations` (create, with `title` required by Zendesk).
 //! - Webhooks: `X-Zendesk-Webhook-Signature` = base64 HMAC-SHA256 of `timestamp + body` with the webhook's
 //!   signing secret (`X-Zendesk-Webhook-Signature-Timestamp`), or the card URL with its token.
+//! - Read back (`current`): `GET /api/v2/help_center/{resource}/{id}/translations` (a translation only exists
+//!   once written: no fallback to the source locale).
+//! - Removed (`remove`): `DELETE /api/v2/help_center/translations/{translation id}`, only when glot wrote the
+//!   whole translation (its title is rolled back and no other field holds text); else unsupported.
+//! - Diagnosis (`doctor`): the user's role (`GET /api/v2/users/me`: an admin, or an agent with Guide
+//!   permissions on the articles) and the Help Center having more than its default locale.
 //!
 //! Docs: https://developer.zendesk.com/api-reference/help_center/help-center-api/articles/,
+//! https://developer.zendesk.com/api-reference/ticketing/users/users/,
 //! https://developer.zendesk.com/api-reference/help_center/help-center-api/translations/,
 //! https://developer.zendesk.com/api-reference/introduction/pagination/,
 //! https://developer.zendesk.com/documentation/webhooks/verifying/
@@ -25,7 +32,8 @@ use std::collections::BTreeMap;
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Zendesk;
@@ -117,6 +125,69 @@ impl Api {
             .ok_or_else(|| anyhow::anyhow!("the Help Center has no locale"))?;
         Ok((def, all))
     }
+}
+
+/// The Help Center locale matching a glot locale.
+fn help_locale(all: &[String], locale: &str) -> anyhow::Result<String> {
+    Ok(cms::match_locale(all, locale)
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "locale {locale} is not enabled in the Help Center (Guide admin → Settings → Language settings)"
+            )
+        })?
+        .to_string())
+}
+
+/// (resource, id, fields) of an item's meta.
+fn target(
+    meta: &Value,
+) -> anyhow::Result<(&str, i64, &'static [(&'static str, &'static str, bool)])> {
+    let (Some(r), Some(id)) = (meta["resource"].as_str(), meta["id"].as_i64()) else {
+        anyhow::bail!("missing metadata, sync again");
+    };
+    let fields = RESOURCES
+        .iter()
+        .find(|(n, _)| *n == r)
+        .map(|x| x.1)
+        .ok_or_else(|| anyhow::anyhow!("unknown resource {r}"))?;
+    Ok((r, id, fields))
+}
+
+/// The `loc` translation of each resource of `items` (`Null` = none), keyed by external id.
+async fn translations<'a>(
+    api: &Api,
+    loc: &str,
+    items: &'a [PushItem],
+) -> anyhow::Result<BTreeMap<&'a str, Value>> {
+    let mut out = BTreeMap::new();
+    for it in items {
+        if out.contains_key(it.external_id.as_str()) {
+            continue;
+        }
+        let (r, id, _) = target(&it.meta)?;
+        let list = api
+            .get(&format!("/help_center/{r}/{id}/translations.json"))
+            .await?;
+        let t = list["translations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|t| {
+                t["locale"]
+                    .as_str()
+                    .is_some_and(|l| l.eq_ignore_ascii_case(loc))
+            })
+            .cloned()
+            .unwrap_or(Value::Null);
+        out.insert(it.external_id.as_str(), t);
+    }
+    Ok(out)
+}
+
+/// The translation field (`title` / `body`) an item is written to.
+fn translation_field(it: &PushItem) -> Option<&'static str> {
+    let (_, _, fields) = target(&it.meta).ok()?;
+    fields.iter().find(|(f, _, _)| *f == it.field).map(|x| x.1)
 }
 
 fn items_of(res: &str, fields: &[(&str, &str, bool)], o: &Value, def: &str) -> Vec<SourceItem> {
@@ -212,13 +283,7 @@ impl Connector for Zendesk {
     ) -> anyhow::Result<PushReport> {
         let api = Api::new(creds).await?;
         let (_, all) = api.locales().await?;
-        let loc = cms::match_locale(&all, locale)
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "locale {locale} is not enabled in the Help Center (Guide admin → Settings → Language settings)"
-                )
-            })?
-            .to_string();
+        let loc = help_locale(&all, locale)?;
         let draft = creds.setting("publish") != Some(&Value::Bool(true));
         let mut by: BTreeMap<&str, Vec<&PushItem>> = BTreeMap::new();
         for it in items {
@@ -228,14 +293,7 @@ impl Connector for Zendesk {
         for (ext, its) in by {
             let meta = &its[0].meta;
             let res: anyhow::Result<()> = async {
-                let (Some(r), Some(id)) = (meta["resource"].as_str(), meta["id"].as_i64()) else {
-                    anyhow::bail!("missing metadata, sync again");
-                };
-                let fields = RESOURCES
-                    .iter()
-                    .find(|(n, _)| *n == r)
-                    .map(|x| x.1)
-                    .ok_or_else(|| anyhow::anyhow!("unknown resource {r}"))?;
+                let (r, id, fields) = target(meta)?;
                 let mut t = Map::new();
                 for it in &its {
                     if let Some((_, tf, _)) = fields.iter().find(|(f, _, _)| *f == it.field) {
@@ -278,6 +336,104 @@ impl Connector for Zendesk {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let loc = help_locale(&api.locales().await?.1, locale)?;
+        let found = translations(&api, &loc, items).await?;
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let v = found[it.external_id.as_str()][translation_field(it)?].as_str()?;
+                    (!v.trim().is_empty()).then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn remove(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<bool> {
+        let api = Api::new(creds).await?;
+        let (def, all) = api.locales().await?;
+        let loc = help_locale(&all, locale)?;
+        anyhow::ensure!(
+            !loc.eq_ignore_ascii_case(&def),
+            "{loc} is the default locale"
+        );
+        let found = translations(&api, &loc, items).await?;
+        // Zendesk deletes a translation as a whole: only when everything it holds is being rolled back.
+        let mut ids = vec![];
+        for (ext, t) in &found {
+            let Some(id) = t["id"].as_i64() else { continue };
+            let rolled: Vec<&str> = items
+                .iter()
+                .filter(|i| i.external_id == *ext)
+                .filter_map(translation_field)
+                .collect();
+            let kept_body = !rolled.contains(&"body")
+                && t["body"].as_str().is_some_and(|b| !b.trim().is_empty());
+            if !rolled.contains(&"title") || kept_body {
+                return Ok(false);
+            }
+            ids.push(id);
+        }
+        for id in ids {
+            api.call(
+                reqwest::Method::DELETE,
+                &format!("/help_center/translations/{id}.json"),
+                None,
+            )
+            .await?;
+        }
+        Ok(true)
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("role", format!("{e:#}"))],
+        };
+        let mut out = vec![match api.get("/users/me.json").await {
+            Ok(me) => match me["user"]["role"].as_str().unwrap_or("") {
+                "admin" => Check::ok("role", "admin"),
+                "agent" => Check::warn(
+                    "role",
+                    "agent: writing translations needs Guide admin, or management permissions on the articles",
+                    Some("permissions"),
+                ),
+                r => Check {
+                    fix: Some("permissions"),
+                    ..Check::fail(
+                        "role",
+                        format!(
+                            "role '{r}' cannot edit the Help Center: use an admin or a Guide agent"
+                        ),
+                    )
+                },
+            },
+            Err(e) => Check::fail("role", format!("{e:#}")),
+        }];
+        out.push(match api.locales().await {
+            Ok((def, all)) if all.len() < 2 => Check::warn(
+                "help_center_locales",
+                format!("only {def} is enabled in the Help Center: add languages (Guide admin → Settings → Language settings)"),
+                Some("enable_locale"),
+            ),
+            Ok((_, all)) => Check::ok("help_center_locales", all.join(", ")),
+            Err(e) => Check::fail("help_center_locales", format!("{e:#}")),
+        });
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {

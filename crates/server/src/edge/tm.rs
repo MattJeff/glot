@@ -122,9 +122,10 @@ async fn serve(
     headers: HeaderMap,
 ) -> ApiResult<Response> {
     let p = crate::cdn::readable(&state, &slug, &headers).await?;
-    if !p.target_locales.contains(&locale) {
-        return Err(AppError::not_found("locale not found"));
-    }
+    // `zh`, `zh_CN`, `zh-Hans` → the project's `zh-CN` (crate::locale_alias); exact match first.
+    let locale = crate::locale_alias::resolve(&locale, &p.target_locales)
+        .ok_or_else(|| AppError::not_found("locale not found"))?
+        .to_string();
     let v = version(&state.db, p.id, &locale).await?;
     let etag = format!("\"tm-{locale}-{v}\"");
     let unchanged = q.get("since").is_some_and(|s| *s == v.to_string())
@@ -254,7 +255,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
          WHERE s.project_id = $1 AND NOT EXISTS (
             SELECT 1 FROM edge_translations t
             WHERE t.project_id = s.project_id AND t.hash = s.hash AND t.context = s.context AND t.locale = $2)
-         ORDER BY s.hits DESC, s.first_seen LIMIT $3",
+         ORDER BY (s.context ~ '^(title|meta:|h1)') DESC, s.hits DESC, s.first_seen LIMIT $3",
     )
     .bind(p.id)
     .bind(&locale)
@@ -358,6 +359,10 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
                 job.cost_usd
             );
         }
+    }
+    // Translated URL slugs wait for their texts like any segment: write the ones this job just translated.
+    if let Err(e) = super::slugs::materialize(state, &p).await {
+        tracing::info!(target: "glot_edge", "slugs not written: {}", e.message);
     }
     Ok(())
 }

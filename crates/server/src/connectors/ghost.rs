@@ -16,8 +16,14 @@
 //!   `updated_at` (Ghost's collision check), else created with the source's tags plus `#{locale}`.
 //! - Webhooks: `POST /ghost/api/admin/webhooks/` (post/page added and edited) with `webhook_secret`;
 //!   `X-Ghost-Signature: sha256=<hex HMAC-SHA256 of body + t>, t=<ms>`.
+//! - Read back (`current`): `GET /ghost/api/admin/{posts,pages}/slug/{slug}-{locale}/?formats=lexical`; `404` =
+//!   no translation. A translated post only holds what glot (or an editor) wrote: no fallback to the source.
+//!   `remove` is not implemented: a translation is a whole post, never deleted by glot.
+//! - Diagnosis (`doctor`): Ghost version (`GET /site/`, 5+ for Lexical) and the language tags in use; Ghost
+//!   cannot tell an integration's permissions, and `routes.yaml` is not readable through the Admin API.
 //!
-//! Docs: https://docs.ghost.org/admin-api, https://docs.ghost.org/admin-api/posts/updating-a-post,
+//! Docs: https://docs.ghost.org/admin-api, https://docs.ghost.org/admin-api/posts/overview (read by slug,
+//! `formats`), https://docs.ghost.org/admin-api/posts/updating-a-post,
 //! https://docs.ghost.org/admin-api/webhooks/creating-a-webhook (signature: Ghost's webhook-trigger.js)
 use async_trait::async_trait;
 use axum::http::HeaderMap;
@@ -27,7 +33,8 @@ use std::collections::BTreeMap;
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Ghost;
@@ -399,6 +406,89 @@ impl Connector for Ghost {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let mut posts: BTreeMap<&str, Value> = BTreeMap::new();
+        for it in items {
+            if posts.contains_key(it.external_id.as_str()) {
+                continue;
+            }
+            let (Some(res), Some(slug)) = (it.meta["resource"].as_str(), it.meta["slug"].as_str())
+            else {
+                anyhow::bail!("missing metadata, sync again");
+            };
+            let tslug = translated_slug(slug, locale);
+            let post = match api
+                .get(&format!("/{res}/slug/{tslug}/?formats=lexical"))
+                .await
+            {
+                Ok(found) => found[res][0].clone(),
+                Err(e) if e.to_string().starts_with("HTTP 404") => Value::Null,
+                Err(e) => return Err(e),
+            };
+            posts.insert(&it.external_id, post);
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let v = posts[it.external_id.as_str()][it.field.as_str()].as_str()?;
+                    match &it.format {
+                        // Same shape as pulled: the Lexical document with inline code protected.
+                        Format::RichText(_) => {
+                            let mut doc: Value = serde_json::from_str(v).ok()?;
+                            protect(&mut doc);
+                            Some(doc.to_string())
+                        }
+                        _ => (!v.trim().is_empty()).then(|| v.to_string()),
+                    }
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("version", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        // `version` is "5.x" on Ghost 5+; older sites store Mobiledoc, which glot does not translate.
+        if let Ok(site) = api.get("/site/").await
+            && let Some(v) = site["site"]["version"].as_str()
+        {
+            let major: u32 = v
+                .split('.')
+                .next()
+                .and_then(|m| m.parse().ok())
+                .unwrap_or(0);
+            out.push(if major >= 5 {
+                Check::ok("version", format!("Ghost {v}"))
+            } else {
+                Check::warn(
+                    "version",
+                    format!("Ghost {v}: glot translates Lexical content (Ghost 5+), upgrade Ghost"),
+                    None,
+                )
+            });
+        }
+        out.push(match self.locales(creds).await {
+            Ok(l) if l.is_empty() => Check::warn(
+                "language_tags",
+                "Ghost has no translations: glot creates one post per language (slug <slug>-<locale>, internal tag #<locale>); no language tag exists yet, add a routes.yaml collection per language once the first push created them",
+                None,
+            ),
+            Ok(l) => Check::ok("language_tags", format!("#{}", l.join(", #"))),
+            Err(e) => Check::fail("language_tags", format!("{e:#}")),
+        });
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {

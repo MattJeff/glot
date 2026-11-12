@@ -14,6 +14,13 @@
 //!   - Polylang for WooCommerce: `?lang=fr&translations[en]=12`, Polylang Pro's REST linking (documented by
 //!     Polylang for `wp/v2` only: best effort on `wc/v3`).
 //!   - New products copy the source's `type` and `regular_price`, with `settings.new_status` (default `draft`).
+//! - Human edits and rollback: [`super::wordpress::read_back`] (sources then translations by `include`, the
+//!   translated object's field is the current value; empty or identical to the source = none). `remove` is
+//!   not implemented: a translation is a whole product or term.
+//! - Diagnosis: the multilingual plugin and its WooCommerce companion, from the REST index and
+//!   `GET /wc/v3/system_status` (`active_plugins`; the key's user must be able to manage WooCommerce). The
+//!   key's permission (Read / Write / Read-Write) is exposed by no endpoint: a read-only key shows on the
+//!   first write only.
 //! - Webhooks: with the optional `webhook_secret` credential, `product.created` / `product.updated` are
 //!   subscribed (`POST /wc/v3/webhooks`, that secret) and checked with `X-WC-Webhook-Signature` (base64
 //!   HMAC-SHA256 of the body). Categories and tags have no webhook topics.
@@ -22,6 +29,9 @@
 //! Docs: https://woocommerce.github.io/woocommerce-rest-api-docs/#authentication,
 //! https://developer.woocommerce.com/docs/apis/rest-api/v3/products/,
 //! https://developer.woocommerce.com/docs/apis/rest-api/v3/webhooks/,
+//! https://woocommerce.github.io/woocommerce-rest-api-docs/#list-all-products (`include`),
+//! https://woocommerce.github.io/woocommerce-rest-api-docs/#system-status-properties,
+//! https://developer.wordpress.org/rest-api/using-the-rest-api/global-parameters/#_fields,
 //! https://wpml.org/documentation/related-projects/woocommerce-multilingual/using-wordpress-rest-api-woocommerce-multilingual/,
 //! https://polylang.pro/doc/rest-api/
 use async_trait::async_trait;
@@ -30,8 +40,10 @@ use base64::Engine;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-use super::wordpress::{Plugin, Site, raw, translation_for, translations};
-use super::{AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem};
+use super::wordpress::{Plugin, Site, plugin_check, raw, read_back, translation_for, translations};
+use super::{
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem,
+};
 
 pub struct WooCommerce;
 
@@ -292,6 +304,49 @@ impl Connector for WooCommerce {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let site = site(creds).await?;
+        let place = |m: &Value| {
+            Some((
+                format!("/wc/v3/{}", m["collection"].as_str()?),
+                m["id"].as_i64()?,
+            ))
+        };
+        Ok(Some(read_back(&site, locale, items, place).await?))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let site = match site(creds).await {
+            Ok(s) => s,
+            Err(e) => return vec![Check::fail("plugin", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        let plugins = match site
+            .get("/wc/v3/system_status?_fields=active_plugins")
+            .await
+        {
+            Ok((v, _)) => Some(Site::plugin_files(&v["active_plugins"])),
+            Err(e) => {
+                out.push(Check::warn(
+                    "permissions",
+                    format!("the key's user cannot read the system status (Administrator or Shop manager needed): {e:#}"),
+                    Some("permissions"),
+                ));
+                None
+            }
+        };
+        out.push(match site.plugin(creds).await {
+            Ok(plugin) => plugin_check(plugin, plugins.as_deref(), true),
+            Err(e) => Check::fail("plugin", format!("{e:#}")),
+        });
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {

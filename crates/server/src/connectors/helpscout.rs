@@ -14,8 +14,12 @@
 //!   `POST /v1/articles` (`collectionId`, `name`, `text`, `slug`, `status`).
 //! - Webhooks: Help Scout has none for Docs: use **Sync now**, or call the card URL (token included).
 //! - Rate limit: 2,000 requests per 10 minutes for one site (more with more sites); glot waits on `429`.
+//! - Read back (`current`): `GET /v1/articles/{id}?draft=true` on the article with the source's slug in the
+//!   target collection (none = no translation; a translated site never falls back to the source).
+//!   `remove` is not implemented: a translation is a whole article, never deleted by glot.
+//! - Diagnosis (`doctor`): `settings.collections` maps every language to an existing collection.
 //!
-//! Docs: https://developer.helpscout.com/docs-api/, https://developer.helpscout.com/docs-api/articles/list/,
+//! Docs: https://developer.helpscout.com/docs-api/, https://developer.helpscout.com/docs-api/articles/get/, https://developer.helpscout.com/docs-api/articles/list/,
 //! https://developer.helpscout.com/docs-api/articles/create/, https://developer.helpscout.com/docs-api/articles/update/
 use async_trait::async_trait;
 use axum::http::HeaderMap;
@@ -25,7 +29,8 @@ use std::collections::{BTreeMap, HashMap};
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct HelpScout;
@@ -110,6 +115,36 @@ async fn sources(api: &Api, c: &Creds) -> anyhow::Result<Vec<String>> {
         .collect();
     out.sort();
     Ok(out)
+}
+
+/// Slug → article id of the collection `locale` is written to.
+async fn translated(
+    api: &Api,
+    c: &Creds,
+    locale: &str,
+) -> anyhow::Result<(String, HashMap<String, String>)> {
+    let t = targets(c);
+    let col = t
+        .get(locale)
+        .or_else(|| {
+            let keys: Vec<String> = t.keys().cloned().collect();
+            cms::match_locale(&keys, locale).and_then(|k| t.get(k))
+        })
+        .filter(|c| id_ok(c))
+        .ok_or_else(|| {
+            anyhow::anyhow!("no Docs collection for {locale}: set settings.collections.{locale}")
+        })?
+        .clone();
+    let existing = api
+        .all(
+            &format!("/collections/{col}/articles?pageSize=100"),
+            "articles",
+        )
+        .await?
+        .iter()
+        .filter_map(|a| Some((a["slug"].as_str()?.to_string(), cms::id_str(&a["id"])?)))
+        .collect();
+    Ok((col, existing))
 }
 
 fn id_ok(s: &str) -> bool {
@@ -218,29 +253,7 @@ impl Connector for HelpScout {
         items: &[PushItem],
     ) -> anyhow::Result<PushReport> {
         let api = Api::new(creds).await?;
-        let t = targets(creds);
-        let col = t
-            .get(locale)
-            .or_else(|| {
-                let keys: Vec<String> = t.keys().cloned().collect();
-                cms::match_locale(&keys, locale).and_then(|k| t.get(k))
-            })
-            .filter(|c| id_ok(c))
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "no Docs collection for {locale}: set settings.collections.{locale}"
-                )
-            })?
-            .clone();
-        let existing: HashMap<String, String> = api
-            .all(
-                &format!("/collections/{col}/articles?pageSize=100"),
-                "articles",
-            )
-            .await?
-            .iter()
-            .filter_map(|a| Some((a["slug"].as_str()?.to_string(), cms::id_str(&a["id"])?)))
-            .collect();
+        let (col, existing) = translated(&api, creds, locale).await?;
         let status = if creds.setting("publish") == Some(&Value::Bool(true)) {
             "published"
         } else {
@@ -293,6 +306,82 @@ impl Connector for HelpScout {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let (_, existing) = translated(&api, creds, locale).await?;
+        let mut articles: BTreeMap<&str, Value> = BTreeMap::new();
+        for it in items {
+            if articles.contains_key(it.external_id.as_str()) {
+                continue;
+            }
+            let slug = it.meta["slug"].as_str().unwrap_or("");
+            let a = match existing.get(slug).filter(|i| id_ok(i)) {
+                Some(id) => api.get(&format!("/articles/{id}?draft=true")).await?["article"].take(),
+                None => Value::Null,
+            };
+            articles.insert(&it.external_id, a);
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let v = articles[it.external_id.as_str()][it.field.as_str()].as_str()?;
+                    (!v.trim().is_empty()).then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let t = targets(creds);
+        if t.is_empty() {
+            return vec![Check::warn(
+                "collections",
+                "no locale → collection mapping (settings.collections): Docs has no languages, create one Docs site per language and map a collection of it to each locale",
+                Some("enable_locale"),
+            )];
+        }
+        let known = async {
+            let api = Api::new(creds).await?;
+            anyhow::Ok(
+                api.all("/collections", "collections")
+                    .await?
+                    .iter()
+                    .filter_map(|c| cms::id_str(&c["id"]))
+                    .collect::<Vec<String>>(),
+            )
+        };
+        vec![match known.await {
+            Ok(known) => {
+                let missing: Vec<String> = t
+                    .iter()
+                    .filter(|(_, c)| !known.contains(c))
+                    .map(|(l, c)| format!("{l} → {c}"))
+                    .collect();
+                if missing.is_empty() {
+                    Check::ok(
+                        "collections",
+                        t.keys().cloned().collect::<Vec<_>>().join(", "),
+                    )
+                } else {
+                    Check {
+                        fix: Some("not_found"),
+                        ..Check::fail(
+                            "collections",
+                            format!("collection not found: {}", missing.join(", ")),
+                        )
+                    }
+                }
+            }
+            Err(e) => Check::fail("collections", format!("{e:#}")),
+        }]
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, _body: &[u8], secret: &str) -> bool {

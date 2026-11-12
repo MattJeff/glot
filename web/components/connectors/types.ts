@@ -15,4 +15,10 @@ export type ConnectorDef = {
   fields: ConnectorField[];
   /** Anchor in /docs/integrations. */
   docs: string;
+  /**
+   * One-click connect (OAuth or the platform's own key authorization), offered when the server lists the kind.
+   * `tenant` = what must be known before leaving for the platform: the store domain or the site address
+   * (label: `connectors.tenant.<kind>`).
+   */
+  oneClick?: { tenant?: { placeholder: string } };
 };

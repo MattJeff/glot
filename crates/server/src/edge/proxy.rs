@@ -101,6 +101,25 @@ struct Domain {
     app_action: String,
     #[serde(default)]
     locale_style: String,
+    /// Per advertised locale, the pages complete enough for search engines (`seo_report::page_ready`).
+    #[serde(default)]
+    ready_pages: super::seo_report::ReadyPages,
+    /// Translated URL paths of every locale (empty unless `translated_slugs`), and for this domain's locale
+    /// every slug ever served (current or replaced, kept when the option is switched off) → its source path.
+    #[serde(default)]
+    slugs: seo::Slugs,
+    #[serde(default)]
+    slug_sources: std::collections::BTreeMap<String, String>,
+    /// sha256 of the row as serialized: what `tr_key` hashes (set by [`seal`]).
+    #[serde(skip)]
+    digest: [u8; 32],
+}
+
+/// The domain row ready to be shared: its digest computed once, not per request.
+fn seal(mut d: Domain) -> Arc<Domain> {
+    use sha2::{Digest, Sha256};
+    d.digest = Sha256::digest(serde_json::to_vec(&d).unwrap_or_default()).into();
+    Arc::new(d)
 }
 
 #[derive(Clone)]
@@ -133,6 +152,10 @@ struct Edge {
 
 /// One translation pass's result, reusable for an identical origin body.
 struct Translated {
+    /// Weak validator of the translated body (conditional requests: a crawler re-fetching gets a 304).
+    etag: String,
+    /// The page is complete enough to be advertised to search engines.
+    ready: bool,
     html: axum::body::Bytes,
     total: usize,
     translated: usize,
@@ -192,7 +215,7 @@ fn tr_key(html: &[u8], d: &Domain, path: &str, v: i64) -> [u8; 32] {
     let mut h = Sha256::new();
     h.update(html);
     h.update([0]);
-    h.update(serde_json::to_vec(d).unwrap_or_default());
+    h.update(d.digest);
     h.update([0]);
     h.update(path.as_bytes());
     h.update(v.to_le_bytes());
@@ -305,7 +328,7 @@ impl Edge {
         // A cold lookup may take longer than the glot budget: without the domain there is no origin to serve.
         match tokio::time::timeout(Duration::from_secs(3), load_domain(state, host)).await {
             Ok(Ok(d)) => {
-                let d = d.map(Arc::new);
+                let d = d.map(seal);
                 if let Some(d) = &d {
                     self.save(&format!("domain-{host}"), &**d);
                 }
@@ -319,7 +342,7 @@ impl Edge {
             }
             _ => cached
                 .and_then(|c| c.1)
-                .or_else(|| self.load::<Domain>(&format!("domain-{host}")).map(Arc::new)),
+                .or_else(|| self.load::<Domain>(&format!("domain-{host}")).map(seal)),
         }
     }
 
@@ -484,7 +507,14 @@ async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain
         Ok(Some(p)) => super::sitemap::site(state, &p, true).await.ok(),
         _ => None,
     };
-    let mut bases = site.map(|s| s.bases).unwrap_or_default();
+    let (mut bases, ready_pages, slugs) = site
+        .map(|s| (s.bases, s.ready_pages.unwrap_or_default(), s.slugs))
+        .unwrap_or_default();
+    let slug_sources = super::slugs::load(&state.db, project_id)
+        .await?
+        .sources
+        .remove(&locale)
+        .unwrap_or_default();
     if bases.is_empty() {
         let source_base = Url::parse(&origin_url)
             .map(|u| u.origin().ascii_serialization())
@@ -515,6 +545,10 @@ async fn load_domain(state: &AppState, host: &str) -> sqlx::Result<Option<Domain
         }),
         app_action,
         locale_style: super::app_paths::locale_style(url_pattern.as_deref()),
+        ready_pages,
+        slugs,
+        slug_sources,
+        digest: [0; 32],
     }))
 }
 
@@ -618,6 +652,27 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     let Ok(mut origin) = Url::parse(&d.origin_url) else {
         return plain(StatusCode::BAD_GATEWAY, "bad origin", "origin-error");
     };
+    // Translated slugs: `/precios` is the origin's `/pricing`; the source path and replaced slugs redirect.
+    let navigation = parts.method == Method::GET
+        && parts
+            .headers
+            .get(header::ACCEPT)
+            .and_then(|v| v.to_str().ok())
+            .is_some_and(|a| a.contains("text/html"));
+    let path_q = match slug_route(&d, &path_q, navigation) {
+        SlugRoute::Serve(p) => p,
+        SlugRoute::Redirect(to) => {
+            let mut r = plain(StatusCode::MOVED_PERMANENTLY, "", "slug-redirect");
+            if let Ok(v) = HeaderValue::from_str(&to) {
+                r.headers_mut().insert(header::LOCATION, v);
+            }
+            r.headers_mut().insert(
+                header::CACHE_CONTROL,
+                HeaderValue::from_static("public, max-age=600"),
+            );
+            return r;
+        }
+    };
     let (path, query) = path_q.split_once('?').unwrap_or((&path_q, ""));
     // Application paths (login, account, API…): back to the origin's own domain, or passed through untouched.
     let cookies = parts
@@ -698,9 +753,19 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         && let Some((exp, page)) = e.pages.lock().ok().and_then(|m| m.get(k).cloned())
         && exp > Instant::now()
     {
-        let mut res = Response::builder().status(page.status);
+        let fresh = not_modified(&parts.headers, &page.headers);
+        let mut res = Response::builder().status(if fresh {
+            StatusCode::NOT_MODIFIED
+        } else {
+            page.status
+        });
         *res.headers_mut().expect("builder") = page.headers;
-        let mut res = res.body(Body::from(page.body)).expect("response");
+        let body = if fresh {
+            Body::empty()
+        } else {
+            Body::from(page.body)
+        };
+        let mut res = res.body(body).expect("response");
         finish(&mut res, page.state, t_lookup, Duration::ZERO, Some("hit"));
         count(&state, d.project_id);
         return res;
@@ -799,6 +864,9 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     }
     if mode != "translate" {
         let origin_ms = t_origin.elapsed();
+        if is_html && matches!(mode, "off" | "quota") {
+            source_canonical(&mut headers, &d, &path_q);
+        }
         let mut res = stream(status, headers, resp);
         finish(&mut res, mode, t_lookup, origin_ms, None);
         return res;
@@ -813,10 +881,10 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     // The "empty shell" verdict is kept per path for 10 min (it scans the whole page).
     let t_shell = Instant::now();
     let html = match d.rendering.as_str() {
-        "prerender" => snapshot(&state, &d, &origin, deadline)
+        "prerender" => snapshot(&state, d.project_id, &origin, deadline)
             .await
             .unwrap_or(html),
-        "auto" if is_shell(&host, path, &html) => snapshot(&state, &d, &origin, deadline)
+        "auto" if is_shell(&host, path, &html) => snapshot(&state, d.project_id, &origin, deadline)
             .await
             .unwrap_or(html),
         _ => html,
@@ -834,6 +902,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     let Some(tm) = tm else {
         // glot had no TM within its budget: the origin page, untranslated and never cached under this URL.
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+        source_canonical(&mut headers, &d, &path_q);
         let mut res = (status, headers, html).into_response();
         finish(&mut res, "fail-open", t_lookup, origin_ms, None);
         return res;
@@ -859,6 +928,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
                 Ok(Ok(o)) => o,
                 _ => {
                     headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+                    source_canonical(&mut headers, &d, &path_q);
                     let mut res = (status, headers, html).into_response();
                     finish(
                         &mut res,
@@ -874,6 +944,8 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
                 report(&state, &d, path, out.missing, out.seen);
             }
             let t = Arc::new(Translated {
+                etag: etag(out.html.as_bytes()),
+                ready: out.ready,
                 html: out.html.into(),
                 total: out.total,
                 translated: out.translated,
@@ -887,7 +959,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         }
     };
     let glot_ms = t_lookup + t_tr.elapsed();
-    for (k, v) in seo::headers(&seo_ctx(&d, path, &|_| None)) {
+    for (k, v) in seo::headers(&seo_ctx(&d, path, &|_| None, false)) {
         if let Ok(v) = HeaderValue::from_str(&v) {
             headers.insert(HeaderName::from_static(k), v);
         }
@@ -897,6 +969,16 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     }
     if let Ok(v) = HeaderValue::from_str(&format!("{}/{}", out.translated, out.total)) {
         headers.insert("x-glot-coverage", v);
+    }
+    // `ready`: advertised to search engines (self canonical, hreflang); `pending`: canonical to the source page
+    // (the page is not complete, or its language is not ready as a whole).
+    let advertised = out.ready && d.bases.iter().any(|(l, _)| *l == d.locale);
+    headers.insert(
+        "x-glot-index",
+        HeaderValue::from_static(if advertised { "ready" } else { "pending" }),
+    );
+    if let Ok(v) = HeaderValue::from_str(&out.etag) {
+        headers.insert(header::ETAG, v);
     }
     let st = if out.translated > 0 {
         "translated"
@@ -920,7 +1002,12 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         m.insert(k, (Instant::now() + Duration::from_secs(ttl), page));
     }
     count(&state, d.project_id);
-    let mut res = (status, headers, body).into_response();
+    super::prewarm::kick(&state, d.project_id, &d.slug);
+    let mut res = if not_modified(&parts.headers, &headers) {
+        (StatusCode::NOT_MODIFIED, headers).into_response()
+    } else {
+        (status, headers, body).into_response()
+    };
     let cache = if reused { "hit-body" } else { "miss" };
     finish(&mut res, st, glot_ms, origin_ms, Some(cache));
     res
@@ -1015,6 +1102,81 @@ fn count(state: &AppState, project: Uuid) {
             q.blocked_until = Some(Instant::now() + Duration::from_secs(300));
         }
     });
+}
+
+/// `W/"…"` of a translated body.
+fn etag(body: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+    let hex: String = Sha256::digest(body)
+        .iter()
+        .take(12)
+        .map(|b| format!("{b:02x}"))
+        .collect();
+    format!("W/\"{hex}\"")
+}
+
+/// The client already holds this exact translated page (`If-None-Match` lists the response's `ETag`).
+fn not_modified(req: &HeaderMap, res: &HeaderMap) -> bool {
+    let Some(tag) = res.get(header::ETAG).and_then(|v| v.to_str().ok()) else {
+        return false;
+    };
+    let weak = |t: &str| t.trim().trim_start_matches("W/").to_string();
+    req.get_all(header::IF_NONE_MATCH)
+        .iter()
+        .filter_map(|v| v.to_str().ok())
+        .flat_map(|v| v.split(','))
+        .any(|t| t.trim() == "*" || weak(t) == weak(tag))
+}
+
+/// An untranslated page served on a translated host (fail-open, kill switch, quota) is a duplicate of the
+/// source page: said to crawlers in a `Link: <…>; rel="canonical"` header (the HTML is the origin's, untouched).
+fn source_canonical(h: &mut HeaderMap, d: &Domain, path_q: &str) {
+    let Some((_, base)) = d.bases.iter().find(|(l, _)| *l == d.source_locale) else {
+        return;
+    };
+    if let Ok(v) = HeaderValue::from_str(&format!(
+        "<{}{path_q}>; rel=\"canonical\"",
+        base.trim_end_matches('/')
+    )) {
+        h.append(header::LINK, v);
+    }
+}
+
+enum SlugRoute {
+    /// Path + query to fetch from the origin (source terms).
+    Serve(String),
+    Redirect(String),
+}
+
+/// Where a request path leads once translated slugs are applied. `navigation`: a browser/crawler asking for a
+/// page (only those are redirected from the source path: data requests of the app keep working).
+// ponytail: one map lookup per request; the maps are per domain row, a few thousand entries at most.
+fn slug_route(d: &Domain, path_q: &str, navigation: bool) -> SlugRoute {
+    let (path, query) = path_q.split_once('?').unwrap_or((path_q, ""));
+    let key = if path.len() > 1 {
+        path.trim_end_matches('/')
+    } else {
+        path
+    };
+    let with_query = |p: &str| {
+        if query.is_empty() {
+            p.to_string()
+        } else {
+            format!("{p}?{query}")
+        }
+    };
+    let current = |source: &str| d.slugs.get(&d.locale).and_then(|m| m.get(source));
+    if let Some(source) = d.slug_sources.get(key) {
+        return match current(source) {
+            Some(cur) if cur == key => SlugRoute::Serve(with_query(source)),
+            // A replaced slug, or the option switched off: the page's address today.
+            other => SlugRoute::Redirect(with_query(other.unwrap_or(source))),
+        };
+    }
+    match current(key) {
+        Some(cur) if navigation => SlugRoute::Redirect(with_query(cur)),
+        _ => SlugRoute::Serve(path_q.to_string()),
+    }
 }
 
 fn finish(res: &mut Response, state: &str, glot: Duration, origin: Duration, cache: Option<&str>) {
@@ -1263,9 +1425,14 @@ fn is_shell(host: &str, path: &str, html: &[u8]) -> bool {
 /// The renderer's stored snapshot of `url` (`GLOT_RENDERER_URL`), within the glot budget; None = use the origin.
 /// Snapshots imported from the customer's CI (`edge::snapshots`) come first: no browser needed on this server.
 // ponytail: one primary-key read per SPA request; cache it in memory if SPA traffic makes it show in Server-Timing.
-async fn snapshot(state: &AppState, d: &Domain, url: &Url, deadline: Instant) -> Option<Vec<u8>> {
+pub(super) async fn snapshot(
+    state: &AppState,
+    project_id: Uuid,
+    url: &Url,
+    deadline: Instant,
+) -> Option<Vec<u8>> {
     let left = deadline.saturating_duration_since(Instant::now());
-    let ci = super::snapshots::imported(&state.db, d.project_id, url.path());
+    let ci = super::snapshots::imported(&state.db, project_id, url.path());
     if let Ok(Some(html)) = tokio::time::timeout(left, ci).await {
         return Some(html);
     }
@@ -1296,19 +1463,38 @@ async fn snapshot(state: &AppState, d: &Domain, url: &Url, deadline: Instant) ->
 
 struct Out {
     html: String,
+    ready: bool,
     total: usize,
     translated: usize,
     missing: Vec<missing::Item>,
     seen: Vec<missing::Seen>,
 }
 
-fn seo_ctx<'a>(d: &Domain, path: &str, tr: &'a dyn Fn(&str) -> Option<String>) -> SeoCtx<'a> {
+/// `ready`: this response's own page is complete (decided on what was just translated, not on a report).
+fn seo_ctx<'a>(
+    d: &'a Domain,
+    path: &str,
+    tr: &'a dyn Fn(&str) -> Option<String>,
+    ready: bool,
+) -> SeoCtx<'a> {
+    let page = ctm::path_only(path);
+    let mut page_locales: Vec<String> = d
+        .ready_pages
+        .iter()
+        .filter(|(l, pages)| **l != d.locale && !path.contains('?') && pages.contains(&page))
+        .map(|(l, _)| l.clone())
+        .collect();
+    if ready {
+        page_locales.push(d.locale.clone());
+    }
     SeoCtx {
         source_locale: d.source_locale.clone(),
         locale: d.locale.clone(),
         bases: d.bases.clone(),
         path: path.to_string(),
         tr,
+        page_locales: Some(page_locales),
+        slugs: Some(&d.slugs),
     }
 }
 
@@ -1351,16 +1537,34 @@ fn translate(html: &str, d: &Domain, tm: &Tm, path: &str) -> Out {
             }
         }
     });
+    // JSON-LD texts: through the TM; a sentence it does not know yet (a FAQ answer that is not in the page body)
+    // is discovered like a segment, role `text`.
+    let ld_missing = std::cell::RefCell::new(Vec::new());
     let tr = |text: &str| {
         let n = ctm::normalize(text);
-        tm.lookup(
-            &ctm::text_hash(&d.source_locale, &n),
-            &format!("text|{template}"),
-        )
-        .map(String::from)
+        let hash = ctm::text_hash(&d.source_locale, &n);
+        let v = tm
+            .lookup(&hash, &format!("text|{template}"))
+            .map(String::from);
+        if v.is_none() && seo::jsonld_sentence(&n) {
+            ld_missing.borrow_mut().push(missing::Item {
+                hash,
+                text: n,
+                url: path.to_string(),
+                role: "text".into(),
+            });
+        }
+        v
     };
     let out = hydration::translate_payloads(&out, &|src: &str| payload.get(src).cloned()).0;
-    let html = seo::rewrite(&out, &seo_ctx(d, path, &tr));
+    // Advertised only once complete: `missing` holds the segments glot may translate and has not yet.
+    let ready = super::seo_report::page_ready(
+        total,
+        missing.len(),
+        missing.iter().any(|m| m.role == "title"),
+    );
+    let html = seo::rewrite(&out, &seo_ctx(d, path, &tr, ready));
+    missing.extend(ld_missing.into_inner());
     // Page version for the client patcher (it ignores an older TM), then the patcher itself: same-origin URLs
     // (served by `own_route`), so the origin's CSP `script-src 'self'` allows it.
     let html = hydration::inject_head(
@@ -1375,6 +1579,7 @@ fn translate(html: &str, d: &Domain, tm: &Tm, path: &str) -> Out {
     );
     Out {
         html,
+        ready,
         total,
         translated,
         missing,

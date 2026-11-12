@@ -333,6 +333,13 @@ async fn verify(
     .await?;
     if ok {
         caddy_sync_bg(&state);
+        // The site is read before its first visitor (no-op when a run is under way or less than a day old).
+        if let Ok(s) = super::discover::Settings::load(&state.db, p.id).await
+            && s.enabled
+            && s.prewarm
+        {
+            let _ = super::prewarm::start(&state, &p, false).await;
+        }
     }
     Ok(Json(out(d)))
 }

@@ -11,6 +11,17 @@
 //! known localization, else `POST /api/{plural}/{id}/localizations`. Components and dynamic zones are not
 //! translated. Webhooks: a header `Authorization: Bearer <secret>` set on the Strapi webhook, an
 //! `X-Webhook-Signature` HMAC of `<X-Webhook-Timestamp>.<body>`, or the dashboard URL with its token.
+//!
+//! Read back (`current`): v5 `GET /api/{plural}/{documentId}?locale=xx&status=draft` (the draft always holds
+//! the last write), v4 `GET /api/{plural}/{localization id}`; an entry answered in another locale, or `404`,
+//! is "no translation". `remove` is not implemented: Strapi only deletes a whole locale version
+//! (`DELETE …?locale=xx`), which may hold fields glot did not write. Diagnosis (`doctor`): a second locale
+//! exists, the content-type-builder is readable, Internationalization is enabled on content types and on
+//! text fields, and the token can `find` each translated type. The REST API cannot tell the token type
+//! (full access / custom) nor its update permission: a refused write shows as a failed push.
+//!
+//! Docs: https://docs.strapi.io/cms/api/rest/locale, https://docs.strapi.io/cms/api/rest/status,
+//! https://docs.strapi.io/cms/features/internationalization
 use async_trait::async_trait;
 use axum::http::HeaderMap;
 use serde_json::{Map, Value, json};
@@ -18,7 +29,8 @@ use std::collections::BTreeMap;
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Strapi;
@@ -401,6 +413,105 @@ impl Connector for Strapi {
         Ok(report)
     }
 
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        let mut entries: BTreeMap<&str, Option<Value>> = BTreeMap::new();
+        for it in items {
+            if !entries.contains_key(it.external_id.as_str()) {
+                entries.insert(&it.external_id, read_entry(&api, &it.meta, locale).await?);
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let attrs = entries.get(it.external_id.as_str())?.as_ref()?;
+                    super::contentful::read_back(&attrs[it.field.as_str()], &it.format)
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("i18n_plugin", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        match api.locales().await {
+            Ok((def, codes)) if codes.len() < 2 => out.push(Check::warn(
+                "locales",
+                format!("only {def} exists: add the target locales (Settings → Internationalization)"),
+                Some("enable_locale"),
+            )),
+            Ok((_, codes)) => out.push(Check::ok("locales", codes.join(", "))),
+            Err(e) => out.push(Check::warn(
+                "i18n_plugin",
+                format!("i18n locales not readable ({e:#}): enable the Internationalization plugin and give the token read access to it"),
+                Some("install_plugin"),
+            )),
+        }
+        if let Err(e) = api.get("/api/content-type-builder/content-types").await {
+            out.push(Check::warn(
+                "schema",
+                format!("the token cannot read the content-type-builder ({e:#}): localized types and fields are not detected, set content_types"),
+                Some("permissions"),
+            ));
+        }
+        let found = match types(&api, creds).await {
+            Ok(t) => t,
+            Err(e) => {
+                out.push(Check::fail("content_types", format!("{e:#}")));
+                return out;
+            }
+        };
+        if found.is_empty() {
+            out.push(Check::warn(
+                "i18n_plugin",
+                "no content type has Internationalization enabled (Content-Type Builder → the type → Advanced settings)",
+                Some("enable_locale"),
+            ));
+        }
+        for t in &found {
+            if t.fields.as_ref().is_some_and(Vec::is_empty) {
+                out.push(Check::warn(
+                    "localized_fields",
+                    format!("{}: no text field is localized (enable localization on the fields to translate)", t.api),
+                    Some("enable_locale"),
+                ));
+            }
+            let path = if t.single {
+                format!("/api/{}", t.api)
+            } else {
+                format!("/api/{}?pagination[pageSize]=1", t.api)
+            };
+            match api.get(&path).await {
+                // A single type without content yet.
+                Err(e) if t.single && e.to_string().starts_with("HTTP 404") => {}
+                Err(e) => out.push(Check {
+                    fix: Some("permissions"),
+                    ..Check::fail(
+                        "permissions",
+                        format!("the token cannot read {} ({e:#}): give it find, findOne and update on this type", t.api),
+                    )
+                }),
+                Ok(_) => {}
+            }
+        }
+        if out.iter().all(|c| c.id != "permissions") && !found.is_empty() {
+            out.push(Check::ok(
+                "permissions",
+                format!("{} content type(s) readable", found.len()),
+            ));
+        }
+        out
+    }
+
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {
         if cms::shared_secret_ok(headers, secret) {
             return true;
@@ -427,16 +538,8 @@ fn urlencode(s: &str) -> String {
         .collect()
 }
 
-async fn push_entry(
-    api: &Api,
-    meta: &Value,
-    locale: &str,
-    data: Map<String, Value>,
-    publish: bool,
-) -> anyhow::Result<()> {
-    let t = meta["api"].as_str().unwrap_or_default();
-    let single = meta["single"] == true;
-    let loc = urlencode(locale);
+/// (API id, single type, entry id) of an item's meta.
+fn entry_ref(meta: &Value) -> anyhow::Result<(&str, bool, String)> {
     let id = match &meta["id"] {
         Value::String(s) => s.clone(),
         v => v.to_string(),
@@ -445,6 +548,63 @@ async fn push_entry(
         id.chars().all(|c| c.is_ascii_alphanumeric()),
         "invalid entry id"
     );
+    Ok((
+        meta["api"].as_str().unwrap_or_default(),
+        meta["single"] == true,
+        id,
+    ))
+}
+
+/// Attributes of the `locale` version of an entry, `None` when it does not exist.
+async fn read_entry(api: &Api, meta: &Value, locale: &str) -> anyhow::Result<Option<Value>> {
+    let (t, single, id) = entry_ref(meta)?;
+    let loc = urlencode(locale);
+    let v5 = meta["v"] == 5;
+    let path = if v5 && single {
+        format!("/api/{t}?locale={loc}&status=draft")
+    } else if v5 {
+        format!("/api/{t}/{id}?locale={loc}&status=draft")
+    } else if single {
+        format!("/api/{t}?locale={loc}")
+    } else {
+        // v4: the localization known from the last pull, else looked up on the source entry.
+        let lid = match meta["loc"].get(locale) {
+            Some(l) => l.clone(),
+            None => {
+                let src = api
+                    .get(&format!("/api/{t}/{id}?populate=localizations"))
+                    .await?;
+                let found = src["data"]["attributes"]
+                    .as_object()
+                    .map(localizations)
+                    .unwrap_or_default();
+                match found.get(locale) {
+                    Some(l) => l.clone(),
+                    None => return Ok(None),
+                }
+            }
+        };
+        format!("/api/{t}/{}", lid.as_u64().unwrap_or(0))
+    };
+    let res = match api.get(&path).await {
+        Err(e) if e.to_string().starts_with("HTTP 404") => return Ok(None),
+        r => r?,
+    };
+    let data = &res["data"];
+    let attrs = if v5 { data } else { &data["attributes"] };
+    // Answered in another locale: not a translation.
+    Ok((attrs["locale"].as_str() == Some(locale)).then(|| attrs.clone()))
+}
+
+async fn push_entry(
+    api: &Api,
+    meta: &Value,
+    locale: &str,
+    data: Map<String, Value>,
+    publish: bool,
+) -> anyhow::Result<()> {
+    let (t, single, id) = entry_ref(meta)?;
+    let loc = urlencode(locale);
     if meta["v"] == 5 {
         let status = if publish { "" } else { "&status=draft" };
         let path = if single {

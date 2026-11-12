@@ -4,6 +4,10 @@
 //! `glot localize --yes --no-install` (never the repo's own code: no package manager, no scripts), syncs the catalogs
 //! into the project (same logic as `sync push`), pushes `glot/localize` and opens a PR. Pushes on the linked branch
 //! (webhook) queue a `github_update` job that refreshes the single open glot PR (or opens `glot/update`).
+//! A refresh starts from the PR branch's previous output (`glot localize --carry-from`): unchanged strings cost
+//! nothing and produce no diff, an identical tree is not pushed. The branch is rebuilt on the latest base (so it
+//! never conflicts with it) and commits people pushed to it are replayed on top; one that no longer applies stops
+//! the run before any push (`pr_conflict`). Failures are classified ([`diagnose`]) for the dashboard.
 //! Secrets (private key, webhook secret, client secret) are encrypted with GLOT_SECRET_KEY; installation tokens live
 //! in memory for one job and only reach git through an env-provided header (never argv, never logs).
 use axum::{
@@ -494,6 +498,116 @@ struct Status {
     installations: Vec<Installation>,
     link: Option<LinkRow>,
     job: Option<Job>,
+    /// Class of the last failure ([`diagnose`]): the dashboard shows a cause and a fix per class.
+    failure: Option<&'static str>,
+}
+
+/// Why a run failed, from its error text: one class per thing the user can act on. The dashboard
+/// (`github.failure.<class>` messages) explains the cause and links to the fix; the raw text stays
+/// available, folded.
+pub(crate) fn diagnose(error: &str) -> &'static str {
+    let e = error.to_lowercase();
+    let has = |xs: &[&str]| xs.iter().any(|x| e.contains(x));
+    if has(&["human commit", "pr_conflict"]) {
+        "pr_conflict"
+    } else if has(&["source_mismatch"]) {
+        "source_mismatch"
+    } else if has(&["mock_output"]) {
+        "mock_output"
+    } else if has(&[
+        "add your llm api key",
+        "cannot decrypt the project api key",
+        "missing_key",
+        "api key is not set",
+        "no api key",
+    ]) {
+        "ai_key_missing"
+    } else if has(&["workspace"])
+        && has(&[
+            "sk-ant",
+            "anthropic",
+            "wrkspc",
+            "workspace id",
+            "workspace_id",
+        ])
+    {
+        "ai_workspace"
+    } else if has(&[
+        "http 401",
+        "http 403",
+        "invalid x-api-key",
+        "invalid_api_key",
+        "invalid api key",
+        "incorrect api key",
+        "authentication_error",
+        "permission_error",
+    ]) {
+        "ai_key_invalid"
+    } else if has(&[
+        "http 429",
+        "rate_limit",
+        "rate limit",
+        "credit balance",
+        "insufficient_quota",
+        "billing",
+        "budget of",
+        "over budget",
+        "budget exceeded",
+    ]) {
+        "ai_quota"
+    } else if has(&["http 5", "overloaded"]) {
+        "ai_unavailable"
+    } else if has(&["repository larger than"]) {
+        "repo_too_large"
+    } else if has(&["timed out after"]) {
+        "timeout"
+    } else if has(&[
+        "remote branch",
+        "couldn't find remote ref",
+        "invalid repository or branch",
+    ]) {
+        "branch_missing"
+    } else if has(&["no longer linked"]) {
+        "unlinked"
+    } else if has(&[
+        "glot.toml",
+        "points outside the repository",
+        "toml parse",
+        "invalid type",
+        "unknown variant",
+    ]) {
+        "config_invalid"
+    } else if has(&[
+        "cannot detect the framework",
+        "own i18n runtime",
+        "no .rs files",
+        "no source files",
+        "nothing to localize",
+        "not supported",
+        "unsupported",
+    ]) {
+        "no_framework"
+    } else if has(&[
+        "git push failed",
+        "protected branch",
+        "github 422",
+        "resource not accessible",
+    ]) {
+        "push_rejected"
+    } else if has(&[
+        "git clone failed",
+        "git fetch failed",
+        "repository not found",
+        "github 404",
+        "github 403",
+        "github 401",
+        "could not read from remote",
+        "installation",
+    ]) {
+        "repo_access"
+    } else {
+        "unknown"
+    }
 }
 
 async fn status(
@@ -503,11 +617,16 @@ async fn status(
 ) -> ApiResult<Json<Status>> {
     let p = projects::load(&state, user.id, &slug, Role::Translator).await?;
     let app = load_app(&state).await?;
+    let job = latest_job(&state, p.id).await?;
     Ok(Json(Status {
         app: app.map(|a| json!({ "slug": a.slug, "html_url": a.html_url })),
         installations: user_installations(&state, user.id).await?,
         link: load_link(&state, p.id).await?,
-        job: latest_job(&state, p.id).await?,
+        failure: job
+            .as_ref()
+            .filter(|j| j.status == "failed")
+            .map(|j| diagnose(j.error.as_deref().unwrap_or_default())),
+        job,
     }))
 }
 
@@ -1273,6 +1392,12 @@ struct Done {
     check_ok: bool,
     warnings: Vec<String>,
     log: String,
+    /// What `glot translate` planned and spent (its `Plan:` and `Cost:` lines), for the PR.
+    plan: Option<String>,
+    cost: Option<String>,
+    /// `glot i18nize` report (`GLOT_REPORT`): strings left with a suggestion, files restored after
+    /// a failed verification. `Null` when the step did not run.
+    report: Value,
 }
 
 /// `glot init` (new repos) + `glot localize --yes --no-install` with the project's LLM key in env, nothing else.
@@ -1281,6 +1406,7 @@ async fn localize(
     home: &Path,
     p: &ProjectRow,
     api_key: Option<String>,
+    carry: Option<&Path>,
 ) -> anyhow::Result<Done> {
     let bin = env_or("GLOT_BIN", "glot");
     let mem_kb = num_env("GLOT_GITHUB_MEM_MB", 1024) * 1024;
@@ -1289,6 +1415,11 @@ async fn localize(
         ("HOME".into(), home.display().to_string()),
         ("NO_COLOR".into(), "1".into()),
         ("GLOT_BIN_PATH".into(), bin.clone()),
+        // Outside the clone: never committed.
+        (
+            "GLOT_REPORT".into(),
+            home.join("report.json").display().to_string(),
+        ),
     ];
     let key = api_key
         .map(|k| glot_llm::provider::clean_key(&k))
@@ -1316,6 +1447,19 @@ async fn localize(
         }
     }
     let provider = p.llm.0.provider.clone();
+    // The project's LLM settings win over the repository's `[llm]` in every glot of this run
+    // (`forced_llm` in the CLI): a committed `provider = "mock"` never ships fake translations.
+    env.push(("GLOT_LLM_PROVIDER".into(), provider.clone()));
+    for (var, v) in [
+        ("GLOT_LLM_MODEL", Some(&p.llm.0.model)),
+        ("GLOT_LLM_BASE_URL", p.llm.0.base_url.as_ref()),
+        ("GLOT_LLM_FALLBACK_MODEL", p.llm.0.fallback_model.as_ref()),
+        ("GLOT_LLM_JUDGE_MODEL", p.llm.0.judge_model.as_ref()),
+    ] {
+        if let Some(v) = v.filter(|v| !v.trim().is_empty()) {
+            env.push((var.into(), v.clone()));
+        }
+    }
     // ulimit caps address space and CPU time of glot and its children; tolerated where unsupported (macOS dev).
     let sh = format!(
         "ulimit -v {mem_kb} 2>/dev/null; ulimit -t {} 2>/dev/null; exec \"$GLOT_BIN_PATH\" \"$@\" 2>&1",
@@ -1353,8 +1497,10 @@ async fn localize(
         check_config(dir)?;
     }
     let mut args = vec!["-c", &sh, "glot", "localize", "--yes", "--no-install"];
-    if fresh || provider == "mock" {
-        args.extend(["--provider", &provider]);
+    args.extend(["--provider", &provider]);
+    let carry = carry.map(|c| c.display().to_string());
+    if let Some(c) = &carry {
+        args.extend(["--carry-from", c]);
     }
     let (code, out) = exec("sh", &args, dir, &env, timeout, &[&key]).await?;
     log.push_str(&out);
@@ -1373,7 +1519,20 @@ async fn localize(
             .filter_map(|l| l.trim().strip_prefix("warning: "))
             .map(String::from)
             .collect(),
+        plan: out
+            .lines()
+            .find_map(|l| l.trim().strip_prefix("Plan: "))
+            .map(|s| s.trim().to_string()),
+        cost: out
+            .lines()
+            .rev()
+            .find_map(|l| l.trim().strip_prefix("Cost: "))
+            .map(|s| s.trim().to_string()),
         log,
+        report: std::fs::read_to_string(home.join("report.json"))
+            .ok()
+            .and_then(|t| serde_json::from_str(&t).ok())
+            .unwrap_or(Value::Null),
     })
 }
 
@@ -1476,19 +1635,97 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         .to_string();
     step(state, job, 2).await;
 
+    // The open glot PR, if any: its branch is the previous output this run starts from.
+    let api = format!("{}/repos/{}", api_base(), link.repo);
+    let open_pr = match (link.pr_number, &link.pr_branch) {
+        (Some(n), Some(b)) => {
+            let v = gh(
+                &token,
+                reqwest::Method::GET,
+                &format!("{api}/pulls/{n}"),
+                None,
+            )
+            .await;
+            match v {
+                Ok(v) => (v["state"] == "open").then(|| (n, b.clone())),
+                // The recorded PR is gone (repo recreated or transferred): open a new one.
+                Err(e) if e.to_string().starts_with("GitHub 404") => None,
+                Err(e) => return Err(e),
+            }
+        }
+        _ => None,
+    };
+    let branch = match &open_pr {
+        Some((_, b)) => b.clone(),
+        None if job.kind == "github_update" => "glot/update".into(),
+        None => "glot/localize".into(),
+    };
+    anyhow::ensure!(valid_branch(&branch), "invalid pull request branch");
+
     // glot localize (glot.toml checked before and after: it decides which files glot reads).
     // Monorepo without a root glot.toml: the shallowest configured app (e.g. `web/`).
     let app_root = app_dir(&dir);
     check_config(&app_root)?;
+    // The repository's glot.toml says which language the code is written in: a project rooted on
+    // another one would store translations as the source (and translate from them).
+    if let Ok(c) = glot_core::config::Config::load(&app_root)
+        && c.source_locale != p.source_locale
+    {
+        anyhow::bail!(
+            "source_mismatch: repo={} project={}: the repository's glot.toml declares `source_locale = \"{}\"` but this glot project's source is `{}`",
+            c.source_locale,
+            p.source_locale,
+            c.source_locale,
+            p.source_locale
+        );
+    }
+    let app_rel = app_root
+        .strip_prefix(&dir)
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    // Previous output (PR branch): unchanged strings then cost nothing and produce no diff.
+    let prev = match &open_pr {
+        Some((_, b)) => previous_output(&dir, &home, &token, b, &app_rel, &root.0, t).await,
+        None => None,
+    };
     let keys_before = glot_llm::engine::Workspace::open(&app_root)
         .map(|ws| ws.source().entries.len())
         .unwrap_or(0);
-    let done = localize(&app_root, &home, &p, api_key).await?;
+    let done = localize(
+        &app_root,
+        &home,
+        &p,
+        api_key,
+        prev.as_ref().map(|(dir, _)| dir.as_path()),
+    )
+    .await?;
     check_config(&app_root)?;
+    // `Cost: $0.0123 …`: shown on the run in the dashboard.
+    if let Some(usd) = done
+        .cost
+        .as_deref()
+        .and_then(|c| c.split('$').nth(1))
+        .and_then(|c| {
+            c.split(|ch: char| !(ch.is_ascii_digit() || ch == '.'))
+                .next()?
+                .parse::<f64>()
+                .ok()
+        })
+    {
+        job.cost_usd = usd;
+    }
     step(state, job, 3).await;
 
     // Sync into the project: same rules as `glot push` (reviewed/human translations on the server win).
     let ws = glot_llm::engine::Workspace::open(&app_root).map_err(|e| anyhow::anyhow!("{e}"))?;
+    // Last gate before anything leaves this machine (server sync, branch, PR): no fake value.
+    if p.llm.0.provider != "mock"
+        && let Some((loc, key, n)) = mock_values(&ws)
+    {
+        anyhow::bail!(
+            "mock_output: {n} value(s) are placeholder translations (`⟦{loc}⟧ …`, e.g. `{loc}` `{key}`): nothing was synced or pushed"
+        );
+    }
     let locales: Vec<&String> = std::iter::once(&p.source_locale)
         .chain(&p.target_locales)
         .collect();
@@ -1516,30 +1753,6 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     step(state, job, 4).await;
 
     // Commit on the glot branch (workflow files excluded: the app has no `workflows` permission).
-    let open_pr = match (link.pr_number, &link.pr_branch) {
-        (Some(n), Some(b)) => {
-            let token = &token;
-            let v = gh(
-                token,
-                reqwest::Method::GET,
-                &format!("{}/repos/{}/pulls/{n}", api_base(), link.repo),
-                None,
-            )
-            .await;
-            match v {
-                Ok(v) => (v["state"] == "open").then(|| (n, b.clone())),
-                // The recorded PR is gone (repo recreated or transferred): open a new one.
-                Err(e) if e.to_string().starts_with("GitHub 404") => None,
-                Err(e) => return Err(e),
-            }
-        }
-        _ => None,
-    };
-    let branch = match &open_pr {
-        Some((_, b)) => b.clone(),
-        None if job.kind == "github_update" => "glot/update".into(),
-        None => "glot/localize".into(),
-    };
     git(&dir, &home, &token, &["checkout", "-q", "-B", &branch], t).await?;
     git(
         &dir,
@@ -1550,19 +1763,22 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     )
     .await?;
     let stat = git(&dir, &home, &token, &["diff", "--cached", "--stat=100"], t).await?;
-    if stat.trim().is_empty() {
+    let seen = || {
         sqlx::query(
             "UPDATE github_links SET last_sha = $2, updated_at = now() WHERE project_id = $1",
         )
         .bind(p.id)
         .bind(&base_sha)
         .execute(&state.db)
-        .await?;
+    };
+    if stat.trim().is_empty() && open_pr.is_none() {
+        seen().await?;
         step(state, job, STEPS).await;
         return Ok(()); // already localized: nothing to propose.
     }
     let bot = format!("{}[bot]", app.slug);
     let email = format!("{}+{bot}@users.noreply.github.com", app.app_id);
+    let (name_cfg, email_cfg) = (format!("user.name={bot}"), format!("user.email={email}"));
     let title = if job.kind == "github_update" {
         format!(
             "glot: update translations ({})",
@@ -1571,24 +1787,129 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     } else {
         format!("glot: localize this app ({})", p.target_locales.join(", "))
     };
-    git(
-        &dir,
-        &home,
-        &token,
-        &[
-            "-c",
-            &format!("user.name={bot}"),
-            "-c",
-            &format!("user.email={email}"),
-            "commit",
-            "-q",
-            "--no-verify",
-            "-m",
-            &title,
-        ],
-        t,
-    )
-    .await?;
+    if !stat.trim().is_empty() {
+        git(
+            &dir,
+            &home,
+            &token,
+            &[
+                "-c",
+                &name_cfg,
+                "-c",
+                &email_cfg,
+                "commit",
+                "-q",
+                "--no-verify",
+                "-m",
+                &title,
+            ],
+            t,
+        )
+        .await?;
+    }
+    // Commits people pushed to the glot branch are never dropped: the branch is rebuilt on the
+    // latest base (so it never conflicts with it), then their commits are replayed on top, with
+    // their authorship. One that no longer applies stops the run before anything is pushed.
+    if let Some((n, _)) = &open_pr {
+        let commits = gh(
+            &token,
+            reqwest::Method::GET,
+            &format!("{api}/pulls/{n}/commits?per_page=100"),
+            None,
+        )
+        .await?;
+        for c in human_commits(&commits, &bot, &email) {
+            let picked = async {
+                git(
+                    &dir,
+                    &home,
+                    &token,
+                    &["fetch", "-q", "--depth", "2", "origin", &c],
+                    t,
+                )
+                .await?;
+                git(
+                    &dir,
+                    &home,
+                    &token,
+                    &[
+                        "-c",
+                        &name_cfg,
+                        "-c",
+                        &email_cfg,
+                        "cherry-pick",
+                        "--allow-empty",
+                        "--keep-redundant-commits",
+                        &c,
+                    ],
+                    t,
+                )
+                .await
+            }
+            .await;
+            if let Err(e) = picked {
+                let short = &c[..c.len().min(7)];
+                let note = format!(
+                    "{STICKY}\n**glot** did not update this pull request for `{}`: commit {short}, pushed to `{branch}` by a person, no longer applies on top of the latest `{}`.\n\nNothing was overwritten. Either merge `{}` into `{branch}` and fix the conflict, or close this pull request: glot opens a fresh one on the next push.",
+                    &base_sha[..base_sha.len().min(7)],
+                    link.branch,
+                    link.branch
+                );
+                let _ = sticky_comment(&token, &api, *n, &note).await;
+                anyhow::bail!(
+                    "pr_conflict: human commit {short} on {branch} does not apply on the latest {} ({})",
+                    link.branch,
+                    tail(&e.to_string(), 2)
+                );
+            }
+        }
+    }
+    // Same tree as the branch already holds: the PR is up to date, no push, no notification.
+    let unchanged = match &prev {
+        Some((_, head)) => {
+            let old = git(
+                &dir,
+                &home,
+                &token,
+                &["rev-parse", &format!("{head}^{{tree}}")],
+                t,
+            )
+            .await
+            .ok();
+            let new = git(&dir, &home, &token, &["rev-parse", "HEAD^{tree}"], t)
+                .await
+                .ok();
+            old.is_some() && old == new
+        }
+        None => false,
+    };
+    let head_is_base = git(&dir, &home, &token, &["rev-parse", "HEAD"], t)
+        .await?
+        .trim()
+        == base_sha;
+    if unchanged {
+        seen().await?;
+        step(state, job, STEPS).await;
+        return Ok(());
+    }
+    if head_is_base {
+        // Everything the PR proposed is now on the base branch: nothing left to propose.
+        if let Some((n, _)) = &open_pr {
+            let note = format!(
+                "{STICKY}\n**glot**: `{}` now contains everything this pull request proposed. It can be closed.",
+                link.branch
+            );
+            let _ = sticky_comment(&token, &api, *n, &note).await;
+        }
+        seen().await?;
+        step(state, job, STEPS).await;
+        return Ok(());
+    }
+    // Never overwrite a push that landed while this run was working.
+    let lease = match &prev {
+        Some((_, head)) => format!("--force-with-lease=refs/heads/{branch}:{head}"),
+        None => "--force".into(),
+    };
     git(
         &dir,
         &home,
@@ -1596,7 +1917,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         &[
             "push",
             "-q",
-            "--force",
+            &lease,
             "origin",
             &format!("HEAD:refs/heads/{branch}"),
         ],
@@ -1606,6 +1927,25 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     step(state, job, 5).await;
 
     // One open glot PR at a time: update it, else find one GitHub already has for the branch, else open it.
+    let stat = git(
+        &dir,
+        &home,
+        &token,
+        &["diff", "--stat=100", &base_sha, "HEAD"],
+        t,
+    )
+    .await
+    .unwrap_or(stat);
+    let blob = format!(
+        "{}/{}/blob/{branch}/{}",
+        web_base(),
+        link.repo,
+        if app_rel.is_empty() {
+            String::new()
+        } else {
+            format!("{app_rel}/")
+        }
+    );
     let body = pr_body(
         &p,
         &link,
@@ -1615,8 +1955,8 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         &pushed,
         &done,
         &stat,
+        &blob,
     );
-    let api = format!("{}/repos/{}", api_base(), link.repo);
     let owner = link.repo.split('/').next().unwrap_or("");
     let existing = match open_pr {
         Some((n, _)) => Some(n),
@@ -1642,11 +1982,12 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
                     Some(json!({ "title": title, "body": body })),
                 )
                 .await?;
-                gh(
+                // One status comment, edited in place: a push does not add a notification each time.
+                sticky_comment(
                     &token,
-                    reqwest::Method::POST,
-                    &format!("{api}/issues/{n}/comments"),
-                    Some(json!({ "body": status_comment(&base_sha, &status, &pushed, &done) })),
+                    &api,
+                    n,
+                    &status_comment(&base_sha, &status, &pushed, &done),
                 )
                 .await?;
                 pr
@@ -1671,6 +2012,182 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     .await?;
     step(state, job, STEPS).await;
     Ok(())
+}
+
+/// Values written by the offline mock provider (`⟦fr⟧ Text`, `mock::fake_translate`), in any
+/// catalog, the source included: (locale, a key, count).
+fn mock_values(ws: &glot_llm::engine::Workspace) -> Option<(String, String, usize)> {
+    let mut first = None;
+    let mut n = 0;
+    for (loc, cat) in &ws.catalogs {
+        for (key, v) in &cat.entries {
+            if has_mock_marker(v) {
+                n += 1;
+                first.get_or_insert_with(|| (loc.clone(), key.clone()));
+            }
+        }
+    }
+    first.map(|(l, k)| (l, k, n))
+}
+
+/// `⟦xx⟧` / `⟦pt-BR⟧`: the mock provider's marker.
+pub(crate) fn has_mock_marker(v: &str) -> bool {
+    v.match_indices('⟦').any(|(i, _)| {
+        let rest = &v[i + '⟦'.len_utf8()..];
+        rest.find('⟧').is_some_and(|e| {
+            let l = &rest[..e];
+            (2..=12).contains(&l.len())
+                && l.bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+        })
+    })
+}
+
+/// Marker of the single status comment glot keeps on its pull request.
+const STICKY: &str = "<!-- glot:status -->";
+
+/// Create the status comment, or edit the one already there.
+async fn sticky_comment(token: &str, api: &str, pr: i32, body: &str) -> anyhow::Result<()> {
+    let list = gh(
+        token,
+        reqwest::Method::GET,
+        &format!("{api}/issues/{pr}/comments?per_page=100"),
+        None,
+    )
+    .await?;
+    let mine = list.as_array().and_then(|a| {
+        a.iter()
+            .find(|c| c["body"].as_str().is_some_and(|b| b.contains(STICKY)))
+            .and_then(|c| c["id"].as_i64())
+    });
+    let (method, url) = match mine {
+        Some(id) => (
+            reqwest::Method::PATCH,
+            format!("{api}/issues/comments/{id}"),
+        ),
+        None => (reqwest::Method::POST, format!("{api}/issues/{pr}/comments")),
+    };
+    gh(token, method, &url, Some(json!({ "body": body }))).await?;
+    Ok(())
+}
+
+/// SHAs (oldest first) of the PR commits a person made: not authored by the app, not a merge
+/// (a merge of the base brings nothing once the branch is rebuilt on the latest base).
+fn human_commits(commits: &Value, bot: &str, bot_email: &str) -> Vec<String> {
+    commits
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|c| {
+            c["author"]["login"].as_str() != Some(bot)
+                && c["commit"]["author"]["email"].as_str() != Some(bot_email)
+                && c["commit"]["author"]["name"].as_str() != Some(bot)
+                && c["parents"].as_array().is_none_or(|p| p.len() < 2)
+        })
+        .filter_map(|c| c["sha"].as_str())
+        .filter(|s| s.len() >= 7 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        .map(String::from)
+        .collect()
+}
+
+/// Directory prefix (or exact path) a catalog pattern can match: `messages/{locale}.json` =>
+/// `messages/`, `web/src/i18n.rs` => itself.
+fn pattern_prefix(pattern: &str) -> &str {
+    match pattern.find(['{', '*', '?', '[']) {
+        Some(i) => pattern[..i].rfind('/').map_or("", |k| &pattern[..=k]),
+        None => pattern,
+    }
+}
+
+/// The glot files of the PR branch (config, lock, glossary, catalogs) written to a scratch
+/// directory, with the branch head. `None`: no such branch or nothing readable (a full run then).
+async fn previous_output(
+    dir: &Path,
+    home: &Path,
+    token: &str,
+    branch: &str,
+    app_rel: &str,
+    scratch: &Path,
+    t: Duration,
+) -> Option<(PathBuf, String)> {
+    let remote = format!("refs/remotes/origin/{branch}");
+    git(
+        dir,
+        home,
+        token,
+        &[
+            "fetch",
+            "-q",
+            "--depth",
+            "1",
+            "origin",
+            &format!("+refs/heads/{branch}:{remote}"),
+        ],
+        t,
+    )
+    .await
+    .ok()?;
+    let head = git(dir, home, token, &["rev-parse", &remote], t)
+        .await
+        .ok()?
+        .trim()
+        .to_string();
+    let rel = |p: &str| {
+        if app_rel.is_empty() {
+            p.to_string()
+        } else {
+            format!("{app_rel}/{p}")
+        }
+    };
+    let out = scratch.join("prev");
+    let show = |path: String| {
+        let (out, head) = (out.clone(), head.clone());
+        async move {
+            let text = git(dir, home, token, &["show", &format!("{head}:{path}")], t)
+                .await
+                .ok()?;
+            let dest = out.join(&path);
+            std::fs::create_dir_all(dest.parent()?).ok()?;
+            std::fs::write(dest, text).ok()
+        }
+    };
+    show(rel(glot_core::config::CONFIG_FILE)).await?;
+    let prev_app = out.join(app_rel);
+    check_config(&prev_app).ok()?;
+    let config = glot_core::config::Config::load(&prev_app).ok()?;
+    let prefixes: Vec<String> = config
+        .files
+        .iter()
+        .map(|f| rel(pattern_prefix(f)))
+        .collect();
+    let tree = git(dir, home, token, &["ls-tree", "-r", "-l", &head], t)
+        .await
+        .ok()?;
+    let wanted: Vec<String> = tree
+        .lines()
+        .filter_map(|l| {
+            let (meta, path) = l.split_once('\t')?;
+            let size: u64 = meta.split_whitespace().nth(3)?.parse().ok()?;
+            let ext = path.rsplit('.').next().unwrap_or("").to_ascii_lowercase();
+            let ours = path == rel("glot.lock")
+                || path == rel("glossary.toml")
+                || path == rel(".glot/tm.json")
+                || prefixes.iter().any(|p| {
+                    if p.ends_with('/') || p.is_empty() {
+                        path.starts_with(p.as_str())
+                    } else {
+                        path == p
+                    }
+                });
+            (ours && size <= 2 << 20 && !SKIP_EXT.contains(&ext.as_str()) && !path.contains(".."))
+                .then(|| path.to_string())
+        })
+        .take(2000)
+        .collect();
+    for path in wanted {
+        show(path).await;
+    }
+    Some((prev_app, head))
 }
 
 fn cell(s: &str) -> String {
@@ -1700,6 +2217,59 @@ fn coverage_table(status: &glot_llm::engine::Status) -> String {
     s
 }
 
+/// Strings glot did not move, from the i18nize report: where (linked), why, and the code to write.
+fn left_section(report: &Value, blob: &str) -> String {
+    let left = report["left"].as_array().cloned().unwrap_or_default();
+    let reverted = report["reverted"].as_array().cloned().unwrap_or_default();
+    let mut s = String::new();
+    if !reverted.is_empty() {
+        s.push_str(&format!(
+            "\n### Files left untouched\nglot re-reads every file it rewrites with the language's own parser before committing. {} did not pass, so the original was kept:\n",
+            if reverted.len() == 1 { "One file" } else { "These files" }
+        ));
+        for r in reverted.iter().take(20) {
+            let (path, why) = (r[0].as_str().unwrap_or(""), r[1].as_str().unwrap_or(""));
+            s.push_str(&format!("- [`{path}`]({blob}{path}): {}\n", cell(why)));
+        }
+    }
+    if left.is_empty() {
+        return s;
+    }
+    s.push_str(&format!(
+        "\n### {} string{} left for you\nglot only rewrites what cannot change a type or a behavior. Each line below gives the place, the reason and the code to paste:\n\n",
+        left.len(),
+        if left.len() == 1 { "" } else { "s" }
+    ));
+    let row = |l: &Value| {
+        let (path, line) = (
+            l["path"].as_str().unwrap_or(""),
+            l["line"].as_u64().unwrap_or(0),
+        );
+        format!(
+            "- [`{path}:{line}`]({blob}{path}#L{line}) {}\n  ```\n  {}\n  ```\n  {}\n",
+            cell(&format!("“{}”", l["text"].as_str().unwrap_or(""))),
+            l["suggestion"].as_str().unwrap_or("").replace("```", "'''"),
+            cell(l["reason"].as_str().unwrap_or(""))
+        )
+    };
+    const SHOWN: usize = 15;
+    for l in left.iter().take(SHOWN) {
+        s.push_str(&row(l));
+    }
+    if left.len() > SHOWN {
+        s.push_str(&format!(
+            "\n<details><summary>{} more</summary>\n\n",
+            left.len() - SHOWN
+        ));
+        // GitHub caps a PR body at 65 536 characters.
+        for l in left.iter().skip(SHOWN).take(150) {
+            s.push_str(&row(l));
+        }
+        s.push_str("\n</details>\n");
+    }
+    s
+}
+
 #[allow(clippy::too_many_arguments)]
 fn pr_body(
     p: &ProjectRow,
@@ -1710,6 +2280,7 @@ fn pr_body(
     pushed: &crate::sync::PushResult,
     done: &Done,
     stat: &str,
+    blob: &str,
 ) -> String {
     let web = web_origin();
     let converted = status.keys.saturating_sub(keys_before);
@@ -1724,6 +2295,26 @@ fn pr_body(
             .collect::<Vec<_>>()
             .join(", ")
     );
+    let r = &done.report;
+    if let (Some(files), Some(kept)) = (
+        r["files_rewritten"].as_u64(),
+        r["imported_translations"].as_u64(),
+    ) {
+        s.push_str(&format!(
+            "**What changed**: {files} source file{} now call{} the translation function instead of holding text{}. Every rewritten file was parsed again before this commit, and every key it uses exists in the source catalog.\n\n",
+            if files == 1 { "" } else { "s" },
+            if files == 1 { "s" } else { "" },
+            if kept > 0 {
+                format!(
+                    "; {kept} translation{} already written in the code {} kept as is, not re-translated",
+                    if kept == 1 { "" } else { "s" },
+                    if kept == 1 { "was" } else { "were" }
+                )
+            } else {
+                String::new()
+            }
+        ));
+    }
     s.push_str(&coverage_table(status));
     s.push_str(&format!(
         "\nSource `{}`: **{} keys**. Synced with the glot project [`{}`]({web}/app/{}): {} strings added, {} updated, {} reviewed translations kept.\n",
@@ -1734,13 +2325,27 @@ fn pr_body(
     } else {
         "\n`glot check` reports issues: see the table above, fix them in the dashboard or with `glot translate --force`.\n"
     });
-    s.push_str("\n### Before merging\n");
+    if let Some(cost) = &done.cost {
+        s.push_str(&format!(
+            "\n**Cost of this run**: {}{}, billed by your AI provider on your own key. Strings already translated are never sent again.\n",
+            cell(cost),
+            done.plan
+                .as_ref()
+                .map(|p| format!(" for {}", cell(p)))
+                .unwrap_or_default()
+        ));
+    }
+    s.push_str(&left_section(r, blob));
+    s.push_str("\n### How to test\n");
     if let Some(cmd) = &done.install_cmd {
         s.push_str(&format!(
             "- [ ] Run `{cmd}` and commit the lockfile: glot never runs package managers or your code on its servers.\n"
         ));
     }
-    s.push_str("- [ ] Run the app and switch language to preview the translations.\n");
+    s.push_str(&format!(
+        "- [ ] Check out this branch, build the app as usual and switch language: every screen reads the same in `{}` and is translated in the other languages.\n- [ ] Skim the diff of the files below: each change replaces a text by a key, nothing else.\n",
+        status.source_locale
+    ));
     if !done.warnings.is_empty() {
         s.push_str(&format!(
             "- [ ] {} string{} left as is (review them):\n",
@@ -1766,9 +2371,18 @@ fn pr_body(
         tail(&done.log, 60).replace("```", "'''")
     ));
     s.push_str(&format!(
-        "\n### Next steps\n- Merge this PR. glot keeps translations up to date: each push to `{}` re-translates only what changed, in a single `glot/update` PR.\n- Review or edit translations in the [dashboard]({web}/app/{}): reviewed values are never overwritten.\n- Optional: add the glot GitHub Action (`.github/workflows/glot.yml`, created by `glot init` locally) to check every PR; glot does not push workflow files.\n",
-        link.branch, p.slug
+        "\n### Next steps\n- Merge this PR. glot keeps translations up to date: each push to `{}` processes only the strings that changed, in this same pull request (or a single `glot/update` one after the merge). Strings you delete leave the catalogs; keys you rename keep their translations.\n- Commits you push to this branch are kept: glot rebuilds the branch on the latest `{}` and replays them on top.\n- Review or edit translations in the [dashboard]({web}/app/{}): reviewed values are never overwritten.\n- Optional: add the glot GitHub Action (`.github/workflows/glot.yml`, created by `glot init` locally) to check every PR; glot does not push workflow files.\n",
+        link.branch, link.branch, p.slug
     ));
+    // GitHub refuses a body over 65 536 characters.
+    if s.len() > 60_000 {
+        let mut cut = 60_000;
+        while !s.is_char_boundary(cut) {
+            cut -= 1;
+        }
+        s.truncate(cut);
+        s.push_str("\n\n…");
+    }
     s
 }
 
@@ -1779,7 +2393,7 @@ fn status_comment(
     done: &Done,
 ) -> String {
     format!(
-        "**glot** updated this PR for `{}`: {} keys, {} translations written, `glot check` {}.\n\n{}",
+        "{STICKY}\n**glot** updated this PR for `{}`: {} keys, {} translations written, `glot check` {}.\n\n{}",
         &sha[..sha.len().min(7)],
         status.keys,
         pushed.created + pushed.updated,
@@ -1844,6 +2458,136 @@ mod tests {
             "assets/demo\\ data\\[1\\].json"
         );
         assert!(SKIP_EXT.contains(&"mp4"));
+    }
+
+    #[test]
+    fn failures_are_classified() {
+        for (error, class) in [
+            (
+                "add your LLM API key in the project settings: glot translates with it",
+                "ai_key_missing",
+            ),
+            (
+                "glot localize failed: anthropic: HTTP 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"invalid x-api-key\"}}",
+                "ai_key_invalid",
+            ),
+            (
+                "glot localize failed: organization key (sk-ant-usr…) needs a workspace ID: set it in Project → Settings → LLM",
+                "ai_workspace",
+            ),
+            (
+                "glot localize failed: openai: HTTP 429: You exceeded your current quota",
+                "ai_quota",
+            ),
+            (
+                "glot localize failed: anthropic: HTTP 529: overloaded",
+                "ai_unavailable",
+            ),
+            ("repository larger than 4096 MB", "repo_too_large"),
+            ("sh -c timed out after 900s", "timeout"),
+            (
+                "git clone failed: fatal: Remote branch release not found in upstream origin",
+                "branch_missing",
+            ),
+            (
+                "git clone failed: remote: Repository not found.",
+                "repo_access",
+            ),
+            (
+                "glot.toml: path `../secrets` points outside the repository",
+                "config_invalid",
+            ),
+            (
+                "glot init failed: cannot detect the framework from package.json; pass --lib",
+                "no_framework",
+            ),
+            (
+                "git push failed: remote: error: GH006: Protected branch update failed",
+                "push_rejected",
+            ),
+            (
+                "pr_conflict: human commit abc1234 on glot/localize does not apply on the latest main",
+                "pr_conflict",
+            ),
+            (
+                "the project is no longer linked to a GitHub repository",
+                "unlinked",
+            ),
+            (
+                "source_mismatch: repo=en project=fr: the repository's glot.toml declares `source_locale = \"en\"`",
+                "source_mismatch",
+            ),
+            (
+                "mock_output: 3763 value(s) are placeholder translations (`⟦fr⟧ …`)",
+                "mock_output",
+            ),
+            ("something nobody planned", "unknown"),
+        ] {
+            assert_eq!(diagnose(error), class, "{error}");
+        }
+    }
+
+    #[test]
+    fn mock_markers() {
+        for v in ["⟦fr⟧ Web App", "  ⟦pt-BR⟧ Olá", "Hi ⟦zh_Hant⟧"] {
+            assert!(has_mock_marker(v), "{v}");
+        }
+        for v in ["Web App", "⟦⟧", "⟦not a locale⟧", "« fr » text", "⟦fr"] {
+            assert!(!has_mock_marker(v), "{v}");
+        }
+    }
+
+    #[test]
+    fn human_commits_are_found() {
+        let commits = json!([
+            { "sha": "1111111aaaa", "author": { "login": "glot-test[bot]" }, "commit": { "author": { "name": "glot-test[bot]", "email": "42+glot-test[bot]@users.noreply.github.com" } }, "parents": [{}] },
+            { "sha": "2222222bbbb", "author": { "login": "ana" }, "commit": { "author": { "name": "Ana", "email": "ana@example.com" } }, "parents": [{}] },
+            // "Update branch" on GitHub: a merge of the base, nothing to replay.
+            { "sha": "3333333cccc", "author": { "login": "ana" }, "commit": { "author": { "name": "Ana", "email": "ana@example.com" } }, "parents": [{}, {}] },
+            { "sha": "--upload-pack=x", "author": { "login": "eve" }, "commit": { "author": { "name": "Eve", "email": "e@example.com" } }, "parents": [{}] },
+        ]);
+        assert_eq!(
+            human_commits(
+                &commits,
+                "glot-test[bot]",
+                "42+glot-test[bot]@users.noreply.github.com"
+            ),
+            ["2222222bbbb"]
+        );
+    }
+
+    #[test]
+    fn catalog_prefixes() {
+        assert_eq!(pattern_prefix("messages/{locale}.json"), "messages/");
+        assert_eq!(pattern_prefix("web/src/i18n.rs"), "web/src/i18n.rs");
+        assert_eq!(pattern_prefix("{locale}.json"), "");
+        assert_eq!(
+            pattern_prefix("public/locales/{locale}/*.json"),
+            "public/locales/"
+        );
+    }
+
+    #[test]
+    fn leftovers_are_listed_with_place_reason_and_code() {
+        let report = json!({
+            "left": [{ "path": "src/pages/a.rs", "line": 12, "text": "Vidéo | sans légende", "reason": "its type is declared there", "suggestion": "t(\"a_video\")" }],
+            "reverted": [["src/b.rs", "line 3: expected `}`"]],
+        });
+        let s = left_section(
+            &report,
+            "https://github.com/acme/app/blob/glot/localize/web/",
+        );
+        assert!(s.contains("[`src/pages/a.rs:12`](https://github.com/acme/app/blob/glot/localize/web/src/pages/a.rs#L12)"), "{s}");
+        assert!(
+            s.contains("t(\"a_video\")") && s.contains("its type is declared there"),
+            "{s}"
+        );
+        assert!(s.contains("Vidéo \\| sans légende"), "table-safe: {s}");
+        assert!(
+            s.contains("[`src/b.rs`]") && s.contains("expected `}`"),
+            "{s}"
+        );
+        assert_eq!(left_section(&Value::Null, ""), "");
     }
 
     #[test]

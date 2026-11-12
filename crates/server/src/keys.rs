@@ -177,7 +177,13 @@ pub async fn write_translation(
     glossary: &Glossary,
     w: Write<'_>,
 ) -> ApiResult<Translation> {
-    let mut issues = check(&w.key.source, w.value, w.locale, w.syntax, glossary);
+    // CMS content mirrored by a connector is plain text, whatever syntax the project's catalogs use.
+    let syntax = if crate::connectors::is_key(&w.key.key) {
+        Syntax::Plain
+    } else {
+        w.syntax
+    };
+    let mut issues = check(&w.key.source, w.value, w.locale, syntax, glossary);
     for extra in w.extra_issues {
         if !issues.iter().any(|i| i.code == extra.code) {
             issues.push(extra);

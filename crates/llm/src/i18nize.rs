@@ -544,7 +544,10 @@ pub async fn plan(ws: &Workspace, files: &[String], lib: Lib) -> Result<Plan> {
 }
 
 /// Write rewritten files, then the new source strings (with notes) to the catalog.
-pub fn apply(ws: &mut Workspace, plan: &Plan) -> Result<()> {
+/// A rewritten file that no longer parses is not written (its original stays, its keys are not
+/// added): returned as (path, reason) so the caller reports it instead of shipping broken code.
+pub fn apply(ws: &mut Workspace, plan: &Plan) -> Result<Vec<(String, String)>> {
+    let mut reverted = vec![];
     for f in plan.changed_files() {
         let path = ws.root.join(&f.path);
         let disk =
@@ -555,10 +558,15 @@ pub fn apply(ws: &mut Workspace, plan: &Plan) -> Result<()> {
                 f.path
             )));
         }
-        ex::parses(&f.path, &f.new).map_err(|e| Error::Other(format!("{}: {e}", f.path)))?;
+        if let Err(e) = ex::parses(&f.path, &f.new) {
+            reverted.push((f.path.clone(), e));
+        }
     }
     let mut written = BTreeSet::new();
-    for f in plan.changed_files() {
+    for f in plan
+        .changed_files()
+        .filter(|f| !reverted.iter().any(|(p, _)| p == &f.path))
+    {
         std::fs::write(ws.root.join(&f.path), &f.new)
             .map_err(|e| Error::Other(format!("{}: {e}", f.path)))?;
         for k in f.keys.iter().filter(|k| !k.reused) {
@@ -583,7 +591,7 @@ pub fn apply(ws: &mut Workspace, plan: &Plan) -> Result<()> {
             }
         }
     }
-    Ok(())
+    Ok(reverted)
 }
 
 #[cfg(test)]

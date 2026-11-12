@@ -2,10 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CodeBlock, useLocaleName } from "@/components/common";
+import { useLocaleName } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -14,11 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "@/i18n/navigation";
-import type { Project } from "@/lib/api";
+import { api, type Project, qk } from "@/lib/api";
 import { useOrigin } from "@/lib/hooks";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { type EdgeSettings, edgeApi, edgeKeys, SNIPPET_CORNERS, type WebsiteSnippet } from "./api";
 import { HreflangSnippet } from "./setup";
+import { VEIL } from "./veil";
+import { WebsiteSetup } from "./website-setup";
 
 const CUSTOM = "selector";
 type Where = (typeof SNIPPET_CORNERS)[number] | typeof CUSTOM;
@@ -38,14 +40,26 @@ export function WebsiteTag({ project, settings }: { project: Project; settings: 
   const [where, setWhere] = useState<Where>(corner ? (w.position as Where) : CUSTOM);
   const [selector, setSelector] = useState(corner ? "" : w.position);
   const [locales, setLocales] = useState<string[]>(w.locales);
+  const [flags, setFlags] = useState(w.flags);
+  // The setup steps switch the tag on by themselves: this form follows.
+  const [seenOn, setSeenOn] = useState(w.on);
+  if (seenOn !== w.on) {
+    setSeenOn(w.on);
+    setOn(w.on);
+  }
   const key = useQuery({ queryKey: edgeKeys.snippet(slug), queryFn: () => edgeApi.snippet(slug) });
   const domains = useQuery({ queryKey: edgeKeys.domains(slug), queryFn: () => edgeApi.domains(slug) });
   const seo = domains.data?.some((d) => d.mode === "subdomain" && d.verified_at && d.enabled);
+  // Plan quota of the tag (`website_pages`: one per translated page view); nothing to show when self-hosted.
+  const format = useFormatter();
+  const billing = useQuery({ queryKey: qk.billing, queryFn: api.billing });
+  const quota = billing.data?.enabled ? (billing.data.limits as Record<string, number | null | undefined>).website_pages : null;
+  const used = (billing.data?.usage as Record<string, number | undefined> | undefined)?.website_pages ?? 0;
 
   const save = useMutation({
     mutationFn: () => {
       const cur = qc.getQueryData<EdgeSettings>(edgeKeys.settings(slug)) ?? settings;
-      const next: WebsiteSnippet = { on, auto_translate: auto, position: where === CUSTOM ? selector.trim() : where, locales };
+      const next: WebsiteSnippet = { ...cur.website_snippet, on, auto_translate: auto, position: where === CUSTOM ? selector.trim() : where, locales, flags };
       return edgeApi.putSettings(slug, { ...cur, website_snippet: next });
     },
     onSuccess: (r) => {
@@ -57,9 +71,16 @@ export function WebsiteTag({ project, settings }: { project: Project; settings: 
 
   const host = origin ? new URL(origin).host : "";
   const server = host.startsWith("app.") ? "" : ` data-server="${origin}"`;
+  // One line: the inline part hides the page for a returning visitor until glot.js has translated it (no flash).
   const tag = key.data
-    ? `<script src="${origin ?? ""}/widget/glot.js" data-project="${slug}" data-key="${key.data.public_key}"${server} async></script>`
+    ? `${VEIL}<script src="${origin ?? ""}/widget/glot.js" data-project="${slug}" data-key="${key.data.public_key}"${server} async></script>`
     : "";
+  // Visitors' browsers read the translations: the tag cannot work on a project whose catalogs are private.
+  const publish = useMutation({
+    mutationFn: () => api.updateProject(slug, { public_cdn: true }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.project(slug) }),
+    onError: (e) => toast.error(message(e)),
+  });
 
   return (
     <div className="space-y-8">
@@ -68,8 +89,23 @@ export function WebsiteTag({ project, settings }: { project: Project; settings: 
           <h2 className="font-medium">{t("title")}</h2>
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("body")}</p>
         </div>
-        {tag ? <CodeBlock label={t("tagLabel")} code={tag} /> : <Skeleton className="h-16 rounded-lg" />}
+        {w.on && !project.public_cdn && (
+          <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+            <p className="max-w-3xl grow">{t("private")}</p>
+            <Button size="sm" disabled={publish.isPending} onClick={() => publish.mutate()}>
+              {publish.isPending && <Loader2 className="animate-spin" />}
+              {t("makePublic")}
+            </Button>
+          </div>
+        )}
+      </section>
+
+      {tag ? <WebsiteSetup project={project} settings={settings} tag={tag} /> : <Skeleton className="h-64 rounded-xl" />}
+
+      <section className="space-y-3">
+        <h2 className="font-medium">{t("optionsTitle")}</h2>
         <p className="text-xs text-muted-foreground">{t("tagHint")}</p>
+        {typeof quota === "number" && <p className="text-sm text-muted-foreground">{t("usage", { used: format.number(used), limit: format.number(quota) })}</p>}
       </section>
 
       <form
@@ -114,6 +150,12 @@ export function WebsiteTag({ project, settings }: { project: Project; settings: 
               <p id="website-selector-hint" className="text-xs text-muted-foreground">{t("selectorHint")}</p>
             </div>
           )}
+        </div>
+        <div className="space-y-1.5">
+          <Label className="flex items-center gap-3 font-normal">
+            <Switch checked={flags} onCheckedChange={setFlags} aria-describedby="website-flags-hint" /> {t("flags")}
+          </Label>
+          <p id="website-flags-hint" className="text-xs text-muted-foreground">{t("flagsHint")}</p>
         </div>
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">{t("locales")}</legend>

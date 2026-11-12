@@ -1,8 +1,10 @@
+/** `site_code`: the code the site itself uses for the locale, when it differs from glot's (`zh` for `zh-CN`). */
 export type Loc = {
     code: string;
     name: string;
     dir: "ltr" | "rtl";
     coverage: number;
+    site_code?: string;
 };
 export type Manifest = {
     source: string;
@@ -27,4 +29,9 @@ export declare function loadCatalog(locale: string, opts?: {
     project?: string;
     cdn?: string;
 }): Promise<Json>;
+/** Did the page take the language? `<html lang>` names it; or the site keeps `lang` as it was and the text changed. */
+export declare function applied(lang: string, loc: Pick<Loc, "code" | "site_code">, before: {
+    l: string;
+    p: number;
+}, now: number, source: string): boolean;
 export {};

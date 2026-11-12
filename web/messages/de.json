@@ -1,4 +1,81 @@
 {
+  "textGraph": {
+    "title": "Sätze",
+    "subtitle": "Jeder Satz, den Sie anzeigen, überall dort, wo er vorkommt: Code, Website, CMS. Korrigieren Sie eine Übersetzung einmal, sie gilt überall.",
+    "refresh": "Aktualisieren",
+    "apply": "{count, plural, one {# Stelle ergänzen} other {# Stellen ergänzen}}",
+    "applyHint": "Kopiert die unbestrittene Übersetzung an die Stellen, an denen sie fehlt. Entscheidet nie zwischen zwei Übersetzungen.",
+    "applied": "{count, plural, =0 {Nichts zu schreiben} one {# Übersetzung geschrieben} other {# Übersetzungen geschrieben}}",
+    "searchPlaceholder": "Satz, Schlüssel oder Seitenpfad suchen",
+    "noResults": "Kein Satz passt zu „{q}“.",
+    "pick": "Wählen Sie einen Satz, um alle Stellen und Übersetzungen zu sehen.",
+    "places": "{count, plural, one {# Stelle} other {# Stellen}}",
+    "seen": "{count, plural, one {# Mal gesehen} other {# Mal gesehen}}",
+    "open": "Diese Stelle öffnen",
+    "inherited": "{count, plural, one {# Seite folgt der Katalogübersetzung} other {# Seiten folgen der Katalogübersetzung}}",
+    "useEverywhere": "Überall verwenden",
+    "custom": "Oder die Übersetzung eingeben, die überall gelten soll",
+    "empty": {
+      "title": "Noch keine Sätze",
+      "body": "glot liest die Schlüssel Ihres Katalogs, die von glot Edge übersetzten Seiten und die Inhalte Ihres verbundenen CMS. Übertragen Sie Ihre Schlüssel oder verbinden Sie eine Website und kommen Sie dann hierher zurück."
+    },
+    "stats": {
+      "sentences": "Sätze",
+      "places": "Stellen",
+      "shared": "An mehreren Stellen",
+      "unsettled": "Zweifach übersetzt",
+      "crossSurface": "{count, plural, =0 {keiner über Code, Website und CMS hinweg} one {# über Code, Website oder CMS hinweg} other {# über Code, Website oder CMS hinweg}}"
+    },
+    "surface": {
+      "catalog": "Code",
+      "connector": "CMS",
+      "edge": "Website"
+    },
+    "context": {
+      "action": "Button oder Link",
+      "actionHint": "Als Beschriftung eines Buttons oder Links. Dasselbe Wort als Fließtext ist ein eigener Satz."
+    },
+    "unsettled": {
+      "title": "Zweifach übersetzt",
+      "body": "Derselbe Satz sagt in einer Sprache zwei verschiedene Dinge. Wählen Sie die Übersetzung, die bleibt."
+    },
+    "reworded": {
+      "title": "Nur an einer Stelle umformuliert",
+      "item": "„{from}“ wurde an {moved, plural, one {# Stelle} other {# Stellen}} zu „{to}“. {remaining, plural, one {# Stelle zeigt} other {# Stellen zeigen}} noch die alte Formulierung."
+    },
+    "detail": {
+      "places": "{count, plural, one {Kommt an # Stelle vor} other {Kommt an # Stellen vor}}",
+      "translations": "Übersetzungen",
+      "related": "Verwandte Sätze",
+      "moved": "Seitdem umformuliert"
+    },
+    "state": {
+      "consistent": "Überall gleich",
+      "partial": "{count, plural, one {Fehlt an # Stelle} other {Fehlt an # Stellen}}",
+      "missing": "Nicht übersetzt",
+      "inconsistent": "Zweifach übersetzt",
+      "conflict": "Zwei geprüfte Übersetzungen widersprechen sich"
+    },
+    "related": {
+      "context": "Gleicher Text, anderer Kontext",
+      "near": "Gleiche Wörter",
+      "fuzzy": "Fast gleich"
+    },
+    "reason": {
+      "reviewed_conflict": "hat eine andere, von einem Menschen geprüfte Übersetzung",
+      "machine_disagrees": "hat eine andere maschinelle Übersetzung",
+      "needs_review": "wartet auf eine menschliche Prüfung",
+      "placeholders": "die Platzhalter passen nicht",
+      "validation": "die Übersetzung besteht dort die Validierung nicht"
+    },
+    "confirm": {
+      "title": "Diese Übersetzung überall verwenden?",
+      "writes": "{count, plural, one {# Stelle wird geändert.} other {# Stellen werden geändert.}}",
+      "none": "Alle Stellen, die diese Übersetzung annehmen können, zeigen sie bereits.",
+      "conflicts": "{count, plural, one {# Stelle hat eine andere, von einem Menschen geprüfte Übersetzung und behält sie.} other {# Stellen haben eine andere, von einem Menschen geprüfte Übersetzung und behalten sie.}}",
+      "force": "Auch von Menschen geprüfte Übersetzungen ersetzen"
+    }
+  },
   "edge": {
     "title": "glot Edge",
     "subtitle": "SEO-Lokalisierung: jede Sprache als übersetztes HTML unter eigener URL, ohne JavaScript indexierbar, ohne Pflicht-Schlüssel.",
@@ -31,6 +108,86 @@
       },
       "selector": "CSS-Selektor",
       "selectorHint": "Der Umschalter wird in das erste passende Element eingefügt, zum Beispiel das Menü Ihres Headers. Ein Element mit data-glot-switcher hat immer Vorrang.",
+      "flags": "Flaggen im Sprachumschalter anzeigen",
+      "flagsHint": "Aus: nur die Namen der Sprachen. Eine Sprache ist kein Land, Flaggen sind daher optional.",
+      "private": "Das Tag ist aktiv, aber die Übersetzungen dieses Projekts sind privat: Die Browser Ihrer Besucher können sie nicht lesen, es wird also nichts übersetzt.",
+      "makePublic": "Übersetzungen öffentlich machen",
+      "optionsTitle": "Tag und Optionen",
+      "usage": "Übersetzte Seitenaufrufe in diesem Monat: {used} von {limit}. Darüber hinaus lässt das Tag Ihre Website wie veröffentlicht, bis zum nächsten Monat oder einem Tarifwechsel.",
+      "setup": {
+        "title": "Übersetzen Sie Ihre Website in 3 Schritten",
+        "intro": "Geben Sie die Adresse Ihrer Website ein. glot liest die öffentlichen Seiten, übersetzt sie und zeigt Ihnen das Ergebnis, bevor Sie etwas installieren.",
+        "step1": "Website analysieren",
+        "step2": "Übersetzung ansehen und korrigieren",
+        "step3": "Eine Zeile einfügen und live gehen",
+        "urlLabel": "Adresse Ihrer Website",
+        "analyze": "Analysieren und übersetzen",
+        "analyzing": "Ihre Website wird gelesen…",
+        "errors": {
+          "invalid": "Das ist keine gültige Webadresse.",
+          "private": "Diese Adresse liegt in einem privaten Netzwerk: glot kann nur öffentliche Websites lesen.",
+          "unreachable": "glot konnte diese Website nicht erreichen. Prüfen Sie die Adresse und ob die Website veröffentlicht ist.",
+          "timeout": "Die Website hat zu lange nicht geantwortet. Versuchen Sie es gleich noch einmal.",
+          "not_html": "Diese Adresse liefert keine Webseite."
+        },
+        "detected": "Erkannte Plattform: {platform}",
+        "unknownPlatform": "Plattform nicht erkannt. Das Tag funktioniert auf jeder Website, die eigenen Code zulässt.",
+        "language": "Sprache der Website: {language}",
+        "crawled": "Gelesene Seiten: {pages} · Gefundene Texte: {segments}",
+        "translating": "Übersetzung nach {languages} läuft… Die Vorschau unten füllt sich von selbst.",
+        "upToDate": "Die Übersetzungen sind aktuell.",
+        "suggest": "Sprachen, die oft als Nächstes hinzukommen:",
+        "add": "{language} hinzufügen",
+        "warn": {
+          "otherTools": "Auf dieser Seite läuft ein weiteres Übersetzungsskript ({tools}). Entfernen Sie es vor dem Livegang: Zwei Tools, die denselben Text umschreiben, stören sich gegenseitig.",
+          "jsOnly": "Diese Seite erzeugt ihren Text mit JavaScript, die Vorschau unten kann daher leer wirken. Im Browser Ihrer Besucher übersetzt das Tag sie ganz normal.",
+          "csp": "Die Sicherheitsrichtlinie Ihrer Website (CSP) blockiert das Tag. Erlauben Sie {hosts} in: {directives}."
+        },
+        "exclude": {
+          "title": "Private Bereiche",
+          "body": "Konto-, Warenkorb- und Kassenseiten werden nie von Ihren Besuchern gelernt, auch wenn deren Sitzungscookie für Skripte unsichtbar ist. Diese Links Ihrer Website wirken ebenfalls privat:",
+          "none": "Konto-, Warenkorb- und Kassenseiten werden nie von Ihren Besuchern gelernt, auch wenn deren Sitzungscookie für Skripte unsichtbar ist. Es wurde kein weiterer privat wirkender Link gefunden.",
+          "apply": "Diese Pfade ausschließen",
+          "done": "Pfade ausgeschlossen"
+        },
+        "previewLater": "Analysieren Sie zuerst Ihre Website: Die übersetzte Vorschau erscheint hier.",
+        "install": {
+          "copy": "Diese Zeile kopieren",
+          "where": "Wo Sie sie bei {platform} einfügen",
+          "generic": "Fügen Sie sie in den Head jeder Seite ein oder in den seitenweiten eigenen Code Ihres Website-Baukastens.",
+          "guide": "Vollständige Anleitung für {platform}",
+          "allGuides": "Anleitung für Ihre Plattform finden"
+        },
+        "verify": {
+          "button": "Meine Website prüfen",
+          "found": "Das Tag ist installiert. Aktivieren Sie es, um live zu gehen.",
+          "live": "Das Tag ist installiert und aktiv: Ihre Besucher sehen Ihre Website in ihrer Sprache.",
+          "notFound": "Das Tag wurde auf {url} nicht gefunden. Veröffentlichen Sie Ihre Website nach dem Einfügen der Zeile und prüfen Sie erneut. Ein über einen Tag-Manager eingebundenes Tag erkennt diese Prüfung nicht.",
+          "wrongProject": "Ein glot-Tag ist installiert, aber für ein anderes Projekt ({project}). Kopieren Sie die Zeile oben erneut.",
+          "noKey": "Das installierte Tag ist unvollständig und tut daher nichts. Kopieren Sie die Zeile oben erneut.",
+          "notHead": "Das Tag steht nicht im Head der Seite: Besucher sehen möglicherweise kurz den Originaltext. Verschieben Sie es in den Head.",
+          "turnOn": "Tag aktivieren"
+        }
+      },
+      "editor": {
+        "locale": "Sprache",
+        "page": "Seite",
+        "open": "Öffnen",
+        "count": "{translated} von {total} Texten auf dieser Seite übersetzt",
+        "hint": "Klicken Sie auf einen Text, um seine Übersetzung zu korrigieren oder seinen Block auszuschließen. Dies ist eine statische Vorschau: Menüs und Animationen laufen nicht.",
+        "empty": "Für diese Seite gibt es noch keine Übersetzung. Wurde Ihre Website gerade analysiert, ist sie in weniger als einer Minute da.",
+        "frame": "Vorschau Ihrer Website auf {language}",
+        "source": "Original",
+        "translation": "Übersetzung",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "saved": "Übersetzung gespeichert",
+        "exclude": "Diesen Block nie übersetzen",
+        "excludeHint": "Wählen Sie, was nicht mehr übersetzt werden soll:",
+        "matches": "Treffer auf dieser Seite: {count}",
+        "excluded": "Von der Übersetzung ausgeschlossen",
+        "noSelector": "Dieser Block hat keinen stabilen Namen, über den glot ihn ausschließen kann. Geben Sie ihm in Ihrem Website-Baukasten die Klasse notranslate."
+      },
       "locales": "Angebotene Sprachen",
       "localesHint": "Keine ausgewählt = alle Zielsprachen des Projekts.",
       "save": "Speichern",
@@ -194,6 +351,16 @@
         "budget": "Monatsbudget (USD)",
         "budgetHint": "Leer: nur das Projektbudget pro Job."
       },
+      "seo": {
+        "title": "Suchmaschinen",
+        "body": "Was glot tut, damit übersetzte Seiten indexiert werden: die Website vor den Besuchern lesen und jeder Sprache eigene Adressen geben.",
+        "prewarm": "Website vor den Besuchern übersetzen",
+        "prewarmHint": "glot liest Ihre Sitemap und die dort verlinkten Seiten, höchstens einmal täglich und eine Seite pro Sekunde: Eine Seite ist übersetzt, bevor jemand sie aufruft. Neue Texte zählen zum Tageslimit und zum Budget oben.",
+        "pages": "Gelesene Seiten pro Durchlauf",
+        "pagesHint": "Zuerst Startseite und Sitemap, dann verlinkte Seiten.",
+        "slugs": "Seitenadressen übersetzen",
+        "slugsHint": "/pricing wird auf der spanischen Website zu /precios. Die ursprüngliche Adresse leitet dorthin weiter; hreflang und Sitemaps verwenden sie. Bei Websites, die im Browser navigieren (Single-Page-Apps), bitte zuerst testen."
+      },
       "rendering": {
         "label": "Rendering",
         "auto": "Automatisch",
@@ -274,6 +441,27 @@
       "indexNowDone": "{n, plural, one {# URL} other {# URLs}} an IndexNow übermittelt.",
       "running": "Seiten werden abgerufen…",
       "issuesTitle": "Gefundene Probleme",
+      "export": "Exportieren (CSV)",
+      "outcome": {
+        "title": "Seiten, die Suchmaschinen indexieren können",
+        "body": "Eine Seite wird Suchmaschinen erst gemeldet (Canonical, hreflang, Sitemap), wenn ihr Titel und mindestens 95 % ihres Textes übersetzt sind. Bis dahin wird sie ausgeliefert und als Kopie der Ausgangsseite ausgewiesen.",
+        "run": "Gesamte Website jetzt übersetzen",
+        "running": "Website wird gelesen … {done} / {total}",
+        "advertised": "Gemeldet",
+        "notAdvertised": "Noch nicht gemeldet",
+        "pages": "indexierbare Seiten / gelesene Seiten",
+        "last": "Letzter Durchlauf am {date}: {pages, plural, one {# Seite gelesen} other {# Seiten gelesen}}, {skipped} übersprungen, {segments, plural, one {# neuer Text} other {# neue Texte}}.",
+        "failed": "Der letzte Durchlauf ist fehlgeschlagen: {error}"
+      },
+      "slugs": {
+        "title": "Übersetzte Adressen ({n})",
+        "body": "Eine Adresse ändert sich nie von selbst. Ersetzen Sie hier eine: Die alte Adresse leitet auf die neue weiter.",
+        "source": "Ausgangsseite",
+        "locale": "Sprache",
+        "address": "Adresse",
+        "addressOf": "Adresse von {path} auf {locale}",
+        "saved": "Adresse gespeichert."
+      },
       "sitemaps": "Sitemaps pro Sprache",
       "critical": "Kritisch",
       "notReciprocal": "hreflang nicht wechselseitig",
@@ -304,6 +492,8 @@
         "advertised_but_not_ready": "Verlinkt, aber nicht bereit",
         "title_missing": "Kein Titel",
         "title_untranslated": "Titel nicht übersetzt",
+        "title_duplicate": "Gleicher Titel wie eine andere Seite",
+        "description_missing": "Keine Beschreibung",
         "description_untranslated": "Beschreibung nicht übersetzt",
         "og_title_untranslated": "og:title nicht übersetzt",
         "jsonld_language": "JSON-LD in anderer Sprache",
@@ -519,17 +709,24 @@
       "integrations": "Integrationen",
       "mcp": "MCP-Server",
       "runtime": "Laufzeit-Fallback",
+      "text-graph": "Ihre Sätze überall (Textgraph)",
+      "live-stream": "Live-Stream-Übersetzung",
       "mobile-ota": "Mobile Apps (OTA)",
+      "local-seo": "Lokales SEO (suchoptimierte Seiten)",
+      "two-way": "Kundenkonversationen",
+      "languages-live-check": "Ist eine Sprache auf Ihrer Website live?",
       "self-hosting": "Selbst gehosteter Server",
       "benchmark": "Benchmark",
       "deploy-hetzner": "Auf einem VPS deployen",
       "labs": "Labs-Übersicht",
+      "render": "Render-API (E-Mails, Benachrichtigungen, Dokumente)",
       "mcp-remote": "Remote-MCP (OAuth)",
       "provenance": "KI-Herkunft (EU-KI-Verordnung)",
       "quality": "Qualität & Review",
       "review": "Live-Review",
       "skills": "Agent-Skills",
-      "github": "GitHub verbinden"
+      "github": "GitHub verbinden",
+      "autopilot": "Autopilot (Umsatz pro Markt)"
     },
     "search": {
       "label": "Doku durchsuchen",
@@ -1553,6 +1750,10 @@
     "subtitle": "Name, Sprachen, Übersetzungsmodell und Auslieferung für dieses Projekt. Änderungen gelten für den nächsten Job."
   },
   "shell": {
+    "liveStream": "Live-Stream",
+    "localSeo": "Lokales SEO",
+    "render": "Render-API",
+    "textGraph": "Sätze",
     "edge": "glot Edge",
     "apiTokens": "API-Tokens",
     "experiments": "Experimente",
@@ -1581,7 +1782,9 @@
     "github": "GitHub",
     "mainNav": "Hauptnavigation",
     "skipToContent": "Zum Inhalt springen",
-    "integrations": "Integrationen"
+    "conversations": "Konversationen",
+    "integrations": "Integrationen",
+    "autopilot": "Autopilot"
   },
   "status": {
     "machine": "Maschinell",
@@ -2517,6 +2720,81 @@
       "subtitle": "Wählen Sie ein Repository: glot öffnet einen Pull Request mit Ihrer lokalisierten App, bereit zum Mergen. Kein Terminal nötig.",
       "title": "GitHub verbinden"
     },
+    "failure": {
+      "mock_output": {
+        "cause": "Dieser Lauf hat Platzhalter-Übersetzungen (⟦xx⟧ …) erzeugt, keine echten.",
+        "fix": "Es wurde nichts gepusht oder synchronisiert. Prüfen Sie unter Einstellungen → LLM, ob das Projekt einen echten KI-Anbieter mit gültigem Schlüssel nutzt, und starten Sie erneut: Platzhalter werden neu übersetzt."
+      },
+      "source_mismatch": {
+        "cause": "Das Repository ist in {repo} geschrieben, die Ausgangssprache dieses glot-Projekts ist aber {project}.",
+        "fix": "glot übersetzt nie einen Katalog aus einer anderen Sprache, um ihn als Ausgangstext zu speichern. Verwenden Sie {repo} als Ausgangssprache des Projekts (Schaltfläche unten) oder setzen Sie source_locale = \"{project}\" in der glot.toml des Repositorys und starten Sie erneut."
+      },
+      "useRepoSource": "{repo} als Ausgangssprache des Projekts verwenden",
+      "access": "Repository-Zugriff verwalten",
+      "ai_key_invalid": {
+        "cause": "Ihr KI-Anbieter hat den API-Schlüssel abgelehnt.",
+        "fix": "Fügen Sie unter Einstellungen → LLM einen gültigen Schlüssel ein, klicken Sie auf „Schlüssel testen“ und starten Sie erneut."
+      },
+      "ai_key_missing": {
+        "cause": "Für dieses Projekt ist kein KI-Schlüssel hinterlegt.",
+        "fix": "glot übersetzt mit dem Schlüssel Ihres eigenen KI-Anbieters. Fügen Sie ihn unter Einstellungen → LLM hinzu, klicken Sie auf „Schlüssel testen“ und starten Sie erneut."
+      },
+      "ai_quota": {
+        "cause": "Ihr KI-Anbieter hat die Anfrage abgelehnt: Kontingent, Guthaben oder Budget erreicht.",
+        "fix": "Prüfen Sie Ihr Guthaben beim Anbieter oder erhöhen Sie das Budget unter Einstellungen → LLM und starten Sie erneut. Bereits geschriebene Übersetzungen bleiben erhalten."
+      },
+      "ai_unavailable": {
+        "cause": "Ihr KI-Anbieter ist vorübergehend nicht erreichbar.",
+        "fix": "Auf Ihrer Seite ist nichts zu korrigieren. Starten Sie in einigen Minuten erneut: Bereits geschriebene Übersetzungen bleiben erhalten."
+      },
+      "ai_workspace": {
+        "cause": "Der Anthropic-Arbeitsbereich passt nicht zum Schlüssel.",
+        "fix": "Organisationsschlüssel (sk-ant-usr…) benötigen die ID ihres Arbeitsbereichs (wrkspc_…). Tragen Sie sie unter Einstellungen → LLM ein, testen Sie den Schlüssel und starten Sie erneut."
+      },
+      "branch_missing": {
+        "cause": "Der Basis-Branch existiert in diesem Repository nicht mehr.",
+        "fix": "Wählen Sie das Repository erneut und einen vorhandenen Branch aus."
+      },
+      "config_invalid": {
+        "cause": "Die glot.toml dieses Repositorys ist ungültig.",
+        "fix": "Korrigieren Sie die in den technischen Details genannte Zeile (Pfade müssen im Repository bleiben) und pushen Sie: glot startet von selbst erneut."
+      },
+      "details": "Technische Details",
+      "no_framework": {
+        "cause": "glot hat in diesem Repository keine App gefunden, die es lokalisieren kann.",
+        "fix": "Unterstützt: React, Next.js, Vue, Svelte, Leptos, SwiftUI und Apps mit eigener t()-Funktion. Führen Sie in einem Monorepo glot init im App-Ordner aus, committen Sie glot.toml und pushen Sie."
+      },
+      "openPr": "Pull-Request öffnen",
+      "pr_conflict": {
+        "cause": "Ein Commit, den Sie auf den glot-Branch gepusht haben, steht im Konflikt mit dem aktuellen Basis-Branch.",
+        "fix": "Es wurde nichts überschrieben. Mergen Sie den Basis-Branch in den Pull-Request und lösen Sie den Konflikt, oder schließen Sie den Pull-Request: glot öffnet beim nächsten Lauf einen neuen."
+      },
+      "push_rejected": {
+        "cause": "GitHub hat den glot-Branch oder seinen Pull-Request abgelehnt.",
+        "fix": "Vermutlich greift eine Branch-Schutzregel für glot/*. Erlauben Sie der glot-App das Pushen auf glot/*-Branches und starten Sie erneut."
+      },
+      "repo_access": {
+        "cause": "glot kann dieses Repository nicht mehr lesen.",
+        "fix": "Die GitHub-App wurde möglicherweise deinstalliert oder hat den Zugriff auf dieses Repository verloren. Geben Sie ihr auf GitHub wieder Zugriff und starten Sie erneut."
+      },
+      "repo_too_large": {
+        "cause": "Dieses Repository ist größer, als ein Lauf klonen kann.",
+        "fix": "Medien und Dateien über 2 MB werden bereits übersprungen. Verschieben Sie die App in ein eigenes Repository oder kontaktieren Sie uns, um das Limit anzuheben."
+      },
+      "settings": "LLM-Einstellungen öffnen",
+      "timeout": {
+        "cause": "Der Lauf hat zu lange gedauert und wurde gestoppt.",
+        "fix": "Starten Sie erneut: Bereits übersetzte Texte werden nicht wiederholt. Passiert es jedes Mal, grenzen Sie die Analyse mit [extract] include in glot.toml ein."
+      },
+      "unknown": {
+        "cause": "Der Lauf wurde durch einen unerwarteten Fehler beendet.",
+        "fix": "Starten Sie erneut. Tritt derselbe Fehler wieder auf, senden Sie uns die technischen Details unten."
+      },
+      "unlinked": {
+        "cause": "Dieses Projekt ist mit keinem Repository mehr verknüpft.",
+        "fix": "Wählen Sie ein Repository, um es erneut zu verknüpfen."
+      }
+    },
     "how": {
       "pr": {
         "body": "Strings werden in Kataloge übernommen, Übersetzungen validiert, und alles landet in einem einzigen PR, den Sie prüfen und mergen.",
@@ -2542,8 +2820,6 @@
     },
     "linked": {
       "change": "Repository wechseln",
-      "failed": "Der letzte Lauf ist fehlgeschlagen",
-      "badKey": "Ihr KI-Anbieter hat den API-Schlüssel abgelehnt. Öffnen Sie <link>Einstellungen → LLM</link>, fügen Sie einen gültigen Schlüssel ein, klicken Sie auf „Schlüssel testen“ und starten Sie erneut.",
       "prHint": "Jeder Push auf {branch} aktualisiert diesen Pull Request.",
       "prReady": "Pull Request #{n} ist bereit zum Mergen",
       "rerun": "Erneut ausführen",
@@ -3722,6 +3998,101 @@
     "test": "Testen",
     "remove": "Trennen",
     "removeConfirm": "{name} trennen? Die Übersetzungen bleiben in glot; im CMS wird nichts gelöscht.",
+    "oneClick": "Mit einem Klick verbinden",
+    "oneClickHint": "Sie erteilen den Zugriff direkt bei {name}. glot sieht Ihr Passwort nie, und Sie können den Zugriff dort jederzeit widerrufen.",
+    "manual": "Zugangsdaten von Hand eingeben",
+    "redirecting": "{name} wird geöffnet…",
+    "connectError": "Die Verbindung kam nicht zustande: {error}",
+    "connectedPreview": "{name} ist verbunden. glot liest Ihre Inhalte für eine Vorschau; noch wird nichts übersetzt oder geändert.",
+    "reconnect": "Neu verbinden",
+    "pause": "Pausieren",
+    "publish": "Veröffentlichen",
+    "published": "Veröffentlicht",
+    "review": "Änderungen ansehen",
+    "ready": "Bereit zur Veröffentlichung: {count}",
+    "kept": "In {name} von Hand bearbeitet, unverändert belassen: {count}",
+    "overwrite": "Übersetzungen ersetzen, die in {name} bereits vorhanden sind",
+    "reviewFirst": "Ich möchte prüfen, bevor etwas veröffentlicht wird",
+    "webhookActive": "Die automatische Synchronisierung funktioniert (letzte Änderung empfangen {when}).",
+    "webhookNone": "Bisher wurde keine Änderung automatisch empfangen. glot prüft zusätzlich einmal täglich auf Änderungen.",
+    "issues": "Nicht veröffentlicht: {count}",
+    "tenant": {
+      "shopify": "Shop-Domain",
+      "wordpress": "Adresse der Website",
+      "woocommerce": "Adresse der Website"
+    },
+    "hold": {
+      "translate": "Wartet auf Ihre Freigabe",
+      "push": "Sie veröffentlichen"
+    },
+    "preview": {
+      "title": "Bevor etwas übersetzt wird",
+      "summary": "Elemente: {resources, number} · Texte: {fields, number} · Sprachen: {languages, number} · Zu übersetzende Wörter: etwa {words, number}",
+      "cost": "Geschätzte Übersetzungskosten: {cost}",
+      "types": "Zu übersetzende Inhalte",
+      "nothing": "In {name} wurde nichts geschrieben. Sie entscheiden, wie es weitergeht.",
+      "approve": "Übersetzen und veröffentlichen",
+      "approveReview": "Übersetzen, ich veröffentliche selbst"
+    },
+    "progress": {
+      "pull": "Ihre Inhalte werden gelesen… gelesene Texte: {count, number}",
+      "translate": "Übersetzung läuft… {done, number} von {total, number}"
+    },
+    "diff": {
+      "new": "Neu",
+      "update": "Aktualisierung",
+      "blocked": "Nicht geschrieben",
+      "empty": "Nichts wartet auf Veröffentlichung.",
+      "more": "…und {count, number} weitere."
+    },
+    "doctor": {
+      "title": "Verbindungsprüfung",
+      "run": "Verbindung testen",
+      "running": "Wird geprüft…",
+      "allGood": "Alles, was glot braucht, ist vorhanden.",
+      "problems": "Etwas erfordert Ihre Aufmerksamkeit, bevor glot vollständig arbeiten kann.",
+      "status": {
+        "ok": "In Ordnung",
+        "warn": "Warnung",
+        "fail": "Problem"
+      },
+      "check": {
+        "auth": "Anmeldung",
+        "source_locale": "Die Ausgangssprache weicht vom Projekt ab",
+        "note": "Hinweis",
+        "languages": "Sprachen",
+        "read": "Lesen Ihrer Inhalte (Texte auf der ersten Seite)",
+        "translations": "Lesen vorhandener Übersetzungen",
+        "webhooks": "Automatische Synchronisierung",
+        "scopes": "Berechtigungen",
+        "scope_locales": "Berechtigung, eine Sprache hinzuzufügen",
+        "scope_content": "Inhalte, die glot nicht lesen kann"
+      }
+    },
+    "fix": {
+      "reconnect": "Der Zugriff ist abgelaufen oder wurde entzogen. Verbinden Sie neu, um fortzufahren.",
+      "permissions": "Eine Berechtigung fehlt. Erteilen Sie sie der App oder dem Token auf der Plattform und testen Sie erneut.",
+      "rate_limit": "Die Plattform drosselt die Anfragen. glot versucht es von selbst erneut; Sie müssen nichts tun.",
+      "placeholders": "Die Übersetzung hat eine Variable oder ein Stück Vorlagencode verändert. Korrigieren Sie sie im Editor; glot veröffentlicht sie gleich danach.",
+      "markup": "Die Übersetzung hat die Formatierung oder einen Link verändert. Korrigieren Sie sie im Editor; glot veröffentlicht sie gleich danach.",
+      "resync": "Der Inhalt hat sich inzwischen geändert. Starten Sie eine Synchronisierung.",
+      "not_found": "Dieser Inhalt existiert auf der Plattform nicht mehr. Starten Sie eine Synchronisierung.",
+      "enable_locale": "Fügen Sie diese Sprache in den Einstellungen der Plattform hinzu und testen Sie erneut.",
+      "unreachable": "Die Website hat nicht geantwortet. Prüfen Sie, ob sie online und aus dem Internet erreichbar ist.",
+      "install_plugin": "Die Plattform braucht ein Mehrsprachigkeits-Plugin, um Übersetzungen zu speichern. Installieren Sie es und testen Sie erneut.",
+      "no_content": "Noch keine übersetzbaren Inhalte gefunden.",
+      "no_readback": "Diese Plattform lässt glot Übersetzungen nicht zurücklesen: Eine dort von Hand gemachte Änderung kann nicht erkannt und beim Rückgängigmachen nicht wiederhergestellt werden.",
+      "webhook_manual": "Die automatische Synchronisierung konnte nicht eingerichtet werden. Tragen Sie die Webhook-URL unten auf der Plattform ein oder verlassen Sie sich auf die tägliche Prüfung."
+    },
+    "history": {
+      "title": "Verlauf",
+      "empty": "Noch nichts veröffentlicht.",
+      "run": "Veröffentlichte Übersetzungen: {count, number}",
+      "rollback": "Rückgängig machen",
+      "rolledBack": "Rückgängig gemacht",
+      "confirm": "Diese Veröffentlichung rückgängig machen? Die Texte werden auf den Stand zurückgesetzt, den {name} vorher hatte. Danach ist die Veröffentlichung pausiert, bis Sie sie fortsetzen.",
+      "done": "Wiederhergestellt: {restored} · Entfernt: {removed} · Belassen (von Hand bearbeitet): {kept}"
+    },
     "status": {
       "idle": "Nicht synchronisiert",
       "queued": "Eingeplant",
@@ -3733,11 +4104,14 @@
       "description": "Produkte, Kollektionen, Seiten, Blogartikel, Metafelder, Menüs und Theme-Texte über die Translations API.",
       "fields": {
         "shop": "Shop-Domain",
+        "client_id": "Client-ID",
+        "client_secret": "Client-Secret",
         "token": "Admin-API-Zugriffstoken",
         "webhook_secret": "API-Geheimschlüssel (Webhook-Signaturen)"
       },
       "hints": {
-        "token": "Benutzerdefinierte App mit Lese-/Schreibrechten für Übersetzungen, Produkte, Inhalte, Onlineshop-Seiten, Themes und Sprachen.",
+        "client_id": "Aus Ihrer eigenen App im Shopify Dev Dashboard (Einstellungen). glot erneuert seine 24-Stunden-Zugriffstoken selbst.",
+        "token": "Nur für eine benutzerdefinierte App, die vor 2026 im Shop-Admin erstellt wurde. Andernfalls leer lassen.",
         "webhook_secret": "Damit prüft glot die Produkt- und Kollektions-Webhooks von Shopify."
       }
     },
@@ -3823,7 +4197,7 @@
       "tagAltBody": "Um im Browser zu übersetzen, was die {name}-Integration nicht abdeckt, fügen Sie stattdessen das universelle Tag hinzu.",
       "prep": {
         "project": "Erstellen Sie in glot ein Projekt und fügen Sie Ihre Sprachen hinzu.",
-        "mode": "Öffnen Sie glot Edge → Website-Tag und schalten Sie das Tag ein.",
+        "mode": "Öffnen Sie glot Edge → Website-Tag und geben Sie die Adresse Ihrer Website ein: glot übersetzt sie und zeigt Ihnen eine Vorschau. Ist das Tag eingefügt, prüfen Sie dort die Installation und schalten Sie das Tag ein.",
         "copy": "Kopieren Sie Ihr Tag aus diesem Tab: Es enthält bereits Ihr Projekt und seinen öffentlichen Schlüssel (data-key). Das Tag unten zeigt seine Form."
       },
       "snippetLabel": "glot-Tag",
@@ -3858,6 +4232,619 @@
         "docs": "Dokumentation lesen"
       },
       "related": "Weitere Integrationen: {category}"
+    }
+  },
+  "liveCheck": {
+    "title": "Live auf Ihrer Website",
+    "description": "Eine Sprache kann hier vollständig übersetzt sein und trotzdem nicht auf Ihrer Website erscheinen, wenn der Code der Website den Sprachcode von glot nicht akzeptiert. glot prüft jede Sprache auf Ihrer Website und sagt Ihnen, was zu ändern ist.",
+    "recheck": "Erneut prüfen",
+    "checking": "Ihre Website wird geprüft…",
+    "willCheck": "Sobald die Sprache gespeichert und übersetzt ist, prüfen wir, ob sie auf Ihrer Website angezeigt wird.",
+    "checked": "Geprüft {date}",
+    "state": {
+      "live": "Übersetzt · Live auf Ihrer Website",
+      "not_displayed": "Übersetzt, aber Ihre Website zeigt sie nicht an",
+      "unknown": "Übersetzt · Auf Ihrer Website noch nicht bestätigt",
+      "unchecked": "Auf Ihrer Website noch nicht geprüft",
+      "no_site": "Auf Ihrer Website nicht geprüft"
+    },
+    "badge": {
+      "live": "Live auf Ihrer Website",
+      "notDisplayed": "Nicht auf Ihrer Website sichtbar"
+    },
+    "evidence": {
+      "visitors": "Bestätigt durch Besucher, die diese Sprache in den letzten 7 Tagen gewählt haben."
+    },
+    "mapped": "glot sendet für diese Sprache <c>{code}</c> an Ihre Website, statt <c>{locale}</c>.",
+    "mappedAuto": "Ihre Website ignoriert <c>{locale}</c> und reagiert auf <c>{code}</c>: glot hat das erkannt und sendet jetzt automatisch <c>{code}</c>.",
+    "cause": {
+      "visitors": "Ein Besucher hat diese Sprache gewählt. Der Sprachumschalter hat <c>{code}</c> an Ihre Website gesendet, und die Seite hat sich nicht geändert: Der Code Ihrer Website akzeptiert <c>{code}</c> nicht.",
+      "visitorsLang": "Ein Besucher hat diese Sprache gewählt. Der Sprachumschalter hat <c>{code}</c> an Ihre Website gesendet, und die Seite blieb auf <c>{lang}</c>: Der Code Ihrer Website akzeptiert <c>{code}</c> nicht.",
+      "probe": "Wir haben <c>{url}</c> geöffnet und dieselbe Seite erhalten, die Ihre Website für eine unbekannte Sprache zeigt: Der Code Ihrer Website akzeptiert <c>{code}</c> nicht.",
+      "worksWith": "Mit <c>{code}</c> antwortet sie in dieser Sprache."
+    },
+    "fix": {
+      "title": "So beheben Sie es",
+      "alias": "{code} auf der Website nutzen",
+      "aliasConfirmed": "glot sendet <c>{code}</c> statt <c>{locale}</c>. Am Code Ihrer Website ändert sich nichts.",
+      "dev": "Oder behalten Sie <c>{locale}</c> und lassen Sie Ihre Website den Code akzeptieren, dort, wo sie die Sprache liest (<docs>Anleitung</docs>):",
+      "send": "An meinen Entwickler senden",
+      "message": "Unsere Website zeigt die Sprache {language} noch nicht an. Die Übersetzungen sind in glot fertig, und der Sprachumschalter sendet den Code „{locale}“ an die Website (zum Beispiel ?lang={locale}), aber die Website ignoriert ihn und bleibt in ihrer Standardsprache. Vermutlich akzeptiert der Code der Website nur kurze Codes wie „en“ oder „fr“.\n\nZwei Lösungen:\n1. „{locale}“ dort akzeptieren, wo die Website die Sprache liest (eine Prüfung auf nur Buchstaben oder auf die Länge lehnt den Code ab).\n2. Oder mir mitteilen, welchen Code die Website für diese Sprache erwartet, dann stelle ich ihn in glot ein (Einstellungen, Sprachen).\n\nWebsite: {site}\nAnleitung: {docs}"
+    },
+    "unknown": {
+      "csr": "Ihre Website sendet unabhängig von der Sprache dasselbe HTML (sie wechselt die Sprache im Browser), deshalb können wir es von unseren Servern aus nicht erkennen. Der erste Besucher, der diese Sprache wählt, bestätigt es.",
+      "http": "Ihre Website hat unter <c>{url}</c> mit einem Fehler ({status}) geantwortet. Prüfen Sie die Website-URL und das URL-Muster unter Ihre Website, weiter unten.",
+      "unreachable": "Wir konnten <c>{url}</c> von den glot-Servern aus nicht erreichen."
+    },
+    "noSiteHint": "Tragen Sie die URL Ihrer Website unter Ihre Website, weiter unten, ein, dann prüfen wir diese Sprache dort. Besucher, die den glot-Sprachumschalter nutzen, bestätigen sie ebenfalls.",
+    "codeLabel": "Code auf Ihrer Website",
+    "reset": "Wieder {locale} verwenden"
+  },
+  "autopilot": {
+    "title": "Autopilot",
+    "subtitle": "Welchen Markt du als Nächstes öffnen solltest, was er wert ist, und Formulierungen, die sich anhand der Conversions selbst verbessern. Jede Zahl stammt aus deinem eigenen Traffic.",
+    "docs": "So wird gerechnet",
+    "footnote": "Basiert auf {visits} Besuchen, erfasst an {dataDays} der letzten {days} Tage. Die Schätzungen werden mit jedem weiteren Tag genauer.",
+    "noConversions": "In diesem Zeitraum kam kein Ereignis „{goal}“ an: Die Märkte werden nur nach Nachfrage sortiert, ein Gewinn wird nicht geschätzt. Sende das Ereignis, um Schätzungen in Conversions und in Geld zu erhalten.",
+    "empty": {
+      "title": "Noch kein Besuch erfasst",
+      "body": "Autopilot liest die anonymen Zähler des Einblicke-Tags. Installiere es, dann erscheinen hier die ersten Märkte. Vor echten Besuchen wird nichts geschätzt.",
+      "track": "Sende danach deine Conversion. Der Wert ist optional: Er macht aus Conversions Geld.",
+      "posthog": "Du nutzt schon PostHog? Verbinde es unten, um Märkte anhand deiner bisherigen Daten zu sortieren, ohne auf das glot-Tag zu warten."
+    },
+    "settings": {
+      "title": "Was eine Conversion wert ist",
+      "subtitle": "Damit werden zusätzliche Conversions in Geld umgerechnet. Lass den Wert leer, um den Durchschnittswert aus deinen Ereignissen zu verwenden.",
+      "goal": "Zielereignis",
+      "value": "Wert pro Conversion",
+      "valuePlaceholder": "gemessen",
+      "currency": "Währung",
+      "mode": "Wenn eine Formulierung gewinnt",
+      "approval": "Vor dem Übernehmen fragen",
+      "auto": "Automatisch übernehmen",
+      "save": "Speichern",
+      "saved": "Gespeichert"
+    },
+    "value": {
+      "declared": "Jedes „{goal}“ zählt als {amount} (deine Einstellung).",
+      "measured": "Jedes „{goal}“ zählt als {amount}: der Durchschnitt aus {events} Ereignissen mit Wert in 90 Tagen.",
+      "none": "Für „{goal}“ ist kein Wert bekannt: Die Schätzungen bleiben in Conversions. Trage hier einen Wert ein oder sende ihn mit dem Ereignis."
+    },
+    "opp": {
+      "title": "Märkte zum Öffnen",
+      "subtitle": "Sprachen, die deine Besucher wünschen und die du noch nicht anbietest, sortiert nach erwartetem Gewinn.",
+      "none": "Jede Sprache, die deine Besucher bevorzugen, wird bereits angeboten. Nichts zu öffnen.",
+      "headline": "{language}: {share} deiner Besucher, nicht in ihrer Sprache bedient",
+      "headlineFinish": "{language}: {share} deiner Besucher, nur zu {coverage} übersetzt",
+      "gap": "Sie konvertieren {gap} schlechter als Besucher, die ihre eigene Sprache sehen ({fallback} gegenüber {native}).",
+      "gapNone": "Sie konvertieren genauso gut wie Besucher, die ihre eigene Sprache sehen ({fallback} gegenüber {native}).",
+      "revenue": "{mid} pro Monat",
+      "conversions": "{mid} „{goal}“ pro Monat",
+      "range": "wahrscheinlich zwischen {low} und {high}",
+      "uncertain": "Die Spanne enthält null: Der Gewinn ist noch nicht belegt.",
+      "insufficient": "Zu wenige Daten, um einen Gewinn zu schätzen.",
+      "missingVisits": "Es fehlen noch {count} Besuche dieser Besucher.",
+      "missingNative": "Für den Vergleich fehlen noch {count} Besuche in der Sprache des Besuchers.",
+      "missingConversions": "Für eine belastbare Schätzung fehlen noch {count} Conversions.",
+      "cost": "{cost} für die Übersetzung von {keys} Texten",
+      "payback": "nach etwa {days} Tagen wieder eingespielt",
+      "paybackFast": "in weniger als einem Tag wieder eingespielt",
+      "method": "So wird gerechnet",
+      "formula": "{visits} Besuche pro Monat × ({native} − {fallback}) = {gain} zusätzliche Conversions pro Monat",
+      "formulaMoney": "× {value} = {revenue} pro Monat",
+      "caveat": "90-%-Intervall. Angenommen wird, dass diese Besucher so konvertieren würden wie jene, die ihre Sprache bereits sehen. Das ist eine Schätzung, kein Versprechen: Die Messung nach dem Öffnen zeigt die Wahrheit.",
+      "open": "Diesen Markt öffnen",
+      "locked": "Erwartete Gewinne sind in Growth enthalten.",
+      "bounce": "{rate} ihrer Sitzungen enden nach einer Seite, gegenüber {all} bei allen Besuchern."
+    },
+    "confidence": {
+      "insufficient": "Zu wenige Daten",
+      "indicative": "Richtwert",
+      "solid": "Belastbar"
+    },
+    "open": {
+      "title": "{language} öffnen?",
+      "body": "glot fügt die Sprache hinzu, übersetzt {keys} Texte (etwa {cost}, gedeckelt auf {cap}) und beginnt mit der Messung, sobald die Übersetzung fertig ist.",
+      "mode": "Messung",
+      "holdout": "Kontrollgruppe (misst die echte Wirkung)",
+      "holdoutHint": "20 % dieser Besucher bleiben 14 Tage bei der aktuellen Sprache, danach erhalten alle die neue. Erfordert zur Laufzeit geladene Übersetzungen (glot-CDN oder glot Edge).",
+      "before_after": "Vorher / nachher",
+      "before_afterHint": "Vergleicht dieselben Besucher vorher und nachher. Kein Beweis: Auch Jahreszeiten und Kampagnen bewegen die Zahlen.",
+      "confirm": "Markt öffnen",
+      "cancel": "Abbrechen",
+      "started": "{language}: Übersetzung gestartet"
+    },
+    "openings": {
+      "title": "Märkte, die gerade geöffnet werden",
+      "status": {
+        "translating": "Wird übersetzt",
+        "measuring": "Wird gemessen",
+        "failed": "Fehlgeschlagen"
+      },
+      "progress": "{done} von {total} Texten",
+      "predicted": "Prognose: {gain}, {range}",
+      "predictedNone": "Keine Prognose: Beim Öffnen lagen keine Daten zu dieser Sprache vor.",
+      "measured": "Gemessen: {lift} (zwischen {low} und {high})",
+      "causal": "Gegen eine Kontrollgruppe gemessen: eine echte Wirkung.",
+      "notCausal": "Vorher-nachher-Vergleich: eine Korrelation, kein Beweis.",
+      "details": "Messung ansehen"
+    },
+    "misrouted": {
+      "title": "Besucher in der falschen Sprache",
+      "subtitle": "Du hast diese Sprachen bereits, trotzdem sieht ein Teil ihrer Besucher eine andere. Keine Übersetzung nötig: Erkenne die Browsersprache oder mache die Sprachauswahl sichtbarer.",
+      "headline": "{language}: {share} der Besucher, die sie bevorzugen, sehen {instead} ({count} Besuche)",
+      "rates": "Conversion: {mismatched} in einer anderen Sprache, {matched} in der eigenen.",
+      "gain": "Erwartet: {mid} „{goal}“ pro Monat (zwischen {low} und {high}).",
+      "missing": "Es fehlen noch {count} Conversions, bevor sich die beiden Gruppen vergleichen lassen.",
+      "caveat": "Manche haben diese Sprache vielleicht selbst gewählt."
+    },
+    "copy": {
+      "title": "Formulierungen, die sich selbst optimieren",
+      "subtitle": "Für Überschriften, Buttons und Preistexte schreibt glot alternative Formulierungen, zeigt sie deinen Besuchern und behält die mit der besten Conversion. Rechtstexte werden nie angefasst.",
+      "candidates": "Texte, die sich zu optimieren lohnen",
+      "noCandidates": "Noch keine übersetzte Überschrift, kein Button und kein Preistext gefunden.",
+      "optimize": "Optimieren",
+      "started": "Test für {key} gestartet",
+      "lowTraffic": "Wenig Traffic: Ein Ergebnis innerhalb von 30 Tagen ist unwahrscheinlich",
+      "noTraffic": "Noch kein Besuch in dieser Sprache",
+      "noConversions": "Noch kein „{goal}“ in dieser Sprache: Ein Test käme zu keinem Ergebnis",
+      "estDays": "erstes Ergebnis in etwa {days} Tagen",
+      "kind": {
+        "headline": "Überschrift",
+        "cta": "Button",
+        "pricing": "Preise",
+        "other": "Text"
+      },
+      "status": {
+        "running": "Im Test",
+        "awaiting_approval": "Ein Gewinner wartet auf dich",
+        "promoted": "Übernommen",
+        "rolled_back": "Zurückgenommen",
+        "no_winner": "Kein Gewinner",
+        "stopped": "Gestoppt"
+      },
+      "reason": {
+        "official_best": "Die aktuelle Übersetzung konvertiert am besten. Nichts wurde geändert.",
+        "no_difference": "Kein messbarer Unterschied nach {days} Tagen. Die aktuelle Übersetzung bleibt.",
+        "all_variants_worse": "Alle neuen Formulierungen konvertierten schlechter. Sie wurden zurückgezogen, die aktuelle Übersetzung bleibt.",
+        "source_changed": "Der Quelltext hat sich geändert: Der Test wurde gestoppt.",
+        "stopped_manually": "Von einem Mitglied gestoppt.",
+        "promoted_manually": "Auf der Seite Experimente übernommen.",
+        "approver_missing": "glot konnte sie nicht automatisch übernehmen: Bestätige sie selbst."
+      },
+      "lift": "bei den Conversions, zwischen {low} und {high}",
+      "worth": "etwa {amount} pro Monat, wenn die Wirkung anhält",
+      "winner": "Gewinner-Formulierung",
+      "leader": "Bisher beste Formulierung",
+      "current": "Aktuelle Übersetzung",
+      "sample": "{views} Besucher und {conversions} Conversions, gegenüber {cviews} Besuchern und {cconversions} Conversions der aktuellen Übersetzung",
+      "dropped": "Zurückgezogen, sie konvertierte schlechter: „{value}“",
+      "refused": "Abgelehnt, bevor ein Besucher sie sah ({why}): „{value}“",
+      "why": {
+        "new_number": "sie fügte eine Zahl hinzu",
+        "new_price": "sie fügte einen Preis oder eine Prozentangabe hinzu",
+        "new_link": "sie fügte einen Link hinzu",
+        "new_claim": "sie fügte ein Versprechen hinzu",
+        "validation": "sie bestand die Validierung nicht"
+      },
+      "approve": "Diese Formulierung übernehmen",
+      "stop": "Stoppen",
+      "approved": "Formulierung übernommen",
+      "stopped": "Test gestoppt",
+      "caveat": "Der Zuwachs eines Gewinners wird meist überschätzt, weil er ausgewählt wurde, als er vorne lag. Die untere Grenze ist die vorsichtige Zahl.",
+      "none": "Noch kein Test. Wähle unten einen Text aus."
+    },
+    "collected": {
+      "title": "Was erfasst wird",
+      "body": "Nur Zähler. Kein Besucher, kein Cookie, keine IP-Adresse, keine Seite.",
+      "insights": "Besuche und Ereignisse pro Tag, mit bevorzugter Sprache, angezeigter Sprache, Land und Testgruppe.",
+      "variants": "Aufrufe und Conversions pro Formulierung.",
+      "revenue": "Pro Tag, Ereignis und Währung: die Anzahl der Ereignisse und die Summe ihres Werts.",
+      "posthog": "Optionaler PostHog-Import: pro Tag, Browsersprache, Seitensprache und Land die Anzahl der Sitzungen, Seitenaufrufe, Sitzungen mit nur einer Seite, Besucher und Sitzungen mit dem Conversion-Ereignis."
+    },
+    "source": {
+      "label": "Quelle: {source} · Tage mit Daten: {days}",
+      "insights": "glot-Tag",
+      "posthog": "PostHog",
+      "switch": "Stattdessen {source} anzeigen",
+      "synced": "importiert {date}"
+    },
+    "posthog": {
+      "title": "Datenquelle: PostHog",
+      "subtitle": "Importiere deine PostHog-Historie (nur lesend, nur tägliche Zähler), um Märkte zu sortieren, ohne auf das glot-Tag zu warten. Formulierungstests und Launch-Messungen brauchen weiterhin das glot-Tag.",
+      "connected": "Verbunden mit Projekt {project} auf {host}.",
+      "notConnected": "Nicht verbunden.",
+      "synced": "Importiert vom {from} bis {to}, letzte Synchronisierung {when}.",
+      "never": "Noch nichts importiert.",
+      "error": "Der letzte Import ist fehlgeschlagen: {error}",
+      "host": "Region",
+      "us": "US-Cloud",
+      "eu": "EU-Cloud",
+      "custom": "Selbst gehostet",
+      "url": "Instanz-URL",
+      "project": "Projekt-ID",
+      "key": "Persönlicher API-Schlüssel",
+      "keyPlaceholder": "phx_…",
+      "keySaved": "Gespeichert. Leer lassen, um ihn zu behalten.",
+      "event": "Conversion-Ereignis",
+      "eventNone": "Keines (nur Besuche)",
+      "eventHint": "Teste die Verbindung, um aus den echten Ereignissen deines Projekts zu wählen (letzte 30 Tage).",
+      "locale": "Sprache von Seiten ohne Sprachcode",
+      "localeHint": "Wird verwendet, wenn die URL kein Präfix /nl/ oder nl. hat. Leer lassen, wenn unbekannt.",
+      "backfill": "Zu importierende Historie (Tage)",
+      "test": "Verbindung testen",
+      "tested": "Verbunden: {pageviews} Seitenaufrufe in 30 Tagen, davon {share} mit Browsersprache.",
+      "save": "Speichern und importieren",
+      "sync": "Jetzt importieren",
+      "syncing": "Wird importiert…",
+      "imported": "Importiert: {rows} Zähler ({queries} Abfragen).",
+      "disconnect": "Trennen",
+      "disconnected": "PostHog getrennt: Schlüssel und importierte Zähler wurden gelöscht.",
+      "steps": "So bekommst du den Schlüssel",
+      "step1": "Öffne in PostHog das Menü deines Avatars → Settings → Personal API keys und erstelle einen Schlüssel (Create personal API key).",
+      "step2": "Berechtigung: nur Query → Read (query:read), auf dieses Projekt beschränkt.",
+      "step3": "Projekt-ID: Project settings → General → Project ID (eine Zahl).",
+      "step4": "Region: US, wenn du dich bei us.posthog.com anmeldest, EU bei eu.posthog.com.",
+      "privacy": "glot fragt bei PostHog nur Zählungen pro Tag, Browsersprache, Seitensprache und Land ab. Keine Person, keine IP-Adresse und keine URL wird abgerufen. Der Schlüssel wird verschlüsselt gespeichert und nie wieder angezeigt."
+    }
+  },
+  "renderProtocol": {
+    "title": "Render-API",
+    "subtitle": "Senden Sie beliebige Inhalte und die Sprache des Empfängers und erhalten Sie sie in dessen Sprache zurück. E-Mails, Benachrichtigungen, Rechnungen, Seiten: gleiches Glossar, gleicher Speicher, gleiche Prüfungen.",
+    "docs": "Dokumentation lesen",
+    "play": {
+      "title": "Ausprobieren",
+      "hint": "Fügen Sie Inhalt in {source} ein. Bekannter Inhalt kommt aus dem Speicher; neuer wird mit dem Modell des Projekts übersetzt und gemerkt.",
+      "content": "Inhalt",
+      "contentPlaceholder": "E-Mail-Text, Benachrichtigung oder Absatz einfügen…",
+      "type": "Typ",
+      "variables": "Variablen (JSON, optional)",
+      "variablesHint": "Werden nach der Übersetzung eingesetzt. Nie an das Modell gesendet, nie gespeichert.",
+      "noLocales": "Fügen Sie in den Projekteinstellungen eine Zielsprache hinzu, um es auszuprobieren.",
+      "languages": "Sprachen",
+      "run": "Rendern",
+      "badJson": "Variablen müssen ein JSON-Objekt sein.",
+      "units": "{cached} aus dem Speicher · {translated} neu · {total} gesamt",
+      "preview": "Vorschau, {locale}"
+    },
+    "types": {
+      "html": "HTML",
+      "text": "Nur Text",
+      "markdown": "Markdown",
+      "template": "ICU-Vorlage"
+    },
+    "status": {
+      "translated": "Übersetzt",
+      "source": "Ausgangssprache",
+      "partial": "Teilweise übersetzt",
+      "fallback": "In der Ausgangssprache zurückgegeben"
+    },
+    "usage": {
+      "title": "Nutzung, letzte 30 Tage",
+      "empty": "Noch kein Dokument gerendert. Nutzen Sie den Bereich oben oder rufen Sie POST /v1/render mit einem Schlüssel auf: Die Zähler erscheinen hier ab dem ersten Aufruf.",
+      "documents": "Dokumente",
+      "hitRate": "Aus dem Speicher bedient",
+      "translated": "Übersetzte Einheiten",
+      "fallbacks": "Rückfälle auf die Quelle",
+      "memory": "Einheiten im Speicher: {entries} · Sprachen: {locales}",
+      "day": "Tag",
+      "fromMemory": "Einheiten aus dem Speicher"
+    },
+    "keys": {
+      "title": "Schlüssel",
+      "create": "Neuer Schlüssel",
+      "createHint": "Ein Schlüssel gehört zu diesem Projekt. Er wird nur einmal angezeigt.",
+      "emptyTitle": "Kein Render-Schlüssel",
+      "emptyBody": "Erstellen Sie einen Schlüssel, um POST /v1/render von Ihrem Server aus aufzurufen.",
+      "name": "Name",
+      "scope": "Zugriff",
+      "scopeRender": "Neue Inhalte übersetzen",
+      "scopeCached": "Nur Speicher (ruft nie ein Modell auf)",
+      "month": "Dokumente diesen Monat",
+      "of": "{used} von {limit}",
+      "revoke": "Widerrufen",
+      "revokeNamed": "{name} widerrufen",
+      "revoked": "Schlüssel widerrufen",
+      "limit": "Monatslimit (Dokumente)",
+      "limitHint": "Leer: Es gilt nur das Limit Ihres Tarifs.",
+      "revealTitle": "Kopieren Sie Ihren Schlüssel jetzt",
+      "revealBody": "Er wird nicht noch einmal angezeigt. Bewahren Sie ihn bei den Geheimnissen Ihres Servers auf."
+    }
+  },
+  "twoWay": {
+    "title": "Konversationen",
+    "subtitle": "Was Ihre Kunden schreiben, in Ihrer Sprache neben dem Original. Sie antworten in Ihrer Sprache, die Kunden lesen ihre.",
+    "attention": "Erfordert Ihre Aufmerksamkeit",
+    "mode": {
+      "suggest": {
+        "name": "Vorschlag",
+        "hint": "glot übersetzt Ihre Antwort und sendet sie nie: Kopieren Sie sie oder senden Sie sie aus Ihrem eigenen Tool."
+      },
+      "one_click": {
+        "name": "Senden mit einem Klick",
+        "hint": "Nichts geht raus, bevor Sie bei einer Antwort auf Senden klicken."
+      },
+      "auto": {
+        "name": "Automatisch",
+        "hint": "Antworten werden gesendet, sobald sie übersetzt sind, außer wenn glot sich nicht sicher ist."
+      }
+    },
+    "channel": {
+      "api": "API / Webhook",
+      "helpscout": "Help Scout",
+      "form": "Kontaktformular",
+      "email": "E-Mail"
+    },
+    "settings": {
+      "open": "Einstellungen",
+      "title": "Einstellungen für Konversationen",
+      "saved": "Einstellungen gespeichert",
+      "mode": "Sendemodus",
+      "team": "Teamsprache",
+      "review": "Prüfung anfordern unter (%)",
+      "reviewHint": "Eine Antwort, deren Rückübersetzung weniger als dies mit Ihrem Text übereinstimmt, wartet auf eine Person.",
+      "webhook": "Signierter Webhook",
+      "secretOnce": "Kopieren Sie dieses Secret jetzt: Es wird nur einmal angezeigt.",
+      "secretSet": "Ein Secret ist gesetzt. Beim Erneuern wird das vorherige ungültig.",
+      "secretNone": "Noch kein Secret: Der Webhook lehnt jede Anfrage ab, bis Sie eines erzeugen.",
+      "rotate": "Secret erneuern",
+      "generate": "Secret erzeugen",
+      "replyUrl": "Antwort-URL (optional)",
+      "replyUrlHint": "Gesendete Antworten werden hierhin gepostet, mit demselben Secret signiert. Leer: Lesen Sie sie aus der API-Antwort.",
+      "form": "Kontaktformular-Helfer",
+      "formEnabled": "Formularnachrichten mit Sprache und Übersetzung versehen",
+      "formStore": "Formularnachrichten auch in diesem Posteingang behalten",
+      "formHint": "Aus: Es wird nichts gespeichert außer einem Zähler pro Sprache. Das Skript blockiert nie ein Absenden.",
+      "hsAppId": "App-ID",
+      "hsAppSecret": "App-Secret",
+      "hsWebhookSecret": "Webhook-Secret",
+      "hsHint": "Erstellen Sie in Help Scout eine App (Your Profile → My Apps) und einen Webhook auf die obige URL mit den Ereignissen „Conversation created“, „Customer replied“ und „Note created“.",
+      "forward": "Übersetzte E-Mails weiterleiten an",
+      "forwardHint": "Eingehende E-Mails werden übersetzt und mit dem Original darunter an diese Adresse weitergeleitet."
+    },
+    "empty": {
+      "title": "Noch keine Kundennachricht",
+      "body": "Dieser Posteingang zeigt nur echte Nachrichten. Verbinden Sie einen Kanal, und die erste Nachricht erscheint hier, übersetzt, neben ihrem Original.",
+      "docs": "Anleitung lesen",
+      "api": "Aus jedem Tool: ein API-Aufruf",
+      "form": "Auf Ihrer Website: das Kontaktformular-Skript",
+      "formOff": "Auf Ihrer Website: das Kontaktformular-Skript (zuerst in den Einstellungen aktivieren)",
+      "helpdesk": "Help Scout und eingehende E-Mails richten Sie in den Einstellungen ein."
+    },
+    "stats": {
+      "title": "{count, plural, one {# Kundennachricht} other {# Kundennachrichten}} {days, plural, one {am letzten Tag} other {in den letzten # Tagen}}",
+      "unknown": "Nicht erkannt",
+      "unserved": "Sprache, die Sie nicht anbieten",
+      "hint": "Kunden, die bereits in einer Sprache schreiben, die Sie nicht anbieten, sind das stärkste Signal für Ihren nächsten Markt."
+    },
+    "flag": {
+      "pii": "{count, plural, one {# persönliche Angabe verborgen} other {# persönliche Angaben verborgen}}",
+      "piiTip": "E-Mail-Adressen, Telefon-, Bestell- und Kartennummern werden durch Platzhalter ersetzt, bevor der Text an das Modell geht, und danach wieder eingesetzt.",
+      "language_uncertain": "Sprache unsicher",
+      "low_confidence": "Prüfen Sie diese Übersetzung",
+      "pii_lost": "Verborgene Daten wurden nicht korrekt wieder eingesetzt",
+      "mixed": "Gemischte Sprachen: {languages}",
+      "untranslated": "Nicht übersetzt",
+      "validation": "Qualitätsprüfung nicht bestanden"
+    },
+    "thread": {
+      "language": "Kunde schreibt auf {language}",
+      "languageUnknown": "Kundensprache unbekannt",
+      "fixLabel": "Kundensprache (Code)",
+      "fix": "Sprache festlegen",
+      "customer": "Kunde",
+      "team": "Ihr Team",
+      "original": "Original ({language})",
+      "translation": "Übersetzung ({language})",
+      "sameLanguage": "Bereits in Ihrer Sprache: nichts zu übersetzen."
+    },
+    "status": {
+      "received": "Empfangen",
+      "draft": "Entwurf",
+      "needs_review": "Zu prüfen",
+      "sent": "Gesendet",
+      "failed": "Fehlgeschlagen"
+    },
+    "reply": {
+      "sent": "Antwort gesendet",
+      "failed": "Die Antwort konnte nicht gesendet werden",
+      "saved": "Übersetzung als Entwurf gespeichert",
+      "back": "Rückübersetzung:",
+      "confidence": "{percent} % Übereinstimmung",
+      "label": "Antworten Sie in Ihrer Sprache",
+      "placeholder": "Schreiben Sie Ihre Antwort…",
+      "checking": "Wird übersetzt und geprüft…",
+      "review": "Die Rückübersetzung weicht von Ihrem Text ab: Lesen Sie sie vor dem Senden.",
+      "hint": "Halten Sie kurz inne, um zu sehen, was der Kunde lesen wird, für Sie zurückübersetzt.",
+      "save": "Übersetzen",
+      "send": "Senden"
+    }
+  },
+  "localSeo": {
+    "title": "Lokales SEO",
+    "subtitle": "Ein übersetztes Keyword ist nicht das, wonach Menschen suchen. Für jede Seite und jeden Markt passt glot Titel, Beschreibung und Überschriften an echte Suchanfragen an. Der Seiteninhalt bleibt eine getreue Übersetzung, und nichts geht ohne Ihre Freigabe live.",
+    "warnings": "Was nicht erledigt werden konnte",
+    "dismiss": "Schließen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saved": "Entwurf gespeichert",
+    "approved": "Freigegeben: für diesen Markt live",
+    "rejected": "Abgelehnt: die Übersetzung bleibt",
+    "approve": "Freigeben",
+    "reject": "Ablehnen",
+    "takeDown": "Zurückziehen",
+    "edit": "Bearbeiten",
+    "edited": "Ihre Version",
+    "proposed": "Vorschlag",
+    "current": "Heute angezeigt",
+    "why": "Wonach dort gesucht wird",
+    "slug": "Slug",
+    "blocked": "Beheben Sie die Fehler unten, bevor Sie freigeben",
+    "volumeUnknown": "Volumen unbekannt",
+    "needsDemand": "Noch keine Suchdaten für {locale}. Verbinden Sie die Search Console oder fügen Sie die Keywords hinzu, die Sie für diesen Markt bereits kennen: glot erfindet niemals Keywords oder Volumen.",
+    "editTitle": "{path} in {locale}",
+    "editBody": "Ihre Version ersetzt den Vorschlag und durchläuft dieselben Prüfungen.",
+    "saveDraft": "Entwurf speichern",
+    "saveApprove": "Speichern und freigeben",
+    "scan": {
+      "action": "Seiten analysieren",
+      "running": "Seiten werden gelesen…",
+      "done": "Gelesene Seiten: {pages} · Vorschläge: {proposed}"
+    },
+    "empty": {
+      "title": "Noch keine Seite analysiert",
+      "body": "glot liest die öffentlichen Seiten von {site}, prüft, was jeder Markt heute anzeigt, und schlägt suchorientierte Inhalte vor, wo echte Suchdaten vorliegen.",
+      "noSite": "Geben Sie oben die Adresse Ihrer Website an, damit glot ihre Seiten analysieren kann."
+    },
+    "site": {
+      "title": "Website",
+      "missing": "glot kennt die URL Ihrer Website noch nicht."
+    },
+    "auto": {
+      "off": "Prüfmodus: Sie geben jeden Vorschlag frei",
+      "on": "Automatikmodus: Vorschläge, die alle Prüfungen bestehen, gehen live",
+      "confirmTitle": "Vorschläge automatisch anwenden?",
+      "confirmBody": "Vorschläge, die alle Prüfungen ohne Warnung bestehen, gehen live, ohne dass jemand sie vorher liest. Vorschläge mit einem Fehler oder einer Warnung warten weiterhin auf Sie. Sie können jederzeit zurückwechseln.",
+      "confirm": "Automatikmodus einschalten"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "notConnected": "Nicht verbunden. Verbinden Sie sie (nur Lesezugriff), um zu sehen, wonach in jedem Land wirklich gesucht wird, und um Impressionen, Klicks und Position nach einer Änderung zu messen.",
+      "notConfigured": "Auf diesem Server noch nicht verfügbar: Der Betreiber muss einen Google-OAuth-Client hinzufügen. Fügen Sie bis dahin die Keywords hinzu, die Sie bereits kennen.",
+      "connect": "Search Console verbinden",
+      "disconnect": "Trennen",
+      "result": {
+        "connected": "Search Console verbunden",
+        "denied": "Search Console wurde nicht verbunden: Der Zugriff wurde abgelehnt",
+        "no_property": "Dieses Google-Konto hat keine Search-Console-Property für diese Website",
+        "failed": "Search Console konnte nicht verbunden werden. Versuchen Sie es erneut."
+      }
+    },
+    "metrics": {
+      "refresh": "Suchdaten aktualisieren",
+      "refreshed": "Gespeicherte Tage mit Suchdaten: {days}",
+      "none": "Für diese Seite sind noch keine Search-Console-Daten gespeichert.",
+      "notConnected": "Verbinden Sie die Search Console, um die Wirkung zu messen.",
+      "window": "{days} Tage · {impressions} Impressionen · {clicks} Klicks · Position {position}",
+      "noRows": "keine Daten",
+      "before": "28 Tage davor",
+      "after": "Seit der Veröffentlichung"
+    },
+    "keywords": {
+      "title": "Ihre Keywords",
+      "hint": "Suchanfragen, die Sie für jeden Markt bereits kennen, aus Ihren eigenen Tools.",
+      "saved": "Gespeicherte Keywords: {count}",
+      "dialogTitle": "Keywords für {locale}",
+      "dialogBody": "Eine Suchanfrage pro Zeile, so wie sie in diesem Markt eingegeben wird. Fügen Sie ein Komma und eine Zahl hinzu, wenn Sie das monatliche Volumen kennen."
+    },
+    "engine": {
+      "google": "Google",
+      "baidu": "Baidu",
+      "yandex": "Yandex",
+      "naver": "Naver"
+    },
+    "status": {
+      "proposed": "Zu prüfen",
+      "approved": "Live",
+      "auto": "Live (automatisch)",
+      "rejected": "Abgelehnt",
+      "stale": "Seite geändert",
+      "needs_demand": "Keine Suchdaten"
+    },
+    "source": {
+      "manual": "Ihre Liste",
+      "gsc": "Search Console",
+      "gsc_site": "Search Console, gesamte Website"
+    },
+    "field": {
+      "title": "Titel",
+      "description": "Meta-Beschreibung",
+      "h1": "Hauptüberschrift (H1)",
+      "slug": "URL-Slug (Vorschlag)"
+    }
+  },
+  "liveStream": {
+    "title": "Live-Stream",
+    "subtitle": "Übersetzen Sie Text, den es noch gar nicht gibt: eine KI-Antwort, eine Benachrichtigung, eine Chat-Nachricht, während er eintrifft, mit Ihrem Glossar und Ihrem Übersetzungsspeicher.",
+    "ms": "{n} ms",
+    "optIn": {
+      "title": "Das sind Inhalte Ihrer Nutzer",
+      "sent": "Was an Ihren KI-Anbieter geht: die zu übersetzenden Sätze, die darin vorkommenden Glossarbegriffe und die letzten Sätze der Unterhaltung. Code, Links und nicht zu übersetzende Begriffe werden vorher durch Platzhalter ersetzt; E-Mail-Adressen und lange Nummern (Telefon, Karten) ebenfalls, sofern Sie die Maskierung nicht abschalten. Namen und Postanschriften werden nicht erkannt.",
+      "stored": "Was glot speichert: einen verschlüsselten Fingerabdruck und einen Zähler pro Satz sowie Tagessummen. Keinen Text, es sei denn, Sie aktivieren unten den Cache.",
+      "on": "Ein",
+      "off": "Aus"
+    },
+    "settings": {
+      "mask_pii": {
+        "label": "Personenbezogene Daten maskieren",
+        "help": "E-Mail-Adressen und Nummern ab 7 Ziffern erreichen den Anbieter nie; sie werden in die Übersetzung zurückgesetzt."
+      },
+      "store": {
+        "label": "Übersetzungen cachen",
+        "help": "Behält maskierte Übersetzungen: Ein wiederholter Satz ist sofort da und kostet nichts. Beim Ausschalten werden sie gelöscht."
+      },
+      "browser": {
+        "label": "Zugriff aus dem Browser",
+        "help": "Akzeptiert den öffentlichen Schlüssel des Projekts von Webseiten. Aus: nur Ihr Server, mit einem API-Token."
+      }
+    },
+    "provider": {
+      "mock": "Dieses Projekt nutzt den Test-Anbieter: Die Ausgabe unten ist markierter Quelltext, keine Übersetzung.",
+      "missing": "Es ist kein KI-Schlüssel hinterlegt: Nur Sätze, die schon in Ihrem Übersetzungsspeicher stehen, werden übersetzt, der Rest wird unverändert durchgereicht.",
+      "fix": "Wählen Sie Anbieter und Schlüssel in den <link>Projekteinstellungen</link>."
+    },
+    "playground": {
+      "title": "Mit eigenem Text ausprobieren",
+      "body": "Tippen oder fügen Sie eine Nachricht ein. Sie wird im gewählten Tempo durch dieselbe Pipeline geschickt, die Ihre App aufrufen würde, mit dem Glossar dieses Projekts ({terms, plural, =0 {noch kein Begriff} one {# Begriff} other {# Begriffe}}) und seinem Übersetzungsspeicher. Die Zeiten unten werden bei diesem Durchlauf in Ihrem Browser gemessen.",
+      "enableFirst": "Schalten Sie den Live-Stream oben ein, um ihn auszuprobieren.",
+      "noLocale": "Fügen Sie diesem Projekt zuerst eine Zielsprache hinzu.",
+      "placeholder": "Nachricht hier eintippen oder einfügen (Markdown, Codeblöcke und Links sind möglich)…",
+      "input": "Zu streamender Text",
+      "to": "Übersetzen nach",
+      "speed": "Tempo",
+      "cps": "{n} Zeichen pro Sekunde",
+      "atOnce": "Alles auf einmal",
+      "start": "Streamen",
+      "stop": "Stoppen",
+      "source": "Was eintrifft",
+      "output": "Was Ihr Nutzer liest ({locale})"
+    },
+    "via": {
+      "tm": "Aus Ihrem Übersetzungsspeicher",
+      "cache": "In dieser Unterhaltung oder im Cache bereits übersetzt"
+    },
+    "reason": {
+      "no_provider": "nicht übersetzt: Es ist kein KI-Anbieter eingerichtet.",
+      "provider_error": "nicht übersetzt: Der KI-Anbieter hat einen Fehler gemeldet.",
+      "provider_timeout": "nicht übersetzt: Der KI-Anbieter hat nicht rechtzeitig geantwortet.",
+      "provider_down": "nicht übersetzt: Der KI-Anbieter war gerade ausgefallen und wurde nicht erneut aufgerufen.",
+      "invalid_output": "nicht übersetzt: Die Antwort hat ein geschütztes Element (Code, Link, personenbezogene Daten) verloren oder die Formatierung beschädigt, daher blieb der Quelltext stehen.",
+      "glossary": "übersetzt, aber ein Glossarbegriff wurde nicht eingehalten.",
+      "live_stream_disabled": "nicht übersetzt: Der Live-Stream ist für dieses Projekt ausgeschaltet.",
+      "live_stream_daily_cap": "nicht übersetzt: Das Tageslimit des Projekts ist erreicht.",
+      "other": "nicht übersetzt: glot war nicht erreichbar."
+    },
+    "metric": {
+      "first": "Erster übersetzter Text",
+      "lag": "Mittlere Verzögerung",
+      "lagMax": "Längste Verzögerung",
+      "llm": "Von der KI übersetzt",
+      "known": "Aus dem Speicher"
+    },
+    "code": {
+      "title": "In Ihrer App",
+      "body": "Eine Zeile um den Stream, den Ihr KI-SDK liefert. Kann glot nicht antworten, erhält Ihr Nutzer den Originaltext, vollständig. <link>Zur Anleitung</link>."
+    },
+    "usage": {
+      "title": "Letzte 30 Tage",
+      "empty": {
+        "title": "Noch nichts übersetzt",
+        "body": "Die Zahlen erscheinen hier nach dem ersten übersetzten Stream für dieses Projekt, aus dem Test oben oder aus Ihrer App."
+      },
+      "chars": "Zeichen",
+      "units": "Sätze",
+      "failed": "Nicht übersetzt",
+      "repeats": "{repeats, plural, one {# Satz wurde} other {# Sätze wurden}} mehr als einmal gesehen, von {distinct} verschiedenen; {stored} im Cache."
     }
   }
 }

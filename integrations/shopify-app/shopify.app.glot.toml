@@ -1,0 +1,32 @@
+# glot's own Shopify app: the one behind the dashboard's one-click "Connect" (crates/server/src/connectors/oauth.rs)
+# AND the theme app embed. Used by glot's operator only; a merchant who self-hosts keeps shopify.app.toml.
+#   shopify app config link --config glot     # fills client_id with the app created in the Dev Dashboard
+#   shopify app deploy --config glot          # releases scopes, redirect URL, webhooks and the extension
+# Then set GLOT_SHOPIFY_CLIENT_ID / GLOT_SHOPIFY_CLIENT_SECRET on the glot server (deploy/.env).
+# Reference: https://shopify.dev/docs/apps/build/cli-for-apps/app-configuration
+name = "glot"
+client_id = "REPLACE_WITH_GLOT_APP_CLIENT_ID"
+# Opened from the Shopify admin: the Integrations docs explain how to connect from glot.
+application_url = "https://glotlang.com/docs/integrations#shopify"
+embedded = false
+
+[access_scopes]
+# Same list as SHOPIFY_SCOPES in oauth.rs: translations and locales to write, the rest to read what is translated.
+scopes = "read_translations,write_translations,read_locales,write_locales,read_products,read_content,read_online_store_pages,read_online_store_navigation,read_themes,read_metaobjects"
+
+[auth]
+# Must be exactly {GLOT_WEB_ORIGIN}/api/connectors/oauth/shopify/callback.
+redirect_urls = ["https://app.glotlang.com/api/connectors/oauth/shopify/callback"]
+
+[webhooks]
+api_version = "2026-07"
+
+# {GLOT_PUBLIC_URL}/api/connectors/shopify/webhooks verifies X-Shopify-Hmac-Sha256 (401 otherwise).
+[[webhooks.subscriptions]]
+topics = ["app/uninstalled"]
+uri = "https://api.glotlang.com/api/connectors/shopify/webhooks"
+
+# Mandatory for distribution: https://shopify.dev/docs/apps/build/compliance/privacy-law-compliance
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+uri = "https://api.glotlang.com/api/connectors/shopify/webhooks"

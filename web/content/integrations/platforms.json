@@ -1559,10 +1559,10 @@
       "notes": "The Shopify help page does not name theme.liquid explicitly; shopify.dev confirms theme.liquid is the default layout for all non-checkout pages and that content_for_header sits in <head>. Script tags on Thank you / Order status are sunset for non-Plus stores on 2026-08-26 per shopify.dev.",
       "native": {
         "steps": [
-          "In Shopify admin → Settings → Apps and sales channels → Develop apps, create a custom app with the Admin API scopes read_translations, write_translations, read_products, read_content, read_online_store_pages, read_themes, read_locales and write_locales.",
-          "Install the app, then copy its Admin API access token (shpat_…) and your store domain (my-store.myshopify.com).",
-          "In glot, open your project → Integrations → Shopify and paste the domain and the token. Add the API secret key too if you want glot to register and verify webhooks.",
-          "Click Sync now. glot translates products, collections, pages, articles and the theme as edited in the admin, and registers each translation in Shopify.",
+          "In glot, open your project → Integrations → Shopify, enter your store domain (my-store.myshopify.com) and click Connect. Approve the access in Shopify: you come back connected, with no token to copy.",
+          "If the Connect button isn't offered on your glot server: create an app in the Shopify Dev Dashboard with the scopes read_translations, write_translations, read_locales, write_locales, read_products, read_content, read_online_store_pages, read_online_store_navigation, read_themes and read_metaobjects, install it on your store, then paste its Client ID and Client secret in the form. glot renews the 24-hour access tokens itself. A custom app created in the store admin before 2026 can still use its shpat_… token.",
+          "glot reads your store and shows a preview: items per content type, languages, words to translate and the estimated cost. Nothing is translated or written yet.",
+          "Choose Translate and publish, or Translate, I publish myself to review the changes first. Translations already edited by hand in Shopify are kept.",
           "A language missing from the store is added unpublished: publish it in Shopify under Settings → Languages when you're ready."
         ],
         "doc": "/docs/integrations#shopify"

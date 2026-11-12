@@ -12,6 +12,19 @@
 //! - Webhooks: `x-webflow-signature` = hex HMAC-SHA256(secret, `{x-webflow-timestamp}:{body}`), timestamp in
 //!   ms within 5 minutes. Dashboard-created webhooks are unsigned: they use the account's `?token=` URL.
 //!
+//! - Read back (`current`): `GET /collections/{id}/items/{item_id}?cmsLocaleId=`, `GET /pages/{id}/dom?localeId=`
+//!   and the component DOM, each compared with the primary locale: a secondary locale answers with the
+//!   primary content until it is localized, so an identical value is "no translation". `remove` is not
+//!   implemented: the API has no call that resets a localized value to the inherited one.
+//! - Diagnosis (`doctor`): `GET /token/introspect` (site, workspace and OAuth tokens) → `authorization.scope`
+//!   against the scopes glot needs (`sites:read`, `cms:read|write`, `pages:read|write`,
+//!   `components:read|write`), and whether the site has secondary locales (Localization).
+//!
+//! Docs: https://developers.webflow.com/data/reference/cms/collection-items/staged-items/get-item,
+//! https://developers.webflow.com/data/reference/pages-and-components/pages/get-content,
+//! https://developers.webflow.com/data/reference/token/introspect,
+//! https://developers.webflow.com/data/reference/scopes
+//!
 //! Cursor: `cms:{collection index}:{offset}` → `page:{index}` → `component:{index}` (one listing call each).
 //! Credentials: `token` (site API token or OAuth token), optional `site_id` (else the token's only site).
 //! Settings: `publish` (bool), `api_base` (tests only, honoured with `GLOT_CONNECTORS_ALLOW_PRIVATE=1`).
@@ -21,12 +34,24 @@ use chrono::{DateTime, Utc};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-use super::{AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem};
+use super::{
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem,
+};
 
 pub struct Webflow;
 
 const KIND: &str = "webflow";
 const API: &str = "https://api.webflow.com/v2";
+/// Scopes a full sync needs.
+const SCOPES: &[&str] = &[
+    "sites:read",
+    "cms:read",
+    "cms:write",
+    "pages:read",
+    "pages:write",
+    "components:read",
+    "components:write",
+];
 
 struct Api {
     http: reqwest::Client,
@@ -211,6 +236,49 @@ async fn all_nodes(api: &Api, path: &str) -> anyhow::Result<Vec<Value>> {
         nodes.extend(page);
         if done {
             return Ok(nodes);
+        }
+    }
+}
+
+/// Field → value of one resource (`page/{id}`, `component/{id}`, `{collection}/{item}`) in a locale
+/// (`None` = primary): the lookup `current` compares between the two.
+async fn values(
+    api: &Api,
+    site: &str,
+    ext: &str,
+    locale: Option<(&str, &str)>,
+) -> anyhow::Result<BTreeMap<String, String>> {
+    let (res, id) = ext.split_once('/').unwrap_or(("", ext));
+    let dom = |path: String| async move {
+        let path = match locale {
+            Some((locale_id, _)) => format!("{path}?localeId={locale_id}"),
+            None => path,
+        };
+        anyhow::Ok(
+            dom_fields(&all_nodes(api, &path).await?)
+                .into_iter()
+                .map(|(field, value, ..)| (field, value))
+                .collect(),
+        )
+    };
+    match res {
+        "page" => dom(format!("/pages/{id}/dom")).await,
+        "component" => dom(format!("/sites/{site}/components/{id}/dom")).await,
+        cid => {
+            let q = locale
+                .map(|(_, cms)| format!("?cmsLocaleId={cms}"))
+                .unwrap_or_default();
+            let item = match api.get(&format!("/collections/{cid}/items/{id}{q}")).await {
+                // The item does not exist in this locale.
+                Err(e) if e.to_string().starts_with("HTTP 404") => Value::Null,
+                r => r?,
+            };
+            Ok(item["fieldData"]
+                .as_object()
+                .into_iter()
+                .flatten()
+                .filter_map(|(k, v)| Some((k.clone(), v.as_str()?.to_string())))
+                .collect())
         }
     }
 }
@@ -530,6 +598,98 @@ impl Connector for Webflow {
         Ok(report)
     }
 
+    // ponytail: two reads per resource (locale + primary); list items with a comma-separated
+    // `cmsLocaleId` if large CMS batches hit the rate limit.
+    async fn current(
+        &self,
+        c: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(c).await?;
+        let site = api.site_id(c).await?;
+        let (locale_id, cms_locale) =
+            locale_ids(&api.get(&format!("/sites/{site}")).await?, locale)?;
+        type Fields = BTreeMap<String, String>;
+        let mut seen: BTreeMap<&str, (Fields, Fields)> = BTreeMap::new();
+        for it in items {
+            let ext = it.external_id.as_str();
+            if !seen.contains_key(ext) {
+                let there = values(&api, &site, ext, Some((&locale_id, &cms_locale))).await?;
+                let primary = values(&api, &site, ext, None).await?;
+                seen.insert(ext, (there, primary));
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let (there, primary) = &seen[it.external_id.as_str()];
+                    there
+                        .get(&it.field)
+                        .filter(|v| !v.trim().is_empty() && primary.get(&it.field) != Some(v))
+                        .cloned()
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, c: &Creds) -> Vec<Check> {
+        let api = match Api::new(c).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("scopes", format!("{e:#}"))],
+        };
+        let mut out = vec![];
+        match api.get("/token/introspect").await {
+            Ok(t) => {
+                let granted: Vec<&str> = str_of(&t["authorization"]["scope"])
+                    .split([',', ' '])
+                    .filter(|s| !s.is_empty())
+                    .collect();
+                let missing: Vec<&str> = SCOPES
+                    .iter()
+                    .copied()
+                    .filter(|s| !granted.iter().any(|g| g.eq_ignore_ascii_case(s)))
+                    .collect();
+                out.push(if missing.is_empty() {
+                    Check::ok("scopes", SCOPES.join(", "))
+                } else {
+                    Check {
+                        fix: Some("permissions"),
+                        ..Check::fail("scopes", format!("missing scope: {}", missing.join(", ")))
+                    }
+                });
+            }
+            Err(e) => out.push(Check::warn(
+                "scopes",
+                format!("token scopes could not be read: {e:#}"),
+                None,
+            )),
+        }
+        let site = async { api.get(&format!("/sites/{}", api.site_id(c).await?)).await };
+        match site.await {
+            Ok(site) => {
+                let tags: Vec<&str> = site["locales"]["secondary"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|l| str_of(&l["tag"]))
+                    .collect();
+                out.push(if tags.is_empty() {
+                    Check::warn(
+                        "localization",
+                        "no secondary locale: enable Localization on the site and add the target locales",
+                        Some("enable_locale"),
+                    )
+                } else {
+                    Check::ok("localization", tags.join(", "))
+                });
+            }
+            Err(e) => out.push(Check::fail("localization", format!("{e:#}"))),
+        }
+        out
+    }
+
     fn verify_webhook(&self, headers: &HeaderMap, body: &[u8], secret: &str) -> bool {
         let h = |n: &str| headers.get(n).and_then(|v| v.to_str().ok());
         let (Some(ts), Some(sig)) = (h("x-webflow-timestamp"), h("x-webflow-signature")) else {
@@ -611,6 +771,34 @@ mod tests {
                 }),
             )
             .route(
+                "/collections/col1/items/{id}",
+                get(|Path(id): Path<String>, Query(q): Query<BTreeMap<String, String>>| async move {
+                    // i1: name localized, body still the primary content; i3 does not exist in French.
+                    let fr = q.get("cmsLocaleId").map(String::as_str) == Some("cms-fr");
+                    let item = match (id.as_str(), fr) {
+                        ("i1", true) => json!({"id": "i1", "cmsLocaleId": "cms-fr",
+                            "fieldData": {"name": "Bonjour (édité)", "slug": "hello", "body": "<p>Read <a href=\"/t\">terms</a></p>"}}),
+                        ("i1", false) | ("i3", false) => json!({"id": id, "cmsLocaleId": "cms-en",
+                            "fieldData": {"name": "Hello", "slug": "hello", "body": "<p>Read <a href=\"/t\">terms</a></p>"}}),
+                        _ => return (axum::http::StatusCode::NOT_FOUND, Json(json!({"code": "resource_not_found"}))),
+                    };
+                    (axum::http::StatusCode::OK, Json(item))
+                }),
+            )
+            .route(
+                "/token/introspect",
+                get(|h: HeaderMap| async move {
+                    // The token `wf-readonly` lacks every write scope.
+                    let scope = if h["authorization"] == "Bearer wf-readonly" {
+                        "sites:read,cms:read,pages:read,components:read"
+                    } else {
+                        "sites:read,cms:read,cms:write,pages:read,pages:write,components:read,components:write"
+                    };
+                    Json(json!({"authorization": {"id": "a1", "grantType": "client_credentials", "rateLimit": 60, "scope": scope,
+                        "authorizedTo": {"siteIds": ["site1"], "workspaceIds": [], "userIds": []}}}))
+                }),
+            )
+            .route(
                 "/collections/col1/items/publish",
                 post({
                     let log = log.clone();
@@ -633,8 +821,14 @@ mod tests {
                 get(|Path(id): Path<String>, Query(q): Query<BTreeMap<String, String>>| async move {
                     assert_eq!(id, "p1");
                     let offset: usize = q.get("offset").and_then(|s| s.parse().ok()).unwrap_or(0);
+                    // The French DOM: n1 is localized, everything else still answers with the primary content.
+                    let n1 = if q.get("localeId").map(String::as_str) == Some("loc-fr") {
+                        "<h1>Bienvenue</h1>"
+                    } else {
+                        "<h1>Welcome <em>home</em></h1>"
+                    };
                     let nodes = [
-                        json!({"id": "n1", "type": "text", "text": {"html": "<h1>Welcome <em>home</em></h1>", "text": "Welcome home"}}),
+                        json!({"id": "n1", "type": "text", "text": {"html": n1, "text": "Welcome home"}}),
                         json!({"id": "n2", "type": "image", "image": {"alt": "x", "assetId": "a"}}),
                         json!({"id": "n3", "type": "component-instance", "componentId": "c1", "propertyOverrides": [
                             {"propertyId": "pr1", "type": "Plain Text", "label": "Title", "text": {"html": null, "text": "Buy now"}}]}),
@@ -847,6 +1041,69 @@ mod tests {
             items.iter().all(|i| i.external_id == "component/c1"),
             "{items:?}"
         );
+    }
+
+    #[tokio::test]
+    async fn current_and_doctor() {
+        let (base, log) = mock().await;
+        let c = creds(&base);
+        let item = |ext: &str, field: &str| PushItem {
+            external_id: ext.into(),
+            field: field.into(),
+            value: "x".into(),
+            format: Format::Plain,
+            meta: Value::Null,
+        };
+        let cur = Webflow
+            .current(
+                &c,
+                "fr",
+                &[
+                    item("col1/i1", "name"),
+                    item("col1/i1", "body"),
+                    item("col1/i3", "name"),
+                    item("page/p1", "n1"),
+                    item("page/p1", "n5/value"),
+                    item("component/c1", "cn1"),
+                ],
+            )
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            cur,
+            [
+                Some("Bonjour (édité)".to_string()),
+                None, // same as the primary locale: inherited, not translated
+                None, // no French item
+                Some("<h1>Bienvenue</h1>".to_string()),
+                None,
+                None,
+            ]
+        );
+        assert!(log.lock().unwrap().is_empty(), "current writes nothing");
+        assert!(
+            Webflow
+                .current(&c, "de", &[item("col1/i1", "name")])
+                .await
+                .is_err()
+        );
+
+        let checks = Webflow.doctor(&c).await;
+        assert!(checks.iter().all(|k| k.status == "ok"), "{checks:?}");
+        assert_eq!(checks[1].detail, "fr-FR");
+        let mut ro = c.clone();
+        ro.secrets = json!({"token": "wf-readonly"});
+        let checks = Webflow.doctor(&ro).await;
+        assert_eq!(
+            (checks[0].id.as_str(), checks[0].status, checks[0].fix),
+            ("scopes", "fail", Some("permissions"))
+        );
+        assert_eq!(
+            checks[0].detail,
+            "missing scope: cms:write, pages:write, components:write"
+        );
+        assert!(log.lock().unwrap().is_empty(), "doctor writes nothing");
     }
 
     #[test]

@@ -10,6 +10,13 @@
 //!   exists from PrestaShop 8 only, so glot GETs the resource as XML, replaces the target language's
 //!   `<language id="N">` node of each field (every other node kept byte for byte), drops the read-only fields
 //!   (`manufacturer_name`, `quantity`, `level_depth`, `nb_products_recursive`) and PUTs the document back.
+//! - Human edits and rollback: one `GET /api/{resource}?display=[id,…fields]&filter[id]=[1|2|3]` per resource
+//!   type returns every language of the fields; the target language's value is the current translation,
+//!   unless it is empty or identical to the source language's (PrestaShop fills a new language with a copy of
+//!   the default one). `remove` is not implemented: a language node cannot be deleted, and emptying a
+//!   required field (`name`) is refused or breaks the page.
+//! - Diagnosis: `GET /api/` lists the resources the key can reach with one flag per method (`get="true"
+//!   put="true"`…): glot needs GET + PUT on the four content resources and GET on `languages`.
 //! - Languages: `/api/languages` (`iso_code`, `language_code`, `active`); a glot locale matches
 //!   `language_code` (`pt-BR` = `pt-br`) else `iso_code` (`fr` = `fr-FR`).
 //! - Webhooks: none in PrestaShop; a module calls the card's token URL, or signs the body with
@@ -21,7 +28,8 @@
 //! https://devdocs.prestashop-project.org/8/webservice/resources/categories/,
 //! https://devdocs.prestashop-project.org/8/webservice/resources/content_management_system/,
 //! https://devdocs.prestashop-project.org/8/webservice/resources/languages/,
-//! https://devdocs.prestashop-project.org/8/webservice/tutorials/prestashop-webservice-lib/update-resource/
+//! https://devdocs.prestashop-project.org/8/webservice/tutorials/prestashop-webservice-lib/update-resource/,
+//! https://devdocs.prestashop-project.org/8/webservice/tutorials/testing-access/ (`GET /api/`, method flags)
 use async_trait::async_trait;
 use axum::http::HeaderMap;
 use base64::Engine;
@@ -29,7 +37,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, cms,
 };
 
 pub struct PrestaShop;
@@ -342,6 +350,36 @@ fn patch_xml(
     Ok(out)
 }
 
+/// What the key cannot do that glot needs (`products PUT`, `languages GET`), from the `GET /api/` document:
+/// `<api><products get="true" put="true" …>`; a resource the key cannot reach at all is not listed.
+fn missing_rights(xml: &str) -> anyhow::Result<Vec<String>> {
+    let doc = roxmltree::Document::parse(xml)?;
+    let api = doc
+        .root_element()
+        .children()
+        .find(|n| n.is_element() && n.tag_name().name() == "api")
+        .ok_or_else(|| anyhow::anyhow!("unexpected XML: no <api>"))?;
+    let needs = RESOURCES
+        .iter()
+        .map(|r| (r.0, &["get", "put"][..]))
+        .chain([("languages", &["get"][..])]);
+    let mut missing = vec![];
+    for (resource, methods) in needs {
+        let node = api
+            .children()
+            .find(|n| n.is_element() && n.tag_name().name() == resource);
+        let lacks: Vec<String> = methods
+            .iter()
+            .filter(|m| node.and_then(|n| n.attribute(**m)) != Some("true"))
+            .map(|m| m.to_uppercase())
+            .collect();
+        if !lacks.is_empty() {
+            missing.push(format!("{resource} {}", lacks.join(" + ")));
+        }
+    }
+    Ok(missing)
+}
+
 #[async_trait]
 impl Connector for PrestaShop {
     fn kind(&self) -> &'static str {
@@ -473,6 +511,94 @@ impl Connector for PrestaShop {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let shop = Shop::open(creds).await?;
+        let langs = shop.languages().await?;
+        let src = shop.source(creds, &langs).await?;
+        let Some(lang) = lang_for(&langs, locale).filter(|l| l.id != src.id) else {
+            return Ok(Some(vec![None; items.len()]));
+        };
+        // resource → (ids, fields).
+        let mut by_resource: BTreeMap<&str, (Vec<&str>, Vec<&str>)> = BTreeMap::new();
+        for it in items {
+            let (resource, id) = it
+                .external_id
+                .split_once(':')
+                .filter(|(_, id)| !id.is_empty() && id.bytes().all(|b| b.is_ascii_digit()))
+                .ok_or_else(|| anyhow::anyhow!("bad id {}", it.external_id))?;
+            anyhow::ensure!(
+                RESOURCES
+                    .iter()
+                    .any(|r| r.0 == resource && r.2.iter().any(|f| f.0 == it.field)),
+                "unknown field {resource}.{}",
+                it.field
+            );
+            let slot = by_resource.entry(resource).or_default();
+            if !slot.0.contains(&id) {
+                slot.0.push(id);
+            }
+            if !slot.1.contains(&it.field.as_str()) {
+                slot.1.push(&it.field);
+            }
+        }
+        let mut found: BTreeMap<(&str, String), Value> = BTreeMap::new();
+        for (resource, (ids, fields)) in by_resource {
+            let v = shop
+                .json(&format!(
+                    "{resource}?display=[id,{}]&filter[id]=[{}]",
+                    fields.join(","),
+                    ids.join("|")
+                ))
+                .await?;
+            for o in v[resource].as_array().into_iter().flatten() {
+                if let Some(id) = id_str(&o["id"]) {
+                    found.insert((resource, id), o.clone());
+                }
+            }
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let (resource, id) = it.external_id.split_once(':')?;
+                    // A plain string = a shop with one language: nothing is a translation.
+                    let v = found
+                        .get(&(resource, id.to_string()))
+                        .map(|o| &o[it.field.as_str()])
+                        .filter(|v| v.is_array())?;
+                    ml(v, &lang.id)
+                        .filter(|t| !t.trim().is_empty() && Some(t) != ml(v, &src.id).as_ref())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let root = match Shop::open(creds).await {
+            Ok(shop) => shop.xml(reqwest::Method::GET, "", None).await,
+            Err(e) => Err(e),
+        };
+        vec![match root.and_then(|xml| missing_rights(&xml)) {
+            Ok(missing) if missing.is_empty() => Check::ok(
+                "permissions",
+                "GET + PUT on products, categories, content_management_system, manufacturers; GET on languages",
+            ),
+            Ok(missing) => Check {
+                fix: Some("permissions"),
+                ..Check::fail(
+                    "permissions",
+                    format!("the webservice key lacks: {}", missing.join(", ")),
+                )
+            },
+            Err(e) => Check::fail("permissions", format!("{e:#}")),
+        }]
     }
 
     /// No native webhooks: a module calls the token URL, or signs with `X-Glot-Signature` / a secret header.

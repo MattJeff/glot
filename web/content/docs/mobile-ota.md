@@ -17,7 +17,7 @@ Requirements: the project's CDN must be public (**Settings → Public CDN**), an
 
 A downloaded translation is only used if it formats with the arguments you pass. On iOS a `%@` given an `Int` would crash `String(format:)`, and on Android a bad `%d` throws. In both cases the SDK falls back to step 2.
 
-**Language choice:** the first of the user's preferred languages that glot has *ready* (see `locales.json`), exact match first, then same language (`fr-CA` → `fr`). Otherwise the device language, with any missing keys filled in from the app. `Glot.locales` lists the ready languages, so a language picker can offer languages the binary doesn't embed.
+**Language choice:** the first of the user's preferred languages that glot has *ready* (see `locales.json`), exact match first, then same language (`fr-CA` → `fr`). Otherwise the device language, with any missing keys filled in from the app. `Glot.locales` lists the ready languages, so a language picker can offer languages the binary doesn't embed. The catalog URL also answers to other spellings of a code (`zh`, `zh_CN`, `zh-Hans` → your `zh-CN`). `locales.json` may carry a `site_code` per language ([the code a website uses](/docs/languages-live-check)); the SDKs ignore it.
 
 ## iOS / macOS (Swift Package)
 

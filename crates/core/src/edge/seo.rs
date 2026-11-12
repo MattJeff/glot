@@ -25,6 +25,63 @@ pub struct SeoCtx<'a> {
     pub path: String,
     /// Translates one free text (JSON-LD values); `None` keeps the source.
     pub tr: &'a dyn Fn(&str) -> Option<String>,
+    /// Target locales whose version of THIS page is complete enough for search engines; `None` = every
+    /// published locale. A page whose own locale is missing here is a duplicate of the source for now:
+    /// canonical to the source URL, no alternates (and no other page lists it).
+    pub page_locales: Option<Vec<String>>,
+    /// Translated URL paths (opt-in); `None` = every locale keeps the source paths.
+    pub slugs: Option<&'a Slugs>,
+}
+
+/// Translated URL paths: locale → source path (no query, no trailing slash but `/`) → localized path.
+pub type Slugs = std::collections::BTreeMap<String, std::collections::BTreeMap<String, String>>;
+
+/// `path` (source terms, may carry `?query` / `#fragment` / a trailing slash) with its translated slug in `locale`.
+pub fn localized_path(slugs: Option<&Slugs>, locale: &str, path: &str) -> String {
+    let cut = path.find(['?', '#']).unwrap_or(path.len());
+    let (p, rest) = path.split_at(cut);
+    let key = if p.len() > 1 {
+        p.trim_end_matches('/')
+    } else {
+        p
+    };
+    match slugs.and_then(|s| s.get(locale)?.get(key)) {
+        Some(slug) => format!("{slug}{}{rest}", &p[key.len()..]),
+        None => path.to_string(),
+    }
+}
+
+/// Open Graph wants `language_TERRITORY`: `es` → `es_ES`, `pt-BR` → `pt_BR`.
+pub fn og_locale(locale: &str) -> String {
+    let (lang, region) = match locale.split_once(['-', '_']) {
+        Some((l, r)) => (l, Some(r)),
+        None => (locale, None),
+    };
+    let lang = lang.to_ascii_lowercase();
+    let region = match region {
+        Some(r) => r.to_ascii_uppercase(),
+        None => match lang.as_str() {
+            "en" => "US",
+            "ja" => "JP",
+            "ko" => "KR",
+            "zh" => "CN",
+            "ar" => "AR",
+            "he" => "IL",
+            "el" => "GR",
+            "da" => "DK",
+            "sv" => "SE",
+            "cs" => "CZ",
+            "uk" => "UA",
+            "hi" => "IN",
+            "vi" => "VN",
+            "fa" => "IR",
+            "nb" | "no" => "NO",
+            "pt" => "PT",
+            _ => return format!("{lang}_{}", lang.to_ascii_uppercase()),
+        }
+        .to_string(),
+    };
+    format!("{lang}_{region}")
 }
 
 impl SeoCtx<'_> {
@@ -42,7 +99,20 @@ impl SeoCtx<'_> {
     /// Absolute URL of `path` (source terms) in `locale`.
     pub fn url_for(&self, locale: &str, path: &str) -> Option<String> {
         let path = if path.is_empty() { "/" } else { path };
-        Some(format!("{}{path}", self.base(locale)?))
+        let base = self.base(locale)?;
+        Some(format!(
+            "{base}{}",
+            localized_path(self.slugs, locale, path)
+        ))
+    }
+    /// `locale`'s version of this page may be shown to search engines (the source always is).
+    pub fn advertised(&self, locale: &str) -> bool {
+        locale == self.source_locale
+            || (self.base(locale).is_some()
+                && self
+                    .page_locales
+                    .as_ref()
+                    .is_none_or(|l| l.iter().any(|x| x == locale)))
     }
 
     /// `(hreflang, href)` alternates: every published locale, then x-default (the source URL).
@@ -50,6 +120,7 @@ impl SeoCtx<'_> {
         let mut out: Vec<(String, String)> = self
             .bases
             .iter()
+            .filter(|(l, _)| self.advertised(l))
             .filter_map(|(l, _)| Some((l.clone(), self.url_for(l, path)?)))
             .collect();
         if let Some(x) = self.url_for(&self.source_locale, path) {
@@ -87,7 +158,7 @@ impl SeoCtx<'_> {
     /// Internal link rewritten for the served locale: root-relative stays root-relative on the same host
     /// (subdomain mode) or gains the locale prefix (subdirectory mode); absolute links to the site switch base.
     pub fn localize_href(&self, href: &str) -> Option<String> {
-        let path = self.site_path(href)?;
+        let path = localized_path(self.slugs, &self.locale, &self.site_path(href)?);
         let base = self.base(&self.locale)?;
         if href.trim().starts_with('/') {
             // Same host as the page being served: keep it relative.
@@ -130,6 +201,13 @@ pub fn headers(ctx: &SeoCtx) -> Vec<(&'static str, String)> {
 /// proxied (subdomain mode: the source domain must list the translated pages too, or reciprocity fails).
 pub fn head_tags(ctx: &SeoCtx, canonical_path: &str) -> String {
     let mut s = String::new();
+    if !ctx.advertised(&ctx.locale) {
+        // Not complete in this language yet: a duplicate of the source page, said so, and out of the cluster.
+        if let Some(c) = ctx.url_for(&ctx.source_locale, canonical_path) {
+            s.push_str(&format!(r#"<link rel="canonical" href="{}">"#, esc(&c)));
+        }
+        return s;
+    }
     if let Some(c) = ctx.url_for(&ctx.locale, canonical_path) {
         s.push_str(&format!(r#"<link rel="canonical" href="{}">"#, esc(&c)));
     }
@@ -204,7 +282,7 @@ pub fn handlers<'h>(ctx: &'h SeoCtx<'h>, st: &'h SeoState) -> Vec<Handler<'h>> {
         }),
         element!("meta[property]", move |el| {
             match el.get_attribute("property").as_deref() {
-                Some("og:locale") => el.set_attribute("content", &ctx.locale.replace('-', "_"))?,
+                Some("og:locale") => el.set_attribute("content", &og_locale(&ctx.locale))?,
                 Some("og:url") => {
                     if let Some(u) = el
                         .get_attribute("content")
@@ -351,6 +429,55 @@ pub fn inspect(html: &str) -> PageSeo {
     let t = crate::edge::tm::normalize(&title.into_inner());
     o.title = (!t.is_empty()).then(|| decode(&t));
     o
+}
+
+/// The texts of a page's JSON-LD that are worth translating on their own (sentences: descriptions, headlines,
+/// FAQ answers), normalized. Short values (names, brands) are only translated when the page shows the same text.
+pub fn jsonld_texts(html: &str) -> Vec<String> {
+    let out = RefCell::new(Vec::new());
+    let collect = |t: &str| {
+        let n = crate::edge::tm::normalize(t);
+        if jsonld_sentence(&n) && !out.borrow().contains(&n) {
+            out.borrow_mut().push(n);
+        }
+        None
+    };
+    let ctx = SeoCtx {
+        source_locale: String::new(),
+        locale: String::new(),
+        bases: vec![],
+        path: "/".into(),
+        tr: &collect,
+        page_locales: None,
+        slugs: None,
+    };
+    rewrite(html, &ctx);
+    out.into_inner()
+}
+
+/// A JSON-LD value glot may learn by itself: at least three words, of a reasonable size.
+pub fn jsonld_sentence(normalized: &str) -> bool {
+    normalized.len() <= 2000 && normalized.split_whitespace().count() >= 3
+}
+
+/// Every `<a href>` of a page, as written (the pre-warm follows the internal ones).
+pub fn links(html: &str) -> Vec<String> {
+    let out = RefCell::new(Vec::new());
+    let settings = lol_html::RewriteStrSettings::new().append_element_content_handler(element!(
+        "a[href]",
+        |el| {
+            if !el
+                .get_attribute("rel")
+                .is_some_and(|r| r.to_ascii_lowercase().contains("nofollow"))
+            {
+                out.borrow_mut()
+                    .push(el.get_attribute("href").unwrap_or_default());
+            }
+            Ok(())
+        }
+    ));
+    let _ = lol_html::rewrite_str(html, settings);
+    out.into_inner()
 }
 
 fn collect_languages(v: &Value, out: &mut Vec<String>) {
@@ -503,6 +630,8 @@ mod tests {
                 .collect(),
             path: path.into(),
             tr: &tr,
+            page_locales: None,
+            slugs: None,
         }
     }
 
@@ -550,7 +679,7 @@ mod tests {
             out.contains(r#"hreflang="en" href="https://cliponit.app/pricing?lang=en""#),
             "{out}"
         );
-        assert!(out.contains(r#"<meta property="og:locale" content="es">"#));
+        assert!(out.contains(r#"<meta property="og:locale" content="es_ES">"#));
         assert!(
             out.contains(r#"<meta property="og:url" content="https://es.cliponit.app/pricing">"#)
         );
@@ -639,7 +768,7 @@ mod tests {
         assert_eq!(s.dir.as_deref(), Some("ltr"));
         assert_eq!(s.canonicals, ["https://es.cliponit.app/pricing?utm=x"]);
         assert_eq!(s.title.as_deref(), Some("Tarifs"));
-        assert_eq!(s.og_locale.as_deref(), Some("es"));
+        assert_eq!(s.og_locale.as_deref(), Some("es_ES"));
         assert_eq!(s.jsonld, 1);
         assert_eq!(s.jsonld_languages, ["es"]);
         let langs: Vec<&str> = s.alternates.iter().map(|(l, _)| l.as_str()).collect();
@@ -648,5 +777,75 @@ mod tests {
             inspect(r#"<meta name="robots" content="NOINDEX, follow"><title>A &amp; B</title>"#);
         assert_eq!(s.robots, ["noindex, follow"]);
         assert_eq!(s.title.as_deref(), Some("A & B"));
+    }
+
+    #[test]
+    fn incomplete_page_is_a_duplicate_of_the_source() {
+        let html = r#"<html><head><link rel="canonical" href="/a"></head><body></body></html>"#;
+        // es page not complete: canonical to the source, out of the cluster.
+        let mut c = ctx("es", DIR, "/a");
+        c.page_locales = Some(vec!["ar".into()]);
+        let out = rewrite(html, &c);
+        assert!(
+            out.contains(r#"<link rel="canonical" href="https://cliponit.app/a">"#),
+            "{out}"
+        );
+        assert!(!out.contains("hreflang"), "{out}");
+        // The complete ar page does not list es.
+        c.locale = "ar".into();
+        let out = rewrite(html, &c);
+        assert!(out.contains(r#"rel="canonical" href="https://cliponit.app/ar/a""#));
+        assert!(out.contains(r#"hreflang="ar""#) && out.contains(r#"hreflang="fr""#));
+        assert!(!out.contains(r#"hreflang="es""#), "{out}");
+        // A locale that is not published at all: same duplicate statement (it used to get no canonical).
+        let out = rewrite(html, &ctx("de", DIR, "/a"));
+        assert!(
+            out.contains(r#"<link rel="canonical" href="https://cliponit.app/a">"#),
+            "{out}"
+        );
+    }
+
+    #[test]
+    fn translated_slugs() {
+        let mut slugs = Slugs::new();
+        slugs
+            .entry("es".into())
+            .or_default()
+            .insert("/pricing".into(), "/precios".into());
+        let mut c = ctx("es", SUB, "/pricing");
+        c.slugs = Some(&slugs);
+        let out = rewrite(PAGE, &c);
+        assert!(
+            out.contains(r#"rel="canonical" href="https://es.cliponit.app/precios?utm=x""#),
+            "{out}"
+        );
+        // Reciprocal: the source keeps its path, es gets its slug, on every page of the cluster.
+        assert!(out.contains(r#"hreflang="es" href="https://es.cliponit.app/precios?utm=x""#));
+        assert!(out.contains(r#"hreflang="fr" href="https://cliponit.app/pricing?utm=x""#));
+        assert!(out.contains(r#"<a href="/precios">"#), "{out}");
+        assert!(out.contains(r#""url":"https://es.cliponit.app/precios""#));
+        assert!(out.contains(r#"property="og:url" content="https://es.cliponit.app/precios""#));
+        c.locale = "fr".into();
+        assert!(
+            rewrite(PAGE, &c).contains(r#"hreflang="es" href="https://es.cliponit.app/precios"#)
+        );
+        assert_eq!(
+            localized_path(Some(&slugs), "es", "/pricing/#a"),
+            "/precios/#a"
+        );
+        assert_eq!(
+            localized_path(Some(&slugs), "es", "/pricing-x"),
+            "/pricing-x"
+        );
+        assert_eq!(localized_path(Some(&slugs), "de", "/pricing"), "/pricing");
+        assert_eq!(
+            [
+                og_locale("es"),
+                og_locale("pt-br"),
+                og_locale("en"),
+                og_locale("ja")
+            ],
+            ["es_ES", "pt_BR", "en_US", "ja_JP"]
+        );
     }
 }

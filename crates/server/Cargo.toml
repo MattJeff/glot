@@ -36,6 +36,13 @@ base64 = "0.23"
 hmac = "0.12"
 roxmltree = "0.20"
 ring = "0.17"
+lol_html = "3"
+regex = "1"
+whatlang = "0.18"
+# render-protocol: CLDR number and date formatting of typed variables (same ICU4X train as glot-core).
+icu_decimal = "~2.3"
+icu_datetime = "~2.3"
+icu_locale_core = "2.3"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }

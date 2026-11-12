@@ -207,7 +207,42 @@ pub async fn run(args: I18nizeArgs) -> Result<()> {
             anstream::println!("Aborted, nothing written.");
             return Ok(());
         }
-        i18nize::apply(&mut ws, &plan)?;
+        let reverted = i18nize::apply(&mut ws, &plan)?;
+        for (path, why) in &reverted {
+            anstream::println!(
+                "warning: {path} left untouched: the rewritten file did not pass verification ({why})"
+            );
+        }
+        // For the GitHub App: what is left, with the place and the reason.
+        rust::Report {
+            files_scanned: files.len(),
+            files_rewritten: plan.changed_files().count() - reverted.len(),
+            new_keys: plan
+                .changed_files()
+                .flat_map(|f| &f.keys)
+                .filter(|k| !k.reused)
+                .count(),
+            imported_translations: plan
+                .changed_files()
+                .flat_map(|f| &f.keys)
+                .map(|k| k.translations.len())
+                .sum(),
+            left: plan
+                .files
+                .iter()
+                .flat_map(|f| {
+                    f.skipped.iter().map(|s| rust::Left {
+                        path: f.path.clone(),
+                        line: s.line,
+                        text: s.text.clone(),
+                        reason: s.reason.clone(),
+                        suggestion: "t(\"<key>\")".into(),
+                    })
+                })
+                .collect(),
+            reverted,
+        }
+        .save();
     }
     if setup_on && let Some(p) = &project {
         // After the rewrite: the layout may have just been converted, and Astro islands need it.
@@ -247,10 +282,13 @@ fn lib_label(lib: Lib, custom: Option<&glot_extract::i18nize::CustomRuntime>) ->
     match lib {
         Lib::NextIntl => "next-intl".into(),
         Lib::ReactI18next => "react-i18next".into(),
-        Lib::Custom => format!(
-            "the app's own {}().t",
-            custom.map_or("useLanguage", |c| c.hook.as_str())
-        ),
+        Lib::Custom => match custom {
+            Some(c) if c.hook.is_empty() => format!("the app's own t() ({})", c.module),
+            c => format!(
+                "the app's own {}().t",
+                c.map_or("useLanguage", |c| c.hook.as_str())
+            ),
+        },
     }
 }
 

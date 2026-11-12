@@ -8,12 +8,13 @@ application_url = "https://glotlang.com/docs/integrations#shopify-app-embed"
 embedded = false
 
 [access_scopes]
-# A theme app extension needs no Admin API scope. Add the glot connector's scopes here
-# (read_translations,write_translations,…) only if this same app also provides the connector's token.
+# A theme app extension needs no Admin API scope. To let this same app also provide the glot connector's
+# credentials (dashboard → Integrations → Shopify → Client ID + Client secret, client credentials grant),
+# set: scopes = "read_translations,write_translations,read_locales,write_locales,read_products,read_content,read_online_store_pages,read_online_store_navigation,read_themes,read_metaobjects"
 scopes = ""
 
 [auth]
 redirect_urls = ["https://glotlang.com/docs/integrations#shopify-app-embed"]
 
 [webhooks]
-api_version = "2025-10"
+api_version = "2026-07"

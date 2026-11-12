@@ -15,8 +15,17 @@
 //!   translation yet), reports it so an editor adds it once (Translate tab); glot keeps it updated afterwards.
 //! - Webhooks: Drupal has none built in; a custom module or ECA calls the card URL (token included) or sends
 //!   `X-Glot-Webhook-Secret`.
+//! - Read back (`current`): `GET /{langcode}/jsonapi/…` and `GET /jsonapi/…` (original language). Drupal
+//!   answers with another language when the translation does not exist, and a translation just added in
+//!   the Translate tab still holds the source text: both are "no translation". `remove` is not implemented:
+//!   core JSON:API cannot delete a translation.
+//! - Diagnosis (`doctor`): more than one language, and Content Translation enabled for each entity type
+//!   (its `content_translation_source` base field shows in the attributes). JSON:API's read-only mode (on by
+//!   default) cannot be detected without attempting a write: it shows as `HTTP 405` on the first push.
 //!
 //! Docs: https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/translations,
+//! https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/security-considerations,
+//! https://api.drupal.org/api/drupal/core%21modules%21content_translation%21src%21ContentTranslationHandler.php/function/ContentTranslationHandler%3A%3AgetFieldDefinitions/10,
 //! https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/updating-existing-resources-patch,
 //! https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/pagination
 use async_trait::async_trait;
@@ -27,7 +36,8 @@ use std::collections::BTreeMap;
 
 use super::cms::{self, required};
 use super::{
-    AccountInfo, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key, send,
+    AccountInfo, Check, Connector, Creds, Format, PullPage, PushItem, PushReport, SourceItem, key,
+    send,
 };
 
 pub struct Drupal;
@@ -106,6 +116,38 @@ fn split_type(t: &str) -> Option<(&str, &str)> {
     let (e, b) = t.split_once("--")?;
     let ok = |s: &str| !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_');
     (ok(e) && ok(b)).then_some((e, b))
+}
+
+fn langcode_ok(locale: &str) -> anyhow::Result<()> {
+    anyhow::ensure!(
+        !locale.is_empty()
+            && locale
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'),
+        "invalid langcode"
+    );
+    Ok(())
+}
+
+/// (type, uuid, `/jsonapi/{entity}/{bundle}/{uuid}`) of an item's meta.
+fn entity_path(meta: &Value) -> anyhow::Result<(&str, &str, String)> {
+    let (Some(ty), Some(id)) = (meta["type"].as_str(), meta["id"].as_str()) else {
+        anyhow::bail!("missing metadata, sync again");
+    };
+    let (e, b) = split_type(ty).ok_or_else(|| anyhow::anyhow!("invalid type"))?;
+    anyhow::ensure!(
+        id.chars().all(|c| c.is_ascii_hexdigit() || c == '-'),
+        "invalid uuid"
+    );
+    Ok((ty, id, format!("/jsonapi/{e}/{b}/{id}")))
+}
+
+/// An item's value in an entity's attributes (`title`, `body.value`).
+fn attr<'a>(attrs: &'a Value, field: &str) -> Option<&'a str> {
+    match field.split_once('.') {
+        Some((f, part)) => attrs[f][part].as_str(),
+        None => attrs[field].as_str(),
+    }
 }
 
 async fn resources(api: &Api, c: &Creds) -> anyhow::Result<Vec<String>> {
@@ -264,12 +306,7 @@ impl Connector for Drupal {
         items: &[PushItem],
     ) -> anyhow::Result<PushReport> {
         let api = Api::new(creds).await?;
-        anyhow::ensure!(
-            locale
-                .chars()
-                .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'),
-            "invalid langcode"
-        );
+        langcode_ok(locale)?;
         let mut by: BTreeMap<&str, Vec<&PushItem>> = BTreeMap::new();
         for it in items {
             by.entry(&it.external_id).or_default().push(it);
@@ -278,12 +315,8 @@ impl Connector for Drupal {
         for (ext, its) in by {
             let meta = &its[0].meta;
             let r: anyhow::Result<()> = async {
-                let (Some(ty), Some(id)) = (meta["type"].as_str(), meta["id"].as_str()) else {
-                    anyhow::bail!("missing metadata, sync again");
-                };
-                let (e, b) = split_type(ty).ok_or_else(|| anyhow::anyhow!("invalid type"))?;
-                anyhow::ensure!(id.chars().all(|c| c.is_ascii_hexdigit() || c == '-'), "invalid uuid");
-                let path = format!("/{locale}/jsonapi/{e}/{b}/{id}");
+                let (ty, id, path) = entity_path(meta)?;
+                let path = format!("/{locale}{path}");
                 let cur = api.get(&path).await?;
                 let cur = &cur["data"]["attributes"];
                 anyhow::ensure!(
@@ -320,6 +353,113 @@ impl Connector for Drupal {
             }
         }
         Ok(report)
+    }
+
+    async fn current(
+        &self,
+        creds: &Creds,
+        locale: &str,
+        items: &[PushItem],
+    ) -> anyhow::Result<Option<Vec<Option<String>>>> {
+        let api = Api::new(creds).await?;
+        langcode_ok(locale)?;
+        // (translation attributes, original attributes) per entity.
+        let mut seen: BTreeMap<&str, (Value, Value)> = BTreeMap::new();
+        for it in items {
+            if seen.contains_key(it.external_id.as_str()) {
+                continue;
+            }
+            let (_, _, path) = entity_path(&it.meta)?;
+            let tr = api.get(&format!("/{locale}{path}")).await?["data"]["attributes"].take();
+            let src = if tr["langcode"].as_str() == Some(locale) {
+                api.get(&path).await?["data"]["attributes"].take()
+            } else {
+                Value::Null
+            };
+            seen.insert(&it.external_id, (tr, src));
+        }
+        Ok(Some(
+            items
+                .iter()
+                .map(|it| {
+                    let (tr, src) = &seen[it.external_id.as_str()];
+                    // Answered in another language: no translation yet.
+                    if tr["langcode"].as_str() != Some(locale) {
+                        return None;
+                    }
+                    let v = attr(tr, &it.field)?;
+                    // Still the source text the Translate tab started from: not translated.
+                    (!v.trim().is_empty() && attr(src, &it.field) != Some(v)).then(|| v.to_string())
+                })
+                .collect(),
+        ))
+    }
+
+    async fn doctor(&self, creds: &Creds) -> Vec<Check> {
+        let api = match Api::new(creds).await {
+            Ok(a) => a,
+            Err(e) => return vec![Check::fail("languages", format!("{e:#}"))],
+        };
+        let mut out = vec![match self.locales(creds).await {
+            Ok(l) if l.len() < 2 => Check::warn(
+                "language_modules",
+                "only one language: enable the Language module and add languages (/admin/config/regional/language)",
+                Some("enable_locale"),
+            ),
+            Ok(l) => Check::ok("language_modules", l.join(", ")),
+            Err(e) => Check::fail("language_modules", format!("{e:#}")),
+        }];
+        let res = match resources(&api, creds).await {
+            Ok(r) => r,
+            Err(e) => {
+                out.push(Check::fail("content_translation", format!("{e:#}")));
+                return out;
+            }
+        };
+        // Content Translation adds its base fields to every entity type it is enabled for.
+        let mut off = vec![];
+        let mut checked = std::collections::BTreeSet::new();
+        for ty in &res {
+            let Some((e, b)) = split_type(ty) else {
+                continue;
+            };
+            if checked.contains(e) {
+                continue;
+            }
+            match api.get(&format!("/jsonapi/{e}/{b}?page[limit]=1")).await {
+                Ok(p) => {
+                    let Some(attrs) = p["data"][0]["attributes"].as_object() else {
+                        continue;
+                    };
+                    checked.insert(e);
+                    if !attrs.contains_key("content_translation_source") {
+                        off.push(e);
+                    }
+                }
+                Err(e) => {
+                    out.push(Check::fail("content_translation", format!("{ty}: {e:#}")));
+                    return out;
+                }
+            }
+        }
+        out.push(if !off.is_empty() {
+            Check::warn(
+                "content_translation",
+                format!(
+                    "Content Translation is not enabled for: {} (enable the module, then the types at /admin/config/regional/content-language)",
+                    off.join(", ")
+                ),
+                Some("install_plugin"),
+            )
+        } else if checked.is_empty() {
+            Check::warn("content_translation", "no content to check yet", None)
+        } else {
+            Check::ok(
+                "content_translation",
+                checked.into_iter().collect::<Vec<_>>().join(", "),
+            )
+        });
+        out
     }
 
     fn verify_webhook(&self, headers: &HeaderMap, _body: &[u8], secret: &str) -> bool {

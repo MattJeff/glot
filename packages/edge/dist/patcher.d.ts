@@ -1,4 +1,4 @@
-import { type Value } from "./segment.js";
+import { type Value, type Part } from "./segment.js";
 import { type Tm } from "./edge.js";
 export { hash16, template } from "./segment.js";
 /** `skip` = the project's excluded selectors (sent along with the TM by the JS runtimes). */
@@ -28,6 +28,8 @@ export interface DomSegment {
 }
 /** Segments of `root` (and its descendants), as segment.ts would cut the same markup. */
 export declare function domSegments(root: Element, source: string, skip?: string): DomSegment[];
+/** Write `parts` (a checked translation) into the live nodes of `seg`; false if its placeholder order differs. */
+export declare function write(seg: DomSegment, parts: Part[], mine: WeakMap<object, string>): boolean;
 export interface PatcherOptions {
     source: string;
     tmUrl?: string;
@@ -56,10 +58,15 @@ export interface PatcherOptions {
     all?: boolean;
     /** Extra fields of the discovery report (`key`, `auth`, `mode`). */
     report?: Record<string, unknown>;
+    /** Website tag: paths where discovery is allowed (project zones, private-looking paths refused). */
+    zone?: (path: string) => unknown;
+    /** Called each time a TM has been applied to the page (the tag un-hides it). */
+    ready?: () => void;
 }
 export declare function startPatcher(o: PatcherOptions): {
     mo: MutationObserver;
     readonly tm: PatcherTm | undefined;
     flush: () => void;
     send: () => void;
+    scan: () => void;
 };
