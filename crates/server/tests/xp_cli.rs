@@ -75,11 +75,10 @@ fn glot_bin() -> std::path::PathBuf {
     // target/<dir>/debug/deps/xp_cli-… → target/<dir>/debug/glot
     let bin = std::env::current_exe()
         .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("glot");
+        .ancestors()
+        .map(|d| d.join("glot"))
+        .find(|p| p.is_file())
+        .unwrap_or_else(|| std::path::PathBuf::from("target/debug/glot"));
     assert!(
         bin.exists(),
         "build the CLI first: cargo build -p glot-cli ({} missing)",

@@ -54,11 +54,10 @@ async fn fake_github(State(log): State<Log>, req: Request<Body>) -> axum::respon
 fn glot_bin() -> PathBuf {
     let p = std::env::current_exe()
         .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("glot");
+        .ancestors()
+        .map(|d| d.join("glot"))
+        .find(|p| p.is_file())
+        .unwrap_or_else(|| std::path::PathBuf::from("target/debug/glot"));
     assert!(p.exists(), "build the CLI first: cargo build -p glot-cli");
     p
 }

@@ -220,11 +220,10 @@ async fn connect_github_end_to_end() {
     };
     let glot = std::env::current_exe()
         .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("glot");
+        .ancestors()
+        .map(|d| d.join("glot"))
+        .find(|p| p.is_file())
+        .unwrap_or_else(|| std::path::PathBuf::from("target/debug/glot"));
     assert!(
         glot.exists(),
         "build the CLI first: cargo build -p glot-cli ({})",
