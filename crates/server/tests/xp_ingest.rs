@@ -281,7 +281,8 @@ async fn xp_config_and_ingest() {
         &ua,
     )
     .await;
-    assert_eq!(s, StatusCode::OK);
+    // A crawler is not a visitor: nothing counted, not even the legacy $view.
+    assert_eq!(s, StatusCode::NO_CONTENT);
     assert_eq!(counts(&seg.to_string(), 1, "$exposure").await.0, 0);
     // A real browser hit counts (and still counts its legacy $view).
     let (s, _, _) = call(&app, Method::POST, "/api/insights/pk_xp", Some(single), &[]).await;
