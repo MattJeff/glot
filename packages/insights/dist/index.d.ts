@@ -5,8 +5,12 @@ export type Options = {
     endpoint?: string;
     /** Locale the app rendered (default: <html lang>). */
     locale?: string;
-    /** Called when this session is in the test arm of a language experiment: render that locale. */
+    /** Called when a language experiment or launch holdout assigns this session a locale (the new one, or the
+     * fallback for held-out visitors): render that locale. Also dispatched as `glot:locale` on window. */
     onLocale?: (locale: string) => void;
+    /** The visitor picked this locale (switcher, `?lang=`, account setting): never held out, excluded from launch
+     * measurement. A pick in `<glot-locale-switcher>` (localStorage `glot-locale`) counts without this flag. */
+    explicit?: boolean;
 };
 /** Copy variant served to this session for a key: experiment id, arm, text. */
 export type Variant = {
