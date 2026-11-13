@@ -122,7 +122,8 @@ const json = (k: string) => {
 
 const noTrack = () => {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
-  return nav.globalPrivacyControl || nav.doNotTrack === "1";
+  // Automated browsers (Playwright, Puppeteer, Selenium, headless QA) are not visitors.
+  return nav.globalPrivacyControl || nav.doNotTrack === "1" || nav.webdriver === true;
 };
 
 /** Marks `id:event` credited this session; false when it already was. */

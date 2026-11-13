@@ -145,6 +145,22 @@ async fn insights_end_to_end() {
     )
     .await;
 
+    // Headless browsers and crawlers are not visitors: 204, nothing counted (totals below are unchanged).
+    for ua in [
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/131.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+    ] {
+        let (s, _, _) = call(
+            Method::POST,
+            &hit,
+            None,
+            Some(json!({"langs": ["en-US"], "served": "fr"})),
+            &[("content-type", "text/plain"), ("user-agent", ua)],
+        )
+        .await;
+        assert_eq!(s, StatusCode::NO_CONTENT, "{ua}");
+    }
+
     // Validation & unknown key.
     let (s, _, _) = send(json!({"served": "../x"}), vec![]).await;
     assert_eq!(s, StatusCode::BAD_REQUEST);

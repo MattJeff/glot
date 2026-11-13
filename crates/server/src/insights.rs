@@ -256,6 +256,10 @@ pub async fn ingest(
     body: Bytes,
 ) -> ApiResult<axum::response::Response> {
     use axum::response::IntoResponse;
+    // Crawlers, previews and headless browsers (QA, renderers, test runs) are not visitors: nothing is counted.
+    if crate::experiments::ingest::is_bot(&headers) {
+        return Ok(StatusCode::NO_CONTENT.into_response());
+    }
     // Any content type: the snippet posts text/plain to avoid a CORS preflight.
     let hit: Hit = serde_json::from_slice(&body)
         .map_err(|e| AppError::bad_request(format!("invalid body: {e}")))?;
