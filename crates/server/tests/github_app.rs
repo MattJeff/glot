@@ -40,17 +40,21 @@ struct Fake {
     llm_key: String,
     /// The provider answers with mock placeholders (`⟦fr⟧ …`) instead of translations.
     llm_placeholders: bool,
+    /// Requests into this locale fail (HTTP 400): a run cut short half-way.
+    llm_fail: Option<String>,
+    /// Target locale of every request, in order.
+    llm_locales: Vec<String>,
 }
 
 /// Anthropic Messages API: the offline mock's answer, made to look like real translations
 /// (`⟦fr⟧ Text` => `«fr» Text`) unless `llm_placeholders`.
 async fn fake_anthropic(f: &Shared, key: String, b: &Value) -> axum::response::Response {
     use glot_llm::provider::Provider as _;
-    let placeholders = {
+    let (placeholders, fail) = {
         let mut f = f.lock().unwrap();
         f.llm_calls += 1;
         f.llm_key = key;
-        f.llm_placeholders
+        (f.llm_placeholders, f.llm_fail.clone())
     };
     let req = glot_llm::provider::CompletionRequest {
         model: b["model"].as_str().unwrap_or_default().into(),
@@ -68,6 +72,14 @@ async fn fake_anthropic(f: &Shared, key: String, b: &Value) -> axum::response::R
     };
     let c = glot_llm::mock::MockProvider.complete(req).await.unwrap();
     let mut text = c.text;
+    let locale = ["fr", "de", "en"]
+        .into_iter()
+        .find(|l| text.contains(&format!("⟦{l}⟧")))
+        .unwrap_or_default();
+    f.lock().unwrap().llm_locales.push(locale.to_string());
+    if fail.as_deref() == Some(locale) {
+        return (StatusCode::BAD_REQUEST, "invalid request").into_response();
+    }
     if !placeholders {
         for l in ["fr", "de", "en"] {
             text = text.replace(&format!("⟦{l}⟧"), &format!("«{l}»"));
@@ -861,7 +873,6 @@ async fn connect_github_end_to_end() {
     )
     .await;
     assert!(!v.to_string().contains('⟦'), "nothing fake synced: {v}");
-    let synced = v["total"].clone();
 
     // 7. A provider answering with placeholders: nothing is synced, nothing is pushed.
     fake.lock().unwrap().llm_placeholders = true;
@@ -891,8 +902,114 @@ async fn connect_github_end_to_end() {
         &[],
     )
     .await;
-    assert_eq!(v["total"], synced, "nothing synced");
+    assert!(!v.to_string().contains('⟦'), "nothing fake synced: {v}");
     fake.lock().unwrap().llm_placeholders = false;
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+
+    // 7b. A run cut short half-way (every `de` request fails): the `fr` translations it paid for
+    // are saved, and the next run translates only what is missing.
+    std::fs::write(
+        work.join("app/page.tsx"),
+        std::fs::read_to_string(work.join("app/page.tsx"))
+            .unwrap()
+            .replace(
+                "</main>",
+                "  <p>Reports are emailed on Monday</p>\n    </main>",
+            ),
+    )
+    .unwrap();
+    sh(&work, &["commit", "-qam", "reports copy"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let kept = head("glot/update");
+    {
+        let mut f = fake.lock().unwrap();
+        f.llm_fail = Some("de".into());
+        f.llm_locales.clear();
+    }
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "failed", "{j}");
+    assert_eq!(head("glot/update"), kept, "nothing pushed");
+    let saved = |locale: &'static str| {
+        let pool = pool.clone();
+        async move {
+            sqlx::query_scalar::<_, String>(
+                "SELECT t.value FROM translations t JOIN keys k ON k.id = t.key_id
+                 WHERE k.source = 'Reports are emailed on Monday' AND t.locale = $1",
+            )
+            .bind(locale)
+            .fetch_optional(&pool)
+            .await
+            .unwrap()
+        }
+    };
+    assert_eq!(
+        saved("fr").await.as_deref(),
+        Some("«fr» Reports are emailed on Monday"),
+        "the translation paid for is kept"
+    );
+    assert_eq!(saved("de").await, None);
+    {
+        let mut f = fake.lock().unwrap();
+        f.llm_fail = None;
+        f.llm_locales.clear();
+    }
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "done", "{j}");
+    // ("" = a call that is not a translation, e.g. key naming during the rewrite.)
+    let asked: Vec<String> = fake
+        .lock()
+        .unwrap()
+        .llm_locales
+        .iter()
+        .filter(|l| !l.is_empty())
+        .cloned()
+        .collect();
+    assert_eq!(
+        asked,
+        ["de"],
+        "only the missing language is translated again"
+    );
+    for loc in ["fr", "de"] {
+        let cat = branch(&format!("messages/{loc}.json"));
+        assert!(
+            cat.contains(&format!("«{loc}» Reports are emailed on Monday")),
+            "{cat}"
+        );
+    }
+
+    // 7c. The estimate is over the repository's budget: refused before any call, with the fix.
+    std::fs::write(
+        work.join("app/page.tsx"),
+        std::fs::read_to_string(work.join("app/page.tsx"))
+            .unwrap()
+            .replace("</main>", "  <p>Archive older invoices</p>\n    </main>"),
+    )
+    .unwrap();
+    std::fs::write(work.join("glot.toml"), {
+        assert!(toml.contains("budget_usd = 5.0"), "{toml}");
+        toml.replace("budget_usd = 5.0", "budget_usd = 0.0000001")
+    })
+    .unwrap();
+    sh(&work, &["commit", "-qam", "archive copy, tiny budget"]);
+    sh(&work, &["push", "-q", "origin", "main"]);
+    let translations = |f: &Fake| f.llm_locales.iter().filter(|l| !l.is_empty()).count();
+    let calls = translations(&fake.lock().unwrap());
+    let kept = head("glot/update");
+    let j = wait!(run_push!());
+    assert_eq!(j["status"], "failed", "{j}");
+    let e = j["error"].as_str().unwrap();
+    assert!(
+        e.contains("exceeds the budget $0.00 set in glot.toml: raise `budget_usd` under [llm]"),
+        "{e}"
+    );
+    assert_eq!(
+        translations(&fake.lock().unwrap()),
+        calls,
+        "nothing translated"
+    );
+    let (_, v, _) = call(get.clone(), "/api/projects/web/github", Value::Null, &[]).await;
+    assert_eq!(v["failure"], "ai_quota");
 
     // 8. The repository's source language differs from the project's: stop before translating.
     std::fs::write(

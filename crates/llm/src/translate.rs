@@ -104,7 +104,7 @@ impl Usage {
 }
 
 const MAX_RETRIES: u8 = 2;
-const CONCURRENCY: usize = 4;
+pub const CONCURRENCY: usize = 4;
 const MAX_TOKENS: u32 = 16_000;
 
 /// Guarded pipeline: batch prompt (JSON in/out) -> validate + glossary check per item ->

@@ -361,9 +361,12 @@ function RepoPicker({ slug, status, onDone }: { slug: string; status: GithubStat
 
 function Steps({ job }: { job: GithubJob }) {
   const t = useTranslations("github");
-  const done = job.progress.done;
+  // done / total is the fraction of the run: whole steps, plus the strings translated within a step.
+  const { done: d, total } = job.progress;
+  const frac = total ? d / total : 0;
+  const done = Math.floor(frac * STEPS.length + 1e-9);
   const current = Math.min(done, STEPS.length - 1);
-  const pct = (done / STEPS.length) * 100;
+  const pct = frac * 100;
   return (
     <div className="space-y-3">
       <Progress value={pct} aria-label={t("job.progress", { done, total: STEPS.length })} className="h-1.5" />

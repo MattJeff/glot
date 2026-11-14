@@ -553,6 +553,7 @@ pub(crate) fn diagnose(error: &str) -> &'static str {
         "budget of",
         "over budget",
         "budget exceeded",
+        "exceeds the budget",
     ]) {
         "ai_quota"
     } else if has(&["http 5", "overloaded"]) {
@@ -1392,9 +1393,11 @@ struct Done {
     check_ok: bool,
     warnings: Vec<String>,
     log: String,
-    /// What `glot translate` planned and spent (its `Plan:` and `Cost:` lines), for the PR.
+    /// What this run translated and spent, for the PR.
     plan: Option<String>,
     cost: Option<String>,
+    /// Strings left for the follow-up run (translation time of this one used up).
+    remaining: usize,
     /// Files of the pull request that are not catalogs (filled from the actual diff).
     code_files: Vec<String>,
     /// `glot i18nize` report (`GLOT_REPORT`): strings left with a suggestion, files restored after
@@ -1402,112 +1405,138 @@ struct Done {
     report: Value,
 }
 
-/// `glot init` (new repos) + `glot localize --yes --no-install` with the project's LLM key in env, nothing else.
+/// The embedded `glot` binary with the project's LLM settings in env, nothing else, capped in
+/// memory, CPU and time.
+struct Glot {
+    env: Vec<(String, String)>,
+    sh: String,
+    key: String,
+    timeout: Duration,
+}
+
+impl Glot {
+    fn new(dir: &Path, home: &Path, p: &ProjectRow, api_key: Option<String>) -> Self {
+        let bin = env_or("GLOT_BIN", "glot");
+        let mem_kb = num_env("GLOT_GITHUB_MEM_MB", 1024) * 1024;
+        let timeout = Duration::from_secs(num_env("GLOT_GITHUB_TIMEOUT_SECS", 900));
+        let mut env: Vec<(String, String)> = vec![
+            ("HOME".into(), home.display().to_string()),
+            ("NO_COLOR".into(), "1".into()),
+            ("GLOT_BIN_PATH".into(), bin),
+            // Outside the clone: never committed.
+            (
+                "GLOT_REPORT".into(),
+                home.join("report.json").display().to_string(),
+            ),
+        ];
+        let key = api_key
+            .map(|k| glot_llm::provider::clean_key(&k))
+            .unwrap_or_default();
+        // Org user keys (sk-ant-usr…) must name the workspace: the CLI reads ANTHROPIC_WORKSPACE_ID.
+        if let Some(ws) = p
+            .llm
+            .0
+            .anthropic_workspace_id
+            .as_ref()
+            .filter(|w| !w.is_empty())
+        {
+            env.push(("ANTHROPIC_WORKSPACE_ID".into(), ws.clone()));
+        }
+        if !key.is_empty() {
+            let var = glot_core::config::Config::load(dir)
+                .ok()
+                .and_then(|c| c.llm.api_key_env);
+            for v in ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY"]
+                .into_iter()
+                .map(String::from)
+                .chain(var.filter(|v| v.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')))
+            {
+                env.push((v, key.clone()));
+            }
+        }
+        // The project's LLM settings win over the repository's `[llm]` in every glot of this run
+        // (`forced_llm` in the CLI): a committed `provider = "mock"` never ships fake translations.
+        env.push(("GLOT_LLM_PROVIDER".into(), p.llm.0.provider.clone()));
+        for (var, v) in [
+            ("GLOT_LLM_MODEL", Some(&p.llm.0.model)),
+            ("GLOT_LLM_BASE_URL", p.llm.0.base_url.as_ref()),
+            ("GLOT_LLM_FALLBACK_MODEL", p.llm.0.fallback_model.as_ref()),
+            ("GLOT_LLM_JUDGE_MODEL", p.llm.0.judge_model.as_ref()),
+        ] {
+            if let Some(v) = v.filter(|v| !v.trim().is_empty()) {
+                env.push((var.into(), v.clone()));
+            }
+        }
+        // ulimit caps address space and CPU time of glot and its children; tolerated where unsupported (macOS dev).
+        let sh = format!(
+            "ulimit -v {mem_kb} 2>/dev/null; ulimit -t {} 2>/dev/null; exec \"$GLOT_BIN_PATH\" \"$@\" 2>&1",
+            timeout.as_secs()
+        );
+        Glot {
+            env,
+            sh,
+            key,
+            timeout,
+        }
+    }
+
+    async fn run(&self, dir: &Path, args: &[&str]) -> anyhow::Result<(i32, String)> {
+        let mut argv = vec!["-c", self.sh.as_str(), "glot"];
+        argv.extend(args);
+        exec("sh", &argv, dir, &self.env, self.timeout, &[&self.key]).await
+    }
+}
+
+/// `glot init` (new repos) + `glot localize --yes --no-install --no-translate`: the code rewrite
+/// and catalog tidy. Translation is the server's ([`jobs::translate_with`]): resumable, saved as it goes.
 async fn localize(
     dir: &Path,
     home: &Path,
     p: &ProjectRow,
-    api_key: Option<String>,
+    glot: &Glot,
     carry: Option<&Path>,
 ) -> anyhow::Result<Done> {
-    let bin = env_or("GLOT_BIN", "glot");
-    let mem_kb = num_env("GLOT_GITHUB_MEM_MB", 1024) * 1024;
-    let timeout = Duration::from_secs(num_env("GLOT_GITHUB_TIMEOUT_SECS", 900));
-    let mut env: Vec<(String, String)> = vec![
-        ("HOME".into(), home.display().to_string()),
-        ("NO_COLOR".into(), "1".into()),
-        ("GLOT_BIN_PATH".into(), bin.clone()),
-        // Outside the clone: never committed.
-        (
-            "GLOT_REPORT".into(),
-            home.join("report.json").display().to_string(),
-        ),
-    ];
-    let key = api_key
-        .map(|k| glot_llm::provider::clean_key(&k))
-        .unwrap_or_default();
-    // Org user keys (sk-ant-usr…) must name the workspace: the CLI reads ANTHROPIC_WORKSPACE_ID.
-    if let Some(ws) = p
-        .llm
-        .0
-        .anthropic_workspace_id
-        .as_ref()
-        .filter(|w| !w.is_empty())
-    {
-        env.push(("ANTHROPIC_WORKSPACE_ID".into(), ws.clone()));
-    }
-    if !key.is_empty() {
-        let var = glot_core::config::Config::load(dir)
-            .ok()
-            .and_then(|c| c.llm.api_key_env);
-        for v in ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY"]
-            .into_iter()
-            .map(String::from)
-            .chain(var.filter(|v| v.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')))
-        {
-            env.push((v, key.clone()));
-        }
-    }
-    let provider = p.llm.0.provider.clone();
-    // The project's LLM settings win over the repository's `[llm]` in every glot of this run
-    // (`forced_llm` in the CLI): a committed `provider = "mock"` never ships fake translations.
-    env.push(("GLOT_LLM_PROVIDER".into(), provider.clone()));
-    for (var, v) in [
-        ("GLOT_LLM_MODEL", Some(&p.llm.0.model)),
-        ("GLOT_LLM_BASE_URL", p.llm.0.base_url.as_ref()),
-        ("GLOT_LLM_FALLBACK_MODEL", p.llm.0.fallback_model.as_ref()),
-        ("GLOT_LLM_JUDGE_MODEL", p.llm.0.judge_model.as_ref()),
-    ] {
-        if let Some(v) = v.filter(|v| !v.trim().is_empty()) {
-            env.push((var.into(), v.clone()));
-        }
-    }
-    // ulimit caps address space and CPU time of glot and its children; tolerated where unsupported (macOS dev).
-    let sh = format!(
-        "ulimit -v {mem_kb} 2>/dev/null; ulimit -t {} 2>/dev/null; exec \"$GLOT_BIN_PATH\" \"$@\" 2>&1",
-        timeout.as_secs()
-    );
+    let provider = p.llm.0.provider.as_str();
     let mut log = String::new();
     let fresh = !dir.join(glot_core::config::CONFIG_FILE).exists();
     if fresh {
         let targets = p.target_locales.join(",");
-        let (code, out) = exec(
-            "sh",
-            &[
-                "-c",
-                &sh,
-                "glot",
-                "init",
-                "--yes",
-                "--source",
-                &p.source_locale,
-                "--targets",
-                &targets,
-                "--provider",
-                &provider,
-            ],
-            dir,
-            &env,
-            timeout,
-            &[&key],
-        )
-        .await?;
+        let (code, out) = glot
+            .run(
+                dir,
+                &[
+                    "init",
+                    "--yes",
+                    "--source",
+                    &p.source_locale,
+                    "--targets",
+                    &targets,
+                    "--provider",
+                    provider,
+                ],
+            )
+            .await?;
         log.push_str(&out);
         if code != 0 {
             anyhow::bail!("glot init failed: {}", tail(&out, 15));
         }
         check_config(dir)?;
     }
-    let mut args = vec!["-c", &sh, "glot", "localize", "--yes", "--no-install"];
-    args.extend(["--provider", &provider]);
+    let mut args = vec![
+        "localize",
+        "--yes",
+        "--no-install",
+        "--no-translate",
+        "--provider",
+        provider,
+    ];
     let carry = carry.map(|c| c.display().to_string());
     if let Some(c) = &carry {
         args.extend(["--carry-from", c]);
     }
-    let (code, out) = exec("sh", &args, dir, &env, timeout, &[&key]).await?;
+    let (code, out) = glot.run(dir, &args).await?;
     log.push_str(&out);
-    // localize: 0 ok, 1 = translated but `glot check` failed (reported in the PR), else a real failure.
-    if code != 0 && code != 1 {
+    if code != 0 {
         anyhow::bail!("glot localize failed: {}", tail(&out, 15));
     }
     Ok(Done {
@@ -1515,21 +1544,15 @@ async fn localize(
             .lines()
             .find_map(|l| l.trim().strip_prefix("install: run "))
             .map(|s| s.trim().to_string()),
-        check_ok: code == 0,
+        check_ok: false,
         warnings: out
             .lines()
             .filter_map(|l| l.trim().strip_prefix("warning: "))
             .map(String::from)
             .collect(),
-        plan: out
-            .lines()
-            .find_map(|l| l.trim().strip_prefix("Plan: "))
-            .map(|s| s.trim().to_string()),
-        cost: out
-            .lines()
-            .rev()
-            .find_map(|l| l.trim().strip_prefix("Cost: "))
-            .map(|s| s.trim().to_string()),
+        plan: None,
+        cost: None,
+        remaining: 0,
         log,
         code_files: vec![],
         report: std::fs::read_to_string(home.join("report.json"))
@@ -1537,6 +1560,101 @@ async fn localize(
             .and_then(|t| serde_json::from_str(&t).ok())
             .unwrap_or(Value::Null),
     })
+}
+
+/// The project's translations into the clone's catalogs and glot.lock (like `glot pull`, limited
+/// to the clone's keys and locales): only values made for the current source, never a placeholder
+/// of the mock for a real provider. Values already there are left as is (no diff, lock untouched).
+async fn write_back(
+    state: &AppState,
+    p: &ProjectRow,
+    ws: &mut glot_llm::engine::Workspace,
+    locales: &[String],
+) -> anyhow::Result<()> {
+    use glot_core::{hash::hash, lock::Origin};
+    type Row = (
+        String,
+        String,
+        String,
+        String,
+        String,
+        Option<String>,
+        Option<i16>,
+        String,
+    );
+    let rows: Vec<Row> = sqlx::query_as(
+        "SELECT k.key, t.locale, t.value, t.status, t.origin, t.model, t.score, t.source_hash
+         FROM translations t JOIN keys k ON k.id = t.key_id
+         WHERE k.project_id = $1 AND t.locale = ANY($2) AND t.status <> 'stale'",
+    )
+    .bind(p.id)
+    .bind(locales)
+    .fetch_all(&state.db)
+    .await?;
+    let source = ws.source().entries.clone();
+    let real = p.llm.0.provider != "mock";
+    let mut by_locale: std::collections::BTreeMap<String, Vec<(String, Option<String>)>> =
+        Default::default();
+    for (key, locale, value, status, origin, model, score, source_hash) in rows {
+        let Some(src) = source.get(&key) else {
+            continue;
+        };
+        if source_hash != hash(src) || (real && has_mock_marker(&value)) {
+            continue;
+        }
+        let current = ws.catalogs.get(&locale).and_then(|c| c.entries.get(&key));
+        let locked = ws
+            .lock
+            .entries
+            .get(&locale)
+            .and_then(|e| e.get(&key))
+            .is_some_and(|e| e.target_hash == hash(&value) && e.source_hash == source_hash);
+        if current == Some(&value) && locked {
+            continue;
+        }
+        let changed = current != Some(&value);
+        let origin = match origin.as_str() {
+            "machine" => Origin::Machine {
+                model: model.unwrap_or_default(),
+            },
+            "human" => Origin::Human,
+            _ => Origin::Imported,
+        };
+        ws.lock.record(
+            &locale,
+            &key,
+            src,
+            &value,
+            origin,
+            score.map(|s| s.clamp(0, 100) as u8),
+        );
+        if let Some(e) = ws
+            .lock
+            .entries
+            .get_mut(&locale)
+            .and_then(|e| e.get_mut(&key))
+        {
+            e.reviewed = status == "reviewed";
+        }
+        if changed {
+            by_locale
+                .entry(locale)
+                .or_default()
+                .push((key, Some(value)));
+        }
+    }
+    for (locale, changes) in by_locale {
+        ws.write_entries(&locale, &changes)
+            .map_err(|e| anyhow::anyhow!("{e}"))?;
+    }
+    ws.lock.save(&ws.root).map_err(|e| anyhow::anyhow!("{e}"))?;
+    Ok(())
+}
+
+/// Translation time of one GitHub run (`GLOT_GITHUB_TRANSLATE_SECS`, 30 min): what is left is
+/// translated by a follow-up run, which starts from what this one saved.
+pub(crate) fn translate_secs() -> u64 {
+    num_env("GLOT_GITHUB_TRANSLATE_SECS", 1800)
 }
 
 fn tail(s: &str, n: usize) -> String {
@@ -1551,6 +1669,21 @@ async fn step(state: &AppState, job: &mut JobRecord, n: i32) {
 }
 
 pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
+    let left = run_once(state, job).await?;
+    // Translation time used up: a follow-up run continues from what this one saved.
+    if left > 0
+        && let Some(link) = load_link(state, job.project_id)
+            .await
+            .map_err(|e| anyhow::anyhow!(e.message))?
+        && let Err(e) = enqueue(state, job.project_id, link.installation_id, &job.kind, None).await
+    {
+        tracing::warn!(job = %job.id, "follow-up GitHub run not queued: {}", e.message);
+    }
+    Ok(())
+}
+
+/// One run; returns how many strings are left to translate.
+async fn run_once(state: &AppState, job: &mut JobRecord) -> anyhow::Result<usize> {
     step(state, job, 0).await;
     let link = load_link(state, job.project_id)
         .await
@@ -1694,49 +1827,40 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     let keys_before = glot_llm::engine::Workspace::open(&app_root)
         .map(|ws| ws.source().entries.len())
         .unwrap_or(0);
+    let glot = Glot::new(&app_root, &home, &p, api_key);
     let mut done = localize(
         &app_root,
         &home,
         &p,
-        api_key,
+        &glot,
         prev.as_ref().map(|(dir, _)| dir.as_path()),
     )
     .await?;
     check_config(&app_root)?;
-    // `Cost: $0.0123 …`: shown on the run in the dashboard.
-    if let Some(usd) = done
-        .cost
-        .as_deref()
-        .and_then(|c| c.split('$').nth(1))
-        .and_then(|c| {
-            c.split(|ch: char| !(ch.is_ascii_digit() || ch == '.'))
-                .next()?
-                .parse::<f64>()
-                .ok()
-        })
-    {
-        job.cost_usd = usd;
-    }
-    step(state, job, 3).await;
 
     // Sync into the project: same rules as `glot push` (reviewed/human translations on the server win).
-    let ws = glot_llm::engine::Workspace::open(&app_root).map_err(|e| anyhow::anyhow!("{e}"))?;
-    // Last gate before anything leaves this machine (server sync, branch, PR): no fake value.
-    if p.llm.0.provider != "mock"
-        && let Some((loc, key, n)) = mock_values(&ws)
-    {
-        anyhow::bail!(
-            "mock_output: {n} value(s) are placeholder translations (`⟦{loc}⟧ …`, e.g. `{loc}` `{key}`): nothing was synced or pushed"
-        );
-    }
-    let locales: Vec<&String> = std::iter::once(&p.source_locale)
-        .chain(&p.target_locales)
+    let mut ws =
+        glot_llm::engine::Workspace::open(&app_root).map_err(|e| anyhow::anyhow!("{e}"))?;
+    // Nothing fake leaves this machine (server sync, branch, PR).
+    let no_mock = |ws: &glot_llm::engine::Workspace| match mock_values(ws) {
+        Some((loc, key, n)) if p.llm.0.provider != "mock" => Err(anyhow::anyhow!(
+            "mock_output: {n} value(s) are placeholder translations (`⟦{loc}⟧ …`, e.g. `{loc}` `{key}`): nothing was pushed"
+        )),
+        _ => Ok(()),
+    };
+    no_mock(&ws)?;
+    let locales: Vec<String> = ws
+        .config
+        .target_locales
+        .iter()
+        .filter(|l| p.target_locales.contains(l))
+        .cloned()
         .collect();
     let body = crate::sync::PushBody {
         catalogs: ws
             .catalogs
             .iter()
-            .filter(|(l, _)| locales.contains(l))
+            .filter(|(l, _)| **l == p.source_locale || locales.contains(l))
             .map(|(l, c)| (l.clone(), c.entries.clone()))
             .collect(),
         lock: ws.lock.clone(),
@@ -1749,10 +1873,62 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
             .map(str::to_string),
         set_syntax: true,
     };
-    let pushed = crate::sync::apply_push(state, &p, body, "glot[bot]")
+    let mut pushed = crate::sync::apply_push(state, &p, body, "glot[bot]")
         .await
         .map_err(|e| anyhow::anyhow!(e.message))?;
+
+    // Translate what the project does not have yet, in this process: every batch is saved as it
+    // comes back, so a run cut short (timeout, deploy) loses nothing and the next one resumes.
+    // The project's budget wins over the repository's `[llm] budget_usd`.
+    let (budget, budget_source) = match (p.llm.0.budget_usd, ws.config.llm.budget_usd) {
+        (Some(_), _) => (
+            None,
+            "set in the project settings: raise it in Settings → LLM".to_string(),
+        ),
+        (None, b) => (
+            b,
+            "set in glot.toml: raise `budget_usd` under [llm], or set a project budget in Settings → LLM".to_string(),
+        ),
+    };
+    let params = jobs::JobParams {
+        locales: Some(locales.clone()),
+        keys: Some(ws.source().entries.keys().cloned().collect()),
+        budget_usd: budget,
+        ..Default::default()
+    };
+    let limits = jobs::Limits {
+        budget_source: Some(budget_source),
+        deadline: Some(std::time::Instant::now() + Duration::from_secs(translate_secs())),
+        step: Some((2, STEPS)),
+    };
+    let tr = jobs::translate_with(state, job, &params, limits).await?;
+    if tr.placeholders > 0 {
+        anyhow::bail!(
+            "mock_output: the AI provider answered {} placeholder translation(s) (`⟦xx⟧ …`): nothing was pushed",
+            tr.placeholders
+        );
+    }
+    write_back(state, &p, &mut ws, &locales).await?;
+    no_mock(&ws)?;
+    pushed.created += tr.translated as u32;
+    done.remaining = tr.remaining;
+    if tr.planned > 0 {
+        let n = tr.planned - tr.remaining;
+        done.plan = Some(format!("{n} string{}", if n == 1 { "" } else { "s" }));
+        done.cost = Some(format!("${:.4}", job.cost_usd));
+    }
+    step(state, job, 3).await;
+
+    // 0 ok, 1 = issues (reported in the PR), else a real failure.
+    let (code, out) = glot.run(&app_root, &["check"]).await?;
+    done.log.push_str(&out);
+    if code != 0 && code != 1 {
+        anyhow::bail!("glot check failed: {}", tail(&out, 15));
+    }
+    done.check_ok = code == 0;
+    check_config(&app_root)?;
     let status = ws.status();
+    let left = tr.remaining;
     step(state, job, 4).await;
 
     // Commit on the glot branch (workflow files excluded: the app has no `workflows` permission).
@@ -1777,7 +1953,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     if stat.trim().is_empty() && open_pr.is_none() {
         seen().await?;
         step(state, job, STEPS).await;
-        return Ok(()); // already localized: nothing to propose.
+        return Ok(left); // already localized: nothing to propose.
     }
     let bot = format!("{}[bot]", app.slug);
     let email = format!("{}+{bot}@users.noreply.github.com", app.app_id);
@@ -1893,7 +2069,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     if unchanged {
         seen().await?;
         step(state, job, STEPS).await;
-        return Ok(());
+        return Ok(left);
     }
     if head_is_base {
         // Everything the PR proposed is now on the base branch: nothing left to propose.
@@ -1906,7 +2082,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
         }
         seen().await?;
         step(state, job, STEPS).await;
-        return Ok(());
+        return Ok(left);
     }
     // Never overwrite a push that landed while this run was working.
     let lease = match &prev {
@@ -2025,7 +2201,7 @@ pub(crate) async fn run_job(state: &AppState, job: &mut JobRecord) -> anyhow::Re
     .execute(&state.db)
     .await?;
     step(state, job, STEPS).await;
-    Ok(())
+    Ok(left)
 }
 
 /// Values written by the offline mock provider (`⟦fr⟧ Text`, `mock::fake_translate`), in any
@@ -2388,6 +2564,13 @@ fn pr_body(
     } else {
         "\n`glot check` reports issues: see the table above, fix them in the dashboard or with `glot translate --force`.\n"
     });
+    if done.remaining > 0 {
+        s.push_str(&format!(
+            "\n**Translation in progress**: {} string{} still to translate. Everything translated so far is saved in the glot project; glot continues automatically and updates this pull request.\n",
+            done.remaining,
+            if done.remaining == 1 { " is" } else { "s are" }
+        ));
+    }
     if let Some(cost) = &done.cost {
         s.push_str(&format!(
             "\n**Cost of this run**: {}{}, billed by your AI provider on your own key. Strings already translated are never sent again.\n",
