@@ -97,6 +97,9 @@ async fn key_map(
 
 /// Push local catalogs. Source values create/update keys (changed source => stale translations).
 /// A target value never overwrites a server translation that is reviewed or human-made: it's reported as a conflict.
+/// Largest `glot push` body: catalogs of every locale plus glot.lock (glot's own repo is ~6 MB as JSON).
+pub const PUSH_LIMIT: usize = 64 << 20;
+
 pub async fn push(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,

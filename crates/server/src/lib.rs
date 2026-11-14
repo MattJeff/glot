@@ -147,7 +147,11 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route(&format!("{p}/jobs"), get(jobs::list).post(jobs::create))
         .route("/api/jobs/{id}", get(jobs::get))
         .route("/api/jobs/{id}/events", get(jobs::events))
-        .route(&format!("{p}/sync/push"), post(sync::push))
+        // A whole repo's catalogs + glot.lock: a 30-language app is several MB, axum's 2 MB default refuses it.
+        .route(
+            &format!("{p}/sync/push"),
+            post(sync::push).layer(axum::extract::DefaultBodyLimit::max(sync::PUSH_LIMIT)),
+        )
         .route(&format!("{p}/sync/pull"), get(sync::pull))
         .route(&format!("{p}/review"), post(review::review_many))
         .route(&format!("{p}/keys/{{key}}/review"), get(review::review_one))

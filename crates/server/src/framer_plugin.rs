@@ -29,7 +29,10 @@ async fn bearer_only(req: Request, next: Next) -> Response {
 pub fn public_routes() -> Router<AppState> {
     let p = "/api/plugin/projects/{slug}";
     Router::new()
-        .route(&format!("{p}/sync/push"), post(sync::push))
+        .route(
+            &format!("{p}/sync/push"),
+            post(sync::push).layer(axum::extract::DefaultBodyLimit::max(sync::PUSH_LIMIT)),
+        )
         .route(&format!("{p}/sync/pull"), get(sync::pull))
         .route(&format!("{p}/jobs"), post(jobs::create))
         .route("/api/plugin/jobs/{id}", get(jobs::get))

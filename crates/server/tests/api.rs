@@ -583,6 +583,21 @@ async fn sync_push_pull_with_conflicts() {
     assert_eq!(r["created"], 4);
     assert_eq!(r["conflicts"], json!([]));
 
+    // A real repo's catalogs + lock are several MB: above axum's 2 MB default, under PUSH_LIMIT.
+    let big: serde_json::Map<String, serde_json::Value> = (0..3000)
+        .map(|i| (format!("big.k{i}"), json!("x".repeat(1000))))
+        .collect();
+    ctx.project(&t, "bigsync").await;
+    let (s, _, r) = ctx
+        .call(
+            Method::POST,
+            "/api/projects/bigsync/sync/push",
+            Some(&t),
+            Some(json!({"catalogs": {"en": big}})),
+        )
+        .await;
+    assert_eq!(s, StatusCode::OK, "3 MB push: {r}");
+
     // A human edit on the server wins over a different local value.
     ctx.call(
         Method::PUT,
