@@ -5,7 +5,6 @@ import {
   ChartNoAxesColumn,
   Check,
   Compass,
-  Eye,
   EyeOff,
   FileClock,
   Globe,
@@ -13,27 +12,24 @@ import {
   type LucideIcon,
   Mail,
   MapPin,
-  MessagesSquare,
   MousePointerClick,
   RefreshCw,
   Scale,
   Search,
   ShieldCheck,
   ShoppingBag,
-  Smartphone,
   Star,
-  Trophy,
   Unlock,
   Wand2,
   X,
-  Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
 import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { ACCENTS } from "@/components/landing-accents";
-import { LangMorph, WinnerBoard } from "@/components/landing-visuals";
+import { LangMorph } from "@/components/landing-visuals";
+import { WowShowcase } from "@/components/wow-showcase";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -66,34 +62,43 @@ function HelloMarquee() {
   );
 }
 
-// Every feature, in plain words (the technical detail lives in /docs). Keys under home.features.
-type Group = { id: "app" | "web" | "beyond" | "grow" | "trust"; anchor: string; acc: string; items: [string, LucideIcon][] };
-const GROUPS: Record<Group["id"], Group> = {
-  app: { id: "app", anchor: "app", acc: "acc-green", items: [["minutes", Zap], ["safe", ShieldCheck], ["fresh", RefreshCw], ["brand", BookOpenText], ["onpage", MousePointerClick]] },
-  web: { id: "web", anchor: "website", acc: "acc-cyan", items: [["tag", Wand2], ["google", Search], ["local", MapPin], ["shop", ShoppingBag], ["live", Eye], ["longtail", Globe]] },
-  beyond: { id: "beyond", anchor: "beyond", acc: "acc-violet", items: [["mobile", Smartphone], ["emails", Mail], ["ai", Bot], ["support", MessagesSquare], ["once", Link2]] },
-  grow: { id: "grow", anchor: "grow", acc: "acc-amber", items: [["next", Compass], ["words", Trophy], ["private", EyeOff]] },
-  trust: { id: "trust", anchor: "trust", acc: "acc-pink", items: [["proof", FileClock], ["open", Unlock]] },
+// Every feature, in plain words (the technical detail lives in /docs), ranked by what it does for glot:
+// wow (shown live in the showcase), what sets it apart, what spreads it. Item keys under home.features.
+type Group = { id: "diff" | "viral"; anchor: string; acc: string; items: [string, LucideIcon][] };
+const DIFF: Group = {
+  id: "diff",
+  anchor: "different",
+  acc: "acc-violet",
+  items: [["app.safe", ShieldCheck], ["web.local", MapPin], ["grow.next", Compass], ["web.google", Search], ["app.brand", BookOpenText], ["beyond.emails", Mail], ["beyond.once", Link2], ["web.shop", ShoppingBag], ["web.longtail", Globe], ["grow.private", EyeOff], ["trust.proof", FileClock]],
 };
+const VIRAL: Group = {
+  id: "viral",
+  anchor: "together",
+  acc: "acc-cyan",
+  items: [["web.tag", Wand2], ["app.onpage", MousePointerClick], ["app.fresh", RefreshCw], ["app.agents", Bot], ["trust.open", Unlock]],
+};
+const WOW = [["minutes", "app"], ["ai", "beyond"], ["mobile", "beyond"], ["support", "beyond"], ["words", "grow"], ["live", "web"]] as const;
+type Key = Parameters<T>[0];
 
 const FAQ = ["dev", "quality", "tools", "google", "privacy", "price"] as const;
 
 type T = Awaited<ReturnType<typeof getTranslations<"home">>>;
 
-function FeatureGroup({ g, t, wash }: { g: Group; t: T; wash?: boolean }) {
-  const k = (s: string) => `features.${g.id}.${s}` as Parameters<T>[0];
+function FeatureGroup({ g, t, wash, extra }: { g: Group; t: T; wash?: boolean; extra?: React.ReactNode }) {
+  const k = (s: string) => `features.${s}` as Parameters<T>[0];
   return (
     <section id={g.anchor} aria-labelledby={`${g.anchor}-title`} className={`${g.acc} scroll-mt-16 ${wash ? "section-wash border-y bg-muted/30" : ""}`}>
       <div className="mx-auto max-w-6xl px-4 py-24">
-        <SectionHead id={`${g.anchor}-title`} eyebrow={t(k("eyebrow"))} title={t(k("title"))} subtitle={t(k("subtitle"))} />
-        <ul className={`mt-12 grid gap-4 sm:grid-cols-2 ${g.items.length === 2 ? "" : "lg:grid-cols-3"}`}>
+        <SectionHead id={`${g.anchor}-title`} eyebrow={t(k(`${g.id}.eyebrow`))} title={t(k(`${g.id}.title`))} subtitle={t(k(`${g.id}.subtitle`))} />
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {g.items.map(([id, Icon], i) => (
-            // ponytail: 5 cards fill a 3-column grid when the first one spans two.
-            <li key={id} className={`reveal card-acc flex flex-col ${g.items.length === 5 && i === 0 ? "lg:col-span-2" : ""} rounded-xl border bg-card p-5 shadow-xs ${ACCENTS[(ACCENTS.indexOf(g.acc as (typeof ACCENTS)[number]) + i) % ACCENTS.length]}`} style={{ animationDelay: `${(i % 3) * 60}ms` }}>
+            // ponytail: 5 or 11 cards fill a 3-column grid when the first one spans two.
+            <li key={id} className={`reveal card-acc flex flex-col ${g.items.length % 3 === 2 && i === 0 ? "lg:col-span-2" : ""} rounded-xl border bg-card p-5 shadow-xs ${ACCENTS[(ACCENTS.indexOf(g.acc as (typeof ACCENTS)[number]) + i) % ACCENTS.length]}`} style={{ animationDelay: `${(i % 3) * 60}ms` }}>
               <span className="tile size-10">
                 <Icon aria-hidden className="size-5" />
               </span>
               <h3 className="mt-4 font-semibold">{t(k(`${id}.title`))}</h3>
+              {i === 0 && extra}
               <p className="mt-3 flex gap-2 text-sm leading-relaxed text-muted-foreground">
                 <X aria-hidden className="mt-0.5 size-4 shrink-0 opacity-60" />
                 <span>
@@ -135,11 +140,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     license: t("footer.license"),
   };
   const navLinks = [
-    { href: "#app", label: t("nav.app") },
-    { href: "#website", label: t("nav.website") },
-    { href: "#beyond", label: t("nav.beyond") },
+    { href: "#wow", label: t("nav.wow") },
+    { href: "#different", label: t("nav.different") },
     { href: "#demo", label: t("nav.demo") },
-    { href: "#results", label: t("nav.results") },
+    { href: "#together", label: t("nav.together") },
   ];
 
   const faq = FAQ.map((k) => ({ q: t(`faq.${k}.q`), a: t(`faq.${k}.a`) }));
@@ -182,7 +186,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <span className="text-xs text-muted-foreground">{t("hero.startHint")}</span>
       </div>
       <Button size="lg" variant="outline" asChild className="h-12 px-6 text-base">
-        <a href="#demo">{t("hero.see")}</a>
+        <a href="#wow">{t("hero.see")}</a>
       </Button>
     </div>
   );
@@ -237,18 +241,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
         <HelloMarquee />
 
-        <section aria-labelledby="problem-title" className="acc-coral mx-auto max-w-6xl px-4 py-24">
-          <SectionHead id="problem-title" eyebrow={t("problem.eyebrow")} title={t("problem.title")} />
-          <ol className="mt-10 grid gap-4 md:grid-cols-3">
-            {(["one", "ai", "manual"] as const).map((k, i) => (
-              <li key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${["acc-coral", "acc-amber", "acc-pink"][i]}`} style={{ animationDelay: `${i * 60}ms` }}>
-                <p className="acc-ink font-mono text-3xl font-semibold tracking-tight tabular-nums">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="mt-2 font-semibold">{t(`problem.${k}.title`)}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`problem.${k}.body`)}</p>
-              </li>
-            ))}
-          </ol>
-          <p className="reveal mt-8 text-lg font-medium text-pretty">{t("problem.kicker")}</p>
+        <section id="wow" aria-labelledby="wow-title" className="scroll-mt-16">
+          <div className="mx-auto max-w-6xl px-4 pt-12 pb-24">
+            <SectionHead id="wow-title" eyebrow={t("features.wow.eyebrow")} title={t("features.wow.title")} subtitle={t("features.wow.subtitle")} />
+            <div className="mt-12">
+              <WowShowcase label={t("features.wow.title")} items={WOW.map(([id, g]) => ({ id, title: t(`features.${g}.${id}.title` as Key), gain: t(`features.${g}.${id}.gain` as Key) }))} />
+            </div>
+          </div>
         </section>
 
         <section id="how" aria-labelledby="how-title" className="acc-cyan section-wash scroll-mt-16 border-y bg-muted/30">
@@ -273,9 +272,27 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <FeatureGroup g={GROUPS.app} t={t} />
-        <FeatureGroup g={GROUPS.web} t={t} wash />
-        <FeatureGroup g={GROUPS.beyond} t={t} />
+        <FeatureGroup
+          g={DIFF}
+          t={t}
+          extra={
+            // Benchmark: docs/benchmark (320 sentences, 8 languages, same model with and without glot).
+            <div aria-hidden className="mt-4 space-y-2 font-mono text-xs" dir="ltr">
+              <div className="flex items-center gap-3">
+                <span className="w-12 text-muted-foreground">AI</span>
+                <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div className="bench-bar h-full w-[100%] rounded-full bg-red-500/70" />
+                </div>
+                <span className="w-12 text-end tabular-nums">14.1%</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="w-12 font-semibold">glot</span>
+                <div className="h-3 flex-1 rounded-full bg-muted" />
+                <span className="acc-ink w-12 text-end font-semibold tabular-nums">0%</span>
+              </div>
+            </div>
+          }
+        />
 
         <section id="demo" aria-labelledby="demo-title" className="acc-green section-wash relative scroll-mt-16 border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
@@ -287,22 +304,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <FeatureGroup g={GROUPS.grow} t={t} />
-
-        <section id="results" aria-labelledby="results-title" className="acc-green section-wash scroll-mt-16 border-y bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead id="results-title" eyebrow={t("results.eyebrow")} title={t("results.title")} subtitle={t("results.subtitle")} />
-            <figure className="reveal card-acc mt-10 rounded-xl border bg-card p-5 shadow-xs sm:p-7">
-              <figcaption className="mb-2 inline-flex rounded-full border border-dashed px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{t("results.example")}</figcaption>
-              <blockquote className="text-lg font-medium text-pretty sm:text-2xl">“{t("results.exampleSentence")}”</blockquote>
-            </figure>
-            <div className="reveal mt-6">
-              <WinnerBoard />
-            </div>
-          </div>
-        </section>
-
-        <FeatureGroup g={GROUPS.trust} t={t} />
+        <FeatureGroup g={VIRAL} t={t} />
 
         <section aria-labelledby="faq-title" className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 lg:grid-cols-[1fr_2fr]">
           <div className="reveal">

@@ -115,6 +115,7 @@ async fn edge_website_snippet() {
     let (_, _, st) = call(Method::GET, "/edge/v1/ed/status", None, None).await;
     assert_eq!(st["website"]["on"], false, "{st}");
     assert_eq!(st["hreflang"], json!({}));
+    assert_eq!(st["badge"], false, "self-hosted: never branded");
     let (_, _, out) = report(vec![seg("Our story")]).await;
     assert_eq!(out["skipped"], "disabled", "{out}");
 

@@ -182,6 +182,7 @@ async fn status(
         // included here. The server re-checks every report.
         "discover": {"include": s.discover_include, "exclude": s.discover_exclude},
         "hreflang": hreflang,
+        "badge": crate::billing::shows_badge(&state, p.id).await?,
     });
     let mut res = Json(body).into_response();
     let h = res.headers_mut();

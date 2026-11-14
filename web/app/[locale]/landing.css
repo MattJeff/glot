@@ -178,3 +178,32 @@
   .board-lit { translate: 0 -3px; border-color: color-mix(in oklch, var(--acc) 50%, var(--border)); box-shadow: 0 16px 40px -18px color-mix(in oklch, var(--acc) 60%, transparent); }
   .board-lit .board-bar { animation: l-grow 800ms var(--ease-out-quint) both; }
 }
+
+/* Wow showcase (components/wow-showcase.tsx). Final states are the static ones: without motion every scene
+   is shown complete and nothing advances. */
+.wow-halo { background: radial-gradient(60% 60% at 50% 50%, color-mix(in oklch, var(--acc) 22%, transparent), transparent 70%); filter: blur(24px); transition: background 400ms ease-out; }
+.wow-strike { text-decoration: line-through; opacity: 0.5; }
+.wow-out { display: none; }
+@keyframes w-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes w-pop { 0% { opacity: 0; transform: scale(0.8); } 60% { opacity: 1; transform: scale(1.06); } 100% { transform: none; } }
+@keyframes w-drop { 0% { opacity: 0; transform: translateY(-120%); } 12%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-120%); } }
+@keyframes w-swap { from { opacity: 0; transform: translateY(40%); filter: blur(3px); } }
+@keyframes w-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes w-strike { from { text-decoration-color: transparent; opacity: 1; } }
+@keyframes w-blink { 50% { opacity: 0; } }
+@keyframes w-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.wow-progress { transform-origin: left; transform: scaleX(0); }
+[dir="rtl"] .wow-progress { transform-origin: right; }
+@media (prefers-reduced-motion: no-preference) {
+  .wow-stage { animation: l-fade 300ms ease-out; }
+  .wow-in { animation: w-in 450ms var(--ease-out-quint) both; }
+  .wow-pop { animation: w-pop 500ms var(--ease-out-quint) both; }
+  .wow-drop { animation: w-drop 4.5s var(--ease-out-quint) both; }
+  .wow-swap { animation: w-swap 380ms var(--ease-out-quint) both; }
+  .wow-out { display: block; animation: w-out 400ms ease-in both; }
+  .wow-strike { animation: w-strike 300ms ease-out 2200ms both; }
+  .wow-caret { animation: w-blink 900ms steps(1) infinite; }
+  .wow-progress { animation: w-progress linear both; }
+  .wow:hover .wow-progress { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) { .wow-caret, .wow-drop { display: none; } }

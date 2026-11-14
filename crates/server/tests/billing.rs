@@ -312,6 +312,9 @@ async fn webhooks_drive_entitlements_and_quotas() {
             .0,
         StatusCode::CREATED
     );
+    // Free cloud plan: the website tag shows "Translated with glot".
+    let (_, st) = call(&app, Method::GET, "/edge/v1/pa/status", None, None).await;
+    assert_eq!(st["badge"], true, "{st}");
     let (s, e) = call(&app, Method::POST, "/api/projects", c, Some(mk("pb"))).await;
     assert_eq!(s, StatusCode::PAYMENT_REQUIRED);
     assert_eq!(e["error"]["code"], "plan_limit");

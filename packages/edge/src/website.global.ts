@@ -39,6 +39,8 @@ type Status = {
   website?: { on?: boolean; position?: string; locales?: string[]; flags?: boolean };
   discover?: { include?: string[]; exclude?: string[] };
   hreflang?: Record<string, string>;
+  /** Free cloud plan: "Translated with glot" under the switcher. */
+  badge?: boolean;
 };
 type Manifest = { source: string; locales: { code: string; dir: string }[] };
 
@@ -125,7 +127,21 @@ w.glot = Object.assign(w.glot ?? {}, { setLocale, get locale() { return current;
 
 const CORNERS: Record<string, string> = { "bottom-right": "bottom:16px;right:16px", "bottom-left": "bottom:16px;left:16px", "top-right": "top:16px;right:16px", "top-left": "top:16px;left:16px" };
 
-function switcher(pos: string, offered: string[], flags: boolean) {
+// Words of the badge, by the language the page is shown in (English otherwise).
+const BADGE: Record<string, string> = { en: "Translated with glot", fr: "Traduit avec glot", es: "Traducido con glot", de: "Übersetzt mit glot", ja: "glot で翻訳", ar: "تُرجم بواسطة glot", pt: "Traduzido com glot", it: "Tradotto con glot" };
+
+function badge() {
+  const a = document.createElement("a");
+  a.href = "https://glotlang.com/?utm_source=badge&utm_medium=website-tag";
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.setAttribute("data-glot-skip", "");
+  a.textContent = BADGE[current.split(/[-_]/)[0].toLowerCase()] ?? BADGE.en;
+  a.style.cssText = "display:block;padding:2px 8px 4px;font-size:10px;line-height:1.4;opacity:.6;color:inherit;text-decoration:none;text-align:center";
+  return a;
+}
+
+function switcher(pos: string, offered: string[], flags: boolean, branded: boolean) {
   if (d.switcher === "none" || pos === "none" || codes.length < 2) return;
   const s = document.createElement("glot-locale-switcher");
   const at = { project: d.project ?? "", cdn, min: "0", strategy: "event", locales: offered.join(","), flags: flags ? "" : "off", "data-glot-skip": "" };
@@ -142,7 +158,13 @@ function switcher(pos: string, offered: string[], flags: boolean) {
     box.setAttribute("data-glot-skip", "");
     box.style.cssText = `position:fixed;${corner};z-index:2147483646;font:14px ${cs.fontFamily};color:${bg ? cs.color : "#111"};background:${bg ?? "#fff"};border-radius:6px;box-shadow:0 2px 10px rgb(0 0 0/.15)`;
     box.append(s);
+  } else if (branded) {
+    box = document.createElement("span");
+    box.setAttribute("data-glot-skip", "");
+    box.style.cssText = "display:inline-block";
+    box.append(s);
   }
+  if (branded) box.append(badge());
   // A selector the page renders late (SPA header): placed as soon as it exists, put back if a re-render drops it.
   const place = () => {
     if (box.isConnected) return;
@@ -228,7 +250,7 @@ function go(status: Status, m: Manifest) {
   if (!edgePage && target !== source) translate(target);
   else (current = target), show();
   dom(() => {
-    switcher(d.position ?? status.website!.position ?? "bottom-right", offered, d.flags !== "off" && status.website!.flags !== false);
+    switcher(d.position ?? status.website!.position ?? "bottom-right", offered, d.flags !== "off" && status.website!.flags !== false, !!status.badge);
     hreflang();
   });
 }

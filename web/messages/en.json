@@ -1076,15 +1076,14 @@
       "label": "Main",
       "home": "glot home",
       "demo": "Demo",
-      "results": "Results",
       "i18n": "Localization",
       "docs": "Docs",
       "pricing": "Pricing",
       "openApp": "Open the app",
       "githubStars": "glot on GitHub, {count, plural, =0 {no stars yet} one {# star} other {# stars}}",
-      "app": "Your app",
-      "website": "Your website",
-      "beyond": "Everything else"
+      "wow": "Live",
+      "different": "Why glot",
+      "together": "Together"
     },
     "hero": {
       "badge": "Apps, websites, emails, support",
@@ -1168,23 +1167,6 @@
       "merged": "Done. The winner is live in every language.",
       "files": "{count, plural, one {# file changed} other {# files changed}}"
     },
-    "problem": {
-      "eyebrow": "The problem",
-      "title": "Going international usually hurts.",
-      "one": {
-        "title": "It takes weeks",
-        "body": "Copying every sentence, sending files to translators, pasting them back. Then starting over with each new feature."
-      },
-      "ai": {
-        "title": "AI alone breaks things",
-        "body": "Fast, but it mangles names, prices and buttons. In our tests, 1 sentence in 7 came out broken."
-      },
-      "manual": {
-        "title": "Translated, but invisible",
-        "body": "Google doesn't show your pages abroad, and you can't tell which countries actually buy."
-      },
-      "kicker": "glot does the whole job: translate, check, publish, measure."
-    },
     "how": {
       "eyebrow": "How it works",
       "title": "Three steps, no technical setup.",
@@ -1200,13 +1182,6 @@
         "title": "Go live and watch it grow",
         "body": "Your customers read their language. You see which countries sign up and buy."
       }
-    },
-    "results": {
-      "example": "Example",
-      "exampleSentence": "Simplicity: +18% signups in Germany (probably between +6% and +30%), 97% probability it's the best. About 3 more days.",
-      "eyebrow": "Results",
-      "title": "Different countries, different winners.",
-      "subtitle": "glot tells you which version wins in each country, by how much and how sure it is, in one sentence."
     },
     "faq": {
       "title": "Questions",
@@ -1259,9 +1234,6 @@
       "before": "Before",
       "after": "With glot",
       "app": {
-        "eyebrow": "Your app",
-        "title": "Your product, fluent in every language.",
-        "subtitle": "Translated, checked and kept up to date, without slowing your team down.",
         "minutes": {
           "title": "Translated in minutes",
           "pain": "Weeks spent copying text into spreadsheets and chasing translators.",
@@ -1286,12 +1258,14 @@
           "title": "Fix it right on the page",
           "pain": "Feedback lost in screenshots and email threads.",
           "gain": "Your team and your visitors point at a sentence on the real site and fix it there."
+        },
+        "agents": {
+          "title": "Your coding assistant knows glot",
+          "pain": "AI coding assistants hardcode text in one language.",
+          "gain": "Claude, Cursor and Codex add every new sentence in every language as they write the app."
         }
       },
       "web": {
-        "eyebrow": "Your website",
-        "title": "Found and understood in every country.",
-        "subtitle": "From a one-page site to a full shop, in a few minutes.",
         "tag": {
           "title": "Any website, one line",
           "pain": "A Wix, Squarespace or Webflow site stuck in one language.",
@@ -1324,9 +1298,6 @@
         }
       },
       "beyond": {
-        "eyebrow": "Everything else",
-        "title": "Every word your customers read.",
-        "subtitle": "Mobile apps, emails, AI answers and support, all in their language.",
         "mobile": {
           "title": "Mobile apps, no store wait",
           "pain": "A typo fix means a new release and days of store review.",
@@ -1354,9 +1325,6 @@
         }
       },
       "grow": {
-        "eyebrow": "Growth",
-        "title": "Know which languages pay off.",
-        "subtitle": "Your own visitors tell you where to go next and which words sell.",
         "next": {
           "title": "Which country to open next",
           "pain": "Adding languages on a hunch.",
@@ -1374,9 +1342,6 @@
         }
       },
       "trust": {
-        "eyebrow": "Trust",
-        "title": "You stay in control.",
-        "subtitle": "From the first sentence to the last.",
         "proof": {
           "title": "A record of what AI wrote",
           "pain": "New EU rules on AI-generated content, and no record of who translated what.",
@@ -1387,6 +1352,21 @@
           "pain": "Locked into a vendor, with per-word prices that keep rising.",
           "gain": "Free and open source. Run it yourself, or let us run it for you."
         }
+      },
+      "wow": {
+        "eyebrow": "Live",
+        "title": "See it happen.",
+        "subtitle": "Six things glot does that you'll want to show your team."
+      },
+      "diff": {
+        "eyebrow": "Why glot",
+        "title": "What you won't find anywhere else.",
+        "subtitle": "Other tools translate. glot makes sure it works, gets found and pays off."
+      },
+      "viral": {
+        "eyebrow": "Together",
+        "title": "Your whole team, and your visitors, pitch in.",
+        "subtitle": "glot fits where people already work, so everyone can help."
       }
     }
   },

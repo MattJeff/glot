@@ -2079,48 +2079,20 @@
       "label": "Principal",
       "openApp": "Abrir la app",
       "pricing": "Precios",
-      "results": "Resultados",
-      "app": "Tu app",
-      "website": "Tu web",
-      "beyond": "Todo lo demás"
+      "wow": "En directo",
+      "different": "Por qué glot",
+      "together": "Juntos"
     },
     "pricing": {
       "body": "Prueba glot gratis en tu propio proyecto. Cuando crezca tu tráfico internacional, elige el plan que te encaje. Es de código abierto, así que también puedes alojarlo tú mismo.",
       "cta": "Ver precios",
       "title": "Empieza gratis, paga cuando rinda."
     },
-    "problem": {
-      "ai": {
-        "body": "Es rápida, pero estropea nombres, precios y botones. En nuestras pruebas, 1 de cada 7 frases salía rota.",
-        "title": "La IA sola rompe cosas"
-      },
-      "eyebrow": "El problema",
-      "kicker": "glot hace todo el trabajo: traducir, revisar, publicar, medir.",
-      "manual": {
-        "body": "Google no muestra tus páginas en el extranjero y no sabes qué países compran de verdad.",
-        "title": "Traducido, pero invisible"
-      },
-      "one": {
-        "body": "Copiar cada frase, enviar archivos a traductores, volver a pegarlos. Y empezar de nuevo con cada novedad.",
-        "title": "Lleva semanas"
-      },
-      "title": "Salir al mercado internacional suele doler."
-    },
-    "results": {
-      "example": "Ejemplo",
-      "exampleSentence": "Simplicidad: +18% de registros en Alemania (probablemente entre +6% y +30%), 97% de probabilidad de que sea la mejor. Faltan unos 3 días más.",
-      "eyebrow": "Resultados",
-      "title": "Países distintos, ganadores distintos.",
-      "subtitle": "glot te dice qué versión gana en cada país, por cuánto y con qué certeza, en una sola frase."
-    },
     "skip": "Ir al contenido",
     "features": {
       "before": "Antes",
       "after": "Con glot",
       "app": {
-        "eyebrow": "Tu app",
-        "title": "Tu producto habla todos los idiomas.",
-        "subtitle": "Traducido, revisado y siempre al día, sin frenar a tu equipo.",
         "minutes": {
           "title": "Traducido en minutos",
           "pain": "Semanas copiando textos en hojas de cálculo y persiguiendo traductores.",
@@ -2145,12 +2117,14 @@
           "title": "Corrige directamente en la página",
           "pain": "Comentarios perdidos en capturas de pantalla y cadenas de correos.",
           "gain": "Tu equipo y tus visitantes señalan una frase en la web real y la corrigen ahí mismo."
+        },
+        "agents": {
+          "title": "Tu asistente de código conoce glot",
+          "pain": "Los asistentes de código con IA escriben los textos fijos en un solo idioma.",
+          "gain": "Claude, Cursor y Codex añaden cada frase nueva en todos los idiomas mientras escriben la app."
         }
       },
       "web": {
-        "eyebrow": "Tu web",
-        "title": "Encontrada y entendida en cada país.",
-        "subtitle": "De una web de una página a una tienda completa, en pocos minutos.",
         "tag": {
           "title": "Cualquier web, una línea",
           "pain": "Una web de Wix, Squarespace o Webflow atascada en un solo idioma.",
@@ -2183,9 +2157,6 @@
         }
       },
       "beyond": {
-        "eyebrow": "Todo lo demás",
-        "title": "Cada palabra que leen tus clientes.",
-        "subtitle": "Apps móviles, correos, respuestas de IA y soporte, todo en su idioma.",
         "mobile": {
           "title": "Apps móviles sin esperar a las tiendas",
           "pain": "Corregir una errata exige una nueva versión y días de revisión.",
@@ -2213,9 +2184,6 @@
         }
       },
       "grow": {
-        "eyebrow": "Crecimiento",
-        "title": "Descubre qué idiomas son rentables.",
-        "subtitle": "Tus propios visitantes te dicen adónde ir y qué palabras venden.",
         "next": {
           "title": "Qué país abrir después",
           "pain": "Añadir idiomas por intuición.",
@@ -2233,9 +2201,6 @@
         }
       },
       "trust": {
-        "eyebrow": "Confianza",
-        "title": "Tú mantienes el control.",
-        "subtitle": "De la primera frase a la última.",
         "proof": {
           "title": "Un registro de lo que escribió la IA",
           "pain": "Nuevas normas europeas sobre contenido generado por IA, y ningún registro de quién tradujo qué.",
@@ -2246,6 +2211,21 @@
           "pain": "Atado a un proveedor, con precios por palabra que no paran de subir.",
           "gain": "Gratis y de código abierto. Alójalo tú mismo o deja que lo hagamos nosotros."
         }
+      },
+      "wow": {
+        "eyebrow": "En directo",
+        "title": "Míralo en acción.",
+        "subtitle": "Seis cosas que hace glot y que querrás enseñar a tu equipo."
+      },
+      "diff": {
+        "eyebrow": "Por qué glot",
+        "title": "Lo que no encontrarás en ningún otro sitio.",
+        "subtitle": "Otras herramientas traducen. glot se asegura de que funcione, se encuentre y sea rentable."
+      },
+      "viral": {
+        "eyebrow": "Juntos",
+        "title": "Todo tu equipo, y tus visitantes, colaboran.",
+        "subtitle": "glot está donde la gente ya trabaja, para que todos puedan ayudar."
       }
     }
   },

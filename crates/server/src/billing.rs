@@ -434,6 +434,29 @@ pub async fn consume(state: &AppState, project: Uuid, kind: &str) -> ApiResult<(
     consume_n(state, project, kind, 1).await
 }
 
+/// "Translated with glot" under the website tag's switcher: cloud projects on the Free plan only (paid plans and
+/// self-hosted servers never show it).
+pub async fn shows_badge(state: &AppState, project: Uuid) -> ApiResult<bool> {
+    if state.billing.is_none() {
+        return Ok(false);
+    }
+    let row: Option<(Option<String>, Option<String>, Option<DateTime<Utc>>)> = sqlx::query_as(
+        "SELECT b.plan, b.status, b.grace_until FROM project_members m
+         LEFT JOIN billing_accounts b ON b.user_id = m.user_id
+         WHERE m.project_id = $1 AND m.role = 'owner' LIMIT 1",
+    )
+    .bind(project)
+    .fetch_optional(&state.db)
+    .await?;
+    let (plan, status, grace) = row.unwrap_or_default();
+    Ok(effective_plan(
+        plan.as_deref().unwrap_or("free"),
+        status.as_deref().unwrap_or("none"),
+        grace,
+        Utc::now(),
+    ) == "free")
+}
+
 /// `consume` for `n` units at once (experiment beacon batches): one statement whatever `n`.
 pub async fn consume_n(state: &AppState, project: Uuid, kind: &str, n: i64) -> ApiResult<()> {
     let Some(cfg) = &state.billing else {
