@@ -34,10 +34,16 @@
 	header Content-Security-Policy "frame-ancestors 'self' https://app.{$GLOT_DOMAIN}"
 	@dashboard path_regexp ^(/[a-z]{2}(-[A-Za-z]{2})?)?/(app|login|signup|oauth)(/|$)
 	redir @dashboard https://app.{http.request.hostport}{uri}
-	reverse_proxy web:3100
+	@server path /api/* /cdn/*
+	handle @server {
+		reverse_proxy server:8790
+	}
+	handle {
+		reverse_proxy web:3100
+	}
 }
 
-# Dashboard: same Next app; Next proxies /api and /cdn to glot-server (same origin => cookie just works).
+# Dashboard: same Next app; /api and /cdn go straight to glot-server (same origin => cookie just works).
 app.{$GLOT_DOMAIN} {
 	import common
 	header X-Frame-Options "SAMEORIGIN"
@@ -51,7 +57,15 @@ app.{$GLOT_DOMAIN} {
 		not path_regexp \.[A-Za-z0-9]+$
 	}
 	redir @marketing https://{$GLOT_DOMAIN}{uri} 308
-	reverse_proxy web:3100
+	# /api and /cdn straight to glot-server: through Next's rewrite proxy a large `glot push` (31 catalogs, ~36 MB)
+	# came back as a bare 500. Same origin either way, so the session cookie still works.
+	@server path /api/* /cdn/*
+	handle @server {
+		reverse_proxy server:8790
+	}
+	handle {
+		reverse_proxy web:3100
+	}
 }
 
 # API for machines: /mcp, /oauth/*, /.well-known/*, /cdn/*, /api/insights|feedback/*, CLI (Bearer tokens), /healthz.
