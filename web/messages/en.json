@@ -847,7 +847,8 @@
     "subtitle": "Background translation runs, updated live. Each string is validated before it is saved; costs come from your LLM provider.",
     "title": "Jobs",
     "finished": "Translation finished: {count, plural, one {# string} other {# strings}} translated and validated",
-    "failed": "Translation job failed"
+    "failed": "Translation job failed",
+    "queuePosition": "In queue (position {n})"
   },
   "keySheet": {
     "notFound": "No matching key",
@@ -2888,7 +2889,8 @@
     },
     "job": {
       "progress": "{done} of {total} steps done",
-      "announce": "Step {n} of {total}: {step}"
+      "announce": "Step {n} of {total}: {step}",
+      "queued": "In queue (position {n})"
     },
     "linked": {
       "rerun": "Run again",

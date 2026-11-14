@@ -72,7 +72,9 @@ export function JobRow({ slug, job, compact }: { slug: string; job: Job; compact
         <div className="flex items-baseline gap-2 text-sm">
           <span className="font-medium">{t(`kind.${job.kind}`)}</span>
           <span className="font-mono text-xs text-muted-foreground">#{job.id.slice(0, 7)}</span>
-          <span className="text-xs text-muted-foreground">{ts(job.status)}</span>
+          <span className="text-xs text-muted-foreground">
+            {job.status === "queued" && job.queue_position ? t("queuePosition", { n: job.queue_position }) : ts(job.status)}
+          </span>
         </div>
         <div className="mt-1.5 flex items-center gap-2">
           <Progress

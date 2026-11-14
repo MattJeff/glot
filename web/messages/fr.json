@@ -1230,7 +1230,8 @@
     "subtitle": "Exécutions de traduction en arrière-plan, mises à jour en direct. Chaque chaîne est validée avant d'être enregistrée ; les coûts proviennent de votre fournisseur de LLM.",
     "title": "Tâches",
     "failed": "Échec de la tâche de traduction",
-    "finished": "Traduction terminée : {count, plural, one {# chaîne traduite et validée} many {# chaînes traduites et validées} other {# chaînes traduites et validées}}"
+    "finished": "Traduction terminée : {count, plural, one {# chaîne traduite et validée} many {# chaînes traduites et validées} other {# chaînes traduites et validées}}",
+    "queuePosition": "En file d'attente (position {n})"
   },
   "keySheet": {
     "notFound": "Aucune clé correspondante",
@@ -2907,7 +2908,8 @@
     },
     "job": {
       "announce": "Étape {n} sur {total} : {step}",
-      "progress": "{done} sur {total} étapes terminées"
+      "progress": "{done} sur {total} étapes terminées",
+      "queued": "En file d'attente (position {n})"
     },
     "linked": {
       "change": "Changer de dépôt",

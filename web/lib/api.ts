@@ -131,6 +131,8 @@ export type Job = {
   error: string | null;
   created_at: string;
   finished_at: string | null;
+  /** 1-based place in the server queue (claim order), only while queued. */
+  queue_position: number | null;
 };
 
 export type Verdict = "same" | "nuance" | "different";
