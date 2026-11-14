@@ -1230,7 +1230,8 @@
     "subtitle": "Hintergrund-Übersetzungsläufe, live aktualisiert. Jeder String wird vor dem Speichern validiert; die Kosten stammen von Ihrem LLM-Anbieter.",
     "title": "Jobs",
     "failed": "Übersetzungsjob fehlgeschlagen",
-    "finished": "Übersetzung abgeschlossen: {count, plural, one {# String übersetzt und validiert} other {# Strings übersetzt und validiert}}"
+    "finished": "Übersetzung abgeschlossen: {count, plural, one {# String übersetzt und validiert} other {# Strings übersetzt und validiert}}",
+    "queuePosition": "In der Warteschlange (Position {n})"
   },
   "keySheet": {
     "notFound": "Kein passender Schlüssel",
@@ -2905,7 +2906,8 @@
     },
     "job": {
       "announce": "Schritt {n} von {total}: {step}",
-      "progress": "{done} von {total} Schritten erledigt"
+      "progress": "{done} von {total} Schritten erledigt",
+      "queued": "In der Warteschlange (Position {n})"
     },
     "linked": {
       "change": "Repository wechseln",

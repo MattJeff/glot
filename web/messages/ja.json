@@ -1230,7 +1230,8 @@
     "subtitle": "バックグラウンドの翻訳実行をリアルタイムで更新します。各文字列は保存前に検証され、コストはLLMプロバイダーから取得されます。",
     "title": "ジョブ",
     "failed": "翻訳ジョブが失敗しました",
-    "finished": "翻訳が完了しました: {count, plural, other {# 件の文字列を翻訳・検証しました}}"
+    "finished": "翻訳が完了しました: {count, plural, other {# 件の文字列を翻訳・検証しました}}",
+    "queuePosition": "待機中（{n} 番目）"
   },
   "keySheet": {
     "notFound": "一致するキーがありません",
@@ -2905,7 +2906,8 @@
     },
     "job": {
       "announce": "ステップ {n}/{total}: {step}",
-      "progress": "{done}/{total} ステップ完了"
+      "progress": "{done}/{total} ステップ完了",
+      "queued": "待機中（{n} 番目）"
     },
     "linked": {
       "change": "リポジトリを変更",

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   CircleCheck,
+  Clock,
   ExternalLink,
   GitBranch,
   GitPullRequest,
@@ -364,8 +365,16 @@ function Steps({ job }: { job: GithubJob }) {
   const done = job.progress.done;
   const current = Math.min(done, STEPS.length - 1);
   const pct = (done / STEPS.length) * 100;
+  // Waiting for a free worker: say so (and where) instead of spinning on the first step.
+  const queued = job.status === "queued";
   return (
     <div className="space-y-3">
+      {queued && job.queue_position && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Clock className="size-4" aria-hidden />
+          {t("job.queued", { n: job.queue_position })}
+        </p>
+      )}
       <Progress value={pct} aria-label={t("job.progress", { done, total: STEPS.length })} className="h-1.5" />
       <ol className="space-y-1.5">
         {STEPS.map((step, i) => {
@@ -382,7 +391,7 @@ function Steps({ job }: { job: GithubJob }) {
               <span className="grid size-5 shrink-0 place-items-center" aria-hidden>
                 {state === "done" ? (
                   <CircleCheck className="size-4 text-success-foreground motion-safe:animate-pop" />
-                ) : state === "current" ? (
+                ) : state === "current" && !queued ? (
                   <Loader2 className="size-4 animate-spin text-info-foreground" />
                 ) : (
                   <span className="size-2 rounded-full bg-border" />
@@ -395,7 +404,9 @@ function Steps({ job }: { job: GithubJob }) {
         })}
       </ol>
       <p role="status" aria-live="polite" className="sr-only">
-        {t("job.announce", { step: t(`step.${STEPS[current]}`), n: current + 1, total: STEPS.length })}
+        {queued && job.queue_position
+          ? t("job.queued", { n: job.queue_position })
+          : t("job.announce", { step: t(`step.${STEPS[current]}`), n: current + 1, total: STEPS.length })}
       </p>
     </div>
   );

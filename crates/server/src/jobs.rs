@@ -43,7 +43,7 @@ pub struct JobParams {
 }
 
 #[derive(Debug, Clone, FromRow)]
-pub(crate) struct JobRecord {
+pub struct JobRecord {
     pub(crate) id: Uuid,
     pub(crate) project_id: Uuid,
     pub(crate) kind: String,
@@ -55,6 +55,9 @@ pub(crate) struct JobRecord {
     pub(crate) error: Option<String>,
     created_at: DateTime<Utc>,
     finished_at: Option<DateTime<Utc>>,
+    /// Only selected with [`QPOS`]; absent from `RETURNING {COLS}`.
+    #[sqlx(default)]
+    queue_position: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
@@ -74,6 +77,8 @@ pub struct Job {
     pub error: Option<String>,
     pub created_at: DateTime<Utc>,
     pub finished_at: Option<DateTime<Utc>>,
+    /// 1-based place among queued jobs, in claim order; only while `queued`.
+    pub queue_position: Option<i64>,
 }
 
 impl From<&JobRecord> for Job {
@@ -90,6 +95,7 @@ impl From<&JobRecord> for Job {
             error: j.error.clone(),
             created_at: j.created_at,
             finished_at: j.finished_at,
+            queue_position: j.queue_position,
         }
     }
 }
@@ -100,7 +106,33 @@ impl Job {
     }
 }
 
-const COLS: &str = "id, project_id, kind, status, params, progress_done, progress_total, cost_usd, error, created_at, finished_at";
+pub(crate) const COLS: &str = "id, project_id, kind, status, params, progress_done, progress_total, cost_usd, error, created_at, finished_at";
+
+/// Claim order: short/urgent kinds (edge, connectors, GitHub) before long catalog `translate`, then FIFO.
+/// `$t` is the table alias; [`QPOS`] counts with the same key, so a position matches what `claim` picks next.
+macro_rules! claim_key {
+    ($t:literal) => {
+        concat!(
+            "((",
+            $t,
+            ".kind = 'translate'), ",
+            $t,
+            ".created_at, ",
+            $t,
+            ".id)"
+        )
+    };
+}
+
+/// `queue_position` column for a query over `jobs j` (one correlated count on the partial `jobs_queued` index).
+/// ponytail: ignores the per-project fairness skip in `claim`, so it is the order, not an ETA.
+pub(crate) const QPOS: &str = concat!(
+    "CASE WHEN j.status = 'queued' THEN (SELECT count(*) + 1 FROM jobs o WHERE o.status = 'queued' AND ",
+    claim_key!("o"),
+    " < ",
+    claim_key!("j"),
+    ") END AS queue_position"
+);
 
 // ---------- handlers ----------
 
@@ -135,8 +167,10 @@ pub async fn create(
             "'{bad}' is not a target locale of this project"
         )));
     }
+    // The CTE's row is not visible to QPOS's count, which is right: it counts the jobs ahead of this one.
     let j: JobRecord = sqlx::query_as(&format!(
-        "INSERT INTO jobs (id, project_id, kind, status, params, created_by) VALUES ($1, $2, $3, 'queued', $4, $5) RETURNING {COLS}"
+        "WITH j AS (INSERT INTO jobs (id, project_id, kind, status, params, created_by) VALUES ($1, $2, $3, 'queued', $4, $5) RETURNING {COLS})
+         SELECT {COLS}, {QPOS} FROM j"
     ))
     .bind(Uuid::new_v4())
     .bind(p.id)
@@ -156,7 +190,7 @@ pub async fn list(
 ) -> ApiResult<Json<Vec<Job>>> {
     let p = projects::load(&state, user.id, &slug, Role::Translator).await?;
     let rows: Vec<JobRecord> = sqlx::query_as(&format!(
-        "SELECT {COLS} FROM jobs WHERE project_id = $1 ORDER BY created_at DESC LIMIT 100"
+        "SELECT {COLS}, {QPOS} FROM jobs j WHERE project_id = $1 ORDER BY created_at DESC LIMIT 100"
     ))
     .bind(p.id)
     .fetch_all(&state.db)
@@ -166,7 +200,7 @@ pub async fn list(
 
 async fn load_visible(state: &AppState, user: Uuid, id: Uuid) -> ApiResult<Job> {
     let j: JobRecord = sqlx::query_as(&format!(
-        "SELECT {COLS} FROM jobs j WHERE id = $1
+        "SELECT {COLS}, {QPOS} FROM jobs j WHERE id = $1
          AND EXISTS (SELECT 1 FROM project_members m WHERE m.project_id = j.project_id AND m.user_id = $2)"
     ))
     .bind(id)
@@ -228,24 +262,44 @@ pub async fn events(
 
 // ---------- worker ----------
 
-/// Background worker: claims queued jobs one at a time (`FOR UPDATE SKIP LOCKED`, safe with several servers).
+/// Background workers (`GLOT_JOB_WORKERS`, default 4), each claiming one job at a time; safe with several
+/// servers. With more than one worker, worker 0 is a fast lane that never takes a long job (catalog `translate`,
+/// `github_*`), so edge and connector jobs always find a worker even while hour-long jobs fill the others.
+/// The handle owns every worker: aborting it stops them all.
 pub fn spawn_worker(state: AppState) -> tokio::task::JoinHandle<()> {
-    tokio::spawn(async move {
-        loop {
-            match claim(state.db.clone()).await {
-                Ok(Some(job)) => run(state.clone(), job).await,
-                Ok(None) => {
-                    let _ =
-                        tokio::time::timeout(Duration::from_secs(5), state.job_wakeup.notified())
-                            .await;
-                }
-                Err(e) => {
-                    tracing::error!("job claim failed: {e}");
-                    tokio::time::sleep(Duration::from_secs(5)).await;
+    let mut set = tokio::task::JoinSet::new();
+    let n = std::env::var("GLOT_JOB_WORKERS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(4)
+        .max(1);
+    for i in 0..n {
+        let state = state.clone();
+        let fast_lane = n > 1 && i == 0;
+        set.spawn(async move {
+            loop {
+                match claim(&state.db, fast_lane).await {
+                    Ok(Some(job)) => {
+                        // Another job may be claimable now (e.g. the next one of the queue): wake a sibling.
+                        state.job_wakeup.notify_one();
+                        run(state.clone(), job).await
+                    }
+                    Ok(None) => {
+                        let _ = tokio::time::timeout(
+                            Duration::from_secs(5),
+                            state.job_wakeup.notified(),
+                        )
+                        .await;
+                    }
+                    Err(e) => {
+                        tracing::error!("job claim failed: {e}");
+                        tokio::time::sleep(Duration::from_secs(5)).await;
+                    }
                 }
             }
-        }
-    })
+        });
+    }
+    tokio::spawn(async move { while set.join_next().await.is_some() {} })
 }
 
 /// Jobs left `running` by a crashed process go back to the queue.
@@ -256,13 +310,35 @@ pub async fn requeue_orphans(db: &sqlx::PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-async fn claim(db: sqlx::PgPool) -> sqlx::Result<Option<JobRecord>> {
+/// Claims the next job: priority + FIFO ([`claim_key`]), skipping projects that already run a job of the same
+/// family (`github_*` is one family), so one project never takes every worker. Long `translate` jobs still run
+/// whenever nothing else is claimable, so they cannot starve. `fast_lane` refuses long kinds.
+/// Claims are serialized by a transaction advisory lock: the "already running" check is then exact across
+/// workers and servers (two claims cannot both see a project idle); a claim is one indexed UPDATE.
+pub async fn claim(db: &sqlx::PgPool, fast_lane: bool) -> sqlx::Result<Option<JobRecord>> {
+    const FAMILY: &str = "CASE WHEN kind LIKE 'github\\_%' THEN 'github' ELSE kind END";
+    let lane = if fast_lane {
+        "AND q.kind <> 'translate' AND q.kind NOT LIKE 'github\\_%'"
+    } else {
+        ""
+    };
+    let fq = FAMILY.replace("kind", "q.kind");
+    let fr = FAMILY.replace("kind", "r.kind");
+    let key = claim_key!("q");
     let sql = format!(
         "UPDATE jobs SET status = 'running' WHERE id = (
-            SELECT id FROM jobs WHERE status = 'queued' ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1
+            SELECT q.id FROM jobs q WHERE q.status = 'queued' {lane}
+              AND NOT EXISTS (SELECT 1 FROM jobs r WHERE r.status = 'running' AND r.project_id = q.project_id AND {fr} = {fq})
+            ORDER BY {key} FOR UPDATE SKIP LOCKED LIMIT 1
          ) RETURNING {COLS}"
     );
-    sqlx::query_as(&sql).fetch_optional(&db).await
+    let mut tx = db.begin().await?;
+    sqlx::query("SELECT pg_advisory_xact_lock(7426_1001)")
+        .execute(&mut *tx)
+        .await?;
+    let job = sqlx::query_as(&sql).fetch_optional(&mut *tx).await?;
+    tx.commit().await?;
+    Ok(job)
 }
 
 pub(crate) async fn save(state: &AppState, j: &JobRecord) {
@@ -292,8 +368,8 @@ async fn run(state: AppState, mut job: JobRecord) {
     let github = job.kind.starts_with("github_");
     let edge = job.kind == crate::edge::tm::JOB_KIND;
     let result = if github {
-        // Every subprocess has its own timeout, but one wedged step must not hold the single worker (and every
-        // other project's queue) forever: a hard ceiling on the whole job.
+        // Every subprocess has its own timeout, but one wedged step must not hold a worker forever: a hard
+        // ceiling on the whole job.
         let ceiling = Duration::from_secs(
             std::env::var("GLOT_GITHUB_JOB_MAX_SECS")
                 .ok()

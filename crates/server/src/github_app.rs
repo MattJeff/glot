@@ -33,7 +33,7 @@ use uuid::Uuid;
 use crate::{
     ApiResult, AppError, AppJson, AppQuery, AppState,
     auth::{AuthUser, User},
-    jobs::{self, Job, JobRecord, Progress},
+    jobs::{self, Job, JobRecord},
     projects::{self, ProjectRow, Role},
 };
 
@@ -469,26 +469,15 @@ async fn user_installations(state: &AppState, user: Uuid) -> ApiResult<Vec<Insta
 }
 
 async fn latest_job(state: &AppState, project: Uuid) -> ApiResult<Option<Job>> {
-    let row: Option<(Uuid, String, String, i32, i32, f64, Option<String>, DateTime<Utc>, Option<DateTime<Utc>>)> =
-        sqlx::query_as(
-            "SELECT id, kind, status, progress_done, progress_total, cost_usd, error, created_at, finished_at
-             FROM jobs WHERE project_id = $1 AND kind LIKE 'github\\_%' ORDER BY created_at DESC LIMIT 1",
-        )
-        .bind(project)
-        .fetch_optional(&state.db)
-        .await?;
-    Ok(row.map(
-        |(id, kind, status, done, total, cost_usd, error, created_at, finished_at)| Job {
-            id,
-            kind,
-            status,
-            progress: Progress { done, total },
-            cost_usd,
-            error,
-            created_at,
-            finished_at,
-        },
+    let row: Option<JobRecord> = sqlx::query_as(&format!(
+        "SELECT {}, {} FROM jobs j WHERE project_id = $1 AND kind LIKE 'github\\_%' ORDER BY created_at DESC LIMIT 1",
+        jobs::COLS,
+        jobs::QPOS
     ))
+    .bind(project)
+    .fetch_optional(&state.db)
+    .await?;
+    Ok(row.as_ref().map(Job::from))
 }
 
 #[derive(Serialize)]

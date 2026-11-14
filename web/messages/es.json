@@ -1230,7 +1230,8 @@
     "subtitle": "Ejecuciones de traducción en segundo plano, actualizadas en vivo. Cada cadena se valida antes de guardarse; los costes provienen de tu proveedor de LLM.",
     "title": "Tareas",
     "failed": "Falló la tarea de traducción",
-    "finished": "Traducción terminada: {count, plural, one {# cadena traducida y validada} many {# cadenas traducidas y validadas} other {# cadenas traducidas y validadas}}"
+    "finished": "Traducción terminada: {count, plural, one {# cadena traducida y validada} many {# cadenas traducidas y validadas} other {# cadenas traducidas y validadas}}",
+    "queuePosition": "En cola (posición {n})"
   },
   "keySheet": {
     "notFound": "Ninguna clave coincide",
@@ -2905,7 +2906,8 @@
     },
     "job": {
       "announce": "Paso {n} de {total}: {step}",
-      "progress": "{done} de {total} pasos completados"
+      "progress": "{done} de {total} pasos completados",
+      "queued": "En cola (posición {n})"
     },
     "linked": {
       "change": "Cambiar repositorio",
