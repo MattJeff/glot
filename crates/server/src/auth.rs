@@ -1080,40 +1080,6 @@ pub async fn change_email(
     Ok(Json(ChangeEmailResult { pending: true }))
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn crypto_roundtrip_and_email() {
-        let k = [7u8; 32];
-        let enc = super::encrypt(&k, "sk-secret");
-        assert_eq!(super::decrypt(&k, &enc).as_deref(), Some("sk-secret"));
-        assert!(super::decrypt(&[8u8; 32], &enc).is_none());
-        assert!(super::valid_email("a@b.co"));
-        assert!(!super::valid_email("a@b"));
-        assert!(!super::valid_email("a b@c.de"));
-    }
-
-    #[test]
-    fn denylist_and_client_ip() {
-        for d in [
-            "example.invalid",
-            "x.test",
-            "foo.example",
-            "mailinator.com",
-            "a.yopmail.com",
-        ] {
-            assert!(super::denied_domain(d), "{d}");
-        }
-        for d in ["example.com", "gmail.com", "notmailinator.com"] {
-            assert!(!super::denied_domain(d), "{d}");
-        }
-        let mut h = axum::http::HeaderMap::new();
-        assert_eq!(super::client_ip(&h), None);
-        h.insert("x-forwarded-for", "6.6.6.6, 203.0.113.9".parse().unwrap());
-        assert_eq!(super::client_ip(&h).as_deref(), Some("203.0.113.9"));
-    }
-}
-
 /// `GET /api/admin/acquisition?days=30` (instance admins): signups per utm source / medium / campaign / term, with how
 /// many confirmed their email and how many pay. What a Google Ads campaign actually brought.
 pub async fn acquisition_report(
@@ -1152,4 +1118,38 @@ pub async fn acquisition_report(
         })
         .collect();
     Ok(Json(serde_json::json!({ "days": days, "rows": rows })))
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn crypto_roundtrip_and_email() {
+        let k = [7u8; 32];
+        let enc = super::encrypt(&k, "sk-secret");
+        assert_eq!(super::decrypt(&k, &enc).as_deref(), Some("sk-secret"));
+        assert!(super::decrypt(&[8u8; 32], &enc).is_none());
+        assert!(super::valid_email("a@b.co"));
+        assert!(!super::valid_email("a@b"));
+        assert!(!super::valid_email("a b@c.de"));
+    }
+
+    #[test]
+    fn denylist_and_client_ip() {
+        for d in [
+            "example.invalid",
+            "x.test",
+            "foo.example",
+            "mailinator.com",
+            "a.yopmail.com",
+        ] {
+            assert!(super::denied_domain(d), "{d}");
+        }
+        for d in ["example.com", "gmail.com", "notmailinator.com"] {
+            assert!(!super::denied_domain(d), "{d}");
+        }
+        let mut h = axum::http::HeaderMap::new();
+        assert_eq!(super::client_ip(&h), None);
+        h.insert("x-forwarded-for", "6.6.6.6, 203.0.113.9".parse().unwrap());
+        assert_eq!(super::client_ip(&h).as_deref(), Some("203.0.113.9"));
+    }
 }
