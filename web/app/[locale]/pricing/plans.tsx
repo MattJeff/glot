@@ -29,8 +29,9 @@ const EXCLUDED: Partial<Record<PlanId, readonly string[]>> = { starter: ["edge",
 export const TRIAL_DAYS = 14;
 export type Interval = "month" | "year";
 
-export function usePlans() {
-  return useQuery({ queryKey: ["billing-plans"], queryFn: api.billingPlans, staleTime: 5 * 60_000 });
+/** `initial`: plans fetched on the server, so prices are in the HTML (crawlers, AI readers, no-JS). */
+export function usePlans(initial?: PlansInfo) {
+  return useQuery({ queryKey: ["billing-plans"], queryFn: api.billingPlans, staleTime: 5 * 60_000, initialData: initial });
 }
 
 export function useQuotaLabel() {
@@ -52,7 +53,10 @@ export function PlanCards({
   current,
   action,
   trial = true,
+  initial,
 }: {
+  /** Server-fetched plans (see `usePlans`). */
+  initial?: PlansInfo;
   /** Plan in force for the signed-in account (billing page). */
   current?: string;
   /** Show the Growth trial on its card (false once the account used it). */
@@ -63,7 +67,7 @@ export function PlanCards({
   const t = useTranslations("pricing");
   const format = useFormatter();
   const label = useQuotaLabel();
-  const plans = usePlans();
+  const plans = usePlans(initial);
   const [interval, setInterval] = useState<Interval>("month");
   const info: PlansInfo | undefined = plans.data;
   const llm = info?.prices.glot_llm_strings;

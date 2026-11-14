@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/seo";
 import { GITHUB_URL } from "@/lib/snippets";
+import { getPlans } from "./get-plans";
 import { PricingCards } from "./pricing-cards";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/pricing">): Promise<Metadata> {
@@ -51,7 +52,7 @@ export default async function Pricing({ params }: PageProps<"/[locale]/pricing">
         <section className="mt-12" aria-labelledby="cloud">
           <h2 id="cloud" className="mb-2 text-center text-xl font-semibold">{t("cloud.title")}</h2>
           <p className="mx-auto mb-6 max-w-2xl text-center text-sm text-muted-foreground">{t("cloud.body")}</p>
-          <PricingCards />
+          <PricingCards initial={await getPlans()} />
         </section>
 
         <section className="mx-auto mt-16 max-w-3xl" aria-labelledby="faq">

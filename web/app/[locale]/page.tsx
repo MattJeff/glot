@@ -7,6 +7,7 @@ import { ACCENTS } from "@/components/landing-accents";
 import { Art } from "@/components/landing-art";
 import { DemoScene, HowScene, ProblemScene, ResultsScene } from "@/components/landing-scenes";
 import { WowShowcase } from "@/components/wow-showcase";
+import { getPlans } from "./pricing/get-plans";
 import { PricingCards } from "./pricing/pricing-cards";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -319,7 +320,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <ResultsScene
           s={s}
           metrics={metrics}
-          plans={<PricingCards />}
+          plans={<PricingCards initial={await getPlans()} />}
           cta={cta}
           faq={
             <div className="space-y-3">
