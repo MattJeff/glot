@@ -169,12 +169,7 @@
 
 /* Landing visuals (components/landing-visuals.tsx). */
 .board-bar { transform-origin: left; }
-@keyframes m-in { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } }
-@keyframes m-check { from { opacity: 0; transform: scale(0.8); } }
 @media (prefers-reduced-motion: no-preference) {
-  .morph-text { animation: m-in 500ms var(--ease-out-quint) both; }
-  .morph-check { animation: m-check 300ms var(--ease-out-quint) both; }
-  .morph { transition: border-color 400ms ease-out; }
   .board-lit { translate: 0 -3px; border-color: color-mix(in oklch, var(--acc) 50%, var(--border)); box-shadow: 0 16px 40px -18px color-mix(in oklch, var(--acc) 60%, transparent); }
   .board-lit .board-bar { animation: l-grow 800ms var(--ease-out-quint) both; }
 }
@@ -207,3 +202,20 @@
   .wow:hover .wow-progress { animation-play-state: paused; }
 }
 @media (prefers-reduced-motion: reduce) { .wow-caret, .wow-drop { display: none; } }
+
+/* Redesign pass: highlighted words, generated art (black backgrounds), the how-it-works wave. */
+.hl { background: linear-gradient(90deg, oklch(0.62 0.17 160), oklch(0.6 0.14 200)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dark .hl { background-image: linear-gradient(90deg, oklch(0.82 0.17 160), oklch(0.8 0.13 200)); }
+/* Art is on pure black: "screen" drops the black in dark mode; light mode inverts it onto white. */
+.glow-img { mix-blend-mode: multiply; filter: invert(1) hue-rotate(180deg) saturate(1.4); }
+.dark .glow-img { mix-blend-mode: screen; filter: none; }
+.how-node { box-shadow: 0 0 0 6px color-mix(in oklch, var(--acc) 10%, transparent), 0 0 32px color-mix(in oklch, var(--acc) 45%, transparent); }
+.how-flow { stroke-dasharray: 60 1400; opacity: 0; }
+.card-acc { background-image: linear-gradient(180deg, color-mix(in oklch, var(--acc) 7%, transparent), transparent 55%); border-color: color-mix(in oklch, var(--acc) 22%, var(--border)); }
+@keyframes float-y { 50% { transform: translateY(-10px); } }
+@keyframes flow { from { stroke-dashoffset: 1460; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .globe-float { animation: float-y 7s ease-in-out infinite; }
+  .chip-float { animation: float-y 5s ease-in-out infinite; }
+  .how-flow { opacity: 0.9; animation: flow 4s linear infinite; filter: drop-shadow(0 0 6px white); }
+}

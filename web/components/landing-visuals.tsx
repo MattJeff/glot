@@ -1,8 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ACCENTS } from "@/components/landing-accents";
 
 // Decorative visuals for the landing. Content is the product's own sample copy in each language,
 // so it is not in the UI catalogs. Both freeze on their first frame with prefers-reduced-motion.
@@ -15,45 +13,6 @@ function useTick(ms: number, n: number) {
     return () => clearInterval(id);
   }, [ms, n]);
   return i;
-}
-
-const MORPH = [
-  { code: "en", text: "Get paid faster. Send invoices in minutes." },
-  { code: "fr", text: "Soyez payé plus vite. Vos factures en quelques minutes." },
-  { code: "de", text: "Schneller bezahlt. Rechnungen in Minuten." },
-  { code: "ja", text: "もっと早く入金を。請求書は数分で。" },
-  { code: "es", text: "Cobra antes. Envía facturas en minutos." },
-  { code: "ar", text: "احصل على أموالك أسرع. فواتير في دقائق." },
-  { code: "pt", text: "Receba mais rápido. Faturas em minutos." },
-  { code: "hi", text: "जल्दी भुगतान पाएं। मिनटों में इनवॉइस भेजें।" },
-];
-const CHECKS = ["{placeholders}", "plural rules", "glossary", "fits 160px", "no fake urgency"];
-
-/** One sentence travelling through languages while the validator ticks its checks. */
-export function LangMorph() {
-  const i = useTick(2600, MORPH.length);
-  const m = MORPH[i];
-  return (
-    <div aria-hidden className={`morph card-acc relative overflow-hidden rounded-2xl border bg-card p-6 shadow-xs sm:p-8 ${ACCENTS[i % ACCENTS.length]}`}>
-      <div className="flex flex-wrap gap-1.5">
-        {MORPH.map((x, j) => (
-          <span key={x.code} className={`rounded-full px-2 py-0.5 font-mono text-[11px] transition-colors duration-300 ${j === i ? "tile" : "text-muted-foreground"}`}>
-            {x.code}
-          </span>
-        ))}
-      </div>
-      <p key={m.code} lang={m.code} dir="auto" className="morph-text mt-6 min-h-[4.5rem] text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-        {m.text}
-      </p>
-      <ul key={`c${m.code}`} className="mt-6 flex flex-wrap gap-2" dir="ltr">
-        {CHECKS.map((c, j) => (
-          <li key={c} className="morph-check inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[11px] text-muted-foreground" style={{ animationDelay: `${300 + j * 180}ms` }}>
-            <Check className="acc-ink size-3" /> {c}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 const MARKETS = [

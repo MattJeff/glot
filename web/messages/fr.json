@@ -2009,18 +2009,17 @@
       "proofBenchNote": "Benchmark : 320 phrases en 8 langues, même modèle d'IA avec et sans glot, 18 octobre 2026.",
       "proofLabel": "Faits du projet",
       "proofNpm": "npm v{version}",
-      "proofOss": "Open source",
       "proofStars": "{count, plural, =0 {Mettre une étoile sur GitHub} one {# étoile sur GitHub} many {# d'étoiles sur GitHub} other {# étoiles sur GitHub}}",
       "start": "Commencer gratuitement",
       "startHint": "Sans carte bancaire.",
       "subtitle": "glot traduit votre app, votre site et tout ce que vous envoyez, vérifie chaque phrase avant qu'elle soit en ligne, et vous montre quels pays vous amènent des clients.",
-      "title": "Parlez la langue de chaque client.",
+      "title": "Parlez la langue de <hl>chaque client</hl>.",
       "see": "Voir en action"
     },
     "cta": {
       "body": "Connectez votre app ou votre site et voyez-le dans toutes les langues dès aujourd'hui.",
       "docs": "Explorer la documentation",
-      "title": "Vos prochains clients ne parlent pas votre langue. Pas encore."
+      "title": "Vos prochains clients ne parlent pas votre langue. <hl>Pas encore.</hl>"
     },
     "faq": {
       "title": "Questions",

@@ -1087,14 +1087,13 @@
     },
     "hero": {
       "badge": "Apps, websites, emails, support",
-      "title": "Speak every customer's language.",
+      "title": "Speak <hl>every customer's</hl> language.",
       "subtitle": "glot translates your app, your website and everything you send, checks every sentence before it goes live, and shows you which countries bring you customers.",
       "start": "Start free",
       "startHint": "No credit card needed.",
       "proofLabel": "Project facts",
       "proofBench": "0% broken sentences vs 14.1% with AI alone",
       "proofBenchNote": "Benchmark: 320 sentences in 8 languages, same AI model with and without glot, October 18, 2026.",
-      "proofOss": "Open source",
       "proofStars": "{count, plural, =0 {Star on GitHub} one {# star on GitHub} other {# stars on GitHub}}",
       "proofNpm": "npm v{version}",
       "see": "See it in action"
@@ -1217,7 +1216,7 @@
       "cta": "See pricing"
     },
     "cta": {
-      "title": "Your next customers don't speak your language. Yet.",
+      "title": "Your next customers don't speak your language. <hl>Yet.</hl>",
       "body": "Connect your app or your website and see it in every language today.",
       "docs": "Explore the docs"
     },

@@ -13,14 +13,17 @@ import {
   Mail,
   MapPin,
   MousePointerClick,
+  Plug,
   RefreshCw,
-  Scale,
+  Rocket,
   Search,
   ShieldCheck,
   ShoppingBag,
+  Sparkles,
   Star,
   Unlock,
   Wand2,
+  Zap,
   X,
 } from "lucide-react";
 import type { Metadata } from "next";
@@ -28,7 +31,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
 import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { ACCENTS } from "@/components/landing-accents";
-import { LangMorph } from "@/components/landing-visuals";
 import { WowShowcase } from "@/components/wow-showcase";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -79,6 +81,27 @@ const VIRAL: Group = {
 };
 const WOW = [["minutes", "app"], ["ai", "beyond"], ["mobile", "beyond"], ["support", "beyond"], ["words", "grow"], ["live", "web"]] as const;
 type Key = Parameters<T>[0];
+
+// Under the hero: five promises, worded as the features they come from.
+const TRUST = [["trust.open", Unlock, "acc-green"], ["app.safe", ShieldCheck, "acc-violet"], ["web.google", Search, "acc-cyan"], ["grow.private", EyeOff, "acc-amber"], ["app.minutes", Zap, "acc-coral"]] as const;
+
+// The six site languages orbiting the globe (codes are universal, not catalog text).
+const ORBIT = [["EN", "top-[12%] start-[6%]", "acc-cyan"], ["FR", "top-[40%] -start-[2%]", "acc-violet"], ["DE", "top-[8%] end-[10%]", "acc-amber"], ["JA", "top-[38%] -end-[1%]", "acc-pink"], ["ES", "bottom-[14%] start-[10%]", "acc-coral"], ["AR", "bottom-[10%] end-[12%]", "acc-green"]] as const;
+
+function Globe3() {
+  return (
+    <div aria-hidden className="relative mx-auto aspect-square w-full max-w-[26rem] lg:max-w-[32rem]" dir="ltr">
+      {/* Generated with Higgsfield (gpt_image_2_6), text-free so every locale shares it. Already a sized WebP. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/landing/globe.webp" alt="" width={880} height={880} fetchPriority="high" decoding="async" className="glow-img globe-float size-full" />
+      {ORBIT.map(([code, pos, acc], i) => (
+        <span key={code} className={`${acc} chip-float hello absolute ${pos} font-mono text-sm font-semibold shadow-lg backdrop-blur`} style={{ animationDelay: `${i * -1.1}s` }}>
+          {code}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 const FAQ = ["dev", "quality", "tools", "google", "privacy", "price"] as const;
 
@@ -204,38 +227,42 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <span />
             <span />
           </div>
-          <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-50" />
-          <div className="relative mx-auto max-w-3xl px-4 pt-16 pb-10 text-center sm:pt-24">
-            <p className="acc-violet tile mx-auto mb-6 w-fit rounded-full px-3 py-1 text-xs font-medium">{t("hero.badge")}</p>
-            <h1 id="hero-title" className="text-4xl font-semibold tracking-tighter text-balance sm:text-6xl">
-              {t("hero.title")}
-            </h1>
-            {/* No entrance animation on the text: it is the LCP. */}
-            <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">{t("hero.subtitle")}</p>
-            <div className="mt-8">{cta}</div>
-            <ul aria-label={t("hero.proofLabel")} className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link href="/docs/benchmark" title={t("hero.proofBenchNote")} className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                  <ChartNoAxesColumn aria-hidden className="size-4 text-brand" />
-                  <span className="tabular-nums">{t("hero.proofBench")}</span>
-                  <sup aria-hidden>1</sup>
-                </Link>
-              </li>
-              <li>
-                <a href={`${GITHUB_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                  <Scale aria-hidden className="size-4" /> {t("hero.proofOss")}
-                </a>
-              </li>
-              <li>
-                <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                  <Star aria-hidden className="size-4" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
-                </a>
-              </li>
+          <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-40" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pt-14 pb-10 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-4">
+            <div className="text-center lg:text-start">
+              <p className="acc-green tile mx-auto mb-6 w-fit rounded-full px-3 py-1 text-xs font-medium lg:mx-0">{t("hero.badge")}</p>
+              <h1 id="hero-title" className="text-4xl font-semibold tracking-tighter text-balance sm:text-6xl">
+                {t.rich("hero.title", { hl: (c) => <span className="hl">{c}</span> })}
+              </h1>
+              {/* No entrance animation on the text: it is the LCP. */}
+              <p className="mx-auto mt-5 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg lg:mx-0">{t("hero.subtitle")}</p>
+              <div className="mt-8 [&>div]:lg:justify-start">{cta}</div>
+              <ul aria-label={t("hero.proofLabel")} className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start">
+                <li>
+                  <Link href="/docs/benchmark" title={t("hero.proofBenchNote")} className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
+                    <ChartNoAxesColumn aria-hidden className="size-4 text-brand" />
+                    <span className="tabular-nums">{t("hero.proofBench")}</span>
+                  </Link>
+                </li>
+                <li>
+                  <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
+                    <Star aria-hidden className="size-4" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <Globe3 />
+          </div>
+          <div className="relative mx-auto max-w-6xl px-4 pb-6">
+            <ul className="reveal grid grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-3 lg:grid-cols-5">
+              {TRUST.map(([key, Icon, acc]) => (
+                <li key={key} className={`${acc} flex items-center gap-3 bg-card/80 p-4 backdrop-blur`}>
+                  <Icon aria-hidden className="acc-ink size-5 shrink-0" />
+                  <span className="text-sm leading-snug font-medium">{t(`features.${key}.title` as Key)}</span>
+                </li>
+              ))}
             </ul>
-            <p className="mt-2 text-[11px] text-muted-foreground">
-              <sup aria-hidden>1 </sup>
-              {t("hero.proofBenchNote")}
-            </p>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">{t("hero.proofBenchNote")}</p>
           </div>
         </section>
 
@@ -250,24 +277,34 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section id="how" aria-labelledby="how-title" className="acc-cyan section-wash scroll-mt-16 border-y bg-muted/30">
+        <section id="how" aria-labelledby="how-title" className="relative scroll-mt-16 overflow-hidden border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead id="how-title" eyebrow={t("how.eyebrow")} title={t("how.title")} />
-            <div className="mt-12 grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
-              <ol className="relative space-y-6 before:absolute before:inset-y-4 before:start-[1.1rem] before:w-px before:bg-gradient-to-b before:from-cyan-500/60 before:via-violet-500/60 before:to-emerald-500/60">
-                {(["pick", "write", "ship"] as const).map((k, i) => (
-                  <li key={k} className={`reveal relative flex gap-4 ${["acc-cyan", "acc-violet", "acc-green"][i]}`} style={{ animationDelay: `${i * 80}ms` }}>
-                    <span className="tile relative size-9 shrink-0 rounded-full bg-card font-mono text-sm font-semibold tabular-nums">{i + 1}</span>
-                    <div>
-                      <h3 className="font-semibold">{t(`how.${k}.title`)}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
-                    </div>
+            <SectionHead center id="how-title" eyebrow={t("how.eyebrow")} title={t("how.title")} />
+            <div className="relative mt-16">
+              <svg aria-hidden viewBox="0 0 1200 120" preserveAspectRatio="none" className="how-wave pointer-events-none absolute inset-x-0 top-0 hidden h-28 w-full md:block">
+                <defs>
+                  <linearGradient id="how-g" x1="0" x2="1">
+                    <stop offset="0" stopColor="#22d3ee" />
+                    <stop offset="0.5" stopColor="#a855f7" />
+                    <stop offset="1" stopColor="#10b981" />
+                  </linearGradient>
+                </defs>
+                <path d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60" fill="none" stroke="url(#how-g)" strokeWidth="3" />
+                <path className="how-flow" d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+              <ol className="relative grid gap-10 md:grid-cols-3">
+                {([["pick", Plug, "acc-cyan"], ["write", Sparkles, "acc-violet"], ["ship", Rocket, "acc-green"]] as const).map(([k, Icon, acc], i) => (
+                  <li key={k} className={`reveal ${acc} flex flex-col items-center text-center`} style={{ animationDelay: `${i * 100}ms` }}>
+                    <span className="how-node tile size-16 rounded-full bg-card">
+                      <Icon aria-hidden className="size-6" />
+                    </span>
+                    <h3 className="mt-5 text-lg font-semibold">
+                      <span className="acc-ink tabular-nums">{i + 1}.</span> {t(`how.${k}.title`)}
+                    </h3>
+                    <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
                   </li>
                 ))}
               </ol>
-              <div className="reveal min-w-0">
-                <LangMorph />
-              </div>
             </div>
           </div>
         </section>
@@ -341,14 +378,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </section>
 
         <section aria-labelledby="cta-title" className="relative overflow-hidden border-t">
-          <div aria-hidden className="aurora pointer-events-none top-auto! -bottom-1/2">
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
+          {/* Generated with Higgsfield (gpt_image_2_6), text-free so every locale shares it. Already a sized WebP. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img aria-hidden src="/landing/waves.webp" alt="" width={1344} height={576} loading="lazy" decoding="async" className="glow-img pointer-events-none absolute inset-x-0 bottom-0 w-full opacity-80" />
           <div className="reveal relative mx-auto flex max-w-3xl flex-col items-center gap-5 px-4 py-24 text-center">
-            <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{t("cta.title")}</h2>
+            <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{t.rich("cta.title", { hl: (c) => <span className="hl">{c}</span> })}</h2>
             <p className="text-muted-foreground">{t("cta.body")}</p>
             {cta}
             <Link href="/docs" className="inline-flex min-h-6 items-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">

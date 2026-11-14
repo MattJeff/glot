@@ -16,7 +16,7 @@ export default async function OgImage() {
           {"glot"}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ fontSize: 76, fontWeight: 700, letterSpacing: -2, lineHeight: 1.05 }}>{h("title")}</div>
+          <div style={{ fontSize: 76, fontWeight: 700, letterSpacing: -2, lineHeight: 1.05 }}>{h.raw("title").replace(/<\/?hl>/g, "")}</div>
           <div style={{ fontSize: 30, color: "#a7adba", maxWidth: 980 }}>{t("bench.title")}</div>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 28, fontSize: 30, color: "#a7adba" }}>

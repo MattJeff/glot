@@ -2009,18 +2009,17 @@
       "proofBenchNote": "Benchmark: 320 Sätze in 8 Sprachen, dasselbe KI-Modell mit und ohne glot, 18. Oktober 2026.",
       "proofLabel": "Projektfakten",
       "proofNpm": "npm v{version}",
-      "proofOss": "Open Source",
       "proofStars": "{count, plural, =0 {Star auf GitHub} one {# Stern auf GitHub} other {# Sterne auf GitHub}}",
       "start": "Kostenlos starten",
       "startHint": "Keine Kreditkarte nötig.",
       "subtitle": "glot übersetzt Ihre App, Ihre Website und alles, was Sie versenden, prüft jeden Satz vor der Veröffentlichung und zeigt Ihnen, welche Länder Ihnen Kunden bringen.",
-      "title": "Sprechen Sie die Sprache jedes Kunden.",
+      "title": "Sprechen Sie die Sprache <hl>jedes Kunden</hl>.",
       "see": "In Aktion sehen"
     },
     "cta": {
       "body": "Verbinden Sie Ihre App oder Website und sehen Sie sie noch heute in jeder Sprache.",
       "docs": "Dokumentation entdecken",
-      "title": "Ihre nächsten Kunden sprechen Ihre Sprache nicht. Noch nicht."
+      "title": "Ihre nächsten Kunden sprechen Ihre Sprache nicht. <hl>Noch nicht.</hl>"
     },
     "faq": {
       "title": "Fragen",
