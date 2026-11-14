@@ -303,7 +303,13 @@
         "title": "Sivuja ei ole vielä nähty",
         "body": "Kattavuus näkyy, kun glot Edge on palvellut sivuja tällä kielellä."
       },
-      "pagesSeen": "Nähdyt sivut"
+      "pagesSeen": "Nähdyt sivut",
+      "cap": {
+        "title": "Uutta tekstiä pidätetään",
+        "body": "{refused} uutta segmenttiä hylättiin viimeisen 24 tunnin aikana: päivittäinen löytämisraja ({cap}) on saavutettu. Ne odottavat, kunnes tilaa vapautuu, joten niitä käyttävät sivut jäävät kääntämättä eikä niitä vielä mainosteta hakukoneille. Otsikoita ja meta-kuvauksia ei pidätetä koskaan.",
+        "raise": "Nosta raja arvoon {n}",
+        "raised": "Päivittäinen raja nostettu arvoon {n}. Pidätetty teksti otetaan käyttöön seuraavilla käynneillä."
+      }
     },
     "segments": {
       "title": "Segmentit",
@@ -847,7 +853,8 @@
     "subtitle": "Taustalla ajettavat käännökset, päivittyvät reaaliaikaisesti. Jokainen merkkijono validoidaan ennen tallennusta; kustannukset tulevat kielimallin palveluntarjoajaltasi.",
     "title": "Työt",
     "finished": "Käännös valmis: {count, plural, one {# merkkijono} other {# merkkijonoa}} käännetty ja validoitu",
-    "failed": "Käännöstyö epäonnistui"
+    "failed": "Käännöstyö epäonnistui",
+    "queuePosition": "Jonossa (sija {n})"
   },
   "keySheet": {
     "notFound": "Vastaavaa avainta ei löytynyt",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Keskustelut",
     "integrations": "Integraatiot",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Kaikki projektit",
+    "switchProject": "Vaihda projektia"
   },
   "status": {
     "machine": "Konekäännös",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} / {total} vaihetta valmiina",
-      "announce": "Vaihe {n} / {total}: {step}"
+      "announce": "Vaihe {n} / {total}: {step}",
+      "queued": "Jonossa (sija {n})"
     },
     "linked": {
       "rerun": "Aja uudelleen",

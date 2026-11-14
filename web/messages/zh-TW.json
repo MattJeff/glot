@@ -303,7 +303,13 @@
         "title": "尚無已瀏覽頁面",
         "body": "在此語言中，glot Edge 提供頁面後即會顯示覆蓋率。"
       },
-      "pagesSeen": "已瀏覽頁面"
+      "pagesSeen": "已瀏覽頁面",
+      "cap": {
+        "title": "新文字正被暫留",
+        "body": "{refused} 則新片段在過去 24 小時內被拒絕：已達每日探索上限（{cap}）。這些片段會等待有額度後再處理，因此使用它們的頁面仍未翻譯，也尚未公開給搜尋引擎。標題與 meta 描述永遠不會被暫留。",
+        "raise": "將上限提高至 {n}",
+        "raised": "每日上限已提高至 {n}。暫留的文字會在下次造訪時套用。"
+      }
     },
     "segments": {
       "title": "片段",
@@ -847,7 +853,8 @@
     "subtitle": "背景翻譯執行，即時更新。每個字串在儲存前都會經過驗證；費用由你的 LLM 供應商計算。",
     "title": "工作",
     "finished": "翻譯完成：已翻譯並驗證 {count, plural, other {# 個字串}}",
-    "failed": "翻譯工作失敗"
+    "failed": "翻譯工作失敗",
+    "queuePosition": "排隊中（第 {n} 位）"
   },
   "keySheet": {
     "notFound": "找不到相符的鍵",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "對話",
     "integrations": "整合",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "所有專案",
+    "switchProject": "切換專案"
   },
   "status": {
     "machine": "機器翻譯",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "已完成 {done} / {total} 步",
-      "announce": "第 {n} 步，共 {total} 步：{step}"
+      "announce": "第 {n} 步，共 {total} 步：{step}",
+      "queued": "排隊中（第 {n} 位）"
     },
     "linked": {
       "rerun": "重新執行",

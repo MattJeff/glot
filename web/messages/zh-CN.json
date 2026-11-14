@@ -303,7 +303,13 @@
         "title": "尚未看到任何页面",
         "body": "glot Edge 在该语言下提供过页面后，将显示覆盖率。"
       },
-      "pagesSeen": "已见页面"
+      "pagesSeen": "已见页面",
+      "cap": {
+        "title": "新文本正在被搁置",
+        "body": "{refused} 条新文本片段在过去 24 小时内被拒绝：已达到每日发现上限（{cap}）。这些片段将等待有空位后再处理，因此使用它们的页面暂未翻译，也尚未向搜索引擎公布。标题和 meta 描述不会被搁置。",
+        "raise": "将上限提高至 {n}",
+        "raised": "每日上限已提高至 {n}。被搁置的文本将在下次访问时生效。"
+      }
     },
     "segments": {
       "title": "文本片段",
@@ -847,7 +853,8 @@
     "subtitle": "后台翻译运行，实时更新。每个字符串在保存前都会经过验证；费用来自你的 LLM 服务商。",
     "title": "任务",
     "finished": "翻译完成：已翻译并验证 {count, plural, other {# 个字符串}}",
-    "failed": "翻译任务失败"
+    "failed": "翻译任务失败",
+    "queuePosition": "排队中（第 {n} 位）"
   },
   "keySheet": {
     "notFound": "没有匹配的键",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "对话",
     "integrations": "集成",
-    "autopilot": "自动驾驶"
+    "autopilot": "自动驾驶",
+    "allProjects": "所有项目",
+    "switchProject": "切换项目"
   },
   "status": {
     "machine": "机器翻译",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "已完成 {done}/{total} 步",
-      "announce": "第 {n} 步，共 {total} 步：{step}"
+      "announce": "第 {n} 步，共 {total} 步：{step}",
+      "queued": "排队中（第 {n} 位）"
     },
     "linked": {
       "rerun": "重新运行",

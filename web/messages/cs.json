@@ -303,7 +303,13 @@
         "title": "Zatím žádná stránka",
         "body": "Pokrytí se zobrazí, jakmile glot Edge obslouží stránky v tomto jazyce."
       },
-      "pagesSeen": "Zobrazené stránky"
+      "pagesSeen": "Zobrazené stránky",
+      "cap": {
+        "title": "Nový text je zadržován",
+        "body": "{refused} nových segmentů bylo za posledních 24 hodin odmítnuto, protože denní limit objevování ({cap}) je vyčerpán. Čekají, dokud se uvolní místo, takže stránky, které je používají, zůstávají nepřeloženy a zatím nejsou nabízeny vyhledávačům. Titulky a meta popisy se nikdy nezadržují.",
+        "raise": "Zvýšit limit na {n}",
+        "raised": "Denní limit zvýšen na {n}. Zadržený text se načte při dalších návštěvách."
+      }
     },
     "segments": {
       "title": "Segmenty",
@@ -847,7 +853,8 @@
     "subtitle": "Překladové úlohy na pozadí, průběžně aktualizované. Každý řetězec je před uložením ověřen; náklady se řídí vaším poskytovatelem LLM.",
     "title": "Úlohy",
     "finished": "Překlad dokončen: {count, plural, one {# řetězec} few {# řetězce} many {# řetězce} other {# řetězců}} přeloženo a ověřeno",
-    "failed": "Překladová úloha selhala"
+    "failed": "Překladová úloha selhala",
+    "queuePosition": "Ve frontě (pozice {n})"
   },
   "keySheet": {
     "notFound": "Žádný odpovídající klíč",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Konverzace",
     "integrations": "Integrace",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Všechny projekty",
+    "switchProject": "Přepnout projekt"
   },
   "status": {
     "machine": "Strojový",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} z {total} kroků dokončeno",
-      "announce": "Krok {n} z {total}: {step}"
+      "announce": "Krok {n} z {total}: {step}",
+      "queued": "Ve frontě (pozice {n})"
     },
     "linked": {
       "rerun": "Spustit znovu",

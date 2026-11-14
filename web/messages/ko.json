@@ -303,7 +303,13 @@
         "title": "아직 확인된 페이지가 없습니다",
         "body": "glot Edge가 이 언어로 페이지를 제공한 후에 커버리지가 표시됩니다."
       },
-      "pagesSeen": "확인된 페이지"
+      "pagesSeen": "확인된 페이지",
+      "cap": {
+        "title": "새 텍스트가 보류되고 있습니다",
+        "body": "최근 24시간 동안 새 세그먼트 {refused}개가 거부되었습니다. 일일 탐색 한도({cap})에 도달했습니다. 여유가 생길 때까지 대기하며, 이 세그먼트를 사용하는 페이지는 번역되지 않은 상태로 남고 아직 검색 엔진에 노출되지 않습니다. 제목과 메타 설명은 보류되지 않습니다.",
+        "raise": "한도를 {n}(으)로 올리기",
+        "raised": "일일 한도가 {n}(으)로 올라갔습니다. 보류된 텍스트는 다음 방문 시 반영됩니다."
+      }
     },
     "segments": {
       "title": "세그먼트",
@@ -847,7 +853,8 @@
     "subtitle": "백그라운드 번역 실행을 실시간으로 업데이트합니다. 각 문자열은 저장 전에 검증되며, 비용은 LLM 제공업체에서 청구됩니다.",
     "title": "작업",
     "finished": "번역 완료: {count, plural, other {#개 문자열}} 번역 및 검증됨",
-    "failed": "번역 작업 실패"
+    "failed": "번역 작업 실패",
+    "queuePosition": "대기 중 (순서 {n})"
   },
   "keySheet": {
     "notFound": "일치하는 키가 없습니다",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "대화",
     "integrations": "연동",
-    "autopilot": "오토파일럿"
+    "autopilot": "오토파일럿",
+    "allProjects": "모든 프로젝트",
+    "switchProject": "프로젝트 전환"
   },
   "status": {
     "machine": "기계 번역",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{total}개 단계 중 {done}개 완료",
-      "announce": "{total}단계 중 {n}단계: {step}"
+      "announce": "{total}단계 중 {n}단계: {step}",
+      "queued": "대기 중 (순서 {n})"
     },
     "linked": {
       "rerun": "다시 실행",

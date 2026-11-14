@@ -3210,7 +3210,7 @@
     "faq": {
       "byok": {
         "a": "Nein. Mit Ihrem eigenen Schlüssel zahlen Sie Ihren LLM-Anbieter direkt, und glot zählt diese Übersetzungen weder noch schlägt etwas auf. Ohne Schlüssel kann die Cloud den Schlüssel von glot nutzen: Jeder Plan enthält ein monatliches Kontingent, und Monatspläne können darüber hinaus nutzungsbasiert weiterlaufen.",
-        "q": "Schlagen Sie etwas auf die LLM-Kosten auf?"
+        "q": "Berechnen Sie einen Aufschlag auf die LLM-Kosten?"
       },
       "limits": {
         "a": "Der Cloud-Endpunkt antwortet mit 402, einer Meldung und einem Upgrade-Link; Ihre ausgelieferten Kataloge funktionieren weiter aus Ihrem Repository. Kontingente werden am 1. jedes Monats (UTC) zurückgesetzt.",

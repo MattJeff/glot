@@ -303,7 +303,13 @@
         "title": "Belum ada halaman yang terlihat",
         "body": "Cakupan muncul setelah glot Edge menyajikan halaman dalam bahasa ini."
       },
-      "pagesSeen": "Halaman terlihat"
+      "pagesSeen": "Halaman terlihat",
+      "cap": {
+        "title": "Teks baru sedang ditahan",
+        "body": "{refused} segmen baru ditolak dalam 24 jam terakhir: batas penemuan harian ({cap}) sudah tercapai. Segmen tersebut menunggu hingga ada ruang, sehingga halaman yang menggunakannya tetap belum diterjemahkan dan belum diiklankan ke mesin pencari. Judul dan meta deskripsi tidak pernah ditahan.",
+        "raise": "Naikkan batas menjadi {n}",
+        "raised": "Batas harian dinaikkan menjadi {n}. Teks yang ditahan akan diproses pada kunjungan berikutnya."
+      }
     },
     "segments": {
       "title": "Segmen",
@@ -847,7 +853,8 @@
     "subtitle": "Job terjemahan latar belakang, diperbarui secara langsung. Setiap string divalidasi sebelum disimpan; biaya berasal dari penyedia LLM Anda.",
     "title": "Job",
     "finished": "Terjemahan selesai: {count, plural, other {# string}} diterjemahkan dan divalidasi",
-    "failed": "Job terjemahan gagal"
+    "failed": "Job terjemahan gagal",
+    "queuePosition": "Dalam antrean (posisi {n})"
   },
   "keySheet": {
     "notFound": "Tidak ada kunci yang cocok",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Percakapan",
     "integrations": "Integrasi",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Semua proyek",
+    "switchProject": "Ganti proyek"
   },
   "status": {
     "machine": "Mesin",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} dari {total} langkah selesai",
-      "announce": "Langkah {n} dari {total}: {step}"
+      "announce": "Langkah {n} dari {total}: {step}",
+      "queued": "Dalam antrean (posisi {n})"
     },
     "linked": {
       "rerun": "Jalankan lagi",

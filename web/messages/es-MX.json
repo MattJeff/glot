@@ -303,7 +303,13 @@
         "title": "Aún no se ha visto ninguna página",
         "body": "La cobertura aparece cuando glot Edge haya servido páginas en este idioma."
       },
-      "pagesSeen": "Páginas vistas"
+      "pagesSeen": "Páginas vistas",
+      "cap": {
+        "title": "Se está reteniendo texto nuevo",
+        "body": "{refused} nuevos segmentos fueron rechazados en las últimas 24 horas: se alcanzó el límite diario de descubrimiento ({cap}). Esperan hasta que haya espacio, así que las páginas que los usan siguen sin traducir y aún no se anuncian a los motores de búsqueda. Los títulos y las metadescripciones nunca se retienen.",
+        "raise": "Subir el límite a {n}",
+        "raised": "Límite diario aumentado a {n}. El texto retenido se incluirá en las próximas visitas."
+      }
     },
     "segments": {
       "title": "Segmentos",
@@ -847,7 +853,8 @@
     "subtitle": "Ejecuciones de traducción en segundo plano, actualizadas en vivo. Cada cadena se valida antes de guardarse; los costos provienen de tu proveedor de LLM.",
     "title": "Trabajos",
     "finished": "Traducción terminada: {count, plural, one {# cadena traducida y validada} many {# cadenas traducidas y validadas} other {# cadenas traducidas y validadas}}",
-    "failed": "La tarea de traducción falló"
+    "failed": "La tarea de traducción falló",
+    "queuePosition": "En cola (posición {n})"
   },
   "keySheet": {
     "notFound": "No hay ninguna clave coincidente",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Conversaciones",
     "integrations": "Integraciones",
-    "autopilot": "Piloto automático"
+    "autopilot": "Piloto automático",
+    "allProjects": "Todos los proyectos",
+    "switchProject": "Cambiar de proyecto"
   },
   "status": {
     "machine": "Automática",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} de {total} pasos completados",
-      "announce": "Paso {n} de {total}: {step}"
+      "announce": "Paso {n} de {total}: {step}",
+      "queued": "En cola (posición {n})"
     },
     "linked": {
       "rerun": "Ejecutar de nuevo",

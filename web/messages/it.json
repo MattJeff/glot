@@ -303,7 +303,13 @@
         "title": "Nessuna pagina vista",
         "body": "La copertura compare quando glot Edge ha servito pagine in questa lingua."
       },
-      "pagesSeen": "Pagine viste"
+      "pagesSeen": "Pagine viste",
+      "cap": {
+        "title": "Nuovo testo trattenuto",
+        "body": "{refused} nuovi segmenti sono stati rifiutati nelle ultime 24 ore: è stato raggiunto il limite giornaliero di scoperta ({cap}). Restano in attesa finché non si libera spazio, quindi le pagine che li usano restano non tradotte e non sono ancora segnalate ai motori di ricerca. Titoli e meta description non vengono mai trattenuti.",
+        "raise": "Aumenta il limite a {n}",
+        "raised": "Limite giornaliero aumentato a {n}. Il testo trattenuto viene elaborato alle prossime visite."
+      }
     },
     "segments": {
       "title": "Segmenti",
@@ -847,7 +853,8 @@
     "subtitle": "Esecuzioni di traduzione in background, aggiornate in tempo reale. Ogni stringa viene convalidata prima di essere salvata; i costi dipendono dal provider LLM.",
     "title": "Job",
     "finished": "Traduzione completata: {count, plural, one {# stringa tradotta e convalidata} many {# stringhe tradotte e convalidate} other {# stringhe tradotte e convalidate}}",
-    "failed": "Job di traduzione non riuscito"
+    "failed": "Job di traduzione non riuscito",
+    "queuePosition": "In coda (posizione {n})"
   },
   "keySheet": {
     "notFound": "Nessuna chiave corrispondente",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Conversazioni",
     "integrations": "Integrazioni",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Tutti i progetti",
+    "switchProject": "Cambia progetto"
   },
   "status": {
     "machine": "Automatica",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} di {total} passaggi completati",
-      "announce": "Passaggio {n} di {total}: {step}"
+      "announce": "Passaggio {n} di {total}: {step}",
+      "queued": "In coda (posizione {n})"
     },
     "linked": {
       "rerun": "Esegui di nuovo",

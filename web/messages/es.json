@@ -1689,7 +1689,7 @@
       "source": "Idioma de origen",
       "targets": "Idiomas de destino",
       "title": "Idiomas",
-      "sourceHint": "El idioma en el que están escritos sus textos. Elija uno de sus idiomas de destino para convertirlo en el de origen.",
+      "sourceHint": "El idioma en el que están escritos tus textos. Elige uno de tus idiomas de destino para convertirlo en el de origen.",
       "changeTitle": "¿Cambiar el idioma de origen a {to}?",
       "changeBody": "La traducción al {to} de cada clave pasa a ser su texto de origen. El texto actual en {from} se conserva como traducción revisada, y ese idioma pasa a ser de destino. Las traducciones hechas a partir del origen anterior se marcan como desactualizadas (no se elimina nada): revíselas o vuelva a traducir. Las retrotraducciones y las puntuaciones de calidad se rehacen con el nuevo origen.",
       "changeMissing": "{count, plural, one {# clave no tiene traducción al {to} y conserva su texto en {from} como origen hasta que la edite.} other {# claves no tienen traducción al {to} y conservan su texto en {from} como origen hasta que las edite.}}",
@@ -2003,7 +2003,7 @@
       "see": "Verlo en acción"
     },
     "cta": {
-      "body": "Conecta tu app o tu web y vela hoy mismo en todos los idiomas.",
+      "body": "Conecta tu app o tu web y mírala hoy mismo en todos los idiomas.",
       "docs": "Explorar la documentación",
       "title": "Tus próximos clientes no hablan tu idioma. <hl>Todavía.</hl>"
     },
@@ -3210,7 +3210,7 @@
     "faq": {
       "byok": {
         "a": "No. Con tu propia clave, pagas directamente a tu proveedor de LLM y glot no cuenta esas traducciones ni les añade margen. Sin clave, la nube puede usar la clave de glot: cada plan incluye una cantidad mensual, y los planes mensuales pueden continuar más allá con facturación por uso.",
-        "q": "¿Aplicáis un margen a los costes de LLM?"
+        "q": "¿Aplicas un margen a los costes de LLM?"
       },
       "limits": {
         "a": "El endpoint de la nube responde 402 con un mensaje y un enlace para actualizar; tus catálogos publicados seguirán funcionando desde tu repositorio. Las cuotas se reinician el día 1 de cada mes (UTC).",

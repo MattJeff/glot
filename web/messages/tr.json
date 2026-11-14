@@ -303,7 +303,13 @@
         "title": "Henüz görülen sayfa yok",
         "body": "Kapsam, glot Edge bu dilde sayfa sunduktan sonra görünür."
       },
-      "pagesSeen": "Görülen sayfalar"
+      "pagesSeen": "Görülen sayfalar",
+      "cap": {
+        "title": "Yeni metinler bekletiliyor",
+        "body": "{refused} yeni segment son 24 saatte reddedildi: günlük keşif sınırı ({cap}) doldu. Yer açılana kadar beklerler; bu segmentleri kullanan sayfalar çevrilmemiş kalır ve arama motorlarına henüz bildirilmez. Başlıklar ve meta açıklamalar hiçbir zaman bekletilmez.",
+        "raise": "Sınırı {n} değerine yükselt",
+        "raised": "Günlük sınır {n} değerine yükseltildi. Bekletilen metin sonraki ziyaretlerde işleme alınır."
+      }
     },
     "segments": {
       "title": "Segmentler",
@@ -847,7 +853,8 @@
     "subtitle": "Arka plan çeviri çalışmaları canlı olarak güncellenir. Her metin kaydedilmeden önce doğrulanır; maliyetler LLM sağlayıcınızdan gelir.",
     "title": "İşler",
     "finished": "Çeviri tamamlandı: {count, plural, one {# metin} other {# metin}} çevrildi ve doğrulandı",
-    "failed": "Çeviri işi başarısız oldu"
+    "failed": "Çeviri işi başarısız oldu",
+    "queuePosition": "Sırada (konum {n})"
   },
   "keySheet": {
     "notFound": "Eşleşen anahtar yok",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Konuşmalar",
     "integrations": "Entegrasyonlar",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Tüm projeler",
+    "switchProject": "Proje değiştir"
   },
   "status": {
     "machine": "Makine",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{total} adımdan {done} tamamlandı",
-      "announce": "Adım {n} / {total}: {step}"
+      "announce": "Adım {n} / {total}: {step}",
+      "queued": "Sırada (konum {n})"
     },
     "linked": {
       "rerun": "Yeniden çalıştır",

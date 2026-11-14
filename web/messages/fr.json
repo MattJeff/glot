@@ -1829,11 +1829,11 @@
     "compareWith": "Comparer avec",
     "cropAlt": "Gros plan sur {key}",
     "empty": {
-      "body": "Rien n’a encore été vérifié. Lancez la commande ci-dessous : elle ouvre votre site dans chaque langue, capture chaque page et affiche ici ce qui casse.",
+      "body": "Rien n’a encore été vérifié. Lancez la commande ci-dessous : elle ouvre votre site dans chaque langue, capture chaque page et affiche ici ce qui casse.",
       "title": "Aucune vérification visuelle pour l’instant"
     },
     "fixedCount": "{count, plural, one {# corrigé} many {# corrigés} other {# corrigés}}",
-    "issueAt": "{kind} : {key}",
+    "issueAt": "{kind} : {key}",
     "issues": "{count, plural, one {# problème} many {# problèmes} other {# problèmes}}",
     "kindHelp": {
       "clamp": "Coupé volontairement par le CSS (points de suspension), en général normal",
@@ -2756,7 +2756,7 @@
       "title": "Trafic insuffisant dans ce segment"
     },
     "verdict": {
-      "draft": "Brouillon : pas encore affiché aux visiteurs. La check-list ci-dessous indique ce qu'il reste avant le lancement.",
+      "draft": "Brouillon : pas encore affiché aux visiteurs. La check-list ci-dessous indique ce qu’il reste avant le lancement.",
       "elsewhere": "Pas encore de gagnant ailleurs.",
       "learning": "Pas encore de gagnant.{days, plural, =-1 {} one { Encore environ # jour au trafic actuel.} many { Encore environ # jours au trafic actuel.} other { Encore environ # jours au trafic actuel.}}",
       "noDifference": "Aucune variante ne dépasse nettement le texte officiel : le conserver est sans risque.",
@@ -3209,8 +3209,8 @@
     "current": "Forfait actuel",
     "faq": {
       "byok": {
-        "a": "Non. Avec votre propre clé, vous payez directement votre fournisseur LLM et glot ne compte ni ne majore ces traductions. Sans clé, le cloud peut utiliser celle de glot : chaque forfait inclut un volume mensuel, et les forfaits mensuels peuvent continuer au-delà avec une facturation à l’usage.",
-        "q": "Les coûts LLM sont-ils majorés ?"
+        "a": "Non. Avec votre propre clé, vous payez directement votre fournisseur LLM et glot ne compte ni ne majore ces traductions. Sans clé, le cloud peut utiliser celle de glot : chaque forfait inclut un volume mensuel, et les forfaits mensuels peuvent continuer au-delà avec une facturation à l’usage.",
+        "q": "Les coûts LLM sont-ils majorés ?"
       },
       "limits": {
         "a": "Le point de terminaison cloud répond 402 avec un message et un lien de mise à niveau ; vos catalogues publiés continuent de fonctionner depuis votre dépôt. Les quotas sont réinitialisés le 1er de chaque mois (UTC).",
@@ -3221,12 +3221,12 @@
         "q": "Certaines fonctionnalités de l’outil open source sont-elles limitées ?"
       },
       "selfHost": {
-        "a": "Oui. Le serveur se trouve dans le même dépôt MIT. Sans clés Stripe, la facturation est désactivée et toutes les limites sont levées ; vous l’exploitez et le mettez à jour vous-même.",
-        "q": "L’auto-hébergement est-il gratuit ?"
+        "a": "Oui. Le serveur se trouve dans le même dépôt MIT. Sans clés Stripe, la facturation est désactivée et toutes les limites sont levées ; vous l’exploitez et le mettez à jour vous-même.",
+        "q": "L’auto-hébergement est-il gratuit ?"
       },
       "tax": {
-        "a": "Les prix sont affichés hors TVA. Stripe gère les paiements, les factures et la TVA : elle est ajoutée au paiement lorsqu’elle s’applique, et les clients professionnels peuvent saisir un numéro de TVA. Les factures sont dans vos paramètres de facturation.",
-        "q": "Les prix sont-ils HT ou TTC ?"
+        "a": "Les prix sont affichés hors TVA. Stripe gère les paiements, les factures et la TVA : elle est ajoutée au paiement lorsqu’elle s’applique, et les clients professionnels peuvent saisir un numéro de TVA. Les factures sont dans vos paramètres de facturation.",
+        "q": "Les prix sont-ils HT ou TTC ?"
       },
       "title": "Questions",
       "quotas": {
@@ -3245,7 +3245,7 @@
     "forever": "à vie",
     "interval": "Période de facturation",
     "meta": {
-      "description": "Tarifs glot : la CLI et le serveur MCP open source sont gratuits. Pro (localisation fiable pour les équipes) et Growth (chiffre d’affaires international) couvrent le cloud hébergé.",
+      "description": "Tarifs glot : la CLI et le serveur MCP open source sont gratuits. Pro (localisation fiable pour les équipes) et Growth (chiffre d’affaires international) couvrent le cloud hébergé.",
       "title": "Tarifs"
     },
     "monthly": "Mensuel",
@@ -3452,7 +3452,7 @@
       "showShot": "Afficher la dernière capture d'écran",
       "title": "Votre site : {url}",
       "unreachable": {
-        "body": "Votre site n'a pas répondu dans le cadre : le widget glot n'est pas sur cette page, ou votre site interdit l'affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
+        "body": "Votre site n’a pas répondu dans le cadre : le widget glot n’est pas sur cette page, ou votre site interdit l’affichage dans un cadre (X-Frame-Options ou CSP frame-ancestors).",
         "title": "Épingles en direct indisponibles."
       }
     },

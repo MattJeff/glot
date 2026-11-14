@@ -303,7 +303,13 @@
         "title": "Chưa có trang nào được ghi nhận",
         "body": "Độ phủ sẽ hiển thị khi glot Edge đã phục vụ trang bằng ngôn ngữ này."
       },
-      "pagesSeen": "Trang đã ghi nhận"
+      "pagesSeen": "Trang đã ghi nhận",
+      "cap": {
+        "title": "Văn bản mới đang bị giữ lại",
+        "body": "{refused} đoạn văn bản mới đã bị từ chối trong 24 giờ qua: đã đạt giới hạn khám phá hằng ngày ({cap}). Chúng sẽ chờ đến khi còn chỗ, nên các trang sử dụng chúng vẫn chưa được dịch và chưa được đưa vào công cụ tìm kiếm. Tiêu đề và mô tả meta không bao giờ bị giữ lại.",
+        "raise": "Nâng giới hạn lên {n}",
+        "raised": "Đã nâng giới hạn hằng ngày lên {n}. Văn bản đang chờ sẽ được xử lý trong lần truy cập tiếp theo."
+      }
     },
     "segments": {
       "title": "Đoạn",
@@ -847,7 +853,8 @@
     "subtitle": "Các job dịch chạy nền, cập nhật trực tiếp. Mỗi chuỗi được kiểm tra trước khi lưu; chi phí lấy từ nhà cung cấp LLM của bạn.",
     "title": "Job",
     "finished": "Đã dịch xong: {count, plural, other {# chuỗi}} đã được dịch và kiểm tra",
-    "failed": "Job dịch thất bại"
+    "failed": "Job dịch thất bại",
+    "queuePosition": "Đang chờ trong hàng đợi (vị trí {n})"
   },
   "keySheet": {
     "notFound": "Không có khóa khớp",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Cuộc hội thoại",
     "integrations": "Tích hợp",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Tất cả dự án",
+    "switchProject": "Chuyển dự án"
   },
   "status": {
     "machine": "Máy dịch",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} trên {total} bước đã hoàn thành",
-      "announce": "Bước {n} trên {total}: {step}"
+      "announce": "Bước {n} trên {total}: {step}",
+      "queued": "Đang chờ (vị trí {n})"
     },
     "linked": {
       "rerun": "Chạy lại",

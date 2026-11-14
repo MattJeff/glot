@@ -9145,7 +9145,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "experimentResults.verdict.elsewhere": {
@@ -12345,7 +12344,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "home.demo.steps": {
@@ -37140,6 +37138,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "212927508a156a97",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "5dbc98c63d81f654",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "123e98b4e8c00f58",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "2fa764bd43942b66",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "723526f0d74f126d",
@@ -43692,6 +43726,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "9810109fa3ed7b36",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "03686d8051b77766",
@@ -49545,6 +49588,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "9810109fa3ed7b36",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -60549,6 +60601,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "d4373c9a9a6dddc1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "f6d06069b348cbeb",
@@ -60813,6 +60874,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "b3a7807e41944f0e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "bfbca2de1e0400c5",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -70271,6 +70341,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "aee9c7079800278f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "7c76b973b72dfae9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "158e2cb4a560204d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "890eda13c27bf3d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "aa075ade0cdc3d29",
@@ -76823,6 +76929,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "b1dde76eed240893",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "36973dfcb5484585",
@@ -82676,6 +82791,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "b1dde76eed240893",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -93680,6 +93804,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "35ac3b589529334a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "005a0328a7d2b493",
@@ -93944,6 +94077,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "de8595d273861ba0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "e841724a13040cc8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -121255,12 +121397,11 @@
       },
       "pricing.faq.byok.q": {
         "source_hash": "546aede21dc35661",
-        "target_hash": "15699387fa11d0d0",
+        "target_hash": "e3823c65e2c1ec1a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.cancel.a": {
@@ -135792,6 +135933,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "2aec2b590e6a53df",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "227959ff63171e41",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "54ba14ab2074aa18",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "0156b5878d6b5bb8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "bb328678d8039c33",
@@ -142344,6 +142521,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "6c51c4f866900981",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "74048fcfa4bac879",
@@ -148197,6 +148383,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "6c51c4f866900981",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -159201,6 +159396,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "ecc1bb53a4a7993b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "f6d9f8f2874f909b",
@@ -159465,6 +159669,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "e91cd3f8cb69da79",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "015615aacdb8fd76",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -168923,6 +169136,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "fa2fcbfef22a102f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "5fa2992c23e2cd81",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "f3548b1633f25838",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "350ebdd981006f0a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "65168f42745f2cc4",
@@ -175475,6 +175724,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "2ca92fd1ea740863",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "9c989cb9ba15e907",
@@ -181328,6 +181586,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "2ca92fd1ea740863",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -192332,6 +192599,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "4b87271b6b8170d4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fa884c0e7a4a72f3",
@@ -192596,6 +192872,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "ac576a66d4563e60",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "47da83441d20f6ed",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -209226,12 +209511,11 @@
       },
       "home.cta.body": {
         "source_hash": "982d625b357ff139",
-        "target_hash": "3b822089aa7ccc0a",
+        "target_hash": "e4be87932f7207f3",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "home.cta.docs": {
@@ -209728,7 +210012,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "home.demo.write.label": {
@@ -219909,12 +220192,11 @@
       },
       "pricing.faq.byok.q": {
         "source_hash": "546aede21dc35661",
-        "target_hash": "f0807f6d024f12f5",
+        "target_hash": "532f5beac0fdac89",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.cancel.a": {
@@ -219996,7 +220278,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.selfHost.q": {
@@ -220015,7 +220296,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.tax.q": {
@@ -220619,7 +220899,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.title": {
@@ -224512,12 +224791,11 @@
       },
       "settings.locales.sourceHint": {
         "source_hash": "1d2f0b93e0fa8f81",
-        "target_hash": "1c9ca424fd6bd5e1",
+        "target_hash": "d3484cecb818e83a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "settings.locales.syntax.fluent": {
@@ -234450,6 +234728,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "98a503152b5149c9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "89e19dd2beb81a02",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "1cd32c1206e4459a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "97aac65554d814b3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "5796a0de7c28d7a3",
@@ -241002,6 +241316,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "1c85ad56cb639df3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "8cb28ca416cc2d7a",
@@ -246855,6 +247178,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "1c85ad56cb639df3",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -257859,6 +258191,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "ac818106afa9ed45",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fc205e3e22fa3758",
@@ -258123,6 +258464,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "fdab69210d5cdafd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "e8cc9c1939fcb54b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -267581,6 +267931,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "87d2e86a26a3609d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "1c9ff2a3c07080bb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "184f5efef07a0d88",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "aebe714c501514ee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "11a932f5876d5a76",
@@ -274133,6 +274519,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "ac95c2cd0aa43403",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "0c4206e2d9e70970",
@@ -279986,6 +280381,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "ac95c2cd0aa43403",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -290990,6 +291394,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "508f5980a4f594d9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "2a51f762fef40c9b",
@@ -291254,6 +291667,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "7a1bdb5beeb7d930",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "85edc457d117a85c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -303713,7 +304135,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "emailAuth.confirmPassword": {
@@ -305104,12 +305525,11 @@
       },
       "experimentResults.verdict.draft": {
         "source_hash": "dc324f2718ceab20",
-        "target_hash": "e432f0ce04be31b6",
+        "target_hash": "d26842f0776e4b7c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "experimentResults.verdict.elsewhere": {
@@ -309222,7 +309642,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "home.hero.proofBench": {
@@ -309335,7 +309754,6 @@
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "home.how.pick.title": {
@@ -318560,22 +318978,20 @@
       },
       "pricing.faq.byok.a": {
         "source_hash": "f06f01c04643cb54",
-        "target_hash": "128bd3652b7ff860",
+        "target_hash": "26a5dd21eda2f52b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.byok.q": {
         "source_hash": "546aede21dc35661",
-        "target_hash": "703f5fdd8e58ab2e",
+        "target_hash": "de17eea0aa32189a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.cancel.a": {
@@ -318652,42 +319068,38 @@
       },
       "pricing.faq.selfHost.a": {
         "source_hash": "c7caed152c5c37e8",
-        "target_hash": "01b7112ebffcf555",
+        "target_hash": "ede26ad930bc8c00",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.selfHost.q": {
         "source_hash": "1acb1f4481171252",
-        "target_hash": "1d93304a10479c92",
+        "target_hash": "cd27e4e5094ebfb1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.tax.a": {
         "source_hash": "0885ba5ae189381f",
-        "target_hash": "31aaa9a3365f25a8",
+        "target_hash": "3a47288f02c9571a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.tax.q": {
         "source_hash": "eea756335331d68f",
-        "target_hash": "4800b38cfb896db3",
+        "target_hash": "f1081d66f86d4342",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.faq.title": {
@@ -318746,12 +319158,11 @@
       },
       "pricing.meta.description": {
         "source_hash": "da81fd3c784ea0c1",
-        "target_hash": "57e65187c3bb6cd9",
+        "target_hash": "82c6b01fce48490b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "pricing.meta.title": {
@@ -321133,12 +321544,11 @@
       },
       "reviewPage.frame.unreachable.body": {
         "source_hash": "ace30cd3c41704c0",
-        "target_hash": "961b03a4ef8f63f1",
+        "target_hash": "4bb8ba8911aa33b2",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
         },
-        "score": 100,
         "reviewed": false
       },
       "reviewPage.frame.unreachable.title": {
@@ -325380,7 +325790,7 @@
       },
       "visual.empty.body": {
         "source_hash": "cbe259aef943eb4c",
-        "target_hash": "dbc6daa6b4844939",
+        "target_hash": "dd96eaf0414e84b9",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -325406,10 +325816,10 @@
       },
       "visual.issueAt": {
         "source_hash": "92f04a35fa63dcd6",
-        "target_hash": "b39c3d9145643956",
+        "target_hash": "14d46045950d39dd",
         "origin": {
           "kind": "machine",
-          "model": "claude-sonnet-5-5"
+          "model": "claude-haiku-5-5"
         },
         "reviewed": false
       },
@@ -333113,6 +333523,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "09fe94cf3c0f8e93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "c37f90dc7e27cedc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "ce4ac656d6d8ddb8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "5173846321c81dc1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "422455087523f518",
@@ -339665,6 +340111,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "966fa31dc12f107b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "6aab0bdb23234f5a",
@@ -345518,6 +345973,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "966fa31dc12f107b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -356522,6 +356986,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "064d04106cbd1045",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "00052d6a1a9872e4",
@@ -356786,6 +357259,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "b17aaa5f679e1204",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "59dc02262cfec639",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -366244,6 +366726,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "e6cc165f03318819",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "2866e2ab0939ed68",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "92565d2382dd4f34",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "7ac2ae50592534c7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "e6f04166bbcecc0a",
@@ -372796,6 +373314,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "3332e7f853e2cd10",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "53593c5e98638f64",
@@ -378649,6 +379176,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "3332e7f853e2cd10",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -389653,6 +390189,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "5d2c81e615e7ce1b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "7a10c8a488a924fc",
@@ -389917,6 +390462,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "e2829436d7d0d00d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "2a1afa1b74feebb4",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -399375,6 +399929,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "9f22a2b5e069eb92",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "e3e993687453e38c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "53e2b66d70945149",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "f94fdf4306bef4fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "9654e96c4a4a3dbb",
@@ -405927,6 +406517,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "9a74097c864b739c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "9579c48d6b4bc2b8",
@@ -411780,6 +412379,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "9a74097c864b739c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -422784,6 +423392,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "616dceb58cab734b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "cf9b7e19dcc8e0e5",
@@ -423048,6 +423665,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "9070f7ff9b5a6ed3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "4c4a28d8f2d3f484",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -432506,6 +433132,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "026952edf59f04f9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "116486a146ed01f6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "2f6c13b31094fc6e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "175c66a6e10ffc97",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "996b98a1f9daec6c",
@@ -439058,6 +439720,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "0b0de0cb1a14c099",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "f7d03d59857310cb",
@@ -444911,6 +445582,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "0b0de0cb1a14c099",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -455915,6 +456595,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "04f8f4932044fed3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "a28c3d95dd910be4",
@@ -456179,6 +456868,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "0d0c545f64113fff",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "4ab36944ecc00abc",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -465637,6 +466335,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "0718f6d6009b54e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "cf80c1455bcc55af",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "b85b807954f2dd67",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "da3f9aa76efc927b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "0c97d5358eda9db1",
@@ -472198,6 +472932,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "f5e387a87910df16",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "48e3fd35a5bf9d72",
@@ -478051,6 +478794,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "f5e387a87910df16",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -489055,6 +489807,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "8102b2c0ceb4a364",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "a28c3d95dd910be4",
@@ -489319,6 +490080,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "649b9da295567891",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "b5b19d137bb56227",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -531166,6 +531936,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "5e464000d03ffb02",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "f40fd378626bef45",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "dcade2ae7f63cd6b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "f0afdebdbcba3c72",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "9aacd3b0f6c775df",
@@ -537718,6 +538524,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "d7f4e1bf10eb67e9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "047e02901e118527",
@@ -543571,6 +544386,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "d7f4e1bf10eb67e9",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -554575,6 +555399,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "262366d27c18f509",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fe1b27ebd737dcb4",
@@ -554839,6 +555672,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "6f9405fb08e4c8f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "269dbcd863af480f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -564297,6 +565139,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "aaf54140edf983f2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "4055dad5f4d6e21c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "f7a04ade2bcc1251",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "a1adc2fbfe6778f7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "aa075ade0cdc3d29",
@@ -570849,6 +571727,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "b7ff624f6daee3ba",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "5b226eb102d25527",
@@ -576702,6 +577589,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "b7ff624f6daee3ba",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -587706,6 +588602,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "3e21203c8fa7d26d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "005a0328a7d2b493",
@@ -587970,6 +588875,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "1b9ba0880b7e7af6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "05b55a5c6fd68258",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -597428,6 +598342,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "590f35476be8b798",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "b781903e5dda7152",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "e45f1b248d0d79ab",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "b6a3f15a71011231",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "53c5243184d0aaf1",
@@ -603980,6 +604930,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "823afbff4fac13af",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "7ba8c9adfc18d970",
@@ -609833,6 +610792,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "823afbff4fac13af",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -620837,6 +621805,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "49de78de60bb0efa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "005a0328a7d2b493",
@@ -621101,6 +622078,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "d3f78245f7970857",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "bd3e7fa8d179d896",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -630559,6 +631545,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "5fa898680d989650",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "6676c260710fafe1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "e599b917d5059bd3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "de6f6197ed46718f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "591019d49ba5464d",
@@ -637111,6 +638133,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "dd5ce4b02049f0d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "dd4489baaaa5751c",
@@ -642964,6 +643995,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "dd5ce4b02049f0d6",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -653968,6 +655008,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "9c80917775f4da5b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "6844849686904b0f",
@@ -654232,6 +655281,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "0df8acbe189a68e7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "f8894888a63cf64b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -663690,6 +664748,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "9ccf80fa8272c24b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "238f3e1be36a920b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "ce84d410a3002b05",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "147622b7e8fe00fc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "5796a0de7c28d7a3",
@@ -670251,6 +671345,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "37028237410bbc2a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "884a8168e6dcabc8",
@@ -676104,6 +677207,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "37028237410bbc2a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -687108,6 +688220,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "f21c564a34482c79",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fc205e3e22fa3758",
@@ -687372,6 +688493,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "79b81dfc024738f4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "53c676bc8f5da287",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -696830,6 +697960,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "fc121964b378d042",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "238f3e1be36a920b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "ce84d410a3002b05",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "8cc7726794482f6a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "5796a0de7c28d7a3",
@@ -703382,6 +704548,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "2ee7fd6478eb5896",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "e76eb38cb522c9cf",
@@ -709235,6 +710410,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "2ee7fd6478eb5896",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -720239,6 +721423,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "f21c564a34482c79",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "fc205e3e22fa3758",
@@ -720503,6 +721696,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "8d82be62715ec268",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "17a766d357f06caf",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -729961,6 +731163,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "8461ccf71cffd263",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "e82806c6fd0f22d1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "9177e04eb57e9145",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "141191d4dc9b56ce",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "c379922a40b46d05",
@@ -736513,6 +737751,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "7ae179b7992cff4c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "326dcf18a1c7a9c8",
@@ -742366,6 +743613,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "7ae179b7992cff4c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -753370,6 +754626,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "95d3ff9ef7d32622",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "bb90ef31a978fc6c",
@@ -753634,6 +754899,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "2fa8dd63ebe0f75c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "c92af3dbf0fbbc7a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -763092,6 +764366,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "9b8d093927746309",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "d9051cb600eef49b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "428437ab37c7747b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "da36ca76e706b0fc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "82a1d4493a6fbbf8",
@@ -769644,6 +770954,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "8fb31897e2856d9a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "1e211181990abb13",
@@ -775497,6 +776816,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "8fb31897e2856d9a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -786501,6 +787829,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "c079c214032e6924",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "daaf8ccbab69d68a",
@@ -786765,6 +788102,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "f35ba214e95d5a94",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "9ce4f459770bb2bb",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -796223,6 +797569,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "cda1785647664f60",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "68f9edfacfac47a5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "f959ef89554507d9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "94f7f78419316faa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "48ca4a7bfc610ac2",
@@ -802775,6 +804157,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "df5f054e46d5393f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "6af83dec0e79b8e9",
@@ -808628,6 +810019,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "df5f054e46d5393f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -819632,6 +821032,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "609e34adaea59a7c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "005a0328a7d2b493",
@@ -819896,6 +821305,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "80ce3095833eaeb1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "56c885b77dd950b1",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -829354,6 +830772,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "0dee9d0b800a5b30",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "1dec786397c8ee2c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "36ad3eb93631b016",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "b3b6ea9de1cadc11",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "9aa7900eb6fd6721",
@@ -835906,6 +837360,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "426b6c408e2849eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "43a996dc009b7876",
@@ -841759,6 +843222,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "426b6c408e2849eb",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -852763,6 +854235,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "d2870ccefb8945dc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "88475f64abc1c2d3",
@@ -853027,6 +854508,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "1358c67b6b4a4408",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "aee24d7d215db1e3",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -862485,6 +863975,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "b384ca42e001682e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "51f85e5e84430c13",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "29e646a95bb364cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "98ba3cbe1497f3a7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "68f4728216f84ae5",
@@ -869037,6 +870563,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "8f70f73ef0acf2d8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "299674d7b07edf38",
@@ -874890,6 +876425,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "8f70f73ef0acf2d8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -885894,6 +887438,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "1191aff270da2a35",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "ce9d9779adf8010a",
@@ -886158,6 +887711,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "1d1efc464bcbede5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "1756f31cd4441d31",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -895616,6 +897178,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "f0ce3ab4dd6b4402",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "dd0f8ca764725d36",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "fef73e855493d741",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "f5410c2c96c079e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "5a8096993cb6a940",
@@ -902168,6 +903766,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "32179b5a3dee4d42",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "06ca5ad4099d4696",
@@ -908021,6 +909628,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "32179b5a3dee4d42",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -919025,6 +920641,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "bfbfacac1b761284",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "e3bcca87a12b7084",
@@ -919289,6 +920914,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "f15465fe36cdd56c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "c8ed75ad4f271a72",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -928747,6 +930381,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "056569579f831059",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "78e9111c297a806b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "cbc19f812a7e5a41",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "5f42b5bab5d14b2d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "6e6fb7ecdd00899e",
@@ -935299,6 +936969,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "681bb49891079a61",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "289c943d1f92417f",
@@ -941152,6 +942831,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "252e37e5e6f13d19",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -952156,6 +953844,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "2129722b73cfbc4d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "a28c3d95dd910be4",
@@ -952420,6 +954117,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "def0badcd4d31d57",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "5f95a89b62284cb8",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -961878,6 +963584,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "55c55ee1ab44ee47",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "960364a53481d4ae",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "745396909c6e0ad6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "56f6c742be0facb2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "0dbb2a161465a22e",
@@ -968430,6 +970172,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "1e9ac9187e419a88",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "0adfb253711ec10e",
@@ -974283,6 +976034,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "1e9ac9187e419a88",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -985287,6 +987047,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "c7a4e66eb765582e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "79db53b22909795f",
@@ -985551,6 +987320,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "64933df78c5cdb0a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "3328125f8a4d6470",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -995009,6 +996787,42 @@
         },
         "reviewed": false
       },
+      "edge.coverage.cap.body": {
+        "source_hash": "9b423d207eee9842",
+        "target_hash": "188782abd24da32c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raise": {
+        "source_hash": "5fa2992c23e2cd81",
+        "target_hash": "e51c85eb6ee3ac6b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.raised": {
+        "source_hash": "f3548b1633f25838",
+        "target_hash": "ac044e74023f5155",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "edge.coverage.cap.title": {
+        "source_hash": "350ebdd981006f0a",
+        "target_hash": "ca7fdd1c8b2b5da5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "edge.coverage.critical": {
         "source_hash": "65168f42745f2cc4",
         "target_hash": "73a4caa55dc4c5ef",
@@ -1001561,6 +1003375,15 @@
         },
         "reviewed": false
       },
+      "github.job.queued": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "978ca75eba324682",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "github.linked.change": {
         "source_hash": "9c989cb9ba15e907",
         "target_hash": "91d814889c895756",
@@ -1007414,6 +1009237,15 @@
       "jobs.progress": {
         "source_hash": "638a82e1af18343b",
         "target_hash": "638a82e1af18343b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "jobs.queuePosition": {
+        "source_hash": "2ca92fd1ea740863",
+        "target_hash": "978ca75eba324682",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -1018418,6 +1020250,15 @@
         },
         "reviewed": false
       },
+      "shell.allProjects": {
+        "source_hash": "4b87271b6b8170d4",
+        "target_hash": "ca075310e74787cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "shell.apiTokens": {
         "source_hash": "fa884c0e7a4a72f3",
         "target_hash": "f3e465cfbb77e717",
@@ -1018682,6 +1020523,15 @@
       "shell.skipToContent": {
         "source_hash": "ac576a66d4563e60",
         "target_hash": "6c2c7c5d847b4fbf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "shell.switchProject": {
+        "source_hash": "47da83441d20f6ed",
+        "target_hash": "51a7db1702cc1103",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"

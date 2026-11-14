@@ -303,7 +303,13 @@
         "title": "Nenhuma página vista ainda",
         "body": "A cobertura aparece quando o glot Edge tiver servido páginas neste idioma."
       },
-      "pagesSeen": "Páginas vistas"
+      "pagesSeen": "Páginas vistas",
+      "cap": {
+        "title": "Novo texto está sendo retido",
+        "body": "{refused} novos segmentos foram recusados nas últimas 24 horas: o limite diário de descoberta ({cap}) foi atingido. Eles aguardam até que haja espaço, então as páginas que os usam permanecem sem tradução e ainda não são anunciadas aos mecanismos de busca. Títulos e meta descrições nunca são retidos.",
+        "raise": "Aumentar o limite para {n}",
+        "raised": "Limite diário aumentado para {n}. O texto retido é processado nas próximas visitas."
+      }
     },
     "segments": {
       "title": "Segmentos",
@@ -847,7 +853,8 @@
     "subtitle": "Execuções de tradução em segundo plano, atualizadas ao vivo. Cada string é validada antes de ser salva; os custos vêm do seu provedor de LLM.",
     "title": "Tarefas",
     "finished": "Tradução concluída: {count, plural, one {# string traduzida e validada} many {# strings traduzidas e validadas} other {# strings traduzidas e validadas}}",
-    "failed": "Falha na tarefa de tradução"
+    "failed": "Falha na tarefa de tradução",
+    "queuePosition": "Na fila (posição {n})"
   },
   "keySheet": {
     "notFound": "Nenhuma chave correspondente",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Conversas",
     "integrations": "Integrações",
-    "autopilot": "Piloto automático"
+    "autopilot": "Piloto automático",
+    "allProjects": "Todos os projetos",
+    "switchProject": "Trocar projeto"
   },
   "status": {
     "machine": "Automática",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} de {total} passos concluídos",
-      "announce": "Passo {n} de {total}: {step}"
+      "announce": "Passo {n} de {total}: {step}",
+      "queued": "Na fila (posição {n})"
     },
     "linked": {
       "rerun": "Executar novamente",

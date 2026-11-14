@@ -303,7 +303,13 @@
         "title": "Nicio pagină văzută încă",
         "body": "Acoperirea apare după ce glot Edge a servit pagini în această limbă."
       },
-      "pagesSeen": "Pagini văzute"
+      "pagesSeen": "Pagini văzute",
+      "cap": {
+        "title": "Textul nou este reținut",
+        "body": "{refused} segmente noi au fost refuzate în ultimele 24 de ore: s-a atins limita zilnică de descoperire ({cap}). Acestea așteaptă până se eliberează spațiu, astfel că paginile care le folosesc rămân netraduse și nu sunt încă indexate de motoarele de căutare. Titlurile și meta descrierile nu sunt reținute niciodată.",
+        "raise": "Mărește limita la {n}",
+        "raised": "Limita zilnică a fost mărită la {n}. Textul reținut este preluat la următoarele vizite."
+      }
     },
     "segments": {
       "title": "Segmente",
@@ -847,7 +853,8 @@
     "subtitle": "Rulări de traducere în fundal, actualizate în timp real. Fiecare șir este validat înainte de a fi salvat; costurile vin de la furnizorul dvs. de LLM.",
     "title": "Joburi",
     "finished": "Traducere finalizată: {count, plural, one {# șir tradus și validat} few {# șiruri traduse și validate} other {# de șiruri traduse și validate}}",
-    "failed": "Jobul de traducere a eșuat"
+    "failed": "Jobul de traducere a eșuat",
+    "queuePosition": "În coadă (poziția {n})"
   },
   "keySheet": {
     "notFound": "Nicio cheie potrivită",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Conversații",
     "integrations": "Integrări",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Toate proiectele",
+    "switchProject": "Schimbă proiectul"
   },
   "status": {
     "machine": "Automat",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} din {total} pași finalizați",
-      "announce": "Pasul {n} din {total}: {step}"
+      "announce": "Pasul {n} din {total}: {step}",
+      "queued": "În coadă (poziția {n})"
     },
     "linked": {
       "rerun": "Rulați din nou",

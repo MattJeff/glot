@@ -303,7 +303,13 @@
         "title": "Ingen sider sett ennå",
         "body": "Dekning vises når glot Edge har levert sider på dette språket."
       },
-      "pagesSeen": "Sett sider"
+      "pagesSeen": "Sett sider",
+      "cap": {
+        "title": "Ny tekst holdes tilbake",
+        "body": "{refused} nye segmenter ble avvist de siste 24 timene: den daglige oppdagelsesgrensen ({cap}) er nådd. De venter til det blir plass, så sidene som bruker dem forblir uoversatt og annonseres ikke til søkemotorer ennå. Titler og metabeskrivelser holdes aldri tilbake.",
+        "raise": "Øk grensen til {n}",
+        "raised": "Daglig grense økt til {n}. Tekst som ble holdt tilbake, hentes ved neste besøk."
+      }
     },
     "segments": {
       "title": "Segmenter",
@@ -847,7 +853,8 @@
     "subtitle": "Bakgrunnsoversettelser, oppdatert live. Hver streng valideres før den lagres; kostnadene kommer fra LLM-leverandøren din.",
     "title": "Jobber",
     "finished": "Oversettelse fullført: {count, plural, one {# streng} other {# strenger}} oversatt og validert",
-    "failed": "Oversettelsesjobben feilet"
+    "failed": "Oversettelsesjobben feilet",
+    "queuePosition": "I kø (posisjon {n})"
   },
   "keySheet": {
     "notFound": "Ingen samsvarende nøkkel",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Samtaler",
     "integrations": "Integrasjoner",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Alle prosjekter",
+    "switchProject": "Bytt prosjekt"
   },
   "status": {
     "machine": "Maskin",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} av {total} steg fullført",
-      "announce": "Steg {n} av {total}: {step}"
+      "announce": "Steg {n} av {total}: {step}",
+      "queued": "I kø (posisjon {n})"
     },
     "linked": {
       "rerun": "Kjør på nytt",

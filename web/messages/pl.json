@@ -303,7 +303,13 @@
         "title": "Nie widziano jeszcze żadnej strony",
         "body": "Pokrycie pojawi się, gdy glot Edge obsłuży strony w tym języku."
       },
-      "pagesSeen": "Widziane strony"
+      "pagesSeen": "Widziane strony",
+      "cap": {
+        "title": "Nowy tekst jest wstrzymywany",
+        "body": "{refused} nowych fragmentów zostało odrzuconych w ciągu ostatnich 24 godzin: osiągnięto dzienny limit wykrywania ({cap}). Czekają, aż zwolni się miejsce, dlatego strony, które ich używają, pozostają nieprzetłumaczone i nie są jeszcze zgłaszane wyszukiwarkom. Tytuły i meta opisy nigdy nie są wstrzymywane.",
+        "raise": "Podnieś limit do {n}",
+        "raised": "Dzienny limit podniesiony do {n}. Wstrzymany tekst zostanie uwzględniony przy następnych wizytach."
+      }
     },
     "segments": {
       "title": "Segmenty",
@@ -847,7 +853,8 @@
     "subtitle": "Zadania tłumaczenia w tle, aktualizowane na żywo. Każdy ciąg jest weryfikowany przed zapisem; koszty pochodzą od Twojego dostawcy LLM.",
     "title": "Zadania",
     "finished": "Tłumaczenie zakończone: {count, plural, one {# ciąg} few {# ciągi} many {# ciągów} other {# ciągów}} przetłumaczono i zweryfikowano",
-    "failed": "Zadanie tłumaczenia nie powiodło się"
+    "failed": "Zadanie tłumaczenia nie powiodło się",
+    "queuePosition": "W kolejce (pozycja {n})"
   },
   "keySheet": {
     "notFound": "Brak pasującego klucza",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Rozmowy",
     "integrations": "Integracje",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Wszystkie projekty",
+    "switchProject": "Przełącz projekt"
   },
   "status": {
     "machine": "Maszynowe",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "Ukończone kroki: {done} z {total}",
-      "announce": "Krok {n} z {total}: {step}"
+      "announce": "Krok {n} z {total}: {step}",
+      "queued": "W kolejce (pozycja {n})"
     },
     "linked": {
       "rerun": "Uruchom ponownie",

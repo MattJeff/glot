@@ -303,7 +303,13 @@
         "title": "No page seen yet",
         "body": "Coverage appears once glot Edge has served pages in this language."
       },
-      "pagesSeen": "Pages seen"
+      "pagesSeen": "Pages seen",
+      "cap": {
+        "title": "New text is being held back",
+        "body": "{refused} new segments were refused in the last 24 hours: the daily discovery limit ({cap}) has been reached. They wait until there is room, so the pages using them stay untranslated and are not advertised to search engines yet. Titles and meta descriptions are never held back.",
+        "raise": "Raise the limit to {n}",
+        "raised": "Daily limit raised to {n}. Held-back text is picked up on the next visits."
+      }
     },
     "segments": {
       "title": "Segments",
@@ -847,7 +853,8 @@
     "subtitle": "Background translation runs, updated live. Each string is validated before it is saved; costs come from your LLM provider.",
     "title": "Jobs",
     "finished": "Translation finished: {count, plural, one {# string} other {# strings}} translated and validated",
-    "failed": "Translation job failed"
+    "failed": "Translation job failed",
+    "queuePosition": "In queue (position {n})"
   },
   "keySheet": {
     "notFound": "No matching key",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Conversations",
     "integrations": "Integrations",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "All projects",
+    "switchProject": "Switch project"
   },
   "status": {
     "machine": "Machine",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} of {total} steps done",
-      "announce": "Step {n} of {total}: {step}"
+      "announce": "Step {n} of {total}: {step}",
+      "queued": "In queue (position {n})"
     },
     "linked": {
       "rerun": "Run again",

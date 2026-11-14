@@ -303,7 +303,13 @@
         "title": "Még nincs megtekintett oldal",
         "body": "A lefedettség akkor jelenik meg, ha a glot Edge már szolgált ki oldalakat ezen a nyelven."
       },
-      "pagesSeen": "Megtekintett oldalak"
+      "pagesSeen": "Megtekintett oldalak",
+      "cap": {
+        "title": "Új szöveg visszatartva",
+        "body": "{refused} új szegmenst utasítottunk el az elmúlt 24 órában, mert elérte a napi felfedezési korlátot ({cap}). Addig várakoznak, amíg lesz hely, ezért a hozzájuk tartozó oldalak lefordítatlanok maradnak, és a keresőmotoroknak még nem jelennek meg. A címeket és a meta-leírásokat soha nem tartjuk vissza.",
+        "raise": "Korlát emelése: {n}",
+        "raised": "A napi korlát {n}-ra emelve. A visszatartott szöveg a következő látogatásoknál kerül feldolgozásra."
+      }
     },
     "segments": {
       "title": "Szegmensek",
@@ -847,7 +853,8 @@
     "subtitle": "Háttérben futó fordítások, élő frissítéssel. Minden szöveg mentés előtt ellenőrzésre kerül; a költségeket az LLM-szolgáltatója adja.",
     "title": "Feladatok",
     "finished": "A fordítás befejeződött: {count, plural, one {# szöveg} other {# szöveg}} lefordítva és ellenőrizve",
-    "failed": "A fordítási feladat sikertelen"
+    "failed": "A fordítási feladat sikertelen",
+    "queuePosition": "Sorban áll (helyezés: {n})"
   },
   "keySheet": {
     "notFound": "Nincs egyező kulcs",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Beszélgetések",
     "integrations": "Integrációk",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Összes projekt",
+    "switchProject": "Projekt váltása"
   },
   "status": {
     "machine": "Gépi",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} / {total} lépés kész",
-      "announce": "{n}. lépés (összesen {total}): {step}"
+      "announce": "{n}. lépés (összesen {total}): {step}",
+      "queued": "Sorban áll (helyezés: {n})"
     },
     "linked": {
       "rerun": "Újrafuttatás",

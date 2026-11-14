@@ -303,7 +303,13 @@
         "title": "Nog geen pagina gezien",
         "body": "Dekking verschijnt zodra glot Edge pagina's in deze taal heeft geserveerd."
       },
-      "pagesSeen": "Bekeken pagina's"
+      "pagesSeen": "Bekeken pagina's",
+      "cap": {
+        "title": "Nieuwe tekst wordt tegengehouden",
+        "body": "{refused} nieuwe segmenten zijn de afgelopen 24 uur geweigerd: de dagelijkse ontdekkingslimiet ({cap}) is bereikt. Ze wachten tot er ruimte is, dus de pagina's die ze gebruiken blijven onvertaald en worden nog niet aangeboden aan zoekmachines. Titels en metabeschrijvingen worden nooit tegengehouden.",
+        "raise": "Limiet verhogen naar {n}",
+        "raised": "Dagelijkse limiet verhoogd naar {n}. Tegengehouden tekst wordt bij de volgende bezoeken opgepikt."
+      }
     },
     "segments": {
       "title": "Segmenten",
@@ -847,7 +853,8 @@
     "subtitle": "Vertaalruns op de achtergrond, live bijgewerkt. Elke string wordt gevalideerd voordat die wordt opgeslagen; kosten komen van je LLM-provider.",
     "title": "Jobs",
     "finished": "Vertaling voltooid: {count, plural, one {# string} other {# strings}} vertaald en gevalideerd",
-    "failed": "Vertaaljob mislukt"
+    "failed": "Vertaaljob mislukt",
+    "queuePosition": "In wachtrij (positie {n})"
   },
   "keySheet": {
     "notFound": "Geen overeenkomende key",
@@ -1854,7 +1861,9 @@
     "github": "GitHub",
     "conversations": "Gesprekken",
     "integrations": "Integraties",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Alle projecten",
+    "switchProject": "Project wisselen"
   },
   "status": {
     "machine": "Machine",
@@ -2886,7 +2895,8 @@
     },
     "job": {
       "progress": "{done} van {total} stappen voltooid",
-      "announce": "Stap {n} van {total}: {step}"
+      "announce": "Stap {n} van {total}: {step}",
+      "queued": "In wachtrij (positie {n})"
     },
     "linked": {
       "rerun": "Opnieuw uitvoeren",
