@@ -431,7 +431,7 @@ test("subdomain strategy (glot Edge hosts)", () => {
   assert.equal(currentLocale("subdomain", at("https://cliponit.app/"), "", "fr", null, e), "fr");
   // Same path on the other Edge host; the source and Edge-less locales go to the origin.
   assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/tools/x?a=1"), "zh-CN", e), "https://zh.cliponit.app/tools/x?a=1");
-  assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/pricing"), "fr", e), "https://cliponit.app/pricing");
+  assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/pricing"), "fr", e), "https://cliponit.app/pricing?lang=fr");
   assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/pricing"), "en", e), "https://cliponit.app/pricing?lang=en");
   assert.equal(targetUrl("subdomain", at("https://cliponit.app/pricing?lang=en"), "ja", e), "https://ja.cliponit.app/pricing");
 });

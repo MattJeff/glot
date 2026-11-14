@@ -63,11 +63,12 @@ export function targetUrl(strategy: string, url: URL, code: string, m: Manifest)
   const loc = m.locales.find((l) => l.code === code);
   const out = loc ? sc(loc) : code; // what the site reads
   if (kind === "subdomain") {
-    // Same path on the locale's Edge host; a locale without one lives on the origin as ?lang= (the source: bare).
+    // Same path on the locale's Edge host. On the origin (the source, or a locale without Edge host) the choice rides
+    // as ?lang=, the source too: the origin cannot read what was saved on another host (localStorage is per origin).
     const origin = m.locales.find((l) => l.code === m.source)?.url;
     const to = new URL(next.pathname + next.search + next.hash, loc?.url ?? origin ?? next.origin);
     to.searchParams.delete("lang");
-    if (!loc?.url && code !== m.source) to.searchParams.set("lang", out);
+    if (!loc?.url || code === m.source) to.searchParams.set("lang", out);
     return to.href;
   }
   if (kind === "query") {
