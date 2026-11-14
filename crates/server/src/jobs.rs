@@ -292,7 +292,21 @@ async fn run(state: AppState, mut job: JobRecord) {
     let github = job.kind.starts_with("github_");
     let edge = job.kind == crate::edge::tm::JOB_KIND;
     let result = if github {
-        crate::github_app::run_job(state, &mut job).await
+        // Every subprocess has its own timeout, but one wedged step must not hold the single worker (and every
+        // other project's queue) forever: a hard ceiling on the whole job.
+        let ceiling = Duration::from_secs(
+            std::env::var("GLOT_GITHUB_JOB_MAX_SECS")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(2700),
+        );
+        match tokio::time::timeout(ceiling, crate::github_app::run_job(state, &mut job)).await {
+            Ok(r) => r,
+            Err(_) => Err(anyhow::anyhow!(
+                "job timed out after {}s",
+                ceiling.as_secs()
+            )),
+        }
     } else if edge {
         crate::edge::tm::run_job(state, &mut job).await
     } else {

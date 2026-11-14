@@ -78,9 +78,10 @@ pub async fn version<'e>(
 
 /// One consistent snapshot (repeatable read: the version and the rows come from the same instant).
 pub async fn snapshot(db: &sqlx::PgPool, p: &ProjectRow, locale: &str) -> sqlx::Result<Tm> {
-    let mut tx = db.begin().await?;
-    sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
-        .execute(&mut *tx)
+    // Isolation in the BEGIN itself: a separate SET TRANSACTION fails ("must be called before any query")
+    // whenever the pooled connection already ran a statement in the transaction.
+    let mut tx = db
+        .begin_with("BEGIN ISOLATION LEVEL REPEATABLE READ, READ ONLY")
         .await?;
     let v = version(&mut *tx, p.id, locale).await?;
     let catalog: Vec<(String, String)> = sqlx::query_as(
