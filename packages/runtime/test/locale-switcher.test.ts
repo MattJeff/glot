@@ -410,3 +410,28 @@ if (/^[a-z]{2,3}$/.test(l) && l === "zh") { document.documentElement.lang = l; h
     server.close();
   }
 });
+
+test("subdomain strategy (glot Edge hosts)", () => {
+  const e: Manifest = {
+    source: "fr",
+    updated_at: null,
+    locales: [
+      { code: "fr", name: "Français", dir: "ltr", coverage: 1, url: "https://cliponit.app" },
+      { code: "en", name: "English", dir: "ltr", coverage: 1 },
+      { code: "ja", name: "日本語", dir: "ltr", coverage: 1, url: "https://ja.cliponit.app" },
+      { code: "zh-CN", name: "中文", dir: "ltr", coverage: 1, url: "https://zh.cliponit.app" },
+    ],
+  };
+  const at = (s: string) => new URL(s);
+  const ec = e.locales.map((l) => l.code);
+  assert.equal(resolveStrategy("auto", at("https://ja.cliponit.app/pricing"), ec, e), "subdomain");
+  assert.equal(resolveStrategy("auto", at("https://cliponit.app/pricing?lang=en"), ec, e), "subdomain");
+  assert.equal(currentLocale("subdomain", at("https://ja.cliponit.app/pricing"), "", "fr", null, e), "ja");
+  assert.equal(currentLocale("subdomain", at("https://cliponit.app/?lang=en"), "", "fr", null, e), "en");
+  assert.equal(currentLocale("subdomain", at("https://cliponit.app/"), "", "fr", null, e), "fr");
+  // Same path on the other Edge host; the source and Edge-less locales go to the origin.
+  assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/tools/x?a=1"), "zh-CN", e), "https://zh.cliponit.app/tools/x?a=1");
+  assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/pricing"), "fr", e), "https://cliponit.app/pricing");
+  assert.equal(targetUrl("subdomain", at("https://ja.cliponit.app/pricing"), "en", e), "https://cliponit.app/pricing?lang=en");
+  assert.equal(targetUrl("subdomain", at("https://cliponit.app/pricing?lang=en"), "ja", e), "https://ja.cliponit.app/pricing");
+});

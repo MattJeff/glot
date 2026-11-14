@@ -340,6 +340,25 @@ pub async fn locales(
             l["site_code"] = json!(s);
         }
     }
+    // `url`: where a locale is served by glot Edge on its own subdomain (and the origin for the source), so a
+    // switcher on es.example.com goes to de.example.com instead of adding ?lang= to a host that ignores it.
+    let edge: Vec<(String, String, String)> = sqlx::query_as(
+        "SELECT locale, host, origin_url FROM edge_domains
+         WHERE project_id = $1 AND mode = 'subdomain' AND verified_at IS NOT NULL AND enabled ORDER BY created_at",
+    )
+    .bind(p.id)
+    .fetch_all(&state.db)
+    .await?;
+    if let Some((_, _, origin)) = edge.first() {
+        for l in &mut list {
+            let code = l["code"].as_str().unwrap_or_default().to_string();
+            if code == p.source_locale {
+                l["url"] = json!(origin.trim_end_matches('/'));
+            } else if let Some((_, host, _)) = edge.iter().find(|(loc, _, _)| *loc == code) {
+                l["url"] = json!(format!("https://{host}"));
+            }
+        }
+    }
     let updated_at = updated_at
         .into_iter()
         .chain(edge_updated)

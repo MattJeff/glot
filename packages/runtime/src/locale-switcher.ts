@@ -4,7 +4,8 @@
 // Built as an IIFE (web/public/widget/locale-switcher.global.js); the pure helpers are exported for tests.
 
 /** `site_code`: the code the site itself uses for the locale, when it differs from glot's (`zh` for `zh-CN`). */
-export type Loc = { code: string; name: string; dir: "ltr" | "rtl"; coverage: number; site_code?: string };
+/** `url`: where the locale is served by glot Edge on its own subdomain (the origin for the source). */
+export type Loc = { code: string; name: string; dir: "ltr" | "rtl"; coverage: number; site_code?: string; url?: string };
 export type Manifest = { source: string; locales: Loc[]; updated_at: string | null };
 type Json = { [k: string]: unknown };
 
@@ -23,9 +24,19 @@ const sc = (l: Loc) => l.site_code ?? l.code;
 const named = (tag: string | null | undefined, m: Manifest) =>
   (tag && m.locales.find((l) => sc(l).toLowerCase() === tag.toLowerCase())?.code) || match(tag, m.locales.map((l) => l.code));
 
-/** `auto` resolves to `query:lang` when the URL has `?lang=`, `prefix` when the path starts with a locale, else `event`. */
-export function resolveStrategy(strategy: string, url: URL, codes: string[]): string {
+const hostOf = (u?: string) => {
+  try {
+    return u ? new URL(u).host : "";
+  } catch {
+    return "";
+  }
+};
+
+/** `auto` resolves to `subdomain` when the page is on one of the project's glot Edge hosts (or their origin), `query:lang`
+ * when the URL has `?lang=`, `prefix` when the path starts with a locale, else `event`. */
+export function resolveStrategy(strategy: string, url: URL, codes: string[], m?: Manifest): string {
   if (strategy && strategy !== "auto") return strategy;
+  if (m?.locales.some((l) => l.url && hostOf(l.url) === url.host)) return "subdomain";
   if (url.searchParams.has("lang")) return "query:lang";
   if (codes.includes(url.pathname.split("/")[1])) return "prefix";
   return "event";
@@ -37,19 +48,28 @@ export function currentLocale(strategy: string, url: URL, cookie: string, htmlLa
   const [kind, name = "lang"] = strategy.split(":");
   let found: string | undefined;
   const seg = url.pathname.split("/")[1];
-  if (kind === "query") found = named(url.searchParams.get(name), m);
+  if (kind === "subdomain") found = m.locales.find((l) => l.url && l.code !== m.source && hostOf(l.url) === url.host)?.code ?? named(url.searchParams.get("lang"), m);
+  else if (kind === "query") found = named(url.searchParams.get(name), m);
   else if (kind === "prefix") found = m.locales.find((l) => sc(l) === seg || l.code === seg)?.code ?? m.source;
   else if (kind === "cookie") found = named(new URLSearchParams(cookie.replace(/;\s*/g, "&")).get(name), m);
   else found = match(saved, codes); // event: the app may cancel the change, the saved choice is what the user picked
   return found ?? match(htmlLang, codes) ?? match(saved, codes) ?? m.source;
 }
 
-/** Where to go for `code` under a navigating strategy (`query:*`, `prefix`, `prefix:always`); null otherwise. */
+/** Where to go for `code` under a navigating strategy (`query:*`, `prefix`, `prefix:always`, `subdomain`); null otherwise. */
 export function targetUrl(strategy: string, url: URL, code: string, m: Manifest): string | null {
   const [kind, opt = "lang"] = strategy.split(":");
   const next = new URL(url.href);
   const loc = m.locales.find((l) => l.code === code);
   const out = loc ? sc(loc) : code; // what the site reads
+  if (kind === "subdomain") {
+    // Same path on the locale's Edge host; a locale without one lives on the origin as ?lang= (the source: bare).
+    const origin = m.locales.find((l) => l.code === m.source)?.url;
+    const to = new URL(next.pathname + next.search + next.hash, loc?.url ?? origin ?? next.origin);
+    to.searchParams.delete("lang");
+    if (!loc?.url && code !== m.source) to.searchParams.set("lang", out);
+    return to.href;
+  }
   if (kind === "query") {
     next.searchParams.set(opt, out);
     return next.href;
@@ -283,7 +303,7 @@ if (typeof customElements !== "undefined" && !customElements.get("glot-locale-sw
       const m = this.#m!;
       const url = new URL(location.href);
       const codes = m.locales.map((l) => l.code);
-      this.#strategy = resolveStrategy(this.getAttribute("strategy") ?? "auto", url, [...codes, ...m.locales.map(sc)]);
+      this.#strategy = resolveStrategy(this.getAttribute("strategy") ?? "auto", url, [...codes, ...m.locales.map(sc)], m);
       liveCheck(m, this.getAttribute("project") ?? defaults.project, base(this.getAttribute("cdn") ?? ""));
       let saved: string | null = null;
       try {

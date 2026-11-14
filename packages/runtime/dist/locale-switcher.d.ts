@@ -1,10 +1,12 @@
 /** `site_code`: the code the site itself uses for the locale, when it differs from glot's (`zh` for `zh-CN`). */
+/** `url`: where the locale is served by glot Edge on its own subdomain (the origin for the source). */
 export type Loc = {
     code: string;
     name: string;
     dir: "ltr" | "rtl";
     coverage: number;
     site_code?: string;
+    url?: string;
 };
 export type Manifest = {
     source: string;
@@ -16,11 +18,12 @@ type Json = {
 };
 /** Picks the manifest locale matching `tag` exactly, else by base language (`fr-CA` → `fr`). */
 export declare function match(tag: string | null | undefined, codes: string[]): string | undefined;
-/** `auto` resolves to `query:lang` when the URL has `?lang=`, `prefix` when the path starts with a locale, else `event`. */
-export declare function resolveStrategy(strategy: string, url: URL, codes: string[]): string;
+/** `auto` resolves to `subdomain` when the page is on one of the project's glot Edge hosts (or their origin), `query:lang`
+ * when the URL has `?lang=`, `prefix` when the path starts with a locale, else `event`. */
+export declare function resolveStrategy(strategy: string, url: URL, codes: string[], m?: Manifest): string;
 /** The locale the page is in, per strategy (`event`: the saved choice); falls back to <html lang>, the saved choice, the source. */
 export declare function currentLocale(strategy: string, url: URL, cookie: string, htmlLang: string, saved: string | null, m: Manifest): string;
-/** Where to go for `code` under a navigating strategy (`query:*`, `prefix`, `prefix:always`); null otherwise. */
+/** Where to go for `code` under a navigating strategy (`query:*`, `prefix`, `prefix:always`, `subdomain`); null otherwise. */
 export declare function targetUrl(strategy: string, url: URL, code: string, m: Manifest): string | null;
 /** The flag for a locale ("" = none, show the code badge). `over` keys are lowercase codes; values an emoji or a region (`us`). */
 export declare function flagFor(code: string, over?: Record<string, string>): string;

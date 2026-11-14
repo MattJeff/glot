@@ -283,6 +283,33 @@ async fn edge_seo() {
         .find(|l| l["code"] == "es")
         .cloned();
     assert_eq!(es.map(|l| l["ready"].clone()), Some(json!(false)), "{m}");
+    // A locale on its own Edge subdomain carries its URL, the source the origin's (the switcher navigates there).
+    let sub = uuid::Uuid::new_v4();
+    sqlx::query("INSERT INTO edge_domains (id, project_id, host, mode, locale, origin_url, verify_token, verified_at)
+                 VALUES ($1, $2, 'de.clip.test', 'subdomain', 'de', 'https://clip.test/', 't', now())")
+        .bind(sub).bind(pid).execute(&pool).await.unwrap();
+    let (_, _, m) = call(Method::GET, "/cdn/clip/locales.json?all=1", None, None).await;
+    let m = j(&m);
+    let url = |c: &str| {
+        m["locales"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|l| l["code"] == c)
+            .map(|l| l["url"].clone())
+    };
+    assert_eq!(url("de"), Some(json!("https://de.clip.test")), "{m}");
+    assert_eq!(url("fr"), Some(json!("https://clip.test")), "{m}");
+    assert_eq!(
+        url("es"),
+        Some(json!(null)),
+        "subdirectory domains have no url: {m}"
+    );
+    sqlx::query("DELETE FROM edge_domains WHERE id = $1")
+        .bind(sub)
+        .execute(&pool)
+        .await
+        .unwrap();
 
     // Coverage API: the page and its missing segment, clickable by hash/context/text.
     let (s, _, cov) = call(
