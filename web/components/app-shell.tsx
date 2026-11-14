@@ -501,6 +501,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const slug = useSlug();
   const pathname = usePathname();
   const [noteDismissed, dismissNote] = useNoteDismissed();
+  // The "experimental" note is about self-hosting: glot cloud (billing configured) never shows it.
+  const cloud = useQuery({ queryKey: ["billing-plans"], queryFn: api.billingPlans, staleTime: 5 * 60_000 }).data?.enabled;
   const fullBleed = FULL_BLEED.test(pathname);
   const locale = useLocale();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -569,7 +571,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main id="main" tabIndex={-1} className="min-w-0 flex-1 px-4 py-6 outline-none sm:px-6 lg:px-8">
-          {!fullBleed && !noteDismissed && (
+          {!fullBleed && !noteDismissed && cloud === false && (
             <div
               role="note"
               className="mb-6 flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 py-1.5 ps-3 pe-1.5 text-xs text-warning-foreground"

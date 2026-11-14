@@ -214,6 +214,33 @@ pub struct SignupBody {
     /// Honeypot: hidden in the form, only bots fill it.
     #[serde(default)]
     website: String,
+    /// `utm_*` of the ad or link that brought the visitor (see `acquisition`).
+    #[serde(default)]
+    utm: std::collections::HashMap<String, String>,
+}
+
+/// Campaign attribution kept on the account: the five utm keys, short values only (never click ids).
+pub fn acquisition(utm: &std::collections::HashMap<String, String>) -> Option<serde_json::Value> {
+    const KEYS: [&str; 5] = [
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_term",
+        "utm_content",
+    ];
+    let kept: serde_json::Map<String, serde_json::Value> = KEYS
+        .iter()
+        .filter_map(|k| {
+            let v = utm.get(*k)?.trim();
+            (!v.is_empty()).then(|| {
+                (
+                    k.to_string(),
+                    serde_json::Value::String(v.chars().take(100).collect()),
+                )
+            })
+        })
+        .collect();
+    (!kept.is_empty()).then(|| serde_json::Value::Object(kept))
 }
 
 /// Signups per client IP: per hour, per day.
@@ -360,7 +387,7 @@ pub async fn signup(
         .filter(|l| crate::email::supported_locale(l))
         .unwrap_or_else(|| "en".into());
     let user = sqlx::query_as::<_, User>(
-        "INSERT INTO users (id, email, name, password_hash, locale, signup_ip) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, email, name",
+        "INSERT INTO users (id, email, name, password_hash, locale, signup_ip, acquisition) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, email, name",
     )
     .bind(Uuid::new_v4())
     .bind(&email)
@@ -368,6 +395,7 @@ pub async fn signup(
     .bind(hash)
     .bind(&locale)
     .bind(&ip)
+    .bind(acquisition(&b.utm))
     .fetch_one(&state.db)
     .await
     .map_err(email_taken)?;
@@ -1084,4 +1112,44 @@ mod tests {
         h.insert("x-forwarded-for", "6.6.6.6, 203.0.113.9".parse().unwrap());
         assert_eq!(super::client_ip(&h).as_deref(), Some("203.0.113.9"));
     }
+}
+
+/// `GET /api/admin/acquisition?days=30` (instance admins): signups per utm source / medium / campaign / term, with how
+/// many confirmed their email and how many pay. What a Google Ads campaign actually brought.
+pub async fn acquisition_report(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    crate::AppQuery(q): crate::AppQuery<std::collections::HashMap<String, String>>,
+) -> ApiResult<Json<serde_json::Value>> {
+    if !is_admin_email(&user.email) {
+        return Err(AppError::new(
+            StatusCode::FORBIDDEN,
+            "forbidden",
+            "instance admins only",
+        ));
+    }
+    let days: i32 = q
+        .get("days")
+        .and_then(|d| d.parse().ok())
+        .unwrap_or(30)
+        .clamp(1, 365);
+    let rows: Vec<(Option<String>, Option<String>, Option<String>, Option<String>, i64, i64, i64)> = sqlx::query_as(
+        "SELECT u.acquisition->>'utm_source', u.acquisition->>'utm_medium', u.acquisition->>'utm_campaign',
+                u.acquisition->>'utm_term', count(*), count(*) FILTER (WHERE u.email_verified_at IS NOT NULL),
+                count(*) FILTER (WHERE coalesce(b.plan, 'free') <> 'free' AND coalesce(b.status, '') IN ('active', 'trialing'))
+         FROM users u LEFT JOIN billing_accounts b ON b.user_id = u.id
+         WHERE u.created_at > now() - make_interval(days => $1)
+         GROUP BY 1, 2, 3, 4 ORDER BY 5 DESC LIMIT 500",
+    )
+    .bind(days)
+    .fetch_all(&state.db)
+    .await?;
+    let rows: Vec<_> = rows
+        .into_iter()
+        .map(|(source, medium, campaign, term, signups, verified, paying)| {
+            serde_json::json!({"source": source, "medium": medium, "campaign": campaign, "term": term,
+                               "signups": signups, "verified": verified, "paying": paying})
+        })
+        .collect();
+    Ok(Json(serde_json::json!({ "days": days, "rows": rows })))
 }

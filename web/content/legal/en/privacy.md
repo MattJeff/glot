@@ -8,7 +8,7 @@ KAIROS (SAS, SIREN 887 948 818, Placette Jean-Sébastien Bach, 35135 Chantepie, 
 
 | Data | Purpose | Legal basis | Retention |
 |---|---|---|---|
-| Account: email, name, password (hashed), language | Create and secure your account | Contract | Until the account is deleted |
+| Account: email, name, password (hashed), language, signup IP address (abuse prevention), signup source (utm parameters of an ad or link) | Create and secure your account | Contract | Until the account is deleted |
 | Billing: name, address, VAT number, payment history | Invoice paid plans (payments handled by Stripe, we never see your card) | Contract, legal obligation | 10 years (accounting law) |
 | Project content: texts to translate, catalogs, glossaries | Provide the service (translation, checks, sync) | Contract | Until the project is deleted |
 | Technical logs (IP address, requests) | Security, abuse prevention, diagnostics | Legitimate interest | Short: deleted automatically by log rotation (days to a few weeks) |

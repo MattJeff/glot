@@ -905,7 +905,7 @@ export type PlansInfo = { enabled: boolean; plans: Partial<Record<PlanId, Limits
 
 export const api = {
   /** `website` is the form's honeypot (hidden; a filled one is refused). */
-  signup: (b: { email: string; password: string; name: string; locale?: string; website?: string }) =>
+  signup: (b: { email: string; password: string; name: string; locale?: string; website?: string; utm?: Record<string, string> }) =>
     request<User>("POST", "/api/auth/signup", b),
   login: (b: { email: string; password: string }) => request<User>("POST", "/api/auth/login", b),
   logout: () => request<void>("POST", "/api/auth/logout"),

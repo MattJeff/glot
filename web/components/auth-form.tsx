@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { api, ApiError, qk } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { readUtm } from "@/components/utm-carry";
 
 // Greetings around the mascot: the product's sample copy, decorative (aria-hidden), not UI text.
 const HELLO = [["en", "Hello!", "top-[14%] start-[8%]"], ["fr", "Bonjour !", "top-[10%] end-[10%]"], ["ja", "こんにちは！", "bottom-[26%] end-[6%]"], ["es", "¡Hola!", "bottom-[20%] start-[10%]"]] as const;
@@ -61,7 +62,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   const mutation = useMutation({
     mutationFn: (f: { name: string; email: string; password: string; website: string }) =>
-      mode === "login" ? api.login(f) : api.signup({ ...f, locale }),
+      mode === "login" ? api.login(f) : api.signup({ ...f, locale, utm: readUtm() }),
     onSuccess: async (user) => {
       qc.setQueryData(qk.me, user);
       const next = params.get("next");

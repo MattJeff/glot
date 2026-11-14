@@ -156,6 +156,7 @@ pub fn router(state: AppState, web_origin: &str) -> Router {
         .route(&format!("{p}/review"), post(review::review_many))
         .route(&format!("{p}/keys/{{key}}/review"), get(review::review_one))
         .route("/api/openapi.json", get(openapi::spec))
+        .route("/api/admin/acquisition", get(auth::acquisition_report))
         .merge(visual::routes())
         .merge(insights::routes())
         .merge(autopilot::routes())

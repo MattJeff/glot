@@ -4943,5 +4943,21 @@
     "legal": "Mentions légales",
     "privacy": "Confidentialité",
     "terms": "Conditions"
+  },
+  "adminAcquisition": {
+    "title": "Acquisition",
+    "subtitle": "Inscriptions par campagne (paramètres utm), avec les e-mails confirmés et les comptes payants.",
+    "period": "Période",
+    "days": "{n} jours",
+    "direct": "Direct / inconnu",
+    "cols": {
+      "source": "Source",
+      "medium": "Support",
+      "campaign": "Campagne",
+      "term": "Mot clé",
+      "signups": "Inscriptions",
+      "verified": "Confirmés",
+      "paying": "Payants"
+    }
   }
 }

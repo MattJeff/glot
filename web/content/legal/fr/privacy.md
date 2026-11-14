@@ -8,7 +8,7 @@ KAIROS (SAS, SIREN 887 948 818, Placette Jean-Sébastien Bach, 35135 Chantepie, 
 
 | Données | Usage | Base légale | Conservation |
 |---|---|---|---|
-| Compte : e-mail, nom, mot de passe (haché), langue | Créer et sécuriser votre compte | Exécution du contrat | Jusqu'à la suppression du compte |
+| Compte : e-mail, nom, mot de passe (haché), langue, adresse IP d'inscription (anti-abus), provenance de l'inscription (paramètres utm d'une annonce ou d'un lien) | Créer et sécuriser votre compte | Exécution du contrat | Jusqu'à la suppression du compte |
 | Facturation : nom, adresse, n° de TVA, historique des paiements | Facturer les offres payantes (paiement traité par Stripe, nous ne voyons jamais votre carte) | Contrat, obligation légale | 10 ans (obligation comptable) |
 | Contenus de vos projets : textes à traduire, catalogues, glossaires | Fournir le service (traduction, vérification, synchronisation) | Exécution du contrat | Jusqu'à la suppression du projet |
 | Journaux techniques (adresse IP, requêtes) | Sécurité, prévention des abus, diagnostic | Intérêt légitime | Courte durée : supprimés automatiquement par rotation (quelques jours à quelques semaines) |

@@ -802,3 +802,70 @@ async fn framer_plugin_routes() {
     assert_eq!(r["catalogs"]["en"]["framer:page:p1:s1"], "Hello");
     ctx.finish().await;
 }
+
+#[tokio::test]
+async fn signup_keeps_campaign_attribution() {
+    let Some(ctx) = setup().await else { return };
+    let (s, h, _) = ctx
+        .call(
+            Method::POST,
+            "/api/auth/signup",
+            None,
+            Some(json!({"email": "ads@example.com", "password": "correct horse", "name": "Ada",
+                        "utm": {"utm_source": "google", "utm_campaign": "i18n-fr", "utm_term": "next.js i18n", "gclid": "CLICKID", "x": "y"}})),
+        )
+        .await;
+    assert_eq!(s, StatusCode::CREATED);
+    let acq: Value =
+        sqlx::query_scalar("SELECT acquisition FROM users WHERE email = 'ads@example.com'")
+            .fetch_one(&ctx.pool)
+            .await
+            .unwrap();
+    // Only the utm keys are kept: no click id, nothing else.
+    assert_eq!(
+        acq,
+        json!({"utm_source": "google", "utm_campaign": "i18n-fr", "utm_term": "next.js i18n"})
+    );
+    let cookie = h
+        .get(header::SET_COOKIE)
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .split(';')
+        .next()
+        .unwrap()
+        .trim_start_matches("glot_session=")
+        .to_string();
+    // The report is for instance admins only.
+    let (s, _, _) = ctx
+        .call(Method::GET, "/api/admin/acquisition", Some(&cookie), None)
+        .await;
+    assert_eq!(s, StatusCode::FORBIDDEN);
+    // SAFETY: only this test reads GLOT_ADMIN_EMAILS for this address.
+    unsafe { std::env::set_var("GLOT_ADMIN_EMAILS", "boss@example.com") };
+    let boss = ctx.signup("boss@example.com").await;
+    let (s, _, r) = ctx
+        .call(
+            Method::GET,
+            "/api/admin/acquisition?days=7",
+            Some(&boss),
+            None,
+        )
+        .await;
+    assert_eq!(s, StatusCode::OK, "{r}");
+    let google = r["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|x| x["source"] == "google")
+        .unwrap();
+    assert_eq!(
+        (
+            google["campaign"].clone(),
+            google["signups"].clone(),
+            google["paying"].clone()
+        ),
+        (json!("i18n-fr"), json!(1), json!(0))
+    );
+    ctx.finish().await;
+}

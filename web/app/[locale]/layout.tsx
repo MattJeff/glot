@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Providers } from "@/components/providers";
+import { UtmCarry } from "@/components/utm-carry";
 import { routing, RTL_LOCALES } from "@/i18n/routing";
 import "../globals.css";
 
@@ -46,6 +47,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <body className="min-h-full">
         <NextIntlClientProvider>
           <Providers>{children}</Providers>
+          <UtmCarry app={GLOT_CLOUD} />
         </NextIntlClientProvider>
         {/* glot in glot (cloud project "lot"). Insights: cookieless daily counters per language, the signup goal
             feeds Autopilot. Review: ~1 kB loader, inert unless the tab holds a review link. */}
