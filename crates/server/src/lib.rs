@@ -397,25 +397,6 @@ pub fn validate_key(k: &str) -> ApiResult<()> {
     }
 }
 
-#[cfg(test)]
-mod key_validation_tests {
-    #[test]
-    fn natural_language_and_dotted_keys() {
-        for k in [
-            "home.title",
-            " countries open",
-            "Loading...",
-            "1/2 done",
-            "Think your friend\u{2019}s passport?",
-        ] {
-            assert!(super::validate_key(k).is_ok(), "{k:?}");
-        }
-        for k in ["", "bad\u{0}key", "line\nbreak"] {
-            assert!(super::validate_key(k).is_err(), "{k:?}");
-        }
-    }
-}
-
 /// Server pool settings. A request cancelled while sqlx sends BEGIN (client gone, timeout) returns its
 /// connection with the transaction still open (sqlx only rolls back once its depth counter moved); the next user
 /// then fails ("SET TRANSACTION must be called before any query", "SELECT FOR UPDATE in a read-only
@@ -437,4 +418,23 @@ pub fn pg_pool_options() -> sqlx::postgres::PgPoolOptions {
                 Ok(!leaked)
             })
         })
+}
+
+#[cfg(test)]
+mod key_validation_tests {
+    #[test]
+    fn natural_language_and_dotted_keys() {
+        for k in [
+            "home.title",
+            " countries open",
+            "Loading...",
+            "1/2 done",
+            "Think your friend\u{2019}s passport?",
+        ] {
+            assert!(super::validate_key(k).is_ok(), "{k:?}");
+        }
+        for k in ["", "bad\u{0}key", "line\nbreak"] {
+            assert!(super::validate_key(k).is_err(), "{k:?}");
+        }
+    }
 }
