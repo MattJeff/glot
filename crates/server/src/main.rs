@@ -26,8 +26,7 @@ async fn main() -> anyhow::Result<()> {
         "glot-insecure-dev-secret".into()
     });
 
-    let db = sqlx::postgres::PgPoolOptions::new()
-        .max_connections(20)
+    let db = glot_server::pg_pool_options()
         .connect(&database_url)
         .await?;
     MIGRATOR.run(&db).await?;

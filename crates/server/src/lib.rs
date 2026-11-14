@@ -415,3 +415,26 @@ mod key_validation_tests {
         }
     }
 }
+
+/// Server pool settings. A request cancelled while sqlx sends BEGIN (client gone, timeout) returns its
+/// connection with the transaction still open (sqlx only rolls back once its depth counter moved); the next user
+/// then fails ("SET TRANSACTION must be called before any query", "SELECT FOR UPDATE in a read-only
+/// transaction", seen in prod 2026-11-14). Inside a transaction now() is frozen at its start while
+/// statement_timestamp() moves: such connections are dropped instead of reused.
+pub fn pg_pool_options() -> sqlx::postgres::PgPoolOptions {
+    sqlx::postgres::PgPoolOptions::new()
+        .max_connections(20)
+        .after_release(|conn, _| {
+            Box::pin(async move {
+                use sqlx::{Executor, Row};
+                // Simple protocol: an implicit transaction starts with the statement, so outside a transaction
+                // the two timestamps are equal (the extended protocol can set them microseconds apart).
+                let leaked = conn
+                    .fetch_one(sqlx::raw_sql("SELECT now() <> statement_timestamp()"))
+                    .await
+                    .map(|r| r.get::<bool, _>(0))
+                    .unwrap_or(true);
+                Ok(!leaked)
+            })
+        })
+}
