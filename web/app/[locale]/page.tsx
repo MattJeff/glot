@@ -1,34 +1,10 @@
-import {
-  ArrowRight,
-  BookOpenText,
-  Bot,
-  Check,
-  Compass,
-  EyeOff,
-  FileClock,
-  Globe,
-  Link2,
-  type LucideIcon,
-  Mail,
-  MapPin,
-  MousePointerClick,
-  Plug,
-  RefreshCw,
-  Rocket,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Unlock,
-  Wand2,
-  Zap,
-  X,
-} from "lucide-react";
+import { ArrowRight, Check, X } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
 import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { ACCENTS } from "@/components/landing-accents";
+import { Art } from "@/components/landing-art";
 import { WowShowcase } from "@/components/wow-showcase";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -64,24 +40,24 @@ function HelloMarquee() {
 
 // Every feature, in plain words (the technical detail lives in /docs), ranked by what it does for glot:
 // wow (shown live in the showcase), what sets it apart, what spreads it. Item keys under home.features.
-type Group = { id: "diff" | "viral"; anchor: string; acc: string; items: [string, LucideIcon][] };
+type Group = { id: "diff" | "viral"; anchor: string; acc: string; items: [string, string][] };
 const DIFF: Group = {
   id: "diff",
   anchor: "different",
   acc: "acc-violet",
-  items: [["app.safe", ShieldCheck], ["web.local", MapPin], ["grow.next", Compass], ["web.google", Search], ["app.brand", BookOpenText], ["beyond.emails", Mail], ["beyond.once", Link2], ["web.shop", ShoppingBag], ["web.longtail", Globe], ["grow.private", EyeOff], ["trust.proof", FileClock]],
+  items: [["app.safe", "shield"], ["web.local", "pin"], ["grow.next", "compass"], ["web.google", "search"], ["app.brand", "book"], ["beyond.emails", "mail"], ["beyond.once", "link"], ["web.shop", "bag"], ["web.longtail", "globe"], ["grow.private", "eyeoff"], ["trust.proof", "fileclock"]],
 };
 const VIRAL: Group = {
   id: "viral",
   anchor: "together",
   acc: "acc-cyan",
-  items: [["web.tag", Wand2], ["app.onpage", MousePointerClick], ["app.fresh", RefreshCw], ["app.agents", Bot], ["trust.open", Unlock]],
+  items: [["web.tag", "wand"], ["app.onpage", "pointer"], ["app.fresh", "refresh"], ["app.agents", "bot"], ["trust.open", "unlock"]],
 };
 const WOW = [["minutes", "app"], ["ai", "beyond"], ["mobile", "beyond"], ["support", "beyond"], ["words", "grow"], ["live", "web"]] as const;
 type Key = Parameters<T>[0];
 
 // Under the hero: five promises, worded as the features they come from.
-const TRUST = [["trust.open", Unlock, "acc-green"], ["app.safe", ShieldCheck, "acc-violet"], ["web.google", Search, "acc-cyan"], ["grow.private", EyeOff, "acc-amber"], ["app.minutes", Zap, "acc-coral"]] as const;
+const TRUST = [["trust.open", "unlock", "acc-green"], ["app.safe", "shield", "acc-violet"], ["web.google", "search", "acc-cyan"], ["grow.private", "eyeoff", "acc-amber"], ["app.minutes", "zap", "acc-coral"]] as const;
 
 // Greetings orbiting the globe: the product's sample copy in each language, not UI text.
 const ORBIT = [
@@ -114,13 +90,15 @@ function Globe3() {
       <img src="/landing/globe.webp" alt="" width={880} height={880} fetchPriority="high" decoding="async" className="glow-img globe-float size-full" />
       {ORBIT.map(([code, hi, pos, acc], i) => (
         <span key={code} className={`${acc} chip-float glass absolute ${pos} flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold`} style={{ animationDelay: `${i * -0.9}s` }}>
-          <span className="tile rounded-md px-1.5 font-mono text-[10px]">{code}</span>
+          {/* Flags generated with Higgsfield (gpt_image_2_6), cropped to 96 px WebP. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`/landing/flags/${code.toLowerCase()}.webp`} alt="" width={24} height={24} className="size-6 rounded-full shadow-sm" />
           {hi}
         </span>
       ))}
       <div className="acc-amber glass absolute start-1/2 bottom-[4%] w-[78%] -translate-x-1/2 rounded-2xl p-4 text-start">
         <div className="flex items-center justify-between">
-          <span className="hello acc-ink inline-flex items-center gap-1.5 !py-0.5 text-xs font-semibold"><Sparkles className="size-3.5" /> AI</span>
+          <span className="hello acc-ink inline-flex items-center gap-1.5 !py-0.5 text-xs font-semibold"><Art n="sparkles" className="size-4" /> AI</span>
           <span className="acc-green tile size-6 rounded-full"><Check className="size-3.5" /></span>
         </div>
         <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm">
@@ -147,9 +125,7 @@ function FeatureGroup({ g, t, wash, extra }: { g: Group; t: T; wash?: boolean; e
           {g.items.map(([id, Icon], i) => (
             // ponytail: 5 or 11 cards fill a 3-column grid when the first one spans two.
             <li key={id} className={`reveal card-acc flex flex-col ${g.items.length % 3 === 2 && i === 0 ? "lg:col-span-2" : ""} rounded-xl border bg-card p-5 shadow-xs ${ACCENTS[(ACCENTS.indexOf(g.acc as (typeof ACCENTS)[number]) + i) % ACCENTS.length]}`} style={{ animationDelay: `${(i % 3) * 60}ms` }}>
-              <span className="tile size-10">
-                <Icon aria-hidden className="size-5" />
-              </span>
+              <Art n={Icon} className="size-14 -ms-1" />
               <h3 className="mt-4 font-semibold">{t(k(`${id}.title`))}</h3>
               {i === 0 && extra}
               <p className="mt-3 flex gap-2 text-sm leading-relaxed text-muted-foreground">
@@ -287,7 +263,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <ul className="reveal glass grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:rounded-full rtl:lg:divide-x-reverse">
               {TRUST.map(([key, Icon, acc]) => (
                 <li key={key} className={`${acc} flex items-center gap-3 px-5 py-4`}>
-                  <Icon aria-hidden className="acc-ink size-7 shrink-0" strokeWidth={1.6} />
+                  <Art n={Icon} className="size-10 shrink-0" />
                   <span className="text-sm leading-snug font-medium">{t(`features.${key}.title` as Key)}</span>
                 </li>
               ))}
@@ -323,10 +299,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 <path className="how-flow" d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
               </svg>
               <ol className="relative grid gap-10 md:grid-cols-3">
-                {([["pick", Plug, "acc-cyan"], ["write", Sparkles, "acc-violet"], ["ship", Rocket, "acc-green"]] as const).map(([k, Icon, acc], i) => (
+                {([["pick", "plug", "acc-cyan"], ["write", "sparkles", "acc-violet"], ["ship", "rocket", "acc-green"]] as const).map(([k, Icon, acc], i) => (
                   <li key={k} className={`reveal ${acc} flex flex-col items-center text-center`} style={{ animationDelay: `${i * 100}ms` }}>
-                    <span className="how-node tile size-16 rounded-full bg-card">
-                      <Icon aria-hidden className="size-6" />
+                    <span className="how-node tile size-20 rounded-full bg-card">
+                      <Art n={Icon} className="size-16" />
                     </span>
                     <h3 className="mt-5 text-lg font-semibold">
                       <span className="acc-ink tabular-nums">{i + 1}.</span> {t(`how.${k}.title`)}

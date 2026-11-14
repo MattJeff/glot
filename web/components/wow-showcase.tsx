@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, GitPullRequest, Globe, MessageSquare, Smartphone, Sparkles, Trophy, X } from "lucide-react";
+import { Check, GitPullRequest, Sparkles, X } from "lucide-react";
+import { Art } from "@/components/landing-art";
 import { type ReactNode, useEffect, useState, useSyncExternalStore } from "react";
 import { WinnerBoard } from "@/components/landing-visuals";
 
@@ -10,7 +11,7 @@ import { WinnerBoard } from "@/components/landing-visuals";
 
 export type WowItem = { id: "minutes" | "ai" | "mobile" | "support" | "words" | "live"; title: string; gain: string };
 
-const ICON = { minutes: GitPullRequest, ai: Sparkles, mobile: Smartphone, support: MessageSquare, words: Trophy, live: Globe };
+const ICON = { minutes: "pr", ai: "sparkles", mobile: "phone", support: "chat", words: "trophy", live: "globe" };
 const ACC = { minutes: "acc-green", ai: "acc-violet", mobile: "acc-coral", support: "acc-cyan", words: "acc-amber", live: "acc-pink" };
 const DWELL = 8000;
 
@@ -230,9 +231,7 @@ export function WowShowcase({ items, label }: { items: WowItem[]; label: string 
               className={`${ACC[it.id]} relative shrink-0 overflow-hidden rounded-xl border p-3 text-start transition-colors duration-200 lg:p-4 ${on ? "border-[color-mix(in_oklch,var(--acc)_45%,var(--border))] bg-card shadow-sm" : "border-transparent hover:bg-card/60"}`}
             >
               <span className="flex items-center gap-3">
-                <span className="tile size-9 shrink-0">
-                  <Icon aria-hidden className="size-4.5" />
-                </span>
+                <Art n={Icon} className="size-11 shrink-0" />
                 <span className="font-semibold whitespace-nowrap lg:whitespace-normal">{it.title}</span>
               </span>
               <span className={`mt-2 hidden text-sm leading-relaxed text-muted-foreground ${on ? "lg:block" : ""}`}>{it.gain}</span>
