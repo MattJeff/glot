@@ -4937,5 +4937,26 @@
     "apps": "Ứng dụng và mã",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Thông báo pháp lý",
+    "privacy": "Quyền riêng tư",
+    "terms": "Điều khoản"
+  },
+  "adminAcquisition": {
+    "title": "Thu hút người dùng",
+    "subtitle": "Số lượt đăng ký theo chiến dịch quảng cáo (tham số utm), kèm email đã xác nhận và tài khoản trả phí.",
+    "period": "Khoảng thời gian",
+    "days": "{n} ngày",
+    "direct": "Trực tiếp / không rõ",
+    "cols": {
+      "source": "Nguồn",
+      "medium": "Kênh",
+      "campaign": "Chiến dịch",
+      "term": "Từ khóa",
+      "signups": "Đăng ký",
+      "verified": "Đã xác nhận",
+      "paying": "Trả phí"
+    }
   }
 }

@@ -4937,5 +4937,26 @@
     "apps": "Apps og kode",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Juridisk meddelelse",
+    "privacy": "Privatliv",
+    "terms": "Vilkår"
+  },
+  "adminAcquisition": {
+    "title": "Akquisition",
+    "subtitle": "Tilmeldinger pr. annoncekampagne (utm-parametre), med bekræftede e-mails og betalende konti.",
+    "period": "Periode",
+    "days": "{n} dage",
+    "direct": "Direkte / ukendt",
+    "cols": {
+      "source": "Kilde",
+      "medium": "Medium",
+      "campaign": "Kampagne",
+      "term": "Søgeord",
+      "signups": "Tilmeldinger",
+      "verified": "Bekræftet",
+      "paying": "Betalende"
+    }
   }
 }

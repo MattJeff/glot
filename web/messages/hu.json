@@ -4937,5 +4937,26 @@
     "apps": "Alkalmazások és kód",
     "benchmark": "Benchmark",
     "faq": "GYIK"
+  },
+  "legal": {
+    "legal": "Jogi nyilatkozat",
+    "privacy": "Adatvédelem",
+    "terms": "Felhasználási feltételek"
+  },
+  "adminAcquisition": {
+    "title": "Akvizíció",
+    "subtitle": "Regisztrációk hirdetési kampányonként (utm paraméterek), megerősített e-mail-címekkel és fizető fiókokkal.",
+    "period": "Időszak",
+    "days": "{n} nap",
+    "direct": "Közvetlen / ismeretlen",
+    "cols": {
+      "source": "Forrás",
+      "medium": "Csatorna",
+      "campaign": "Kampány",
+      "term": "Kulcsszó",
+      "signups": "Regisztrációk",
+      "verified": "Megerősített",
+      "paying": "Fizető"
+    }
   }
 }

@@ -4937,5 +4937,26 @@
     "apps": "Apps en code",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Juridische kennisgeving",
+    "privacy": "Privacy",
+    "terms": "Voorwaarden"
+  },
+  "adminAcquisition": {
+    "title": "Acquisitie",
+    "subtitle": "Aanmeldingen per advertentiecampagne (utm-parameters), met bevestigde e-mailadressen en betalende accounts.",
+    "period": "Periode",
+    "days": "{n} dagen",
+    "direct": "Direct / onbekend",
+    "cols": {
+      "source": "Bron",
+      "medium": "Medium",
+      "campaign": "Campagne",
+      "term": "Zoekwoord",
+      "signups": "Aanmeldingen",
+      "verified": "Bevestigd",
+      "paying": "Betalend"
+    }
   }
 }

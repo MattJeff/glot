@@ -4937,5 +4937,26 @@
     "apps": "Apps y código",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Aviso legal",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  },
+  "adminAcquisition": {
+    "title": "Adquisición",
+    "subtitle": "Registros por campaña de anuncios (parámetros utm), con correos confirmados y cuentas de pago.",
+    "period": "Período",
+    "days": "{n} días",
+    "direct": "Directo / desconocido",
+    "cols": {
+      "source": "Fuente",
+      "medium": "Medio",
+      "campaign": "Campaña",
+      "term": "Palabra clave",
+      "signups": "Registros",
+      "verified": "Confirmado",
+      "paying": "De pago"
+    }
   }
 }

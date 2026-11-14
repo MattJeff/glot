@@ -4938,5 +4938,26 @@
     "apps": "Apps e código",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Aviso legal",
+    "privacy": "Privacidade",
+    "terms": "Termos"
+  },
+  "adminAcquisition": {
+    "title": "Aquisição",
+    "subtitle": "Cadastros por campanha de anúncio (parâmetros utm), com e-mails confirmados e contas pagantes.",
+    "period": "Período",
+    "days": "{n} dias",
+    "direct": "Direto / desconhecido",
+    "cols": {
+      "source": "Origem",
+      "medium": "Mídia",
+      "campaign": "Campanha",
+      "term": "Palavra-chave",
+      "signups": "Cadastros",
+      "verified": "Confirmados",
+      "paying": "Pagantes"
+    }
   }
 }

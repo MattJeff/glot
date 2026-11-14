@@ -4937,5 +4937,26 @@
     "apps": "Apps and code",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Legal notice",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "adminAcquisition": {
+    "title": "Acquisition",
+    "subtitle": "Sign-ups per ad campaign (UTM parameters), with confirmed emails and paying accounts.",
+    "period": "Period",
+    "days": "{n} days",
+    "direct": "Direct / unknown",
+    "cols": {
+      "source": "Source",
+      "medium": "Medium",
+      "campaign": "Campaign",
+      "term": "Keyword",
+      "signups": "Sign-ups",
+      "verified": "Confirmed",
+      "paying": "Paying"
+    }
   }
 }

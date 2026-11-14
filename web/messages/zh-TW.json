@@ -4937,5 +4937,26 @@
     "apps": "應用程式與程式碼",
     "benchmark": "基準測試",
     "faq": "常見問題"
+  },
+  "legal": {
+    "legal": "法律聲明",
+    "privacy": "隱私權政策",
+    "terms": "服務條款"
+  },
+  "adminAcquisition": {
+    "title": "獲客分析",
+    "subtitle": "依廣告活動（UTM 參數）統計註冊數，並顯示已驗證的電子郵件與付費帳號。",
+    "period": "期間",
+    "days": "{n} 天",
+    "direct": "直接 / 未知",
+    "cols": {
+      "source": "來源",
+      "medium": "媒介",
+      "campaign": "活動",
+      "term": "關鍵字",
+      "signups": "註冊數",
+      "verified": "已驗證",
+      "paying": "付費帳號"
+    }
   }
 }

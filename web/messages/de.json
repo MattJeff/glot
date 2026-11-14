@@ -4943,5 +4943,21 @@
     "legal": "Impressum",
     "privacy": "Datenschutz",
     "terms": "AGB"
+  },
+  "adminAcquisition": {
+    "title": "Akquise",
+    "subtitle": "Anmeldungen pro Werbekampagne (UTM-Parameter) mit bestätigten E-Mails und zahlenden Accounts.",
+    "period": "Zeitraum",
+    "days": "{n} Tage",
+    "direct": "Direkt / unbekannt",
+    "cols": {
+      "source": "Quelle",
+      "medium": "Medium",
+      "campaign": "Kampagne",
+      "term": "Keyword",
+      "signups": "Anmeldungen",
+      "verified": "Bestätigt",
+      "paying": "Zahlend"
+    }
   }
 }

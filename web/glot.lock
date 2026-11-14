@@ -216,6 +216,114 @@
         "score": 100,
         "reviewed": false
       },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "c46fefb587c8fa17",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "ae7f0a14a1fc39dc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "6fe67f06fb13fd39",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "7c32d489fa12c76f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "64660bb87d8972be",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "74eabb0ba9aa7d02",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "833a289ad5f3cb72",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "b9213523d654cf63",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "b201bef219d50d4a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "0335edfeb5f3163d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "29bd2f398e218e90",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "98f630bdf38322d0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "auth.errors.invalid": {
         "source_hash": "db2a02d8daccaff6",
         "target_hash": "1b1ba37acea65cdf",
@@ -18899,6 +19007,30 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "fcc99c2bf761d7e4",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "b2a0889b31316390",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "fe577104955bcea4",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "09fd8ddb26399a3c",
@@ -32578,6 +32710,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "ccddac0297945610",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "741510ed045b8584",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "46a0285876215a95",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "6c28f415f927a162",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "99372c2e95b7dc30",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "9eb02c14e3b53e1d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "a452b49913b18f9d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "63c57052f7a29b5a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "231898d3e3478c21",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "b9a6405e999faff6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "fa070a96577e9973",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "b4ca6255bbbd74f5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "bb780076827791db",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -51961,6 +52201,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "b49ecf597c0db3e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "3b8244aee44ec5d2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "9ddef29727d27aa6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "e5badafd3bc9ea1d",
@@ -65781,6 +66048,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "df8525011f618f54",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "9bc5dad8183c771e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "98d62bb3058ae04e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "02bead3bdf3c944e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "2ce919ad43a77cd2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "3aeeba106f721e8c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "e9e5f55ab4c2cdcc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "3ba74335629b93d2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "7d681828a3cdac98",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "7514b2438ec728d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "1c4adfe715b17237",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "834b05b70911904c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -85164,6 +85539,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "1c3d2a35fadec369",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "9f72052e0966729f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "0c75486a77657131",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "720be3a3933e1414",
@@ -99009,6 +99411,114 @@
           "model": "claude-haiku-5-5"
         },
         "score": 100,
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "9bc5dad8183c771e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "5c4f8de6e702033d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "1c7056dd73b42e3f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0378894a522e5f07",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "a668022aed26067d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "61794f0a3e3a5ba7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "1f07688bf95ea9b8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "8bf0101df4d63b40",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "ab0f2fd5b2501811",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "baea097994dc85c7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "aed4dd8279974747",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
         "reviewed": false
       },
       "auth.errors.invalid": {
@@ -117694,6 +118204,30 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "b8a6051923e6a649",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "f624fcf0dcbb39c0",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "ef0fe873bb684727",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "ae82923541b36c70",
@@ -131373,6 +131907,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "1f281d931938b98b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "b36c4e4618be86aa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "7d20f32125d4aa4a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "5309ab9110ee5895",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "742866afd285561a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "795a1e3f83fbf4cb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "15cbabe0d427160c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "b04ded75259c2149",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "8e0888fc03fe3799",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "c96717ef4f913efc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "6d4eefde60b54f0d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "131538d0e3907ef1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "819fc0543c57be2e",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -150756,6 +151398,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "b539e53e0184f91d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "c6a2d1ec1703c5c2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "011788f1afc301e6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "d0721cdb7e22a38e",
@@ -164576,6 +165245,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "7e1b0d5641f2640c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "268286d2ef7573e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "422bda9e9fd6f308",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "88aee6f51e07a13f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0e570ca6fabe24f9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "a668022aed26067d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "fe00b67b6dd1143f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "901bac8a657292dd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "501b6d0bf8ed9ea0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "6e795d4d3cc21c5c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "3824f578c963d4e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "a0f0155586e8f497",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -183959,6 +184736,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "1011b3a811f08490",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "54a57c3147c49f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "ede5489964834a51",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "5a19f146486f1eeb",
@@ -197804,6 +198608,114 @@
           "model": "claude-haiku-5-5"
         },
         "score": 100,
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "98c0f6d4a303e4ef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "da26d4f11244518e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "d6abacfd17cb50ed",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "aae57b720baa1820",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "167a940c62788a7a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "0130510eb04f3629",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "8257c43e08a954e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "0c9cbfa88bb34b77",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "1740693528ad6d29",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "162459d223dc72e5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "a27c4b2f84cc244c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "0b833eb8632b4725",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
         "reviewed": false
       },
       "auth.errors.invalid": {
@@ -216489,6 +217401,30 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "79e539a703dbcb93",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "52233e2c4d6b2e9a",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "668c44cf8ac64a9f",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "4ce43902c844869d",
@@ -230168,6 +231104,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "e436ddcd06e85cd0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "98c0f6d4a303e4ef",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "da26d4f11244518e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "d6abacfd17cb50ed",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "aae57b720baa1820",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "382897b636f37cbb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "0130510eb04f3629",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "710bb383bba5b65d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "0c9cbfa88bb34b77",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "1740693528ad6d29",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "162459d223dc72e5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "a27c4b2f84cc244c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "0b833eb8632b4725",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -249551,6 +250595,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "79e539a703dbcb93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "52233e2c4d6b2e9a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "60eaf1f65f219475",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "4ce43902c844869d",
@@ -263371,6 +264442,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "bca1e43acab841b0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "80c1f2a2339c04d8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "4d65d9449a99bfbd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "1e8da233879e4c91",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "7b7167f0aaafa1f0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "d004714309968110",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "5dfb4e9a7cc81aec",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "74e4b38d2ee4eb3e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "8f8663d0079998b5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "15bbfd1c48dd4b96",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "67af0b8ae827bac9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "553ecb8f978db5a2",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -282754,6 +283933,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "e5a853e63f4543f3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "cc1e622422bed34c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "a79378df7b86f6d5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "27daf9d1803e6aca",
@@ -296599,6 +297805,102 @@
           "model": "claude-haiku-5-5"
         },
         "score": 100,
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "a33b656171e31157",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "be91940b79f46910",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "2a6bab4b2efa9180",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "dd025d03912d86f3",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0e570ca6fabe24f9",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "7a061f1e509b78eb",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "4f36e2376ed26fd0",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "8e5c87c340e9ebe5",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "c8d337af80b79045",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "2171009f4e2a3d1c",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "98a111f415ac34c9",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "a0f0155586e8f497",
+        "origin": {
+          "kind": "imported"
+        },
         "reviewed": false
       },
       "auth.errors.invalid": {
@@ -315284,6 +316586,30 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "cce9c0a1b975aca0",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "f19bb4113dafe7cf",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "97d4be8960698f97",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "dc097f107d038341",
@@ -328963,6 +330289,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "0a2c683ebe868133",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "aab2b24fab3842d4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "69fb6fdbb81fc2cb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "b261f783d29ce4a5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "d002bf97ce6e4e2e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "43b8584f5824adf2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "2edd065e044fe1af",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "820e52615fbed9a5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "c43d6c0128224642",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "3671dcdb411526f1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "62299c85755263a8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "85bdb352657e268d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "dea1851c3fa4d1ea",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -348346,6 +349780,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "3eceec1835715a78",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "7934094d24f8b2e6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "fcadcaab114b00b1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "4be912a95f9a8248",
@@ -362166,6 +363627,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "8c095a09bc90bba5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "ca585c0a4fe1c486",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "d0d0a73dcf1597ee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "660e1ff6eb48bb1f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "c58ffdc287904d70",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "44a0dcc223b66908",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "ca563207df152530",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "60a0c05ebc32681e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "cd611e991cd9656c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "722ce1203e072599",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "16a3378e5a9d3f64",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "50794d931dfc3790",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "1d98f2972ac7b45d",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -381549,6 +383118,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "9d0c08679cdd1c23",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "a479e5eed9a346d2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "6b3b7efedce44b68",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "22e286aada85592d",
@@ -395369,6 +396965,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "a27153b120f4ba59",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "28dce948f9539cb4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "315542bc2c196b83",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "cd588d389a8e95fa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "bd7bebf878bd8469",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "02d2ab5f5f880fb8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "b73c71ad1e2dfb77",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "91705f94fdd7a2b2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "be5c958e2cdea33b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "e6dc02e952a09596",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "13af41e7e6850846",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "a9069cb015dd9c35",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "82763fef955b2bba",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -414752,6 +416456,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "b170df3404dd6d78",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "ea2f113c76e353a2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "16fd515593cdf137",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "a0e507e58a7758a8",
@@ -428572,6 +430303,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "7cb3a729e6fe886a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "878444a6462d31bd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "d84293bdcca89ef1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "c465e8b13c7bb8cc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "05f5ed1e04fa6e95",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "b4c358b13a540463",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "c4e3631b2bf22f67",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "96de4c4bd85861a0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "140e8a0039d65716",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "7514b2438ec728d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "58dbf11372988605",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "88f990945ee99034",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -447955,6 +449794,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "e4a7743d07014d93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "82a690f800a3d74b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "55fc1aa909290aa0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "1f40dedee1e288bd",
@@ -461775,6 +463641,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "7e1b0d5641f2640c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "1465ddcfb0319db5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "2de5f6131596e206",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "904ecfa1709fa61e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "60464b6838428430",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "1bdb4add5da2415f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "9c214d4c85e46896",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "337091837156ea8c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "425818b66620dcf0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "31485909bdc49eec",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "fb5065f3c8c1ca0a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "3f9fb9985514abdb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "37e76473d9686561",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -481167,6 +483141,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "851744dbef7fed15",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "54a57c3147c49f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "ca60f2fdc7d9953e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "6a01f30b83fd6d6e",
@@ -495012,6 +497013,114 @@
           "model": "claude-haiku-5-5"
         },
         "score": 100,
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "96cb155735ba3fb1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "d4389ace8320b824",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "1c7d329f60fa4885",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "f39beb7c47ded8f9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "003741059728c399",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "d9acb15aeab30b32",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "b8ab1d88205dded8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "ca05d5a36b560e64",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "6411b13dc49addeb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "cc0784b2a4611d5b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "94247cfab6cdfe92",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "9e1cb5f22d2a8bd7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
         "reviewed": false
       },
       "auth.errors.invalid": {
@@ -513697,6 +515806,30 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "29bc72cac40e4e7d",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "fd55785d80315153",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "a9ebd889eddf6f19",
+        "origin": {
+          "kind": "imported"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "29283929a7d283d9",
@@ -527376,6 +529509,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "b0b3d3bc6c2762fe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "56368bb221dad5ce",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "e2cae5479f040a13",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "b00913d46a855080",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "7463c2034790d649",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "ffa449b1814256e3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "8167bc6750957c63",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "2f905abd52ed4bc7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "3533b4c7ac6dc5bb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "f3a174a0821346f7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "b918d5af77b8733a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "0314699dfd2899bd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "bed7d8dc99622f6a",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -546759,6 +549000,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "8f76059867d8cc1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "9fb41de3065c32ce",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "c7e724d5c4951b72",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "eef11cb238c9a518",
@@ -560579,6 +562847,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "df8525011f618f54",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "7b53c19a9c0b902c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "98d62bb3058ae04e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "a4d4efe26032774a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "2ce919ad43a77cd2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "1bc18391e398f21a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "8acb1d5f15c2045c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "a294397912f974a9",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "966af3e65e360af0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "7514b2438ec728d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "45da0c338c3b6a48",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "f6f07f56735e6d86",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -579962,6 +582338,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "7b49e6f231e6a5dd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "c0d76d99394f54a2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "0c75486a77657131",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "3d170543d13c941f",
@@ -593782,6 +596185,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "7e1b0d5641f2640c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "a33b656171e31157",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "b052ea879e292452",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "5bfe04f2f4b80ba6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "f568ed5d0e816de4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "554e47b0eff3e95c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "b6dd2e3a043dc861",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "222596a3ee7f59db",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "6da61c1fe178db8a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "7514b2438ec728d7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "246609d9cebf7219",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "c5ab783e9848a030",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -613165,6 +615676,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "30503a0dcbc2ab45",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "54a57c3147c49f33",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "74a91287d1fd1f38",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "01dda20eebb0238c",
@@ -626985,6 +629523,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "df8525011f618f54",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "790786c1aee64a49",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "c5b19de3675b8092",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "3db33ced12814d01",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "94e2e1623946971a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "19286f3e76453999",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "6abcf125138b5917",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "8ac4b44b3634d926",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "ea02fafe2e487e82",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "1fa72bb552c88ba0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "f4b46a792e10259b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "5a180cba4f6e0116",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -646368,6 +649014,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "f470b5392e563815",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "2a7a8720c4c79cfe",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "a7fd485861b5aecb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "5efbfa336c3a75b9",
@@ -660188,6 +662861,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "5a4cc65d866b2781",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "4700cce8e987ef53",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "73a72cc88fd4a57e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "1a6efbcff05e2c9d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "60e4dd4d13b6e415",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "7b9afa8bda071a80",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "9ef657238f560daf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "8257c43e08a954e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "7814b9e1895dbd0c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "becf2dca0b65fef4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "162459d223dc72e5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "3f6a3881136f90cc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "351abf77140d403c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -679580,6 +682361,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "79e539a703dbcb93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "2bb2d8436a5c0668",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "93ba09fe6f1d2d6d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "22c5841e132b2782",
@@ -693400,6 +696208,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "5a4cc65d866b2781",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "4700cce8e987ef53",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "eb401b0a10f4e48b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "1a6efbcff05e2c9d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "dd43a1480f26818e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "7b9afa8bda071a80",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "9ef657238f560daf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "8257c43e08a954e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "7814b9e1895dbd0c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "becf2dca0b65fef4",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "162459d223dc72e5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "c6272ba449469826",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "351abf77140d403c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -712783,6 +715699,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "79e539a703dbcb93",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "2bb2d8436a5c0668",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "93ba09fe6f1d2d6d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "22c5841e132b2782",
@@ -726603,6 +729546,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "7729bbc1b40a60c0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "34edb34b2ebbb1e7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "aaed35340ae02101",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "172e7057f8c4728d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "0ee6c0853da5c0a8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "1b80b7cc9248bc95",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "c76158997471ea17",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "63f7b7c87a6a7ba8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "e0a499435bccf4b2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "38955e0322e41b6f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "6399f348f97d892b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "63b81cc7eb657bfc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "cb0169a92062bc17",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -745986,6 +749037,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "4d217c90a92fae32",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "ebc68c607549b247",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "6f7e29d9acbae2d1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "59c5a04f2a5dd084",
@@ -759806,6 +762884,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "aecc997d3bc725dd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "e6be02acc1335057",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "a9cd3794fd35fd0a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "6ffee0f611e93efb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "d576d37eacea44ee",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "56e46960c10438ad",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "2e22c77d518a8e30",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "087b5fb202d6ad86",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "45f9856d4959710b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "c72ac8a482b7ec1e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "e97ca72e2ca5bbe1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "be5666bbe1ca669f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "b5bb9b2063f0f631",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -779189,6 +782375,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "013e672c9daecf24",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "6d5c24967752a415",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "908b6d3a8368c31a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "6059ded898188396",
@@ -793009,6 +796222,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "df8525011f618f54",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "1d65a14451fadcde",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "8e588cd187741f1c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "e89ebb4773fa5742",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "1fa23cc98280a15a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "73bbefbe305ceb1d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "2fa0867e098f3594",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "5ae8359d6eb43928",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "a3e56ea1c0d033a2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "0c2dcf8d81c78f8e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "6e795d4d3cc21c5c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "a2218d241e2711f5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "76aa06681c445e52",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -812392,6 +815713,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "16dcfd2eb952bf14",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "d92007bd4d179b27",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "4343dc8fdedffc55",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "d34faf33f6c62567",
@@ -826212,6 +829560,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "2642ab8692197940",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "b4a72ff5472482b3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "1ef8f492e1a39094",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "24101bc1a601a34a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "19bde62420901246",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "2528236054bf817d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "b74abc47157072ba",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "765cdd8a6c3ecbcb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "47c6ac8a046fcd63",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "e361d6b40fec2a37",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "751df9a4a7fea300",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "c978998ad30ddc0d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "b5e1df6115f0c65c",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -845595,6 +849051,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "540258f09ccf8ea7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "81e72bfec8b8e157",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "5defe00e7fee940f",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "53334e15a8324b92",
@@ -859415,6 +862898,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "1c56ac8f2dc6dc84",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "fa3938f810a5acec",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "fe59abe12ce9fb30",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "929baed29cecde9b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "cafb2d991bbef6aa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "2f0db590c3dcd1da",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "fd1e24420b303bf2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "50d19f2b3ba0b21c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "b1347b5dca0a61a5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "e32b6185f6afb810",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "8310d07b9e6c521c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "0300a5c190ccd911",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "bdbcf9cbeba975c4",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -878798,6 +882389,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "e7646868f235e7e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "b867e8544d0e6022",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "6500173fb9ac1e0c",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "487bbef89657b8b5",
@@ -892618,6 +896236,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "e066e17040870546",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "0b996524f112a1e2",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "a9cd3794fd35fd0a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "b8d36d341ce32bb1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "7b11187f53a6d667",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "0ca90ea375f329eb",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "32fed66b92ae671d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "eee671389d701a5a",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "cf8c04110d6f47a3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "3f34c78ded9ead8d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "7a482883f965dff8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "47fda0c5573e8262",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "a3378e48f116456f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -912001,6 +915727,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "3a4b071d97460d49",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "dca43e30fc120616",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "25d4f8077fc1c765",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "a789ec212e10db6e",
@@ -925821,6 +929574,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "09128ce8ce340441",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "c027a99074984d64",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "16d56640c7f6c4cd",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "b8a7ab52a663138d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "cb18c60444eb413d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "c76d57b348bd2310",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "29267414bb6d90e0",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "e72d13e31a137a58",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "e75d0d473c23658d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "41221334bc985d8d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "337f7d4331bf72b7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "a8213d3d900b8810",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "9f8cecc890748f9b",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -945204,6 +949065,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "5fd4bf31286b1954",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "6ca4260e62ece1c8",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "55034b836d596ff5",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "01157422c6ef0a23",
@@ -959024,6 +962912,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "061246bd31e084a7",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "dc4fb5f4d6c19300",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "ae5105499637cf80",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "60f2e2b0251b4b31",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "c3656df1b5654eca",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "a488e93d69cc1296",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "1f7f0db90f932dfa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "0a1b6f1b57f5198e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "a3819cd3efeccc22",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "5389d1ca007582d6",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "07eb730af89936bf",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "50a1c0d8a2314cb3",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "d84ecb44ef60fcdf",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -978407,6 +982403,33 @@
         },
         "reviewed": false
       },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "9e5f40333000f74b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "86651d17a401c55b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "41c7311f8646f3e1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
       "liveCheck.badge.live": {
         "source_hash": "5a19f146486f1eeb",
         "target_hash": "07ef58c83b428070",
@@ -992227,6 +996250,114 @@
       "account.title": {
         "source_hash": "7e1b0d5641f2640c",
         "target_hash": "b0f18aa763de610d",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.campaign": {
+        "source_hash": "268286d2ef7573e0",
+        "target_hash": "e1ba21d79b75b58e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.medium": {
+        "source_hash": "8e588cd187741f1c",
+        "target_hash": "ae5105499637cf80",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.paying": {
+        "source_hash": "422bda9e9fd6f308",
+        "target_hash": "00047106e6f20972",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.signups": {
+        "source_hash": "5c2b06176d6ce908",
+        "target_hash": "b3226b4d6a8bde63",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.source": {
+        "source_hash": "0e570ca6fabe24f9",
+        "target_hash": "c21db84c06536abc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.term": {
+        "source_hash": "a668022aed26067d",
+        "target_hash": "ef5c4bdebda08c0e",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.cols.verified": {
+        "source_hash": "fe00b67b6dd1143f",
+        "target_hash": "53ffcc00e9eb66bc",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.days": {
+        "source_hash": "901bac8a657292dd",
+        "target_hash": "a3819cd3efeccc22",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.direct": {
+        "source_hash": "501b6d0bf8ed9ea0",
+        "target_hash": "ed9f63eba4cb29a1",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.period": {
+        "source_hash": "6e795d4d3cc21c5c",
+        "target_hash": "cc0784b2a4611d5b",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.subtitle": {
+        "source_hash": "54ded70faacf2dbc",
+        "target_hash": "69cabc697859f355",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "adminAcquisition.title": {
+        "source_hash": "a0f0155586e8f497",
+        "target_hash": "c8769fc7767b0e28",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"
@@ -1011604,6 +1015735,33 @@
       "launches.verdict.probably_positive": {
         "source_hash": "e592f8d116370644",
         "target_hash": "585c3c26fcf68654",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.legal": {
+        "source_hash": "1011b3a811f08490",
+        "target_hash": "3f1f0a3bc86f93fa",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.privacy": {
+        "source_hash": "54a57c3147c49f33",
+        "target_hash": "5d1a4adc5d739037",
+        "origin": {
+          "kind": "machine",
+          "model": "claude-haiku-5-5"
+        },
+        "reviewed": false
+      },
+      "legal.terms": {
+        "source_hash": "ede5489964834a51",
+        "target_hash": "afe218eb533fdc3f",
         "origin": {
           "kind": "machine",
           "model": "claude-haiku-5-5"

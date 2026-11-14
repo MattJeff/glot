@@ -4938,5 +4938,26 @@
     "apps": "App e codice",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Note legali",
+    "privacy": "Privacy",
+    "terms": "Termini"
+  },
+  "adminAcquisition": {
+    "title": "Acquisizione",
+    "subtitle": "Registrazioni per campagna pubblicitaria (parametri utm), con email confermate e account a pagamento.",
+    "period": "Periodo",
+    "days": "{n} giorni",
+    "direct": "Diretto / sconosciuto",
+    "cols": {
+      "source": "Fonte",
+      "medium": "Mezzo",
+      "campaign": "Campagna",
+      "term": "Parola chiave",
+      "signups": "Registrazioni",
+      "verified": "Confermati",
+      "paying": "Paganti"
+    }
   }
 }

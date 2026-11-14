@@ -4937,5 +4937,26 @@
     "apps": "Aplikacje i kod",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Nota prawna",
+    "privacy": "Prywatność",
+    "terms": "Regulamin"
+  },
+  "adminAcquisition": {
+    "title": "Pozyskiwanie",
+    "subtitle": "Rejestracje według kampanii reklamowej (parametry utm), z potwierdzonymi adresami e-mail i kontami płacącymi.",
+    "period": "Okres",
+    "days": "{n} dni",
+    "direct": "Bezpośrednie / nieznane",
+    "cols": {
+      "source": "Źródło",
+      "medium": "Medium",
+      "campaign": "Kampania",
+      "term": "Słowo kluczowe",
+      "signups": "Rejestracje",
+      "verified": "Potwierdzeni",
+      "paying": "Płacący"
+    }
   }
 }

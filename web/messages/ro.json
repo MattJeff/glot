@@ -4937,5 +4937,26 @@
     "apps": "Aplicații și cod",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Notă legală",
+    "privacy": "Confidențialitate",
+    "terms": "Termeni"
+  },
+  "adminAcquisition": {
+    "title": "Achiziție",
+    "subtitle": "Înregistrări pe campanie publicitară (parametrii utm), cu e-mailuri confirmate și conturi plătitoare.",
+    "period": "Perioadă",
+    "days": "{n} zile",
+    "direct": "Direct / necunoscut",
+    "cols": {
+      "source": "Sursă",
+      "medium": "Mediu",
+      "campaign": "Campanie",
+      "term": "Cuvânt cheie",
+      "signups": "Înregistrări",
+      "verified": "Confirmate",
+      "paying": "Plătitori"
+    }
   }
 }

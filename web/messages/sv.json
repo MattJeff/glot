@@ -4937,5 +4937,26 @@
     "apps": "Appar och kod",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Juridisk information",
+    "privacy": "Integritet",
+    "terms": "Villkor"
+  },
+  "adminAcquisition": {
+    "title": "Förvärv",
+    "subtitle": "Registreringar per annonskampanj (utm-parametrar), med bekräftade e-postadresser och betalande konton.",
+    "period": "Period",
+    "days": "{n} dagar",
+    "direct": "Direkt / okänd",
+    "cols": {
+      "source": "Källa",
+      "medium": "Medium",
+      "campaign": "Kampanj",
+      "term": "Nyckelord",
+      "signups": "Registreringar",
+      "verified": "Bekräftade",
+      "paying": "Betalande"
+    }
   }
 }

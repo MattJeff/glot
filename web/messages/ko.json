@@ -4937,5 +4937,26 @@
     "apps": "앱 및 코드",
     "benchmark": "벤치마크",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "법적 고지",
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관"
+  },
+  "adminAcquisition": {
+    "title": "유입 경로",
+    "subtitle": "광고 캠페인별 가입 수(utm 파라미터)를 이메일 인증 및 유료 결제 계정과 함께 표시합니다.",
+    "period": "기간",
+    "days": "{n}일",
+    "direct": "직접 / 알 수 없음",
+    "cols": {
+      "source": "소스",
+      "medium": "매체",
+      "campaign": "캠페인",
+      "term": "키워드",
+      "signups": "가입 수",
+      "verified": "이메일 인증",
+      "paying": "유료 결제"
+    }
   }
 }

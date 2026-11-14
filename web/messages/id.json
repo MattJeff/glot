@@ -4937,5 +4937,26 @@
     "apps": "Aplikasi dan kode",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Pemberitahuan hukum",
+    "privacy": "Privasi",
+    "terms": "Ketentuan"
+  },
+  "adminAcquisition": {
+    "title": "Akuisisi",
+    "subtitle": "Pendaftaran per kampanye iklan (parameter utm), dengan email terkonfirmasi dan akun berbayar.",
+    "period": "Periode",
+    "days": "{n} hari",
+    "direct": "Langsung / tidak diketahui",
+    "cols": {
+      "source": "Sumber",
+      "medium": "Medium",
+      "campaign": "Kampanye",
+      "term": "Kata kunci",
+      "signups": "Pendaftaran",
+      "verified": "Terkonfirmasi",
+      "paying": "Berbayar"
+    }
   }
 }

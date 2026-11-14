@@ -4943,5 +4943,21 @@
     "legal": "Aviso legal",
     "privacy": "Privacidad",
     "terms": "Condiciones"
+  },
+  "adminAcquisition": {
+    "title": "Adquisición",
+    "subtitle": "Registros por campaña de anuncios (parámetros utm), con correos confirmados y cuentas de pago.",
+    "period": "Período",
+    "days": "{n} días",
+    "direct": "Directo / desconocido",
+    "cols": {
+      "source": "Origen",
+      "medium": "Medio",
+      "campaign": "Campaña",
+      "term": "Palabra clave",
+      "signups": "Registros",
+      "verified": "Confirmados",
+      "paying": "De pago"
+    }
   }
 }

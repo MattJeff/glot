@@ -4937,5 +4937,26 @@
     "apps": "Apper og kode",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Juridisk informasjon",
+    "privacy": "Personvern",
+    "terms": "Vilkår"
+  },
+  "adminAcquisition": {
+    "title": "Anskaffelse",
+    "subtitle": "Registreringer per annonsekampanje (utm-parametere), med bekreftede e-postadresser og betalende kontoer.",
+    "period": "Periode",
+    "days": "{n} dager",
+    "direct": "Direkte / ukjent",
+    "cols": {
+      "source": "Kilde",
+      "medium": "Medium",
+      "campaign": "Kampanje",
+      "term": "Nøkkelord",
+      "signups": "Registreringer",
+      "verified": "Bekreftet",
+      "paying": "Betalende"
+    }
   }
 }

@@ -4937,5 +4937,26 @@
     "apps": "Aplikace a kód",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Právní upozornění",
+    "privacy": "Ochrana údajů",
+    "terms": "Podmínky"
+  },
+  "adminAcquisition": {
+    "title": "Akvizice",
+    "subtitle": "Registrace podle reklamní kampaně (parametry utm), s potvrzenými e-maily a platícími účty.",
+    "period": "Období",
+    "days": "{n} dní",
+    "direct": "Přímé / neznámé",
+    "cols": {
+      "source": "Zdroj",
+      "medium": "Médium",
+      "campaign": "Kampaň",
+      "term": "Klíčové slovo",
+      "signups": "Registrace",
+      "verified": "Potvrzeno",
+      "paying": "Platící"
+    }
   }
 }

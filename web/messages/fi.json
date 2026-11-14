@@ -4937,5 +4937,26 @@
     "apps": "Sovellukset ja koodi",
     "benchmark": "Vertailu",
     "faq": "UKK"
+  },
+  "legal": {
+    "legal": "Oikeudellinen ilmoitus",
+    "privacy": "Tietosuoja",
+    "terms": "Käyttöehdot"
+  },
+  "adminAcquisition": {
+    "title": "Hankinta",
+    "subtitle": "Rekisteröinnit mainoskampanjoittain (utm-parametrit), vahvistetut sähköpostit ja maksavat tilit.",
+    "period": "Ajanjakso",
+    "days": "{n} päivää",
+    "direct": "Suora / tuntematon",
+    "cols": {
+      "source": "Lähde",
+      "medium": "Medium",
+      "campaign": "Kampanja",
+      "term": "Avainsana",
+      "signups": "Rekisteröinnit",
+      "verified": "Vahvistetut",
+      "paying": "Maksavat"
+    }
   }
 }

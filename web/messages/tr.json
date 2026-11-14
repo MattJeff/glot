@@ -4937,5 +4937,26 @@
     "apps": "Uygulamalar ve kod",
     "benchmark": "Karşılaştırma",
     "faq": "SSS"
+  },
+  "legal": {
+    "legal": "Yasal bildirim",
+    "privacy": "Gizlilik",
+    "terms": "Koşullar"
+  },
+  "adminAcquisition": {
+    "title": "Edinme",
+    "subtitle": "Reklam kampanyası başına kayıtlar (utm parametreleri), onaylı e-postalar ve ödeme yapan hesaplarla.",
+    "period": "Dönem",
+    "days": "{n} gün",
+    "direct": "Doğrudan / bilinmiyor",
+    "cols": {
+      "source": "Kaynak",
+      "medium": "Kanal",
+      "campaign": "Kampanya",
+      "term": "Anahtar kelime",
+      "signups": "Kayıtlar",
+      "verified": "Onaylı",
+      "paying": "Ödeme yapan"
+    }
   }
 }

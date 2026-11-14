@@ -4943,5 +4943,21 @@
     "legal": "法的情報",
     "privacy": "プライバシー",
     "terms": "利用規約"
+  },
+  "adminAcquisition": {
+    "title": "アクイジション",
+    "subtitle": "広告キャンペーンごと（utmパラメータ）の登録数。確認済みメールアドレスと有料アカウントを含みます。",
+    "period": "期間",
+    "days": "{n}日間",
+    "direct": "直接 / 不明",
+    "cols": {
+      "source": "ソース",
+      "medium": "メディア",
+      "campaign": "キャンペーン",
+      "term": "キーワード",
+      "signups": "登録数",
+      "verified": "確認済み",
+      "paying": "有料"
+    }
   }
 }

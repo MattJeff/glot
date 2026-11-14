@@ -4937,5 +4937,26 @@
     "apps": "应用与代码",
     "benchmark": "基准测试",
     "faq": "常见问题"
+  },
+  "legal": {
+    "legal": "法律声明",
+    "privacy": "隐私",
+    "terms": "条款"
+  },
+  "adminAcquisition": {
+    "title": "获客",
+    "subtitle": "按广告系列（UTM 参数）统计注册数，并显示已验证邮箱和付费账户。",
+    "period": "时间范围",
+    "days": "{n} 天",
+    "direct": "直接访问 / 未知",
+    "cols": {
+      "source": "来源",
+      "medium": "媒介",
+      "campaign": "广告系列",
+      "term": "关键词",
+      "signups": "注册数",
+      "verified": "已验证",
+      "paying": "付费用户"
+    }
   }
 }
