@@ -43,8 +43,8 @@ export function pageMetadata({ locale, path: p = "", ns, title, description, abs
       siteName: "glot",
       title: full,
       description,
-      locale: OG_LOCALE[own],
-      alternateLocale: ls.filter((l) => l !== own).map((l) => OG_LOCALE[l]),
+      locale: (OG_LOCALE[own] ?? own.replace("-", "_")),
+      alternateLocale: ls.filter((l) => l !== own).map((l) => (OG_LOCALE[l] ?? l.replace("-", "_"))),
     },
     twitter: { card: "summary_large_image", title: full, description },
   };

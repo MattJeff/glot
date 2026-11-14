@@ -852,21 +852,6 @@
     "chartAria": "Taux de conversion a posteriori par variante : {summary}",
     "chartCaption": "Chaque courbe représente la plage plausible du taux de conversion d’une variante au vu des données actuelles ; plus elle est étroite, plus le résultat est certain.",
     "confirm": "Confirmer",
-    "dialog": {
-      "body": "Les variantes conservent le sens, les variables et le glossaire de la traduction officielle ; seules celles qui passent la validation sont diffusées.",
-      "cancel": "Annuler",
-      "created": "{n, plural, one {# variante validée et en ligne} many {# variantes validées et en ligne} other {# variantes validées et en ligne}}{rejected, plural, =0 {} one {, # rejetée} many {, # rejetées} other {, # rejetées}}",
-      "explore": "Trafic %",
-      "goal": "Événement objectif",
-      "guardrails": "La traduction officielle reste en lice comme référence. Le trafic % est la part des visiteurs exposés à l’expérience ; les autres voient toujours le texte officiel.",
-      "key": "Clé",
-      "keyHint": "Chaîne à forts enjeux : appel à l’action, titre de tarification, bouton d’inscription.",
-      "locale": "Langue",
-      "minN": "Minimum par variante",
-      "submit": "Générer et lancer",
-      "title": "Nouvelle expérience de texte",
-      "variants": "Variantes"
-    },
     "empty": {
       "body": "Choisissez un CTA ou un titre de tarification, ainsi qu'une langue. glot rédige 2 à 3 variantes au même sens, sur des tons différents, les valide, les diffuse à une partie de vos visiteurs et indique laquelle convertit le mieux.",
       "title": "Trouvez la formulation qui convertit"
@@ -983,14 +968,12 @@
       "proposed": "Proposition prête",
       "rejected": "Rejeté"
     },
-    "subtitle": "Traductions signalées par des locuteurs natifs en production, avec une correction proposée par l'IA à examiner.",
     "suggested": "Suggestion : {text}",
     "tabs": {
       "accepted": "Acceptés",
       "live": "À examiner",
       "rejected": "Rejetés"
     },
-    "title": "Retours",
     "userReports": "Ce que les utilisateurs ont dit",
     "viewPr": "Voir la pull request",
     "filterLabel": "Filtrer les signalements par statut",
@@ -1536,10 +1519,6 @@
     "noBudget": "Aucun budget défini",
     "noIssues": "Aucun problème ouvert. Toutes les traductions passent la validation.",
     "noJobs": "Aucune tâche pour l'instant. Traduisez les clés manquantes pour en lancer une.",
-    "noKeys": {
-      "body": "Poussez vos catalogues depuis votre dépôt pour commencer.",
-      "title": "Aucune clé pour l'instant"
-    },
     "openIssues": "Problèmes ouverts",
     "progress": "Progression par langue",
     "progressHint": "{translated} sur {total} traduits · {reviewed} relus",
@@ -1567,7 +1546,6 @@
   },
   "projects": {
     "create": {
-      "description": "Vous pourrez modifier les langues et les paramètres LLM plus tard.",
       "name": "Nom",
       "namePlaceholder": "Mon SaaS",
       "slug": "Slug",
@@ -1576,7 +1554,6 @@
       "submit": "{count, plural, one {Créer le projet avec # langue} many {Créer le projet avec # langues} other {Créer le projet avec # langues}}",
       "success": "Projet {name} créé",
       "targetLocales": "Langues cibles",
-      "targetLocalesHint": "Codes BCP 47 séparés par des virgules, par ex. fr, de, pt-BR.",
       "title": "Nouveau projet",
       "back": "Retour",
       "next": "Continuer",
@@ -3325,7 +3302,8 @@
         }
       },
       "self_hosted": {
-        "name": "Auto-hébergé"
+        "name": "Auto-hébergé",
+        "tagline": ""
       },
       "team": {
         "name": "Growth",

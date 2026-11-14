@@ -852,21 +852,6 @@
     "chartAria": "Posterior-Conversion-Rate je Variante: {summary}",
     "chartCaption": "Jede Kurve zeigt den plausiblen Bereich der Conversion-Rate einer Variante auf Basis der bisherigen Daten; ein schmalerer Bereich bedeutet mehr Sicherheit.",
     "confirm": "Bestätigen",
-    "dialog": {
-      "body": "Varianten behalten Bedeutung, Platzhalter und Glossar der offiziellen Übersetzung bei; ausgeliefert werden nur Varianten, die die Validierung bestanden haben.",
-      "cancel": "Abbrechen",
-      "created": "{n, plural, one {# Variante} other {# Varianten}} validiert und aktiv{rejected, plural, =0 {} one {, # abgelehnt} other {, # abgelehnt}}",
-      "explore": "Traffic %",
-      "goal": "Zielereignis",
-      "guardrails": "Die offizielle Übersetzung bleibt als Referenz im Rennen. Traffic % ist der Anteil der Besucher, die dem Experiment ausgesetzt sind; alle übrigen sehen immer den offiziellen Text.",
-      "key": "Schlüssel",
-      "keyHint": "Eine wichtige Zeichenkette: Call-to-Action, Preistitel, Registrierungsbutton.",
-      "locale": "Sprache",
-      "minN": "Min. pro Variante",
-      "submit": "Generieren & starten",
-      "title": "Neues Copy-Experiment",
-      "variants": "Varianten"
-    },
     "empty": {
       "body": "Wählen Sie eine CTA oder eine Preisüberschrift und eine Sprache. glot schreibt 2-3 Varianten mit derselben Bedeutung in unterschiedlichen Tonlagen, validiert sie, spielt sie einem Anteil Ihrer Besucher aus und zeigt Ihnen, welche Variante gewinnt.",
       "title": "Die Formulierung finden, die konvertiert"
@@ -983,14 +968,12 @@
       "proposed": "Vorschlag bereit",
       "rejected": "Abgelehnt"
     },
-    "subtitle": "Von Muttersprachlern in der Produktion markierte Übersetzungen, mit einer KI-Korrektur zur Prüfung durch Sie.",
     "suggested": "Vorschlag: {text}",
     "tabs": {
       "accepted": "Akzeptiert",
       "live": "Zu prüfen",
       "rejected": "Abgelehnt"
     },
-    "title": "Feedback",
     "userReports": "Was Nutzer gemeldet haben",
     "viewPr": "Pull Request ansehen",
     "filterLabel": "Meldungen nach Status filtern",
@@ -1536,10 +1519,6 @@
     "noBudget": "Kein Budget festgelegt",
     "noIssues": "Keine offenen Probleme. Jede Übersetzung besteht die Validierung.",
     "noJobs": "Noch keine Jobs. Fehlende Schlüssel übersetzen, um einen zu starten.",
-    "noKeys": {
-      "body": "Pushen Sie Ihre Kataloge aus Ihrem Repository, um loszulegen.",
-      "title": "Noch keine Schlüssel"
-    },
     "openIssues": "Offene Probleme",
     "progress": "Fortschritt nach Sprache",
     "progressHint": "{translated} von {total} übersetzt · {reviewed} geprüft",
@@ -1567,7 +1546,6 @@
   },
   "projects": {
     "create": {
-      "description": "Sie können Sprachen und LLM-Einstellungen später ändern.",
       "name": "Name",
       "namePlaceholder": "Mein SaaS",
       "slug": "Slug",
@@ -1576,7 +1554,6 @@
       "submit": "{count, plural, one {Projekt mit # Sprache erstellen} other {Projekt mit # Sprachen erstellen}}",
       "success": "Projekt {name} erstellt",
       "targetLocales": "Zielsprachen",
-      "targetLocalesHint": "Durch Kommas getrennte BCP-47-Codes, z. B. fr, de, pt-BR.",
       "title": "Neues Projekt",
       "back": "Zurück",
       "next": "Weiter",
@@ -3325,7 +3302,8 @@
         }
       },
       "self_hosted": {
-        "name": "Selbst gehostet"
+        "name": "Selbst gehostet",
+        "tagline": ""
       },
       "team": {
         "name": "Growth",

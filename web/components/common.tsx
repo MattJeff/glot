@@ -101,9 +101,10 @@ export function LocaleSwitcher() {
           <Languages />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-[min(26rem,calc(100vw-2rem))]">
         <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={locale} onValueChange={(v) => switchLocale(v as Locale)}>
+        {/* 31 languages: two columns so the list fits without a long scroll. */}
+        <DropdownMenuRadioGroup value={locale} onValueChange={(v) => switchLocale(v as Locale)} className="grid grid-cols-2">
           {routing.locales.map((l) => (
             <DropdownMenuRadioItem key={l} value={l} lang={l}>
               <span className="capitalize">{name(l, true)}</span>

@@ -1,0 +1,4931 @@
+{
+  "textGraph": {
+    "title": "句子",
+    "subtitle": "你显示的每个句子，无论出现在哪里：代码、网站、CMS。修改一次译文，即可应用到所有位置。",
+    "refresh": "刷新",
+    "apply": "{count, plural, other {填充 # 处}}",
+    "applyHint": "将无争议的译文复制到缺少译文的位置。从不在两个译文之间做选择。",
+    "applied": "{count, plural, =0 {暂无可写入} other {已写入 # 条翻译}}",
+    "searchPlaceholder": "搜索句子、键或页面路径",
+    "noResults": "没有与“{q}”匹配的句子。",
+    "pick": "选择一个句子，查看它出现的所有位置及其译文。",
+    "places": "{count, plural, other {# 个位置}}",
+    "seen": "{count, plural, other {已查看 # 次}}",
+    "open": "打开此位置",
+    "inherited": "{count, plural, other {# 个页面沿用目录译文}}",
+    "useEverywhere": "全部应用",
+    "custom": "或输入要在所有位置使用的译文",
+    "empty": {
+      "title": "暂无句子",
+      "body": "glot 会读取你的目录键、glot Edge 翻译的页面以及已连接 CMS 的内容。推送你的键或连接网站，然后返回此处。"
+    },
+    "stats": {
+      "sentences": "句子",
+      "places": "位置",
+      "shared": "多处出现",
+      "unsettled": "两种译法",
+      "crossSurface": "{count, plural, =0 {代码、网站和 CMS 中均无} other {代码、网站或 CMS 中共 #}}"
+    },
+    "surface": {
+      "catalog": "代码",
+      "connector": "CMS",
+      "edge": "网站"
+    },
+    "context": {
+      "action": "按钮或链接",
+      "actionHint": "用作按钮或链接标签。以纯文本形式出现的相同词语是另一句。"
+    },
+    "unsettled": {
+      "title": "两种译法",
+      "body": "同一语言中，同一句子表达了两种不同含义。请选择保留的一种。"
+    },
+    "reworded": {
+      "title": "仅在一个位置改写",
+      "item": "“{from}”在 {moved, plural, other {# 个位置}} 中改为“{to}”。{remaining, plural, other {# 个位置仍显示}}旧文案。"
+    },
+    "detail": {
+      "places": "{count, plural, other {出现在 # 处}}",
+      "translations": "译文",
+      "related": "相关句子",
+      "moved": "自以下版本起已改写"
+    },
+    "state": {
+      "consistent": "各处一致",
+      "partial": "{count, plural, other {# 个位置缺失}}",
+      "missing": "未翻译",
+      "inconsistent": "两种译法",
+      "conflict": "两个已审校译文不一致"
+    },
+    "related": {
+      "context": "文本相同，语境不同",
+      "near": "词语相同",
+      "fuzzy": "基本相同"
+    },
+    "reason": {
+      "reviewed_conflict": "已有不同的人工审校译文",
+      "machine_disagrees": "机器译文不一致",
+      "needs_review": "等待人工审校",
+      "placeholders": "占位符不匹配",
+      "validation": "该位置的译文未通过校验"
+    },
+    "confirm": {
+      "title": "在所有位置使用此译文？",
+      "writes": "{count, plural, other {# 处将会更改。}}",
+      "none": "所有可采用此译文的位置都已显示该译文。",
+      "conflicts": "{count, plural, other {# 处已有不同的人工审校译文，将保留该译文。}}",
+      "force": "同时替换人工审校的译文"
+    }
+  },
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "SEO 本地化：每种语言都以翻译后的 HTML 提供，拥有独立 URL，无需 JavaScript 即可被索引，无需密钥。",
+    "tabs": {
+      "setup": "接入",
+      "website": "网站标签",
+      "coverage": "覆盖率",
+      "review": "审核队列",
+      "seo": "SEO 报告",
+      "performance": "性能",
+      "settings": "设置"
+    },
+    "website": {
+      "title": "网站标签",
+      "body": "一段脚本标签即可在访客浏览器中翻译任何公开网站——Wix、Squarespace、Bubble、Lovable、Carrd、Jimdo、Duda 或手写 HTML。它会添加语言切换器，应用你的翻译记忆，并将新的公开文本发送至 glot。无需 DNS，也无需代理。",
+      "tagLabel": "将其粘贴到每个页面的 head 中（或粘贴到网站构建工具的全站自定义代码中）",
+      "tagHint": "密钥是公开的，它只允许页面上报待翻译的文本。开启下方的标签之前不会发生任何事。个人数据、表单内容以及通过会话 Cookie 查看的页面永远不会被发送。",
+      "on": "标签已启用",
+      "onHint": "关闭后，标签不执行任何操作，所有页面保持发布时的状态（约一分钟内生效）。",
+      "auto": "自动翻译新文本",
+      "autoHint": "关闭时：标签发现的文本会先进入审核队列，访客看到翻译前需经审核。",
+      "position": "语言切换器",
+      "positions": {
+        "bottom-right": "悬浮，右下角",
+        "bottom-left": "悬浮，左下角",
+        "top-right": "悬浮，右上角",
+        "top-left": "悬浮，左上角",
+        "none": "隐藏（使用我自己的切换器）",
+        "selector": "置于元素内（CSS 选择器）"
+      },
+      "selector": "CSS 选择器",
+      "selectorHint": "切换器将添加到第一个匹配的元素内，例如您的页眉菜单。带有 data-glot-switcher 的元素始终优先。",
+      "flags": "在切换器中显示旗帜",
+      "flagsHint": "关闭时仅显示语言名称。语言不等同于国家，因此旗帜为可选项。",
+      "private": "标签已启用，但此项目的译文为私有：访客的浏览器无法读取，因此不会翻译任何内容。",
+      "makePublic": "公开译文",
+      "optionsTitle": "标签与选项",
+      "usage": "本月已翻译的页面浏览量：{used} / {limit}。超出限额后，标签将保持您网站的原始发布状态，直到下个月或套餐变更。",
+      "setup": {
+        "title": "3 步翻译您的网站",
+        "intro": "输入您网站的地址。glot 会读取其公开页面、进行翻译，并在您安装任何内容之前向您展示结果。",
+        "step1": "分析您的网站",
+        "step2": "查看并修正译文",
+        "step3": "粘贴一行代码并上线",
+        "urlLabel": "您网站的地址",
+        "analyze": "分析并翻译",
+        "analyzing": "正在读取您的网站…",
+        "errors": {
+          "invalid": "这不是有效的网址。",
+          "private": "该地址位于私有网络中：glot 只能读取公开网站。",
+          "unreachable": "glot 无法访问此网站。请检查地址，并确认网站已发布。",
+          "timeout": "网站响应时间过长，请稍后重试。",
+          "not_html": "该地址未返回网页。"
+        },
+        "detected": "检测到平台：{platform}",
+        "unknownPlatform": "无法识别平台。该标签适用于任何支持自定义代码的网站。",
+        "language": "网站语言：{language}",
+        "crawled": "已读取页面：{pages} · 找到文本：{segments}",
+        "translating": "正在翻译为 {languages}…下方预览会自动填充。",
+        "upToDate": "译文已是最新。",
+        "suggest": "接下来常添加的语言：",
+        "add": "添加{language}",
+        "warn": {
+          "otherTools": "此页面上还有另一个翻译脚本（{tools}）。上线前请将其移除：两个工具同时改写同一文本会产生冲突。",
+          "jsOnly": "此页面使用 JavaScript 生成文本，因此下方预览可能显示为空白。在访客的浏览器中，标签会正常翻译。",
+          "csp": "您网站的安全策略（CSP）阻止了该标签。请在以下指令中允许 {hosts}：{directives}。"
+        },
+        "exclude": {
+          "title": "私密区域",
+          "body": "账户、购物车和结账页面的内容永远不会被学习，即使其会话 Cookie 对脚本隐藏。您网站的以下链接看起来也属于私密内容：",
+          "none": "账户、购物车和结账页面的内容永远不会被学习，即使其会话 Cookie 对脚本隐藏。未发现其他看起来私密的链接。",
+          "apply": "排除这些路径",
+          "done": "已排除路径"
+        },
+        "previewLater": "请先分析您的网站：翻译预览将显示在此处。",
+        "install": {
+          "copy": "复制此行",
+          "where": "在 {platform} 上的粘贴位置",
+          "generic": "将其粘贴到每个页面的 head 中，或粘贴到您网站构建工具的全站自定义代码中。",
+          "guide": "{platform} 完整指南",
+          "allGuides": "查找您所用平台的指南"
+        },
+        "verify": {
+          "button": "检查我的网站",
+          "found": "标签已安装。开启后即可上线。",
+          "live": "标签已安装并已开启：访客会以其语言看到您的网站。",
+          "notFound": "在 {url} 上未找到该标签。粘贴代码后请发布网站，然后再次检查。通过标签管理器添加的标签无法被此检查识别。",
+          "wrongProject": "已安装 glot 标签，但它属于其他项目（{project}）。请重新复制上面的代码。",
+          "noKey": "已安装的标签不完整，因此不会生效。请重新复制上面的代码。",
+          "notHead": "标签不在页面的 head 中：访客可能会短暂看到原文。请将其移至 head。",
+          "turnOn": "开启标签"
+        }
+      },
+      "editor": {
+        "locale": "语言",
+        "page": "页面",
+        "open": "打开",
+        "count": "本页 {total} 段文本中已翻译 {translated} 段",
+        "hint": "点击任意文本以修正其翻译，或排除其所在区块。这是静态预览：菜单和动画不会运行。",
+        "empty": "本页尚无翻译。如果你的网站刚刚完成分析，将在一分钟内生成。",
+        "frame": "{language} 版网站预览",
+        "source": "原文",
+        "translation": "译文",
+        "save": "保存",
+        "cancel": "取消",
+        "saved": "译文已保存",
+        "exclude": "不再翻译此区块",
+        "excludeHint": "选择要停止翻译的内容：",
+        "matches": "本页匹配项：{count}",
+        "excluded": "已排除翻译",
+        "noSelector": "此区块没有 glot 可用于排除的稳定名称。请在你的网站构建工具中为它添加 class notranslate。"
+      },
+      "locales": "提供的语言",
+      "localesHint": "未选择任何语言时，将使用项目的所有目标语言。",
+      "save": "保存",
+      "saved": "网站标签已保存",
+      "seo": {
+        "title": "搜索引擎",
+        "body": "浏览器中翻译的文本不会被 Google 可靠地索引。若希望页面被其他语言的用户找到，请添加 glot Edge 子域名（es.your-site.com，一条 CNAME 记录）：页面将在服务器端翻译并添加 hreflang，切换器会将访客引导至此。",
+        "ready": "您的 Edge 子域名已验证：切换器会将访客引导至该域名，标签也会在浏览器中添加 hreflang 链接。搜索引擎还应能在 HTML 中找到这些链接：请将以下标签粘贴到站点的 head 中（自定义代码）。",
+        "cta": "设置子域名"
+      }
+    },
+    "kill": {
+      "labelOn": "Edge 已开启",
+      "labelOff": "Edge 已关闭",
+      "hint": "关闭：所有域名将在一分钟内原样提供你的源站内容。",
+      "aria": "glot Edge 紧急开关",
+      "on": "glot Edge 已重新开启。",
+      "off": "glot Edge 已关闭：源站内容将原样提供。"
+    },
+    "setup": {
+      "dynamic": {
+        "title": "动态本地化",
+        "body": "CDN 目录加运行时：速度快、无需部署，在浏览器中翻译。搜索引擎主要看到的是您的源语言。",
+        "cta": "配置 CDN"
+      },
+      "seo": {
+        "title": "SEO 本地化",
+        "badge": "Growth",
+        "body": "glot Edge 或预渲染：首个 HTML 字节即已翻译，每种语言一个 URL，并设置 hreflang 和 canonical。页面可被索引。",
+        "quota": "本月已提供 {used} / {limit} 个边缘页面",
+        "quotaUnlimited": "本月已提供 {used} 个边缘页面"
+      },
+      "upgrade": "SEO 本地化已包含在 Growth 中（Pro：限时试用）。",
+      "upgradeCta": "查看套餐",
+      "steps": {
+        "title": "设置步骤",
+        "domain": "添加域名",
+        "dns": "验证 DNS",
+        "tls": "HTTPS 已启用",
+        "ready": "语言已就绪",
+        "done": "已完成",
+        "todo": "待办"
+      },
+      "add": {
+        "title": "添加域名",
+        "mode": "服务模式",
+        "host": "语言子域名",
+        "site": "站点域名",
+        "locale": "语言",
+        "origin": "源站（您的网站）",
+        "submit": "添加"
+      },
+      "mode": {
+        "subdomain": "子域名",
+        "subdomainHint": "es.example.com：将 CNAME 指向 glot，HTTPS 由我们处理。",
+        "subdirectory": "子目录",
+        "subdirectoryHint": "example.com/es/：在您的网站前放置 Cloudflare Worker 或代理规则。",
+        "middleware": "中间件",
+        "middlewareHint": "Next.js 或 Express 中间件：全部保留在您的托管环境中。"
+      },
+      "added": "域名已添加。请发布下方的 DNS 记录。",
+      "empty": {
+        "title": "尚无域名",
+        "body": "添加将提供某种语言服务的域名。在 DNS 验证通过之前，您的网站不会有任何变化。"
+      },
+      "status": {
+        "verified": "DNS 已验证",
+        "unverified": "DNS 未验证",
+        "tls": {
+          "pending": "HTTPS 待处理",
+          "active": "HTTPS 已启用",
+          "error": "HTTPS 错误"
+        }
+      },
+      "domainOn": "服务中",
+      "domainOff": "已暂停",
+      "verify": "检查 DNS",
+      "verified": "DNS 已验证。",
+      "notYet": "尚未找到记录。DNS 生效可能需要几分钟。",
+      "remove": "移除域名",
+      "removeConfirm": "移除 {host}？其流量将恢复到您的源站。",
+      "originLine": "源站：{origin}",
+      "checkedAt": "检查于 {when}",
+      "dnsSubdomain": "在您的 DNS 服务商处创建这两条记录，然后检查：",
+      "dnsTxt": "在您的 DNS 服务商处创建此 TXT 记录以证明域名归您所有，然后检查：",
+      "dnsLabel": "DNS 记录",
+      "dnsNothing": "未找到记录",
+      "wiring": {
+        "subdomain": "配置",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "Next.js 中间件"
+      },
+      "hreflang": {
+        "title": "源站点的 hreflang 标签",
+        "body": "在子域名模式下，您的源页面不由 glot 提供服务：请将这些标签添加到页面的 head 中，使每种语言都能互相链接（hreflang 必须是互相的）。",
+        "path": "路径",
+        "show": "显示"
+      }
+    },
+    "coverage": {
+      "intro": "基于实际提供的页面统计：已翻译片段 / 已渲染片段。当每个关键页面的覆盖率达到 {critical}，且总体覆盖率达到 {global} 时，该语言即为就绪状态（切换器和 locales.json 中生效）。",
+      "ready": "就绪",
+      "notReady": "未就绪",
+      "global": "总体",
+      "critical": "关键页面",
+      "pages": "{locale} 中的页面",
+      "mark": "标记为关键",
+      "unmark": "取消标记为关键",
+      "byPattern": "可通过模式设为关键：请在设置中编辑",
+      "criticalBadge": "关键",
+      "missing": "{n, plural, other {# 个缺失片段}}",
+      "empty": {
+        "title": "尚未看到任何页面",
+        "body": "glot Edge 在该语言下提供过页面后，将显示覆盖率。"
+      },
+      "pagesSeen": "已见页面"
+    },
+    "segments": {
+      "title": "文本片段",
+      "subtitle": "来自已渲染页面的文本，无需键即可翻译。目录中的键始终优先。",
+      "viewKeys": "键",
+      "viewSegments": "文本片段",
+      "intro": "每个文本片段都是渲染后文本在其上下文中的一部分（所在元素和页面模板）。编辑内容会像键一样进行校验：语法、术语表、长度。",
+      "queueIntro": "来自敏感页面（支付、账户）的新文本片段，在译文获得批准前将以源语言显示。",
+      "search": "搜索文本",
+      "locale": "语言",
+      "status": "状态",
+      "all": "所有状态",
+      "statuses": {
+        "missing": "缺失",
+        "pending": "待审核",
+        "machine": "机器翻译",
+        "reviewed": "已审核",
+        "stale": "已过期"
+      },
+      "sensitive": "敏感页面",
+      "hits": "{n, plural, other {# 次浏览}}",
+      "translation": "译文",
+      "save": "保存",
+      "approve": "批准",
+      "saved": "译文已保存。",
+      "approved": "译文已批准，将从下一次请求起生效。",
+      "prev": "上一个",
+      "next": "下一个",
+      "empty": {
+        "title": "暂无文本片段",
+        "body": "glot Edge 渲染页面时会显示文本片段，或尝试其他筛选条件。"
+      },
+      "queueEmpty": {
+        "title": "没有待审核内容",
+        "body": "敏感页面的所有文本片段均已批准。"
+      }
+    },
+    "settings": {
+      "saved": "Edge 设置已保存。",
+      "save": "保存",
+      "translate": {
+        "title": "自动翻译",
+        "auto": "自动翻译新片段",
+        "autoHint": "使用您的模型、术语表和校验器。翻译完成前显示源文本，绝不留空白。",
+        "budget": "每月预算（美元）",
+        "budgetHint": "留空：仅使用每个任务的项目预算。"
+      },
+      "seo": {
+        "title": "搜索引擎",
+        "body": "glot 为让译文页面被收录所做的工作：在访客到来前读取网站，并为每种语言提供独立地址。",
+        "prewarm": "在访客访问前翻译网站",
+        "prewarmHint": "glot 每天最多读取一次站点地图及其链接的页面，每秒一个页面，使页面在被访问前即已翻译。新文本计入每日上限和上方的预算。",
+        "pages": "每次运行读取的页面数",
+        "pagesHint": "优先读取首页和站点地图，然后是链接页面。",
+        "slugs": "翻译页面地址",
+        "slugsHint": "在西班牙语网站上，/pricing 将变为 /precios。原地址会重定向至新地址，hreflang 和站点地图也会使用新地址。对于在浏览器中进行路由的网站（单页应用），请先测试。"
+      },
+      "rendering": {
+        "label": "渲染方式",
+        "auto": "自动",
+        "origin": "源站 HTML",
+        "prerender": "预渲染快照",
+        "autoHint": "当源站返回空白外壳（SPA）时，使用预渲染快照。",
+        "originHint": "按原样翻译服务器返回的 HTML。",
+        "prerenderHint": "始终翻译由无头浏览器渲染的快照（缓存，部署时刷新）。"
+      },
+      "discovery": {
+        "title": "发现区域",
+        "body": "glot Edge 可学习新文本的范围。不包括需登录的页面和个人数据，并按每日上限控制。",
+        "include": "允许路径",
+        "includeHint": "每行一个规则，* 为通配符。留空：所有公开页面。",
+        "exclude": "排除路径",
+        "excludeHint": "即使已在上方允许，也不会被发现。",
+        "selectorsInclude": "翻译区域（CSS 选择器）",
+        "selectorsIncludeHint": "留空：整个页面。",
+        "selectors": "排除的选择器",
+        "selectorsHint": "不翻译，也不发送至 glot：用户内容、姓名、小组件。",
+        "cap": "每日新片段上限",
+        "capHint": "超出上限后，新文本将以源语言显示，直至次日。"
+      },
+      "critical": {
+        "title": "关键页面与敏感页面",
+        "body": "关键页面决定是否提供某种语言。敏感页面未经审核不会发布任何新内容。",
+        "patterns": "关键页面",
+        "patternsHint": "默认包括首页、注册、定价、结账。",
+        "sensitive": "敏感页面",
+        "sensitiveHint": "新片段将进入审核队列等待。",
+        "threshold": "关键页面覆盖率阈值（%）",
+        "thresholdHint": "每个关键页面都需达到该阈值，该语言才会就绪。"
+      },
+      "app": {
+        "title": "应用页面",
+        "body": "这些页面保留在您的源域名上：登录、账户、支付、API……Edge 从不翻译、缓存或发现它们。",
+        "rules": "应用路径",
+        "rulesHint": "每行一条规则。/login = /login 及 /login/…，/live/ = 仅其子页面，/x* = 任何以 /x 开头的路径。行首写 proxy 可不翻译直通（API、资源、技术文件），写 redirect 则将访客重定向回您的域名。/sitemap.xml、/robots.txt 和 IndexNow 密钥仍由 glot 生成。",
+        "action": "默认操作",
+        "redirect": "重定向到您的域名",
+        "proxy": "不翻译直通",
+        "actionHint": "重定向：使用 302（表单使用 307）跳转到您域名上的同一页面，语言按您的站点要求设置。直通：原样返回您服务器的响应，包括 Cookie。",
+        "suggest": "使用推荐列表"
+      },
+      "auth": {
+        "title": "登录后的页面",
+        "body": "仪表盘、账户、发票：访客已登录会话的页面。glot 从不接收其内容或您用户的数据。",
+        "mode": "翻译已登录页面",
+        "server": "由 Edge 提供，私有响应",
+        "patcher": "在浏览器中（script 标签）",
+        "off": "不翻译",
+        "serverHint": "Edge 仅为该访客从翻译记忆库翻译每个页面：Cache-Control private，永不进入共享缓存，不进行发现。您域名的 Cookie 原样通过。",
+        "patcherHint": "Edge 原样提供您的页面；页面上的 data-glot-app script 标签在浏览器中、在您的域名上应用翻译记忆库（会话不受影响），并提供语言切换器。",
+        "offHint": "已登录访客看到的页面仍为源语言。",
+        "discover": "发现界面文本",
+        "discoverHint": "仅浏览器模式。仅发送带有 data-glot-ui 标记的文本，以及 glot 已知文本的指纹；绝不包含个人数据。每条新文本须经审核后才会展示。"
+      }
+    },
+    "seo": {
+      "run": "运行报告",
+      "empty": {
+        "title": "暂无报告",
+        "body": "报告会像 Google 一样，在不执行 JavaScript 的情况下抓取最多 20 个页面的每种语言版本，并检查 hreflang、canonical、元数据和未翻译文本。需要已验证的域名。"
+      },
+      "summary": "{indexable} / {total} 个页面在技术上可被索引",
+      "indexedNote": "此处衡量的是技术上的可索引性。只有连接 Search Console 后才能得知实际是否已索引；否则显示为未知，绝不猜测。",
+      "indexable": "可索引",
+      "notIndexable": "不可索引",
+      "indexed": "已索引",
+      "notIndexed": "未索引",
+      "indexedUnknown": "索引状态未知",
+      "untranslated": "{n} 处未翻译",
+      "renderDiffNone": "未比较",
+      "renderDiffSame": "有无 JavaScript 时文本相同",
+      "renderDiffCount": "{n, plural, other {# 个片段}}仅在 JavaScript 执行后出现",
+      "indexNow": "通知 Bing 和 Yandex（IndexNow）",
+      "indexNowHint": "Google 不使用 IndexNow，它会读取 robots.txt 中声明的站点地图。",
+      "indexNowDone": "已向 IndexNow 提交 {n, plural, other {# 个 URL}}。",
+      "running": "正在获取页面…",
+      "issuesTitle": "发现的问题",
+      "export": "导出 (CSV)",
+      "outcome": {
+        "title": "可被搜索引擎索引的页面",
+        "body": "只有当页面的标题和至少 95% 的正文都已翻译后，才会向搜索引擎声明该页面（canonical、hreflang、sitemap）。在此之前，该页面照常提供，并被声明为源页面的副本。",
+        "run": "立即翻译整个站点",
+        "running": "正在读取站点… {done} / {total}",
+        "advertised": "已声明",
+        "notAdvertised": "尚未声明",
+        "pages": "可索引页面 / 已读取页面",
+        "last": "上次运行于 {date}：{pages, plural, other {# 个页面已读取}}，{skipped} 个已跳过，{segments, plural, other {# 条新文本}}。",
+        "failed": "上次运行失败：{error}"
+      },
+      "slugs": {
+        "title": "已翻译的地址（{n}）",
+        "body": "地址不会自行更改。在此替换地址：旧地址将重定向到新地址。",
+        "source": "源页面",
+        "locale": "语言",
+        "address": "地址",
+        "addressOf": "{path} 在 {locale} 中的地址",
+        "saved": "地址已保存。"
+      },
+      "sitemaps": "各语言的站点地图",
+      "critical": "严重",
+      "notReciprocal": "hreflang 未互相引用",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "canonical",
+        "title": "标题",
+        "description": "描述",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "抓取失败",
+        "http_error": "HTTP 错误",
+        "noindex": "noindex",
+        "robots_txt_blocked": "被 robots.txt 阻止",
+        "redirected": "已重定向",
+        "canonical_missing": "缺少 canonical",
+        "canonical_multiple": "存在多个 canonical",
+        "canonical_to_source": "Canonical 指向源页面",
+        "canonical_not_self": "Canonical 指向其他页面",
+        "html_lang": "html lang 错误",
+        "html_dir": "文本方向错误",
+        "content_language": "Content-Language 错误",
+        "hreflang_self_missing": "缺少自引用 hreflang",
+        "hreflang_x_default_missing": "缺少 x-default",
+        "hreflang_not_reciprocal": "hreflang 未互相引用",
+        "advertised_but_not_ready": "已链接但未就绪",
+        "title_missing": "缺少标题",
+        "title_untranslated": "标题未翻译",
+        "title_duplicate": "与其他页面标题相同",
+        "description_missing": "缺少描述",
+        "description_untranslated": "描述未翻译",
+        "og_title_untranslated": "og:title 未翻译",
+        "jsonld_language": "JSON-LD 使用其他语言",
+        "untranslated_segments": "未翻译的片段"
+      }
+    },
+    "perf": {
+      "period": "周期",
+      "days": "{n, plural, other {# 天}}",
+      "requests": "已提供页面",
+      "hitRatio": "缓存命中率",
+      "failOpen": "失败放行",
+      "glotP50": "glot 开销 p50",
+      "glotP95": "glot 开销 p95",
+      "originP50": "源站 p50",
+      "note": "glot 开销 = 在源站耗时之上增加的时间（Server-Timing）。失败放行 = 因 glot 未能及时响应而未翻译地提供的页面：绝不会报错。",
+      "byDay": "按天",
+      "date": "日期",
+      "empty": {
+        "title": "暂无流量",
+        "body": "域名提供页面后将显示指标。"
+      }
+    }
+  },
+  "launches": {
+    "title": "发布",
+    "open": "上线",
+    "subtitle": "新增一种语言是否提升了转化？基于偏好该语言的访客进行测量。",
+    "back": "洞察",
+    "new": "测量上线",
+    "empty": "尚未测量任何上线。语言正式上线时开始测量。",
+    "started": "正在测量：{language}",
+    "dialog": {
+      "title": "测量语言上线效果",
+      "body": "该语言将加入您的目标语言（请先翻译）。随后 glot 将衡量它对目标事件的影响。",
+      "locale": "语言",
+      "mode": "方法",
+      "holdout": "保留比例 (%)",
+      "days": "持续时间（天）",
+      "goal": "目标事件",
+      "start": "开始测量",
+      "cancel": "取消",
+      "guardDown": "护栏指标（下降为不良）",
+      "guardUp": "护栏指标（上升为不良）",
+      "guardHint": "以逗号分隔的事件。若其中任一事件恶化超过 5%或缺乏数据，则阻止切换至 100%。",
+      "auto": "满足所有条件后自动升至 100%"
+    },
+    "mode": {
+      "holdout": "留出对照",
+      "holdoutHint": "偏好该语言的访客会看到该语言，但保留的一部分比例仍使用{fallback}；满足所有条件后将提升至 100%（需你确认，或选择加入后自动提升）。可测量实际效果。需要运行时目录（glot CDN + @glot/insights）。",
+      "before_after": "前后对比",
+      "before_afterHint": "在应用内置目录的情况下，比较上线前后的同一受众。并非因果关系：季节性与营销活动也会影响数据。"
+    },
+    "status": {
+      "measuring": "测量中",
+      "rolled_out": "已全量发布",
+      "invalid": "无效",
+      "done": "已完成",
+      "ready": "可推至 100 %"
+    },
+    "verdict": {
+      "collecting": "收集数据中",
+      "probably_positive": "可能为正面",
+      "probably_negative": "可能为负面",
+      "inconclusive": "尚无定论",
+      "invalid": "测量无效",
+      "higher_after": "上线后更高",
+      "lower_after": "上线后更低",
+      "no_clear_change": "无明显变化"
+    },
+    "explain": {
+      "collecting": "数据尚不足：结论需等待完整一周及每组的最小样本量。",
+      "probably_positive": "看到该语言的访客转化率更高，至少有 95% 的概率。置信区间显示效果可能有多大。",
+      "probably_negative": "看到该语言的访客转化率更低，至少有 95% 的概率。保留前请检查翻译。",
+      "inconclusive": "目前尚无明显差异超出噪声范围。置信区间显示仍可能存在的效果范围。",
+      "invalid": "流量分配与配置不符（样本比例失调）：部分受众获得了错误的语言。请修正后重新测量。",
+      "higher_after": "上线后，受众的转化率高于上线前。这是相关性，并不能证明是该语言导致的。",
+      "lower_after": "上线后，受众的转化率低于上线前。这是相关性，并不能证明是该语言导致的。",
+      "no_clear_change": "上线前后没有明显变化。"
+    },
+    "story": {
+      "kicker": "语言上线",
+      "headline": "{project}（{language}）",
+      "period": "{from} – {to} · {mode}",
+      "step1": "推荐",
+      "reco": "在 glot 推荐的 {of} 种语言中排名第 #{rank}：{share} 的访客偏好该语言，翻译成本约 {cost}（置信度：{confidence, select, solid {可靠} indicative {初步} other {低}}）。",
+      "recoNone": "未记录该语言的 glot 推荐。",
+      "step2": "成本",
+      "cost": "翻译成本：{cost}。",
+      "costEstimated": "翻译成本约 {cost}（估算）。",
+      "step3": "受众",
+      "audience": "上线前 {days} 天内，有 {visits} 名访客偏好该语言（{language}）；其中 {rate} 完成了转化（{goal}）。",
+      "step4": "结果",
+      "armFallback": "保留 {language}",
+      "armNew": "展示 {language}",
+      "armBefore": "上线前",
+      "armAfter": "上线后",
+      "lift": "转化率相对变化（{goal}）",
+      "interval": "95% 可信区间",
+      "pBetter": "{language} 转化更优的概率：{p}",
+      "caveat": "上线前后对比仅体现相关性，而非可测量的效果。季节性、营销活动或趋势都可能解释这一变化。",
+      "caveatShort": "上线前后对比：相关性，而非因果关系",
+      "explicit": "{n, plural, other {已从分析中排除 # 个自行选择语言的会话。}}",
+      "srm": "流量分配与 {pct}% 的留出比例不符：结果不可靠。",
+      "chart": "累计转化率",
+      "chartAria": "按天统计的累计转化率（{goal}）：{a} 和 {b}",
+      "footer": "通过 glot Insights 测量：每日匿名汇总数据，不使用 Cookie，不收集访客数据。",
+      "footerShort": "与留出对照组对比测量",
+      "scope": "已排除自行选择语言的访客：所测量的效果是自动本地化对无明确语言偏好访客的影响。",
+      "guardrails": "护栏指标",
+      "guardrailsHint": "不得变差的事件。当劣化超过 5 % 的概率超过 20 % 时，将阻止推至 100 %。",
+      "guardrailDown": "下降即为不利",
+      "guardrailUp": "上升即为不利",
+      "pWorse": "劣化超过 5 % 的概率：{p}"
+    },
+    "share": {
+      "button": "分享",
+      "title": "公开案例研究",
+      "body": "只读页面，仅含汇总数据，不含访客数据。在你撤销之前，持有链接的任何人都可以查看。",
+      "revoke": "撤销链接",
+      "created": "已创建公开链接",
+      "revoked": "链接已撤销"
+    },
+    "public": {
+      "title": "{project} 的 {language} 上线：案例研究",
+      "description": "{verdict}：转化率{lift}（{goal}）。glot 案例研究。",
+      "cta": "用 glot 测量你的下一种语言"
+    },
+    "rollout": {
+      "readyTitle": "可以提升至 100% 了",
+      "readyBody": "所有条件均已满足：每组 {min} 次转化、7 天、流量分配符合预期、置信提升显著、护栏指标稳定。保留组将继续使用{fallback}，直到你确认。",
+      "confirm": "提升至 100%",
+      "endedTitle": "测量已结束，但未满足所有条件",
+      "endedBody": "保留组将继续使用{fallback}，直到你作出决定。",
+      "done": "{language} 现已向所有偏好该语言的访客提供。",
+      "pending": "提升至 100% 之前：",
+      "pendingAuto": "满足以下条件后将自动提升至 100%："
+    },
+    "blocker": {
+      "min_days": "完整一周的测量周期",
+      "min_visitors": "每组至少 {n} 名访客",
+      "min_conversions": "每组至少 {min} 次转化",
+      "srm": "与配置一致的流量分配",
+      "no_credible_lift": "可信的提升（至少 95% 概率）",
+      "guardrail": "护栏指标数据充足且未退化",
+      "no_holdout": "一个留出组"
+    },
+    "guardrailStatus": {
+      "ok": "稳定",
+      "degraded": "已劣化",
+      "insufficient": "数据不足"
+    }
+  },
+  "auth": {
+    "errors": {
+      "invalid": "邮箱或密码无效。",
+      "passwordTooShort": "密码至少需要 8 个字符。"
+    },
+    "fields": {
+      "email": "邮箱",
+      "name": "姓名",
+      "password": "密码",
+      "passwordHint": "至少 8 个字符。"
+    },
+    "login": {
+      "submit": "登录",
+      "subtitle": "登录你的 glot 工作区。",
+      "switch": "还没有账户？",
+      "switchLink": "创建账户",
+      "title": "欢迎回来",
+      "forgot": "忘记密码？"
+    },
+    "signup": {
+      "submit": "创建账户",
+      "subtitle": "免费开源，使用你自己的 LLM 密钥。",
+      "switch": "已有账户？",
+      "switchLink": "登录",
+      "title": "创建你的账户"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "取消",
+    "close": "关闭",
+    "copied": "已复制到剪贴板",
+    "copy": "复制",
+    "create": "创建",
+    "delete": "删除",
+    "edit": "编辑",
+    "github": "GitHub",
+    "never": "从不",
+    "retry": "重试",
+    "save": "保存",
+    "saving": "保存中…",
+    "dismiss": "关闭"
+  },
+  "editor": {
+    "anyLocale": "所有语言区域",
+    "anyStatus": "所有状态",
+    "approve": "批准",
+    "approved": "已批准",
+    "clearFilters": "清除筛选",
+    "columns": "语言区域",
+    "columnsHint": "要显示的列",
+    "detail": {
+      "by": "作者 {author}",
+      "description": "描述",
+      "doNotTranslate": "请勿翻译",
+      "glossary": "术语匹配",
+      "history": "历史记录",
+      "noDescription": "暂无描述。添加描述可为 LLM 提供更多上下文。",
+      "noGlossary": "此源文本中没有术语。",
+      "noHistory": "暂无历史记录。",
+      "noReferences": "未找到代码引用。",
+      "references": "引用",
+      "selectKey": "选择一个键以查看其上下文。",
+      "title": "详情",
+      "toggle": "切换详情",
+      "translations": "翻译"
+    },
+    "differentMeaning": "含义不同",
+    "editPlaceholder": "{locale} 的翻译",
+    "empty": "没有符合这些筛选条件的键。",
+    "emptyValue": "尚未翻译",
+    "issuesTooltip": "{count, plural, other {# 个问题}}",
+    "key": "键",
+    "loadMore": "正在加载更多…",
+    "origin": {
+      "human": "人工",
+      "imported": "导入",
+      "machine": "机器"
+    },
+    "results": "{count, plural, =0 {没有键} other {# 个键}}",
+    "reviewDone": "{count, plural, other {已审核 # 条翻译}} · {different, plural, =0 {无含义偏差} other {# 条含义不同}}",
+    "reviewLocale": "审核 {locale}",
+    "reviewLocaleHint": "回译此语言区域的所有翻译，并标记含义偏差",
+    "saved": "已保存",
+    "savedWithIssues": "已保存，但有 {count, plural, other {# 个问题}}",
+    "score": "评分 {score}",
+    "search": "搜索键名和文本…",
+    "shortcuts": "j/k 移动 · Enter 编辑 · ⌘Enter 批准 · Esc 取消",
+    "source": "源文本",
+    "title": "键名",
+    "withIssues": "存在问题",
+    "subtitle": "逐个键名编辑、审阅并批准每条译文。",
+    "saving": "保存中…",
+    "saveFailed": "保存失败。您的修改已恢复到单元格中；请修正，或按 Escape 键放弃。",
+    "approveFailed": "审核失败，译文未更改，请重试。",
+    "emptyFilteredBody": "请尝试其他搜索词，或清除筛选条件以查看所有键。",
+    "noKeys": {
+      "title": "暂无键",
+      "body": "键来自您的代码仓库：使用 CLI 推送源目录，或手动添加单个字符串。它们会立即显示在此处。",
+      "push": "推送目录（在代码仓库中运行）",
+      "add": "或添加一个字符串"
+    }
+  },
+  "errors": {
+    "emailUnverified": "请先确认邮箱地址：打开我们发送的链接，或在横幅中重新发送。",
+    "generic": "出现错误，请重试。",
+    "network": "网络错误，请检查连接后重试。",
+    "notFound": "未找到。",
+    "sessionExpired": "会话已过期，请重新登录。"
+  },
+  "glossary": {
+    "add": "添加术语",
+    "caseSensitive": "区分大小写",
+    "deleteConfirm": {
+      "body": "删除后，后续翻译将不再强制使用该术语。",
+      "title": "删除“{term}”？"
+    },
+    "deleted": "术语已删除",
+    "description": "描述",
+    "dialog": {
+      "createTitle": "新建术语",
+      "editTitle": "编辑术语",
+      "forbiddenFor": "禁用（{locale}）",
+      "translationFor": "译文（{locale}）"
+    },
+    "doNotTranslate": "不翻译",
+    "empty": {
+      "body": "添加产品名称和领域术语，确保各语言保持一致。",
+      "title": "暂无术语"
+    },
+    "flags": "规则",
+    "forbiddenHint": "以逗号分隔，LLM 不得使用的译法变体。",
+    "saved": "术语已保存",
+    "subtitle": "在每次翻译中强制执行的术语：需保留的品牌名称，以及只允许一种译法的词语。与仓库中的 <file>glossary.toml</file> 保持一致。",
+    "term": "术语",
+    "title": "术语表",
+    "translations": "译文",
+    "fileTip": "术语文件位于仓库根目录。glot push 和 glot pull 会使其与此页面保持同步，glot check 会在 CI 中强制执行。"
+  },
+  "health": {
+    "detail": {
+      "coverage": "已翻译 {translated}/{total} 个键",
+      "errors": "{translated} 条译文中有 {issues} 条存在校验问题",
+      "meaning": "已审阅 {reviewed} · 语义不同 {different}",
+      "visual": "{pages} 个页面中有 {clean} 个无视觉问题"
+    },
+    "dims": {
+      "coverage": "覆盖率",
+      "errors": "校验",
+      "meaning": "语义",
+      "visual": "视觉"
+    },
+    "empty": {
+      "coverage": "暂无键",
+      "errors": "尚未翻译任何内容",
+      "meaning": "没有可供审阅的译文",
+      "visual": "暂无覆盖此语言区域的视觉 QA 报告"
+    },
+    "locale": "语言区域",
+    "na": "不适用",
+    "overall": "评分",
+    "runReview": "运行审查",
+    "status": {
+      "fair": "需改进",
+      "good": "健康",
+      "poor": "存在风险"
+    },
+    "subtitle": "覆盖率、校验、语义（回译）和视觉 QA，按 0–100 评分。",
+    "title": "语言区域健康度",
+    "dimsHelp": {
+      "coverage": "该语言中已有译文的键所占比例。",
+      "errors": "通过校验的译文所占比例：占位符、ICU 复数、术语表和长度。",
+      "meaning": "回译检查：由 LLM 将文本译回源语言并比较语义。按需运行。",
+      "visual": "最新视觉 QA 报告中无布局问题的页面所占比例。"
+    }
+  },
+  "jobStatus": {
+    "done": "已完成",
+    "failed": "失败",
+    "queued": "排队中",
+    "running": "运行中"
+  },
+  "jobs": {
+    "cost": "费用",
+    "empty": {
+      "body": "任务会使用你的项目模型翻译所有缺失或过时的键，验证每个结果，并重试失败的部分。可从「翻译缺失项」开始。",
+      "title": "暂无任务"
+    },
+    "kind": {
+      "translate": "翻译",
+      "github_localize": "本地化仓库",
+      "github_update": "更新拉取请求",
+      "edge_translate": "Edge 翻译",
+      "connector_translate": "CMS 翻译"
+    },
+    "live": "实时",
+    "progress": "{done} / {total}",
+    "subtitle": "后台翻译运行，实时更新。每个字符串在保存前都会经过验证；费用来自你的 LLM 服务商。",
+    "title": "任务",
+    "finished": "翻译完成：已翻译并验证 {count, plural, other {# 个字符串}}",
+    "failed": "翻译任务失败"
+  },
+  "keySheet": {
+    "notFound": "没有匹配的键",
+    "notFoundHint": "在应用中为元素添加 data-glot-key 标签，以便将问题精确关联到键。",
+    "openInEditor": "在编辑器中打开",
+    "pick": "多个键与此文本匹配，请选择一个：",
+    "saved": "翻译已保存",
+    "savedWithIssues": "已保存，存在 {count, plural, other {# 个问题}}",
+    "source": "源文本",
+    "title": "编辑键",
+    "translation": "翻译"
+  },
+  "landing": {
+    "meta": {
+      "title": "面向编码代理的开源 AI 本地化",
+      "description": "面向编码代理的开源本地化工具。每条 LLM 翻译都由确定性代码检查（占位符、CLDR 复数、术语表、像素宽度），无效则拒绝，直到有效为止。在我们的基准测试中，损坏字符串占比 0%，而不使用 glot 时为 14.1%。"
+    },
+    "skip": "跳至内容",
+    "nav": {
+      "label": "主导航",
+      "how": "工作原理",
+      "guarantees": "保障",
+      "try": "试用",
+      "compare": "对比",
+      "docs": "文档",
+      "pricing": "价格",
+      "openApp": "打开应用",
+      "githubStars": "GitHub 上的 glot，{count, plural, =0 {暂无 Star} other {# 个 Star}}",
+      "home": "glot 首页",
+      "experiments": "复制实验"
+    },
+    "hero": {
+      "badge": "开源 · MIT · 使用你自己的 LLM 密钥",
+      "title": "你的代理负责本地化，代码负责保障。",
+      "subtitle": "你的编码代理会将硬编码字符串迁移为键并翻译。glot 用确定性代码检查每个 LLM 输出，拒绝任何损坏或过长的内容，并给出具体原因，直到重试结果有效。",
+      "copy": "复制命令",
+      "copied": "命令已复制",
+      "openApp": "打开应用",
+      "commandHint": "自动检测你的 i18n 技术栈，提取字符串、翻译并校验。每次修改界面后重新运行。",
+      "demoAlt": "终端：glot translate 拒绝了缺少 few 和 many 的波兰语复数、被重命名为 '{nom}' 的法语占位符，以及宽 276 px 的德语标签（按钮宽 120 px）；它将原因返回给 LLM，然后写入修正后的版本；glot check 通过。",
+      "demoCaption": "真实的 glot 二进制文件。本录制中的 LLM 被脚本设定为会出错三个字符串；拒绝记录均来自 glot。",
+      "pause": "暂停演示",
+      "play": "播放演示",
+      "proofOss": "MIT 许可",
+      "proofStars": "{count, plural, =0 {在 GitHub 上 Star} other {在 GitHub 上获得 # 个 Star}}",
+      "proofNpm": "npm v{version}",
+      "proofLabel": "项目信息"
+    },
+    "bench": {
+      "eyebrow": "基准测试，2026 年 10 月 18 日",
+      "title": "进入目录的错误字符串",
+      "lead": "每个模型和条件 320 条 ICU 消息，覆盖 8 种语言区域。提示词和模型相同。",
+      "raw": "原始提示词",
+      "glot": "使用 glot",
+      "rejected": "使用 glot 时，经重试后仍有 {haiku}（Haiku）和 {sonnet}（Sonnet）的字符串被拒绝，并保持未翻译，而不是带着错误发布。独立评判方（FormatJS + Intl.PluralRules）也认同此结果。",
+      "report": "阅读完整报告",
+      "tableCaption": "按模型和条件划分的已翻译消息中出错的占比",
+      "model": "模型"
+    },
+    "how": {
+      "eyebrow": "工作原理",
+      "title": "三个步骤。你的代理也可以运行它们。",
+      "subtitle": "或一次完成全部三步，幂等：npx glot-i18n localize。",
+      "init": {
+        "title": "检测",
+        "body": "查找你的 i18n 库和目录，写入 glot.toml 以及你的编码代理所读取的规则。"
+      },
+      "i18nize": {
+        "title": "提取",
+        "body": "将硬编码的界面字符串迁移为键，并为 next-intl 或 react-i18next 重写组件。"
+      },
+      "translate": {
+        "title": "翻译并校验",
+        "body": "仅翻译增量部分。每个输出都会校验；被拒绝的结果连同原因返回给模型。重试后仍无效则不写入任何内容。"
+      }
+    },
+    "guarantees": {
+      "eyebrow": "核心保障",
+      "title": "LLM 负责提议，代码决定写入什么。",
+      "subtitle": "每张卡片都展示真实的拒绝记录，与 glot 的输出逐字一致。",
+      "refusal": "被 glot 拒绝",
+      "placeholders": {
+        "title": "占位符与标签",
+        "body": "与源文本的集合一致，不新增、不翻译。支持 ICU、i18next 和 MessageFormat 2。"
+      },
+      "plurals": {
+        "title": "CLDR 复数",
+        "body": "覆盖目标语言所需的全部类别：波兰语需要四类，阿拉伯语需要六类。"
+      },
+      "glossary": {
+        "title": "术语表即代码",
+        "body": "仓库中的 glossary.toml：必需与禁用的译文，以及不翻译的术语。"
+      },
+      "width": {
+        "title": "像素宽度",
+        "body": "按照你应用的真实字体和容器测量。超宽即拒绝，绝不截断。"
+      },
+      "lockfile": {
+        "title": "锁文件",
+        "body": "glot.lock 记录源文本和译文的哈希值。只翻译增量部分，手动编辑的内容永远不会被覆盖。"
+      },
+      "ci": {
+        "title": "CI 检查",
+        "body": "glot check 会离线对每个目录运行所有规则，退出码为 1，并附带 PR 标注。"
+      }
+    },
+    "fit": {
+      "eyebrow": "像素预算",
+      "title": "适配按钮的译文",
+      "body": "德语比英语长约三分之一。glot fit 会在每种语言环境中渲染你正在运行的应用，依据各自的容器测量每段文本，请求保留含义和占位符的更短变体，然后重新渲染。",
+      "before": "修改前",
+      "after": "glot fit 后，迭代 1 次",
+      "overflow": "超出 112 px 按钮宽度",
+      "fits": "适配",
+      "meta": "在演示应用上的实际运行结果，德语语言环境。",
+      "p1": "在浏览器中实测，而非根据字符数估算",
+      "p2": "更短的变体仍需通过校验器和术语表检查",
+      "p3": "固定轮次，绝不会无限循环"
+    },
+    "play": {
+      "eyebrow": "立即试用，无需安装",
+      "title": "你能难倒 glot 吗？",
+      "subtitle": "编辑译文。与守护 glot 翻译的校验器相同，它已编译为 WebAssembly，在您的浏览器中每次击键时运行。",
+      "source": "源文本（英文，ICU）",
+      "target": "译文",
+      "locale": "目标语言",
+      "challenges": "从一个有错误的译文开始",
+      "loading": "正在加载校验器…",
+      "failed": "校验器加载失败。请重新加载页面后重试。",
+      "accepted": "已接受：glot 会写入此译文。",
+      "refused": "{count, plural, other {已拒绝 # 个错误}}",
+      "warnings": "{count, plural, other {# 条警告，仍会写入}}",
+      "score": "{refused, plural, =0 {尚无拒绝。请尝试其中一个挑战。} other {glot 拒绝了您的 # 次尝试。}}",
+      "reset": "重置",
+      "note": "像素宽度和术语表需要您的应用和代码仓库，请使用 CLI 试用。"
+    },
+    "agents": {
+      "eyebrow": "智能体",
+      "title": "兼容你已在使用的智能体",
+      "subtitle": "glot mcp 会向你的智能体提供你的键、它们的使用位置和术语表。它新增的每条字符串都会经过同一套校验器。",
+      "plugin": "插件 + MCP",
+      "rules": "规则 + MCP",
+      "agentsMd": "AGENTS.md + MCP",
+      "skill": "智能体技能",
+      "prompt": "生成的提示词",
+      "docs": "各代理的设置方法"
+    },
+    "overlay": {
+      "alt": "glot 覆盖层弹窗，显示一个键、其源文本及其在五种语言中的翻译",
+      "body": "开发覆盖层可找到您点击的文本所对应的键，在每种语言中显示该键及实时校验问题，并保存到您的翻译文件。",
+      "eyebrow": "应用内编辑",
+      "p1": "建议、精简、更正式、全部翻译",
+      "p2": "标记溢出容器的文本",
+      "p3": "仅限开发环境，gzip 压缩后约 6 kB",
+      "title": "Alt+点击应用中的任意文本"
+    },
+    "compare": {
+      "crowdinPrice": "14 天试用后为付费套餐，开源项目免费",
+      "feature": "功能",
+      "footnote": "核对时间为 2026 年 10 月 18 日，依据各厂商的公开网站和文档。“部分”表示功能有限、取决于套餐或需通过集成实现。“否”表示我们在公开文档中未找到该功能。套餐可能变化：每个单元格都链接到其来源。",
+      "glotPrice": "免费（MIT）+ 你的 LLM 用量",
+      "lingoPrice": "CLI 免费，使用你自己的密钥；托管引擎基础费用 $0 + 用量",
+      "lokalisePrice": "起价 $149/月，14 天试用",
+      "no": "否",
+      "partial": "部分支持",
+      "rows": {
+        "byok": "自带 LLM 密钥",
+        "fit": "按渲染像素预算适配",
+        "gitNative": "以 Git 作为事实来源（锁文件）",
+        "inContext": "在应用内直接编辑",
+        "mcp": "面向编程智能体的 MCP 服务器",
+        "openSource": "开源",
+        "price": "价格",
+        "validator": "对每条字符串进行确定性校验"
+      },
+      "sources": "每个单元格的来源和日期",
+      "subtitle": "glot 与托管式翻译平台及其他面向开发者的工具有何不同。",
+      "title": "对比",
+      "tolgeePrice": "免费套餐和免费自托管，云端起价 €58/月",
+      "yes": "是"
+    },
+    "faq": {
+      "title": "常见问题",
+      "more": "查看更多常见问题",
+      "cost": {
+        "q": "费用是多少？",
+        "a": "glot 采用 MIT 协议，免费使用。你使用自己的密钥向 LLM 服务商付费：在我们的测试中，使用默认模型翻译 850 个字符串花费 $0.035。运行 glot translate --dry-run 可先估算费用，预算上限可以限制总开销。"
+      },
+      "runtime": {
+        "q": "它会增加运行时依赖吗？",
+        "a": "不需要。你的应用继续使用 next-intl、i18next 或 FormatJS 以及普通 JSON 目录。glot 直接处理文件，在你的仓库和 CI 中运行。"
+      },
+      "fails": {
+        "q": "如果模型一直翻译错某个字符串怎么办？",
+        "a": "glot 会把具体原因回传给模型，重试两次，然后尝试备用模型。如果仍然失败，则不写入任何内容：该键会被标记为已拒绝，并保持未翻译状态。"
+      },
+      "code": {
+        "q": "我的代码会离开我的机器吗？",
+        "a": "待翻译的字符串及其上下文会发送到你的 LLM 服务商，源文件不会发送。glot 的作者不会收到任何内容，也没有遥测。"
+      },
+      "app": {
+        "q": "我需要 Web 应用吗？",
+        "a": "不需要。CLI 和 MCP 服务器完全在本地完成全部工作。应用额外提供共享仪表盘、审阅功能，以及面向团队的 GitHub 同步。"
+      }
+    },
+    "cta": {
+      "title": "每次发布都交付所有语言。",
+      "body": "在你的仓库中运行一条命令。出错的字符串不会进入你的目录。",
+      "docs": "阅读快速入门"
+    },
+    "footer": {
+      "tagline": "AI 无法破坏的本地化。",
+      "license": "MIT 许可证",
+      "docs": "文档",
+      "benchmark": "基准测试",
+      "npm": "npm"
+    }
+  },
+  "home": {
+    "meta": {
+      "title": "glot：您的应用与网站支持所有语言，毫无差错",
+      "description": "glot 将您的应用、网站、邮件和客服内容翻译为各种语言，在上线前逐句检查，并告诉您哪些国家为您带来客户。"
+    },
+    "skip": "跳至内容",
+    "nav": {
+      "label": "主导航",
+      "home": "glot 首页",
+      "demo": "演示",
+      "i18n": "本地化",
+      "docs": "文档",
+      "pricing": "定价",
+      "openApp": "打开应用",
+      "githubStars": "glot 的 GitHub 仓库，{count, plural, =0 {暂无 Star} other {# 个 Star}}",
+      "wow": "实时",
+      "different": "为何选择 glot",
+      "together": "协作"
+    },
+    "hero": {
+      "badge": "应用、网站、邮件、客服",
+      "title": "用<hl>每位客户</hl>的语言交流。",
+      "subtitle": "glot 翻译您的应用、网站及所有对外内容，在上线前逐句检查，并告诉您哪些国家为您带来客户。",
+      "start": "免费开始",
+      "startHint": "无需信用卡。",
+      "proofLabel": "项目概况",
+      "proofBench": "0% 错句，而纯 AI 为 14.1%",
+      "proofBenchNote": "基准测试：8 种语言共 320 个句子，相同 AI 模型，有无 glot 的对比，2026 年 10 月 18 日。",
+      "proofStars": "{count, plural, =0 {在 GitHub 上 Star} other {在 GitHub 上获得 # 个 Star}}",
+      "proofNpm": "npm v{version}",
+      "see": "查看实际效果"
+    },
+    "demo": {
+      "eyebrow": "查看效果",
+      "title": "一个创意，用所有语言撰写",
+      "subtitle": "glot 为一个标题撰写多个版本，在每种语言中检查，为每个国家展示最佳版本，并保留胜出版本。",
+      "label": "逐步进行的文案实验",
+      "steps": "演示步骤",
+      "example": "示例数据",
+      "caption": "示例数据。",
+      "key": "键",
+      "official": "官方文本",
+      "play": "播放演示",
+      "pause": "暂停演示",
+      "replay": "重播",
+      "announce": "第 {n} 步，共 {total} 步：{title}",
+      "write": {
+        "label": "撰写",
+        "title": "AI 撰写三个版本",
+        "body": "每个版本一个创意。你的当前文案保留为参考。"
+      },
+      "check": {
+        "label": "检查",
+        "title": "glot 检查每种语言",
+        "body": "名称、价格、复数形式、你的术语表以及屏幕空间，覆盖每种语言。"
+      },
+      "serve": {
+        "label": "投放",
+        "title": "每个国家看到各自的版本",
+        "body": "访客会看到更多有效的版本。"
+      },
+      "learn": {
+        "label": "了解",
+        "title": "一句话说明结果",
+        "body": "哪个版本胜出、优势多大，以及 glot 有多大把握。"
+      },
+      "ship": {
+        "label": "上线",
+        "title": "胜出版本正式上线",
+        "body": "一键即可用胜出文案替换旧文案，覆盖所有语言。"
+      },
+      "intent": {
+        "simplicity": "简洁",
+        "benefit": "直接收益",
+        "urgency": "真实紧迫感"
+      },
+      "writing": "撰写中…",
+      "ready": "就绪",
+      "refused": "被 glot 拒绝",
+      "retried": "首次过宽，已改写后通过。",
+      "checks": "已通过 {passed, number} / {total, number} 项检查",
+      "version": "版本",
+      "pass": "已通过",
+      "fail": "已拒绝",
+      "audience": {
+        "de": "德国 · 搜索",
+        "fr": "法国 · 移动端",
+        "rest": "其他所有地区"
+      },
+      "traffic": "各版本的流量占比",
+      "visitors": "{count, plural, other {# 位访客}}",
+      "day": "第 {day} 天",
+      "win": "{variant}：注册数约增加 {lift}（可能在 {low} 到 {high} 之间），为最佳版本的概率为 {probability}。",
+      "none": "尚无明确胜出者。你的官方文本将继续展示。",
+      "learning": "仍在学习中。还需约 {days, plural, other {# 天}}。",
+      "promote": "全部推广",
+      "merge": "合并拉取请求",
+      "merged": "完成。获胜版本已在所有语言中上线。",
+      "files": "{count, plural, other {已更改 # 个文件}}"
+    },
+    "how": {
+      "eyebrow": "工作方式",
+      "title": "三步完成，无需技术配置。",
+      "pick": {
+        "title": "连接现有内容",
+        "body": "您的应用、网站、店铺。点击几下，或粘贴一行代码。"
+      },
+      "write": {
+        "title": "glot 负责翻译与检查",
+        "body": "每个句子，翻译成您选择的每种语言，并在上线前完成检查。"
+      },
+      "ship": {
+        "title": "上线并观察增长",
+        "body": "您的客户使用其母语阅读。您可以看到哪些国家的用户注册并购买。"
+      }
+    },
+    "faq": {
+      "title": "常见问题",
+      "more": "全部问题",
+      "dev": {
+        "q": "需要开发者吗？",
+        "a": "网站或店铺无需开发者：粘贴一行代码或连接账户即可。对于应用，glot 会准备好变更，您的开发者一键即可批准。"
+      },
+      "quality": {
+        "q": "翻译质量如何？",
+        "a": "glot 使用当前最好的 AI 模型，遵循您的术语表和语气，并在上线前检查每一句。不确定的内容会进入待人工审批列表。"
+      },
+      "tools": {
+        "q": "能与我的工具配合使用吗？",
+        "a": "支持 Wix、Squarespace、Webflow、Shopify、WordPress 等众多建站平台，以及网页和移动应用、邮件和支持工具。完整列表见集成页面。"
+      },
+      "google": {
+        "q": "Google 会显示我的翻译页面吗？",
+        "a": "可以。每种语言都有独立页面，搜索引擎可以抓取，标题会根据各国用户的搜索习惯调整。"
+      },
+      "privacy": {
+        "q": "我的访客数据会怎样？",
+        "a": "glot 统计访问时不使用 Cookie，也不收集个人数据。在邮件和支持消息中，个人信息会在任何 AI 处理文本前被隐藏。"
+      },
+      "price": {
+        "q": "费用是多少？",
+        "a": "免费开始，无需信用卡。付费方案提供更大用量和 Growth 工具。glot 是开源项目，您也可以自行部署。"
+      }
+    },
+    "pricing": {
+      "title": "免费开始，增长后再付费。",
+      "body": "在您自己的项目上免费试用 glot。当国际流量增长时，选择合适的方案。它是开源的，您也可以自行部署。",
+      "cta": "查看定价"
+    },
+    "cta": {
+      "title": "你的下一批客户不说你的语言。<hl>还没有。</hl>",
+      "body": "接入你的应用或网站，今天就能看到它以每种语言呈现。",
+      "docs": "查看文档"
+    },
+    "footer": {
+      "tagline": "您的产品覆盖所有语言，毫无差错。",
+      "docs": "文档",
+      "benchmark": "基准测试",
+      "i18n": "本地化",
+      "pricing": "定价",
+      "npm": "npm",
+      "license": "MIT 许可证"
+    },
+    "features": {
+      "before": "使用前",
+      "after": "使用 glot 之后",
+      "app": {
+        "minutes": {
+          "title": "几分钟完成翻译",
+          "pain": "花数周时间把文本复制到电子表格里，还要催促译员。",
+          "gain": "整个应用，按你选择的任意语言，当天完成。"
+        },
+        "safe": {
+          "title": "出错的内容不会上线",
+          "pain": "AI 翻译会破坏按钮、名称和价格。",
+          "gain": "每个句子在客户看到之前都会经过检查。"
+        },
+        "fresh": {
+          "title": "始终保持最新",
+          "pain": "每个新功能上线时都只完成了一半的翻译。",
+          "gain": "每次改动都会自动翻译，等你确认即可。"
+        },
+        "brand": {
+          "title": "你的用词，你的品牌",
+          "pain": "你的产品名称被翻译成三种不同的写法。",
+          "gain": "你的术语表和语气会在每种语言中得到遵循。"
+        },
+        "onpage": {
+          "title": "直接在页面上修正",
+          "pain": "反馈散落在截图和邮件往来中，难以追踪。",
+          "gain": "你的团队和访客可以直接指向真实网站上的某句话，并就地修正。"
+        },
+        "agents": {
+          "title": "你的编程助手懂 glot",
+          "pain": "AI 编程助手只能把文本硬编码为单一语言。",
+          "gain": "Claude、Cursor 和 Codex 在编写应用时，会为每个新句子同步添加所有语言的翻译。"
+        }
+      },
+      "web": {
+        "tag": {
+          "title": "任意网站，一行代码",
+          "pain": "使用 Wix、Squarespace 或 Webflow 搭建的网站只能是单一语言。",
+          "gain": "粘贴一行代码，网站即可获得语言切换器。无需开发人员。"
+        },
+        "google": {
+          "title": "各国都能在 Google 上搜到",
+          "pain": "翻译好的网站在海外从未出现在 Google 结果中。",
+          "gain": "每种语言都有独立页面，搜索引擎可以抓取并排名。"
+        },
+        "local": {
+          "title": "用户真正搜索的词",
+          "pain": "逐字直译的标题，没有人会在 Google 中搜索。",
+          "gain": "标题和小标题采用马德里或墨西哥城用户真正搜索的词。"
+        },
+        "shop": {
+          "title": "店铺和博客也能覆盖",
+          "pain": "商品页面和文章需要逐种语言手动复制。",
+          "gain": "glot 连接你的店铺或 CMS，并保持所有语言同步。"
+        },
+        "live": {
+          "title": "每种语言都真正生效",
+          "pain": "翻译已达 100%，网站却仍显示旧语言。",
+          "gain": "glot 检查你的真实网站，并准确告诉你需要修改什么。"
+        },
+        "longtail": {
+          "title": "即使是你未计划的语言",
+          "pain": "使用其他语言的访客只能看到英文页面。",
+          "gain": "访客浏览器会翻译其余内容，同样经过检查，且免费。"
+        }
+      },
+      "beyond": {
+        "mobile": {
+          "title": "移动应用，无需等待商店审核",
+          "pain": "修复一个错别字也要重新发版，还要等待数天的商店审核。",
+          "gain": "修复和新语言会在用户下次打开应用时生效。"
+        },
+        "emails": {
+          "title": "邮件、发票、通知",
+          "pain": "网站翻译好了，收据却还是英文。",
+          "gain": "每条消息都使用客户的语言，且他们的个人数据绝不会发送给 AI。"
+        },
+        "ai": {
+          "title": "你的 AI 回答",
+          "pain": "你的聊天机器人用英语回复日本客户。",
+          "gain": "AI 的回答会在生成时被翻译，并使用你品牌的措辞。"
+        },
+        "support": {
+          "title": "支持所有语言的服务",
+          "pain": "工单使用的语言，团队中没有人能读懂。",
+          "gain": "用你自己的语言阅读和回复，客户看到的是他们的语言。"
+        },
+        "once": {
+          "title": "改一次，处处生效",
+          "pain": "同一句话要在五个地方分别修改。",
+          "gain": "glot 会找到句子出现的每一处，并同步更新。"
+        }
+      },
+      "grow": {
+        "next": {
+          "title": "下一个开拓哪个国家",
+          "pain": "凭直觉添加语言。",
+          "gain": "查看来自你自己访客的各语言需求和注册情况，以及下一个市场的价值。"
+        },
+        "words": {
+          "title": "每个国家的最佳用词",
+          "pain": "一个在国内有效的标题，到了国外却平淡无奇。",
+          "gain": "在每种语言中尝试多个版本，保留每个国家表现最好的那个。"
+        },
+        "private": {
+          "title": "默认保护隐私",
+          "pain": "分析工具还要弹出 Cookie 横幅。",
+          "gain": "无需 Cookie，不收集个人数据，过滤机器人流量。只提供真实的统计数字。"
+        }
+      },
+      "trust": {
+        "proof": {
+          "title": "AI 写了什么，有据可查",
+          "pain": "欧盟针对 AI 生成内容的新规则出台，而你没有任何谁翻译了什么的记录。",
+          "gain": "每份译文都保留其历史记录，有人问起时随时可以出示。"
+        },
+        "open": {
+          "title": "开源，永远归你所有",
+          "pain": "被供应商锁定，而且按字数计费的价格不断上涨。",
+          "gain": "免费且开源。可以自行部署，也可以交给我们代为运行。"
+        }
+      },
+      "wow": {
+        "eyebrow": "实时",
+        "title": "亲眼见证。",
+        "subtitle": "glot 的六项功能，值得展示给你的团队。"
+      },
+      "diff": {
+        "eyebrow": "为什么选择 glot",
+        "title": "你在别处找不到的功能。",
+        "subtitle": "其他工具只负责翻译。glot 确保翻译有效、被找到，并带来回报。"
+      },
+      "viral": {
+        "eyebrow": "齐心协力",
+        "title": "整个团队和你的访客，都能参与贡献。",
+        "subtitle": "glot 融入大家已在使用的工作环境，让每个人都能参与贡献。"
+      }
+    },
+    "scenes": {
+      "hero": {
+        "eyebrow": "AI 本地化，没有边界",
+        "l1": "说出",
+        "l2": "每一种",
+        "l3": "语言，",
+        "l4": "规模化。",
+        "subtitle": "借助 glot 的 AI，将你的产品翻译、本地化并推向全球：自然、一致的内容，适配每个市场。",
+        "start": "免费试用 glot",
+        "demo": "观看演示",
+        "check1": "无需绑定银行卡",
+        "check2": "开源，MIT 许可证",
+        "check3": "每句话都经过检查",
+        "plateCulture": "文化本地化",
+        "plateAi": "AI 翻译",
+        "plateBrand": "术语与品牌语气",
+        "platePublish": "多语言发布",
+        "statBroken": "出错的句子",
+        "statAlone": "仅靠 AI",
+        "statOss": "永久开源",
+        "statStars": "GitHub 上的星标",
+        "statCookie": "我们分析工具中的 Cookie",
+        "statNote": "基准测试：8 种语言、320 句，同一 AI 模型在有无 glot 情况下的结果，2026 年 10 月 18 日。"
+      },
+      "problem": {
+        "badge": "问题 / 为什么选择 glot",
+        "title": "走向全球，",
+        "titleHl": "是一条布满障碍的路？",
+        "body": "跨国翻译、本地化和运营，会把绝佳的机会变成实实在在的麻烦。",
+        "without": "不使用 glot",
+        "withoutBody": "您在盲目前行，每一步都布满障碍。",
+        "p1": "翻译慢且成本高",
+        "p1s": "截止日期不断推迟",
+        "p2": "本地化不完整",
+        "p2s": "体验不自然",
+        "p3": "工具和团队过多",
+        "p3s": "运营复杂",
+        "p4": "性能与投资回报不确定",
+        "p4s": "难以衡量",
+        "verdict": "结果？上线更慢、成本更高、风险更大。",
+        "tagTranslate": "翻译",
+        "tagLocalize": "本地化",
+        "tagCheck": "检查",
+        "tagMeasure": "衡量",
+        "with": "使用 glot",
+        "solTitle": "借助 glot，走向全球变得",
+        "solHl": "一个 Growth 引擎。",
+        "solBody": "一个平台，覆盖从翻译到性能，再到上线，助您在全球推广并增长产品：更快、更简单，also 让您安心。",
+        "s1": "即时翻译并适配。",
+        "s2": "提供真正本地化的体验。",
+        "s3": "集中管理您的内容、团队和市场。",
+        "s4": "衡量成效，更快增长。",
+        "fast": "更快",
+        "fastS": "从翻译到上线",
+        "simple": "更简单",
+        "simpleS": "一体化，无摩擦",
+        "profit": "更有利可图",
+        "profitS": "可衡量的成效",
+        "result": "结果：",
+        "resultBody": "更快、更顺畅、更有利可图的全球化上线。"
+      },
+      "how": {
+        "badge": "工作原理",
+        "title": "了解",
+        "titleHl": "它如何运作？",
+        "subtitle": "从您的内容出发，打造真正的全球化体验。",
+        "fast": "快速",
+        "fastS": "几分钟内即可获得首批结果",
+        "complete": "完成",
+        "completeS": "所有渠道，一个平台",
+        "scale": "可扩展",
+        "scaleS": "从几种语言扩展到全球规模",
+        "k1": "连接",
+        "t1": "接入您的内容",
+        "b1": "只需几次点击，即可将你的应用、网站、邮件和支持渠道连接到 glot。",
+        "k2": "翻译",
+        "t2": "借助 AI 翻译",
+        "b2": "感知上下文的翻译，经过检查，即可使用。",
+        "k3": "适配",
+        "t3": "自定义，并保持掌控",
+        "b3": "调整语气、术语和业务规则（术语表、风格、例外）。",
+        "k4": "部署",
+        "t4": "随处发布",
+        "b4": "在每个渠道无障碍发布你的多语言内容。",
+        "k5": "衡量",
+        "t5": "追踪影响",
+        "b5": "按语言查看哪些国家访问、注册和购买。",
+        "surfaces": "产品界面",
+        "surfTitle": "统一生态系统，覆盖",
+        "surfHl": "覆盖您的全部内容。",
+        "mobile": "移动应用",
+        "mobileB": "无需等待应用商店审核，即可翻译您的 iOS 和 Android 应用。",
+        "mobile1": "原生集成",
+        "mobile2": "持续更新",
+        "mobile3": "本地化体验",
+        "web": "网站",
+        "webB": "几分钟内让您的网站支持多语言，并内置 SEO 优化。",
+        "web1": "即时翻译",
+        "web2": "SEO 优化",
+        "web3": "CMS 连接器",
+        "email": "邮件",
+        "emailB": "自动翻译您的通信内容和营销活动。",
+        "email1": "事务性邮件",
+        "email2": "营销活动",
+        "email3": "自动化工作流",
+        "support": "支持",
+        "supportB": "提供多语言客户支持，做到一致且响应迅速。",
+        "support1": "实时翻译",
+        "support2": "语气与回复保持一致",
+        "support3": "兼容您的工具",
+        "connectors": "连接器",
+        "campaign": "产品活动"
+      },
+      "demo": {
+        "badge": "交互式演示",
+        "title": "一个实时翻译工作室，让",
+        "titleHl": "你的文案表现更出色。",
+        "body": "在一个地方，实时为每个市场翻译、调整、测试和优化您的内容。",
+        "start": "启动交互式演示",
+        "explore": "探索工作区",
+        "n1": "交互式演示",
+        "n1b": "体验真实场景，无需安装。",
+        "n2": "实时工作室",
+        "n2b": "翻译、调整并比较不同版本。",
+        "n3": "质量检查",
+        "n3b": "发布前检查名称、价格、复数形式和长度。",
+        "n4": "智能 A/B 测试",
+        "n4b": "每个市场都保留最适合当地的文案。"
+      },
+      "results": {
+        "badge": "真实成果",
+        "title": "可衡量的成果，",
+        "titleHl": "可验证的信任。",
+        "body": "可复现的数据：基准测试公开，代码也公开。",
+        "c1": "公开基准测试",
+        "c2": "开放代码",
+        "c3": "不收集个人数据",
+        "impact": "glot 数据一览",
+        "m1": "使用 glot 时出错的句子",
+        "m2": "同款 AI 未用 glot 时",
+        "m3": "经 8 种语言测试的句子",
+        "m4": "本页语言",
+        "plans": "为你的 Growth 打造的方案",
+        "plansTitle": "选择能助你",
+        "plansHl": "腾飞的方案。",
+        "faqBadge": "FAQ",
+        "faqTitle": "常见",
+        "faqHl": "问题。",
+        "faqBody": "关于 glot 的要点，一目了然。",
+        "ctaTitle": "准备好让你的产品",
+        "ctaHl": "走向全世界了吗？",
+        "ctaBody": "免费开始，无需信用卡。代码开源，并将始终保持开源。",
+        "cta1": "无需信用卡",
+        "cta2": "开源"
+      }
+    }
+  },
+  "localeSwitcher": {
+    "label": "语言"
+  },
+  "matrix": {
+    "howTo": "每一列都是你真实站点中同一页面的一种语言版本。滚动一列，所有列同步滚动；红框表示视觉质检问题，点击即可修改文本。",
+    "fit": "适应",
+    "overlayHint": "标出上次视觉 QA 运行发现的问题（文字截断、重叠或未翻译）。",
+    "overlayNone": "尚无视觉 QA 报告：请先在“视觉 QA”页面运行一次，即可在此处查看问题标记。",
+    "pseudoHint": "添加一列更长、带重音符号的文本，以发现硬编码字符串以及在较长语言下布局出错的问题。",
+    "pseudoTag": "较长的带重音文本",
+    "focus": "仅显示此语言",
+    "unfocus": "显示所有语言",
+    "knownRoutes": "站点页面",
+    "openReport": "打开报告",
+    "loading": "加载中…",
+    "missing": "{count, plural, other {缺失 # 个键}}",
+    "missingHint": "补齐 {language} 中缺失的键",
+    "complete": "所有键已翻译",
+    "issues": "{count, plural, other {# 个问题}}",
+    "blank": {
+      "summary": "框架一直空白或显示错误？",
+      "body": "你的站点可能禁止被嵌入框架中显示（X-Frame-Options 或 CSP frame-ancestors）。若只允许 glot 嵌入，请移除 X-Frame-Options 并发送：",
+      "other": "如果页面在新标签页中可以正常打开，但显示错误语言或 404，请在以下位置检查语言 URL 模式",
+      "settings": "设置 → 你的站点"
+    },
+    "bridge": {
+      "body": "将此脚本添加到你的应用中（仅限开发环境），以精确获取框架高度并渲染伪语言。glot 控制台已内置该脚本。",
+      "title": "预览桥接"
+    },
+    "desktop": "桌面端",
+    "frameTitle": "在 {locale} 中预览",
+    "issueAt": "{kind}问题：{key}",
+    "kinds": {
+      "clamp": "已截断",
+      "overflow": "溢出",
+      "overlap": "重叠",
+      "rtl": "RTL 方向",
+      "tofu": "缺失字形",
+      "untranslated": "未翻译"
+    },
+    "mobile": "移动端",
+    "noBase": {
+      "body": "矩阵会将你的真实站点以所有语言并排展示，让你在用户发现之前，先发现文字被截断、重叠或未翻译的问题。",
+      "cta": "添加站点 URL",
+      "title": "添加站点，对比每种语言",
+      "step1": "在“设置 → 你的站点”中输入站点地址（生产、预发布或 http://localhost:3000）。",
+      "step2": "检查语言 URL 的构造方式（例如 /fr/pricing），并列出要对比的页面。",
+      "step3": "允许 glot 在框架中显示你的站点（CSP frame-ancestors 响应头）。"
+    },
+    "openTab": "在新标签页中打开",
+    "overlay": "QA 叠加层",
+    "pseudo": "伪语言",
+    "pseudoColumn": "伪语言",
+    "reload": "重新加载所有框架",
+    "reportFrom": "视觉 QA 报告，生成于 {date} · {count, plural, =0 {此屏幕无问题} other {此屏幕有 # 个问题}}",
+    "route": "页面",
+    "routePlaceholder": "/pricing",
+    "source": "来源",
+    "title": "语言矩阵",
+    "viewport": "视口",
+    "zoom": "缩放",
+    "subtitle": "你的应用在所有语言下并排渲染，便于一眼发现布局问题。",
+    "bySegment": "按分段",
+    "locale": "语言"
+  },
+  "notFound": {
+    "back": "返回首页",
+    "title": "页面未找到"
+  },
+  "overview": {
+    "budget": "预算 {budget}",
+    "cost": "LLM 支出",
+    "issuesCount": "{count, plural, =0 {无问题} other {# 个问题}}",
+    "jobStarted": "翻译任务已开始",
+    "keys": "键",
+    "locales": "语言",
+    "model": "模型",
+    "noBudget": "未设置预算",
+    "noIssues": "没有未解决的问题。所有翻译均已通过校验。",
+    "noJobs": "暂无任务。翻译缺失的键即可开始一个任务。",
+    "openIssues": "待处理问题",
+    "progress": "各语言区域进度",
+    "progressHint": "已翻译 {translated}/{total} · 已审校 {reviewed}",
+    "recentJobs": "最近任务",
+    "staleCount": "{count, plural, other {# 个过期}}",
+    "translateMissing": "翻译缺失项",
+    "viewAll": "查看全部",
+    "subtitle": "查看各语言区域的覆盖率、校验与质量，以及下一步需要修复的问题。"
+  },
+  "palette": {
+    "empty": "无结果。",
+    "goTo": "前往 {page}",
+    "navigation": "导航",
+    "openProject": "打开 {name}",
+    "placeholder": "输入命令或搜索…",
+    "preferences": "偏好设置",
+    "projects": "项目",
+    "switchLanguage": "切换语言为 {language}",
+    "toggleTheme": "切换主题",
+    "searching": "搜索中…",
+    "keys": "键",
+    "actions": "操作",
+    "translateMissing": "翻译缺失的键",
+    "createProject": "创建项目"
+  },
+  "projects": {
+    "create": {
+      "name": "名称",
+      "namePlaceholder": "我的 SaaS",
+      "slug": "Slug",
+      "slugHint": "用于 URL、CLI 和 CDN。",
+      "sourceLocale": "源语言",
+      "submit": "{count, plural, other {创建包含 # 种语言的项目}}",
+      "success": "项目 {name} 已创建",
+      "targetLocales": "目标语言",
+      "title": "新建项目",
+      "pickOne": "至少选择一种语言",
+      "slugTaken": "该 Slug 已被占用，请尝试其他的。",
+      "step": "第 {n} 步，共 {total} 步",
+      "back": "返回",
+      "next": "继续",
+      "steps": {
+        "name": {
+          "title": "为项目命名",
+          "description": "通常是你的应用名称。Slug 用于在 CLI、API 和 CDN 中标识该项目。"
+        },
+        "source": {
+          "title": "你的应用使用哪种语言编写？",
+          "description": "glot 将从此语言翻译。我们已选择你浏览器的语言。"
+        },
+        "targets": {
+          "title": "你需要哪些语言？",
+          "description": "先选几种即可，之后随时可以添加。"
+        }
+      },
+      "picker": {
+        "search": "搜索语言或输入代码（pt-BR）",
+        "singleHint": "一种语言：即你的字符串所使用的语言。",
+        "multiHint": "按 Enter 添加第一个匹配项。",
+        "selected": "{count, plural, =0 {未选择语言} other {已选择 # 种语言}}",
+        "remove": "移除 {language}",
+        "detected": "已从你的浏览器检测到",
+        "noMatch": "没有匹配的语言。请输入 BCP 47 代码，例如 pt-BR。"
+      }
+    },
+    "empty": {
+      "body": "创建项目后，在代码仓库中运行 glot push 以导入你的目录。",
+      "cta": "创建第一个项目",
+      "title": "还没有项目"
+    },
+    "keysCount": "{count, plural, =0 {没有键} other {# 个键}}",
+    "localesCount": "{count, plural, other {# 种语言}}",
+    "subtitle": "每个项目对应你某个代码仓库中的一个 glot.toml。圆环表示其健康状况：各语言的覆盖率与校验情况。",
+    "title": "项目"
+  },
+  "review": {
+    "applied": "已应用建议",
+    "apply": "应用建议",
+    "backTranslate": "回译",
+    "backTranslation": "回译（{locale}）",
+    "refresh": "重新运行审校",
+    "running": "正在回译…",
+    "suggestion": "建议译文",
+    "verdict": {
+      "different": "含义不同",
+      "nuance": "细微差别",
+      "same": "含义相同"
+    }
+  },
+  "settings": {
+    "cdn": {
+      "description": "以 JSON 格式提供目录，并附带 ETag 和缓存标头。",
+      "enable": "启用公共 CDN",
+      "example": "示例 URL",
+      "title": "公共 CDN"
+    },
+    "switcher": {
+      "description": "添加一个脚本标签，并在需要的位置放置 {tag}。在此添加的语言将在一分钟内显示在您的网站上，无需重新部署。",
+      "hint": "仅显示翻译完成度至少为 95% 的语言（min 属性）。您的网站仍需加载新语言的字符串：请参阅文档中的“语言切换器”。",
+      "preview": "预览",
+      "snippet": "粘贴到您的网站",
+      "title": "语言切换器"
+    },
+    "danger": {
+      "confirmBody": "此操作无法撤销。请输入 {slug} 以确认。",
+      "confirmTitle": "删除 {name}？",
+      "delete": "删除项目",
+      "deleted": "项目已删除",
+      "description": "删除项目会移除其所有翻译键、译文、术语表和任务。你的代码仓库不受影响。",
+      "title": "危险区域"
+    },
+    "general": {
+      "name": "项目名称",
+      "slug": "Slug",
+      "title": "常规",
+      "slugHint": "CLI（glot.toml 中的 [server] project）、API 和 CDN URL 均使用此值。无法更改。"
+    },
+    "llm": {
+      "apiKey": "API 密钥",
+      "apiKeySet": "已保存密钥。留空则保留现有密钥。",
+      "apiKeyUnset": "尚未保存密钥。",
+      "baseUrl": "基础 URL",
+      "baseUrlHint": "适用于 Ollama、vLLM、OpenRouter 及其他兼容端点。",
+      "budget": "预算（美元）",
+      "budgetHint": "达到此预算后任务将停止。",
+      "extraHeaders": "额外请求头",
+      "extraHeadersHint": "每行一个“名称: 值”，随每次 LLM 调用发送。请勿填写机密信息：凭据将被拒绝。",
+      "workspaceId": "Anthropic 工作区 ID",
+      "workspaceIdHint": "组织级密钥（sk-ant-usr-…）必填。将覆盖 ANTHROPIC_WORKSPACE_ID。",
+      "test": {
+        "button": "测试密钥",
+        "ok": "服务商已接受此密钥。",
+        "missing_key": "没有可测试的密钥：请先粘贴一个。",
+        "invalid_key": "服务商拒绝了此密钥。请完整重新复制密钥（Anthropic：console.anthropic.com → API Keys），或创建新密钥。",
+        "revoked_or_wrong_workspace": "该密钥可识别但不被允许：已被撤销或禁用，或来自与当前设置不同的工作区。",
+        "workspace_required": "组织密钥（sk-ant-usr-…）：请填写下方的工作区 ID。",
+        "oauth_token_needs_bearer": "OAuth 令牌被拒绝：可能已过期。请重新登录或改用 API 密钥。",
+        "network": "无法连接服务商。请检查基础 URL 后重试。",
+        "provider_error": "服务商返回了错误（详见下方）。",
+        "config": "LLM 设置不完整（详见下方）。",
+        "kind": "检测结果：{kind, select, oauth {OAuth 令牌} org-user {组织密钥} other {API 密钥}}",
+        "savedFailed": "设置已保存，但密钥测试失败：{reason}"
+      },
+      "description": "使用你自己的服务商密钥。glot 不会对 LLM 用量加价。",
+      "fallback": "备用模型",
+      "fallbackHint": "重试后验证仍失败时使用。",
+      "judge": "评判模型",
+      "judgeHint": "为译文评分，范围 0 到 100。",
+      "model": "模型",
+      "provider": "服务商",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "模拟（测试用）",
+        "openai": "OpenAI",
+        "openai-compatible": "兼容 OpenAI"
+      },
+      "style": "风格指南",
+      "stylePlaceholder": "友好、简洁，法语使用非正式的“tu”…",
+      "title": "LLM",
+      "modelHint": "模型 ID 需与服务商的命名完全一致，例如 claude-haiku-5-5。",
+      "styleHint": "随每次翻译发送的语气与措辞规则，例如“非正式，简短的界面文案，产品名保留英文”。"
+    },
+    "locales": {
+      "add": "添加语言区域",
+      "addPlaceholder": "例如 pt-BR",
+      "description": "字符串以源语言编写。目标语言由任务和 CLI 翻译。",
+      "remove": "移除 {locale}",
+      "source": "源语言",
+      "targets": "目标语言",
+      "title": "语言",
+      "sourceHint": "你的字符串所使用的语言。选择一个目标语言即可将其设为源语言。",
+      "changeTitle": "将 {to} 设为源语言？",
+      "changeBody": "每个键的 {to} 译文将成为其源文本。当前的 {from} 文本将保留为已审阅的译文，该语言将成为目标语言。基于旧源文本的译文会被标记为过时（不会删除任何内容）：请审阅它们或重新运行翻译。回译审阅和质量评分将基于新源文本重新进行。",
+      "changeMissing": "{count, plural, other {# 个键没有 {to} 译文，在你编辑之前将保留其 {from} 文本作为源文本。}}",
+      "changeCli": "使用 CLI？请在 glot.toml 中将 source_locale 设为 “{toCode}”，并将 “{fromCode}” 添加到 target_locales，然后再运行 glot pull。",
+      "changeConfirm": "更改源语言",
+      "changed": "源语言已更改",
+      "syntaxLabel": "消息语法",
+      "syntaxExample": "示例",
+      "syntaxHint": "glot 在检查和翻译字符串时如何解析占位符、标签和复数，与 glot.toml 中的 syntax 设置相同。更改此项将重新检查所有译文。",
+      "syntax": {
+        "icu": "ICU MessageFormat（next-intl、FormatJS、Lingui）：花括号包含参数、复数和选择。",
+        "i18next": "i18next：双花括号为变量，_one、_other 等键后缀表示复数。",
+        "mf2": "Unicode MessageFormat 2.0：变量在花括号内以美元符号开头。",
+        "printf": "printf 风格（iOS、Android、gettext、Python）：百分号占位符。",
+        "rails": "Rails 和 Ruby i18n：百分号花括号变量。",
+        "vue": "vue-i18n：单花括号变量、链接消息，复数形式用竖线分隔。",
+        "laravel": "Laravel：冒号前缀变量，复数形式用竖线分隔。",
+        "template": "Liquid 和 Go 模板（Shopify、Jekyll、Hugo）：双花括号表达式。",
+        "fluent": "Project Fluent (.ftl)：美元符号变量、术语和选择器。",
+        "plain": "纯文本：只有单花括号名称是占位符。其他内容（包括双花括号和标签）都视为文本。",
+        "symfony": "Symfony Translation：百分号包裹的变量，复数区间用竖线分隔。",
+        "java": "Java MessageFormat（Spring、ResourceBundle）：编号参数，双单引号。"
+      }
+    },
+    "preview": {
+      "baseUrl": "站点 URL",
+      "baseUrlHint": "生产、预发布或本地环境，例如 orizn.app 或 localhost:3000。留空则复用上次视觉 QA 运行的地址。",
+      "description": "应用的运行地址。glot 会打开该地址，在真实页面中展示你的译文和文案变体。",
+      "pattern": "URL 模式",
+      "detected": "你的站点似乎使用 {how} 切换语言。",
+      "useDetected": "使用 {pattern}",
+      "subdomain": "你的站点似乎为每种语言使用一个子域名（en.example.com）：glot 暂时无法打开这类地址。",
+      "defaultMismatch": "你的站点默认语言似乎是 {site}，但本项目的源语言是 {source}。",
+      "patternHint": "'{locale}' 和 '{route}' 会被替换；源语言会去掉其 /'{locale}' 段。",
+      "routes": "路由",
+      "routesHint": "每行一个，将在矩阵路由选择器中提供。",
+      "title": "你的站点",
+      "usedBy": "显示位置："
+    },
+    "saved": "设置已保存",
+    "title": "设置",
+    "subtitle": "此项目的名称、语言区域、翻译模型和交付方式。更改将应用于下一个任务。"
+  },
+  "shell": {
+    "liveStream": "实时流",
+    "localSeo": "本地 SEO",
+    "render": "Render API",
+    "textGraph": "句子",
+    "edge": "glot Edge",
+    "apiTokens": "API 令牌",
+    "glossary": "术语表",
+    "jobs": "任务",
+    "keys": "密钥",
+    "logout": "退出登录",
+    "newProject": "新建项目",
+    "noProjects": "暂无项目",
+    "overview": "概览",
+    "preview": "语言区域矩阵",
+    "projects": "项目",
+    "search": "搜索…",
+    "settings": "设置",
+    "toggleSidebar": "切换导航",
+    "collapseSidebar": "收起侧边栏",
+    "expandSidebar": "展开侧边栏",
+    "userMenu": "账户菜单",
+    "visual": "视觉 QA",
+    "insights": "洞察",
+    "feedback": "审阅",
+    "experiments": "实验功能",
+    "labs": "实验室",
+    "experimental": "自托管服务器和控制台处于实验阶段：可能存在粗糙之处，且可能包含不兼容的更改。CLI 和 MCP 服务器是稳定的核心。<docs>了解更多</docs>",
+    "account": "账户",
+    "billing": "账单",
+    "mainNav": "主导航",
+    "skipToContent": "跳至内容",
+    "github": "GitHub",
+    "conversations": "对话",
+    "integrations": "集成",
+    "autopilot": "自动驾驶"
+  },
+  "status": {
+    "machine": "机器翻译",
+    "missing": "缺失",
+    "reviewed": "已审校",
+    "stale": "已过期"
+  },
+  "theme": {
+    "dark": "深色",
+    "label": "主题",
+    "light": "浅色",
+    "system": "跟随系统"
+  },
+  "tokens": {
+    "create": "新建令牌",
+    "created": "创建时间",
+    "empty": {
+      "body": "创建令牌，以连接 CLI 或你的编程代理。",
+      "title": "暂无令牌"
+    },
+    "lastUsed": "最近使用",
+    "name": "名称",
+    "namePlaceholder": "例如 laptop、github-actions",
+    "reveal": {
+      "body": "仅显示这一次。请将其保存到密钥管理器或 Shell 环境变量中。",
+      "title": "请立即复制你的令牌"
+    },
+    "revoke": "撤销",
+    "revokeConfirm": {
+      "body": "使用此令牌的所有服务将立即停止工作。",
+      "title": "撤销“{name}”？"
+    },
+    "revoked": "令牌已撤销",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "登录一次即可；CLI 会为此服务器保存令牌。",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "将 glot 添加到 Claude Code、Cursor 或任何 MCP 客户端。",
+      "title": "连接你的工具"
+    },
+    "subtitle": "令牌用于验证 glot CLI、MCP 服务器和 CI。",
+    "title": "API 令牌"
+  },
+  "visual": {
+    "after": "之后",
+    "allLocales": "全部语言区域",
+    "allRoutes": "全部页面",
+    "allViewports": "全部视口",
+    "before": "之前",
+    "clean": "无问题",
+    "clear": {
+      "body": "已检查 {count, plural, other {# 个屏幕}}，未发现布局问题。",
+      "title": "全部通过"
+    },
+    "clearFilters": "清除筛选",
+    "compareWith": "对比",
+    "cropAlt": "{key} 的特写",
+    "empty": {
+      "body": "尚未进行检查。运行下方命令：它会在每种语言下打开你的站点，为每个页面截图，并在此显示问题所在。",
+      "title": "尚无视觉检查"
+    },
+    "fixedCount": "{count, plural, other {已修复 # 项}}",
+    "issueAt": "{kind}：{key}",
+    "issues": "{count, plural, other {# 个问题}}",
+    "kindHelp": {
+      "clamp": "由 CSS 有意截断（省略号），通常无妨",
+      "overflow": "文字溢出其容器",
+      "overlap": "两段文字相互叠放",
+      "rtl": "页面未按从右到左排版",
+      "tofu": "字体无法显示的字符",
+      "untranslated": "仍为源语言"
+    },
+    "kinds": {
+      "clamp": "截断",
+      "overflow": "溢出",
+      "overlap": "重叠",
+      "rtl": "RTL 方向",
+      "tofu": "字形缺失",
+      "untranslated": "未翻译"
+    },
+    "locale": "语言区域",
+    "new": "新增",
+    "newCount": "{count, plural, other {# 个新增}}",
+    "noCompare": "无对比",
+    "noMatch": "没有符合这些筛选条件的问题",
+    "notInReport": "此屏幕不在对比报告中。",
+    "onlyNew": "仅新增",
+    "openKey": "打开键",
+    "report": "报告",
+    "route": "页面",
+    "run": {
+      "body": "检查在您的机器或 CI 中运行，而非 glot 服务器：它会用无头浏览器打开您的站点，为每种语言的每个页面截图，并将报告上传到此处。",
+      "browser": "首次运行？请先执行一次 npx playwright install chromium 安装浏览器。",
+      "button": "运行检查",
+      "noSite": "未设置站点 URL，因此命令将使用 http://localhost:3000。在<link>设置</link>中添加以预先填充。",
+      "paste": "将 glot_… 替换为您的令牌，然后在终端或 CI 中运行此命令：",
+      "title": "运行视觉检查",
+      "token": "在 <link>API 令牌</link>中创建令牌。"
+    },
+    "scope": "{pages, plural, other {# 个屏幕}}：{routes, plural, other {# 个页面}} × {locales, plural, other {# 种语言}} × {viewports, plural, other {# 个视口}}",
+    "screenshotAlt": "{route} 在 {locale} 下的截图",
+    "showExpected": "显示预期的截断和噪声（{count}）",
+    "showOnScreen": "在屏幕上显示",
+    "since": "自 {date}",
+    "stale": "此报告使用“{used}”作为源语言，但本项目的源语言是“{source}”：其中大多数问题都是噪声。",
+    "subtitle": "查找在其他语言中破坏布局的文本。每个问题都会显示元素、其在页面上的位置，以及需要修复的键及其<term>像素预算</term>。",
+    "tabs": {
+      "issues": "问题（{count}）",
+      "screens": "屏幕（{count}）"
+    },
+    "title": "视觉 QA",
+    "toReview": "{count, plural, =0 {无需修复} other {# 个问题待审阅}}",
+    "viewport": "视口",
+    "budgetTip": "文案在你界面中可占用的宽度，由 glot measure 在运行中的应用里测得。超出预算的译文会被标记，glot fit 会将其缩短。"
+  },
+  "nextLanguage": {
+    "kicker": "下一种语言",
+    "headline": "{language}：{share} 的访客会请求该语言",
+    "headlineFinish": "{language}：{share} 的访客，但仅 {coverage} 已翻译",
+    "cost": "~{cost} 翻译（{keys, plural, other {# 个键}}）",
+    "gain": "每月预计 {mid} “{goal}”（介于 {low} 至 {high} 之间）",
+    "noGain": "“{goal}”暂无可衡量的收益",
+    "perConversion": "每次预计转化 {cost}",
+    "servedNow": "今天以 {locale} 提供服务（占其访问的 {share}）",
+    "rates": "今天“{goal}”的转化率：{fallback}，而使用其母语访客为 {native}",
+    "trendUp": "期间需求上升 {pct}",
+    "trendDown": "期间需求下降 {pct}",
+    "reasons": {
+      "thin_demand": "目前来自该语言的访问较少，数字还会变化。",
+      "thin_baseline": "使用其母语的访客尚少，因此对比基准较弱。",
+      "baseline_includes_source": "对比基准包含源语言访客（其他语言的访客尚不足够）。",
+      "gain_uncertain": "置信区间包含零：收益有可能存在，但尚未得到证实。",
+      "no_gain": "目前看来，使用其母语的访客在此并未有更好的转化。",
+      "under_translated": "已提供该语言，但缺失的字符串会回退到源语言。",
+      "no_conversions": "未追踪转化。",
+      "rising": "需求正在上升。",
+      "falling": "需求正在下降。"
+    },
+    "confidence": {
+      "insufficient": "数据不足",
+      "insufficientHint": "来自该语言的访问少于 30 次，或以其母语访问的访客少于 100 位。",
+      "indicative": "参考",
+      "indicativeHint": "足以排序，但不足以承诺具体数值。",
+      "solid": "可靠",
+      "solidHint": "双方各有 300 次以上访问，且各有 10 次以上转化。"
+    },
+    "add": "添加 {language}",
+    "finish": "完成 {language}",
+    "runnersUp": "其他候选",
+    "noConversions": "未追踪转化，因此此排名仅基于需求和成本。访客完成转化时调用 glot.track(\"{goal}\")，即可查看每种语言带来的收益。",
+    "allServed": "访客请求的所有语言均已提供并完成翻译。",
+    "footnote": "基于 {days} 天内的 {visits, plural, other {# 次访问}}。收益通过对比这些访客今天的转化率与使用其母语访客的转化率得出（贝叶斯估计，90% 区间）。",
+    "started": "已添加 {language}，翻译已开始（上限为 {cap}）。",
+    "confirm": {
+      "title": "添加 {language} 并翻译？",
+      "titleFinish": "翻译 {language} 的其余内容？",
+      "body": "{keys, plural, other {# 个键}} 将使用 {model} 处理。预计成本 {cost}；任务将在 {cap}（预估 + 20%）时停止。",
+      "cta": "添加并翻译"
+    },
+    "empty": {
+      "title": "找出下一个应添加的语言",
+      "body": "使用一个标签安装 Insights。它会按天汇总每次访问的浏览器语言和你提供的语言版本，不使用 Cookie，不存储访客 ID，也不存储 IP。",
+      "track": "然后追踪一次转化，以便 glot 估算每种语言带来的收益：",
+      "open": "打开分析"
+    },
+    "gainLocked": "预期收益已包含在 Growth 中",
+    "upgrade": "升级"
+  },
+  "insights": {
+    "layout": {
+      "title": "布局 RUM：真实访客看到的溢出",
+      "subtitle": "按语言和视口宽度，展示访客浏览器中被截断或溢出容器的译文。数据为抽样匿名数据。",
+      "repair": "立即缩短",
+      "repaired": "{n, plural, =0 {没有可缩短的新内容} other {已提议 # 个更短的变体}}",
+      "empty": "暂无布局数据。请将可选模块添加到应用中（小于 1.5 kB）：",
+      "tableCaption": "按键、语言和视口区间统计的溢出率。溢出率高于 {min} 且浏览量至少 {views} 次的键将自动缩短。",
+      "key": "键与文本",
+      "viewport": "视口",
+      "rate": "溢出率",
+      "width": "所需 / 容器",
+      "views": "{n, plural, other {# 次浏览}}",
+      "fallback": "网页字体加载前 {n} 次",
+      "px": "{need} / {box} px",
+      "unknownKey": "此项目中不存在该键",
+      "fixes": "修复建议",
+      "openPr": "打开 Pull Request",
+      "review": "在反馈中查看",
+      "status": {
+        "pending": "进行中",
+        "pr": "拉取请求",
+        "suggested": "建议",
+        "failed": "没有合适的变体"
+      }
+    },
+    "title": "洞察",
+    "subtitle": "了解访客想使用哪些语言、各语言的转化情况，以及新增语言是否值得投入。",
+    "goal": "目标事件",
+    "period": "周期",
+    "lastDays": "最近 {days} 天",
+    "empty": {
+      "title": "暂无访问记录",
+      "body": "将下方代码片段添加到你的应用中。几分钟内即可看到访问者偏好的语言，以及你尚未提供的语言。"
+    },
+    "hero": {
+      "kicker": "最大的需求缺口",
+      "headline": "<strong>{share}</strong> 的访客偏好 <strong>{language}</strong>，但您尚未提供该语言。",
+      "potential": "若转化率与已提供其语言的访客相同，每月可多获得约 {n} 次{goal}",
+      "cost": "翻译 {keys, plural, other {# 个键}} 的成本约为 {cost}",
+      "cta": "测试 {language}",
+      "covered": "您访客偏好的所有语言均已提供。"
+    },
+    "stats": {
+      "visits": "访问量",
+      "unserved": "未满足的需求",
+      "unservedHint": "{n, plural, =0 {没有未提供的语言} other {未提供 # 种语言}}",
+      "sourceConv": "{goal}率（源语言）",
+      "potential": "每月潜在收益",
+      "potentialHint": "未覆盖语言额外带来的 {goal}"
+    },
+    "demand": {
+      "title": "需求缺口",
+      "subtitle": "按浏览器首选语言统计访客。未提供的语言优先，按需求排序。",
+      "language": "语言",
+      "share": "访客占比",
+      "conversion": "转化率",
+      "potential": "潜在 / 月",
+      "cost": "上线成本",
+      "action": "操作",
+      "visitsTitle": "{n, plural, other {# 次访问}}",
+      "offered": "已提供",
+      "testing": "测试中",
+      "test": "测试"
+    },
+    "daily": {
+      "title": "每日访问",
+      "subtitle": "首选语言未提供的访问，占所有访问。",
+      "unserved": "未提供",
+      "served": "已提供"
+    },
+    "funnel": {
+      "title": "各语言的转化情况（{goal}）",
+      "subtitle": "按已提供的语言显示各地区转化率及其 95% 置信区间，并与源语言对比。",
+      "empty": "暂无转化数据。",
+      "source": "源语言",
+      "pts": "百分点",
+      "ciTitle": "95% CI：{low} – {high}",
+      "legendSource": "源语言转化率",
+      "legendCi": "95% 置信区间",
+      "sampleSize": "· n = {n}"
+    },
+    "exp": {
+      "title": "语言实验",
+      "subtitle": "为部分偏好该语言的访客提供该语言，测量效果，然后决定保留或移除。",
+      "new": "新建实验",
+      "empty": "暂无实验。请从上方缺失的语言开始一个实验。",
+      "meta": "{pct}% 的流量 · 目标 {goal}",
+      "endsIn": "{when}结束",
+      "ended": "测量已结束",
+      "kept": "已保留",
+      "removed": "已移除",
+      "verdict": {
+        "collecting": "收集中",
+        "keep": "保留",
+        "remove": "移除",
+        "inconclusive": "效果不明显"
+      },
+      "explain": {
+        "collecting": "访客数量尚不足以得出结论：请等待达到所需样本量（或结束日期）后再做决定。",
+        "keep": "测试语言的转化率更高，且置信区间不包含零。",
+        "remove": "测试语言的转化率更低，且置信区间不包含零。",
+        "inconclusive": "没有可测量的差异。如果成本较低或该市场具有战略意义，可保留。"
+      },
+      "armTest": "测试组 · {language}",
+      "armControl": "对照组 · {language}",
+      "diff": "差值（测试组 − 对照组）",
+      "pts": "个百分点",
+      "ciAria": "95% 置信区间，范围为 {low} 至 {high} 个百分点",
+      "sample": "每组访客数（最少）/ 所需样本量",
+      "sampleUnknown": "对照组记录到转化后，将显示所需样本量。",
+      "keep": "保留",
+      "remove": "移除",
+      "early": "现在做决定为时过早",
+      "keptToast": "已保留该语言",
+      "removedToast": "已从目标语言中移除该语言",
+      "dialogTitle": "测试语言",
+      "dialogBody": "偏好该语言的访客将在选定比例的会话中看到该语言；其余访客继续使用源语言作为对照。",
+      "locale": "语言代码",
+      "traffic": "流量（%）",
+      "days": "时长（天）",
+      "goal": "目标事件",
+      "costNote": "该语言将加入目标语言。翻译 {keys, plural, other {# 个键}} 预计费用约为 {cost}：请在流量到达前完成翻译。",
+      "translateNote": "该语言将加入目标语言：请在流量到达前完成翻译。",
+      "cancel": "取消",
+      "start": "开始实验",
+      "started": "已为 {language} 开始实验",
+      "removeTitle": "要从目标语言中移除 {language} 吗？",
+      "removeBody": "实验结束后，{language} 将从目标语言中移除：其访客将再次看到源语言。"
+    },
+    "install": {
+      "title": "安装代码片段",
+      "subtitle": "支持 script 标签、npm 导入或 Next.js middleware，三者使用同一公钥。",
+      "show": "显示",
+      "tabScript": "Script 标签",
+      "tabMiddleware": "Next.js middleware",
+      "publicKey": "公钥",
+      "rotate": "轮换密钥",
+      "rotateTitle": "轮换公钥？",
+      "rotateBody": "当前密钥将立即失效。请使用新密钥更新应用中的代码片段。",
+      "rotated": "已生成新的公钥",
+      "cancel": "取消",
+      "privacy": {
+        "noCookie": "不使用 Cookie，不记录访客 ID：仅为实验分组存储一条 sessionStorage 记录。",
+        "noIp": "不存储 IP 地址、User Agent 或路由。",
+        "daily": "仅按语言、语言区域和国家统计每日计数。",
+        "size": "gzip 压缩后小于 1 kB。"
+      }
+    }
+  },
+  "feedback": {
+    "tabs": {
+      "live": "待审核",
+      "accepted": "已接受",
+      "rejected": "已拒绝"
+    },
+    "empty": {
+      "title": "暂无反馈",
+      "body": "将反馈组件添加到您的应用中：访客可以选中文本，说明问题并提出更好的措辞。"
+    },
+    "none": "这里没有内容。",
+    "reports": "{count, plural, other {# 条报告}}",
+    "status": {
+      "open": "待处理",
+      "proposed": "建议已就绪",
+      "accepted": "已接受",
+      "rejected": "已拒绝"
+    },
+    "kind": {
+      "wrong": "错误",
+      "awkward": "生硬",
+      "unclear": "不清楚"
+    },
+    "source": "来源",
+    "current": "当前译文",
+    "userReports": "用户反馈",
+    "suggested": "建议：{text}",
+    "proposal": "AI 提案",
+    "backTranslation": "回译",
+    "noProposal": "暂无提案。达到 {threshold, plural, other {# 条报告}} 时将自动生成。",
+    "propose": "提出更正",
+    "regenerate": "重新生成",
+    "accept": "接受",
+    "reject": "拒绝",
+    "accepted": "修正已保存为经人工审核的译文",
+    "rejectedToast": "反馈已拒绝",
+    "openPr": "打开 GitHub PR",
+    "viewPr": "查看拉取请求",
+    "prOpened": "拉取请求已创建",
+    "prNeedsSettings": "请在下方设置仓库和令牌，以便发起拉取请求。",
+    "install": {
+      "title": "安装组件",
+      "body": "使用与 Insights 相同的公钥。请传入已翻译为应用语言的标签。"
+    },
+    "settings": {
+      "title": "设置",
+      "threshold": "AI 建议前的报告数",
+      "repo": "GitHub 仓库（owner/name）",
+      "base": "基础分支",
+      "catalog": "目录路径",
+      "lock": "锁文件路径",
+      "token": "GitHub 令牌",
+      "tokenHint": "需要具有 Contents 和 Pull requests 写入权限的细粒度令牌。加密存储，不再显示。",
+      "tokenStored": "令牌已保存，留空则保留原令牌",
+      "clearToken": "移除令牌",
+      "save": "保存",
+      "saved": "反馈设置已保存",
+      "catalogHint": "源目录在仓库中的位置，例如 messages/{locale}.json。修复 PR 会编辑此文件。",
+      "lockHint": "glot.lock 的路径。该锁文件记录哪些翻译由机器生成或经人工编辑，以确保已接受的修复不会被覆盖。"
+    },
+    "toAnnotation": "转为注释",
+    "filterLabel": "按状态筛选报告"
+  },
+  "docs": {
+    "title": "文档",
+    "github": "GitHub",
+    "menu": "菜单",
+    "edit": "在 GitHub 上编辑此页面",
+    "onThisPage": "本页内容",
+    "search": {
+      "label": "搜索文档",
+      "placeholder": "搜索文档…",
+      "noResults": "无结果",
+      "hint": "输入关键词搜索所有文档页面，按 Enter 打开结果。",
+      "input": "搜索文档…",
+      "pages": "页面"
+    },
+    "sections": {
+      "start": "快速开始",
+      "agents": "AI 代理",
+      "guides": "指南",
+      "reference": "参考",
+      "labs": "Labs（实验性）"
+    },
+    "pages": {
+      "edge": "glot Edge（SEO 本地化）",
+      "website": "网站标签（适用于任何建站工具）",
+      "getting-started": "安装与快速开始",
+      "concepts": "核心概念",
+      "mcp": "MCP 服务器",
+      "integrations": "集成",
+      "frameworks": "框架",
+      "runtime": "运行时回退",
+      "text-graph": "全站句子（文本图谱）",
+      "live-stream": "实时流式翻译",
+      "mobile-ota": "移动应用（OTA）",
+      "local-seo": "本地 SEO（搜索本地化页面）",
+      "two-way": "客户对话",
+      "languages-live-check": "某种语言是否已在网站上线？",
+      "quality": "质量与审校",
+      "review": "实时审校",
+      "insights": "洞察",
+      "experiments": "分段实验",
+      "self-hosting": "自托管服务器",
+      "cli": "CLI 参考",
+      "faq": "常见问题与费用",
+      "labs": "Labs 概览",
+      "render": "Render API（邮件、通知、文档）",
+      "mcp-remote": "远程 MCP（OAuth）",
+      "skills": "Agent 技能",
+      "provenance": "AI 来源追溯（欧盟 AI 法案）",
+      "deploy-hetzner": "在 VPS 上部署",
+      "benchmark": "基准测试",
+      "github": "连接 GitHub",
+      "autopilot": "Autopilot（按市场划分的收入）"
+    },
+    "skip": "跳至内容",
+    "prev": "上一页",
+    "next": "下一页",
+    "pager": "上一页和下一页",
+    "copy": "复制",
+    "copied": "已复制",
+    "start": {
+      "title": "glot 文档",
+      "subtitle": "安装 glot，让编码代理为你的应用完成本地化，并在 CI 中确保每个词条目录始终有效。",
+      "paths": "从当前位置开始",
+      "all": "所有页面",
+      "solo": {
+        "title": "独立开发者",
+        "body": "在代码仓库中运行一条命令：检测技术栈、提取字符串、翻译并检查。"
+      },
+      "team": {
+        "title": "团队",
+        "body": "在 CI 中校验每个 Pull Request，审阅翻译，并共享仪表板。"
+      },
+      "agent": {
+        "title": "AI 编程代理",
+        "body": "Claude Code、Cursor、Codex 等工具可通过 MCP 获取你的密钥、用量和术语表。"
+      },
+      "mobile": {
+        "title": "移动应用",
+        "body": "glot init 还可识别 Apple String Catalogs、Android strings.xml 和 Flutter ARB 文件。"
+      }
+    },
+    "home": "glot 首页"
+  },
+  "experiments": {
+    "title": "实验",
+    "subtitle": "每个语言环境中转化率最高的译文。glot 会为高风险文案生成经过验证的变体，并让访客选出优胜者。",
+    "new": "新建实验",
+    "official": "正式",
+    "variant": "变体 {letter}",
+    "winner": "优胜者",
+    "reference": "参考",
+    "pBeats": "击败正式版本的概率：{p}",
+    "meta": "目标 {goal} · 流量 {pct}% · 每个版本至少 {n}",
+    "source": "来源",
+    "sourceChanged": "自这些变体编写以来，源文本已更改：它们不再提供。请停止此实验并新建一个。",
+    "noTraffic": "暂无访客。@glot/insights 会将变体提供给此语言的访客。",
+    "burnIn": "每个版本的访客",
+    "promote": "将{name}设为正式",
+    "keepOfficial": "保留正式译文",
+    "promoteBody": "“{value}”将成为{key}的正式{locale}译文（已审核，记录于该键的历史中）。它会随你的下一次 glot 拉取、CDN 刷新或 PR 一同发布，与其他编辑相同。其他变体将停止。",
+    "keepBody": "正式译文转化效果最佳。实验将结束，你的目录中不会有任何变更。",
+    "confirm": "确认",
+    "cancel": "取消",
+    "stop": "停止",
+    "promotedToast": "完成：目录现已保存获胜文案",
+    "stoppedToast": "实验已停止：所有人都将看到官方译文",
+    "history": "已完成的实验（{n}）",
+    "install": "在应用中提供变体",
+    "chartAria": "各版本的后验转化率：{summary}",
+    "chartCaption": "每条曲线表示根据目前数据推断出的版本转化率可能范围，曲线越窄，结论越确定。",
+    "status": {
+      "running": "运行中",
+      "decided": "已找到优胜者",
+      "promoted": "已推广",
+      "stopped": "已停止"
+    },
+    "tone": {
+      "direct": "直接",
+      "warm": "亲切",
+      "urgent": "紧迫",
+      "official": "官方"
+    },
+    "table": {
+      "arm": "文案",
+      "visitors": "访客数",
+      "rate": "{goal}转化率",
+      "pBest": "成为最佳的概率",
+      "lift": "相对官方译文的提升"
+    },
+    "explain": {
+      "burnIn": "在达到最小样本量之前，每个版本获得相同的流量；之后，流量会向转化更好的版本倾斜。",
+      "running": "流量依据证据分配（汤普森采样）。当某个版本最佳的概率超过 95%时宣布获胜，每当流量翻倍时进行检查。",
+      "decided": "{name} 为最佳版本，概率 {p}。落选版本不再提供；将其设为正式版本即可生效。",
+      "officialWins": "正式译文转化效果最佳。变体将不再提供。",
+      "promoted": "获胜文案现已成为正式译文。",
+      "stopped": "已停止：所有人都会看到正式译文。"
+    },
+    "stats": {
+      "live": "进行中的实验",
+      "liveHint": "{n, plural, other {# 种语言}}",
+      "toPromote": "待升级的获胜者",
+      "toPromoteHint": "P(best) 高于 95%",
+      "visitors": "已测试的访客",
+      "visitorsHint": "覆盖所有进行中的实验"
+    },
+    "empty": {
+      "title": "找到转化率最高的文案",
+      "body": "选择一个 CTA 或定价标题以及一种语言。glot 会以不同语气撰写 2-3 个含义相同的变体，进行校验，将其提供给部分访客，并告诉你哪个版本效果最好。"
+    },
+    "segmented": "分段实验",
+    "stopTitle": "停止此实验？",
+    "stopBody": "所有访客将再次看到官方译文。已有结果将保留在历史记录中。"
+  },
+  "oauth": {
+    "title": "将 {client} 连接到 glot",
+    "subtitle": "此应用将以你的身份，在一个项目上使用 glot 的 MCP 工具。",
+    "project": "项目",
+    "noProjects": "你还没有项目。请先在控制台中创建一个。",
+    "scopes": "权限",
+    "scope": {
+      "read": {
+        "title": "读取",
+        "body": "状态、键及其上下文、问题、术语表。"
+      },
+      "translate": {
+        "title": "翻译",
+        "body": "运行翻译任务和 AI 审核（使用项目的 LLM 额度）。"
+      },
+      "write": {
+        "title": "写入",
+        "body": "添加源字符串、编辑译文和术语表，发起 GitHub 拉取请求。"
+      }
+    },
+    "redirect": "你将被重定向回 {host}。",
+    "allow": "允许",
+    "deny": "拒绝",
+    "invalid": "无效的授权请求"
+  },
+  "emailAuth": {
+    "email": "邮箱",
+    "newPassword": "新密码",
+    "confirmPassword": "确认新密码",
+    "passwordTooShort": "密码至少需要 8 个字符。",
+    "passwordMismatch": "两次输入的密码不一致。",
+    "invalidLink": "此链接无效、已被使用或已过期。",
+    "toLogin": "返回登录",
+    "toDashboard": "前往控制台",
+    "verify": {
+      "title": "确认邮箱",
+      "checking": "正在确认您的邮箱地址…",
+      "done": "您的邮箱地址已确认。"
+    },
+    "forgot": {
+      "title": "重置密码",
+      "subtitle": "输入您的账户邮箱，我们将向您发送重置链接。",
+      "submit": "发送重置链接",
+      "sent": "如果该地址已注册账户，重置链接即将发送。链接 1 小时内有效。"
+    },
+    "reset": {
+      "title": "设置新密码",
+      "subtitle": "您的所有会话都将退出登录。",
+      "submit": "更新密码",
+      "done": "密码已更新。",
+      "again": "重新申请链接"
+    },
+    "gate": {
+      "tooltip": "请先确认邮箱地址以解锁此功能。"
+    },
+    "inbox": {
+      "title": "查收邮件",
+      "body": "我们已向 {email} 发送确认链接。打开链接即可开始创建项目。",
+      "hint": "几分钟后仍未收到？请检查垃圾邮件文件夹，或重新发送邮件。"
+    },
+    "banner": {
+      "text": "请确认您的邮箱地址后再创建项目。我们已向 {email} 发送了确认链接。",
+      "resend": "重新发送邮件",
+      "sent": "确认邮件已发送"
+    }
+  },
+  "account": {
+    "title": "账户",
+    "currentPassword": "当前密码",
+    "notifications": {
+      "title": "邮件通知",
+      "jobDone": "翻译任务已完成",
+      "jobDoneHint": "当你发起的翻译任务完成或失败时，通过邮件通知你。",
+      "accountNote": "安全邮件（密码重置、邮箱或密码更改）始终会发送。"
+    },
+    "email": {
+      "title": "邮箱地址",
+      "new": "新邮箱",
+      "hint": "我们会向新邮箱发送确认链接，打开链接后更改生效。",
+      "submit": "更改邮箱",
+      "pending": "确认链接已发送至 {email}",
+      "changed": "邮箱已更新"
+    },
+    "password": {
+      "title": "密码",
+      "new": "新密码",
+      "hint": "至少 8 个字符。其他会话将退出登录。",
+      "submit": "更改密码",
+      "changed": "密码已更新"
+    },
+    "subtitle": "登录邮箱、密码、通知和仪表盘偏好设置。",
+    "preferences": {
+      "title": "偏好设置",
+      "celebrations": "庆祝里程碑",
+      "celebrationsHint": "当某个语言区域达到 100% 或校验问题降为零时，显示简短提示和小型动效。关闭后仪表盘更简洁。"
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "定价",
+      "description": "glot 定价：开源 CLI 和 MCP 服务器免费。Pro（面向团队的可靠本地化）和 Growth（面向国际化营收）涵盖托管云服务。"
+    },
+    "title": "每次发布都确保每种语言正确。然后衡量每种语言带来的收益。",
+    "subtitle": "Pro 确保翻译正确、经过审核，并与您的代码保持同步。Growth 增加实验和上线效果衡量功能，帮助您了解哪些文案和哪些语言带来收益。开源 CLI 始终免费且不限量。",
+    "oss": {
+      "title": "开源：永久免费",
+      "body": "MIT 许可证。glot translate、check、fit、i18nize、校验器、锁文件和本地 MCP 服务器均在你的机器上运行，使用你自己的 LLM 密钥。无需账户，没有配额，也不会将任何功能限制在付费方案中。",
+      "cta": "在 GitHub 上查看"
+    },
+    "cloud": {
+      "title": "glot cloud",
+      "body": "托管控制台、CDN 上的 OTA 目录、洞察分析、供智能体使用的远程 MCP 以及按需翻译。按账户计费，计费范围为您拥有的项目。"
+    },
+    "interval": "计费周期",
+    "monthly": "按月",
+    "yearly": "按年付费",
+    "perMonth": "/ 月",
+    "perYear": "/ 年",
+    "forever": "永久",
+    "current": "当前套餐",
+    "ossIncluded": "CLI 和本地 MCP 服务器，不限量",
+    "usage": "月付方案中，超出包含额度的服务端翻译（使用 glot 的 LLM 密钥）按 {price} / 每 1,000 条字符串计费。使用您自己的密钥（BYOK）时，这些翻译不计入用量。",
+    "selfHosted": "此服务器为自托管：计费已关闭，所有功能均不受限制。",
+    "plans": {
+      "free": {
+        "name": "免费版",
+        "tagline": "在一个项目上试用云服务。",
+        "for": "适用于评估 glot 的开发者和开源项目。",
+        "features": {
+          "oss": "开源 CLI、MCP 服务器和 GitHub Action，在你的机器上不限量使用",
+          "project": "一个云端项目，每月配额有限",
+          "noCard": "无需信用卡"
+        }
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "为网站或应用推出其他语言版本。",
+        "for": "适合首次开通多语言的独立开发者、店铺和应用。",
+        "features": {
+          "projects": "两个云端项目",
+          "dynamic": "动态本地化：CDN 目录与语言切换器",
+          "sync": "GitHub 同步：所有语言合并到一个 Pull Request 中",
+          "qa": "可视化 QA：发现截断、重叠或未翻译的文本",
+          "cms": "CMS 集成（Shopify、WordPress、Webflow、Contentful、Sanity、Strapi）",
+          "quotas": "月度配额适中，适合首次上线"
+        },
+        "excluded": {
+          "edge": "glot Edge（SEO 本地化）",
+          "xp": "分群实验",
+          "launch": "语言上线效果衡量",
+          "recommend": "附带预期收益的语言推荐"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "面向团队的可靠本地化。",
+        "for": "面向代理商和以多种语言发布产品的 SaaS 团队。",
+        "features": {
+          "sync": "GitHub 同步：所有语言区域合并到一个拉取请求中",
+          "qa": "视觉 QA：发现截断、重叠或未翻译的文本",
+          "review": "在真实网站上进行实时审阅，且带上下文",
+          "glossary": "每条字符串均提供术语表与校验",
+          "matrix": "语言区域矩阵：并排查看你网站的各语言版本",
+          "byok": "使用你自己的 LLM 密钥：费用直接付给服务商，glot 不加收任何费用",
+          "xp": "可尝试的文案实验，以及语言推荐"
+        }
+      },
+      "team": {
+        "name": "Growth",
+        "tagline": "助力国际化收入增长。",
+        "for": "拥有足够流量、可衡量每种语言效果的产品。",
+        "features": {
+          "everything": "包含 Pro 的全部功能",
+          "xp": "基于受众分群的文本实验，数量不限",
+          "recommend": "下一步该添加哪种语言，以及预期收益",
+          "launch": "语言上线效果通过对照组衡量，并附可分享的案例研究",
+          "volume": "更多项目、席位和月度用量"
+        }
+      },
+      "self_hosted": {
+        "name": "自托管",
+        "tagline": ""
+      }
+    },
+    "quota": {
+      "value": "{name}：{n}",
+      "unlimited": "{name}：不限",
+      "projects": "云端项目",
+      "seats": "席位",
+      "cdn_requests": "每月 CDN/OTA 请求数",
+      "insights_events": "每月 Insights 事件数",
+      "mcp_calls": "每月远程 MCP 调用次数",
+      "ondemand_jobs": "每月按需语言任务数",
+      "llm_strings": "每月通过 glot 的 LLM 密钥翻译的字符串数",
+      "notIncluded": "{name}：不包含",
+      "experiments": "实时文本实验"
+    },
+    "cta": {
+      "free": "免费开始",
+      "upgrade": "升级到 {plan}"
+    },
+    "faq": {
+      "title": "常见问题",
+      "oss": {
+        "q": "开源工具的任何功能是否受限？",
+        "a": "不会。配额仅适用于由 glot cloud 提供的请求。CLI、本地 MCP 服务器和 GitHub Action 从不调用计费系统。"
+      },
+      "byok": {
+        "q": "glot 会对 LLM 费用加价吗？",
+        "a": "不会。使用您自己的密钥时，您直接向 LLM 提供商付费，glot 既不统计也不加价。不使用密钥时，云端可以使用 glot 的密钥：每个套餐包含一定的月度额度，月付套餐超出部分可按用量计费继续使用。"
+      },
+      "selfHost": {
+        "q": "自托管是免费的吗？",
+        "a": "是的。服务端位于同一个 MIT 仓库中。未配置 Stripe 密钥时，计费功能关闭，所有限制均取消；由你自行运行和更新。"
+      },
+      "limits": {
+        "q": "达到配额后会怎样？",
+        "a": "云端接口会返回 402 错误，并附带提示信息和升级链接；您已发布的目录仍可在代码仓库中正常使用。配额于每月 1 日（UTC）重置。"
+      },
+      "tax": {
+        "q": "价格是否含增值税（VAT）？",
+        "a": "价格未含增值税（VAT）。Stripe 负责处理支付、发票和增值税：在适用的情况下于结账时加收增值税，企业客户可填写增值税号。发票可在计费设置中查看。"
+      },
+      "quotas": {
+        "q": "哪些内容计入配额？",
+        "a": "仅计入 glot cloud 提供的服务：CDN/OTA 请求、洞察分析与实验事件、远程 MCP 调用、按需语言区域任务、实时审校批注，以及使用 glot 密钥翻译的字符串。实时实验和云端项目在存续期间计入。您在本地运行的内容，以及使用您自己密钥翻译的内容，均不计入。月度计数器于每月 1 日（UTC）重置。"
+      },
+      "trial": {
+        "q": "付费前能试用 Growth 吗？",
+        "a": "是的。你的首个 Growth 订阅可享受 14 天免费试用，每个账户仅限一次。注册时即保存支付方式，但试用结束前不会扣费；届时之前可在计费门户取消，无需付费。Starter 和 Pro 不提供试用。"
+      },
+      "cancel": {
+        "q": "可以随时取消吗？",
+        "a": "可以，请通过账单门户取消。套餐将保持有效直至您已付费的周期结束，之后账户转为免费版。项目和数据将予以保留。"
+      }
+    },
+    "compare": "与 Lokalise、Crowdin、Tolgee 和 Lingo.dev 的对比：<link>查看对比</link>。",
+    "yearlySave": "{n, plural, other {免费 # 个月}}",
+    "yearlyEquiv": "每月 {price}，按年计费",
+    "trial": "{days} 天免费试用，随时可取消",
+    "excludedSr": "不包含：",
+    "forWho": "适用对象：",
+    "vat": "价格不含增值税。"
+  },
+  "billing": {
+    "trialing": "{plan} 试用期至 {date}。除非你在此之前在门户中取消，否则订阅将开始，并扣除首次付款。",
+    "title": "账单",
+    "subtitle": "你的套餐覆盖你拥有的云端项目。CLI 和本地 MCP 服务器从不受限制。",
+    "selfHosted": "此自托管服务器已关闭计费：不受任何限制。",
+    "manage": "管理账单",
+    "updated": "你的订阅已更新，可能需要几秒钟才会在此显示。",
+    "pastDue": "你最近一次付款失败。请在 {date} 前更新付款方式，以保留你的套餐。",
+    "plan": "{plan} 套餐",
+    "renewsOn": "将于 {date} 续订",
+    "endsOn": "将于 {date} 结束",
+    "usage": "本月用量",
+    "metered": "超出套餐包含的服务端翻译用量将于月底计费。",
+    "ossNote": "配额仅适用于 glot 云端。你使用 CLI 在本地处理的项目不计入配额。",
+    "downgrade": "在账单门户中取消",
+    "invoices": "发票",
+    "noInvoices": "暂无发票。",
+    "invoice": {
+      "date": "日期",
+      "number": "编号",
+      "total": "总计",
+      "status": "状态",
+      "open": "待支付"
+    }
+  },
+  "gamification": {
+    "achieved": "已达成",
+    "notYet": "尚未达成",
+    "health": "项目健康度",
+    "healthHint": "目标语言的覆盖率与校验通过率平均值，范围 0–100。打开概览查看完整细分。",
+    "localesProgress": "按语言查看翻译进度",
+    "ringLabel": "{language}：已翻译 {percent}",
+    "ringTooltip": "{language} · 已翻译 {percent} · {issues, plural, =0 {无问题} other {# 个问题}}",
+    "celebrate": {
+      "complete": "{language} 已全部翻译",
+      "completeBody": "所有 {count, plural, other {# 个键}} 均已翻译。请审核，或添加其他语言。",
+      "zeroErrors": "无校验问题",
+      "zeroErrorsBody": "所有翻译均通过占位符、复数和术语表检查。",
+      "completeMany": "现已有 {count} 个语言完成全部翻译"
+    },
+    "healthLabel": "项目健康度 {score}（满分 100）"
+  },
+  "onboarding": {
+    "title": "设置 {name}",
+    "subtitle": "从空项目到第一种翻译语言，约需 3 分钟。glot 检测到你的数据后，步骤会自动勾选。",
+    "progress": "设置进度：已完成 {done} / {total} 步",
+    "hide": "隐藏设置指南",
+    "toDashboard": "前往仪表盘",
+    "stepsLabel": "设置步骤",
+    "sideLabel": "语言和里程碑",
+    "stepDone": "已完成",
+    "stepTodo": "待办",
+    "path": {
+      "title": "选择发送字符串的方式",
+      "description": "三种方式的结果相同：你的键都会进入此项目。随时可以切换。",
+      "recommended": "推荐",
+      "agent": {
+        "name": "AI 代理",
+        "hint": "Claude Code、Cursor 或任何 MCP 客户端负责执行。"
+      },
+      "terminal": {
+        "name": "终端",
+        "hint": "一条命令完成提取和翻译，另一条命令推送。"
+      },
+      "github": {
+        "name": "GitHub",
+        "hint": "每次拉取请求时从你的代码仓库同步。"
+      }
+    },
+    "connect": {
+      "agent": {
+        "title": "连接你的智能体",
+        "description": "生成令牌，将 glot 添加到你的智能体，然后让它为你的应用做本地化。",
+        "claude": "Claude Code",
+        "json": ".mcp.json（Cursor 及其他 MCP 客户端）",
+        "prompt": "然后让你的智能体"
+      },
+      "terminal": {
+        "title": "运行两条命令",
+        "description": "生成令牌，然后在应用根目录运行以下命令。",
+        "localize": "1. 提取并翻译你的字符串",
+        "push": "2. 连接此项目并推送"
+      },
+      "github": {
+        "title": "连接你的代码仓库",
+        "description": "glot 会从 GitHub 读取你的消息文件，并提交包含译文的拉取请求。"
+      }
+    },
+    "token": {
+      "why": "你的命令需要此项目的 API 令牌。",
+      "again": "已创建过令牌。请生成新令牌，以重新填入命令。",
+      "generate": "生成我的令牌",
+      "regenerate": "生成新令牌",
+      "created": "令牌已创建，并已添加到下方命令中",
+      "once": "请立即复制：令牌只显示一次。请像保管密码一样妥善保管。"
+    },
+    "wait": {
+      "title": "推送你的第一批字符串",
+      "description": "glot 一接收到你的键，此页面就会自动更新。",
+      "waiting": "正在等待你的第一次推送…",
+      "received": "{keys, plural, other {已接收 # 个键}} · {languages, plural, other {# 种目标语言}}",
+      "slowTitle": "还没有数据？请检查：",
+      "slowToken": "推送所用的终端或智能体配置中已设置 GLOT_TOKEN。",
+      "slowProject": "glot.toml 中的项目或 MCP URL 为 \"{slug}\"。",
+      "slowServer": "服务器 URL 为 {url}。"
+    },
+    "more": {
+      "title": "完成生产环境准备",
+      "description": "每个步骤都会根据项目的实际状态自动检查。可按任意顺序完成。",
+      "done": "已完成",
+      "todo": "待办",
+      "first_translation": {
+        "title": "翻译第一种语言",
+        "body": "运行翻译任务，或推送已包含译文的翻译文件。",
+        "cta": "打开任务"
+      },
+      "zero_errors": {
+        "title": "消除所有校验错误",
+        "body": "每条翻译都保留占位符、复数形式和术语表中的术语。",
+        "cta": "查看问题"
+      },
+      "invite": {
+        "title": "邀请团队成员",
+        "body": "团队邀请功能即将推出。当第二位成员加入时，此步骤会自动检查。"
+      },
+      "glossary": {
+        "title": "添加术语表",
+        "body": "glot 需要保留或固定翻译方式的产品名称和术语。",
+        "cta": "打开术语表"
+      },
+      "cdn": {
+        "title": "启用 CDN",
+        "body": "无需重新部署，即可远程分发你的目录。",
+        "cta": "打开设置"
+      },
+      "badge": {
+        "title": "添加 README 徽章",
+        "body": "展示你的翻译覆盖率。此步骤会在首次显示徽章时自动检查。需要 CDN。"
+      }
+    },
+    "next": {
+      "label": "下一步：",
+      "push": "推送源文案以开始使用。",
+      "pushCta": "开始设置",
+      "translate": "{count, plural, other {{language} 缺少 # 个键。}}",
+      "translateCta": "翻译缺失项",
+      "fix": "{count, plural, other {{language} 中有 # 处翻译存在错误。}}",
+      "fixCta": "查看",
+      "glossary": "添加产品术语，确保所有语言统一使用。",
+      "glossaryCta": "添加术语表",
+      "cdn": "通过 CDN 实时分发翻译。",
+      "cdnCta": "启用 CDN",
+      "jobStarted": "翻译任务已开始"
+    },
+    "locales": {
+      "title": "各语言覆盖率",
+      "none": "尚未添加目标语言。请在项目设置中添加。",
+      "ring": "{language}：已翻译 {value}%"
+    },
+    "achievements": {
+      "title": "里程碑",
+      "unlocked": "达成于 {date}",
+      "toast": "已达成里程碑：{name}",
+      "first_push": {
+        "name": "首次推送",
+        "how": "你的首批键已推送到 glot。"
+      },
+      "first_locale_100": {
+        "name": "首个语言达到 100%",
+        "how": "在一种语言中翻译所有键。"
+      },
+      "zero_errors": {
+        "name": "零错误",
+        "how": "所有译文均通过校验。"
+      },
+      "five_languages": {
+        "name": "5 种语言",
+        "how": "已完成五种语言的翻译。"
+      },
+      "glossary_set": {
+        "name": "已设置术语表",
+        "how": "至少添加一条术语。"
+      }
+    },
+    "overview": {
+      "title": "后续步骤",
+      "setupTitle": "完成设置",
+      "setupProgress": "已完成 {done}/{total} 个设置步骤",
+      "continue": "继续设置",
+      "guide": "设置指南",
+      "hide": "隐藏设置进度",
+      "rings": "各语言覆盖率",
+      "ring": "{language}：已翻译 {value}%",
+      "emptyTitle": "暂无键",
+      "emptyBody": "约 3 分钟即可连接你的代码：选择一种方式，复制一条命令，此页面将实时显示你的首次推送。",
+      "start": "开始设置指南"
+    },
+    "github": {
+      "title": "连接 GitHub",
+      "soon": "GitHub 同步正在设置中。与此同时，请使用智能体或终端方式，之后可随时切换。"
+    }
+  },
+  "github": {
+    "card": {
+      "title": "连接 GitHub",
+      "subtitle": "选择一个代码仓库：glot 会打开一个拉取请求，附带已本地化的应用，可直接合并。无需终端。"
+    },
+    "noApp": {
+      "title": "此 glot 服务器尚未设置 GitHub",
+      "body": "管理员只需创建一次 glot GitHub App，之后所有人即可连接各自的仓库。",
+      "docs": "阅读设置指南",
+      "setup": "设置 GitHub App"
+    },
+    "promise": {
+      "pr": "打开拉取请求：不会推送到你的主分支",
+      "noCode": "从不运行你的代码：不安装包，不执行脚本",
+      "updates": "每次推送时保持翻译同步更新"
+    },
+    "install": {
+      "cta": "连接 GitHub",
+      "redirecting": "正在打开 GitHub…",
+      "already": "已安装？改为授权"
+    },
+    "pick": {
+      "account": "GitHub 账户",
+      "repo": "仓库",
+      "search": "搜索仓库",
+      "none": "glot 暂时看不到任何仓库：请在 GitHub App 设置中添加。",
+      "noMatch": "没有与搜索匹配的仓库。",
+      "private": "私有",
+      "missing": "缺少仓库？",
+      "addRepos": "在 GitHub 上授权 glot 访问",
+      "branch": "基础分支",
+      "branchHelp": "glot 会读取此分支，并以它为目标打开拉取请求。通常为默认分支。",
+      "cta": "本地化 {repo}",
+      "ctaEmpty": "选择仓库",
+      "cancel": "取消"
+    },
+    "step": {
+      "token": "正在连接 GitHub",
+      "clone": "正在克隆仓库",
+      "localize": "正在提取并翻译字符串",
+      "sync": "正在与 glot 同步目录",
+      "push": "正在推送 glot 分支",
+      "pr": "正在打开拉取请求"
+    },
+    "stepState": {
+      "done": "已完成",
+      "current": "进行中",
+      "todo": "待处理"
+    },
+    "job": {
+      "progress": "已完成 {done}/{total} 步",
+      "announce": "第 {n} 步，共 {total} 步：{step}"
+    },
+    "linked": {
+      "rerun": "重新运行",
+      "change": "更换仓库",
+      "prReady": "拉取请求 #{n} 可以合并了",
+      "prHint": "每次推送到 {branch} 都会更新此拉取请求。",
+      "review": "查看拉取请求",
+      "upToDate": "已是最新：此仓库无需更改。",
+      "waiting": "等待首次运行…"
+    },
+    "newTab": "（在新标签页中打开）",
+    "page": {
+      "title": "GitHub",
+      "subtitle": "无需终端即可本地化仓库：glot 会打开拉取请求并保持其更新。",
+      "how": "工作原理",
+      "disconnect": "断开仓库连接",
+      "disconnectTitle": "断开 {repo} 的连接？",
+      "disconnectBody": "glot 将停止为此仓库更新翻译。已打开的拉取请求仍保留在 GitHub 上；你的翻译仍保留在 glot 中。",
+      "cancel": "取消",
+      "disconnected": "仓库已断开连接"
+    },
+    "failure": {
+      "mock_output": {
+        "fix": "未推送或同步任何内容。请检查项目是否在 设置 → LLM 中配置了有效密钥的真实 AI 服务商，然后重新运行：占位内容会被重新翻译。"
+      },
+      "source_mismatch": {
+        "cause": "该仓库使用 {repo} 编写，但此 glot 项目的源语言为 {project}。",
+        "fix": "glot 从不翻译其他语言的目录并将其存为源语言。请将 {repo} 设为项目源语言（即下方按钮），或在仓库的 glot.toml 中设置 source_locale = \"{project}\"，然后重新运行。"
+      },
+      "useRepoSource": "将 {repo} 设为项目源语言",
+      "access": "管理仓库访问权限",
+      "ai_key_invalid": {
+        "cause": "您的 AI 服务商拒绝了该 API 密钥。",
+        "fix": "在 设置 → LLM 中粘贴有效密钥，点击“测试密钥”，然后重新运行。"
+      },
+      "ai_key_missing": {
+        "cause": "此项目未设置 AI 密钥。",
+        "fix": "glot 使用您自己的 AI 服务商密钥进行翻译。请在 设置 → LLM 中添加，点击“测试密钥”，然后重新运行。"
+      },
+      "ai_quota": {
+        "cause": "您的 AI 服务商拒绝了该请求：配额、额度或预算已用完。",
+        "fix": "请在服务商处检查您的额度，或在 设置 → LLM 中提高预算，然后重新运行。已写入的翻译将被保留。"
+      },
+      "ai_unavailable": {
+        "cause": "您的 AI 服务商暂时不可用。",
+        "fix": "问题不在您这边。几分钟后重新运行即可：已写入的翻译将被保留。"
+      },
+      "ai_workspace": {
+        "cause": "Anthropic 工作区与该密钥不匹配。",
+        "fix": "组织密钥（sk-ant-usr…）需要其工作区的 ID（wrkspc_…）。请在 设置 → LLM 中设置该 ID，测试密钥，然后重新运行。"
+      },
+      "branch_missing": {
+        "cause": "基础分支在此代码仓库中已不存在。",
+        "fix": "请重新选择代码仓库，并选择一个现有分支。"
+      },
+      "config_invalid": {
+        "cause": "此代码仓库的 glot.toml 无效。",
+        "fix": "修复技术详情中指出的那一行（路径必须位于仓库内）并推送：glot 会自动重新运行。"
+      },
+      "details": "技术详情",
+      "no_framework": {
+        "cause": "glot 在此仓库中未找到可本地化的应用。",
+        "fix": "支持 React、Next.js、Vue、Svelte、Leptos、SwiftUI 以及带有自有 t() 函数的应用。在 monorepo 中，请在应用目录下运行 glot init，提交 glot.toml 并推送。"
+      },
+      "openPr": "打开拉取请求",
+      "pr_conflict": {
+        "cause": "你推送到 glot 分支的一个提交与最新的基础分支冲突。",
+        "fix": "未覆盖任何内容。请将基础分支合并到拉取请求中并解决冲突，或关闭该拉取请求：glot 会在下次运行时开启一个新的。"
+      },
+      "push_rejected": {
+        "cause": "GitHub 拒绝了 glot 分支或其拉取请求。",
+        "fix": "分支保护规则可能覆盖了 glot/*。请允许 glot 应用推送到 glot/* 分支，然后重新运行。"
+      },
+      "repo_access": {
+        "cause": "glot 无法再读取此仓库。",
+        "fix": "GitHub App 可能已被卸载，或已失去此仓库的访问权限。请在 GitHub 上重新授权，然后重新运行。"
+      },
+      "repo_too_large": {
+        "cause": "此仓库超过了单次运行可克隆的大小。",
+        "fix": "超过 2 MB 的媒体文件和文件已被跳过。请将该应用迁移到独立仓库，或联系我们提高上限。"
+      },
+      "settings": "打开 LLM 设置",
+      "timeout": {
+        "cause": "运行耗时过长，已被停止。",
+        "fix": "请重新运行：已翻译的字符串不会重复处理。如果每次都出现，请在 glot.toml 中使用 [extract] include 缩小扫描范围。"
+      },
+      "unknown": {
+        "cause": "运行因意外错误而停止。",
+        "fix": "请重新运行。如果仍以相同方式失败，请将下方的技术详情发送给我们。"
+      },
+      "unlinked": {
+        "cause": "此项目已不再关联仓库。",
+        "fix": "选择一个仓库以重新关联。"
+      }
+    },
+    "how": {
+      "pr": {
+        "title": "一个拉取请求",
+        "body": "字符串会移入目录，译文经过校验，所有内容汇总到一个你可以审阅并合并的 PR 中。"
+      },
+      "safe": {
+        "title": "你的代码从不运行",
+        "body": "glot 在隔离的临时克隆中读取文件。不安装依赖，不运行脚本，每次运行后删除。"
+      },
+      "updates": {
+        "title": "始终保持同步",
+        "body": "每次推送到你的分支时，只重新翻译有变化的内容，并更新同一个已打开的 PR。"
+      }
+    },
+    "return": {
+      "installed": "GitHub 已连接。现在请选择仓库。",
+      "pending": "已请求安装：需由 GitHub 组织的所有者批准。",
+      "error": "GitHub 未完成连接。请重试。"
+    }
+  },
+  "githubAdmin": {
+    "title": "GitHub App",
+    "subtitle": "为此服务器创建 glot GitHub App。GitHub 会要求您确认，然后将凭据回传给 glot。",
+    "name": "应用名称",
+    "nameHelp": "在 GitHub 上须唯一，最多 34 个字符。用户安装应用时会看到该名称。",
+    "org": "组织（可选）",
+    "orgHelp": "留空则以您的个人账户拥有该应用。",
+    "permissions": "申请的最小权限",
+    "cta": "创建 GitHub App",
+    "redirecting": "正在打开 GitHub…",
+    "created": "GitHub App 已创建：用户现在可以连接其代码仓库。",
+    "configured": "GitHub App 已设置完成。",
+    "slug": "Slug",
+    "appId": "App ID",
+    "webhook": "Webhook URL",
+    "open": "在 GitHub 中打开",
+    "back": "返回控制台",
+    "recreate": "替换为新应用",
+    "notAdmin": {
+      "title": "只有管理员可以创建 GitHub App",
+      "body": "请在服务器环境变量 GLOT_ADMIN_EMAILS 中添加您的邮箱，然后刷新此页面。"
+    },
+    "callbackError": "GitHub 未返回应用凭据。请重新开始：此链接有效期为一小时。"
+  },
+  "xpLifecycle": {
+    "more": "{name} 的更多操作",
+    "edit": "编辑",
+    "launch": "启动",
+    "pause": "暂停",
+    "resume": "恢复",
+    "stop": "停止",
+    "rename": "重命名",
+    "duplicate": "复制",
+    "duplicateDraft": "复制为草稿",
+    "archive": "归档",
+    "unarchive": "取消归档",
+    "delete": "删除",
+    "cancel": "取消",
+    "save": "保存",
+    "copyName": "{name}（副本）",
+    "renameTitle": "重命名实验",
+    "renameBody": "名称仅在控制台和命令行中显示。重命名不会影响访问者或结果。",
+    "nameLabel": "名称",
+    "launchFailed": "无法启动实验。",
+    "preflight": "上线前检查",
+    "checking": "检查中…",
+    "blocking": "{n, plural, other {# 项需在启动前修复}}",
+    "readyWithWarnings": "可以启动。部分信号尚未就绪，详见下方。",
+    "ready": "一切就绪：启动后，访问者会立即看到各个变体。",
+    "ok": "已完成：",
+    "warning": "请检查：",
+    "missing": "缺失：",
+    "andMore": "还有 {n} 项",
+    "warnHint": "非阻塞项：实验可以启动，但若不补充，将收不到任何结果。",
+    "toml": "定义是否保存在 Git 中？如果此项目使用 <file>glot.experiments.toml</file>，则 <push>glot experiments push</push> 会覆盖此处所做的修改（同名）。如需将其同步回文件，请使用 <pull>glot experiments pull</pull>。",
+    "locked": "实验运行期间，只能修改名称。中途更改变体、键、受众或目标，会让两个实验的数据混在一起，导致结果有偏差。如需尝试其他方案，请将其复制为草稿。",
+    "archivedNote": "已归档：已从列表中隐藏，结果已保留。现在可以删除，结果将一并删除。",
+    "endedNote": "已结束。归档可整理列表且保留结果；只有已归档的实验可以删除。",
+    "backToExperiment": "返回实验",
+    "editTitle": "编辑“{name}”",
+    "editSubtitle": "更改会在输入时自动保存。发布前，访客不会看到任何内容。",
+    "archivedBadge": "已归档",
+    "toast": {
+      "pause": "实验已暂停：所有人都看到官方文案",
+      "resume": "实验已恢复",
+      "stop": "实验已停止：所有人都看到官方文案",
+      "promote": "已完成：所选变体现已成为官方文案",
+      "archive": "实验已归档，结果已保留",
+      "unarchive": "实验已重新出现在列表中",
+      "renamed": "实验已重命名",
+      "duplicated": "已基于此实验创建草稿",
+      "deleted": "实验已删除",
+      "launched": "实验已启动"
+    },
+    "confirmDelete": {
+      "title": "删除“{name}”？",
+      "draft": "此草稿及其变体文本将被删除。尚未向访客展示过任何内容。",
+      "archived": "实验、其变体及所有结果将被永久删除，此操作无法撤销。",
+      "cta": "永久删除"
+    },
+    "confirmStop": {
+      "title": "停止“{name}”？",
+      "body": "结果将被保留。请选择此后访客看到的内容。",
+      "then": "之后",
+      "keep": "保留官方文本",
+      "keepHint": "您的目录不会有任何变化。",
+      "publish": "将“{arm}”发布为官方文本",
+      "publishHint": "写入实验的所有语言版本并保留历史记录（若已关联代码仓库，还会创建拉取请求）。",
+      "cta": "停止实验",
+      "ctaPublish": "停止并发布"
+    },
+    "confirmLaunch": {
+      "title": "仍要启动“{name}”？",
+      "body": "实验可以启动，但缺少以下信号，在修复之前将不会产生任何结果：",
+      "cta": "仍然启动"
+    },
+    "check": {
+      "keys": "{n, plural, other {# 个键已测试}}",
+      "locales": "{n, plural, other {# 种语言}}",
+      "variants": "{n, plural, other {# 个变体与官方文本对比}}",
+      "noVariant": "至少添加一个变体，以便与官方文本进行比较",
+      "unapproved": "{n, plural, other {# 个变体正在等待批准，在批准前不会显示}}",
+      "texts": "每个变体在每种语言中都有有效文本",
+      "settings": "需修复的设置",
+      "site": "您的网站正在向 glot 发送访问数据",
+      "noSite": "过去 30 天内您的网站未收到任何访问：请安装 @glot-i18n/insights",
+      "goal": "目标“{goal}”在过去 30 天内有追踪记录",
+      "noGoal": "目标“{goal}”在过去 30 天内从未被追踪：请在您的网站上调用 track(\"{goal}\")"
+    },
+    "blocker": {
+      "no_keys": "至少选择一个键",
+      "key_missing": "键 {key} 已不存在",
+      "key_live": "键 {key} 已在另一个正在运行的实验中测试",
+      "no_locales": "至少选择一种语言",
+      "too_many_segments": "最多 4 个分段",
+      "currency": "收入目标需要设置货币",
+      "weights": "固定分流比例与变体数量不匹配",
+      "no_variant": "至少批准一个变体",
+      "cell_missing": "“{arm}”：{locale} 中缺少 {key} 的文本",
+      "cell_invalid": "“{arm}”：{locale} 中 {key} 的文本有误（占位符、术语或长度）"
+    },
+    "filter": {
+      "label": "按状态筛选",
+      "all": "全部",
+      "draft": "草稿",
+      "live": "运行中",
+      "ended": "已结束",
+      "archived": "已归档",
+      "empty": "此状态下没有实验。"
+    },
+    "wizard": {
+      "locales": "已测试语言",
+      "localesHint": "使用其他语言的访问者将看到官方文案。移除某种语言会删除其变体文案。",
+      "rebalance": "将更多访问者导向表现更好的方案",
+      "rebalanceOn": "开启：随着结果出现，流量会自动转向表现最佳的变体（减少在较差文案上流失的访问者）。",
+      "rebalanceOff": "关闭：在整个实验期间，流量在官方文案和每个变体之间平均分配。",
+      "traffic": "参与实验的访问者比例",
+      "trafficHint": "其他访问者始终看到官方文案。流量越少，实验周期越长。"
+    },
+    "duration": {
+      "title": "多久能得出结果",
+      "hint": "基于你的流量，以及过去 30 天“{goal}”的当前转化率，对比 {arms} 个文案（95% 置信度，80% 检验力）。",
+      "allTraffic": "全部流量",
+      "unavailable": "当前无法提供估算。",
+      "noData": "尚未测得访问量或“{goal}”转化数据：请安装 @glot-i18n/insights 并追踪该目标以获取估算。",
+      "audience": "受众",
+      "perDay": "访客 / 天",
+      "rate": "转化率",
+      "lift": "可检测到 +{lift}",
+      "upperBound": "（最多）",
+      "overYears": "{n, plural, other {超过 # 年}}",
+      "weeks": "{n, plural, other {# 周}}",
+      "days": "{n, plural, other {# 天}}",
+      "tooSlow": "以你的流量，此实验只能检测到在 {weeks} 周内（{audience}）至少为 {lift} 的提升。",
+      "tooSlowNone": "以你的流量，此实验在 {weeks} 周内（{audience}）无法检测出可信的提升。",
+      "whatToDo": "要更快得出结果：",
+      "fewerVariants": "减少对比的变体（仅与官方文案对比）。",
+      "oneSegment": "只定向一个分群，或不定向：每个分群都需要各自的访客。",
+      "frequentGoal": "选择更频繁的目标，例如点击按钮而非注册。",
+      "busierPage": "测试访问量更高的页面。"
+    }
+  },
+  "experimentResults": {
+    "official": "官方",
+    "everyone": "所有人",
+    "everyoneElse": "其他所有人",
+    "winner": "获胜者",
+    "reference": "参考",
+    "served": "已投放给此分段",
+    "pBestShort": "{p} 的最佳概率",
+    "cancel": "取消",
+    "back": "实验",
+    "previewInPage": "在页面中预览",
+    "pause": "暂停",
+    "resume": "恢复",
+    "stop": "停止",
+    "bySegment": "按分段查看结果",
+    "bySegmentHint": "每个分段单独衡量。只有当某个文案在该分段中以超过 95% 的概率优于其他文案时，才算赢得该分段。",
+    "wording": "按语言的文案",
+    "wordingHint": "各版本在每种语言中的表述。打开页面预览可查看其实际效果。",
+    "promoteSegment": "为此分段推广",
+    "promoteAll": "全部推广",
+    "propagate": "在其他语言中测试",
+    "status": {
+      "draft": "草稿",
+      "running": "运行中",
+      "paused": "已暂停",
+      "decided": "已找到获胜者",
+      "personalized": "个性化",
+      "promoted": "已推广",
+      "stopped": "已停止"
+    },
+    "state": {
+      "learning": "学习中",
+      "winner": "获胜",
+      "no_difference": "无差异",
+      "personalized": "个性化"
+    },
+    "summary": {
+      "verdict": "结论",
+      "duration": "已运行",
+      "days": "{n, plural, other {# 天}}",
+      "since": "自 {date} 起",
+      "traffic": "参与测试的访客",
+      "segments": "{n, plural, other {# 个分群}}",
+      "goal": "目标",
+      "revenue": "每访客收入",
+      "allocation": {
+        "fixed": "固定分配",
+        "bandit": "流量转向最佳文案",
+        "segmented": "流量按分群转向最佳文案"
+      },
+      "locales": "{n, plural, other {# 种语言}}",
+      "pausedNote": "已暂停：所有访客看到官方文案，不计入任何数据。结果已保留。"
+    },
+    "verdict": {
+      "win": "“{arm}”{star, select, only {对所有人} rest {对其他所有人} other {在{segment}中}}的转化率高出{lift}（{p}概率）。",
+      "officialWins": "{star, select, only {对所有人} rest {对其他人} other {在{segment}中}}，官方文案仍是最优的。",
+      "personalized": "{star, select, only {所有人} rest {其他所有人} other {{segment}}}将永久看到“{arm}”。",
+      "elsewhere": "其他位置暂无获胜者。",
+      "learning": "暂无获胜者。{days, plural, =-1 {} other { 按当前流量还需约 # 天。}}",
+      "noDifference": "没有文案明显优于官方文案，保留官方文案是安全的。",
+      "noTraffic": "暂无访客。访客开始看到页面后，结果会立即显示在这里。",
+      "winRevenue": "“{arm}”{star, select, only {对所有人} rest {对其他所有人} other {在{segment}中}}每位访客多赚{lift}（{p}概率）。",
+      "winShort": "“{arm}”{star, select, only {对所有人获胜} rest {对其他所有人获胜} other {在{segment}中获胜}}。",
+      "draft": "草稿：尚未向访客展示。下方清单列出了上线前仍需完成的事项。",
+      "promoted": "完成：“{arm}”现已在所有位置设为官方文案。",
+      "stopped": "已停止，无获胜者：所有人看到官方文案。"
+    },
+    "cell": {
+      "visitors": "{n, plural, other {# 位访客}}",
+      "noTraffic": "此分段暂无访客。",
+      "winner": "“{arm}”可多带来 {lift} 的{goal}（很可能在 {lo} 到 {hi} 之间），置信度 {p}。",
+      "officialWins": "官方文案在此分段转化率最高。该分段不再展示各变体。",
+      "noDifference": "各文案在此分段的表现基本相同。保留官方文案不会有任何损失。",
+      "learning": "仍在学习：“{arm}”以 {p} 的概率最有可能是最佳版本。{days, plural, =-1 {} other { 还需约 # 天。}}",
+      "personalized": "此分段始终看到“{arm}”。glot 将在 90 天后建议重新测试。",
+      "winnerRevenue": "“{arm}”每位访客多带来 {lift} 的收入（很可能在 {lo} 到 {hi} 之间），置信度 {p}。"
+    },
+    "srm": {
+      "title": "流量分配异常：决策已冻结",
+      "body": "变体获得的访客比例与预期不符（p = {p}）。通常原因是页面缓存了单一变体、重定向，或某个变体遭遇机器人访问。请修复原因；结果将自动恢复。"
+    },
+    "underpowered": {
+      "title": "该分群的流量不足",
+      "body": "按当前速度，检测 20% 的差异需要超过 90 天。请扩大分群范围，或基于所有人的结果做决定。"
+    },
+    "chart": {
+      "aria": "相对于官方文案的提升幅度及可能范围：{summary}",
+      "row": "{arm}：{lift}，可能介于 {lo} 与 {hi} 之间",
+      "caption": "圆点：与官方文案相比最可能的差异。线段：差异很可能落入的范围（95%）。穿过虚线中心的线段表示“尚不确定”。"
+    },
+    "table": {
+      "caption": "{segment} 的结果",
+      "arm": "文案",
+      "visitors": "访客数",
+      "rate": "{goal}率",
+      "lift": "相对官方文案的提升",
+      "range": "{lo} 至 {hi}",
+      "rpv": "每访客收入",
+      "pBest": "最优概率"
+    },
+    "confirmSegment": {
+      "title": "永久向{segment}展示“{arm}”？",
+      "body": "此后，{segment} 中的所有用户都将在 {locales, plural, other {# 种语言}} 中看到此文案。其他访客保留官方文案。",
+      "after": "此分段的测试将结束，其访客不再计入统计。glot 会提醒你在 90 天后重新测试；如果源文本发生变化，将切换回官方文案。",
+      "cta": "为此分段推广"
+    },
+    "confirmAll": {
+      "title": "将“{arm}”设为所有用户的官方文案？",
+      "body": "{keys, plural, other {# 个键}}将在 {locales, plural, other {# 种语言}} 中使用此文案，以经过审核的译文形式记录在键历史中。它会随下一次 glot 拉取、CDN 刷新或拉取请求一起发布。",
+      "after": "实验将在所有分段结束。",
+      "cta": "全部推广"
+    },
+    "confirmPropagate": {
+      "title": "在其他语言中测试“{arm}”？",
+      "body": "glot 将基于在 {segment} 中胜出的文案新建一个实验，为本测试未覆盖的 {n, plural, other {# 种语言}}编写译文。每条译文在提供前都会通过校验；本实验不会被更改。",
+      "cta": "设置测试"
+    },
+    "confirmStop": {
+      "title": "停止“{name}”？",
+      "body": "所有访客将重新看到官方文案。结果会被保留；你的目录不会有任何变化。",
+      "cta": "停止实验"
+    },
+    "toast": {
+      "pause": "实验已暂停：所有人看到官方文案",
+      "resume": "实验已恢复",
+      "stop": "实验已停止：所有人看到官方文案",
+      "promote_segment": "完成：该分群现在始终看到获胜文案",
+      "promote_all": "完成：获胜文案已设为官方文案"
+    },
+    "celebrate": {
+      "first": "你的第一个获胜文案",
+      "winner": "某个分段已有获胜者",
+      "body": "可在结果页为该分段或全部用户推广此文案。"
+    },
+    "milestones": {
+      "label": "实验里程碑",
+      "first": "首个实验",
+      "firstBody": "将文案呈现给真实访客",
+      "winner": "首个获胜者",
+      "winnerBody": "某个变体以 95% 的置信度胜过官方文案"
+    },
+    "list": {
+      "segments": "分段",
+      "meta": "{keys, plural, other {# 个键}} · {locales, plural, other {# 种语言}}"
+    },
+    "preview": {
+      "title": "按分段预览",
+      "byLocale": "按地区",
+      "experiment": "实验",
+      "segment": "分段",
+      "language": "语言",
+      "allLanguages": "所有语言",
+      "viewport": "视口",
+      "desktop": "桌面端",
+      "mobile": "移动端",
+      "route": "路由",
+      "notCounted": "每一行都会在真实页面上强制使用一种文案。预览不计入访问量。",
+      "noBase": "请设置预览 URL 以查看页面中的变体。在此之前，可先查看文案。",
+      "noBaseCta": "设置预览 URL",
+      "openTab": "在新标签页中打开 {locale}",
+      "frame": "{locale} 页面预览",
+      "none": {
+        "title": "没有可预览的实验",
+        "body": "为一组键启动实验；随后每个变体都会在此按页面和语言逐一显示。",
+        "cta": "新建实验"
+      }
+    }
+  },
+  "xpWizard": {
+    "title": "新建实验",
+    "subtitle": "在所有语言中测试少量文案的新措辞，让访客选出优胜者。共四步，约两分钟，无需统计知识。",
+    "backToList": "所有实验",
+    "restored": "已恢复您未完成的草稿。",
+    "startOver": "重新开始",
+    "stepOf": "第 {n} 步，共 {total} 步",
+    "progress": "实验设置进度",
+    "done": "(已完成)",
+    "back": "返回",
+    "continue": "前往{step}",
+    "launch": {
+      "name": "实验名称",
+      "goal": "转化事件",
+      "goalHint": "你的网站在过去 30 天内发送的事件。选择一个，或输入其他事件名。",
+      "goalHintNone": "尚未收到任何事件。请输入你传给 track() 的名称，例如 signup。",
+      "goalInput": "事件名称",
+      "revenue": "优化收入",
+      "revenueHint": "选择每位访客带来收入最高的变体，而非转化最高的变体。请将金额和货币与事件一起通过 track() 传入。",
+      "currency": "货币",
+      "minN": "每个变体的最低访客数",
+      "minNHint": "在达到此样本量且满 7 天之前，无论早期数据如何都不做决定。至少 {n}；500 适合大多数落地页。",
+      "cookie": "记住变体",
+      "cookieMode": {
+        "none": {
+          "label": "不使用 Cookie",
+          "body": "设备上不存储任何内容。访问者刷新页面后可能会看到其他变体。适用于单一落地页。"
+        },
+        "session": {
+          "label": "会话 Cookie",
+          "body": "第一方 Cookie 仅在浏览器关闭前保存变体。访问者在各页面间保持相同文案。推荐。"
+        }
+      },
+      "gdpr": "两种模式均不存储 IP、用户代理或标识符：glot 仅保留汇总计数。会话 Cookie 的设计旨在符合法国 CNIL 受众测量豁免（无需同意横幅）；请让你的 DPO 为你的网站确认。适用于本项目的所有实验。",
+      "recap": "摘要",
+      "recapKeys": "文案键",
+      "recapVariants": "变体",
+      "recapVariantsValue": "{n, plural, other {# 个变体}} + 官方，{locales, plural, other {# 种语言}}",
+      "recapAudience": "受众",
+      "segmentN": "分段 {n}",
+      "everyone": "所有人",
+      "recapGoal": "目标",
+      "notSet": "未设置",
+      "revenueIn": "以 {currency} 计收入",
+      "recapMin": "每个变体至少 {n} 名访客",
+      "problems": "启动前请先修复",
+      "edit": "编辑{what}",
+      "editShort": "编辑"
+    },
+    "launching": "正在启动…",
+    "launched": "实验已上线：访问者现在会看到各变体",
+    "autosaved": "草稿已自动保存",
+    "saving": "正在保存草稿…",
+    "steps": {
+      "keys": {
+        "short": "测试内容",
+        "title": "您想测试什么？",
+        "body": "选择需要同时变化的文案，例如主视觉区的标题、副标题和按钮。每个变体都会在所有语言中同时改写这些文案。"
+      },
+      "variants": {
+        "short": "变体",
+        "title": "编写变体",
+        "body": "变体即意图：一种不同的点击理由。您可以根据所选意图让 AI 生成变体，也可以自行输入。每段文本都会由与翻译相同的校验器实时检查。"
+      },
+      "audience": {
+        "short": "受众",
+        "title": "谁会看到测试？",
+        "body": "默认面向所有人。仅当您预期不同受众会有不同的优胜方案时才添加分段：每个分段都需要各自的流量。"
+      },
+      "launch": {
+        "short": "目标与启动",
+        "title": "什么算作胜出？",
+        "body": "选择代表成功的事件。glot 会展示各个变体、统计转化，并在出现明确优胜者时通知您。"
+      }
+    },
+    "block": {
+      "keys": "请至少选择一个要测试的键。",
+      "noArm": "请至少添加一个变体：使用 AI 生成，或手动编写。",
+      "empty": "{n, plural, other {仍有 # 条文本为空。请填写每个变体的所有语言，或删除该变体。}}",
+      "validating": "仍在检查你的文本，请稍后再试。",
+      "errors": "{n, plural, other {# 条文本存在验证错误。请修正标为红色的单元格。}}",
+      "countries": "国家/地区代码无效。请使用两位 ISO 代码，例如 DE 或 FR。",
+      "goal": "请选择用于判定胜出方的转化事件。",
+      "currency": "请输入三位货币代码，例如 EUR。",
+      "minN": "每个变体的最小样本量至少须为 {n} 位访问者。"
+    },
+    "keys": {
+      "search": "搜索键",
+      "searchHint": "输入键的一部分或其文本的一部分。可一键添加相关键组。",
+      "groups": "添加整个分组",
+      "groupCount": "{n, plural, other {# 个键}}",
+      "results": "匹配的键",
+      "noMatch": "没有与“{q}”匹配的键。请尝试更短的搜索词。",
+      "noKeys": "此项目尚无键。请先使用 glot push 推送你的目录。",
+      "more": "显示 {total} 项中的 {shown} 项。请优化搜索以查看其他项。",
+      "selected": "{n, plural, =0 {未选择键} other {已选择 # 个键}}",
+      "openMatrix": "打开语言矩阵",
+      "emptySelected": "已选键会在此处显示其各语言的当前文本。",
+      "remove": "移除 {key}",
+      "missing": "未翻译",
+      "cropAlt": "{locale} 语言下 {route} 页面中 {key} 的截图"
+    },
+    "variants": {
+      "intents": "意图",
+      "intentsHint": "每个意图生成一个变体。最多选择三个。",
+      "intent": {
+        "social_proof": {
+          "label": "社会认同",
+          "hint": "他人已在使用并信赖它"
+        },
+        "benefit": {
+          "label": "直接好处",
+          "hint": "访客即刻获得的好处"
+        },
+        "urgency": {
+          "label": "真实紧迫感",
+          "hint": "现在行动的真实理由，不使用虚假倒计时"
+        },
+        "simplicity": {
+          "label": "简洁",
+          "hint": "更短、更直白、更少字"
+        },
+        "clarity": {
+          "label": "清晰度",
+          "hint": "明确说明点击后会发生什么"
+        }
+      },
+      "facts": "AI 可引用的事实",
+      "factsPlaceholder": "2,000 家团队\n评分 4.8/5",
+      "factsHint": "每行一条。此处未列出的数字、评分和日期会被拒绝，因此变体不会编造内容。",
+      "generate": "{n, plural, other {使用 AI 生成 # 个变体}}",
+      "generating": "正在用所有语言撰写变体…",
+      "generated": "{n, plural, other {已添加 # 个变体}}",
+      "or": "或",
+      "manualLabel": "手写变体的意图",
+      "manualPlaceholder": "你的意图，例如“永久免费”",
+      "manual": "手动编写",
+      "handWritten": "手写",
+      "maxArms": "最多 {n} 个变体：变体越多，测试耗时越长。移除一个后可添加其他变体。",
+      "policyTitle": "部分文本已被拦截",
+      "policyHint": "编辑文本或选择其他意图。定价和法律类文案无法参与测试。",
+      "variantName": "变体 {letter}",
+      "intentOf": "变体 {letter} 的意图",
+      "remove": "移除变体 {letter}",
+      "empty": "还没有变体。可根据上方的意图生成，或手动编写。",
+      "gridLabel": "按语言划分的变体",
+      "locale": "语言",
+      "official": "官方（对照组）",
+      "noOfficial": "未翻译",
+      "budget": "可容纳于 {px} px，{lines, plural, other {# 行}}",
+      "cellLabel": "变体 {letter}，{key}，{locale}",
+      "cellEmpty": "必填",
+      "cellChecking": "检查中…",
+      "cellOk": "通过验证",
+      "summary": {
+        "ok": "全部 {total} 段文本已通过验证。",
+        "checking": "正在检查你的文本…",
+        "empty": "{n, plural, other {还需撰写 # 段文本才能继续。}}",
+        "errors": "{n, plural, other {# 段文本需要修正：请查看红色单元格。}}",
+        "saveError": "无法保存你最近的修改。请检查网络连接；你再次输入时将重试。"
+      },
+      "officialShort": "官方："
+    },
+    "audience": {
+      "unnamed": "分组",
+      "add": "添加分群",
+      "preset": {
+        "mobile": "移动端访客",
+        "search": "搜索流量",
+        "new": "新访客"
+      },
+      "max": "最多 {n} 个分组。",
+      "everyone": "所有人",
+      "everyoneHint": "测试语言中的所有访客。",
+      "everyoneElse": "其他所有人",
+      "everyoneElseHint": "未匹配上方任何分组的访客。",
+      "perDay": "名访客/天",
+      "needs": "需要约",
+      "days": "{n, plural, other {# 天}}",
+      "merged": "流量过少，将并入“其他所有人”",
+      "estimateUnavailable": "当前无法提供流量估算。估算基于 glot insights 记录的最近 30 天访问数据。",
+      "total": "预计时长：<b>{days, plural, other {# 天}}</b>，即可检测到 20% 的提升。",
+      "fragmentedTitle": "你的流量被分得太散",
+      "fragmentedSlow": "{n, plural, other {# 个分组}}需要超过 {max} 天。请删除或放宽{n, plural, other {这些分组}}，否则测试将大多在“其他所有人”中运行。",
+      "fragmentedMany": "{n} 个分组会将访客分成 {n} 份，并拖慢每项结果。请只保留你确实预期会出现不同结果的分组。",
+      "name": "分组 {n}",
+      "namePlaceholder": "德国搜索流量",
+      "remove": "移除 {name}",
+      "attr": {
+        "country": "国家/地区",
+        "locale": "语言",
+        "source": "流量来源",
+        "device": "设备",
+        "visitor": "访客"
+      },
+      "countryHint": "两位字母代码，用逗号分隔。留空表示所有国家/地区。",
+      "countryBad": "不是国家代码：{codes}",
+      "source": {
+        "search": "搜索",
+        "social": "社交媒体",
+        "email": "邮件",
+        "paid": "付费广告",
+        "direct": "直接访问",
+        "referral": "推荐"
+      },
+      "device": {
+        "mobile": "移动端",
+        "tablet": "平板",
+        "desktop": "桌面端"
+      },
+      "visitor": {
+        "new": "新",
+        "returning": "回访"
+      },
+      "visitorHint": "只有接受了你网站 Cookie 的访客才能区分新访客与回访访客；其他访客计入“其他所有人”。"
+    },
+    "launchCta": "启动实验"
+  },
+  "reviewPage": {
+    "title": "审阅",
+    "subtitle": "与团队一起标注线上站点，修改文案并发布。",
+    "tabs": {
+      "annotations": "标注",
+      "reports": "用户反馈"
+    },
+    "converted": "报告已转为标注",
+    "pinLabel": "批注 {n}：{body}",
+    "created": "标注已添加",
+    "resolved": "批注 {n} 已解决",
+    "openPanel": "{count, plural, =0 {批注} other {# 条未解决的批注}}",
+    "panel": "批注",
+    "panelHint": "此项目的所有批注，支持筛选、讨论和文本编辑。",
+    "live": {
+      "annotation": "{name} 添加了一条批注",
+      "comment": "{name} 回复了一条批注"
+    },
+    "noSite": {
+      "title": "连接站点以开始评审",
+      "body": "评审会在顶部叠加团队批注来展示你的线上站点。请先设置站点的基础 URL，只需约 30 秒。",
+      "cta": "设置站点 URL"
+    },
+    "toolbar": {
+      "route": "页面路径",
+      "locale": "显示语言",
+      "viewport": "屏幕尺寸",
+      "desktop": "桌面",
+      "tablet": "平板",
+      "mobile": "手机",
+      "comment": "评论",
+      "edit": "编辑文本",
+      "share": "分享",
+      "shortcuts": "键盘快捷键",
+      "reload": "重新加载站点"
+    },
+    "setup": {
+      "title": "连接你的站点",
+      "body": "评审会在框架中显示你的站点，并与其中的 glot 评审小组件通信。这些检查会针对你的线上站点运行。",
+      "recheck": "重新检查",
+      "status": {
+        "ok": "已完成",
+        "fail": "需要处理",
+        "unknown": "无法检查",
+        "pending": "检查中"
+      },
+      "site": {
+        "title": "站点 URL 已设置",
+        "ok": "Review 将打开此地址。",
+        "change": "更改"
+      },
+      "framing": {
+        "title": "你的站点允许在 glot 中显示",
+        "ok": "没有阻止框架显示的设置。",
+        "unchecked": "尚未检查。",
+        "private": "这是本地或私有地址，glot 的服务器无法检测。实时连接（第 4 步）才是真正的测试。",
+        "unreachable": "glot 的服务器无法加载你的站点。请检查该 URL 是否公开且在线。",
+        "blocked": "你的站点禁止嵌入框架，返回的响应头为：{header}",
+        "fix": "请改为发送此响应头（现代浏览器会忽略 X-Frame-Options）："
+      },
+      "widget": {
+        "title": "审阅小组件已加入你的页面",
+        "ok": "审阅小组件已安装。",
+        "bridge": "预览桥接已响应，因此标注可用。添加审阅小组件，以便审阅者也能直接在你的站点上添加标注。",
+        "unchecked": "无法读取你页面的 HTML。如果尚未添加，请添加审阅小组件。",
+        "missing": "在你页面的 HTML 中未找到审阅小组件。如果你通过 JavaScript 包加载它，请忽略此提示。",
+        "feedback": "你的页面包含的是反馈小组件（终端用户报告），而非审阅小组件。Review 需要审阅小组件。",
+        "wrongProject": "小组件设置的项目为“{found}”，但此项目为“{expected}”。",
+        "wrongOrigin": "小组件的 data-app-origin 必须为 {origin}，否则它无法响应此页面。",
+        "denied": "小组件已加载，但 glot 拒绝了其审阅会话。请点击“重新检查”；如果问题持续，请退出后重新登录。",
+        "network": "小组件已加载，但无法连接 glot（网络或 CORS 问题）。请检查“设置”中的站点 URL 是否为你站点的真实地址。",
+        "paste": "将以下内容粘贴到你站点的 HTML 中，放在结束 body 标签之前："
+      },
+      "connected": {
+        "title": "你的站点已可在评审中响应",
+        "ok": "已连接：标记点和实时预览可用。",
+        "pending": "正在等待你的站点响应…",
+        "fail": "你的站点未在框架中响应。"
+      },
+      "advanced": {
+        "title": "无法添加小组件？",
+        "body": "这个较小的脚本足以让评审放置标记点并预览编辑；但评审人员无法从你的站点添加批注。你的站点仍须允许被嵌入框架（第 2 步）。"
+      },
+      "chip": {
+        "widget": "已连接",
+        "bridge": "已连接（桥接）",
+        "loading": "连接中…",
+        "unreachable": "未连接"
+      }
+    },
+    "help": {
+      "title": "键盘快捷键",
+      "body": "不在输入框中输入时，单键快捷键可用。",
+      "c": "评论站点中的文本",
+      "e": "编辑所选文本",
+      "j": "下一条标注",
+      "k": "上一条标注",
+      "r": "解决所选标注",
+      "esc": "取消拾取",
+      "help": "显示此帮助",
+      "enabled": "启用单键快捷键"
+    },
+    "frame": {
+      "title": "站点：{url}",
+      "unreachable": {
+        "title": "实时标注不可用。",
+        "body": "站点未在框架内响应：此页面未加载 glot 小组件，或站点禁止嵌入框架（X-Frame-Options 或 CSP frame-ancestors）。"
+      },
+      "install": "修复连接",
+      "showLive": "显示实时站点",
+      "showShot": "显示最后一张截图",
+      "retry": "重试",
+      "picking": "点击所需文本。按 Esc 取消。",
+      "annotating": "点击站点中的文本即可添加评论。按 Esc 取消。",
+      "pickingBlind": "站点暂时无法上报点击。请安装小组件，或切换到最后一张截图并在其上点击。",
+      "cancel": "取消",
+      "connecting": "正在连接站点…",
+      "shotAlt": "来自视觉 QA 的该页面最后一张截图",
+      "pickHere": "在此放置标注"
+    },
+    "status": {
+      "open": "待处理",
+      "in_progress": "处理中",
+      "resolved": "已解决",
+      "wontfix": "不予修复"
+    },
+    "list": {
+      "empty": {
+        "title": "还没有批注",
+        "body": "按 C 或点击“评论”，然后点击站点中的任意文字开始讨论。"
+      },
+      "resolvedThisWeek": "{count, plural, other {本周已解决 # 条批注}}",
+      "search": "搜索批注",
+      "searchPlaceholder": "搜索文本、键或作者",
+      "filters": "筛选",
+      "status": "状态",
+      "route": "页面",
+      "locale": "语言",
+      "author": "作者",
+      "statusFilter": {
+        "active": "待办",
+        "done": "已完成",
+        "all": "全部状态"
+      },
+      "allRoutes": "所有页面",
+      "allLocales": "所有语言",
+      "allAuthors": "所有作者",
+      "count": "{count, plural, =0 {没有匹配的批注} other {# 条批注}}",
+      "noMatch": "没有批注符合这些筛选条件。",
+      "clearFilters": "清除筛选",
+      "label": "批注",
+      "number": "批注 {n}。",
+      "replies": "{count, plural, other {# 条回复}}"
+    },
+    "composer": {
+      "title": "新建标注",
+      "noText": "此处未检测到文本；标注将固定在该位置。",
+      "body": "评论",
+      "bodyHint": "支持 Markdown：**粗体**、*斜体*、`代码`、链接。使用 @姓名 提及同事。按 Ctrl+Enter 发送。",
+      "suggestion": "建议措辞（可选）",
+      "suggestionHint": "文本应改为的内容。稍后可一键应用。",
+      "submit": "添加标注",
+      "submitting": "添加中…",
+      "cancel": "取消"
+    },
+    "detail": {
+      "statusChanged": "已标记为 {status}",
+      "deleted": "标注已删除",
+      "back": "所有标注",
+      "title": "批注 {n}",
+      "more": "更多操作",
+      "edit": "编辑评论",
+      "delete": "删除标注",
+      "anchor": "标注的文本",
+      "noKey": "未关联键",
+      "editText": "编辑文本",
+      "createKey": "创建键",
+      "reactions": "反应",
+      "reaction": {
+        "approve": "批准（{count}）",
+        "up": "赞（{count}）",
+        "down": "踩（{count}）",
+        "heart": "喜欢（{count}）",
+        "eyes": "关注中（{count}）",
+        "check": "完成（{count}）"
+      },
+      "status": "状态",
+      "assignee": "负责人",
+      "unassigned": "未分配",
+      "you": "（你）",
+      "resolve": "解决",
+      "deleteTitle": "删除标注 {n}？",
+      "deleteBody": "{count, plural, =0 {该标注将对所有人删除。} other {该标注及其 # 条回复将对所有人删除。}}",
+      "keep": "保留",
+      "deleteConfirm": "删除标注",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "wording": {
+      "title": "修改文案",
+      "source": "源文本：",
+      "instruction": "给 AI 的指令",
+      "instructionPlaceholder": "可选：更简短、更友好…",
+      "rephrase": "改写",
+      "rephrasing": "正在改写…",
+      "variants": "选择一个版本，悬停即可预览",
+      "allLocales": "已在 {count, plural, other {# 种语言}} 中验证",
+      "newWording": "新文案",
+      "previewHint": "输入时在网站中实时预览。应用前不会保存任何内容。",
+      "apply": "应用",
+      "applyAll": "应用到 {count, plural, other {# 种语言}}",
+      "applied": "已保存 {locale} 的翻译并解决标注",
+      "failed": "无法保存译文，请重试。",
+      "prOpened": "拉取请求已打开",
+      "openPr": "打开 GitHub PR",
+      "prNeedsSettings": "请在“用户报告 › 设置”中设置代码仓库和 token，以便打开拉取请求。",
+      "noKey": "此文本尚未关联翻译键，因此无法在此修改。请先创建翻译键。",
+      "createKey": "创建翻译键",
+      "invalidProposal": "至少一种语言未通过校验",
+      "showLocales": "查看全部 {count, plural, other {# 种语言}}",
+      "rejected": "已丢弃 {count, plural, other {# 个版本}}，因为它们违反了规则（占位符、术语表、长度）。"
+    },
+    "thread": {
+      "title": "{count, plural, =0 {讨论} other {# 条回复}}",
+      "edited": "已编辑",
+      "editComment": "编辑回复",
+      "deleteComment": "删除回复",
+      "reply": "回复",
+      "replyPlaceholder": "回复…",
+      "replyHint": "按 Ctrl+Enter 发送",
+      "send": "发送"
+    },
+    "editor": {
+      "back": "返回",
+      "title": "编辑文本",
+      "noText": "未选择文本",
+      "candidates": "匹配的键",
+      "created": "已创建键 {key}",
+      "createTitle": "从此文本创建键",
+      "createBody": "此文本不在你的目录中：它很可能是硬编码的。glot 会将其添加为源字符串；随后开发者在代码中用 glot i18nize 或拉取请求替换该字面量。",
+      "keyName": "键名（可选）",
+      "keyPlaceholder": "pricing.start_free_trial",
+      "keyHint": "留空则根据页面和文本自动生成。",
+      "description": "译者上下文（可选）",
+      "descriptionHint": "文本出现的位置及其作用，例如“开始免费试用的按钮”。",
+      "createKey": "创建键",
+      "saved": "{count, plural, other {已保存 # 条翻译}}",
+      "invalid": "未保存任何内容：请修复各语言下方显示的错误。",
+      "source": "源文本（{locale}）：",
+      "protected": "花括号中的占位符由你的应用填充，请保留每一个。点击标签即可插入。",
+      "unsaved": "{count, plural, other {# 项未保存的更改}}",
+      "upToDate": "所有更改已保存",
+      "discard": "放弃",
+      "saving": "保存中…",
+      "save": "{count, plural, =0 {保存} other {保存 # 种语言}}",
+      "empty": "文本为空。如需删除此翻译，请使用“移除”。",
+      "missingPlaceholder": "缺少占位符 {name}。",
+      "reverted": "已恢复 {locale} 的上一版本",
+      "removed": "{locale} 翻译已移除",
+      "undo": "撤销",
+      "inFrame": "在网站中显示",
+      "showInFrame": "在站点中显示",
+      "insertPlaceholder": "插入占位符",
+      "insert": "插入 {name}",
+      "valid": "看起来不错",
+      "reset": "重置",
+      "history": "历史记录",
+      "undoLast": "撤销上一次更改",
+      "remove": "移除",
+      "noHistory": "没有更早的版本。",
+      "origin": {
+        "machine": "AI",
+        "human": "人工"
+      },
+      "restore": "恢复",
+      "removeTitle": "移除 {locale} 翻译？",
+      "removeBody": "你的网站将为该语言显示回退内容（通常为源文本）。历史记录会保留，因此你可以恢复它。",
+      "keep": "保留",
+      "removeConfirm": "移除翻译"
+    },
+    "share": {
+      "title": "分享以供审阅",
+      "body": "审阅者通过此链接打开你的站点并添加批注，无需账户。链接可随时撤销。",
+      "adminOnly": "只有项目管理员可以创建审阅链接。请让管理员分享一个。",
+      "label": "名称（可选）",
+      "labelPlaceholder": "例如：德语校对员",
+      "access": "权限",
+      "accessLevel": {
+        "read": "可查看",
+        "comment": "可评论",
+        "edit": "可评论并编辑文本"
+      },
+      "accessHint": {
+        "read": "可查看批注和讨论，但无法编辑。",
+        "comment": "可添加批注、回复和表情反应。",
+        "edit": "还可编辑文本、更改状态并应用建议。"
+      },
+      "expiry": "有效期",
+      "never": "永不",
+      "days": "{count, plural, other {# 天}}",
+      "create": "创建链接",
+      "createdTitle": "链接已就绪。请立即复制，之后将不再显示。",
+      "createdHint": "任何拥有此链接的人在其过期或你撤销之前，都将拥有上述权限。",
+      "active": "{count, plural, =0 {暂无有效链接} other {# 个有效链接}}",
+      "none": "没有有效链接。",
+      "untitled": "未命名链接",
+      "expires": "将于 {date} 过期",
+      "neverExpires": "永不过期",
+      "revoke": "撤销 {label}",
+      "revoked": "链接已撤销"
+    }
+  },
+  "connectors": {
+    "magento": {
+      "description": "通过 REST API 同步产品和分类，每种语言对应一个商店视图。",
+      "fields": {
+        "url": "商店 URL",
+        "token": "访问令牌",
+        "token_secret": "访问令牌密钥",
+        "consumer_key": "Consumer key",
+        "consumer_secret": "Consumer secret"
+      },
+      "hints": {
+        "token": "系统 → 扩展 → 集成：创建并激活一个集成，需包含 Catalog 和 Stores 资源。",
+        "token_secret": "填写 consumer key 和 secret 后，glot 将使用 OAuth 1.0a 对请求签名。否则，令牌将以 Bearer 令牌形式发送，而 Commerce 2.4.4+ 仅在启用该选项时才接受。"
+      }
+    },
+    "prestashop": {
+      "description": "通过 Webservice API 同步商品、分类、CMS 页面和品牌；HTML 描述会保留其标签。",
+      "fields": {
+        "url": "店铺网址",
+        "api_key": "Webservice 密钥"
+      },
+      "hints": {
+        "url": "店铺地址，不含 /api。",
+        "api_key": "高级参数 → Webservice：密钥需对 products、categories、content_management_system 和 manufacturers 拥有 GET 和 PUT 权限，并对 languages 和 configurations 拥有 GET 权限。"
+      }
+    },
+    "woocommerce": {
+      "description": "通过 WooCommerce REST API 同步商品、分类和标签；支持 WPML（WooCommerce Multilingual）和 Polylang for WooCommerce。",
+      "fields": {
+        "url": "店铺网址",
+        "consumer_key": "消费者密钥",
+        "consumer_secret": "消费者私钥",
+        "webhook_secret": "Webhook 密钥"
+      },
+      "hints": {
+        "consumer_key": "WooCommerce → 设置 → 高级 → REST API → 添加密钥，权限选择“读/写”。",
+        "webhook_secret": "任意较长的随机字符串：glot 会用它注册商品 Webhook，并校验其签名。"
+      }
+    },
+    "bigcommerce": {
+      "description": "通过 Translations API 同步商品、分类和品牌，按渠道和语言区域划分。",
+      "fields": {
+        "store_hash": "店铺哈希",
+        "token": "访问令牌",
+        "channel_id": "渠道 ID",
+        "webhook_secret": "Webhook 密钥"
+      },
+      "hints": {
+        "store_hash": "API 路径中的代码：api.bigcommerce.com/stores/STORE_HASH/v3。",
+        "token": "具有商品（修改）、店铺信息（读取）和渠道设置（修改）权限的店铺级 API 账户。",
+        "channel_id": "默认店面填写 1。",
+        "webhook_secret": "任意随机字符串：glot 会注册商品和分类 webhook，并在每次调用时进行校验。"
+      }
+    },
+    "shopware": {
+      "description": "通过 Admin API 同步商品、分类和属性，并写入每种 Shopware 语言。",
+      "fields": {
+        "url": "店铺 URL",
+        "client_id": "访问密钥 ID",
+        "client_secret": "Secret 访问密钥",
+        "webhook_secret": "应用密钥（Webhook 签名）"
+      },
+      "hints": {
+        "client_id": "设置 → 系统 → 集成 → 添加集成（Administrator 角色）。",
+        "client_secret": "创建集成时仅显示一次。",
+        "webhook_secret": "仅当 Shopware 应用发送 webhook 时需要：glot 会校验 shopware-shop-signature 请求头。"
+      }
+    },
+    "contentful": {
+      "description": "通过 Content Management API 处理所有内容类型的条目：本地化的短文本、长文本（Markdown）和富文本字段。",
+      "fields": {
+        "space_id": "空间 ID",
+        "token": "个人访问令牌",
+        "environment": "环境",
+        "api_url": "API 地址"
+      },
+      "hints": {
+        "token": "设置 → CMA 令牌。需要对该空间的读写权限。",
+        "api_url": "仅适用于欧盟数据驻留：https://api.eu.contentful.com"
+      }
+    },
+    "sanity": {
+      "description": "通过 HTTP API 处理文档：字段级（本地化对象、国际化数组）或文档级（document-internationalization）i18n，并保持 Portable Text 完整。",
+      "fields": {
+        "project_id": "项目 ID",
+        "dataset": "数据集",
+        "token": "API 令牌",
+        "source_locale": "源语言代码",
+        "webhook_secret": "Webhook 密钥"
+      },
+      "hints": {
+        "token": "sanity.io/manage → API → Tokens，需具备 Editor 权限。",
+        "source_locale": "架构中的语言键（默认为 en）。",
+        "webhook_secret": "GROQ webhook 的密钥，用于验证其签名。"
+      }
+    },
+    "strapi": {
+      "description": "同步 Strapi 4 和 5 的本地化集合类型与单一类型（i18n 插件）：文本、Markdown 和 Blocks 字段。",
+      "fields": {
+        "url": "Strapi URL",
+        "token": "API 令牌"
+      },
+      "hints": {
+        "token": "设置 → API Tokens，选择 Full access（或在相应类型上授予 find、update 和 createLocalization 权限）。"
+      }
+    },
+    "hubspot": {
+      "description": "博客文章、网站和落地页（包括富文本模块），以 HubSpot 多语言变体形式写入。",
+      "fields": {
+        "token": "私有应用访问令牌",
+        "webhook_secret": "应用客户端密钥"
+      },
+      "hints": {
+        "token": "设置 → 集成 → 私有应用，需具备 content 权限范围。",
+        "webhook_secret": "可选：用于验证 Webhook 调用中的 X-HubSpot-Signature（v1）。"
+      }
+    },
+    "drupal": {
+      "description": "通过 Core JSON:API 读取节点和分类术语：标题和格式化文本，写入现有译文（Content Translation）。",
+      "fields": {
+        "url": "站点 URL",
+        "username": "用户名",
+        "password": "密码",
+        "token": "OAuth 令牌"
+      },
+      "hints": {
+        "username": "需启用 basic_auth 模块。或留空并填写 OAuth 令牌。",
+        "token": "Bearer 令牌（Simple OAuth），替代用户名和密码。"
+      }
+    },
+    "ghost": {
+      "description": "通过 Admin API 获取文章和页面。每种语言是一篇标记为 #fr（slug-fr）的文章，这是 Ghost 的路由模式。",
+      "fields": {
+        "url": "站点 URL",
+        "admin_key": "Admin API 密钥",
+        "webhook_secret": "Webhook 密钥"
+      },
+      "hints": {
+        "admin_key": "设置 → Integrations → Add custom integration，填写 id:secret。",
+        "webhook_secret": "任意字符串：glot 随后将注册带签名的 Ghost Webhook。"
+      }
+    },
+    "craft": {
+      "description": "通过 GraphQL API 处理条目：标题和文本字段，保存到每种语言对应的 Craft 站点。",
+      "fields": {
+        "url": "GraphQL 端点",
+        "token": "Schema 令牌",
+        "sites": "各语言对应站点"
+      },
+      "hints": {
+        "token": "GraphQL → 令牌，且该 Schema 需能查询并保存每个站点中的条目。",
+        "sites": "glot 语言区域：Craft 站点句柄，用逗号分隔。默认：与语言区域同名的站点。"
+      }
+    },
+    "zendesk": {
+      "description": "同步帮助中心的分类、版块和文章，并翻译到每个 Guide 语言版本。",
+      "fields": {
+        "subdomain": "Zendesk 子域名",
+        "email": "客服人员邮箱",
+        "token": "API 令牌",
+        "webhook_secret": "Webhook 签名密钥"
+      },
+      "hints": {
+        "token": "管理中心 → 应用和集成 → Zendesk API。",
+        "webhook_secret": "可选：用于验证 X-Zendesk-Webhook-Signature。"
+      }
+    },
+    "helpscout": {
+      "description": "Docs 文章，按语言分别写入对应的 Docs 站点（Help Scout 翻译 Docs 的方式）。",
+      "fields": {
+        "api_key": "API 密钥",
+        "collections": "按语言设置 Collections"
+      },
+      "hints": {
+        "api_key": "在你的 Profile → Authentication → API Keys 中获取。",
+        "collections": "glot 语言区域：该语言 Docs 站点的 collection ID，以逗号分隔。"
+      }
+    },
+    "page": {
+      "title": "集成",
+      "subtitle": "连接 CMS 或商店：glot 会拉取其内容，使用项目的模型进行翻译，并将经过验证的译文写回。",
+      "docs": "同步机制说明见各 CMS：<docs>集成文档</docs>。"
+    },
+    "connect": "连接",
+    "save": "测试并保存",
+    "testing": "测试中…",
+    "cancel": "取消",
+    "optional": "可选",
+    "connected": "{name} 已连接，首次同步已排队。",
+    "localeMismatch": "CMS 的默认语言（{locale}）与项目的源语言不一致。",
+    "webhooksError": "已连接，但无法自动注册 Webhook：请手动添加 Webhook URL。",
+    "syncQueued": "已排队同步",
+    "testOk": "{name} 可访问。语言：{locales}",
+    "lastSync": "已同步 {when}",
+    "stats": "{items, plural, other {# 个字段}} · {pushed} 已推送 · {waiting} 等待翻译",
+    "webhook": "Webhook URL",
+    "webhookHint": "发送到此处的内容变更会触发增量同步。请妥善保密：其中包含令牌。",
+    "sync": "立即同步",
+    "syncing": "同步中…",
+    "test": "测试",
+    "remove": "断开连接",
+    "removeConfirm": "断开 {name} 的连接？翻译内容将保留在 glot 中，CMS 中的内容不会被删除。",
+    "oneClick": "一键连接",
+    "oneClickHint": "你需要在 {name} 上自行批准访问。glot 不会获取你的密码，你可以随时在那里撤销访问权限。",
+    "manual": "改为手动输入凭据",
+    "redirecting": "正在打开 {name}…",
+    "connectError": "连接未成功：{error}",
+    "connectedPreview": "{name} 已连接。glot 正在读取你的内容以生成预览；尚未翻译或更改任何内容。",
+    "reconnect": "重新连接",
+    "pause": "暂停",
+    "publish": "发布",
+    "published": "已发布",
+    "review": "查看更改",
+    "ready": "待发布：{count}",
+    "kept": "在 {name} 中手动编辑，保持原样：{count}",
+    "overwrite": "替换 {name} 中已存在的译文",
+    "reviewFirst": "发布前让我先审核",
+    "webhookActive": "自动同步正常（最后一次收到变更：{when}）。",
+    "webhookNone": "尚未自动收到任何变更。glot 也会每天检查一次变更。",
+    "issues": "未发布：{count}",
+    "tenant": {
+      "shopify": "店铺域名",
+      "wordpress": "站点地址",
+      "woocommerce": "站点地址"
+    },
+    "hold": {
+      "translate": "等待你的批准",
+      "push": "由你发布"
+    },
+    "preview": {
+      "title": "翻译前预览",
+      "summary": "条目：{resources, number} · 文本：{fields, number} · 语言：{languages, number} · 待翻译词数：约 {words, number}",
+      "cost": "预估翻译成本：{cost}",
+      "types": "待翻译内容",
+      "nothing": "{name} 中尚未写入任何内容。接下来由您决定。",
+      "approve": "翻译并发布",
+      "approveReview": "翻译，由我自行发布"
+    },
+    "progress": {
+      "pull": "正在读取您的内容… 已读取文本：{count, number}",
+      "translate": "正在翻译… {done, number}/{total, number}"
+    },
+    "diff": {
+      "new": "新增",
+      "update": "更新",
+      "blocked": "未写入",
+      "empty": "没有等待发布的内容。",
+      "more": "…另有 {count, number} 项。"
+    },
+    "doctor": {
+      "title": "连接检查",
+      "run": "测试连接",
+      "running": "检查中…",
+      "allGood": "glot 所需的一切均已就绪。",
+      "problems": "有些问题需要你处理，glot 才能完全正常工作。",
+      "status": {
+        "ok": "正常",
+        "warn": "警告",
+        "fail": "问题"
+      },
+      "check": {
+        "auth": "登录",
+        "source_locale": "源语言与项目不一致",
+        "note": "注意",
+        "languages": "语言",
+        "read": "读取内容（首页文本）",
+        "translations": "读取现有译文",
+        "webhooks": "自动同步",
+        "scopes": "权限",
+        "scope_locales": "添加语言的权限",
+        "scope_content": "glot 无法读取的内容"
+      }
+    },
+    "fix": {
+      "reconnect": "访问权限已过期或被撤销。请重新连接以恢复。",
+      "permissions": "缺少权限。请在平台上将其授予应用或令牌，然后重新测试。",
+      "rate_limit": "平台正在降低请求速度。glot 会自动重试，无需操作。",
+      "placeholders": "译文改变了变量或模板代码。请在编辑器中更正；glot 随后会立即发布。",
+      "markup": "译文改变了格式或链接。请在编辑器中更正；glot 随后会立即发布。",
+      "resync": "内容在此期间已更改。请运行同步。",
+      "not_found": "此内容在平台上已不存在。请运行同步。",
+      "enable_locale": "请在平台设置中添加此语言，然后重新测试。",
+      "unreachable": "站点没有响应。请检查它是否在线，以及能否从互联网访问。",
+      "install_plugin": "平台需要多语言插件来存储译文。请安装后重新测试。",
+      "no_content": "尚未找到可翻译的内容。",
+      "no_readback": "此平台不允许 glot 读回译文：在平台上手动所做的更改无法被检测，撤销操作也无法恢复。",
+      "webhook_manual": "无法设置自动同步。请在平台上添加下方的 Webhook URL，或依赖每日检查。"
+    },
+    "history": {
+      "title": "历史记录",
+      "empty": "尚未发布任何内容。",
+      "run": "已发布翻译：{count, number}",
+      "rollback": "撤销",
+      "rolledBack": "已撤销",
+      "confirm": "撤销此次发布？文本将恢复为 {name} 之前的内容。之后发布将暂停，直到你恢复为止。",
+      "done": "已恢复：{restored} · 已移除：{removed} · 已保留（手动编辑）：{kept}"
+    },
+    "status": {
+      "idle": "未同步",
+      "queued": "排队中",
+      "running": "同步中",
+      "ok": "已是最新",
+      "error": "错误"
+    },
+    "shopify": {
+      "description": "通过 Translations API 同步商品、系列、页面、文章、metafields、菜单和主题文本。",
+      "fields": {
+        "shop": "店铺域名",
+        "client_id": "客户端 ID",
+        "client_secret": "客户端密钥",
+        "token": "Admin API 访问令牌",
+        "webhook_secret": "API 密钥（用于 webhook 签名）"
+      },
+      "hints": {
+        "client_id": "来自你在 Shopify Dev Dashboard（设置）中自建的应用。glot 会自动续期其 24 小时有效的访问令牌。",
+        "token": "仅适用于 2026 年之前在店铺后台创建的自定义应用。否则请留空。",
+        "webhook_secret": "用于让 glot 验证 Shopify 的商品和集合 webhook。"
+      }
+    },
+    "webflow": {
+      "description": "CMS 集合（纯文本和富文本字段）、静态页面内容和组件，覆盖站点的每个次要语言（Webflow Localization）。",
+      "fields": {
+        "token": "站点 API 令牌",
+        "site_id": "站点 ID",
+        "webhook_secret": "Webhook 签名密钥"
+      },
+      "hints": {
+        "token": "站点设置 → Apps & integrations → API access，需对 CMS、Pages、Components 和 Sites 具有读写权限。",
+        "site_id": "仅当令牌可访问多个站点时需要。",
+        "webhook_secret": "仅适用于由 Webflow 签名的 webhook（OAuth 应用 client secret）。在站点设置中添加的 webhook 请改用下方的 webhook URL。"
+      }
+    },
+    "wordpress": {
+      "description": "通过 REST API 同步文章、页面、分类、标签和菜单；支持 WPML 和 Polylang。",
+      "fields": {
+        "url": "站点网址",
+        "username": "用户名",
+        "app_password": "应用程序密码"
+      },
+      "hints": {
+        "app_password": "用户 → 个人资料 → 应用程序密码。请勿填写登录密码。"
+      }
+    }
+  },
+  "integrations": {
+    "nav": "集成",
+    "meta": {
+      "title": "集成：在任意平台上翻译你的网站",
+      "description": "在 {count} 个平台上使用 glot 翻译网站的分步指南：网站构建器、店铺、CMS、AI 应用构建器、课程平台和帮助中心。"
+    },
+    "title": "集成",
+    "subtitle": "glot 可在任何允许在每个页面添加脚本的网站上运行。选择你的平台，查看具体步骤、所需套餐以及如何为搜索引擎获取翻译后的 URL。",
+    "search": "搜索平台",
+    "searchPlaceholder": "Wix、Shopify、Ghost…",
+    "filter": "按分类筛选",
+    "all": "全部",
+    "count": "{count, plural, =0 {没有平台} other {# 个平台}}",
+    "empty": "没有与“{q}”匹配的平台。如果你的网站支持自定义代码，通用标签同样适用。",
+    "categories": {
+      "site-builder": "网站构建器",
+      "e-commerce": "电子商务",
+      "cms": "CMS",
+      "ai-builder": "AI 应用构建器",
+      "lms": "课程平台",
+      "help-center": "帮助中心",
+      "enterprise": "企业版"
+    },
+    "methods": {
+      "connector": "连接器",
+      "plugin": "插件",
+      "tag": "通用标签"
+    },
+    "generic": {
+      "title": "没有找到你的平台？",
+      "body": "如果平台允许在每个页面的 head 部分添加脚本，通用标签同样适用。如果你可以控制域名的 DNS，glot Edge 也能提供翻译后的 URL。",
+      "cta": "阅读网站标签指南"
+    },
+    "page": {
+      "metaTitle": "面向 {name} 的 glot：翻译你的 {name} 网站",
+      "metaDescription": "如何使用 glot 翻译 {name} 网站：{method, select, connector {glot 连接器} plugin {glot 插件} other {一段脚本标签}}、所需套餐，以及供搜索引擎索引的译文 URL，分步说明。",
+      "breadcrumb": "面包屑导航",
+      "title": "glot 适用于 {name}",
+      "intro": {
+        "connector": "glot 直接连接 {name}：读取你的内容，结合你的术语表和检查进行翻译，并将译文写回 {name} 自带的语言设置中。",
+        "plugin": "glot 以插件形式安装在 {name} 中。下面的步骤将指导你完成设置。",
+        "tag": "在 {name} 上，glot 通过在每个页面添加一段脚本标签来运行。它在访客的浏览器中翻译页面，并添加语言菜单。"
+      },
+      "unavailable": "{name} 不允许在每个页面添加脚本，因此通用标签无法在此运行。下方说明列出了可行的方案。",
+      "unverified": "我们无法在 {name} 官方文档中确认这些步骤。使用前请先在 {name} 帮助中心核实。",
+      "englishNote": "平台步骤以英文提供，菜单名称与 {name} 界面保持一致。",
+      "nativeTitle": {
+        "connector": "连接 {name}",
+        "plugin": "安装 glot 插件"
+      },
+      "nativeDoc": "完整连接器文档",
+      "tagDoc": "网站标签指南",
+      "tagTitle": "添加 glot 标签",
+      "tagAltTitle": "替代方案：通用标签",
+      "tagAltBody": "如需在浏览器中翻译 {name} 集成未覆盖的内容，请改为添加通用标签。",
+      "prep": {
+        "project": "在 glot 中创建项目并添加语言。",
+        "mode": "打开 glot Edge → Website tag，输入你的网站地址：glot 会翻译该网站并显示预览。粘贴标签后，在此处检查安装情况并开启标签。",
+        "copy": "从该标签页复制你的标签：它已包含你的项目及其公钥（data-key）。下方标签显示其格式。"
+      },
+      "snippetLabel": "glot 标签",
+      "plansTitle": "套餐要求",
+      "glotPlan": "关于 glot 方面，请参阅定价页面了解各套餐包含的内容。glot Edge（译文 URL）包含在 Growth 套餐中，Pro 套餐提供有限的试用。",
+      "seoTitle": "供搜索引擎索引的译文 URL",
+      "seoYes": "对于希望搜索引擎无需运行 JavaScript 即可索引的译文页面，请在你的域名下使用子域名（例如 es.example.com）部署 glot Edge，并添加两条 DNS 记录：",
+      "seoNo": "glot Edge 的子域名模式在此不可用：",
+      "dnsLabel": "DNS 记录（TXT 令牌显示在 glot Edge → Setup 中）",
+      "edgeDoc": "glot Edge 的工作原理",
+      "faqTitle": "常见问题",
+      "faq": {
+        "partner": {
+          "q": "glot 是 {name} 的合作伙伴吗？",
+          "a": "不会。glot 是独立产品，与 {name} 没有关联，也未获其认可。本指南仅使用 {name} 的标准功能。"
+        },
+        "content": {
+          "q": "glot 会修改我的 {name} 内容吗？",
+          "a": "{method, select, tag {不会。标签在访客的浏览器中翻译页面；你的 {name} 内容保持不变。移除标签后，网站将恢复为源语言。} plugin {你的源内容保持不变。插件在浏览器中翻译页面，连接后会将译文写入语言字段，你可以在发布前进行审核。} other {你的源内容保持不变。glot 会将译文写入 {name} 自带的语言字段，你可以在发布前进行审核。}}"
+        },
+        "seo": {
+          "q": "搜索引擎会索引我的译文吗？",
+          "a": "仅靠标签并不能：它在浏览器中翻译，因此搜索引擎主要索引的仍是源语言。拥有独立 URL 的译文页面需要 glot Edge，或能为每种语言发布独立 URL 的平台。"
+        }
+      },
+      "docsTitle": "{name} 官方文档",
+      "trademark": "{name} 是其所有者的商标。glot 与 {name} 无关联。",
+      "cta": {
+        "title": "翻译你的 {name} 网站",
+        "body": "创建项目，选择语言，然后按照上述步骤操作。",
+        "start": "创建项目",
+        "docs": "阅读文档"
+      },
+      "related": "更多集成：{category}"
+    }
+  },
+  "liveCheck": {
+    "title": "在您的网站上显示",
+    "description": "此处可以完整翻译某种语言，但如果您网站自己的代码不接受 glot 发送的语言代码，该语言仍可能无法在您的网站上显示。glot 会检查您网站上的每种语言，并告诉您需要修改什么。",
+    "recheck": "重新检查",
+    "checking": "正在检查您的网站…",
+    "willCheck": "保存并翻译后，我们会检查它是否显示在您的网站上。",
+    "checked": "检查于 {date}",
+    "state": {
+      "live": "已翻译 · 已在您的网站上线",
+      "not_displayed": "已翻译，但您的网站未显示",
+      "unknown": "已翻译 · 尚未在您的网站上确认",
+      "unchecked": "尚未在您的网站上检查",
+      "no_site": "未在您的网站上检查"
+    },
+    "badge": {
+      "live": "已在您的网站上显示",
+      "notDisplayed": "未在您的网站上显示"
+    },
+    "evidence": {
+      "visitors": "过去 7 天内选择此语言的访客已确认。"
+    },
+    "mapped": "对于此语言，glot 会向您的网站发送 <c>{code}</c>，而非 <c>{locale}</c>。",
+    "mappedAuto": "您的网站忽略 <c>{locale}</c>，并响应 <c>{code}</c>：glot 已找到该代码，现在会自动发送 <c>{code}</c>。",
+    "cause": {
+      "visitors": "访客选择了此语言。语言切换器将 <c>{code}</c> 发送到您的网站，页面未发生变化：您网站自己的代码不接受 <c>{code}</c>。",
+      "visitorsLang": "访客选择了此语言。语言切换器将 <c>{code}</c> 发送到您的网站，页面仍停留在 <c>{lang}</c>：您网站自己的代码不接受 <c>{code}</c>。",
+      "probe": "我们打开了 <c>{url}</c>，得到的是您网站对未知语言显示的同一页面：您网站自己的代码不接受 <c>{code}</c>。",
+      "worksWith": "使用 <c>{code}</c> 时，网站会以此语言响应。"
+    },
+    "fix": {
+      "title": "修复方法",
+      "alias": "在我的网站上使用 {code}",
+      "aliasConfirmed": "glot 将发送 <c>{code}</c> 而非 <c>{locale}</c>。无需修改您网站的代码。",
+      "dev": "或者保留 <c>{locale}</c>，并让您的网站在读取语言的任何位置都接受它（<docs>指南</docs>）：",
+      "send": "发送给我的开发人员",
+      "message": "我们的网站尚未显示{language}。译文已在 glot 中准备就绪，语言切换器也会将代码 “{locale}” 发送到网站（例如 ?lang={locale}），但网站会忽略它，仍停留在默认语言。网站代码可能只接受 “en” 或 “fr” 之类的短代码。\n\n两种修复方式：\n1. 在网站读取语言的任何位置接受 “{locale}”（仅含字母或长度检查会拒绝它）。\n2. 或者告诉我网站对{language}期望使用哪个代码，我会在 glot 中设置（设置 → 语言）。\n\n网站：{site}\n指南：{docs}"
+    },
+    "unknown": {
+      "csr": "无论语言如何，您的网站都返回相同的 HTML（语言在浏览器中切换），因此我们的服务器无法判断。第一位选择此语言的访客将确认它。",
+      "http": "您的网站在 <c>{url}</c> 返回了错误（{status}）。请检查下方“您的网站”中的网站 URL 和 URL 格式。",
+      "unreachable": "glot 的服务器无法访问 <c>{url}</c>。"
+    },
+    "noSiteHint": "在下方的“您的网站”中添加网站 URL，我们会在该网站上检查此语言。使用 glot 语言切换器的访客也会确认该语言。",
+    "codeLabel": "您网站上的代码",
+    "reset": "再次使用 {locale}"
+  },
+  "autopilot": {
+    "title": "Autopilot",
+    "subtitle": "下一步开拓哪个市场、其价值多少，以及哪些文案会根据转化自行优化。每个数字都来自你自己的流量。",
+    "docs": "计算方式",
+    "footnote": "基于 {visits} 次访问，记录于最近 {days} 天中的 {dataDays} 天。随着数据天数增加，估算会更加稳定。",
+    "noConversions": "本周期内未收到“{goal}”事件：市场仅按需排序，不估算收益。发送该事件即可获得转化和收益估算。",
+    "empty": {
+      "title": "尚无访问记录",
+      "body": "Autopilot 读取 Insights 标签的匿名计数。安装后，首批市场将显示在这里。在真实访问到达之前，不做任何估算。",
+      "track": "然后发送转化事件。金额为可选项：有了它，转化即可折算为收益。",
+      "posthog": "已在使用 PostHog？在下方连接即可基于现有历史数据对市场排序，无需等待 glot 标签。"
+    },
+    "settings": {
+      "title": "一次转化价值多少",
+      "subtitle": "用于将额外转化换算为金额。留空则使用随事件发送的平均值。",
+      "goal": "目标事件",
+      "value": "每次转化价值",
+      "valuePlaceholder": "已测量",
+      "currency": "货币",
+      "mode": "文案获胜时",
+      "approval": "保留前先询问我",
+      "auto": "自动保留",
+      "save": "保存",
+      "saved": "已保存"
+    },
+    "value": {
+      "declared": "每次“{goal}”计为 {amount}（你的设置）。",
+      "measured": "每次“{goal}”计为 {amount}：90 天内 {events} 个有价值事件的平均值。",
+      "none": "“{goal}”未设置价值：估算将保留为转化数。请在此设置价值，或随事件一并发送。"
+    },
+    "opp": {
+      "title": "待开放的市场",
+      "subtitle": "访客请求但你尚未提供服务的语言，按预期收益排序。",
+      "none": "访客偏好的所有语言均已提供服务，无需开放。",
+      "headline": "{language}：{share} 的访客未以其语言获得服务",
+      "headlineFinish": "{language}：{share} 的访客，仅 {coverage} 已翻译",
+      "gap": "他们的转化率比使用其母语的访客低 {gap}（{fallback} 对比 {native}）。",
+      "gapNone": "他们的转化率与使用其母语的访客相当（{fallback} 对比 {native}）。",
+      "revenue": "每月 {mid}",
+      "conversions": "每月 {mid} 次“{goal}”",
+      "range": "可能介于 {low} 与 {high} 之间",
+      "uncertain": "区间包含零：收益尚未确定。",
+      "insufficient": "数据不足，无法估算收益。",
+      "missingVisits": "还需 {count} 次来自这些访客的访问。",
+      "missingNative": "还需 {count} 次以访客母语提供服务的访问，才能进行比较。",
+      "missingConversions": "还需 {count} 次转化才能得出可靠的估算。",
+      "cost": "翻译 {keys} 个字符串需 {cost}",
+      "payback": "约 {days} 天内回本",
+      "paybackFast": "不到一天即可回本",
+      "method": "计算方法",
+      "formula": "每月 {visits} 次访问 ×（{native} − {fallback}）= 每月额外 {gain} 次转化",
+      "formulaMoney": "× {value} = 每月 {revenue}",
+      "caveat": "90% 置信区间。该估算假设这些访客的转化率与已使用其语言的访客相同。这只是估计而非承诺：开放后的测量结果才能反映实际情况。",
+      "open": "开放此市场",
+      "locked": "预期收益已计入 Growth。",
+      "bounce": "这些访客中有 {rate} 的会话在浏览一个页面后即结束，所有访客的对应比例为 {all}。"
+    },
+    "confidence": {
+      "insufficient": "数据不足",
+      "indicative": "仅供参考",
+      "solid": "可靠"
+    },
+    "open": {
+      "title": "开放 {language}？",
+      "body": "glot 将添加该语言，翻译 {keys} 条字符串（约 {cost}，上限 {cap}），翻译完成后立即开始测量。",
+      "mode": "衡量方式",
+      "holdout": "对照组（衡量真实效果）",
+      "holdoutHint": "这些访问者中的 20% 将在 14 天内保持当前语言，之后所有人都将看到新语言。需要在运行时加载翻译（glot CDN 或 glot Edge）。",
+      "before_after": "前后对比",
+      "before_afterHint": "对比同一批访问者的前后数据。这不是证明：季节和营销活动同样会影响数字。",
+      "confirm": "开启市场",
+      "cancel": "取消",
+      "started": "{language}：翻译已开始"
+    },
+    "openings": {
+      "title": "正在开放的市场",
+      "status": {
+        "translating": "翻译中",
+        "measuring": "测量中",
+        "failed": "失败"
+      },
+      "progress": "{done} / {total} 个字符串",
+      "predicted": "预测：{gain}，{range}",
+      "predictedNone": "无预测：开启时该语言没有任何数据。",
+      "measured": "测得：{lift}（介于 {low} 与 {high} 之间）",
+      "causal": "与对照组对比测得：真实效果。",
+      "notCausal": "前后对比：相关性，而非证明。",
+      "details": "查看测量详情"
+    },
+    "misrouted": {
+      "title": "访问者看到了错误的语言",
+      "subtitle": "这些语言你已经有了，但部分访问者看到的是其他语言。无需翻译：请检测浏览器语言，或让语言切换器更醒目。",
+      "headline": "{language}：偏好该语言的访问者中有 {share} 看到的是 {instead}（{count} 次访问）",
+      "rates": "转化率：看到其他语言时为 {mismatched}，看到自己语言时为 {matched}。",
+      "gain": "预计每月 {mid} 个“{goal}”（介于 {low} 至 {high} 之间）。",
+      "missing": "还需要 {count} 次转化，两组数据才能进行比较。",
+      "caveat": "其中一些人可能是自行选择了该语言。"
+    },
+    "copy": {
+      "title": "自动优化的文案",
+      "subtitle": "对于标题、按钮和价格文案，glot 会撰写备选文案，展示给访问者，并保留转化率最高的一个。法律文本永远不会被改动。",
+      "candidates": "值得优化的文案",
+      "noCandidates": "尚未找到已翻译的标题、按钮或价格文本。",
+      "optimize": "优化",
+      "started": "已在 {key} 上开始测试",
+      "lowTraffic": "访问量低：30 天内不太可能得出结果",
+      "noTraffic": "此语言尚无访问",
+      "noConversions": "此语言尚无“{goal}”：测试无法得出结论",
+      "estDays": "预计约 {days} 天后出现首个结果",
+      "kind": {
+        "headline": "标题",
+        "cta": "按钮",
+        "pricing": "价格",
+        "other": "文本"
+      },
+      "status": {
+        "running": "测试中",
+        "awaiting_approval": "获胜文案等待您确认",
+        "promoted": "已保留",
+        "rolled_back": "已回滚",
+        "no_winner": "无获胜者",
+        "stopped": "已停止"
+      },
+      "reason": {
+        "official_best": "当前译文转化最佳，未作更改。",
+        "no_difference": "{days} 天后无可测量的差异。当前译文保持不变。",
+        "all_variants_worse": "所有新文案的转化都更差。它们已被撤回，当前译文保持不变。",
+        "source_changed": "源文本已更改：测试已停止。",
+        "stopped_manually": "成员已手动停止。",
+        "promoted_manually": "已从实验页面保留。",
+        "approver_missing": "glot 无法自动保留此文案，请您手动批准。"
+      },
+      "lift": "基于转化，区间为 {low} 至 {high}",
+      "worth": "若效果保持，每月约 {amount}",
+      "winner": "获胜文案",
+      "leader": "目前表现最佳的文案",
+      "current": "当前译文",
+      "sample": "{views} 名访客和 {conversions} 次转化，对比当前译文的 {cviews} 名访客和 {cconversions} 次转化",
+      "dropped": "已撤回，转化率更低：“{value}”",
+      "refused": "在任何访客看到之前已被拒绝（{why}）：“{value}”",
+      "why": {
+        "new_number": "新增了数字",
+        "new_price": "新增了价格或百分比",
+        "new_link": "新增了链接",
+        "new_claim": "新增了承诺",
+        "validation": "未通过校验"
+      },
+      "approve": "保留此文案",
+      "stop": "停止",
+      "approved": "已保留文案",
+      "stopped": "测试已停止",
+      "caveat": "获胜文案的提升幅度往往被高估，因为它是在领先时被选中的。下限值更为可靠。",
+      "none": "尚未进行测试。请在下方选择一段文本。"
+    },
+    "collected": {
+      "title": "收集的数据",
+      "body": "仅统计计数。不收集访客、Cookie、IP 地址或页面信息。",
+      "insights": "按天统计访问量和事件数，包括偏好语言、实际展示语言、国家和测试分组。",
+      "variants": "每种文案的展示量和转化量。",
+      "revenue": "按天、事件和货币统计：事件数量及其价值总和。",
+      "posthog": "可选的 PostHog 导入：按天统计浏览器语言、页面语言和国家/地区，以及会话数、页面浏览量、单页会话数、访客数，以及包含转化事件的会话数。"
+    },
+    "source": {
+      "label": "来源：{source} · 数据天数：{days}",
+      "insights": "glot 标签",
+      "posthog": "PostHog",
+      "switch": "改为显示 {source}",
+      "synced": "导入于 {date}"
+    },
+    "posthog": {
+      "title": "数据源：PostHog",
+      "subtitle": "导入你的 PostHog 历史数据（只读，仅每日计数），无需等待 glot 标签即可对市场排序。复制测试和上线测量仍需要 glot 标签。",
+      "connected": "已连接到 {host} 上的项目 {project}。",
+      "notConnected": "未连接。",
+      "synced": "已从 {from} 导入到 {to}，上次同步 {when}。",
+      "never": "尚未导入任何数据。",
+      "error": "上次导入失败：{error}",
+      "host": "地区",
+      "us": "美国云",
+      "eu": "欧盟云",
+      "custom": "自托管",
+      "url": "实例 URL",
+      "project": "项目 ID",
+      "key": "个人 API 密钥",
+      "keyPlaceholder": "phx_…",
+      "keySaved": "已保存。留空则保持不变。",
+      "event": "转化事件",
+      "eventNone": "无（仅统计访问）",
+      "eventHint": "测试连接后，可从项目的真实事件中选择（最近 30 天）。",
+      "locale": "无语言代码页面的语言",
+      "localeHint": "当 URL 中没有 /nl/ 或 nl. 前缀时使用。未知时留空。",
+      "backfill": "导入的历史天数",
+      "test": "测试连接",
+      "tested": "已连接：过去 30 天有 {pageviews} 次页面浏览，其中 {share} 带有浏览器语言。",
+      "save": "保存并导入",
+      "sync": "立即导入",
+      "syncing": "导入中…",
+      "imported": "已导入：{rows} 个计数（{queries} 次查询）。",
+      "disconnect": "断开连接",
+      "disconnected": "PostHog 已断开：密钥和已导入的计数器已删除。",
+      "steps": "如何获取密钥",
+      "step1": "在 PostHog 中，打开头像菜单 → 设置 → 个人 API 密钥 → 创建个人 API 密钥。",
+      "step2": "权限范围：Query → 只读 (query:read)，仅限此项目。",
+      "step3": "项目 ID：项目设置 → General → Project ID（一个数字）。",
+      "step4": "地区：如果你在 us.posthog.com 登录，选择 US；如果在 eu.posthog.com 登录，选择 EU。",
+      "privacy": "glot 仅向 PostHog 请求每天的计数、浏览器语言、页面语言和国家/地区。不会获取个人信息、IP 地址或 URL。密钥加密存储，且不会再次显示。"
+    }
+  },
+  "renderProtocol": {
+    "title": "Render API",
+    "subtitle": "发送任意内容和接收者的区域设置，即可获得其语言的结果。邮件、通知、发票、页面：相同术语表、相同记忆、相同检查。",
+    "docs": "阅读文档",
+    "play": {
+      "title": "演练场",
+      "hint": "粘贴以 {source} 编写的内容。已知内容来自记忆；新内容由项目的模型翻译并记住。",
+      "content": "内容",
+      "contentPlaceholder": "粘贴邮件正文、通知或段落……",
+      "type": "类型",
+      "variables": "变量（JSON，可选）",
+      "variablesHint": "在翻译后填充。不会发送给模型，也不会存储。",
+      "noLocales": "请在项目设置中添加目标语言后再试用。",
+      "languages": "语言",
+      "run": "渲染",
+      "badJson": "变量必须是 JSON 对象。",
+      "units": "{cached} 来自记忆 · {translated} 新翻译 · {total} 总计",
+      "preview": "预览，{locale}"
+    },
+    "types": {
+      "html": "HTML",
+      "text": "纯文本",
+      "markdown": "Markdown",
+      "template": "ICU 模板"
+    },
+    "status": {
+      "translated": "已翻译",
+      "source": "源语言",
+      "partial": "部分翻译",
+      "fallback": "以源语言返回"
+    },
+    "usage": {
+      "title": "用量（近 30 天）",
+      "empty": "尚未渲染任何文档。请使用上方的演练场，或使用密钥调用 POST /v1/render：首次调用后即显示计数。",
+      "documents": "文档",
+      "hitRate": "记忆命中",
+      "translated": "已翻译单元",
+      "fallbacks": "回退到源语言",
+      "memory": "内存中的单元：{entries} · 语言：{locales}",
+      "day": "天",
+      "fromMemory": "来自记忆的单元"
+    },
+    "keys": {
+      "title": "密钥",
+      "create": "新建密钥",
+      "createHint": "密钥属于此项目，且只显示一次。",
+      "emptyTitle": "暂无渲染密钥",
+      "emptyBody": "创建密钥，以便从后端调用 POST /v1/render。",
+      "name": "名称",
+      "scope": "访问权限",
+      "scopeRender": "翻译新内容",
+      "scopeCached": "仅使用记忆（从不调用模型）",
+      "month": "本月文档数",
+      "of": "{used} / {limit}",
+      "revoke": "撤销",
+      "revokeNamed": "撤销 {name}",
+      "revoked": "密钥已撤销",
+      "limit": "每月限额（文档数）",
+      "limitHint": "留空则仅应用套餐的限额。",
+      "revealTitle": "请立即复制密钥",
+      "revealBody": "这是唯一一次显示密钥的机会。请将其存入服务器的密钥管理中。"
+    }
+  },
+  "twoWay": {
+    "title": "会话",
+    "subtitle": "客户的原文与你语言的译文并排显示。你用自己的语言回复，客户读到的是他们的语言。",
+    "attention": "需要你处理",
+    "mode": {
+      "suggest": {
+        "name": "建议",
+        "hint": "glot 翻译你的回复且从不发送：你可以复制，或用自己的工具发送。"
+      },
+      "one_click": {
+        "name": "一键发送",
+        "hint": "在回复上点击“发送”之前，不会发出任何内容。"
+      },
+      "auto": {
+        "name": "自动",
+        "hint": "回复翻译完成后即发送，glot 不够确定的除外。"
+      }
+    },
+    "channel": {
+      "api": "API / Webhook",
+      "helpscout": "Help Scout",
+      "form": "联系表单",
+      "email": "邮件"
+    },
+    "settings": {
+      "open": "设置",
+      "title": "会话设置",
+      "saved": "设置已保存",
+      "mode": "发送模式",
+      "team": "团队语言",
+      "review": "低于 (%) 时请求人工审核",
+      "reviewHint": "回译与你的原文一致度低于此值的回复，将等待人工处理。",
+      "webhook": "签名 webhook",
+      "secretOnce": "请立即复制此密钥：仅显示一次。",
+      "secretSet": "已设置密钥。轮换后将使旧密钥失效。",
+      "secretNone": "尚未设置密钥：生成密钥前，webhook 将拒绝所有请求。",
+      "rotate": "轮换密钥",
+      "generate": "生成密钥",
+      "replyUrl": "回复 URL（可选）",
+      "replyUrlHint": "已发送的回复将以相同密钥签名后发布到此处。留空则从 API 响应中读取。",
+      "form": "联系表单助手",
+      "formEnabled": "为表单消息标注语言和译文",
+      "formStore": "同时将表单消息保留在此收件箱中",
+      "formHint": "关闭时，除按语言统计的数量外不存储任何内容。脚本从不阻止提交。",
+      "hsAppId": "应用 ID",
+      "hsAppSecret": "应用密钥",
+      "hsWebhookSecret": "Webhook 密钥",
+      "hsHint": "在 Help Scout 中创建应用（Your Profile → My Apps），然后创建指向上方 URL 的 webhook，并订阅事件 \"Conversation created\"、\"Customer replied\" 和 \"Note created\"。",
+      "forward": "将译后邮件转发至",
+      "forwardHint": "入站邮件先经翻译，再连同下方原文转发至此地址。"
+    },
+    "empty": {
+      "title": "暂无客户消息",
+      "body": "此收件箱仅显示真实消息。连接一个渠道后，第一条消息会在此处显示，附带译文并与原文并排展示。",
+      "docs": "查看指南",
+      "api": "任意工具：一次 API 调用",
+      "form": "在你的网站上：联系表单脚本",
+      "formOff": "在你的网站上：联系表单脚本（请先在设置中开启）",
+      "helpdesk": "Help Scout 和收入邮件需在设置中配置。"
+    },
+    "stats": {
+      "title": "最近 {days, plural, other {# 天}}内的 {count, plural, other {# 条客户消息}}",
+      "unknown": "未检测到",
+      "unserved": "你未支持的语言",
+      "hint": "已用你未支持的语言写信的客户，是下一个目标市场的最强信号。"
+    },
+    "flag": {
+      "pii": "{count, plural, other {已隐藏 # 项个人信息}}",
+      "piiTip": "邮箱、电话号码、订单号和卡号在文本发送给模型前会被占位符替换，之后再还原。",
+      "language_uncertain": "语言不确定",
+      "low_confidence": "请检查此译文",
+      "pii_lost": "隐藏数据未能正确还原",
+      "mixed": "混合语言：{languages}",
+      "untranslated": "未翻译",
+      "validation": "未通过质量检查"
+    },
+    "thread": {
+      "language": "客户使用{language}书写",
+      "languageUnknown": "客户语言未知",
+      "fixLabel": "客户语言（代码）",
+      "fix": "设置语言",
+      "customer": "客户",
+      "team": "你的团队",
+      "original": "原文（{language}）",
+      "translation": "译文（{language}）",
+      "sameLanguage": "已是你的语言，无需翻译。"
+    },
+    "status": {
+      "received": "已接收",
+      "draft": "草稿",
+      "needs_review": "待审核",
+      "sent": "已发送",
+      "failed": "失败"
+    },
+    "reply": {
+      "sent": "回复已发送",
+      "failed": "无法发送回复",
+      "saved": "译文已保存为草稿",
+      "back": "回译：",
+      "confidence": "一致度 {percent}%",
+      "label": "用你的语言回复",
+      "placeholder": "输入你的回复…",
+      "checking": "正在翻译并检查…",
+      "review": "回译结果与你的原文不一致：发送前请仔细阅读。",
+      "hint": "停止输入后，即可查看客户将读到的内容（已为你回译）。",
+      "save": "翻译",
+      "send": "发送"
+    }
+  },
+  "localSeo": {
+    "title": "本地 SEO",
+    "subtitle": "译文关键词并不是用户实际搜索的词。glot 会针对每个页面和市场，将标题、描述和标题层级调整为真实的搜索词。页面正文保持忠实译文，未经你批准不会上线。",
+    "warnings": "无法完成的操作",
+    "dismiss": "关闭",
+    "cancel": "取消",
+    "save": "保存",
+    "saved": "草稿已保存",
+    "approved": "已批准：已在该市场上线",
+    "rejected": "已拒绝：译文保持不变",
+    "approve": "批准",
+    "reject": "拒绝",
+    "takeDown": "下线",
+    "edit": "编辑",
+    "edited": "你的版本",
+    "proposed": "待审核",
+    "current": "今日展示",
+    "why": "该市场的用户搜索内容",
+    "slug": "slug",
+    "blocked": "批准前请先修复以下错误",
+    "volumeUnknown": "搜索量未知",
+    "needsDemand": "{locale} 暂无搜索数据。请连接 Search Console，或添加您已知的该市场关键词：glot 从不编造关键词或搜索量。",
+    "editTitle": "{path}（{locale}）",
+    "editBody": "你的版本将替换该建议，并经过相同的检查。",
+    "saveDraft": "保存草稿",
+    "saveApprove": "保存并批准",
+    "scan": {
+      "action": "扫描页面",
+      "running": "正在读取页面…",
+      "done": "已读取页面：{pages} · 提议：{proposed}"
+    },
+    "empty": {
+      "title": "尚未扫描任何页面",
+      "body": "glot 会读取 {site} 的公开页面，检查各市场当前展示的内容，并在存在真实搜索数据时提出面向搜索的内容建议。",
+      "noSite": "请在上方告诉 glot 你的网站地址，以便扫描其页面。"
+    },
+    "site": {
+      "title": "网站",
+      "missing": "glot 尚不知道您网站的 URL。"
+    },
+    "auto": {
+      "off": "审核模式：每条建议需你批准",
+      "on": "自动模式：通过所有检查的建议将直接上线",
+      "confirmTitle": "自动应用建议？",
+      "confirmBody": "通过所有检查且无任何警告的建议将直接上线，无需人工审阅。含错误或警告的建议仍需你确认。你可随时切换回去。",
+      "confirm": "开启自动模式"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "notConnected": "未连接。连接（只读）后，可查看各国用户的真实搜索词，并衡量更改后的展示次数、点击次数和排名。",
+      "notConfigured": "此服务器暂不可用：运营方需要添加 Google OAuth 客户端。在此之前，请添加您已知的关键词。",
+      "connect": "连接 Search Console",
+      "disconnect": "断开连接",
+      "result": {
+        "connected": "Search Console 已连接",
+        "denied": "未连接 Search Console：访问已被拒绝",
+        "no_property": "此 Google 账号没有该网站的 Search Console 资源。",
+        "failed": "无法连接 Search Console。请重试。"
+      }
+    },
+    "metrics": {
+      "refresh": "更新搜索数据",
+      "refreshed": "已存储的搜索数据天数：{days}",
+      "none": "此页面尚未存储 Search Console 数据。",
+      "notConnected": "连接 Search Console 以衡量效果。",
+      "window": "{days} 天 · {impressions} 次展示 · {clicks} 次点击 · 排名 {position}",
+      "noRows": "暂无数据",
+      "before": "上线前 28 天",
+      "after": "上线后"
+    },
+    "keywords": {
+      "title": "您的关键词",
+      "hint": "您已从自己的工具中获知的各市场搜索词。",
+      "saved": "已保存关键词：{count}",
+      "dialogTitle": "{locale} 的关键词",
+      "dialogBody": "每行一个搜索词，按用户在此市场的输入方式填写。如果您知道月搜索量，可在词后加逗号并填写数字。"
+    },
+    "engine": {
+      "google": "谷歌",
+      "baidu": "百度",
+      "yandex": "Yandex",
+      "naver": "Naver"
+    },
+    "status": {
+      "proposed": "待审核",
+      "approved": "已上线",
+      "auto": "已上线（自动）",
+      "rejected": "已拒绝",
+      "stale": "页面已变更",
+      "needs_demand": "无搜索数据"
+    },
+    "source": {
+      "manual": "你的列表",
+      "gsc": "Search Console",
+      "gsc_site": "Search Console，整个站点"
+    },
+    "field": {
+      "title": "标题",
+      "description": "Meta 描述",
+      "h1": "主标题（H1）",
+      "slug": "URL slug（建议）"
+    }
+  },
+  "liveStream": {
+    "title": "实时流",
+    "subtitle": "翻译尚不存在的文本：AI 回答、通知、聊天消息，边生成边翻译，并使用你的术语表和翻译记忆库。",
+    "ms": "{n} ms",
+    "optIn": {
+      "title": "这是您用户的内容",
+      "sent": "发送给 AI 服务商的内容：待翻译的句子、其中包含的术语表词条以及对话的最后几句。代码、链接和禁止翻译的术语会先替换为占位符；电子邮件和长数字（电话、卡号）同样会被替换，除非您关闭脱敏。姓名和邮寄地址不会被识别。",
+      "stored": "glot 保存的内容：每个句子的带密钥指纹和计数器，以及每日总计。不保存文本，除非您开启下方的缓存。",
+      "on": "开启",
+      "off": "关闭"
+    },
+    "settings": {
+      "mask_pii": {
+        "label": "隐藏个人数据",
+        "help": "邮箱和 7 位及以上的数字不会发送给服务商，翻译时会还原。"
+      },
+      "store": {
+        "label": "缓存翻译",
+        "help": "保留已脱敏的翻译，使重复出现的句子即时返回且免费。关闭后将删除这些翻译。"
+      },
+      "browser": {
+        "label": "浏览器访问",
+        "help": "接受来自网页的项目公钥。关闭时仅允许你的服务器访问，并需使用 API 令牌。"
+      }
+    },
+    "provider": {
+      "mock": "此项目使用模拟服务商：下方输出的是带标记的源文本，而非译文。",
+      "missing": "未配置 AI 密钥：只有已存在于翻译记忆库中的句子会被翻译，其余内容原样保留。",
+      "fix": "在<link>项目设置</link>中设置服务商和密钥。"
+    },
+    "playground": {
+      "title": "用您自己的文本试试",
+      "body": "输入或粘贴一条消息。它将按您选择的速度重放，经过与您应用相同的调用管道，并使用本项目的术语表 ({terms, plural, =0 {尚无术语} other {# 个术语}}) 和翻译记忆库。下方的耗时在您的浏览器中本次运行时测量。",
+      "enableFirst": "先在上方开启实时流，即可试用。",
+      "noLocale": "请先为此项目添加目标语言。",
+      "placeholder": "在此输入或粘贴消息（支持 Markdown、代码块和链接）…",
+      "input": "待流式传输的文本",
+      "to": "翻译为",
+      "speed": "速度",
+      "cps": "每秒 {n} 个字符",
+      "atOnce": "一次性全部显示",
+      "start": "开始流式翻译",
+      "stop": "停止",
+      "source": "接收到的内容",
+      "output": "用户看到的内容（{locale}）"
+    },
+    "via": {
+      "tm": "来自你的翻译记忆库",
+      "cache": "已在本对话或缓存中翻译过"
+    },
+    "reason": {
+      "no_provider": "未翻译：未配置 AI 服务商。",
+      "provider_error": "未翻译：AI 服务商返回了错误。",
+      "provider_timeout": "未翻译：AI 服务商未在规定时间内响应。",
+      "provider_down": "未翻译：AI 服务商刚刚出错，因此未再次调用。",
+      "invalid_output": "未翻译：回复丢失了受保护的元素（代码、链接、个人数据）或破坏了格式，因此保留了原文。",
+      "glossary": "已翻译，但未遵循术语表中的某个术语。",
+      "live_stream_disabled": "未翻译：此项目已关闭实时流。",
+      "live_stream_daily_cap": "未翻译：已达到项目的每日上限。",
+      "other": "未翻译：无法连接 glot。"
+    },
+    "metric": {
+      "first": "首段译文",
+      "lag": "中位延迟",
+      "lagMax": "最长延迟",
+      "llm": "由 AI 翻译",
+      "known": "来自记忆库"
+    },
+    "code": {
+      "title": "在您的应用中",
+      "body": "围绕 AI SDK 返回的流添加一行代码。若 glot 无法给出译文，用户将获得完整的原文。<link>阅读指南</link>。"
+    },
+    "usage": {
+      "title": "过去 30 天",
+      "empty": {
+        "title": "暂无翻译记录",
+        "body": "在本项目首次完成流式翻译后，统计数据将显示在这里，可来自上方的试验场或你的应用。"
+      },
+      "chars": "字符",
+      "units": "句子",
+      "failed": "未翻译",
+      "repeats": "{repeats, plural, other {# 个句子}}出现不止一次，共 {distinct} 个不同句子；{stored} 个保存在缓存中。"
+    }
+  },
+  "siteNav": {
+    "product": "产品",
+    "solutions": "解决方案",
+    "resources": "资源",
+    "signIn": "登录",
+    "tryFree": "免费试用",
+    "why": "为什么选择 glot",
+    "how": "工作原理",
+    "demo": "演示",
+    "live": "实时",
+    "sites": "网站与店铺",
+    "apps": "应用与代码",
+    "benchmark": "基准测试",
+    "faq": "常见问题"
+  }
+}

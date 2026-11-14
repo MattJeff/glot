@@ -1,82 +1,202 @@
 [[term]]
-term = "glot"
-description = "Product name"
-do_not_translate = true
-
-[[term]]
-term = "glot Edge"
-description = "Product name: glot's SEO localization proxy"
-do_not_translate = true
-
-[[term]]
-term = "MCP"
-description = "Model Context Protocol"
-do_not_translate = true
-
-[[term]]
 term = "CDN"
 do_not_translate = true
+case_sensitive = false
 
-[[term]]
-term = "key"
-description = "A translation key, e.g. auth.login.cta (dotted path in a catalog)"
-translations = { fr = "clé", es = "clave", de = "Schlüssel", ja = "キー", ar = "مفتاح" }
+[term.translations]
 
-[[term]]
-term = "locale"
-description = "A language/region code such as fr or pt-BR"
-translations = { fr = "langue", es = "idioma", de = "Sprache", ja = "ロケール", ar = "لغة" }
-
-[[term]]
-term = "glossary"
-description = "Project terminology enforced on every translation"
-translations = { fr = "glossaire", es = "glosario", de = "Glossar", ja = "用語集", ar = "مسرد" }
-
-[[term]]
-term = "lockfile"
-description = "glot.lock, the hash file tracking which translations are up to date"
-translations = { fr = "lockfile", es = "lockfile", de = "Lockfile", ja = "ロックファイル", ar = "ملف القفل" }
-
-[[term]]
-term = "workspace"
-description = "A team's shared space"
-translations = { fr = "espace de travail", es = "espacio de trabajo", de = "Arbeitsbereich", ja = "ワークスペース", ar = "مساحة العمل" }
-
-[[term]]
-term = "token"
-description = "API token used by the CLI and MCP server"
-translations = { fr = "jeton", es = "token", de = "Token", ja = "トークン", ar = "رمز" }
-
-[[term]]
-term = "job"
-description = "A background translation run"
-translations = { fr = "tâche", es = "tarea", de = "Job", ja = "ジョブ", ar = "مهمة" }
-
-[[term]]
-term = "Lokalise"
-description = "Competitor name"
-do_not_translate = true
+[term.forbidden]
 
 [[term]]
 term = "Crowdin"
 description = "Competitor name"
 do_not_translate = true
+case_sensitive = false
 
-[[term]]
-term = "Tolgee"
-description = "Competitor name"
-do_not_translate = true
+[term.translations]
+
+[term.forbidden]
 
 [[term]]
 term = "GitHub"
 do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "glossary"
+description = "Project terminology enforced on every translation"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "مسرد"
+de = "Glossar"
+es = "glosario"
+fr = "glossaire"
+ja = "用語集"
+
+[term.forbidden]
+
+[[term]]
+term = "glot"
+description = "Product name"
+do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "glot Edge"
+description = "Product name: glot's SEO localization proxy"
+do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
 
 [[term]]
 term = "Growth"
 description = "Name of the paid plan above Pro (plan id team)"
 do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "job"
+description = "A background translation run"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "مهمة"
+de = "Job"
+es = "tarea"
+fr = "tâche"
+ja = "ジョブ"
+
+[term.forbidden]
+
+[[term]]
+term = "key"
+description = "A translation key, e.g. auth.login.cta (dotted path in a catalog)"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "مفتاح"
+de = "Schlüssel"
+es = "clave"
+fr = "clé"
+ja = "キー"
+
+[term.forbidden]
+
+[[term]]
+term = "locale"
+description = "A language/region code such as fr or pt-BR"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "لغة"
+de = "Sprache"
+es = "idioma"
+fr = "langue"
+ja = "ロケール"
+
+[term.forbidden]
+
+[[term]]
+term = "lockfile"
+description = "glot.lock, the hash file tracking which translations are up to date"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "ملف القفل"
+de = "Lockfile"
+es = "lockfile"
+fr = "lockfile"
+ja = "ロックファイル"
+
+[term.forbidden]
+
+[[term]]
+term = "Lokalise"
+description = "Competitor name"
+do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "MCP"
+description = "Model Context Protocol"
+do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
 
 [[term]]
 term = "Starter"
 description = "Name of the paid plan between Free and Pro (plan id starter)"
 do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "token"
+description = "API token used by the CLI and MCP server"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "رمز"
+de = "Token"
+es = "token"
+fr = "jeton"
+ja = "トークン"
+
+[term.forbidden]
+
+[[term]]
+term = "Tolgee"
+description = "Competitor name"
+do_not_translate = true
+case_sensitive = false
+
+[term.translations]
+
+[term.forbidden]
+
+[[term]]
+term = "workspace"
+description = "A team's shared space"
+do_not_translate = false
+case_sensitive = false
+
+[term.translations]
+ar = "مساحة العمل"
+de = "Arbeitsbereich"
+es = "espacio de trabajo"
+fr = "espace de travail"
+ja = "ワークスペース"
+
+[term.forbidden]

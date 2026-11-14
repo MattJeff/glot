@@ -1,0 +1,4931 @@
+{
+  "textGraph": {
+    "title": "句子",
+    "subtitle": "你顯示的每個句子，無論出現在哪裡：程式碼、網站、CMS。只要修正一次翻譯，即可套用至所有位置。",
+    "refresh": "重新整理",
+    "apply": "{count, plural, other {填入 # 個位置}}",
+    "applyHint": "將沒有爭議的翻譯複製到缺少該翻譯的位置。絕不會在兩個翻譯之間做選擇。",
+    "applied": "{count, plural, =0 {尚無需寫入} other {已寫入 # 則翻譯}}",
+    "searchPlaceholder": "搜尋句子、鍵或頁面路徑",
+    "noResults": "沒有句子符合「{q}」。",
+    "pick": "選擇一個句子，查看它出現的所有位置及其翻譯。",
+    "places": "{count, plural, other {# 個位置}}",
+    "seen": "{count, plural, other {已查看 # 次}}",
+    "open": "開啟此位置",
+    "inherited": "{count, plural, other {# 個頁面沿用目錄翻譯}}",
+    "useEverywhere": "全部套用",
+    "custom": "或輸入要在所有位置使用的翻譯",
+    "empty": {
+      "title": "尚無句子",
+      "body": "glot 會讀取你的目錄鍵、glot Edge 翻譯的頁面，以及已連接 CMS 的內容。推送你的鍵，或連接網站，然後回到這裡。"
+    },
+    "stats": {
+      "sentences": "句子",
+      "places": "位置",
+      "shared": "多處出現",
+      "unsettled": "翻譯有兩種寫法",
+      "crossSurface": "{count, plural, =0 {程式碼、網站與 CMS 中皆無} other {跨程式碼、網站或 CMS 共 #}}"
+    },
+    "surface": {
+      "catalog": "程式碼",
+      "connector": "CMS",
+      "edge": "網站"
+    },
+    "context": {
+      "action": "按鈕或連結",
+      "actionHint": "作為按鈕或連結標籤。若以純文字使用同一個詞，則為另一句。"
+    },
+    "unsettled": {
+      "title": "翻譯有兩種寫法",
+      "body": "同一句子在同一語言中表達了兩種不同意思。請選擇要保留的一種。"
+    },
+    "reworded": {
+      "title": "僅在一處改寫",
+      "item": "“{from}” 在 {moved, plural, other {# 個位置}} 中已改為 “{to}”，{remaining, plural, other {# 個位置}}仍顯示舊的措辭。"
+    },
+    "detail": {
+      "places": "{count, plural, other {出現在 # 個位置}}",
+      "translations": "翻譯",
+      "related": "相關句子",
+      "moved": "自此已改寫"
+    },
+    "state": {
+      "consistent": "各處一致",
+      "partial": "{count, plural, other {在 # 個位置缺少}}",
+      "missing": "尚未翻譯",
+      "inconsistent": "翻譯有兩種寫法",
+      "conflict": "兩份已審閱翻譯不一致"
+    },
+    "related": {
+      "context": "相同文字，不同脈絡",
+      "near": "詞語相同",
+      "fuzzy": "幾乎相同"
+    },
+    "reason": {
+      "reviewed_conflict": "有不同的人工審閱翻譯",
+      "machine_disagrees": "有不同的機器翻譯",
+      "needs_review": "等待人工審閱",
+      "placeholders": "佔位符不一致",
+      "validation": "該處的翻譯未通過驗證"
+    },
+    "confirm": {
+      "title": "要在所有位置使用此翻譯嗎？",
+      "writes": "{count, plural, other {將變更 # 個位置。}}",
+      "none": "所有可套用此翻譯的位置都已顯示此翻譯。",
+      "conflicts": "{count, plural, other {有 # 個位置已有不同的人工審閱翻譯，將保留原翻譯。}}",
+      "force": "同時取代人工審閱的翻譯"
+    }
+  },
+  "edge": {
+    "title": "glot Edge",
+    "subtitle": "SEO 本地化：每種語言都以翻譯後的 HTML 提供於自己的 URL，無需 JavaScript 即可被索引，也不需要金鑰。",
+    "tabs": {
+      "setup": "初始設定",
+      "website": "網站標籤",
+      "coverage": "覆蓋率",
+      "review": "審核佇列",
+      "seo": "SEO 報告",
+      "performance": "效能",
+      "settings": "設定"
+    },
+    "website": {
+      "title": "網站標籤",
+      "body": "一段腳本標籤即可在訪客的瀏覽器中翻譯任何公開網站，支援 Wix、Squarespace、Bubble、Lovable、Carrd、Jimdo、Duda 或手寫 HTML。它會新增語言切換器、套用你的翻譯記憶庫，並將新的公開文字傳送至 glot。無需 DNS，也無需代理。",
+      "tagLabel": "將其貼到每個頁面的 head 中（或貼到網站建置工具的全站自訂程式碼中）",
+      "tagHint": "金鑰是公開的：它只允許頁面回報要翻譯的文字。在下方開啟標籤之前不會有任何動作。個人資料、表單內容以及透過工作階段 Cookie 查看的頁面絕不會被傳送。",
+      "on": "標籤啟用",
+      "onHint": "關閉：標籤不會執行任何動作，每個頁面都維持發布時的樣子（約一分鐘內生效）。",
+      "auto": "自動翻譯新文字",
+      "autoHint": "關閉時：標籤偵測到的文字會先進入審核佇列，訪客看到翻譯前需經審核。",
+      "position": "語言切換器",
+      "positions": {
+        "bottom-right": "浮動，右下",
+        "bottom-left": "浮動，左下",
+        "top-right": "浮動，右上",
+        "top-left": "浮動，左上",
+        "none": "隱藏（使用我自己的切換器）",
+        "selector": "嵌入元素中（CSS 選擇器）"
+      },
+      "selector": "CSS 選擇器",
+      "selectorHint": "切換器會加入第一個符合的元素內，例如您的頁首選單。含有 data-glot-switcher 的元素優先。",
+      "flags": "在切換器中顯示旗幟",
+      "flagsHint": "關閉：僅顯示語言名稱。語言不等同於國家，因此旗幟為選用。",
+      "private": "標籤已啟用，但此專案的翻譯為私人：訪客的瀏覽器無法讀取，因此不會翻譯任何內容。",
+      "makePublic": "公開翻譯",
+      "optionsTitle": "標籤與選項",
+      "usage": "本月翻譯頁面瀏覽次數：{used} / {limit}。超過上限後，標籤會保持網站原樣發布，直到下個月或方案變更。",
+      "setup": {
+        "title": "三個步驟翻譯您的網站",
+        "intro": "輸入您網站的位址。glot 會讀取其公開頁面、翻譯內容，並在您安裝任何東西之前向您顯示結果。",
+        "step1": "分析您的網站",
+        "step2": "檢視並修正翻譯",
+        "step3": "貼上一行程式碼並上線",
+        "urlLabel": "您網站的位址",
+        "analyze": "分析並翻譯",
+        "analyzing": "正在讀取您的網站…",
+        "errors": {
+          "invalid": "這不是有效的網址。",
+          "private": "此網址位於私人網路：glot 只能讀取公開網站。",
+          "unreachable": "glot 無法連線至此網站。請檢查網址，並確認網站已發布。",
+          "timeout": "網站回應時間過長，請稍後再試。",
+          "not_html": "此網址未回傳網頁。"
+        },
+        "detected": "偵測到平台：{platform}",
+        "unknownPlatform": "無法辨識平台。此標籤適用於任何接受自訂程式碼的網站。",
+        "language": "網站語言：{language}",
+        "crawled": "已讀取頁面：{pages} · 找到文字：{segments}",
+        "translating": "正在翻譯為 {languages}… 下方預覽會自動填入。",
+        "upToDate": "翻譯已是最新。",
+        "suggest": "接下來常加入的語言：",
+        "add": "新增{language}",
+        "warn": {
+          "otherTools": "此頁面上有另一個翻譯指令碼（{tools}）。上線前請將其移除：兩個工具同時改寫同一段文字會產生衝突。",
+          "jsOnly": "此頁面以 JavaScript 建立文字，因此下方預覽可能看起來是空的。在訪客的瀏覽器中，此標籤會正常翻譯。",
+          "csp": "您網站的安全性政策（CSP）阻擋了此標籤。請在 {directives} 中允許 {hosts}。"
+        },
+        "exclude": {
+          "title": "私密區域",
+          "body": "帳戶、購物車與結帳頁面永遠不會從訪客學習，即使其工作階段 Cookie 對指令碼隱藏。貴網站的以下連結看起來也屬私密：",
+          "none": "帳戶、購物車與結帳頁面永遠不會從訪客學習，即使其工作階段 Cookie 對指令碼隱藏。未發現其他看似私密的連結。",
+          "apply": "排除這些路徑",
+          "done": "已排除路徑"
+        },
+        "previewLater": "請先分析您的網站：其翻譯預覽會顯示在這裡。",
+        "install": {
+          "copy": "複製此行",
+          "where": "在 {platform} 上該貼在哪裡",
+          "generic": "將其貼到每個頁面的 head 中，或貼到網站建置工具的全站自訂程式碼中。",
+          "guide": "{platform} 完整指南",
+          "allGuides": "尋找您的平台指南"
+        },
+        "verify": {
+          "button": "檢查我的網站",
+          "found": "標籤已安裝。開啟它即可上線。",
+          "live": "標籤已安裝並已開啟：您的訪客會以他們的語言看到您的網站。",
+          "notFound": "在 {url} 上找不到此標籤。貼上程式碼行後請發布您的網站，再重新檢查。透過標籤管理工具新增的標籤無法被此檢查偵測到。",
+          "wrongProject": "已安裝 glot 標籤，但它屬於另一個專案（{project}）。請重新複製上方的程式碼行。",
+          "noKey": "已安裝的標籤不完整，因此不會有任何作用。請重新複製上方的程式碼行。",
+          "notHead": "此標籤不在頁面的 head 中：訪客可能會短暫看到原始文字。請將其移至 head。",
+          "turnOn": "開啟標籤"
+        }
+      },
+      "editor": {
+        "locale": "語言",
+        "page": "頁面",
+        "open": "開啟",
+        "count": "此頁已翻譯 {translated}/{total} 段文字",
+        "hint": "點擊任一文字以修正其翻譯，或排除其所在區塊。這是靜態預覽，選單與動畫不會執行。",
+        "empty": "此頁尚無翻譯。若你的網站剛完成分析，將在一分鐘內顯示。",
+        "frame": "你的網站 {language} 版預覽",
+        "source": "原文",
+        "translation": "譯文",
+        "save": "儲存",
+        "cancel": "取消",
+        "saved": "翻譯已儲存",
+        "exclude": "永不翻譯此區塊",
+        "excludeHint": "選擇要停止翻譯的項目：",
+        "matches": "此頁符合項目：{count}",
+        "excluded": "已排除於翻譯之外",
+        "noSelector": "此區塊沒有 glot 可用來排除的穩定名稱。請在你的網站建置工具中為它加上 class notranslate。"
+      },
+      "locales": "提供的語言",
+      "localesHint": "未勾選任何語言時，即為專案的所有目標語言。",
+      "save": "儲存",
+      "saved": "網站標籤已儲存",
+      "seo": {
+        "title": "搜尋引擎",
+        "body": "瀏覽器中翻譯的文字不一定能被 Google 可靠地索引。若希望頁面在其他語言中被搜尋到，請新增 glot Edge 子網域（es.your-site.com，一筆 CNAME）：頁面會在伺服器端翻譯並加上 hreflang，切換器會將訪客導向該處。",
+        "ready": "您的 glot Edge 子網域已驗證：切換器會將訪客導向該網域，標籤也會在瀏覽器中加入 hreflang 連結。搜尋引擎也應能在 HTML 中找到這些連結：請將這些標籤貼到您網站的 head（自訂程式碼）中。",
+        "cta": "設定子網域"
+      }
+    },
+    "kill": {
+      "labelOn": "Edge 已開啟",
+      "labelOff": "Edge 已關閉",
+      "hint": "關閉：所有網域會在一分鐘內改為直接提供你的來源站台內容。",
+      "aria": "glot Edge 緊急開關",
+      "on": "glot Edge 已重新開啟。",
+      "off": "glot Edge 已關閉：來源站台內容將原樣提供。"
+    },
+    "setup": {
+      "dynamic": {
+        "title": "動態在地化",
+        "body": "CDN 目錄 + 執行階段：快速、免部署，並在瀏覽器中翻譯。搜尋引擎大多只會看到你的來源語言。",
+        "cta": "設定 CDN"
+      },
+      "seo": {
+        "title": "SEO 在地化",
+        "badge": "Growth",
+        "body": "glot Edge 或預先渲染：第一個 HTML 位元組就已翻譯完成，每種語言一個 URL，並設定 hreflang 與 canonical。頁面可被索引。",
+        "quota": "本月已提供 {used} / {limit} 個邊緣頁面",
+        "quotaUnlimited": "本月已提供 {used} 個邊緣頁面"
+      },
+      "upgrade": "SEO 本地化包含在 Growth 方案中（Pro：限時試用）。",
+      "upgradeCta": "查看方案",
+      "steps": {
+        "title": "設定步驟",
+        "domain": "新增網域",
+        "dns": "驗證 DNS",
+        "tls": "HTTPS 已啟用",
+        "ready": "已有語言就緒",
+        "done": "完成",
+        "todo": "待辦"
+      },
+      "add": {
+        "title": "新增網域",
+        "mode": "服務模式",
+        "host": "語言子網域",
+        "site": "網站網域",
+        "locale": "語言",
+        "origin": "來源（你的網站）",
+        "submit": "新增"
+      },
+      "mode": {
+        "subdomain": "子網域",
+        "subdomainHint": "es.example.com：CNAME 指向 glot，HTTPS 由我們處理。",
+        "subdirectory": "子目錄",
+        "subdirectoryHint": "example.com/es/：在你的網站前方使用 Cloudflare Worker 或代理規則。",
+        "middleware": "中介軟體",
+        "middlewareHint": "Next.js 或 Express 中介軟體：所有內容都留在你的主機上。"
+      },
+      "added": "已新增網域。請發布下方的 DNS 記錄。",
+      "empty": {
+        "title": "尚無網域",
+        "body": "新增將提供語言服務的網域。在 DNS 驗證通過前，你的網站不會有任何變動。"
+      },
+      "status": {
+        "verified": "DNS 已驗證",
+        "unverified": "DNS 未驗證",
+        "tls": {
+          "pending": "HTTPS 待處理",
+          "active": "HTTPS 已啟用",
+          "error": "HTTPS 錯誤"
+        }
+      },
+      "domainOn": "服務中",
+      "domainOff": "已暫停",
+      "verify": "檢查 DNS",
+      "verified": "DNS 已驗證。",
+      "notYet": "尚未找到記錄。DNS 可能需要幾分鐘才會生效。",
+      "remove": "移除網域",
+      "removeConfirm": "要移除 {host} 嗎？其流量將改回你的來源。",
+      "originLine": "來源：{origin}",
+      "checkedAt": "檢查於 {when}",
+      "dnsSubdomain": "在你的 DNS 服務商建立這兩筆記錄，然後點選檢查：",
+      "dnsTxt": "建立這筆 TXT 記錄以證明你擁有此網域，然後點選檢查：",
+      "dnsLabel": "DNS 記錄",
+      "dnsNothing": "找不到記錄",
+      "wiring": {
+        "subdomain": "設定",
+        "subdirectory": "Cloudflare Worker",
+        "middleware": "Next.js middleware"
+      },
+      "hreflang": {
+        "title": "來源網站的 hreflang 標籤",
+        "body": "在子網域模式下，glot 不會提供你的來源頁面：請將這些標籤加入其 head，讓每種語言都能互相連結（hreflang 必須互相對應）。",
+        "path": "路徑",
+        "show": "顯示"
+      }
+    },
+    "coverage": {
+      "intro": "依實際提供的頁面計算：已翻譯片段 / 已渲染片段。當所有關鍵頁面達到 {critical}，且整體覆蓋率達到 {global} 時，語言即為就緒（會列入切換器與 locales.json）。",
+      "ready": "就緒",
+      "notReady": "未就緒",
+      "global": "整體",
+      "critical": "關鍵頁面",
+      "pages": "{locale} 的頁面",
+      "mark": "標示為關鍵",
+      "unmark": "取消關鍵標示",
+      "byPattern": "透過模式標示為關鍵：請前往設定編輯",
+      "criticalBadge": "關鍵",
+      "missing": "{n, plural, other {# 個缺漏片段}}",
+      "empty": {
+        "title": "尚無已瀏覽頁面",
+        "body": "在此語言中，glot Edge 提供頁面後即會顯示覆蓋率。"
+      },
+      "pagesSeen": "已瀏覽頁面"
+    },
+    "segments": {
+      "title": "片段",
+      "subtitle": "來自已渲染頁面的文字，無需鍵即可翻譯。目錄中的鍵一律優先。",
+      "viewKeys": "鍵",
+      "viewSegments": "片段",
+      "intro": "每個片段是其所在情境（元素與頁面範本）中已渲染的文字。編輯會像鍵值一樣驗證：語法、術語表、長度。",
+      "queueIntro": "來自敏感頁面（付款、帳戶）的新片段，在有人核准其翻譯前，將以原始語言提供。",
+      "search": "搜尋文字",
+      "locale": "語言",
+      "status": "狀態",
+      "all": "所有狀態",
+      "statuses": {
+        "missing": "未翻譯",
+        "pending": "待審閱",
+        "machine": "機器翻譯",
+        "reviewed": "已審閱",
+        "stale": "過時"
+      },
+      "sensitive": "敏感頁面",
+      "hits": "{n, plural, other {# 次瀏覽}}",
+      "translation": "翻譯",
+      "save": "儲存",
+      "approve": "批准",
+      "saved": "翻譯已儲存。",
+      "approved": "翻譯已核准，將從下一個請求開始提供。",
+      "prev": "上一個",
+      "next": "下一個",
+      "empty": {
+        "title": "沒有片段",
+        "body": "glot Edge 提供頁面時會顯示片段，或嘗試其他篩選條件。"
+      },
+      "queueEmpty": {
+        "title": "沒有待審閱項目",
+        "body": "敏感頁面的所有片段都已核准。"
+      }
+    },
+    "settings": {
+      "saved": "Edge 設定已儲存。",
+      "save": "儲存",
+      "translate": {
+        "title": "自動翻譯",
+        "auto": "自動翻譯新片段",
+        "autoHint": "使用你的模型、術語表與驗證器。完成前會顯示原始文字，絕不留白。",
+        "budget": "每月預算（美元）",
+        "budgetHint": "留空：僅使用各工作的專案預算。"
+      },
+      "seo": {
+        "title": "搜尋引擎",
+        "body": "glot 為了讓翻譯頁面被索引所做的事：搶先讀取網站內容，並讓每種語言擁有各自的網址。",
+        "prewarm": "搶先翻譯網站",
+        "prewarmHint": "glot 會讀取你的網站地圖及其連結的頁面，每天至多一次、每秒一頁，讓頁面在有人請求前就已翻譯。新文字會計入每日上限與上方的預算。",
+        "pages": "每次執行讀取的頁面數",
+        "pagesHint": "先讀取首頁與網站地圖，再讀取連結頁面。",
+        "slugs": "翻譯頁面網址",
+        "slugsHint": "/pricing 在西班牙文網站會變成 /precios。原網址會重新導向至該網址，hreflang 與網站地圖也會使用它。若網站在瀏覽器中路由（單頁應用程式），請先測試。"
+      },
+      "rendering": {
+        "label": "渲染方式",
+        "auto": "自動",
+        "origin": "來源 HTML",
+        "prerender": "預先渲染快照",
+        "autoHint": "當來源站台回傳空白外殼（SPA）時，使用預先渲染的快照。",
+        "originHint": "原樣翻譯伺服器回傳的 HTML。",
+        "prerenderHint": "一律翻譯由無頭瀏覽器渲染的快照（已快取，部署時重新整理）。"
+      },
+      "discovery": {
+        "title": "探索區域",
+        "body": "glot Edge 可學習新文字的範圍。絕不包含需登入的頁面與個人資料，且每日有上限。",
+        "include": "允許路徑",
+        "includeHint": "每行一個規則，* 為萬用字元。留空：所有公開頁面。",
+        "exclude": "排除路徑",
+        "excludeHint": "即使已在上方允許，仍不會被探索。",
+        "selectorsInclude": "翻譯區域（CSS 選取器）",
+        "selectorsIncludeHint": "留空：整個頁面。",
+        "selectors": "排除的選取器",
+        "selectorsHint": "絕不翻譯或傳送給 glot：使用者內容、名稱、小工具。",
+        "cap": "每日新片段上限",
+        "capHint": "超過上限後，新文字會以原始語言顯示，直到隔天。"
+      },
+      "critical": {
+        "title": "關鍵與敏感頁面",
+        "body": "關鍵頁面決定是否提供某語言。敏感頁面未經審核，不發布任何新內容。",
+        "patterns": "關鍵頁面",
+        "patternsHint": "預設為首頁、註冊、定價、結帳。",
+        "sensitive": "敏感頁面",
+        "sensitiveHint": "新片段會先進入審核佇列。",
+        "threshold": "關鍵頁面覆蓋率門檻（%）",
+        "thresholdHint": "每個關鍵頁面都必須達到此門檻，該語言才會就緒。"
+      },
+      "app": {
+        "title": "應用程式頁面",
+        "body": "這些頁面會保留在您的原始網域上：登入、帳戶、付款、API… Edge 絕不翻譯、快取或探索這些頁面。",
+        "rules": "應用程式路徑",
+        "rulesHint": "每行一條規則。/login = /login 及 /login/…，/live/ = 僅其子頁面，/x* = 任何以 /x 開頭的路徑。行首加上 proxy 可直接通過不翻譯（API、資源、技術檔案），加上 redirect 則將訪客導回您的網域。/sitemap.xml、/robots.txt 與 IndexNow 金鑰仍由 glot 產生。",
+        "action": "預設動作",
+        "redirect": "重新導向至您的網域",
+        "proxy": "直接通過，不翻譯",
+        "actionHint": "重新導向：302（表單為 307）至您網域上的相同頁面，語言依您網站的設定。直接通過：原封不動回傳您伺服器的回應，包括 Cookie。",
+        "suggest": "使用建議清單"
+      },
+      "auth": {
+        "title": "登入後頁面",
+        "body": "儀表板、帳戶、發票：訪客已登入會話的頁面。glot 絕不接收其內容或您使用者的資料。",
+        "mode": "翻譯已登入頁面",
+        "server": "由 Edge 提供，私有回應",
+        "patcher": "在瀏覽器中（script 標籤）",
+        "off": "不翻譯",
+        "serverHint": "Edge 僅針對此訪客、依翻譯記憶庫逐頁翻譯：Cache-Control private，絕不存入共用快取，且不進行探索。您網域的 Cookie 原封不動傳遞。",
+        "patcherHint": "Edge 原封不動提供您的頁面；您頁面上的 data-glot-app script 標籤會在瀏覽器中套用翻譯記憶庫，於您的網域上執行（會話不受影響），並提供語言切換器。",
+        "offHint": "已登入訪客會以原始語言查看您的頁面。",
+        "discover": "探索介面文字",
+        "discoverHint": "僅限瀏覽器模式。只會傳送標記為 data-glot-ui 的文字，以及 glot 已知文字的指紋；絕不傳送個人資料。每則新文字須經審核後才會提供。"
+      }
+    },
+    "seo": {
+      "run": "執行報告",
+      "empty": {
+        "title": "尚無報告",
+        "body": "報告會在不執行 JavaScript 的情況下，依 Google 的方式抓取最多 20 個頁面的所有語言，並檢查 hreflang、canonical、中繼資料與未翻譯文字。需要已驗證的網域。"
+      },
+      "summary": "{indexable} / {total} 個頁面在技術上可索引",
+      "indexedNote": "技術上的可索引性在此測量。實際是否已索引，僅在連接 Search Console 時可知；否則顯示為未知，絕不猜測。",
+      "indexable": "可索引",
+      "notIndexable": "無法索引",
+      "indexed": "已索引",
+      "notIndexed": "未索引",
+      "indexedUnknown": "索引狀態未知",
+      "untranslated": "{n} 個未翻譯",
+      "renderDiffNone": "未比對",
+      "renderDiffSame": "有無 JavaScript 的文字相同",
+      "renderDiffCount": "{n, plural, other {僅在執行 JavaScript 後才出現 # 個片段}}",
+      "indexNow": "通知 Bing 與 Yandex（IndexNow）",
+      "indexNowHint": "Google 不使用 IndexNow，它會讀取 robots.txt 中宣告的網站地圖。",
+      "indexNowDone": "已將 {n, plural, other {# 個網址}} 提交至 IndexNow。",
+      "running": "正在擷取頁面…",
+      "issuesTitle": "發現的問題",
+      "export": "匯出 (CSV)",
+      "outcome": {
+        "title": "搜尋引擎可索引的頁面",
+        "body": "只有當頁面標題及至少 95% 的文字都已翻譯後，該頁面才會向搜尋引擎宣告（canonical、hreflang、網站地圖）。在此之前，頁面仍會提供服務，並宣告為來源頁面的副本。",
+        "run": "立即翻譯整個網站",
+        "running": "正在讀取網站… {done} / {total}",
+        "advertised": "已宣告",
+        "notAdvertised": "尚未宣告",
+        "pages": "可索引頁面 / 已讀取頁面",
+        "last": "上次執行於 {date}：已讀取 {pages, plural, other {# 個頁面}}，略過 {skipped} 個，{segments, plural, other {# 段新文字}}。",
+        "failed": "上次執行失敗：{error}"
+      },
+      "slugs": {
+        "title": "已翻譯網址 ({n})",
+        "body": "網址不會自行變更。您可以在此替換：舊網址會重新導向至新網址。",
+        "source": "來源頁面",
+        "locale": "語言",
+        "address": "網址",
+        "addressOf": "{path} 在 {locale} 的網址",
+        "saved": "網址已儲存。"
+      },
+      "sitemaps": "各語言的網站地圖",
+      "critical": "嚴重",
+      "notReciprocal": "hreflang 未互相指向",
+      "fields": {
+        "lang": "lang / dir",
+        "contentLanguage": "Content-Language",
+        "canonical": "標準網址",
+        "title": "標題",
+        "description": "描述",
+        "hreflang": "hreflang"
+      },
+      "issues": {
+        "fetch_failed": "擷取失敗",
+        "http_error": "HTTP 錯誤",
+        "noindex": "noindex",
+        "robots_txt_blocked": "被 robots.txt 封鎖",
+        "redirected": "已重新導向",
+        "canonical_missing": "缺少 canonical",
+        "canonical_multiple": "多個 canonical",
+        "canonical_to_source": "Canonical 指向來源頁面",
+        "canonical_not_self": "Canonical 指向其他頁面",
+        "html_lang": "html lang 錯誤",
+        "html_dir": "文字方向錯誤",
+        "content_language": "Content-Language 錯誤",
+        "hreflang_self_missing": "缺少自身 hreflang",
+        "hreflang_x_default_missing": "缺少 x-default",
+        "hreflang_not_reciprocal": "hreflang 未互相指向",
+        "advertised_but_not_ready": "已連結但未就緒",
+        "title_missing": "缺少標題",
+        "title_untranslated": "標題未翻譯",
+        "title_duplicate": "標題與其他頁面相同",
+        "description_missing": "缺少描述",
+        "description_untranslated": "描述未翻譯",
+        "og_title_untranslated": "og:title 未翻譯",
+        "jsonld_language": "JSON-LD 語言不同",
+        "untranslated_segments": "未翻譯的段落"
+      }
+    },
+    "perf": {
+      "period": "期間",
+      "days": "{n, plural, other {# 天}}",
+      "requests": "已提供頁面",
+      "hitRatio": "快取命中率",
+      "failOpen": "失敗放行",
+      "glotP50": "glot 成本 p50",
+      "glotP95": "glot 成本 p95",
+      "originP50": "來源 p50",
+      "note": "glot 成本 = 在來源站台之上額外增加的時間（Server-Timing）。失敗放行 = 因 glot 未在時限內回應而未翻譯直接提供的頁面：絕不會回傳錯誤。",
+      "byDay": "按日",
+      "date": "日期",
+      "empty": {
+        "title": "尚無流量",
+        "body": "網域提供頁面後即會顯示指標。"
+      }
+    }
+  },
+  "launches": {
+    "title": "上線結果",
+    "open": "上線",
+    "subtitle": "新增語言是否提升轉換？以偏好該語言的訪客進行測量。",
+    "back": "Insights",
+    "new": "測量上線",
+    "empty": "尚未測量任何上線。語言正式上線時再開始測量。",
+    "started": "正在測量：{language}",
+    "dialog": {
+      "title": "測量語言上線",
+      "body": "此語系將加入您的目標語系（請先完成翻譯）。之後 glot 會量測其對目標事件的影響。",
+      "locale": "語言",
+      "mode": "方法",
+      "holdout": "保留比例 (%)",
+      "days": "期間（天）",
+      "goal": "目標事件",
+      "start": "開始測量",
+      "cancel": "取消",
+      "guardDown": "護欄指標（下降為不良）",
+      "guardUp": "護欄指標（上升為不良）",
+      "guardHint": "以逗號分隔事件。若其中任一事件惡化超過 5%，或缺乏資料，則無法調至 100%。",
+      "auto": "所有條件達成後自動調至 100%"
+    },
+    "mode": {
+      "holdout": "保留組",
+      "holdoutHint": "偏好此語言的訪客都會看到它，但保留的一部分流量會維持在{fallback}；此比例在滿足所有條件後會提升至 100%（需你確認，或若你選擇自動則會自動提升）。可測量實際效果。需要執行階段目錄（glot CDN + @glot/insights）。",
+      "before_after": "前後對比",
+      "before_afterHint": "比較上線前後的同一批受眾，適用於編譯進應用程式的目錄。並非因果關係：季節性與行銷活動也會影響數字。"
+    },
+    "status": {
+      "measuring": "測量中",
+      "rolled_out": "已全面推出",
+      "invalid": "無效",
+      "done": "已完成",
+      "ready": "準備推至 100 %"
+    },
+    "verdict": {
+      "collecting": "收集資料中",
+      "probably_positive": "可能為正面",
+      "probably_negative": "可能為負面",
+      "inconclusive": "尚無定論",
+      "invalid": "測量無效",
+      "higher_after": "上線後較高",
+      "lower_after": "上線後較低",
+      "no_clear_change": "無明顯變化"
+    },
+    "explain": {
+      "collecting": "資料尚不足：需等滿一週，且每組都達到最低樣本數後才會給出結論。",
+      "probably_positive": "看到此語言的訪客轉換率較佳，機率至少為 95%。區間顯示效果可能有多大。",
+      "probably_negative": "看到此語言的訪客轉換率較差，機率至少為 95%。保留前請先檢查翻譯。",
+      "inconclusive": "目前尚無明顯差異超出雜訊範圍。區間顯示仍可能存在哪些效果。",
+      "invalid": "流量分配與設定不符（樣本比例錯誤）：部分受眾拿到錯誤的語言。請修正後重新測量。",
+      "higher_after": "上線後，受眾的轉換率高於上線前。這只是相關性，並不能證明是該語言促成的。",
+      "lower_after": "上線後，受眾的轉換率低於上線前。這只是相關性，並不能證明是該語言促成的。",
+      "no_clear_change": "上線前後沒有明顯變化。"
+    },
+    "story": {
+      "kicker": "語言上線",
+      "headline": "{project}（{language}）",
+      "period": "{from} – {to} · {mode}",
+      "step1": "建議",
+      "reco": "glot 建議排名 #{rank}（共 {of} 種語言）：{share} 的訪客偏好此語言，翻譯費用約 {cost}（信心：{confidence, select, solid {高} indicative {中} other {低}}）。",
+      "recoNone": "此語言尚無 glot 建議紀錄。",
+      "step2": "費用",
+      "cost": "翻譯費用 {cost}。",
+      "costEstimated": "翻譯費用約 {cost}（估算）。",
+      "step3": "受眾",
+      "audience": "上線前 {days} 天內，有 {visits} 位訪客偏好此語言（{language}），其中 {rate} 完成轉換（{goal}）。",
+      "step4": "結果",
+      "armFallback": "保持 {language}",
+      "armNew": "提供 {language}",
+      "armBefore": "上線前",
+      "armAfter": "上線後",
+      "lift": "轉換相對變化（{goal}）",
+      "interval": "95% 可信區間",
+      "pBetter": "{language} 轉換較佳的機率：{p}",
+      "caveat": "前後比較：此為相關性，並非測量所得的效果。季節性、行銷活動或趨勢都可能解釋此變化。",
+      "caveatShort": "前後比較：相關性，非因果關係",
+      "explicit": "{n, plural, other {自行選擇語言的 # 個工作階段}} 已排除於分析之外。",
+      "srm": "流量分配與 {pct}% 保留組不符：結果不可靠。",
+      "chart": "累積轉換率",
+      "chartAria": "每日累積轉換率（{goal}）：{a} 與 {b}",
+      "footer": "透過 glot Insights 測量：匿名每日彙總資料，不使用 cookie，不含訪客資料。",
+      "footerShort": "以保留組進行對照測量",
+      "scope": "自行選擇語言的訪客會被排除：所測量的效果，是自動在地化對沒有明確偏好訪客的影響。",
+      "guardrails": "防護指標",
+      "guardrailsHint": "不應變差的事件。當劣化超過 5 % 的機率超過 20 % 時，將阻止推至 100 %。",
+      "guardrailDown": "下降即為不良",
+      "guardrailUp": "上升即為不良",
+      "pWorse": "劣化超過 5 % 的機率：{p}"
+    },
+    "share": {
+      "button": "分享",
+      "title": "公開案例研究",
+      "body": "唯讀頁面，僅含彙總數據，不含訪客資料。在你撤銷之前，任何擁有連結的人都能查看。",
+      "revoke": "撤銷連結",
+      "created": "已建立公開連結",
+      "revoked": "連結已撤銷"
+    },
+    "public": {
+      "title": "{project} 的 {language} 上線：案例研究",
+      "description": "{verdict}：轉換率 {lift}（{goal}）。glot 案例研究。",
+      "cta": "使用 glot 測量你的下一個語言"
+    },
+    "rollout": {
+      "readyTitle": "已可提升至 100%",
+      "readyBody": "所有條件皆已達成：每組 {min} 次轉換、7 天、符合預期的流量分配、可信的提升幅度，且防護指標穩定。保留組將維持在{fallback}，直到你確認。",
+      "confirm": "提升至 100%",
+      "endedTitle": "測量已結束，未達成所有條件",
+      "endedBody": "保留組將維持在{fallback}，直到你做出決定。",
+      "done": "{language} 現已提供給所有偏好此語言的訪客",
+      "pending": "提升至 100% 前：",
+      "pendingAuto": "以下條件達成後將自動提升至 100%："
+    },
+    "blocker": {
+      "min_days": "完整一週的量測期",
+      "min_visitors": "每組各 {n} 位訪客",
+      "min_conversions": "每組各需 {min} 次轉換",
+      "srm": "流量分配與設定相符",
+      "no_credible_lift": "可信的提升（至少 95% 機率）",
+      "guardrail": "護欄指標有足夠資料且未惡化",
+      "no_holdout": "一個保留組"
+    },
+    "guardrailStatus": {
+      "ok": "穩定",
+      "degraded": "惡化",
+      "insufficient": "資料不足"
+    }
+  },
+  "auth": {
+    "errors": {
+      "invalid": "電子郵件或密碼不正確。",
+      "passwordTooShort": "密碼至少需要 8 個字元。"
+    },
+    "fields": {
+      "email": "電子郵件",
+      "name": "名稱",
+      "password": "密碼",
+      "passwordHint": "至少 8 個字元。"
+    },
+    "login": {
+      "submit": "登入",
+      "subtitle": "登入你的 glot 工作區。",
+      "switch": "還沒有帳戶？",
+      "switchLink": "建立帳戶",
+      "title": "歡迎回來",
+      "forgot": "忘記密碼？"
+    },
+    "signup": {
+      "submit": "建立帳戶",
+      "subtitle": "免費且開放原始碼。使用你自己的 LLM 金鑰。",
+      "switch": "已有帳戶？",
+      "switchLink": "登入",
+      "title": "建立你的帳戶"
+    }
+  },
+  "common": {
+    "brand": "glot",
+    "cancel": "取消",
+    "close": "關閉",
+    "copied": "已複製到剪貼簿",
+    "copy": "複製",
+    "create": "建立",
+    "delete": "刪除",
+    "edit": "編輯",
+    "github": "GitHub",
+    "never": "從未",
+    "retry": "重試",
+    "save": "儲存",
+    "saving": "儲存中…",
+    "dismiss": "關閉"
+  },
+  "editor": {
+    "anyLocale": "所有語系",
+    "anyStatus": "所有狀態",
+    "approve": "核准",
+    "approved": "已核准",
+    "clearFilters": "清除篩選",
+    "columns": "語系",
+    "columnsHint": "要顯示的欄位",
+    "detail": {
+      "by": "由 {author}",
+      "description": "描述",
+      "doNotTranslate": "請勿翻譯",
+      "glossary": "術語表比對",
+      "history": "紀錄",
+      "noDescription": "尚無描述。請新增描述，以提供 LLM 更多脈絡。",
+      "noGlossary": "此來源文字中沒有術語表詞彙。",
+      "noHistory": "尚無紀錄。",
+      "noReferences": "找不到程式碼參考。",
+      "references": "參考",
+      "selectKey": "選取鍵以查看其脈絡。",
+      "title": "詳細資料",
+      "toggle": "切換詳細資料",
+      "translations": "翻譯"
+    },
+    "differentMeaning": "語意不同",
+    "editPlaceholder": "{locale} 的翻譯",
+    "empty": "沒有符合這些篩選條件的鍵。",
+    "emptyValue": "尚未翻譯",
+    "issuesTooltip": "{count, plural, other {# 個問題}}",
+    "key": "鍵",
+    "loadMore": "載入更多…",
+    "origin": {
+      "human": "人工",
+      "imported": "匯入",
+      "machine": "機器"
+    },
+    "results": "{count, plural, =0 {尚無鍵} other {# 個鍵}}",
+    "reviewDone": "{count, plural, other {# 則翻譯已審閱}} · {different, plural, =0 {無語意偏移} other {# 則語意不同}}",
+    "reviewLocale": "審閱 {locale}",
+    "reviewLocaleHint": "逐一回譯此語系的所有翻譯，並標記語意偏移",
+    "saved": "已儲存",
+    "savedWithIssues": "已儲存，含 {count, plural, other {# 個問題}}",
+    "score": "分數 {score}",
+    "search": "搜尋鍵值與文字…",
+    "shortcuts": "j/k 移動 · Enter 編輯 · ⌘Enter 核准 · Esc 取消",
+    "source": "來源",
+    "title": "鍵值",
+    "withIssues": "有問題",
+    "subtitle": "逐一編輯、審閱並核准每則翻譯。",
+    "saving": "儲存中…",
+    "saveFailed": "儲存失敗，您的編輯已退回儲存格；請修正，或按 Escape 捨棄。",
+    "approveFailed": "核准失敗，翻譯未變更，請再試一次。",
+    "emptyFilteredBody": "請嘗試其他搜尋詞，或清除篩選條件以查看所有鍵。",
+    "noKeys": {
+      "title": "尚無鍵",
+      "body": "鍵來自您的儲存庫：使用 CLI 推送來源目錄，或手動新增單一字串。新增後會立即顯示在此。",
+      "push": "推送您的目錄（於儲存庫中執行）",
+      "add": "或新增一個字串"
+    }
+  },
+  "errors": {
+    "emailUnverified": "請先確認您的電子郵件地址：開啟我們寄給您的連結，或從橫幅重新寄送。",
+    "generic": "發生錯誤，請再試一次。",
+    "network": "網路錯誤，請檢查連線後再試一次。",
+    "notFound": "找不到。",
+    "sessionExpired": "您的工作階段已過期，請重新登入。"
+  },
+  "glossary": {
+    "add": "新增術語",
+    "caseSensitive": "區分大小寫",
+    "deleteConfirm": {
+      "body": "之後的翻譯將不再套用此術語。",
+      "title": "刪除「{term}」？"
+    },
+    "deleted": "已刪除術語",
+    "description": "說明",
+    "dialog": {
+      "createTitle": "新增術語",
+      "editTitle": "編輯術語",
+      "forbiddenFor": "禁用詞（{locale}）",
+      "translationFor": "譯文（{locale}）"
+    },
+    "doNotTranslate": "不翻譯",
+    "empty": {
+      "body": "新增產品名稱與領域詞彙，確保各語系用詞一致。",
+      "title": "尚無術語"
+    },
+    "flags": "規則",
+    "forbiddenHint": "以逗號分隔，LLM 不得使用的變體。",
+    "saved": "術語已儲存",
+    "subtitle": "每則翻譯都會套用的術語：需保留的品牌名稱，以及只能採用單一譯法的詞彙。與儲存庫中的 <file>glossary.toml</file> 保持一致。",
+    "term": "術語",
+    "title": "術語表",
+    "translations": "譯文",
+    "fileTip": "術語表檔案位於儲存庫根目錄。glot push 與 glot pull 會讓它與此頁面保持同步，glot check 則在 CI 中強制套用。"
+  },
+  "health": {
+    "detail": {
+      "coverage": "已翻譯 {translated} / {total} 個鍵",
+      "errors": "{translated} 則譯文中有 {issues} 則未通過驗證",
+      "meaning": "已審閱 {reviewed} · {different} 則語意不同",
+      "visual": "{pages} 個畫面中有 {clean} 個無視覺問題"
+    },
+    "dims": {
+      "coverage": "覆蓋率",
+      "errors": "驗證",
+      "meaning": "語意",
+      "visual": "視覺"
+    },
+    "empty": {
+      "coverage": "尚無鍵",
+      "errors": "尚未翻譯任何內容",
+      "meaning": "沒有可審閱的譯文",
+      "visual": "此語言尚無視覺 QA 報告"
+    },
+    "locale": "語系",
+    "na": "不適用",
+    "overall": "總分",
+    "runReview": "開始審查",
+    "status": {
+      "fair": "待改善",
+      "good": "良好",
+      "poor": "風險高"
+    },
+    "subtitle": "涵蓋率、驗證、語意（回譯）與視覺 QA，以 0–100 評分。",
+    "title": "語系健康度",
+    "dimsHelp": {
+      "coverage": "此語系已有翻譯的鍵所佔比例。",
+      "errors": "通過驗證的譯文所佔比例：佔位符、ICU 複數、術語表與長度。",
+      "meaning": "回譯檢查：LLM 將文字譯回來源語言並比較語意。依需求執行。",
+      "visual": "最新視覺 QA 報告中無版面問題的畫面所佔比例。"
+    }
+  },
+  "jobStatus": {
+    "done": "完成",
+    "failed": "失敗",
+    "queued": "排隊中",
+    "running": "執行中"
+  },
+  "jobs": {
+    "cost": "費用",
+    "empty": {
+      "body": "工作會使用你的專案模型翻譯每個缺漏或過期的鍵，驗證每項結果，並重試失敗的項目。可從「翻譯缺漏項目」開始。",
+      "title": "尚無工作"
+    },
+    "kind": {
+      "translate": "翻譯",
+      "github_localize": "在地化儲存庫",
+      "github_update": "更新 Pull Request",
+      "edge_translate": "Edge 翻譯",
+      "connector_translate": "CMS 翻譯"
+    },
+    "live": "即時",
+    "progress": "{done} / {total}",
+    "subtitle": "背景翻譯執行，即時更新。每個字串在儲存前都會經過驗證；費用由你的 LLM 供應商計算。",
+    "title": "工作",
+    "finished": "翻譯完成：已翻譯並驗證 {count, plural, other {# 個字串}}",
+    "failed": "翻譯工作失敗"
+  },
+  "keySheet": {
+    "notFound": "找不到相符的鍵",
+    "notFoundHint": "在應用程式中為元素加上 data-glot-key 標記，以精確將問題連結到鍵。",
+    "openInEditor": "在編輯器中開啟",
+    "pick": "多個鍵符合此文字，請選擇一個：",
+    "saved": "翻譯已儲存",
+    "savedWithIssues": "已儲存，但有 {count, plural, other {# 個問題}}",
+    "source": "來源",
+    "title": "編輯鍵",
+    "translation": "翻譯"
+  },
+  "landing": {
+    "meta": {
+      "title": "供程式助理使用的開放原始碼 AI 在地化工具",
+      "description": "為程式助理打造的開放原始碼在地化工具。每個 LLM 翻譯都由確定性程式檢查（佔位符、CLDR 複數、術語表、像素寬度），無效即拒絕。基準測試中字串損壞率為 0%，未使用 glot 時為 14.1%。"
+    },
+    "skip": "跳至內容",
+    "nav": {
+      "label": "主選單",
+      "how": "運作方式",
+      "guarantees": "保證",
+      "try": "試用",
+      "compare": "比較",
+      "docs": "文件",
+      "pricing": "價格",
+      "openApp": "開啟應用程式",
+      "githubStars": "glot 在 GitHub 上，{count, plural, =0 {尚無 star} other {# 個 star}}",
+      "home": "glot 首頁",
+      "experiments": "複製實驗"
+    },
+    "hero": {
+      "badge": "開放原始碼 · MIT · 自備 LLM 金鑰",
+      "title": "你的助理負責在地化，程式負責保證。",
+      "subtitle": "你的程式助理會將寫死的字串改為鍵值並翻譯。glot 以確定性程式檢查每個 LLM 輸出，對任何損壞或過長的內容加以拒絕，並附上確切原因，直到重試結果有效為止。",
+      "copy": "複製指令",
+      "copied": "已複製指令",
+      "openApp": "開啟應用程式",
+      "commandHint": "偵測你的 i18n 技術堆疊、擷取字串、翻譯並檢查。每次修改介面後請重新執行。",
+      "demoAlt": "終端機：glot translate 拒絕缺少 few 與 many 的波蘭文複數、將法文佔位符改名為 '{nom}' 的譯文，以及寬 276 px、用於 120 px 按鈕的德文標籤；它會將拒絕原因回傳給 LLM，接著寫入修正後的版本；glot check 通過。",
+      "demoCaption": "真實的 glot 執行檔。此錄影中的 LLM 被設定為會錯誤翻譯三個字串；拒絕訊息皆來自 glot。",
+      "pause": "暫停示範",
+      "play": "播放示範",
+      "proofOss": "MIT 授權",
+      "proofStars": "{count, plural, =0 {在 GitHub 上 Star} other {在 GitHub 上有 # 個 Star}}",
+      "proofNpm": "npm v{version}",
+      "proofLabel": "專案資訊"
+    },
+    "bench": {
+      "eyebrow": "基準測試，2026 年 10 月 18 日",
+      "title": "流入翻譯目錄的損壞字串",
+      "lead": "每個模型與條件使用 320 則 ICU 訊息，涵蓋 8 種語系。相同提示詞、相同模型。",
+      "raw": "原始提示詞",
+      "glot": "使用 glot",
+      "rejected": "使用 glot 時，重試後有 {haiku}（Haiku）與 {sonnet}（Sonnet）的字串遭拒絕，並保留未翻譯，而非交付損壞的內容。獨立評審（FormatJS + Intl.PluralRules）也認同此結果。",
+      "report": "閱讀完整報告",
+      "tableCaption": "依模型與條件劃分，已翻譯訊息中損壞的比例",
+      "model": "模型"
+    },
+    "how": {
+      "eyebrow": "運作方式",
+      "title": "三個步驟，你的助理也能執行。",
+      "subtitle": "或一次完成三個步驟，具冪等性：npx glot-i18n localize。",
+      "init": {
+        "title": "偵測",
+        "body": "尋找你的 i18n 函式庫與目錄，寫入 glot.toml 以及你的程式助理會讀取的規則。"
+      },
+      "i18nize": {
+        "title": "擷取",
+        "body": "將寫死的介面字串移至鍵值，並為 next-intl 或 react-i18next 重寫元件。"
+      },
+      "translate": {
+        "title": "翻譯並驗證",
+        "body": "只翻譯差異部分。每個輸出都會檢查；被拒絕的內容會連同原因送回模型。重試後仍無效則不寫入任何內容。"
+      }
+    },
+    "guarantees": {
+      "eyebrow": "保證事項",
+      "title": "LLM 提出建議，由程式決定寫入什麼內容。",
+      "subtitle": "每張卡片都會顯示真實的拒絕訊息，與 glot 輸出的文字完全一致。",
+      "refusal": "遭 glot 拒絕",
+      "placeholders": {
+        "title": "佔位符與標籤",
+        "body": "與來源相同的集合，不會新增，也不會翻譯。支援 ICU、i18next 與 MessageFormat 2。"
+      },
+      "plurals": {
+        "title": "CLDR 複數形式",
+        "body": "涵蓋目標語系所需的每個類別：波蘭文需要四種，阿拉伯文需要六種。"
+      },
+      "glossary": {
+        "title": "以程式碼管理術語表",
+        "body": "儲存庫中的 glossary.toml：指定必要與禁止的譯文，以及不翻譯的術語。"
+      },
+      "width": {
+        "title": "像素寬度",
+        "body": "依據你應用程式的實際字型與容器測量。寬度超出即拒絕，絕不截斷。"
+      },
+      "lockfile": {
+        "title": "鎖定檔",
+        "body": "glot.lock 記錄來源與譯文的雜湊值。僅翻譯變更的部分；手動編輯的內容永不會被覆寫。"
+      },
+      "ci": {
+        "title": "CI 檢查",
+        "body": "glot check 會在每個目錄上離線執行所有規則，失敗時以結束碼 1 退出，並附上 PR 註解。"
+      }
+    },
+    "fit": {
+      "eyebrow": "像素預算",
+      "title": "符合按鈕寬度的翻譯",
+      "body": "德文比英文長約三分之一。glot fit 會在每種語系下渲染您正在執行的應用程式，依各自的框寬測量每段文字，要求產生既保留語意與佔位符、又更短的版本，然後重新渲染。",
+      "before": "修正前",
+      "after": "執行 glot fit 後（1 次迭代）",
+      "overflow": "超出 112 px 按鈕範圍",
+      "fits": "符合",
+      "meta": "在示範應用程式上的實際執行結果，德文語系。",
+      "p1": "以瀏覽器實際測量，而非依字元數估算",
+      "p2": "較短的版本仍會通過驗證器與術語表檢查",
+      "p3": "固定的處理次數，絕不會無限迴圈"
+    },
+    "play": {
+      "eyebrow": "立即試用，無需安裝",
+      "title": "您能難倒 glot 嗎？",
+      "subtitle": "編輯翻譯。用來保護 glot 翻譯的同一個驗證器已編譯為 WebAssembly，會在您的瀏覽器中於每次按鍵時執行。",
+      "source": "來源（英文，ICU）",
+      "target": "翻譯",
+      "locale": "目標語系",
+      "challenges": "從有錯誤的翻譯開始",
+      "loading": "正在載入驗證器…",
+      "failed": "無法載入驗證器。請重新載入頁面再試一次。",
+      "accepted": "已接受：glot 會寫入此翻譯。",
+      "refused": "{count, plural, other {已拒絕：# 個錯誤}}",
+      "warnings": "{count, plural, other {# 則警告，仍會寫入}}",
+      "score": "{refused, plural, =0 {尚未拒絕任何翻譯。試試其中一個挑戰。} other {glot 拒絕了您的 # 次嘗試。}}",
+      "reset": "重設",
+      "note": "像素寬度與術語表需要您的應用程式與儲存庫，請使用 CLI 試試看。"
+    },
+    "agents": {
+      "eyebrow": "AI 代理",
+      "title": "與你現有的代理工具搭配使用",
+      "subtitle": "glot mcp 會讓你的代理取得你的金鑰、金鑰的使用位置與術語表。它新增的每個字串都會經過同一套驗證器。",
+      "plugin": "外掛 + MCP",
+      "rules": "規則 + MCP",
+      "agentsMd": "AGENTS.md + MCP",
+      "skill": "代理技能",
+      "prompt": "產生的提示詞",
+      "docs": "各代理的設定方式"
+    },
+    "overlay": {
+      "alt": "glot 覆蓋層彈出視窗，顯示一個鍵、其來源文字及五種語言的翻譯",
+      "body": "開發覆蓋層會找出您點擊文字背後的鍵，以所有語系顯示即時驗證問題，並將變更儲存至您的目錄檔案。",
+      "eyebrow": "應用程式內編輯",
+      "p1": "建議、縮短、改得更正式、全部翻譯",
+      "p2": "標示溢出容器的文字",
+      "p3": "僅限開發環境，gzip 壓縮後約 6 kB",
+      "title": "在應用程式中 Alt+點擊任何文字"
+    },
+    "compare": {
+      "crowdinPrice": "14 天試用後為付費方案，開源專案免費",
+      "feature": "功能",
+      "footnote": "已於 2026 年 10 月 18 日查核各供應商的公開網站與文件。部分支援表示功能有限、依方案而定，或需透過整合提供。不支援表示在公開文件中找不到此功能。方案可能變動：每個儲存格都連結至其來源。",
+      "glotPrice": "免費（MIT）+ 你的 LLM 用量",
+      "lingoPrice": "免費 CLI，使用你自己的金鑰；託管引擎基本費 $0 + 用量",
+      "lokalisePrice": "每月 $149 起，14 天試用",
+      "no": "否",
+      "partial": "部分支援",
+      "rows": {
+        "byok": "自備 LLM 金鑰",
+        "fit": "依渲染像素預算調整",
+        "gitNative": "以 Git 作為事實來源（lockfile）",
+        "inContext": "在應用程式中就地編輯",
+        "mcp": "供程式代理使用的 MCP 伺服器",
+        "openSource": "開源",
+        "price": "價格",
+        "validator": "對每個字串進行確定性驗證"
+      },
+      "sources": "每個儲存格的來源與日期",
+      "subtitle": "glot 與託管翻譯平台及其他開發者優先工具的差異。",
+      "title": "比較",
+      "tolgeePrice": "免費方案與免費自架，雲端每月 €58 起",
+      "yes": "是"
+    },
+    "faq": {
+      "title": "常見問題",
+      "more": "更多常見問題解答",
+      "cost": {
+        "q": "費用是多少？",
+        "a": "glot 採 MIT 授權且免費。您使用自己的金鑰向 LLM 供應商付費：依我們的測試，使用預設模型翻譯 850 則字串約需 $0.035。執行 glot translate --dry-run 可先估算費用，設定預算上限即可限制花費。"
+      },
+      "runtime": {
+        "q": "是否會增加執行階段相依套件？",
+        "a": "不需要。您的應用程式仍使用 next-intl、i18next 或 FormatJS 搭配一般 JSON 目錄。glot 直接處理檔案，在您的儲存庫與 CI 中運作。"
+      },
+      "fails": {
+        "q": "如果模型一直翻錯某個字串怎麼辦？",
+        "a": "glot 會將確切的失敗原因回傳給模型，並重試兩次，接著改用備用模型。若仍失敗，不會寫入任何內容：該鍵會被回報為遭拒，並維持未翻譯狀態。"
+      },
+      "code": {
+        "q": "我的程式碼會離開我的電腦嗎？",
+        "a": "待翻譯的字串及其上下文會傳送至您的 LLM 供應商，不會傳送原始碼檔案。glot 的開發者不會收到任何資料，也沒有遙測功能。"
+      },
+      "app": {
+        "q": "需要使用網頁應用程式嗎？",
+        "a": "不需要。CLI 與 MCP 伺服器可在本機完成全部工作。應用程式另外提供共用儀表板、審閱功能，以及為團隊提供的 GitHub 同步。"
+      }
+    },
+    "cta": {
+      "title": "每次發布都同步交付所有語言。",
+      "body": "在你的儲存庫中執行一個指令。損壞的內容不會進入你的翻譯目錄。",
+      "docs": "閱讀快速入門"
+    },
+    "footer": {
+      "tagline": "AI 也無法破壞的在地化。",
+      "license": "MIT 授權",
+      "docs": "文件",
+      "benchmark": "基準測試",
+      "npm": "npm"
+    }
+  },
+  "home": {
+    "meta": {
+      "title": "glot：你的應用程式與網站，多語言呈現，毫無破綻",
+      "description": "glot 將你的應用程式、網站、電子郵件與客服內容翻譯成各種語言，在上線前逐句檢查，並顯示哪些國家為你帶來客戶。"
+    },
+    "skip": "跳至主要內容",
+    "nav": {
+      "label": "主選單",
+      "home": "glot 首頁",
+      "demo": "示範",
+      "i18n": "在地化",
+      "docs": "文件",
+      "pricing": "定價",
+      "openApp": "開啟應用程式",
+      "githubStars": "glot 在 GitHub 上，{count, plural, =0 {尚無星標} other {# 個星標}}",
+      "wow": "即時",
+      "different": "為何選擇 glot",
+      "together": "一起"
+    },
+    "hero": {
+      "badge": "應用程式、網站、電子郵件、客服支援",
+      "title": "說<hl>每位客戶的</hl>語言。",
+      "subtitle": "glot 翻譯你的應用程式、網站與所有對外內容，在上線前逐句檢查，並告訴你哪些國家會為你帶來客戶。",
+      "start": "免費開始",
+      "startHint": "無需信用卡。",
+      "proofLabel": "專案資訊",
+      "proofBench": "0% 錯誤句子，對比僅使用 AI 的 14.1%",
+      "proofBenchNote": "基準測試：8 種語言共 320 個句子，相同 AI 模型分別使用與不使用 glot，2026 年 10 月 18 日。",
+      "proofStars": "{count, plural, =0 {在 GitHub 上點星} other {# 個 GitHub 星標}}",
+      "proofNpm": "npm v{version}",
+      "see": "看看實際運作"
+    },
+    "demo": {
+      "eyebrow": "看看它如何運作",
+      "title": "同一個想法，以每種語言撰寫",
+      "subtitle": "glot 會為標題撰寫多個版本，在每種語言中進行檢查，為每個國家顯示最佳版本，並保留勝出的版本。",
+      "label": "文案實驗，逐步進行",
+      "steps": "示範步驟",
+      "example": "示例資料",
+      "caption": "示例資料。",
+      "key": "鍵名",
+      "official": "正式文案",
+      "play": "播放示範",
+      "pause": "暫停示範",
+      "replay": "重播",
+      "announce": "第 {n} 步，共 {total} 步：{title}",
+      "write": {
+        "label": "撰寫",
+        "title": "AI 撰寫三個版本",
+        "body": "每個版本只表達一個想法。你目前的文字會保留作為參考。"
+      },
+      "check": {
+        "label": "檢查",
+        "title": "glot 檢查每一種語言",
+        "body": "人名、價格、複數、你的術語表與畫面空間，涵蓋每種語言。"
+      },
+      "serve": {
+        "label": "投放",
+        "title": "每個國家看到各自的版本",
+        "body": "訪客會看到更多有效的版本。"
+      },
+      "learn": {
+        "label": "結論",
+        "title": "一句話說明結果",
+        "body": "哪個版本勝出、勝出多少，以及 glot 有多大把握。"
+      },
+      "ship": {
+        "label": "上線",
+        "title": "勝出版本正式上線",
+        "body": "一鍵即可用勝出的文字取代舊文字，適用於所有語言。"
+      },
+      "intent": {
+        "simplicity": "簡潔",
+        "benefit": "直接效益",
+        "urgency": "誠實的急迫感"
+      },
+      "writing": "撰寫中…",
+      "ready": "就緒",
+      "refused": "遭 glot 拒絕",
+      "retried": "第一次版本過寬，已改寫並通過。",
+      "checks": "{passed, number} / {total, number} 項檢查已通過",
+      "version": "版本",
+      "pass": "通過",
+      "fail": "已拒絕",
+      "audience": {
+        "de": "德國 · 搜尋",
+        "fr": "法國 · 行動裝置",
+        "rest": "其他所有地區"
+      },
+      "traffic": "各版本的流量占比",
+      "visitors": "{count, plural, other {# 位訪客}}",
+      "day": "第 {day} 天",
+      "win": "{variant}：預計增加 {lift} 次註冊（可能介於 {low} 到 {high} 之間），為最佳版本的機率為 {probability}。",
+      "none": "尚無明確勝者。你的正式文案將持續運行。",
+      "learning": "仍在學習中。約還需 {days, plural, other {# 天}}。",
+      "promote": "全面推廣",
+      "merge": "合併 Pull Request",
+      "merged": "完成。勝出版本已在每種語言上線。",
+      "files": "{count, plural, other {# 個檔案已變更}}"
+    },
+    "how": {
+      "eyebrow": "運作方式",
+      "title": "三個步驟，無需技術設定。",
+      "pick": {
+        "title": "連接現有內容",
+        "body": "你的應用程式、網站或商店。只需幾次點擊，或貼上一行程式碼。"
+      },
+      "write": {
+        "title": "glot 翻譯並檢查",
+        "body": "每個句子都會以你選擇的每種語言翻譯，並在上線前完成檢查。"
+      },
+      "ship": {
+        "title": "正式上線，觀察成長",
+        "body": "客戶以自己的語言閱讀。你可以看到哪些國家註冊並購買。"
+      }
+    },
+    "faq": {
+      "title": "常見問題",
+      "more": "所有問題",
+      "dev": {
+        "q": "我需要開發人員嗎？",
+        "a": "網站或商店不需要：只要貼上一行程式碼，或連結你的帳號即可。若是應用程式，glot 會準備變更內容，你的開發人員只需一鍵即可核准。"
+      },
+      "quality": {
+        "q": "翻譯品質好嗎？",
+        "a": "glot 使用目前最好的 AI 模型，遵循你的詞彙表與語氣，並在上線前檢查每個句子。不確定的內容會列入清單，交由人工核准。"
+      },
+      "tools": {
+        "q": "可以搭配我使用的工具嗎？",
+        "a": "支援 Wix、Squarespace、Webflow、Shopify、WordPress 等眾多網站建置平台，以及網頁與行動應用程式、電子郵件和客服工具。完整清單請見整合頁面。"
+      },
+      "google": {
+        "q": "Google 會顯示我翻譯後的頁面嗎？",
+        "a": "會。每種語言都有自己的頁面，搜尋引擎可以讀取，且標題會依各國用戶的搜尋習慣調整。"
+      },
+      "privacy": {
+        "q": "我的訪客資料會怎麼處理？",
+        "a": "glot 計算造訪次數時不使用 Cookie，也不收集個人資料。在電子郵件與客服訊息中，個人資訊會在 AI 處理文字前先被隱藏。"
+      },
+      "price": {
+        "q": "費用是多少？",
+        "a": "免費即可開始，無需信用卡。付費方案提供更多用量與 Growth 工具。此外，glot 為開源專案，您也可以自行架設。"
+      }
+    },
+    "pricing": {
+      "title": "免費開始，成長時再付費。",
+      "body": "免費在你自己的專案上試用 glot。當你的國際流量成長時，再選擇適合的方案。它是開源的，你也可以自行架設。",
+      "cta": "查看定價"
+    },
+    "cta": {
+      "title": "你的下一批客戶不說你的語言。<hl>尚未。</hl>",
+      "body": "今天就連接你的應用程式或網站，即刻以每種語言呈現。",
+      "docs": "查看文件"
+    },
+    "footer": {
+      "tagline": "讓你的產品以每種語言呈現，且沒有任何錯誤。",
+      "docs": "文件",
+      "benchmark": "效能基準",
+      "i18n": "在地化",
+      "pricing": "定價",
+      "npm": "npm",
+      "license": "MIT 授權條款"
+    },
+    "features": {
+      "before": "之前",
+      "after": "使用 glot 之後",
+      "app": {
+        "minutes": {
+          "title": "幾分鐘內完成翻譯",
+          "pain": "花上數週把文字複製到試算表，還得四處催促譯者。",
+          "gain": "整個應用程式，所選的每種語言，當天即可完成。"
+        },
+        "safe": {
+          "title": "有問題的內容不會上線",
+          "pain": "AI 翻譯會弄壞按鈕、名稱和價格。",
+          "gain": "每個句子在客戶看到之前都會經過檢查。"
+        },
+        "fresh": {
+          "title": "隨時保持最新",
+          "pain": "每個新功能上線時都只翻譯了一半。",
+          "gain": "每項變更都會自動翻譯，等你確認即可。"
+        },
+        "brand": {
+          "title": "你的用詞，你的品牌",
+          "pain": "你的產品名稱被翻成三種不同寫法。",
+          "gain": "你的術語表與語氣會套用到每一種語言。"
+        },
+        "onpage": {
+          "title": "直接在頁面上修正",
+          "pain": "意見回饋散落在截圖與電子郵件討論串中而遺失。",
+          "gain": "團隊與訪客可直接在真實網站上點選句子並就地修正。"
+        },
+        "agents": {
+          "title": "你的程式碼助理懂 glot",
+          "pain": "AI 程式輔助工具只會把文字寫死成單一語言。",
+          "gain": "Claude、Cursor 和 Codex 在撰寫應用程式時，會為每個新句子加入所有語言的翻譯。"
+        }
+      },
+      "web": {
+        "tag": {
+          "title": "任何網站，一行搞定",
+          "pain": "使用 Wix、Squarespace 或 Webflow 的網站，只能停留在單一語言。",
+          "gain": "貼上一行程式碼，你的網站就會有語言切換器。無需工程師。"
+        },
+        "google": {
+          "title": "各國 Google 皆可搜尋到",
+          "pain": "翻譯好的網站，在海外卻從未出現在 Google 搜尋結果中。",
+          "gain": "每種語言都有獨立頁面，搜尋引擎可以讀取並排名。"
+        },
+        "local": {
+          "title": "使用者真正搜尋的字詞",
+          "pain": "逐字直譯的標題，沒有人會拿去 Google 搜尋。",
+          "gain": "標題與小標使用馬德里或墨西哥城民眾實際搜尋的字詞。"
+        },
+        "shop": {
+          "title": "商店與部落格也適用",
+          "pain": "商品頁與文章需要逐一語言手動複製。",
+          "gain": "glot 可連接你的商店或 CMS，並讓所有語言保持同步。"
+        },
+        "live": {
+          "title": "每種語言都確實顯示",
+          "pain": "翻譯進度 100%，網站卻仍顯示舊的語言。",
+          "gain": "glot 會檢查你的實際網站，並明確告訴你該修改什麼。"
+        },
+        "longtail": {
+          "title": "連你沒規劃的語言也涵蓋",
+          "pain": "使用其他語言的訪客，只能看到英文頁面。",
+          "gain": "其餘語言由瀏覽器翻譯，同樣經過檢查，且不需額外費用。"
+        }
+      },
+      "beyond": {
+        "mobile": {
+          "title": "行動應用程式，無需等待商店",
+          "pain": "修正一個錯字，就得發新版本並等待商店審核數天。",
+          "gain": "修正與新語言會在使用者下次開啟應用程式時生效。"
+        },
+        "emails": {
+          "title": "電子郵件、帳單、通知",
+          "pain": "網站翻譯完成，收據卻還是英文。",
+          "gain": "每則訊息都使用客戶的語言，且其個人資料絕不會傳送給 AI。"
+        },
+        "ai": {
+          "title": "你的 AI 回覆",
+          "pain": "你的聊天機器人用英文回覆日本客戶。",
+          "gain": "AI 回覆會在產生時即依照你的品牌用語翻譯。"
+        },
+        "support": {
+          "title": "支援每種語言",
+          "pain": "團隊沒人看得懂的語言所寫的客服工單。",
+          "gain": "以你的語言閱讀與回覆，客戶則收到他們的語言。"
+        },
+        "once": {
+          "title": "修正一次，處處生效",
+          "pain": "同一句子要在五個地方分別修正。",
+          "gain": "glot 會找出句子出現的每個位置，並一併更新。"
+        }
+      },
+      "grow": {
+        "next": {
+          "title": "接下來該開拓哪個國家",
+          "pain": "憑直覺隨意新增語言。",
+          "gain": "從你自己的訪客查看各語言的需求與註冊數，以及下一個市場的價值。"
+        },
+        "words": {
+          "title": "各國最適合的用詞",
+          "pain": "在本國有效、到了海外卻乏人問津的標題。",
+          "gain": "每種語言都測試多個版本，保留各國成效最好的那一個。"
+        },
+        "private": {
+          "title": "設計上即重視隱私",
+          "pain": "需要 Cookie 同意橫幅的分析工具。",
+          "gain": "不使用 Cookie、不收集個人資料，並過濾機器人流量。只提供誠實的數據。"
+        }
+      },
+      "trust": {
+        "proof": {
+          "title": "AI 撰寫內容的紀錄",
+          "pain": "歐盟針對 AI 生成內容的新規範，卻無法留存誰翻譯了什麼的紀錄。",
+          "gain": "每則翻譯都保留其歷史紀錄，有人詢問時可隨時提供。"
+        },
+        "open": {
+          "title": "開源，永遠屬於你",
+          "pain": "被單一廠商綁定，而且逐字計價的費用不斷上漲。",
+          "gain": "免費開源。可自行架設，也可交由我們代管。"
+        }
+      },
+      "wow": {
+        "eyebrow": "即時",
+        "title": "親眼見證。",
+        "subtitle": "glot 的六項功能，都值得你展示給團隊看。"
+      },
+      "diff": {
+        "eyebrow": "為何選擇 glot",
+        "title": "其他地方找不到的功能。",
+        "subtitle": "其他工具只負責翻譯。glot 確保內容正常運作、能被找到，並帶來回報。"
+      },
+      "viral": {
+        "eyebrow": "團隊協作",
+        "title": "整個團隊與訪客，都能一起參與。",
+        "subtitle": "glot 融入大家既有的工作流程，讓每個人都能參與協助。"
+      }
+    },
+    "scenes": {
+      "hero": {
+        "eyebrow": "AI 在地化，無國界限制",
+        "l1": "說",
+        "l2": "每一種",
+        "l3": "語言，",
+        "l4": "大規模進行。",
+        "subtitle": "借助 glot 的 AI 翻譯、調整並向全球推出你的產品：自然、一致的內容，適合每個市場。",
+        "start": "免費試用 glot",
+        "demo": "觀看示範",
+        "check1": "無需信用卡",
+        "check2": "開源，採用 MIT 授權",
+        "check3": "每句都經過檢查",
+        "plateCulture": "文化調整",
+        "plateAi": "AI 翻譯",
+        "plateBrand": "術語與品牌語調",
+        "platePublish": "多語發布",
+        "statBroken": "出錯的句子",
+        "statAlone": "僅靠 AI",
+        "statOss": "永久開源",
+        "statStars": "GitHub 上的星標",
+        "statCookie": "分析工具中的 Cookie",
+        "statNote": "基準測試：8 種語言共 320 句，相同 AI 模型，有無使用 glot，2026 年 10 月 18 日。"
+      },
+      "problem": {
+        "badge": "問題 / 為何選擇 glot",
+        "title": "走向全球，",
+        "titleHl": "一條充滿阻礙的路？",
+        "body": "跨國翻譯、在地化與營運，會讓絕佳機會變成真正的麻煩。",
+        "without": "不使用 glot",
+        "withoutBody": "你將摸黑前行，每一步都布滿障礙。",
+        "p1": "翻譯緩慢且成本高",
+        "p1s": "截止日期一再延後",
+        "p2": "在地化不完整",
+        "p2s": "體驗不自然",
+        "p3": "工具與團隊過多",
+        "p3s": "營運複雜度高",
+        "p4": "成效與投資報酬率不確定",
+        "p4s": "難以衡量",
+        "verdict": "結果？上線更慢、成本更高、風險更大。",
+        "tagTranslate": "翻譯",
+        "tagLocalize": "在地化",
+        "tagCheck": "檢查",
+        "tagMeasure": "衡量",
+        "with": "使用 glot",
+        "solTitle": "使用 glot，跨國發展將變成",
+        "solHl": "一個 growth engine。",
+        "solBody": "單一平台，涵蓋從翻譯、成效到上線與全球成長，更快、更簡單，也更安心。",
+        "s1": "即時翻譯並調整內容。",
+        "s2": "打造真正在地化的體驗。",
+        "s3": "集中管理你的內容、團隊與市場。",
+        "s4": "衡量成效，加速成長。",
+        "fast": "更快",
+        "fastS": "從翻譯到上線",
+        "simple": "更簡單",
+        "simpleS": "一站式、順暢無阻",
+        "profit": "獲利更高",
+        "profitS": "可衡量的成效",
+        "result": "結果：",
+        "resultBody": "更快、更順暢、獲利更高的全球上線。"
+      },
+      "how": {
+        "badge": "運作方式",
+        "title": "如何",
+        "titleHl": "運作？",
+        "subtitle": "從你的內容出發，打造真正的全球體驗。",
+        "fast": "快速",
+        "fastS": "數分鐘內即可看到首批結果",
+        "complete": "完整",
+        "completeS": "所有通路，一個平台",
+        "scale": "可擴展",
+        "scaleS": "從幾種語言到全球規模",
+        "k1": "連接",
+        "t1": "導入你的內容",
+        "b1": "只需幾次點擊，即可將你的應用程式、網站、電子郵件和客服連結至 glot。",
+        "k2": "翻譯",
+        "t2": "以 AI 翻譯",
+        "b2": "具情境感知的翻譯，經過檢查，可立即使用。",
+        "k3": "調整",
+        "t3": "自訂並保有掌控權",
+        "b3": "調整語氣、術語與業務規則（術語表、風格、例外）。",
+        "k4": "部署",
+        "t4": "全面發布",
+        "b4": "在每個管道無縫發布你的多語內容。",
+        "k5": "衡量",
+        "t5": "追蹤成效",
+        "b5": "依語言查看哪些國家造訪、註冊與購買。",
+        "surfaces": "產品介面",
+        "surfTitle": "統一生態系，涵蓋",
+        "surfHl": "所有內容。",
+        "mobile": "行動應用程式",
+        "mobileB": "無需等待應用商店審核，即可翻譯你的 iOS 與 Android 應用程式。",
+        "mobile1": "原生整合",
+        "mobile2": "持續更新",
+        "mobile3": "在地化體驗",
+        "web": "網站",
+        "webB": "幾分鐘內讓網站支援多語言，並包含 SEO 最佳化。",
+        "web1": "即時翻譯",
+        "web2": "SEO 最佳化",
+        "web3": "CMS 連接器",
+        "email": "電子郵件",
+        "emailB": "自動翻譯你的通訊與行銷活動。",
+        "email1": "交易型郵件",
+        "email2": "行銷活動",
+        "email3": "自動化流程",
+        "support": "支援",
+        "supportB": "提供一致且快速回應的多語客服支援。",
+        "support1": "即時翻譯",
+        "support2": "語氣與回覆一致",
+        "support3": "與你的工具整合",
+        "connectors": "連接器",
+        "campaign": "產品活動"
+      },
+      "demo": {
+        "badge": "互動示範",
+        "title": "一個即時翻譯工作室，讓",
+        "titleHl": "你的訊息表現更好。",
+        "body": "為每個市場即時翻譯、調整、測試並最佳化你的內容，所有工作都在同一處完成。",
+        "start": "啟動互動示範",
+        "explore": "探索工作區",
+        "n1": "互動示範",
+        "n1b": "使用真實情境試玩，無需安裝。",
+        "n2": "即時工作室",
+        "n2b": "翻譯、調整並比較你的版本。",
+        "n3": "品質檢查",
+        "n3b": "發布前檢查名稱、價格、複數與長度。",
+        "n4": "智慧 A/B 測試",
+        "n4b": "每個市場都保留該地最有效的訊息。"
+      },
+      "results": {
+        "badge": "真實成效",
+        "title": "可衡量的成果，",
+        "titleHl": "可驗證的信任。",
+        "body": "數據可以重現：基準測試公開，程式碼也公開。",
+        "c1": "公開基準測試",
+        "c2": "開放原始碼",
+        "c3": "不含個人資料",
+        "impact": "glot 數據一覽",
+        "m1": "使用 glot 時的破碎句子",
+        "m2": "使用相同 AI、未搭配 glot",
+        "m3": "8 種語言測試的句子",
+        "m4": "本頁所示語言",
+        "plans": "為你的 Growth 量身打造的方案",
+        "plansTitle": "選擇能助你",
+        "plansHl": "起飛的方案。",
+        "faqBadge": "常見問題",
+        "faqTitle": "常被問到的",
+        "faqHl": "問題。",
+        "faqBody": "一覽 glot 的所有重點。",
+        "ctaTitle": "準備好讓產品",
+        "ctaHl": "與全世界溝通？",
+        "ctaBody": "免費開始，無需信用卡。程式碼保持開放，並將持續如此。",
+        "cta1": "無需信用卡",
+        "cta2": "開源"
+      }
+    }
+  },
+  "localeSwitcher": {
+    "label": "語言"
+  },
+  "matrix": {
+    "howTo": "每一欄都是你真實網站上同一頁面的某種語言版本。捲動一次，所有欄位會同步跟隨；紅框為視覺品質問題，點擊即可修正文字。",
+    "fit": "符合",
+    "overlayHint": "標示上次視覺 QA 檢查發現的問題（文字被截斷、重疊或未翻譯）。",
+    "overlayNone": "尚無視覺 QA 報告：請從「視覺 QA」頁面執行一次，即可在此查看標示的問題。",
+    "pseudoHint": "新增一欄較長且帶有重音符號的文字，找出硬編碼字串及在較長語言下排版錯誤的地方。",
+    "pseudoTag": "較長且帶重音符號的文字",
+    "focus": "僅顯示此語言",
+    "unfocus": "顯示所有語言",
+    "knownRoutes": "網站頁面",
+    "openReport": "開啟報告",
+    "loading": "載入中…",
+    "missing": "{count, plural, other {# 個鍵缺失}}",
+    "missingHint": "翻譯 {language} 缺少的鍵",
+    "complete": "所有鍵皆已翻譯",
+    "issues": "{count, plural, other {# 個問題}}",
+    "blank": {
+      "summary": "框架一直空白或顯示錯誤？",
+      "body": "你的網站可能禁止被嵌入框架中顯示（X-Frame-Options 或 CSP frame-ancestors）。若要僅允許 glot，請移除 X-Frame-Options，並傳送：",
+      "other": "若頁面在新分頁中能正常開啟，但顯示錯誤語言或 404，請檢查以下位置的語言 URL 格式：",
+      "settings": "設定 → 你的網站"
+    },
+    "bridge": {
+      "body": "在你的應用程式中加入此腳本（僅限開發環境），以取得精確的框架高度與偽語言渲染。glot 儀表板已內建此腳本。",
+      "title": "預覽橋接"
+    },
+    "desktop": "桌面",
+    "frameTitle": "在 {locale} 中預覽",
+    "issueAt": "{kind} 問題：{key}",
+    "kinds": {
+      "clamp": "已裁切",
+      "overflow": "溢出",
+      "overlap": "重疊",
+      "rtl": "RTL 方向",
+      "tofu": "缺少字形",
+      "untranslated": "未翻譯"
+    },
+    "mobile": "行動裝置",
+    "noBase": {
+      "body": "矩陣會將你的網站以各語言並排開啟，讓你在使用者發現之前，先找出文字被截斷、重疊或未翻譯的問題。",
+      "cta": "新增我的網站網址",
+      "title": "新增你的網站以比較各語言",
+      "step1": "前往「設定 → 你的網站」，輸入網站位址（正式、預備或 http://localhost:3000）。",
+      "step2": "檢查語言網址的建立方式（例如 /fr/pricing），並列出要比較的頁面。",
+      "step3": "允許 glot 以框架顯示你的網站（CSP frame-ancestors 標頭）。"
+    },
+    "openTab": "在新分頁中開啟",
+    "overlay": "QA 疊加層",
+    "pseudo": "偽語系",
+    "pseudoColumn": "偽語系",
+    "reload": "重新載入所有框架",
+    "reportFrom": "{date} 的視覺 QA 報告 · {count, plural, =0 {此畫面無問題} other {此畫面有 # 個問題}}",
+    "route": "頁面",
+    "routePlaceholder": "/pricing",
+    "source": "來源",
+    "title": "語系矩陣",
+    "viewport": "視口",
+    "zoom": "縮放",
+    "subtitle": "將你的應用程式以各語系並排呈現，一眼發現版面問題。",
+    "bySegment": "依區段",
+    "locale": "語言"
+  },
+  "notFound": {
+    "back": "返回首頁",
+    "title": "找不到頁面"
+  },
+  "overview": {
+    "budget": "預算 {budget}",
+    "cost": "LLM 花費",
+    "issuesCount": "{count, plural, =0 {沒有問題} other {# 個問題}}",
+    "jobStarted": "翻譯作業已開始",
+    "keys": "翻譯鍵",
+    "locales": "語言",
+    "model": "模型",
+    "noBudget": "未設定預算",
+    "noIssues": "沒有未解決的問題。所有翻譯都已通過驗證。",
+    "noJobs": "尚無任務。翻譯缺少的鍵即可開始。",
+    "openIssues": "待處理問題",
+    "progress": "各語系進度",
+    "progressHint": "{translated} / {total} 已翻譯 · {reviewed} 已審閱",
+    "recentJobs": "近期任務",
+    "staleCount": "{count, plural, other {# 個過期}}",
+    "translateMissing": "翻譯缺少的鍵",
+    "viewAll": "查看全部",
+    "subtitle": "檢視每個語系的覆蓋率、驗證與品質，以及下一個待修項目。"
+  },
+  "palette": {
+    "empty": "沒有結果。",
+    "goTo": "前往 {page}",
+    "navigation": "導覽",
+    "openProject": "開啟 {name}",
+    "placeholder": "輸入指令或搜尋…",
+    "preferences": "偏好設定",
+    "projects": "專案",
+    "switchLanguage": "切換語言為 {language}",
+    "toggleTheme": "切換主題",
+    "searching": "搜尋中…",
+    "keys": "鍵",
+    "actions": "操作",
+    "translateMissing": "翻譯缺少的鍵",
+    "createProject": "建立專案"
+  },
+  "projects": {
+    "create": {
+      "name": "名稱",
+      "namePlaceholder": "我的 SaaS",
+      "slug": "Slug",
+      "slugHint": "用於 URL、CLI 與 CDN。",
+      "sourceLocale": "來源語言",
+      "submit": "{count, plural, other {使用 # 種語言建立專案}}",
+      "success": "已建立專案 {name}",
+      "targetLocales": "目標語言",
+      "title": "新增專案",
+      "pickOne": "請至少選擇一種語言",
+      "slugTaken": "此 Slug 已被使用，請換一個。",
+      "step": "第 {n} 步，共 {total} 步",
+      "back": "返回",
+      "next": "繼續",
+      "steps": {
+        "name": {
+          "title": "為專案命名",
+          "description": "通常是您應用程式的名稱。Slug 用於在 CLI、API 與 CDN 中識別此專案。"
+        },
+        "source": {
+          "title": "您的應用程式使用哪種語言撰寫？",
+          "description": "glot 將從此語言翻譯。我們已選取您瀏覽器的語言。"
+        },
+        "targets": {
+          "title": "您想要哪些語言？",
+          "description": "先選幾種即可，之後隨時可以再新增。"
+        }
+      },
+      "picker": {
+        "search": "搜尋語言或輸入代碼（pt-BR）",
+        "singleHint": "一種語言：您的字串所使用的語言。",
+        "multiHint": "按 Enter 新增第一個符合項目。",
+        "selected": "{count, plural, =0 {尚未選擇語言} other {已選擇 # 種語言}}",
+        "remove": "移除 {language}",
+        "detected": "從瀏覽器偵測",
+        "noMatch": "沒有符合的語言。請輸入 BCP 47 代碼，例如 pt-BR。"
+      }
+    },
+    "empty": {
+      "body": "建立專案後，從您的儲存庫執行 glot push 以匯入翻譯目錄。",
+      "cta": "建立第一個專案",
+      "title": "尚無專案"
+    },
+    "keysCount": "{count, plural, =0 {沒有金鑰} other {# 個金鑰}}",
+    "localesCount": "{count, plural, other {# 種語言}}",
+    "subtitle": "每個專案對應到您某個儲存庫中的 glot.toml。圓環代表其健康狀態：各語言的覆蓋率與驗證結果。",
+    "title": "專案"
+  },
+  "review": {
+    "applied": "已套用建議",
+    "apply": "套用建議",
+    "backTranslate": "回譯",
+    "backTranslation": "回譯（{locale}）",
+    "refresh": "重新執行審查",
+    "running": "回譯中…",
+    "suggestion": "建議譯文",
+    "verdict": {
+      "different": "語意不同",
+      "nuance": "語氣細微差異",
+      "same": "語意相同"
+    }
+  },
+  "settings": {
+    "cdn": {
+      "description": "以 JSON 格式提供翻譯目錄，並附帶 ETag 與快取標頭。",
+      "enable": "啟用公開 CDN",
+      "example": "網址範例",
+      "title": "公開 CDN"
+    },
+    "switcher": {
+      "description": "加入一個 script 標籤，然後在想顯示的位置放置 {tag}。你在此新增的語言會在一分鐘內出現在網站上，無需重新部署。",
+      "hint": "僅顯示翻譯完成度至少 95% 的語言（min 屬性）。你的網站仍需載入新語言的字串：請參閱文件中的「語言切換器」。",
+      "preview": "預覽",
+      "snippet": "貼到你的網站",
+      "title": "語言切換器"
+    },
+    "danger": {
+      "confirmBody": "此操作無法復原。請輸入 {slug} 以確認。",
+      "confirmTitle": "刪除 {name}？",
+      "delete": "刪除專案",
+      "deleted": "專案已刪除",
+      "description": "刪除專案會移除其所有鍵、翻譯、術語表與工作。你的儲存庫不會受影響。",
+      "title": "危險區域"
+    },
+    "general": {
+      "name": "專案名稱",
+      "slug": "Slug",
+      "title": "一般",
+      "slugHint": "供 CLI（glot.toml 中的 [server] project）、API 與 CDN 網址使用。無法變更。"
+    },
+    "llm": {
+      "apiKey": "API 金鑰",
+      "apiKeySet": "已儲存金鑰。留空即保留現有金鑰。",
+      "apiKeyUnset": "尚未儲存金鑰。",
+      "baseUrl": "基礎 URL",
+      "baseUrlHint": "適用於 Ollama、vLLM、OpenRouter 及其他相容端點。",
+      "budget": "預算（美元）",
+      "budgetHint": "達到此預算時，任務將停止。",
+      "extraHeaders": "額外標頭",
+      "extraHeadersHint": "每行一個「名稱: 值」，會隨每次 LLM 呼叫傳送。請勿填入機密資訊：含憑證的內容會被拒絕。",
+      "workspaceId": "Anthropic 工作區 ID",
+      "workspaceIdHint": "組織層級金鑰（sk-ant-usr-…）必須填寫。會覆寫 ANTHROPIC_WORKSPACE_ID。",
+      "test": {
+        "button": "測試金鑰",
+        "ok": "服務商已接受此金鑰。",
+        "missing_key": "沒有可測試的金鑰：請先貼上金鑰。",
+        "invalid_key": "服務商拒絕此金鑰。請重新完整複製金鑰（Anthropic：console.anthropic.com → API Keys），或建立新的金鑰。",
+        "revoked_or_wrong_workspace": "此金鑰可識別，但不允許在此使用：已撤銷或停用，或來自與目前設定不同的工作區。",
+        "workspace_required": "組織金鑰（sk-ant-usr-…）：請填入下方的工作區 ID。",
+        "oauth_token_needs_bearer": "OAuth 權杖遭拒：可能已過期。請重新登入，或改用 API 金鑰。",
+        "network": "無法連線至服務商。請檢查基礎 URL 後再試一次。",
+        "provider_error": "服務商回傳錯誤（詳情見下方）。",
+        "config": "LLM 設定不完整（詳情見下方）。",
+        "kind": "偵測結果：{kind, select, oauth {OAuth 權杖} org-user {組織金鑰} other {API 金鑰}}",
+        "savedFailed": "設定已儲存，但金鑰測試失敗：{reason}"
+      },
+      "description": "使用您自己的服務商金鑰。glot 不會對 LLM 用量加價。",
+      "fallback": "備用模型",
+      "fallbackHint": "重試後驗證仍失敗時使用。",
+      "judge": "評審模型",
+      "judgeHint": "為翻譯結果評分（0 至 100）。",
+      "model": "模型",
+      "provider": "服務商",
+      "providers": {
+        "anthropic": "Anthropic",
+        "mock": "Mock（測試用）",
+        "openai": "OpenAI",
+        "openai-compatible": "OpenAI 相容"
+      },
+      "style": "風格指南",
+      "stylePlaceholder": "親切、簡潔，法文使用非正式的「tu」…",
+      "title": "LLM",
+      "modelHint": "請填入服務商提供的確切模型 ID，例如 claude-haiku-5-5。",
+      "styleHint": "隨每次翻譯傳送的語氣與用字規則，例如「非正式、簡短的介面標籤、產品名稱保留英文」。"
+    },
+    "locales": {
+      "add": "新增語言",
+      "addPlaceholder": "例如 pt-BR",
+      "description": "字串以來源語系撰寫。目標語系由翻譯工作與 CLI 翻譯。",
+      "remove": "移除 {locale}",
+      "source": "來源語系",
+      "targets": "目標語系",
+      "title": "語系",
+      "sourceHint": "你的字串所使用的語言。選擇一個目標語系即可將其設為來源。",
+      "changeTitle": "將 {to} 設為來源語系？",
+      "changeBody": "每個鍵的 {to} 翻譯都會成為其來源文字。目前的 {from} 文字會保留為已審閱的翻譯，該語系將成為目標語系。依舊來源產生的翻譯會標記為過時（不會刪除），請審閱或重新執行翻譯。反向翻譯審閱與品質分數將依新來源重新計算。",
+      "changeMissing": "{count, plural, other {# 個鍵沒有 {to} 翻譯，在你編輯之前會保留其 {from} 文字作為來源。}}",
+      "changeCli": "使用 CLI？請在 glot.toml 中將 source_locale 設為 \"{toCode}\"，並在下次執行 glot pull 前將 \"{fromCode}\" 加入 target_locales。",
+      "changeConfirm": "變更來源語系",
+      "changed": "來源語系已變更",
+      "syntaxLabel": "訊息語法",
+      "syntaxExample": "範例",
+      "syntaxHint": "glot 檢查及翻譯字串時如何解讀佔位符、標籤與複數，類似 glot.toml 中的 syntax 設定。變更後會重新檢查每個翻譯。",
+      "syntax": {
+        "icu": "ICU MessageFormat（next-intl、FormatJS、Lingui）：大括號內為引數、複數與選擇。",
+        "i18next": "i18next：雙大括號為變數，_one、_other 等鍵後綴為複數。",
+        "mf2": "Unicode MessageFormat 2.0：變數在大括號內以美元符號開頭。",
+        "printf": "printf 風格（iOS、Android、gettext、Python）：百分號佔位符。",
+        "rails": "Rails 與 Ruby i18n：百分號大括號變數。",
+        "vue": "vue-i18n：單大括號變數、連結訊息，複數以管線符號分隔。",
+        "laravel": "Laravel：冒號前綴變數，複數以管線符號分隔。",
+        "template": "Liquid 與 Go 範本（Shopify、Jekyll、Hugo）：雙大括號運算式。",
+        "fluent": "Project Fluent (.ftl)：美元符號變數、術語與選擇器。",
+        "plain": "純文字：只有單大括號名稱為佔位符，其他內容（包括雙大括號與標籤）皆視為文字。",
+        "symfony": "Symfony Translation：百分號包夾的變數，複數區間以管線符號分隔。",
+        "java": "Java MessageFormat（Spring、ResourceBundle）：編號引數、重複的單引號。"
+      }
+    },
+    "preview": {
+      "baseUrl": "網站 URL",
+      "baseUrlHint": "正式、預備或本機環境，例如 orizn.app 或 localhost:3000。留空則重用上次的視覺 QA 執行結果。",
+      "description": "應用程式的執行位置。glot 會開啟此網址，在真實頁面中顯示你的翻譯與文案變體。",
+      "pattern": "URL 模式",
+      "detected": "你的網站似乎使用 {how} 切換語言。",
+      "useDetected": "使用 {pattern}",
+      "subdomain": "你的網站似乎為每種語言使用一個子網域（en.example.com）：glot 目前無法開啟這種網址。",
+      "defaultMismatch": "你的網站預設語言似乎是 {site}，但此專案的來源語言為 {source}。",
+      "patternHint": "'{locale}' 與 '{route}' 會被取代；來源語系會省略其 /'{locale}' 區段。",
+      "routes": "路由",
+      "routesHint": "每行一個，會在矩陣路由選擇器中提供。",
+      "title": "你的網站",
+      "usedBy": "顯示於："
+    },
+    "saved": "設定已儲存",
+    "title": "設定",
+    "subtitle": "此專案的名稱、語系、翻譯模型與發佈方式。變更會套用到下一個工作。"
+  },
+  "shell": {
+    "liveStream": "即時串流",
+    "localSeo": "在地 SEO",
+    "render": "Render API",
+    "textGraph": "句子",
+    "edge": "glot Edge",
+    "apiTokens": "API 權杖",
+    "glossary": "術語表",
+    "jobs": "工作",
+    "keys": "金鑰",
+    "logout": "登出",
+    "newProject": "新增專案",
+    "noProjects": "尚無專案",
+    "overview": "總覽",
+    "preview": "語系矩陣",
+    "projects": "專案",
+    "search": "搜尋…",
+    "settings": "設定",
+    "toggleSidebar": "切換導覽",
+    "collapseSidebar": "收合側邊欄",
+    "expandSidebar": "展開側邊欄",
+    "userMenu": "帳戶選單",
+    "visual": "視覺 QA",
+    "insights": "洞察",
+    "feedback": "審閱",
+    "experiments": "實驗功能",
+    "labs": "實驗室",
+    "experimental": "自架伺服器與儀表板仍在實驗階段：預期會有粗糙之處與不相容的變更。CLI 與 MCP 伺服器是穩定的核心。<docs>閱讀更多</docs>",
+    "account": "帳戶",
+    "billing": "帳單",
+    "mainNav": "主要",
+    "skipToContent": "跳至內容",
+    "github": "GitHub",
+    "conversations": "對話",
+    "integrations": "整合",
+    "autopilot": "Autopilot"
+  },
+  "status": {
+    "machine": "機器翻譯",
+    "missing": "缺少",
+    "reviewed": "已審閱",
+    "stale": "已過期"
+  },
+  "theme": {
+    "dark": "深色",
+    "label": "主題",
+    "light": "淺色",
+    "system": "跟隨系統"
+  },
+  "tokens": {
+    "create": "新增權杖",
+    "created": "建立時間",
+    "empty": {
+      "body": "建立權杖以連接 CLI 或你的程式碼代理。",
+      "title": "尚無權杖"
+    },
+    "lastUsed": "上次使用",
+    "name": "名稱",
+    "namePlaceholder": "例如：laptop、github-actions",
+    "reveal": {
+      "body": "此權杖僅會顯示這一次。請將其儲存於密鑰管理工具或 Shell 環境變數中。",
+      "title": "立即複製你的權杖"
+    },
+    "revoke": "撤銷",
+    "revokeConfirm": {
+      "body": "使用此權杖的所有服務將立即停止運作。",
+      "title": "撤銷「{name}」？"
+    },
+    "revoked": "權杖已撤銷",
+    "setup": {
+      "cli": "CLI",
+      "cliHint": "登入一次即可；CLI 會為此伺服器儲存權杖。",
+      "mcp": "MCP (.mcp.json)",
+      "mcpHint": "將 glot 加入 Claude Code、Cursor 或任何 MCP 用戶端。",
+      "title": "連接你的工具"
+    },
+    "subtitle": "權杖用於驗證 glot CLI、MCP 伺服器與 CI。",
+    "title": "API 權杖"
+  },
+  "visual": {
+    "after": "修改後",
+    "allLocales": "所有語系",
+    "allRoutes": "所有頁面",
+    "allViewports": "所有視窗尺寸",
+    "before": "修改前",
+    "clean": "無問題",
+    "clear": {
+      "body": "已檢查 {count, plural, other {# 個畫面}}，未發現版面問題。",
+      "title": "全部正常"
+    },
+    "clearFilters": "清除篩選",
+    "compareWith": "比較對象",
+    "cropAlt": "{key} 特寫",
+    "empty": {
+      "body": "尚未進行任何檢查。執行下方指令：它會以每種語言開啟您的網站、截取每個頁面的畫面，並在此顯示哪些地方有問題。",
+      "title": "尚無視覺檢查"
+    },
+    "fixedCount": "{count, plural, other {# 個已修正}}",
+    "issueAt": "{kind}：{key}",
+    "issues": "{count, plural, other {# 個問題}}",
+    "kindHelp": {
+      "clamp": "由 CSS 刻意截斷（省略號），通常無妨",
+      "overflow": "文字溢出其容器",
+      "overlap": "兩段文字彼此疊合",
+      "rtl": "頁面未採用由右至左的排版",
+      "tofu": "字型無法繪製的字元",
+      "untranslated": "仍為原始語言"
+    },
+    "kinds": {
+      "clamp": "已截斷",
+      "overflow": "溢出",
+      "overlap": "重疊",
+      "rtl": "RTL 方向",
+      "tofu": "缺少字形",
+      "untranslated": "未翻譯"
+    },
+    "locale": "語系",
+    "new": "新增",
+    "newCount": "{count, plural, other {# 個新增}}",
+    "noCompare": "無比較",
+    "noMatch": "沒有符合這些篩選條件的問題",
+    "notInReport": "此畫面不在已比較的報告中。",
+    "onlyNew": "僅顯示新增",
+    "openKey": "開啟 key",
+    "report": "報告",
+    "route": "頁面",
+    "run": {
+      "body": "檢查會在你的電腦或 CI 上執行，而非 glot 的伺服器：它會以無頭瀏覽器開啟你的網站，截取每個語言下的每個頁面，並將報告上傳至此。",
+      "browser": "首次執行？請使用 npx playwright install chromium 安裝瀏覽器（只需一次）。",
+      "button": "執行檢查",
+      "noSite": "尚未設定網站 URL，因此指令將使用 http://localhost:3000。請在<link>設定</link>中新增以預先填入。",
+      "paste": "將 glot_… 替換為你的權杖，並在終端機或 CI 中執行此指令：",
+      "title": "執行視覺檢查",
+      "token": "請在<link>API 權杖</link>中建立權杖。"
+    },
+    "scope": "{pages, plural, other {# 個畫面}}：{routes, plural, other {# 個頁面}} × {locales, plural, other {# 種語言}} × {viewports, plural, other {# 種視窗尺寸}}",
+    "screenshotAlt": "{locale} 中 {route} 的截圖",
+    "showExpected": "顯示預期的截斷與雜訊（{count}）",
+    "showOnScreen": "在畫面上顯示",
+    "since": "自 {date} 起",
+    "stale": "此報告使用「{used}」作為來源語言，但此專案的來源語言為「{source}」：其中大部分問題都是雜訊。",
+    "subtitle": "找出在其他語言中會破壞版面的文字。每個問題會顯示元素、它在頁面上的位置，以及需要修正的 key，並附上其<term>像素預算</term>。",
+    "tabs": {
+      "issues": "問題（{count}）",
+      "screens": "畫面（{count}）"
+    },
+    "title": "視覺 QA",
+    "toReview": "{count, plural, =0 {沒有需要修正的項目} other {# 個問題待檢視}}",
+    "viewport": "視窗尺寸",
+    "budgetTip": "字串在您 UI 中可占用的寬度，由 glot measure 在執行中的應用程式量測。超出預算寬度的譯文會被標記，glot fit 會將其縮短。"
+  },
+  "nextLanguage": {
+    "kicker": "下一個語言",
+    "headline": "{language}：{share} 的訪客請求此語言",
+    "headlineFinish": "{language}：{share} 的訪客，僅 {coverage} 已翻譯",
+    "cost": "翻譯費用約 {cost}（{keys, plural, other {# 個鍵}}）",
+    "gain": "預計每月 “{goal}” 增加 {mid}（介於 {low} 至 {high} 之間）",
+    "noGain": "“{goal}” 尚無可測量的增益",
+    "perConversion": "每次預期轉換 {cost}",
+    "servedNow": "今日以 {locale} 提供（佔其造訪的 {share}）",
+    "rates": "“{goal}” 目前轉換率：{fallback}，對比以本身語言瀏覽之訪客的 {native}",
+    "trendUp": "期間需求上升 {pct}",
+    "trendDown": "期間需求下降 {pct}",
+    "reasons": {
+      "thin_demand": "此語言的造訪次數尚少，數字仍會變動。",
+      "thin_baseline": "以本身語言瀏覽的訪客尚少，比較基準較弱。",
+      "baseline_includes_source": "比較基準包含來源語言的訪客（其他語言的訪客尚不足）。",
+      "gain_uncertain": "區間包含零：增益有可能但尚未證實。",
+      "no_gain": "以本身語言瀏覽的訪客，目前在此未見更好的轉換率。",
+      "under_translated": "已提供此語言，但缺少的字串會退回來源語言。",
+      "no_conversions": "未追蹤轉換。",
+      "rising": "需求上升。",
+      "falling": "需求下降。"
+    },
+    "confidence": {
+      "insufficient": "資料不足",
+      "insufficientHint": "來自此語言的造訪不足 30 次，或以其母語提供服務的訪客不足 100 位。",
+      "indicative": "參考",
+      "indicativeHint": "足以排序，不足以作為數字承諾。",
+      "solid": "可靠",
+      "solidHint": "雙方各有 300 次以上造訪，且各有 10 次以上轉換。"
+    },
+    "add": "新增 {language}",
+    "finish": "完成 {language}",
+    "runnersUp": "其他候選語言",
+    "noConversions": "未追蹤轉換，因此此排名僅依據需求與成本。訪客完成轉換時，呼叫 glot.track(\"{goal}\") 即可查看各語言帶來的效益。",
+    "allServed": "你的訪客要求的所有語言都已提供並完成翻譯。",
+    "footnote": "依 {visits, plural, other {# 次造訪}} 計算，涵蓋 {days} 天。增益會比較這些訪客今日的轉換率，與以其本身語言瀏覽的訪客（貝氏估計，90% 區間）。",
+    "started": "已新增 {language}，翻譯已開始（上限 {cap}）。",
+    "confirm": {
+      "title": "要新增並翻譯 {language} 嗎？",
+      "titleFinish": "要翻譯 {language} 的其餘部分嗎？",
+      "body": "{keys, plural, other {# 個鍵}}，使用 {model}。預估費用 {cost}；任務將在 {cap}（預估值 + 20%）時停止。",
+      "cta": "新增並翻譯"
+    },
+    "empty": {
+      "title": "找出接下來要新增的語言",
+      "body": "只要安裝一個標籤即可使用 Insights。它以每日總計的方式統計每次造訪的瀏覽器語言與您提供的語系：不使用 Cookie，不儲存訪客 ID，也不儲存 IP。",
+      "track": "接著追蹤一次轉換，讓 glot 估算每種語言帶來的效益：",
+      "open": "開啟分析"
+    },
+    "gainLocked": "預期增益已包含於 Growth",
+    "upgrade": "升級"
+  },
+  "insights": {
+    "layout": {
+      "title": "版面 RUM：真實訪客看到的溢出",
+      "subtitle": "依語言和視窗寬度，顯示訪客瀏覽器中被截斷或溢出容器的翻譯字串。已取樣且匿名。",
+      "repair": "立即縮短",
+      "repaired": "{n, plural, =0 {沒有新的可縮短項目} other {已提出 # 個較短的變體}}",
+      "empty": "尚無版面資料。請將選用模組加入您的應用程式（小於 1.5 kB）：",
+      "tableCaption": "依鍵、語言和視窗寬度區間的溢出率。超過 {min} 次且至少 {views} 次瀏覽的鍵會自動縮短。",
+      "key": "鍵與文字",
+      "viewport": "視窗寬度",
+      "rate": "溢出率",
+      "width": "需求 / 容器",
+      "views": "{n, plural, other {# 次瀏覽}}",
+      "fallback": "網頁字型載入前的 {n} 次",
+      "px": "{need} / {box} px",
+      "unknownKey": "此專案中沒有此鍵",
+      "fixes": "修復建議",
+      "openPr": "開啟 Pull Request",
+      "review": "在意見回饋中查看",
+      "status": {
+        "pending": "進行中",
+        "pr": "拉取要求",
+        "suggested": "建議",
+        "failed": "沒有符合的變體"
+      }
+    },
+    "title": "洞察",
+    "subtitle": "訪客想使用哪些語言、各語言的轉換情況，以及新增語言是否值得。",
+    "goal": "目標事件",
+    "period": "期間",
+    "lastDays": "過去 {days} 天",
+    "empty": {
+      "title": "尚無造訪紀錄",
+      "body": "將下方程式碼片段加入您的應用程式。幾分鐘內，您就能看到訪客偏好的語言，以及您尚未提供的語言。"
+    },
+    "hero": {
+      "kicker": "最大的需求缺口",
+      "headline": "<strong>{share}</strong> 的訪客偏好 <strong>{language}</strong> — 您尚未提供此語言。",
+      "potential": "若其轉換表現與使用母語的訪客相同，每月可多獲得 ≈ {n} 次{goal}",
+      "cost": "翻譯 {keys, plural, other {# 個鍵}} 費用約 ≈ {cost}",
+      "cta": "測試 {language}",
+      "covered": "訪客偏好的所有語言都已提供。"
+    },
+    "stats": {
+      "visits": "造訪次數",
+      "unserved": "未提供的需求",
+      "unservedHint": "{n, plural, =0 {沒有缺少的語言} other {# 種語言未提供}}",
+      "sourceConv": "{goal} 轉換率（來源）",
+      "potential": "每月潛在流量",
+      "potentialHint": "跨缺少語言的額外 {goal}"
+    },
+    "demand": {
+      "title": "需求缺口",
+      "subtitle": "依瀏覽器偏好語言統計訪客。未提供的語言優先，依需求排序。",
+      "language": "語言",
+      "share": "訪客佔比",
+      "conversion": "轉換",
+      "potential": "潛在 / 月",
+      "cost": "上線成本",
+      "action": "操作",
+      "visitsTitle": "{n, plural, other {# 次造訪}}",
+      "offered": "已提供",
+      "testing": "測試中",
+      "test": "測試"
+    },
+    "daily": {
+      "title": "每日造訪",
+      "subtitle": "偏好語言未提供的造訪，佔所有造訪。",
+      "unserved": "未提供",
+      "served": "已提供"
+    },
+    "funnel": {
+      "title": "依語系分類的轉換率（{goal}）",
+      "subtitle": "每個已提供語系的轉換率及其 95% 信賴區間，與來源語言相比。",
+      "empty": "尚無轉換資料。",
+      "source": "來源語言",
+      "pts": "百分點",
+      "ciTitle": "95% CI：{low} – {high}",
+      "legendSource": "來源語言轉換率",
+      "legendCi": "95% 信賴區間",
+      "sampleSize": "· n = {n}"
+    },
+    "exp": {
+      "title": "語言實驗",
+      "subtitle": "向部分偏好此語言的訪客提供該語言，進行測量，接著決定保留或移除。",
+      "new": "新增實驗",
+      "empty": "尚無實驗。請從上方缺少的語言開始建立。",
+      "meta": "{pct}% 的流量 · 目標 {goal}",
+      "endsIn": "於 {when} 結束",
+      "ended": "測量已結束",
+      "kept": "已保留",
+      "removed": "已移除",
+      "verdict": {
+        "collecting": "收集中",
+        "keep": "保留",
+        "remove": "移除",
+        "inconclusive": "效果不明確"
+      },
+      "explain": {
+        "collecting": "樣本數尚不足以下結論：請等待達到所需樣本數（或結束日期）後再做決定。",
+        "keep": "測試語言的轉換率較佳，且信賴區間不包含零。",
+        "remove": "測試語言的轉換率較差，且信賴區間不包含零。",
+        "inconclusive": "沒有可測量的差異。若成本低或市場具策略價值，可保留。"
+      },
+      "armTest": "測試組 · {language}",
+      "armControl": "對照組 · {language}",
+      "diff": "差異（測試組 − 對照組）",
+      "pts": "點",
+      "ciAria": "95% 信賴區間，從 {low} 到 {high} 點",
+      "sample": "每組最少訪客數 / 所需數量",
+      "sampleUnknown": "對照組記錄到第一筆轉換後，即會顯示所需樣本數。",
+      "keep": "保留",
+      "remove": "移除",
+      "early": "現在做決定還為時過早",
+      "keptToast": "已保留語言",
+      "removedToast": "已從目標中移除語言",
+      "dialogTitle": "測試語言",
+      "dialogBody": "偏好此語言的訪客，會在選定比例的工作階段中看到此語言；其餘訪客則維持原始語言，作為對照組。",
+      "locale": "語系",
+      "traffic": "流量（%）",
+      "days": "持續時間（天）",
+      "goal": "目標事件",
+      "costNote": "此語言將加入目標語言。翻譯 {keys, plural, other {# 個鍵}} 約需 ≈ {cost}：請在流量進入前完成翻譯。",
+      "translateNote": "此語言將加入目標語言：請在流量進入前完成翻譯。",
+      "cancel": "取消",
+      "start": "開始實驗",
+      "started": "已為 {language} 開始實驗",
+      "removeTitle": "要從目標語言中移除 {language} 嗎？",
+      "removeBody": "實驗將結束，{language} 會從目標語言中移除：其訪客將再次看到原始語言。"
+    },
+    "install": {
+      "title": "安裝程式碼片段",
+      "subtitle": "可使用 script 標籤、npm 匯入或 Next.js 中介軟體，三者使用相同的公開金鑰。",
+      "show": "顯示",
+      "tabScript": "Script 標籤",
+      "tabMiddleware": "Next.js 中介軟體",
+      "publicKey": "公開金鑰",
+      "rotate": "輪替金鑰",
+      "rotateTitle": "要輪替公開金鑰嗎？",
+      "rotateBody": "目前的金鑰將立即失效。請使用新金鑰更新應用程式中的程式碼片段。",
+      "rotated": "已產生新的公開金鑰",
+      "cancel": "取消",
+      "privacy": {
+        "noCookie": "不使用 Cookie，也不記錄訪客 ID：僅在 sessionStorage 中保存一筆實驗分組資料。",
+        "noIp": "不儲存 IP 位址、使用者代理或路由資訊。",
+        "daily": "僅保存各語言、語系與國家的每日計數。",
+        "size": "gzip 壓縮後小於 1 kB。"
+      }
+    }
+  },
+  "feedback": {
+    "tabs": {
+      "live": "待審閱",
+      "accepted": "已接受",
+      "rejected": "已拒絕"
+    },
+    "empty": {
+      "title": "尚無意見回饋",
+      "body": "請在應用程式中加入意見回饋元件：訪客可以選取文字、說明問題並提出更好的措辭。"
+    },
+    "none": "這裡沒有任何內容。",
+    "reports": "{count, plural, other {# 則回報}}",
+    "status": {
+      "open": "待處理",
+      "proposed": "建議已就緒",
+      "accepted": "已接受",
+      "rejected": "已拒絕"
+    },
+    "kind": {
+      "wrong": "錯誤",
+      "awkward": "不通順",
+      "unclear": "不清楚"
+    },
+    "source": "來源",
+    "current": "目前翻譯",
+    "userReports": "使用者的意見",
+    "suggested": "建議：{text}",
+    "proposal": "AI 提案",
+    "backTranslation": "回譯",
+    "noProposal": "尚無提案。達到 {threshold, plural, other {# 則回報}} 時會自動產生。",
+    "propose": "提出修正建議",
+    "regenerate": "重新生成",
+    "accept": "接受",
+    "reject": "拒絕",
+    "accepted": "修正已儲存為經審閱的人工翻譯",
+    "rejectedToast": "已拒絕回饋",
+    "openPr": "開啟 GitHub PR",
+    "viewPr": "查看 Pull Request",
+    "prOpened": "已開啟 Pull Request",
+    "prNeedsSettings": "請在下方設定儲存庫與 token 以開啟 Pull Request。",
+    "install": {
+      "title": "安裝元件",
+      "body": "使用與 Insights 相同的公開金鑰。請傳入已翻譯為您應用程式語言的標籤。"
+    },
+    "settings": {
+      "title": "設定",
+      "threshold": "AI 建議前的回報數",
+      "repo": "GitHub 儲存庫（owner/name）",
+      "base": "基礎分支",
+      "catalog": "目錄路徑",
+      "lock": "Lockfile 路徑",
+      "token": "GitHub token",
+      "tokenHint": "具有 Contents 與 Pull requests 寫入權限的細粒度 token。加密儲存，之後不會再顯示。",
+      "tokenStored": "Token 已儲存 — 留空即可保留",
+      "clearToken": "移除 token",
+      "save": "儲存",
+      "saved": "回饋設定已儲存",
+      "catalogHint": "原始目錄檔在儲存庫中的位置，例如 messages/{locale}.json。修正 PR 會編輯此檔案。",
+      "lockHint": "glot.lock 的路徑。此 lockfile 記錄哪些翻譯為機器產生或人工編輯，確保已接受的修正不會被覆寫。"
+    },
+    "toAnnotation": "轉為註解",
+    "filterLabel": "依狀態篩選回報"
+  },
+  "docs": {
+    "title": "文件",
+    "github": "GitHub",
+    "menu": "選單",
+    "edit": "在 GitHub 上編輯此頁面",
+    "onThisPage": "本頁內容",
+    "search": {
+      "label": "搜尋文件",
+      "placeholder": "搜尋文件…",
+      "noResults": "無結果",
+      "hint": "輸入以搜尋所有文件頁面，按 Enter 開啟結果。",
+      "input": "搜尋文件…",
+      "pages": "頁面"
+    },
+    "sections": {
+      "start": "快速入門",
+      "agents": "AI 代理",
+      "guides": "指南",
+      "reference": "參考資料",
+      "labs": "Labs（實驗性）"
+    },
+    "pages": {
+      "edge": "glot Edge（SEO 在地化）",
+      "website": "網站標籤（任何網站建置工具）",
+      "getting-started": "安裝與快速入門",
+      "concepts": "核心概念",
+      "mcp": "MCP 伺服器",
+      "integrations": "整合",
+      "frameworks": "框架",
+      "runtime": "執行階段備援",
+      "text-graph": "各處句子（文字圖譜）",
+      "live-stream": "即時串流翻譯",
+      "mobile-ota": "行動應用程式（OTA）",
+      "local-seo": "在地 SEO（搜尋在地化頁面）",
+      "two-way": "客戶對話",
+      "languages-live-check": "某個語言是否已在您的網站上線？",
+      "quality": "品質與審查",
+      "review": "即時審查",
+      "insights": "洞察分析",
+      "experiments": "分段實驗",
+      "self-hosting": "自架伺服器",
+      "cli": "CLI 參考",
+      "faq": "常見問題與費用",
+      "labs": "Labs 總覽",
+      "render": "Render API（郵件、通知、文件）",
+      "mcp-remote": "遠端 MCP（OAuth）",
+      "skills": "Agent 技能",
+      "provenance": "AI 來源追蹤（歐盟 AI 法案）",
+      "deploy-hetzner": "在 VPS 上部署",
+      "benchmark": "基準測試",
+      "github": "連接 GitHub",
+      "autopilot": "自動駕駛（各市場營收）"
+    },
+    "skip": "跳至內容",
+    "prev": "上一頁",
+    "next": "下一頁",
+    "pager": "上一頁與下一頁",
+    "copy": "複製",
+    "copied": "已複製",
+    "start": {
+      "title": "glot 文件",
+      "subtitle": "安裝 glot，讓你的 AI 程式代理為應用程式進行在地化，並在 CI 中確保每個目錄皆有效。",
+      "paths": "從你目前的位置開始",
+      "all": "所有頁面",
+      "solo": {
+        "title": "單人開發者",
+        "body": "在你的專案中執行一道指令：偵測技術堆疊、擷取字串、翻譯、檢查。"
+      },
+      "team": {
+        "title": "團隊",
+        "body": "在 CI 中驗證每個拉取請求、審查翻譯，並分享儀表板。"
+      },
+      "agent": {
+        "title": "AI 程式設計代理",
+        "body": "Claude Code、Cursor、Codex 等工具可透過 MCP 取得你的金鑰、用量與術語表。"
+      },
+      "mobile": {
+        "title": "行動應用程式",
+        "body": "glot init 也會偵測 Apple String Catalogs、Android strings.xml 與 Flutter ARB 檔案。"
+      }
+    },
+    "home": "glot 首頁"
+  },
+  "experiments": {
+    "title": "實驗",
+    "subtitle": "每個語系轉換率最高的翻譯。glot 會為高風險文字撰寫已驗證的版本，並讓訪客選出勝出者。",
+    "new": "新增實驗",
+    "official": "正式版",
+    "variant": "版本 {letter}",
+    "winner": "勝出者",
+    "reference": "參考",
+    "pBeats": "{p} 機率優於正式版",
+    "meta": "目標 {goal} · {pct}% 流量 · 每版本至少 {n}",
+    "source": "來源",
+    "sourceChanged": "這些版本撰寫後原始文字已變更，因此不再提供。請停止此實驗並建立新的實驗。",
+    "noTraffic": "尚無訪客。版本將由 @glot/insights 提供給此語系的訪客。",
+    "burnIn": "各版本的訪客",
+    "promote": "推廣 {name}",
+    "keepOfficial": "保留正式翻譯",
+    "promoteBody": "「{value}」將成為 {key} 在 {locale} 語系的正式翻譯（已審閱，並記錄於鍵的歷史中）。它會隨你的下一次 glot pull、CDN 更新或 PR 一併發布，與其他編輯相同。其他版本將停止提供。",
+    "keepBody": "正式翻譯的轉換表現最佳。實驗將結束，你的翻譯目錄不會有任何變動。",
+    "confirm": "確認",
+    "cancel": "取消",
+    "stop": "停止",
+    "promotedToast": "完成：目錄現在已包含勝出的文案",
+    "stoppedToast": "實驗已停止：所有人都會看到官方翻譯",
+    "history": "已結束的實驗（{n}）",
+    "install": "在應用程式中提供版本",
+    "chartAria": "各版本的後驗轉換率：{summary}",
+    "chartCaption": "每條曲線表示根據目前資料，各版本轉換率可能的範圍；曲線越窄，結果越確定。",
+    "status": {
+      "running": "執行中",
+      "decided": "已找出勝出版本",
+      "promoted": "已推廣",
+      "stopped": "已停止"
+    },
+    "tone": {
+      "direct": "直接",
+      "warm": "親切",
+      "urgent": "緊迫",
+      "official": "正式"
+    },
+    "table": {
+      "arm": "文案",
+      "visitors": "訪客數",
+      "rate": "{goal} 轉換率",
+      "pBest": "成為最佳的機率",
+      "lift": "相較官方翻譯的提升"
+    },
+    "explain": {
+      "burnIn": "在達到最低樣本數之前，每個版本分到的流量相同；之後流量會轉向轉換較佳的版本。",
+      "running": "流量依據實際證據分配（湯普森抽樣）。當某個版本有超過 95% 機率為最佳時宣告勝出，且每當流量加倍時進行檢查。",
+      "decided": "{name} 為最佳版本的機率為 {p}。落敗的版本已停止提供；推廣後即可成為正式版本。",
+      "officialWins": "正式翻譯的轉換表現最佳。不再提供其他版本。",
+      "promoted": "獲勝的文案現已成為正式翻譯。",
+      "stopped": "已停止：所有人都看到正式翻譯。"
+    },
+    "stats": {
+      "live": "進行中的實驗",
+      "liveHint": "{n, plural, other {# 個語系}}",
+      "toPromote": "待推廣的優勝者",
+      "toPromoteHint": "最佳機率高於 95%",
+      "visitors": "已測試的訪客",
+      "visitorsHint": "跨進行中的實驗"
+    },
+    "empty": {
+      "title": "找出最能提升轉換的文案",
+      "body": "選擇 CTA 或定價標題，以及語系。glot 會以相同意義、不同語氣撰寫 2-3 個版本，加以驗證後提供給部分訪客，並告訴你哪一個表現最佳。"
+    },
+    "segmented": "分群實驗",
+    "stopTitle": "要停止此實驗嗎？",
+    "stopBody": "所有訪客將重新看到官方翻譯。目前的結果會保留在歷史紀錄中。"
+  },
+  "oauth": {
+    "title": "將 {client} 連接到 glot",
+    "subtitle": "此應用程式將以你的身分，在一個專案上使用 glot 的 MCP 工具。",
+    "project": "專案",
+    "noProjects": "您尚未建立任何專案，請先在儀表板中建立一個。",
+    "scopes": "權限",
+    "scope": {
+      "read": {
+        "title": "讀取",
+        "body": "狀態、翻譯鍵及其上下文、問題、術語表。"
+      },
+      "translate": {
+        "title": "翻譯",
+        "body": "執行翻譯任務與 AI 審查（使用專案的 LLM 預算）。"
+      },
+      "write": {
+        "title": "寫入",
+        "body": "新增原文字串、編輯翻譯與術語表，並開啟 GitHub 拉取要求。"
+      }
+    },
+    "redirect": "即將返回 {host}。",
+    "allow": "允許",
+    "deny": "拒絕",
+    "invalid": "無效的授權請求"
+  },
+  "emailAuth": {
+    "email": "電子郵件",
+    "newPassword": "新密碼",
+    "confirmPassword": "確認新密碼",
+    "passwordTooShort": "密碼長度至少需 8 個字元。",
+    "passwordMismatch": "密碼不一致。",
+    "invalidLink": "此連結無效、已使用或已過期。",
+    "toLogin": "返回登入",
+    "toDashboard": "前往儀表板",
+    "verify": {
+      "title": "確認您的電子郵件",
+      "checking": "正在確認您的地址…",
+      "done": "您的電子郵件地址已確認。"
+    },
+    "forgot": {
+      "title": "重設您的密碼",
+      "subtitle": "輸入您的帳號電子郵件，我們將寄送重設連結給您。",
+      "submit": "寄送重設連結",
+      "sent": "若此地址已有帳號，重設連結即將寄出。連結將於 1 小時後失效。"
+    },
+    "reset": {
+      "title": "設定新密碼",
+      "subtitle": "您所有的工作階段將會被登出。",
+      "submit": "更新密碼",
+      "done": "您的密碼已更新。",
+      "again": "重新申請連結"
+    },
+    "gate": {
+      "tooltip": "請先確認您的電子郵件地址以解鎖此功能。"
+    },
+    "inbox": {
+      "title": "請查看您的收件匣",
+      "body": "我們已將確認連結寄送至 {email}。開啟連結即可開始建立專案。",
+      "hint": "幾分鐘後仍未收到？請檢查垃圾郵件資料夾，或重新寄送郵件。"
+    },
+    "banner": {
+      "text": "請確認您的電子郵件地址以建立專案。我們已將連結寄送至 {email}。",
+      "resend": "重新寄送電子郵件",
+      "sent": "確認信已寄出"
+    }
+  },
+  "account": {
+    "title": "帳戶",
+    "currentPassword": "目前密碼",
+    "notifications": {
+      "title": "電子郵件通知",
+      "jobDone": "翻譯作業已完成",
+      "jobDoneHint": "當你啟動的翻譯作業完成或失敗時，收到電子郵件通知。",
+      "accountNote": "安全性郵件（密碼重設、電子郵件或密碼變更）一律會寄出。"
+    },
+    "email": {
+      "title": "電子郵件地址",
+      "new": "新電子郵件",
+      "hint": "我們會將確認連結寄至新地址，開啟連結後變更才會生效。",
+      "submit": "變更電子郵件",
+      "pending": "確認連結已寄至 {email}",
+      "changed": "電子郵件已更新"
+    },
+    "password": {
+      "title": "密碼",
+      "new": "新密碼",
+      "hint": "至少 8 個字元。其他工作階段將會登出。",
+      "submit": "變更密碼",
+      "changed": "密碼已更新"
+    },
+    "subtitle": "你的登入電子郵件、密碼、通知與儀表板偏好設定。",
+    "preferences": {
+      "title": "偏好設定",
+      "celebrations": "里程碑慶祝",
+      "celebrationsHint": "當某個語系達到 100% 或驗證問題降為零時，顯示簡短提示與小型動畫。關閉可讓儀表板更清爽。"
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "價格方案",
+      "description": "glot 價格方案：開源 CLI 與 MCP 伺服器免費。Pro（適合團隊的可靠在地化）與 Growth（國際營收）涵蓋託管雲端服務。"
+    },
+    "title": "每次發版都確保每種語言正確。接著衡量每種語言帶來的收益。",
+    "subtitle": "Pro 讓翻譯保持正確、經過審核，並與你的程式碼同步。Growth 加入實驗與上線成效衡量，協助你看出哪些文案與哪些語言帶來營收。開源 CLI 永久免費且無用量限制。",
+    "oss": {
+      "title": "開源：永久免費",
+      "body": "MIT 授權。glot translate、check、fit、i18nize、驗證器、lockfile 與本機 MCP 伺服器皆在您的機器上執行，使用您自己的 LLM 金鑰。無需帳號、無用量配額，也不會將任何功能保留給付費方案。",
+      "cta": "在 GitHub 上查看"
+    },
+    "cloud": {
+      "title": "glot cloud",
+      "body": "託管儀表板、CDN 上的 OTA 目錄、洞察、供代理程式使用的遠端 MCP，以及隨選翻譯。依帳號計費，適用於您擁有的專案。"
+    },
+    "interval": "計費週期",
+    "monthly": "按月",
+    "yearly": "年繳",
+    "perMonth": "/ 月",
+    "perYear": "/ 年",
+    "forever": "永久",
+    "current": "目前方案",
+    "ossIncluded": "CLI 與本機 MCP 伺服器，不限量",
+    "usage": "月繳方案：超出內含額度的伺服器端翻譯若使用 glot 的 LLM 金鑰，將以每 1,000 個字串 {price} 計費。使用自有金鑰（BYOK）時，這些翻譯永遠不計入用量。",
+    "selfHosted": "此伺服器為自架：不計費，且不設任何限制。",
+    "plans": {
+      "free": {
+        "name": "免費版",
+        "tagline": "在一個專案上試用雲端服務。",
+        "for": "適合評估 glot 的開發者與開源專案。",
+        "features": {
+          "oss": "開源 CLI、MCP 伺服器與 GitHub Action，可在您的機器上無限使用",
+          "project": "一個雲端專案，每月配額有限",
+          "noCard": "無需信用卡"
+        }
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "讓你的網站或應用程式推出其他語言。",
+        "for": "適合獨立開發者、商店與應用程式開始推出第一批語言。",
+        "features": {
+          "projects": "兩個雲端專案",
+          "dynamic": "動態在地化：CDN 目錄與語言切換器",
+          "sync": "GitHub 同步：所有語言合併於單一 pull request",
+          "qa": "視覺 QA：偵測截斷、重疊或未翻譯的文字",
+          "cms": "CMS 整合（Shopify、WordPress、Webflow、Contentful、Sanity、Strapi）",
+          "quotas": "每月適量配額，適合初次上線"
+        },
+        "excluded": {
+          "edge": "glot Edge（SEO 在地化）",
+          "xp": "分段實驗",
+          "launch": "語言上線成效衡量",
+          "recommend": "附預期成長的語言建議"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "適合團隊的可靠在地化。",
+        "for": "適合代理商與需要多語發佈的 SaaS 團隊。",
+        "features": {
+          "sync": "GitHub 同步：所有語系合併於一個 pull request",
+          "qa": "視覺 QA：找出截斷、重疊或未翻譯的文字",
+          "review": "在真實網站上即時審閱，保留情境",
+          "glossary": "每個字串都包含術語表與驗證",
+          "matrix": "語系矩陣：您的網站所有語言並排檢視",
+          "byok": "自備 LLM 金鑰：費用直接支付供應商，glot 不加收任何費用",
+          "xp": "可嘗試的文案實驗，以及語言建議"
+        }
+      },
+      "team": {
+        "name": "Growth",
+        "tagline": "拓展國際營收。",
+        "for": "流量足以衡量每種語言成效的產品。",
+        "features": {
+          "everything": "包含 Pro 的所有功能",
+          "xp": "文字實驗搭配受眾區隔，數量不限",
+          "recommend": "建議下一個要新增的語言，並附上預期效益",
+          "launch": "以保留組對照衡量語言上線成效，並提供可分享的案例研究",
+          "volume": "更多專案、席次與每月用量"
+        }
+      },
+      "self_hosted": {
+        "name": "自行架設",
+        "tagline": ""
+      }
+    },
+    "quota": {
+      "value": "{name}：{n}",
+      "unlimited": "{name}：無限制",
+      "projects": "雲端專案",
+      "seats": "席次",
+      "cdn_requests": "CDN/OTA 每月請求數",
+      "insights_events": "每月 Insights 事件數",
+      "mcp_calls": "每月遠端 MCP 呼叫次數",
+      "ondemand_jobs": "每月隨選語系任務數",
+      "llm_strings": "每月透過 glot 的 LLM 金鑰翻譯的字串數",
+      "notIncluded": "{name}：未包含",
+      "experiments": "即時文字實驗"
+    },
+    "cta": {
+      "free": "免費開始",
+      "upgrade": "升級至 {plan}"
+    },
+    "faq": {
+      "title": "常見問題",
+      "oss": {
+        "q": "開源工具有任何限制嗎？",
+        "a": "不會。配額僅適用於由 glot cloud 提供的請求。CLI、本機 MCP 伺服器和 GitHub Action 從不呼叫計費系統。"
+      },
+      "byok": {
+        "q": "glot 會對 LLM 費用加價嗎？",
+        "a": "不會。使用您自己的金鑰時，您直接向 LLM 供應商付費，glot 不會計算或加價這些翻譯。若未提供金鑰，雲端可使用 glot 的金鑰：每個方案都包含每月額度，而按月計費的方案可在超出額度後依用量計費繼續使用。"
+      },
+      "selfHost": {
+        "q": "自行架設是否免費？",
+        "a": "是的。伺服器位於同一個 MIT 儲存庫中。未設定 Stripe 金鑰時，帳務功能會停用，所有用量限制都會解除；您需自行執行與更新。"
+      },
+      "limits": {
+        "q": "達到配額時會發生什麼事？",
+        "a": "雲端端點會以 402 回應，附上訊息與升級連結；您已發布的目錄仍可從您的儲存庫繼續運作。配額會於每月 1 日（UTC）重設。"
+      },
+      "tax": {
+        "q": "價格是否含加值稅？",
+        "a": "價格顯示不含加值稅（VAT）。付款、發票與加值稅皆由 Stripe 處理：適用時會在結帳時加收加值稅，企業客戶可填寫統一編號。發票位於您的帳務設定中。"
+      },
+      "quotas": {
+        "q": "什麼會計入配額？",
+        "a": "僅計入 glot cloud 提供的項目：CDN/OTA 請求、洞察與實驗事件、遠端 MCP 呼叫、隨選語系任務、即時審閱註解，以及使用 glot 金鑰翻譯的字串。即時實驗與雲端專案在存在期間計入。您在本機執行的內容，以及使用自己金鑰翻譯的內容，都不會計入。每月計數器於每月 1 日（UTC）重設。"
+      },
+      "trial": {
+        "q": "付費前可以試用 Growth 嗎？",
+        "a": "是的。您的第一個 Growth 訂閱享有 14 天免費試用，每個帳號限一次。註冊時會儲存付款方式，但試用期結束前不會收費；在此之前於帳務入口網站取消，即無需付費。Starter 與 Pro 沒有試用期。"
+      },
+      "cancel": {
+        "q": "可以隨時取消嗎？",
+        "a": "可以，請透過帳單入口網站取消。您的方案會持續有效至已付費的期間結束，之後帳號會轉為免費方案。專案與資料都會保留。"
+      }
+    },
+    "compare": "與 Lokalise、Crowdin、Tolgee 和 Lingo.dev 的比較：<link>查看比較</link>。",
+    "yearlySave": "{n, plural, other {# 個月免費}}",
+    "yearlyEquiv": "每月 {price}，年度計費",
+    "trial": "{days} 天免費試用，隨時可取消",
+    "excludedSr": "未包含：",
+    "forWho": "適用對象：",
+    "vat": "價格未含 VAT。"
+  },
+  "billing": {
+    "trialing": "{plan} 試用期至 {date}。若您在此之前未於入口網站取消，訂閱將開始並收取首次付款。",
+    "title": "帳單",
+    "subtitle": "您的方案涵蓋您擁有的雲端專案。CLI 與本機 MCP 伺服器永不受限制。",
+    "selfHosted": "此自架伺服器已停用計費：不設任何限制。",
+    "manage": "管理帳單",
+    "updated": "訂閱已更新，可能需要數秒才會顯示於此。",
+    "pastDue": "您上次的付款失敗。請在 {date} 前更新付款方式，以保留您的方案。",
+    "plan": "{plan} 方案",
+    "renewsOn": "將於 {date} 續訂",
+    "endsOn": "將於 {date} 結束",
+    "usage": "本月用量",
+    "metered": "超過內含伺服器端翻譯額度的用量，將於月底計費。",
+    "ossNote": "額度僅適用於 glot 雲端。您使用 CLI 在本機處理的專案不計入。",
+    "downgrade": "在帳單入口網站取消",
+    "invoices": "帳單",
+    "noInvoices": "尚無帳單。",
+    "invoice": {
+      "date": "日期",
+      "number": "編號",
+      "total": "總計",
+      "status": "狀態",
+      "open": "未付款"
+    }
+  },
+  "gamification": {
+    "achieved": "已達成",
+    "notYet": "尚未達成",
+    "health": "專案健康度",
+    "healthHint": "各目標語系的覆蓋率與驗證通過率平均值，範圍 0–100。開啟總覽可查看完整細項。",
+    "localesProgress": "各語系翻譯進度",
+    "ringLabel": "{language}：已翻譯 {percent}",
+    "ringTooltip": "{language} · 已翻譯 {percent} · {issues, plural, =0 {沒有問題} other {# 個問題}}",
+    "celebrate": {
+      "complete": "{language} 已完成全部翻譯",
+      "completeBody": "所有 {count, plural, other {# 個鍵}} 皆已有翻譯。可審閱或新增其他語系。",
+      "zeroErrors": "零驗證問題",
+      "zeroErrorsBody": "每則翻譯都通過佔位符、複數與術語表檢查。",
+      "completeMany": "{count} 個語系已全部完成翻譯"
+    },
+    "healthLabel": "專案健康度 {score}（滿分 100）"
+  },
+  "onboarding": {
+    "title": "設定 {name}",
+    "subtitle": "從空白專案到第一個翻譯語言，約需 3 分鐘。當 glot 看到你的資料時，步驟會自動勾選。",
+    "progress": "設定進度：已完成 {done}／{total} 個步驟",
+    "hide": "隱藏設定指南",
+    "toDashboard": "前往儀表板",
+    "stepsLabel": "設定步驟",
+    "sideLabel": "語言與里程碑",
+    "stepDone": "已完成",
+    "stepTodo": "待辦",
+    "path": {
+      "title": "選擇要如何傳送你的字串",
+      "description": "三種方式最後的結果相同：你的翻譯鍵會進入此專案。隨時可以切換。",
+      "recommended": "推薦",
+      "agent": {
+        "name": "AI 代理程式",
+        "hint": "Claude Code、Cursor 或任何 MCP 用戶端會替你完成工作。"
+      },
+      "terminal": {
+        "name": "終端機",
+        "hint": "一個指令負責擷取與翻譯，另一個負責推送。"
+      },
+      "github": {
+        "name": "GitHub",
+        "hint": "每次 pull request 時從你的儲存庫同步。"
+      }
+    },
+    "connect": {
+      "agent": {
+        "title": "連接你的代理程式",
+        "description": "產生 token，將 glot 加入你的代理程式，接著請它在地化你的應用程式。",
+        "claude": "Claude Code",
+        "json": ".mcp.json（Cursor 與其他 MCP 用戶端）",
+        "prompt": "接著請你的代理程式"
+      },
+      "terminal": {
+        "title": "執行兩個指令",
+        "description": "產生 token，然後在應用程式的根目錄執行以下指令。",
+        "localize": "1. 擷取並翻譯你的字串",
+        "push": "2. 連接此專案並推送"
+      },
+      "github": {
+        "title": "連接你的儲存庫",
+        "description": "glot 會從 GitHub 讀取你的訊息檔，並開啟含翻譯的拉取要求。"
+      }
+    },
+    "token": {
+      "why": "你的指令需要此專案的 API token。",
+      "again": "已建立過 token。請重新產生一個，以再次填入指令。",
+      "generate": "產生我的 token",
+      "regenerate": "產生新的 token",
+      "created": "token 已建立，並已加入下方指令",
+      "once": "請立即複製：此 token 只會顯示一次。請妥善保密，如同密碼。"
+    },
+    "wait": {
+      "title": "推送你的第一批字串",
+      "description": "一旦 glot 收到你的翻譯鍵，此頁面會自動更新。",
+      "waiting": "等待你的第一次推送…",
+      "received": "已收到 {keys, plural, other {# 個翻譯鍵}} · {languages, plural, other {# 個目標語言}}",
+      "slowTitle": "尚無資料？請檢查：",
+      "slowToken": "GLOT_TOKEN 已在終端機或推送用的代理程式設定中設定。",
+      "slowProject": "glot.toml 中的專案或 MCP URL 為「{slug}」。",
+      "slowServer": "伺服器 URL 為 {url}。"
+    },
+    "more": {
+      "title": "準備好正式上線",
+      "description": "每個步驟都會根據專案的實際狀態自動檢查。可依任意順序完成。",
+      "done": "已完成",
+      "todo": "待辦",
+      "first_translation": {
+        "title": "翻譯第一種語言",
+        "body": "執行翻譯工作，或推送已包含翻譯的目錄檔。",
+        "cta": "開啟工作"
+      },
+      "zero_errors": {
+        "title": "將驗證錯誤降至零",
+        "body": "每則翻譯都會保留變數、複數形式與術語表詞彙。",
+        "cta": "查看問題"
+      },
+      "invite": {
+        "title": "邀請團隊成員",
+        "body": "團隊邀請功能即將推出。當第二位成員加入時，此步驟會自動檢查。"
+      },
+      "glossary": {
+        "title": "新增你的術語表",
+        "body": "glot 必須保留或以固定方式翻譯的產品名稱與術語。",
+        "cta": "開啟術語表"
+      },
+      "cdn": {
+        "title": "開啟 CDN",
+        "body": "無需重新部署，即可透過空中更新提供你的目錄。",
+        "cta": "開啟設定"
+      },
+      "badge": {
+        "title": "新增 README 徽章",
+        "body": "顯示你的翻譯覆蓋率。首次顯示徽章時，此步驟會自動檢查。需要 CDN。"
+      }
+    },
+    "next": {
+      "label": "下一步：",
+      "push": "推送來源字串即可開始。",
+      "pushCta": "開始設定",
+      "translate": "{count, plural, other {{language} 缺少 # 個鍵。}}",
+      "translateCta": "翻譯缺少的項目",
+      "fix": "{count, plural, other {# 個翻譯在 {language} 中有錯誤。}}",
+      "fixCta": "檢視",
+      "glossary": "新增產品術語，讓每種語言都以相同方式使用。",
+      "glossaryCta": "新增術語表",
+      "cdn": "透過 CDN 即時提供翻譯內容。",
+      "cdnCta": "開啟 CDN",
+      "jobStarted": "翻譯工作已開始"
+    },
+    "locales": {
+      "title": "各語言翻譯覆蓋率",
+      "none": "尚無目標語言。請在專案設定中新增。",
+      "ring": "{language}：已翻譯 {value}%"
+    },
+    "achievements": {
+      "title": "里程碑",
+      "unlocked": "達成於 {date}",
+      "toast": "已達成里程碑：{name}",
+      "first_push": {
+        "name": "首次推送",
+        "how": "你的第一批鍵已送達 glot。"
+      },
+      "first_locale_100": {
+        "name": "首個語言達 100%",
+        "how": "單一語言的所有鍵皆已翻譯。"
+      },
+      "zero_errors": {
+        "name": "零錯誤",
+        "how": "所有翻譯皆通過驗證。"
+      },
+      "five_languages": {
+        "name": "5 種語言",
+        "how": "五種語言的翻譯。"
+      },
+      "glossary_set": {
+        "name": "已設定術語表",
+        "how": "至少一個術語。"
+      }
+    },
+    "overview": {
+      "title": "後續步驟",
+      "setupTitle": "完成設定",
+      "setupProgress": "已完成 {done}／{total} 個設定步驟",
+      "continue": "繼續設定",
+      "guide": "設定指南",
+      "hide": "隱藏設定進度",
+      "rings": "各語言翻譯覆蓋率",
+      "ring": "{language}：已翻譯 {value}%",
+      "emptyTitle": "尚無鍵",
+      "emptyBody": "約 3 分鐘即可完成串接：選擇方式、複製一行指令，此頁面會即時偵測你的第一次推送。",
+      "start": "開始設定指南"
+    },
+    "github": {
+      "title": "連接 GitHub",
+      "soon": "GitHub 同步功能設定中。在此期間，請使用代理程式或終端機方式；之後可隨時切換。"
+    }
+  },
+  "github": {
+    "card": {
+      "title": "連接 GitHub",
+      "subtitle": "選擇儲存庫：glot 會開啟一個 pull request，內含已在地化的應用程式，可直接合併。無需使用終端機。"
+    },
+    "noApp": {
+      "title": "此 glot 伺服器尚未設定 GitHub",
+      "body": "管理員只需建立一次 glot GitHub App，之後所有人都能連結自己的儲存庫。",
+      "docs": "閱讀設定指南",
+      "setup": "設定 GitHub App"
+    },
+    "promise": {
+      "pr": "開啟拉取要求：不會推送到你的主要分支",
+      "noCode": "絕不執行你的程式碼：不安裝套件，也不執行腳本",
+      "updates": "每次推送都會保持翻譯更新"
+    },
+    "install": {
+      "cta": "連接 GitHub",
+      "redirecting": "正在開啟 GitHub…",
+      "already": "已安裝？改為授權"
+    },
+    "pick": {
+      "account": "GitHub 帳號",
+      "repo": "儲存庫",
+      "search": "搜尋儲存庫",
+      "none": "glot 目前看不到任何儲存庫：請在 GitHub App 設定中新增。",
+      "noMatch": "沒有符合搜尋條件的儲存庫。",
+      "private": "私有",
+      "missing": "找不到儲存庫？",
+      "addRepos": "在 GitHub 上授權 glot 存取",
+      "branch": "基礎分支",
+      "branchHelp": "glot 會讀取此分支，並針對它開啟拉取要求。通常是你的預設分支。",
+      "cta": "在地化 {repo}",
+      "ctaEmpty": "選擇儲存庫",
+      "cancel": "取消"
+    },
+    "step": {
+      "token": "正在連線至 GitHub",
+      "clone": "正在複製儲存庫",
+      "localize": "正在擷取並翻譯字串",
+      "sync": "正在與 glot 同步目錄",
+      "push": "正在推送 glot 分支",
+      "pr": "正在開啟拉取要求"
+    },
+    "stepState": {
+      "done": "已完成",
+      "current": "進行中",
+      "todo": "待處理"
+    },
+    "job": {
+      "progress": "已完成 {done} / {total} 步",
+      "announce": "第 {n} 步，共 {total} 步：{step}"
+    },
+    "linked": {
+      "rerun": "重新執行",
+      "change": "變更儲存庫",
+      "prReady": "Pull Request #{n} 已可合併",
+      "prHint": "每次推送到 {branch} 都會更新此 Pull Request。",
+      "review": "審查拉取要求",
+      "upToDate": "已是最新：此儲存庫沒有需要變更的內容。",
+      "waiting": "等待首次執行…"
+    },
+    "newTab": "（在新分頁中開啟）",
+    "page": {
+      "title": "GitHub",
+      "subtitle": "無需終端機即可為儲存庫進行在地化：glot 會開啟拉取要求，並持續保持更新。",
+      "how": "運作方式",
+      "disconnect": "中斷儲存庫連結",
+      "disconnectTitle": "要中斷與 {repo} 的連結嗎？",
+      "disconnectBody": "glot 將停止更新此儲存庫的翻譯。已開啟的拉取要求會保留在 GitHub 上；你的翻譯會保留在 glot 中。",
+      "cancel": "取消",
+      "disconnected": "已中斷儲存庫連結"
+    },
+    "failure": {
+      "mock_output": {
+        "fix": "未推送或同步任何內容。請在設定 → LLM 中確認專案使用的是具有有效金鑰的真實 AI 供應商，然後重新執行：佔位翻譯會被重新翻譯。"
+      },
+      "source_mismatch": {
+        "cause": "此儲存庫使用 {repo} 撰寫，但此 glot 專案的來源語言為 {project}。",
+        "fix": "glot 絕不會翻譯其他語言的目錄並將其儲存為來源。請使用下方按鈕將 {repo} 設為專案來源，或在儲存庫的 glot.toml 中設定 source_locale = \"{project}\"，然後重新執行。"
+      },
+      "useRepoSource": "將 {repo} 設為專案來源",
+      "access": "管理儲存庫存取權限",
+      "ai_key_invalid": {
+        "cause": "您的 AI 供應商拒絕了此 API 金鑰。",
+        "fix": "請在 設定 → LLM 中貼上有效的金鑰，點選「測試金鑰」，然後再執行一次。"
+      },
+      "ai_key_missing": {
+        "cause": "此專案尚未設定 AI 金鑰。",
+        "fix": "glot 會使用您自己的 AI 供應商金鑰進行翻譯。請在 設定 → LLM 中新增，點選「測試金鑰」，然後再執行一次。"
+      },
+      "ai_quota": {
+        "cause": "您的 AI 供應商因配額、點數或預算已用完而拒絕了此請求。",
+        "fix": "請向供應商確認您的點數，或在 設定 → LLM 中提高預算，然後再執行一次。已寫入的翻譯會保留。"
+      },
+      "ai_unavailable": {
+        "cause": "您的 AI 供應商暫時無法使用。",
+        "fix": "問題不在您這邊。請幾分鐘後再執行一次：已寫入的翻譯會保留。"
+      },
+      "ai_workspace": {
+        "cause": "Anthropic 工作區與金鑰不符。",
+        "fix": "組織金鑰（sk-ant-usr…）需要其工作區的 ID（wrkspc_…）。請在 設定 → LLM 中設定，測試金鑰，然後再執行一次。"
+      },
+      "branch_missing": {
+        "cause": "此儲存庫中已不存在基底分支。",
+        "fix": "請重新選擇儲存庫，並挑選一個現有的分支。"
+      },
+      "config_invalid": {
+        "cause": "此儲存庫的 glot.toml 無效。",
+        "fix": "修正技術詳細中指出的那一行（路徑必須位於儲存庫內），然後推送：glot 會自行重新執行。"
+      },
+      "details": "技術詳細資料",
+      "no_framework": {
+        "cause": "glot 在此儲存庫中找不到可進行在地化的應用程式。",
+        "fix": "支援：React、Next.js、Vue、Svelte、Leptos、SwiftUI，以及具有自有 t() 函式的應用程式。若為 monorepo，請在應用程式資料夾中執行 glot init，提交 glot.toml 並推送。"
+      },
+      "openPr": "開啟 Pull Request",
+      "pr_conflict": {
+        "cause": "你推送到 glot 分支的一個提交與最新的基底分支發生衝突。",
+        "fix": "未覆寫任何內容。請將基底分支合併到 Pull Request 並解決衝突，或關閉 Pull Request：glot 會在下次執行時開啟新的一個。"
+      },
+      "push_rejected": {
+        "cause": "GitHub 拒絕了 glot 分支或其 Pull Request。",
+        "fix": "分支保護規則可能涵蓋了 glot/*。請允許 glot 應用程式推送到 glot/* 分支，然後重新執行。"
+      },
+      "repo_access": {
+        "cause": "glot 無法再讀取此儲存庫。",
+        "fix": "GitHub App 可能已被解除安裝，或已失去此儲存庫的存取權。請在 GitHub 上重新授予存取權，然後重新執行。"
+      },
+      "repo_too_large": {
+        "cause": "此儲存庫超過單次執行可複製的大小。",
+        "fix": "超過 2 MB 的媒體與檔案已會被略過。請將應用程式移至獨立的儲存庫，或聯絡我們以提高限制。"
+      },
+      "settings": "開啟 LLM 設定",
+      "timeout": {
+        "cause": "執行時間過長，已停止。",
+        "fix": "請重新執行：已翻譯的字串不會重做。若每次都發生，請在 glot.toml 中使用 [extract] include 縮小掃描範圍。"
+      },
+      "unknown": {
+        "cause": "執行因非預期的錯誤而停止。",
+        "fix": "請重新執行。若仍以相同方式失敗，請將下方的技術詳細資料寄給我們。"
+      },
+      "unlinked": {
+        "cause": "此專案已不再連結至任何儲存庫。",
+        "fix": "請選擇儲存庫以重新連結。"
+      }
+    },
+    "how": {
+      "pr": {
+        "title": "一個 Pull Request",
+        "body": "字串會移入目錄，翻譯會經過驗證，所有內容都會放入單一 Pull Request，供你審閱並合併。"
+      },
+      "safe": {
+        "title": "你的程式碼從不執行",
+        "body": "glot 在隔離的暫時性複製中讀取檔案。不安裝套件、不執行腳本，每次執行後刪除。"
+      },
+      "updates": {
+        "title": "隨時保持同步",
+        "body": "每次推送到你的分支時，只會重新翻譯有變動的部分，並更新同一個開啟中的 Pull Request。"
+      }
+    },
+    "return": {
+      "installed": "GitHub 已連結。請選擇儲存庫。",
+      "pending": "已提出安裝申請：需由 GitHub 組織的擁有者核准。",
+      "error": "GitHub 未完成連結，請再試一次。"
+    }
+  },
+  "githubAdmin": {
+    "title": "GitHub App",
+    "subtitle": "為此伺服器建立 glot GitHub App。GitHub 會要求您確認，然後將憑證傳回 glot。",
+    "name": "App 名稱",
+    "nameHelp": "在 GitHub 上須為唯一值，最多 34 個字元。使用者安裝應用程式時會看到此名稱。",
+    "org": "組織（選填）",
+    "orgHelp": "留空即可以您的個人帳戶擁有此應用程式。",
+    "permissions": "已要求的最低權限",
+    "cta": "建立 GitHub App",
+    "redirecting": "正在開啟 GitHub…",
+    "created": "GitHub App 已建立：使用者現在可以連接其儲存庫。",
+    "configured": "GitHub App 已完成設定。",
+    "slug": "Slug",
+    "appId": "App ID",
+    "webhook": "Webhook URL",
+    "open": "在 GitHub 上開啟",
+    "back": "返回儀表板",
+    "recreate": "以新應用程式取代",
+    "notAdmin": {
+      "title": "只有管理員可以建立 GitHub App",
+      "body": "請將您的電子郵件加入伺服器環境中的 GLOT_ADMIN_EMAILS，然後重新載入此頁面。"
+    },
+    "callbackError": "GitHub 未回傳應用程式憑證。請重新開始：此連結有效期為一小時。"
+  },
+  "xpLifecycle": {
+    "more": "{name} 的更多操作",
+    "edit": "編輯",
+    "launch": "啟動",
+    "pause": "暫停",
+    "resume": "繼續",
+    "stop": "停止",
+    "rename": "重新命名",
+    "duplicate": "複製",
+    "duplicateDraft": "複製為草稿",
+    "archive": "封存",
+    "unarchive": "取消封存",
+    "delete": "刪除",
+    "cancel": "取消",
+    "save": "儲存",
+    "copyName": "{name}（副本）",
+    "renameTitle": "重新命名實驗",
+    "renameBody": "名稱僅顯示在儀表板與 CLI 中。重新命名不會影響訪客或結果。",
+    "nameLabel": "名稱",
+    "launchFailed": "無法啟動實驗。",
+    "preflight": "上線前",
+    "checking": "檢查中…",
+    "blocking": "{n, plural, other {# 項上線前待修正事項}}",
+    "readyWithWarnings": "已可啟動。部分訊號尚未到位：請見下方。",
+    "ready": "一切就緒：實驗一啟動，訪客就會看到各個變體。",
+    "ok": "完成：",
+    "warning": "請檢查：",
+    "missing": "缺少：",
+    "andMore": "另外 {n} 個",
+    "warnHint": "非阻擋項目：實驗可以啟動，但缺少此項就不會有任何結果進來。",
+    "toml": "定義是否保存在 Git 中？若此專案使用 <file>glot.experiments.toml</file>，<push>glot experiments push</push> 會覆寫此處所做的編輯（同名）。請使用 <pull>glot experiments pull</pull> 將其寫回檔案。",
+    "locked": "實驗進行中時，只能變更名稱。中途變更變體、鍵、受眾或目標，會讓兩個實驗的數據混在一起並使結果出現偏差。若要嘗試其他方案，請將其複製為草稿。",
+    "archivedNote": "已封存：已從清單隱藏，結果會保留。你現在可以刪除，結果會一併刪除。",
+    "endedNote": "已結束。封存以整理清單，同時保留結果；只有已封存的實驗可以刪除。",
+    "backToExperiment": "返回實驗",
+    "editTitle": "編輯「{name}」",
+    "editSubtitle": "變更會在輸入時自動儲存。在你啟動之前，訪客不會看到任何內容。",
+    "archivedBadge": "已封存",
+    "toast": {
+      "pause": "實驗已暫停：所有人都會看到官方文字",
+      "resume": "實驗已繼續",
+      "stop": "實驗已停止：所有人都會看到官方文字",
+      "promote": "完成：所選變體現已成為官方文字",
+      "archive": "實驗已封存，結果已保留",
+      "unarchive": "實驗已回到列表中",
+      "renamed": "實驗已重新命名",
+      "duplicated": "已從此實驗建立草稿",
+      "deleted": "實驗已刪除",
+      "launched": "實驗已啟動"
+    },
+    "confirmDelete": {
+      "title": "要刪除「{name}」嗎？",
+      "draft": "此草稿及其變體文字將被刪除。尚未向訪客顯示過任何內容。",
+      "archived": "此實驗、其變體及所有結果將被永久刪除，且無法復原。",
+      "cta": "永久刪除"
+    },
+    "confirmStop": {
+      "title": "要停止「{name}」嗎？",
+      "body": "結果會保留。請選擇之後訪客看到的內容。",
+      "then": "接著",
+      "keep": "保留官方文字",
+      "keepHint": "你的目錄不會有任何變更。",
+      "publish": "將「{arm}」發布為官方文字",
+      "publishHint": "寫入實驗的所有語言並保留歷史紀錄（若已連結儲存庫，會建立 Pull Request）。",
+      "cta": "停止實驗",
+      "ctaPublish": "停止並發布"
+    },
+    "confirmLaunch": {
+      "title": "要仍然啟動「{name}」嗎？",
+      "body": "實驗可以開始，但缺少以下訊號，在修正之前不會有任何結果：",
+      "cta": "仍要啟動"
+    },
+    "check": {
+      "keys": "{n, plural, other {# 個鍵已測試}}",
+      "locales": "{n, plural, other {# 種語言}}",
+      "variants": "{n, plural, other {# 個變體與官方文字比較}}",
+      "noVariant": "至少新增一個變體，以便與官方文字比較",
+      "unapproved": "{n, plural, other {# 個變體等待核准，將不會顯示}}",
+      "texts": "每個變體在每種語言都有有效文字",
+      "settings": "待修正的設定",
+      "site": "你的網站會將造訪傳送至 glot",
+      "noSite": "過去 30 天內你的網站未收到任何造訪：請安裝 @glot-i18n/insights",
+      "goal": "過去 30 天內有追蹤到目標「{goal}」",
+      "noGoal": "過去 30 天內從未追蹤到目標「{goal}」：請在你的網站呼叫 track(\"{goal}\")"
+    },
+    "blocker": {
+      "no_keys": "至少選擇一個鍵",
+      "key_missing": "鍵 {key} 已不存在",
+      "key_live": "鍵 {key} 已在另一個執行中的實驗測試",
+      "no_locales": "至少選擇一種語言",
+      "too_many_segments": "最多 4 個區隔",
+      "currency": "營收目標需要設定貨幣",
+      "weights": "固定分配比例與變體數量不符",
+      "no_variant": "至少核准一個變體",
+      "cell_missing": "「{arm}」：{locale} 中沒有 {key} 的文字",
+      "cell_invalid": "「{arm}」：{locale} 中 {key} 的文字有錯誤（佔位符、詞彙表或長度）"
+    },
+    "filter": {
+      "label": "依狀態篩選",
+      "all": "全部",
+      "draft": "草稿",
+      "live": "執行中",
+      "ended": "已結束",
+      "archived": "已封存",
+      "empty": "此狀態下沒有實驗。"
+    },
+    "wizard": {
+      "locales": "測試語言",
+      "localesHint": "使用其他語言的訪客會保留官方文字。移除語言會刪除其變體文字。",
+      "rebalance": "將更多訪客導向表現較佳者",
+      "rebalanceOn": "開啟：隨著結果陸續進來，流量會自動轉向表現最佳的變體（減少在較弱文字上流失的訪客）。",
+      "rebalanceOff": "關閉：在整個實驗期間，流量會平均分配給官方文字與各個變體。",
+      "traffic": "參與實驗的訪客比例",
+      "trafficHint": "其他訪客一律看到官方文字。流量越少，實驗時間越長。"
+    },
+    "duration": {
+      "title": "多久能得到結果",
+      "hint": "根據你的流量，以及過去 30 天「{goal}」的目前轉換率，比較 {arms} 個文字版本（95% 信賴度、80% 檢定力）。",
+      "allTraffic": "全部流量",
+      "unavailable": "目前無法提供預估。",
+      "noData": "尚無訪客或「{goal}」轉換紀錄：請安裝 @glot-i18n/insights 並追蹤該目標，以取得預估。",
+      "audience": "受眾",
+      "perDay": "每日訪客",
+      "rate": "轉換率",
+      "lift": "可偵測 +{lift}",
+      "upperBound": "（最多）",
+      "overYears": "{n, plural, other {超過 # 年}}",
+      "weeks": "{n, plural, other {# 週}}",
+      "days": "{n, plural, other {# 天}}",
+      "tooSlow": "依你的流量，此實驗在 {weeks} 週內只能偵測到至少 {lift} 的提升（{audience}）。",
+      "tooSlowNone": "依你的流量，此實驗在 {weeks} 週內無法偵測到實際的提升（{audience}）。",
+      "whatToDo": "若要更快取得結果：",
+      "fewerVariants": "比較較少的變體（僅與官方文字比較）。",
+      "oneSegment": "僅鎖定單一區隔，或不鎖定：每個區隔都需要各自的訪客。",
+      "frequentGoal": "請選擇較常發生的目標，例如點擊按鈕而非註冊。",
+      "busierPage": "測試流量較多的頁面。"
+    }
+  },
+  "experimentResults": {
+    "official": "官方版本",
+    "everyone": "所有人",
+    "everyoneElse": "其他所有人",
+    "winner": "優勝者",
+    "reference": "參照",
+    "served": "已提供給此區隔",
+    "pBestShort": "{p} 機率最佳",
+    "cancel": "取消",
+    "back": "實驗",
+    "previewInPage": "在頁面中預覽",
+    "pause": "暫停",
+    "resume": "繼續",
+    "stop": "停止",
+    "bySegment": "依區隔的結果",
+    "bySegmentHint": "每個區隔各自計算。只有當某個文案在該區隔中勝過其他文案，且機率超過 95%，才會在該區隔勝出。",
+    "wording": "各語言文案",
+    "wordingHint": "各版本在每種語言中的內容。開啟頁面預覽可查看實際情境。",
+    "promoteSegment": "為此區隔推出",
+    "promoteAll": "全面推出",
+    "propagate": "在其他語言中測試",
+    "status": {
+      "draft": "草稿",
+      "running": "執行中",
+      "paused": "已暫停",
+      "decided": "已找到獲勝者",
+      "personalized": "個人化",
+      "promoted": "已推出",
+      "stopped": "已停止"
+    },
+    "state": {
+      "learning": "學習中",
+      "winner": "獲勝者",
+      "no_difference": "無差異",
+      "personalized": "已個人化"
+    },
+    "summary": {
+      "verdict": "結論",
+      "duration": "執行時間",
+      "days": "{n, plural, other {# 天}}",
+      "since": "自 {date} 起",
+      "traffic": "已測試訪客",
+      "segments": "{n, plural, other {# 個區隔}}",
+      "goal": "目標",
+      "revenue": "每位訪客營收",
+      "allocation": {
+        "fixed": "固定分流",
+        "bandit": "流量會轉向表現最佳的文案",
+        "segmented": "流量依區隔轉向表現最佳的文案"
+      },
+      "locales": "{n, plural, other {# 種語言}}",
+      "pausedNote": "已暫停：所有訪客都看到官方文案，且不計入任何數據。結果已保留。"
+    },
+    "verdict": {
+      "win": "「{arm}」{star, select, only {對所有人} rest {對其他所有人} other {在{segment}中}}轉換率提升 {lift}（{p} 機率）。",
+      "officialWins": "官方文案{star, select, only {對所有人} rest {對其他所有人} other {在{segment}中}}仍是最佳。",
+      "personalized": "{star, select, only {所有人} rest {其他所有人} other {{segment}}}永久看到「{arm}」。",
+      "elsewhere": "其他區隔尚無獲勝者。",
+      "learning": "尚無獲勝者。{days, plural, =-1 {} other {依目前流量，還需約 # 天。}}",
+      "noDifference": "沒有任何文案以明顯優勢勝過官方文案：維持現狀即可安心。",
+      "noTraffic": "尚無訪客。訪客開始看到此頁面後，結果就會顯示於此。",
+      "winRevenue": "「{arm}」{star, select, only {對所有人} rest {對其他所有人} other {在{segment}中}}每位訪客營收高出 {lift}（{p} 機率）。",
+      "winShort": "「{arm}」{star, select, only {對所有人} rest {對其他所有人} other {在{segment}中}}勝出。",
+      "draft": "草稿：尚未向訪客顯示。下方清單列出上線前尚待完成的項目。",
+      "promoted": "已完成：「{arm}」現已成為所有地方的官方文案。",
+      "stopped": "已停止，沒有獲勝者：所有人都看到官方文案。"
+    },
+    "cell": {
+      "visitors": "{n, plural, other {# 位訪客}}",
+      "noTraffic": "此區隔目前還沒有訪客。",
+      "winner": "「{arm}」可多帶來 {lift} 的{goal}（可能介於 {lo} 至 {hi} 之間），信心 {p}。",
+      "officialWins": "此處官方文案的轉換率最高。此區隔已不再提供變體文案。",
+      "noDifference": "此處各文案的表現大致相同。維持官方文案不會有任何成本。",
+      "learning": "仍在學習中：「{arm}」領先，有 {p} 機率為最佳。{days, plural, =-1 {} other { 還需約 # 天。}}",
+      "personalized": "此區隔一律看到「{arm}」。glot 會在 90 天後建議重新測試。",
+      "winnerRevenue": "「{arm}」每位訪客可多帶來 {lift} 收益（可能介於 {lo} 至 {hi} 之間），信心 {p}。"
+    },
+    "srm": {
+      "title": "流量分配異常：決策已凍結",
+      "body": "各變體分到的訪客比例不符預期（p = {p}）。通常原因是頁面以單一變體快取、重新導向，或機器人集中於某一變體。請修正原因；結果會自動恢復。"
+    },
+    "underpowered": {
+      "title": "此區隔的流量不足",
+      "body": "以目前速度，要偵測 20% 的差異需要超過 90 天。請擴大此區隔，或依整體結果做決定。"
+    },
+    "chart": {
+      "aria": "相對於官方文案的提升幅度及可能範圍：{summary}",
+      "row": "{arm}：{lift}，可能介於 {lo} 至 {hi} 之間",
+      "caption": "圓點：與官方文案相比最可能的差異。線段：差異極可能落在的範圍（95%）。跨越虛線中心的線段代表「尚不確定」。"
+    },
+    "table": {
+      "caption": "{segment} 的結果",
+      "arm": "文案",
+      "visitors": "訪客數",
+      "rate": "{goal} 轉換率",
+      "lift": "相對官方文案提升",
+      "range": "{lo} 至 {hi}",
+      "rpv": "每位訪客營收",
+      "pBest": "成為最佳的機率"
+    },
+    "confirmSegment": {
+      "title": "要永久向{segment}顯示「{arm}」嗎？",
+      "body": "從現在起，{segment} 中的所有人在全部 {locales, plural, other {# 種語言}} 中都會看到此文案。其他訪客仍維持官方文案。",
+      "after": "此區隔的測試將結束，其訪客不再計入統計。glot 會提醒你在 90 天後重新測試，並在來源文字變更時切回官方文案。",
+      "cta": "僅為此區隔推廣"
+    },
+    "confirmAll": {
+      "title": "要將「{arm}」設為所有地方的官方文案嗎？",
+      "body": "{keys, plural, other {# 個鍵}} 會以經審核的翻譯，在 {locales, plural, other {# 種語言}} 中採用此文案，並記錄於鍵的歷史紀錄中。將隨你的下次 glot 拉取、CDN 更新或拉取請求一併發佈。",
+      "after": "實驗將在所有區隔中結束。",
+      "cta": "全部推廣"
+    },
+    "confirmPropagate": {
+      "title": "要在其他語言中測試「{arm}」嗎？",
+      "body": "glot 會以在 {segment} 勝出的構想開啟新實驗，為本次測試未涵蓋的 {n, plural, other {# 種語言}} 撰寫文案。每則翻譯在提供前都會通過驗證；本實驗不會變更。",
+      "cta": "設定測試"
+    },
+    "confirmStop": {
+      "title": "要停止「{name}」嗎？",
+      "body": "所有訪客將再次看到官方文案。結果會保留；你的語言目錄不會有任何變更。",
+      "cta": "停止實驗"
+    },
+    "toast": {
+      "pause": "實驗已暫停：所有人都看到官方文案",
+      "resume": "實驗已恢復",
+      "stop": "實驗已停止：所有人都看到官方文案",
+      "promote_segment": "已完成：此區隔現在一律看到獲勝文案",
+      "promote_all": "已完成：獲勝文案已成為官方文案"
+    },
+    "celebrate": {
+      "first": "你的第一個勝出文案",
+      "winner": "有一個區隔已有勝出文案",
+      "body": "可從結果頁面為該區隔或全部推廣此文案。"
+    },
+    "milestones": {
+      "label": "實驗里程碑",
+      "first": "首次實驗",
+      "firstBody": "將文案呈現給真實訪客",
+      "winner": "首次勝出",
+      "winnerBody": "某個變體以 95% 信心度勝過官方文案"
+    },
+    "list": {
+      "segments": "區隔",
+      "meta": "{keys, plural, other {# 個鍵}} · {locales, plural, other {# 種語言}}"
+    },
+    "preview": {
+      "title": "依區隔預覽",
+      "byLocale": "依地區",
+      "experiment": "實驗",
+      "segment": "區隔",
+      "language": "語言",
+      "allLanguages": "所有語言",
+      "viewport": "檢視區域",
+      "desktop": "桌機",
+      "mobile": "行動版",
+      "route": "路由",
+      "notCounted": "每一列都會在正式頁面上強制套用一種文案。預覽不會計入造訪次數。",
+      "noBase": "設定預覽網址，以查看頁面中的變體。目前先顯示此文案。",
+      "noBaseCta": "設定預覽網址",
+      "openTab": "在新分頁中開啟 {locale}",
+      "frame": "{locale} 頁面預覽",
+      "none": {
+        "title": "沒有可預覽的實驗",
+        "body": "對一組鍵開始實驗；各變體接著會依頁面與語言逐一顯示於此。",
+        "cta": "新增實驗"
+      }
+    }
+  },
+  "xpWizard": {
+    "title": "新增實驗",
+    "subtitle": "在所有語言中測試幾段文字的新措辭，讓訪客決定勝出者。四個步驟，約兩分鐘，無需統計知識。",
+    "backToList": "所有實驗",
+    "restored": "已還原您未完成的草稿。",
+    "startOver": "重新開始",
+    "stepOf": "第 {n} 步，共 {total} 步",
+    "progress": "實驗設定進度",
+    "done": "(已完成)",
+    "back": "返回",
+    "continue": "繼續至 {step}",
+    "launch": {
+      "name": "實驗名稱",
+      "goal": "轉換事件",
+      "goalHint": "貴網站在過去 30 天內傳送的事件。可選擇一個，或輸入其他名稱。",
+      "goalHintNone": "尚未收到任何事件。請輸入您傳給 track() 的名稱，例如 signup。",
+      "goalInput": "事件名稱",
+      "revenue": "優化營收",
+      "revenueHint": "選擇每位訪客帶來最多營收的變體，而非轉換率最高的變體。請將金額與幣別隨事件一併傳入 track()。",
+      "currency": "幣別",
+      "minN": "每個變體的最少訪客數",
+      "minNHint": "無論早期數據如何，在達到此樣本數且滿 7 天前不做決定。至少 {n}；500 適用於大多數著陸頁。",
+      "cookie": "記住變體",
+      "cookieMode": {
+        "none": {
+          "label": "不使用 Cookie",
+          "body": "不會在裝置上儲存任何資料。訪客重新載入後可能會看到其他變體。適用於單一登陸頁。"
+        },
+        "session": {
+          "label": "工作階段 Cookie",
+          "body": "第一方 Cookie 僅在瀏覽器關閉前保存變體。訪客在各頁面間會看到相同文案。建議使用。"
+        }
+      },
+      "gdpr": "兩種模式都不會儲存 IP、使用者代理或識別碼：glot 僅保留彙總計數。工作階段 Cookie 的設計符合 CNIL 受眾測量豁免（無需同意橫幅）；請由貴公司的資料保護長確認貴網站的做法。適用於本專案的所有實驗。",
+      "recap": "摘要",
+      "recapKeys": "翻譯鍵",
+      "recapVariants": "變體",
+      "recapVariantsValue": "{n, plural, other {# 個變體}} + 官方，{locales, plural, other {# 種語言}}",
+      "recapAudience": "受眾",
+      "segmentN": "區隔 {n}",
+      "everyone": "所有人",
+      "recapGoal": "目標",
+      "notSet": "未設定",
+      "revenueIn": "營收（{currency}）",
+      "recapMin": "每個變體至少 {n} 位訪客",
+      "problems": "啟動前請先修正",
+      "edit": "編輯 {what}",
+      "editShort": "編輯"
+    },
+    "launching": "啟動中…",
+    "launched": "實驗已上線：訪客現在會看到各個變體",
+    "autosaved": "草稿已自動儲存",
+    "saving": "儲存草稿中…",
+    "steps": {
+      "keys": {
+        "short": "測試項目",
+        "title": "您想測試什麼？",
+        "body": "選擇會一起變動的文字，例如首圖的標題、副標題與按鈕。每個變體都會在所有語言中改寫這些文字。"
+      },
+      "variants": {
+        "short": "變體",
+        "title": "撰寫變體",
+        "body": "變體代表一種意圖：促使點擊的不同理由。您可以選擇意圖讓 AI 撰寫，或自行輸入。每段文字都會由與您的翻譯相同的驗證器即時檢查。"
+      },
+      "audience": {
+        "short": "受眾",
+        "title": "誰會看到這項測試？",
+        "body": "預設為所有人。只有當您預期不同區隔會有不同的勝出者時才新增區隔：每個區隔都需要自己的流量。"
+      },
+      "launch": {
+        "short": "目標與啟動",
+        "title": "什麼算是勝出？",
+        "body": "選擇代表成功的事件。glot 會顯示各變體、統計轉換，並在勝出者明確時通知您。"
+      }
+    },
+    "block": {
+      "keys": "請至少選取一個要測試的金鑰。",
+      "noArm": "請至少新增一個變體：使用 AI 產生或手動撰寫。",
+      "empty": "{n, plural, other {仍有 # 個文字尚未填寫。請填寫每個變體的所有語言，或移除該變體。}}",
+      "validating": "仍在檢查您的文字，請稍後再試。",
+      "errors": "{n, plural, other {有 # 個文字發生驗證錯誤。請修正標示為紅色的儲存格。}}",
+      "countries": "國家代碼無效。請使用兩位字母的 ISO 代碼，例如 DE 或 FR。",
+      "goal": "請選擇決定勝負的轉換事件。",
+      "currency": "請輸入三位字母的貨幣代碼，例如 EUR。",
+      "minN": "每個變體的最小樣本數至少須為 {n} 位訪客。"
+    },
+    "keys": {
+      "search": "搜尋金鑰",
+      "searchHint": "輸入金鑰或其文字的一部分。相關金鑰群組可一鍵新增。",
+      "groups": "新增整個群組",
+      "groupCount": "{n, plural, other {# 個金鑰}}",
+      "results": "符合的金鑰",
+      "noMatch": "沒有符合「{q}」的金鑰。請嘗試較短的搜尋詞。",
+      "noKeys": "此專案尚無金鑰。請先使用 glot push 推送您的目錄。",
+      "more": "顯示 {shown} 個（共 {total} 個）。請縮小搜尋範圍以查看其他項目。",
+      "selected": "{n, plural, =0 {尚未選取金鑰} other {已選取 # 個金鑰}}",
+      "openMatrix": "開啟語言矩陣",
+      "emptySelected": "已選取的金鑰會在此顯示，並附上各語言的目前文字。",
+      "remove": "移除 {key}",
+      "missing": "未翻譯",
+      "cropAlt": "擷取 {locale} 在 {route} 上的 {key}"
+    },
+    "variants": {
+      "intents": "意圖",
+      "intentsHint": "每個意圖產生一個版本。最多選三個。",
+      "intent": {
+        "social_proof": {
+          "label": "社會認同",
+          "hint": "其他人已在使用並信任它"
+        },
+        "benefit": {
+          "label": "直接好處",
+          "hint": "訪客立即獲得的好處"
+        },
+        "urgency": {
+          "label": "真實的急迫感",
+          "hint": "立即行動的真實理由，不使用假倒數"
+        },
+        "simplicity": {
+          "label": "簡潔",
+          "hint": "更短、更直白、字數更少"
+        },
+        "clarity": {
+          "label": "清晰度",
+          "hint": "明確說明點擊後會發生什麼事"
+        }
+      },
+      "facts": "允許 AI 引用的事實",
+      "factsPlaceholder": "2,000 個團隊\n評分 4.8/5",
+      "factsHint": "每行一項。未列於此的數字、評分與日期將被拒絕，因此版本不會捏造內容。",
+      "generate": "{n, plural, other {使用 AI 產生 # 個版本}}",
+      "generating": "正在以所有語言撰寫版本…",
+      "generated": "{n, plural, other {已新增 # 個版本}}",
+      "or": "或",
+      "manualLabel": "手動撰寫版本的意圖",
+      "manualPlaceholder": "你的意圖，例如「永久免費」",
+      "manual": "手動撰寫",
+      "handWritten": "手動撰寫",
+      "maxArms": "最多 {n} 個版本：版本越多，測試時間越長。移除一個才能新增另一個。",
+      "policyTitle": "部分文字已被暫停",
+      "policyHint": "編輯文字或選擇其他意圖。定價與法律相關的鍵無法進行測試。",
+      "variantName": "變體 {letter}",
+      "intentOf": "版本 {letter} 的意圖",
+      "remove": "移除版本 {letter}",
+      "empty": "尚無版本。可從上方的意圖產生，或手動撰寫一則。",
+      "gridLabel": "依語言列出的版本",
+      "locale": "語言",
+      "official": "官方版本（對照組）",
+      "noOfficial": "未翻譯",
+      "budget": "符合 {px} px，{lines, plural, other {# 行}}",
+      "cellLabel": "版本 {letter}，{key}，{locale}",
+      "cellEmpty": "必填",
+      "cellChecking": "檢查中…",
+      "cellOk": "通過驗證",
+      "summary": {
+        "ok": "全部 {total} 則文字皆通過驗證。",
+        "checking": "正在檢查你的文字…",
+        "empty": "{n, plural, other {# 則文字}} 需撰寫後才能繼續。",
+        "errors": "{n, plural, other {# 則文字}} 需要修正：請查看紅色儲存格。",
+        "saveError": "無法儲存你最近的編輯。請檢查網路連線；你再次輸入時會重新嘗試。"
+      },
+      "officialShort": "官方版本："
+    },
+    "audience": {
+      "unnamed": "區隔",
+      "add": "新增區隔",
+      "preset": {
+        "mobile": "行動裝置訪客",
+        "search": "搜尋流量",
+        "new": "新訪客"
+      },
+      "max": "最多 {n} 個區隔。",
+      "everyone": "所有人",
+      "everyoneHint": "所有受測語言的訪客。",
+      "everyoneElse": "其他所有人",
+      "everyoneElseHint": "不符合上方任何區隔的訪客。",
+      "perDay": "位訪客／天",
+      "needs": "需要約",
+      "days": "{n, plural, other {# 天}}",
+      "merged": "流量過少：將併入「其他所有人」",
+      "estimateUnavailable": "目前無法提供流量估算。估算基於 glot insights 記錄的過去 30 天造訪資料。",
+      "total": "預期持續時間：<b>{days, plural, other {# 天}}</b>，可偵測到 20% 的提升。",
+      "fragmentedTitle": "你的流量過度分散",
+      "fragmentedSlow": "{n, plural, other {# 個區隔}}需要超過 {max} 天。請移除或放寬{n, plural, other {這些區隔}}，否則測試大多會在「其他所有人」中執行。",
+      "fragmentedMany": "{n} 個區隔會讓你的訪客分散成 {n} 種情況，並拖慢每項結果。只保留你確定會出現不同結果的區隔。",
+      "name": "區隔 {n}",
+      "namePlaceholder": "德語搜尋流量",
+      "remove": "移除 {name}",
+      "attr": {
+        "country": "國家",
+        "locale": "語言",
+        "source": "流量來源",
+        "device": "裝置",
+        "visitor": "訪客"
+      },
+      "countryHint": "兩位字母代碼，以逗號分隔。留空表示所有國家。",
+      "countryBad": "不是國家代碼：{codes}",
+      "source": {
+        "search": "搜尋",
+        "social": "社群",
+        "email": "電子郵件",
+        "paid": "付費",
+        "direct": "直接",
+        "referral": "推薦"
+      },
+      "device": {
+        "mobile": "手機",
+        "tablet": "平板",
+        "desktop": "電腦"
+      },
+      "visitor": {
+        "new": "新",
+        "returning": "回訪"
+      },
+      "visitorHint": "新訪客與回訪訪客的資訊，僅適用於接受你網站 Cookie 的訪客；其他訪客皆計入「其他所有人」。"
+    },
+    "launchCta": "啟動實驗"
+  },
+  "reviewPage": {
+    "title": "審閱",
+    "subtitle": "與團隊一起標註即時網站、修正文案後發布。",
+    "tabs": {
+      "annotations": "標註",
+      "reports": "使用者回報"
+    },
+    "converted": "回報已轉為標註",
+    "pinLabel": "註解 {n}：{body}",
+    "created": "已新增標註",
+    "resolved": "註解 {n} 已解決",
+    "openPanel": "{count, plural, =0 {註解} other {# 則未解決註解}}",
+    "panel": "註解",
+    "panelHint": "專案中的所有註解，可進行篩選、討論及編輯文字。",
+    "live": {
+      "annotation": "{name} 新增了一則註解",
+      "comment": "{name} 回覆了一則註解"
+    },
+    "noSite": {
+      "title": "連接你的網站以開始審閱",
+      "body": "Review 會在頂部顯示你的即時網站與團隊註解。請先設定網站的基礎 URL，只需 30 秒。",
+      "cta": "設定網站 URL"
+    },
+    "toolbar": {
+      "route": "頁面路徑",
+      "locale": "顯示語言",
+      "viewport": "螢幕尺寸",
+      "desktop": "桌面",
+      "tablet": "平板",
+      "mobile": "行動裝置",
+      "comment": "標註",
+      "edit": "編輯文字",
+      "share": "分享",
+      "shortcuts": "鍵盤快捷鍵",
+      "reload": "重新載入網站"
+    },
+    "setup": {
+      "title": "連接你的網站",
+      "body": "Review 會以框架顯示你的網站，並與其中的 glot 審閱小工具通訊。這些檢查會針對你的即時網站執行。",
+      "recheck": "重新檢查",
+      "status": {
+        "ok": "完成",
+        "fail": "需要處理",
+        "unknown": "無法檢查",
+        "pending": "檢查中"
+      },
+      "site": {
+        "title": "已設定網站 URL",
+        "ok": "Review 會開啟此位址。",
+        "change": "變更"
+      },
+      "framing": {
+        "title": "你的網站允許在 glot 中顯示",
+        "ok": "沒有任何項目阻擋框架。",
+        "unchecked": "尚未檢查。",
+        "private": "這是本機或私有位址，glot 的伺服器無法檢查。即時連線（步驟 4）才是真正的測試。",
+        "unreachable": "glot 的伺服器無法載入你的網站。請確認網址是公開且可連線的。",
+        "blocked": "你的網站禁止嵌入框架，回傳：{header}",
+        "fix": "請改為傳送此回應標頭（現代瀏覽器會忽略 X-Frame-Options）："
+      },
+      "widget": {
+        "title": "review widget 已在你的頁面上",
+        "ok": "review widget 已安裝。",
+        "bridge": "預覽橋接已回應，因此標記點功能可用。請加入 review widget，讓審閱者也能直接從你的網站進行標註。",
+        "unchecked": "無法讀取你頁面的 HTML。若尚未加入，請新增 review widget。",
+        "missing": "在你頁面的 HTML 中找不到 review widget。若你是從 JavaScript 套件載入，請忽略此項。",
+        "feedback": "你的頁面有回饋小工具（供終端使用者回報），而非 review widget。Review 需要 review widget。",
+        "wrongProject": "小工具設定的專案為「{found}」，但此專案是「{expected}」。",
+        "wrongOrigin": "小工具的 data-app-origin 必須是 {origin}，否則它不會回應此頁面。",
+        "denied": "小工具已載入，但 glot 拒絕了其審閱工作階段。請點選「重新檢查」；若問題持續，請登出後再重新登入。",
+        "network": "小工具已載入，但無法連上 glot（網路或 CORS）。請確認「設定」中的網站 URL 是你網站的實際位址。",
+        "paste": "請貼到你網站的 HTML 中，緊接在 body 結束標籤之前："
+      },
+      "connected": {
+        "title": "你的網站可在 Review 中回應",
+        "ok": "已連線：標記與即時預覽運作正常。",
+        "pending": "等待你的網站回應…",
+        "fail": "你的網站未在框架中回應。"
+      },
+      "advanced": {
+        "title": "無法新增小工具？",
+        "body": "此精簡腳本足以讓 Review 放置標記並預覽編輯；但審閱者無法從你的網站新增註解。你的網站仍必須允許嵌入框架（步驟 2）。"
+      },
+      "chip": {
+        "widget": "已連線",
+        "bridge": "已連線（橋接）",
+        "loading": "連線中…",
+        "unreachable": "未連線"
+      }
+    },
+    "help": {
+      "title": "鍵盤快捷鍵",
+      "body": "單鍵快捷鍵僅在未於欄位中輸入時生效。",
+      "c": "在網站中對文字留言",
+      "e": "編輯選取的文字",
+      "j": "下一則註記",
+      "k": "上一則註記",
+      "r": "解決選取的註記",
+      "esc": "取消選取",
+      "help": "顯示此說明",
+      "enabled": "啟用單鍵快捷鍵"
+    },
+    "frame": {
+      "title": "你的網站：{url}",
+      "unreachable": {
+        "title": "即時註記無法使用。",
+        "body": "你的網站未在框架內回應：glot 小工具不在此頁面上，或你的網站禁止被嵌入框架（X-Frame-Options 或 CSP frame-ancestors）。"
+      },
+      "install": "修復連線",
+      "showLive": "顯示即時網站",
+      "showShot": "顯示最後的截圖",
+      "retry": "再試一次",
+      "picking": "點擊你要的文字。按 Esc 取消。",
+      "annotating": "點擊網站中的文字以留言。按 Esc 取消。",
+      "pickingBlind": "網站尚無法回報點擊。請安裝小工具，或切換到最後的截圖後在該處點擊。",
+      "cancel": "取消",
+      "connecting": "正在連線至你的網站…",
+      "shotAlt": "來自視覺 QA 的此頁面最新截圖",
+      "pickHere": "在此放置註記"
+    },
+    "status": {
+      "open": "待處理",
+      "in_progress": "進行中",
+      "resolved": "已解決",
+      "wontfix": "不予修正"
+    },
+    "list": {
+      "empty": {
+        "title": "尚無註解",
+        "body": "按下 C 或點選「註解」，然後點選網站中的任意文字開始討論。"
+      },
+      "resolvedThisWeek": "{count, plural, other {本週已解決 # 則註解}}",
+      "search": "搜尋註解",
+      "searchPlaceholder": "搜尋文字、鍵或作者",
+      "filters": "篩選",
+      "status": "狀態",
+      "route": "頁面",
+      "locale": "語言",
+      "author": "作者",
+      "statusFilter": {
+        "active": "待辦",
+        "done": "已完成",
+        "all": "所有狀態"
+      },
+      "allRoutes": "所有頁面",
+      "allLocales": "所有語言",
+      "allAuthors": "所有作者",
+      "count": "{count, plural, =0 {沒有符合的註解} other {# 則註解}}",
+      "noMatch": "沒有符合這些篩選條件的註解。",
+      "clearFilters": "清除篩選",
+      "label": "註解",
+      "number": "註解 {n}。",
+      "replies": "{count, plural, other {# 則回覆}}"
+    },
+    "composer": {
+      "title": "新增標註",
+      "noText": "此處未偵測到文字；標註將固定於此位置。",
+      "body": "留言",
+      "bodyHint": "Markdown：**粗體**、*斜體*、`程式碼`、連結。以 @Name 提及團隊成員。按 Ctrl+Enter 送出。",
+      "suggestion": "建議文字（選填）",
+      "suggestionHint": "文字應改為的內容。之後可一鍵套用。",
+      "submit": "新增標註",
+      "submitting": "新增中…",
+      "cancel": "取消"
+    },
+    "detail": {
+      "statusChanged": "已標記為{status}",
+      "deleted": "已刪除標註",
+      "back": "所有標註",
+      "title": "註解 {n}",
+      "more": "更多操作",
+      "edit": "編輯留言",
+      "delete": "刪除標註",
+      "anchor": "標註文字",
+      "noKey": "未連結至鍵",
+      "editText": "編輯文字",
+      "createKey": "建立鍵",
+      "reactions": "回應",
+      "reaction": {
+        "approve": "核准（{count}）",
+        "up": "讚（{count}）",
+        "down": "倒讚（{count}）",
+        "heart": "愛心（{count}）",
+        "eyes": "關注中（{count}）",
+        "check": "完成（{count}）"
+      },
+      "status": "狀態",
+      "assignee": "指派對象",
+      "unassigned": "未指派",
+      "you": "（你）",
+      "resolve": "解決",
+      "deleteTitle": "刪除標註 {n}？",
+      "deleteBody": "{count, plural, =0 {將為所有人移除此標註。} other {將為所有人移除此標註及其 # 則回覆。}}",
+      "keep": "保留",
+      "deleteConfirm": "刪除標註",
+      "save": "儲存",
+      "cancel": "取消"
+    },
+    "wording": {
+      "title": "修正文案",
+      "source": "來源：",
+      "instruction": "給 AI 的指示",
+      "instructionPlaceholder": "選填：更簡短、更親切…",
+      "rephrase": "改寫",
+      "rephrasing": "改寫中…",
+      "variants": "選擇一個版本，滑鼠移上即可預覽",
+      "allLocales": "已通過 {count, plural, other {# 種語言}} 驗證",
+      "newWording": "新文案",
+      "previewHint": "輸入時會即時在網站中預覽。套用前不會儲存任何內容。",
+      "apply": "套用",
+      "applyAll": "套用到 {count, plural, other {# 種語言}}",
+      "applied": "已為 {locale} 儲存翻譯並解決標註",
+      "failed": "無法儲存翻譯，請再試一次。",
+      "prOpened": "已開啟 Pull Request",
+      "openPr": "開啟 GitHub PR",
+      "prNeedsSettings": "請在「使用者回報 › 設定」中設定儲存庫與 token 以開啟 PR。",
+      "noKey": "這段文字尚未連結到翻譯鍵，因此無法在此變更。請先建立鍵。",
+      "createKey": "建立鍵",
+      "invalidProposal": "至少一種語言驗證失敗",
+      "showLocales": "查看全部 {count, plural, other {# 種語言}}",
+      "rejected": "{count, plural, other {# 個版本因違反規則（佔位符、術語表、長度）而被捨棄。}}"
+    },
+    "thread": {
+      "title": "{count, plural, =0 {討論} other {# 則回覆}}",
+      "edited": "已編輯",
+      "editComment": "編輯回覆",
+      "deleteComment": "刪除回覆",
+      "reply": "回覆",
+      "replyPlaceholder": "回覆…",
+      "replyHint": "按 Ctrl+Enter 送出",
+      "send": "送出"
+    },
+    "editor": {
+      "back": "返回",
+      "title": "編輯文字",
+      "noText": "未選取文字",
+      "candidates": "符合的鍵",
+      "created": "已建立鍵 {key}",
+      "createTitle": "從此文字建立鍵",
+      "createBody": "此文字不在你的目錄中，可能是寫死的。glot 會將其新增為來源字串；之後開發者再於程式碼中以 glot i18nize 或提交 pull request 取代該字面值。",
+      "keyName": "鍵名稱（選填）",
+      "keyPlaceholder": "pricing.start_free_trial",
+      "keyHint": "留空則會根據頁面與文字自動產生。",
+      "description": "給譯者的脈絡（選填）",
+      "descriptionHint": "文字出現的位置與用途，例如「啟動免費試用的按鈕」。",
+      "createKey": "建立鍵",
+      "saved": "{count, plural, other {已儲存 # 筆翻譯}}",
+      "invalid": "未儲存任何內容：請修正各語言下方顯示的錯誤。",
+      "source": "來源（{locale}）：",
+      "protected": "大括號內的佔位符會由你的應用程式填入，請保留每一個。點選標籤即可插入。",
+      "unsaved": "{count, plural, other {# 項未儲存的變更}}",
+      "upToDate": "所有變更已儲存",
+      "discard": "捨棄",
+      "saving": "儲存中…",
+      "save": "{count, plural, =0 {儲存} other {儲存 # 種語言}}",
+      "empty": "文字為空。若要移除此譯文，請使用「移除」。",
+      "missingPlaceholder": "缺少佔位符 {name}。",
+      "reverted": "已還原 {locale} 的前一版本",
+      "removed": "已移除 {locale} 譯文",
+      "undo": "復原",
+      "inFrame": "顯示於網站中",
+      "showInFrame": "在網站中顯示",
+      "insertPlaceholder": "插入佔位符",
+      "insert": "插入 {name}",
+      "valid": "看起來沒問題",
+      "reset": "重設",
+      "history": "歷史紀錄",
+      "undoLast": "復原上一次變更",
+      "remove": "移除",
+      "noHistory": "沒有較早的版本。",
+      "origin": {
+        "machine": "AI",
+        "human": "某人"
+      },
+      "restore": "還原",
+      "removeTitle": "要移除 {locale} 譯文嗎？",
+      "removeBody": "對此語言，你的網站將顯示備用文字（通常為來源文字）。歷史紀錄會保留，因此你可以還原。",
+      "keep": "保留",
+      "removeConfirm": "移除譯文"
+    },
+    "share": {
+      "title": "分享以供審閱",
+      "body": "審閱者透過此連結開啟你的網站並進行標註，無需帳號。連結可隨時撤銷。",
+      "adminOnly": "只有專案管理員可以建立審閱連結。請管理員分享一個。",
+      "label": "名稱（選填）",
+      "labelPlaceholder": "例如：德文校對人員",
+      "access": "權限",
+      "accessLevel": {
+        "read": "可檢視",
+        "comment": "可留言",
+        "edit": "可留言並編輯文字"
+      },
+      "accessHint": {
+        "read": "可查看標註與討論，無法寫入。",
+        "comment": "可新增標註、回覆與反應。",
+        "edit": "另可編輯文字、變更狀態並套用建議。"
+      },
+      "expiry": "有效期限",
+      "never": "永不",
+      "days": "{count, plural, other {# 天}}",
+      "create": "建立連結",
+      "createdTitle": "連結已就緒。請立即複製，之後將不再顯示。",
+      "createdHint": "持有此連結的任何人，都能取得上述權限，直到連結到期或你將其撤銷。",
+      "active": "{count, plural, =0 {有效連結} other {# 個有效連結}}",
+      "none": "沒有有效的連結。",
+      "untitled": "未命名連結",
+      "expires": "於 {date} 到期",
+      "neverExpires": "永不過期",
+      "revoke": "撤銷 {label}",
+      "revoked": "連結已撤銷"
+    }
+  },
+  "connectors": {
+    "magento": {
+      "description": "透過 REST API 同步商品與分類，每種語言對應一個商店檢視。",
+      "fields": {
+        "url": "商店網址",
+        "token": "存取權杖",
+        "token_secret": "存取權杖密鑰",
+        "consumer_key": "消費者金鑰",
+        "consumer_secret": "消費者密鑰"
+      },
+      "hints": {
+        "token": "前往 System → Extensions → Integrations：建立並啟用包含 Catalog 與 Stores 資源的整合。",
+        "token_secret": "搭配消費者金鑰與密鑰，glot 會以 OAuth 1.0a 簽署請求。若未提供，權杖將以 Bearer 權杖傳送，而 Commerce 2.4.4+ 僅在啟用該選項時才接受。"
+      }
+    },
+    "prestashop": {
+      "description": "透過 Webservice API 處理商品、分類、CMS 頁面和品牌；HTML 描述會保留其標籤。",
+      "fields": {
+        "url": "商店網址",
+        "api_key": "Webservice 金鑰"
+      },
+      "hints": {
+        "url": "商店的網址，不含 /api。",
+        "api_key": "進階參數 → Webservice：金鑰需對 products、categories、content_management_system 和 manufacturers 具有 GET 與 PUT 權限，並對 languages 和 configurations 具有 GET 權限。"
+      }
+    },
+    "woocommerce": {
+      "description": "透過 WooCommerce REST API 同步商品、分類與標籤；支援 WPML（WooCommerce Multilingual）與適用於 WooCommerce 的 Polylang。",
+      "fields": {
+        "url": "商店網址",
+        "consumer_key": "消費者金鑰",
+        "consumer_secret": "消費者密鑰",
+        "webhook_secret": "Webhook 密鑰"
+      },
+      "hints": {
+        "consumer_key": "WooCommerce → 設定 → 進階 → REST API → 新增金鑰，權限選擇讀取/寫入。",
+        "webhook_secret": "任意長的隨機字串：glot 會以此註冊商品 webhook，並用來驗證簽章。"
+      }
+    },
+    "bigcommerce": {
+      "description": "透過 Translations API 同步商品、分類與品牌，依頻道與語系。",
+      "fields": {
+        "store_hash": "商店雜湊值",
+        "token": "存取權杖",
+        "channel_id": "頻道 ID",
+        "webhook_secret": "Webhook 密鑰"
+      },
+      "hints": {
+        "store_hash": "API 路徑中的代碼：api.bigcommerce.com/stores/STORE_HASH/v3。",
+        "token": "商店層級的 API 帳號，需具備商品（修改）、商店資訊（讀取）與頻道設定（修改）權限。",
+        "channel_id": "預設前台請填 1。",
+        "webhook_secret": "任意隨機字串：glot 會註冊商品與分類 webhook，並在每次呼叫時驗證。"
+      }
+    },
+    "shopware": {
+      "description": "透過 Admin API 同步商品、分類與屬性，並寫入每個 Shopware 語言。",
+      "fields": {
+        "url": "商店網址",
+        "client_id": "存取金鑰 ID",
+        "client_secret": "私密存取金鑰",
+        "webhook_secret": "應用程式密鑰（Webhook 簽章）"
+      },
+      "hints": {
+        "client_id": "設定 → 系統 → 整合 → 新增整合（Administrator 角色）。",
+        "client_secret": "建立整合後僅顯示一次。",
+        "webhook_secret": "僅在 Shopware 應用程式傳送 Webhook 時需要：glot 會檢查 shopware-shop-signature 標頭。"
+      }
+    },
+    "contentful": {
+      "description": "透過 Content Management API 處理所有內容類型的條目：本地化的短文字、長文字（Markdown）與富文本欄位。",
+      "fields": {
+        "space_id": "Space ID",
+        "token": "個人存取權杖",
+        "environment": "環境",
+        "api_url": "API URL"
+      },
+      "hints": {
+        "token": "設定 → CMA 權杖。需要該 space 的讀取與寫入權限。",
+        "api_url": "僅適用於歐盟資料駐留：https://api.eu.contentful.com"
+      }
+    },
+    "sanity": {
+      "description": "透過 HTTP API 處理文件：欄位層級（localized objects、internationalized arrays）或文件層級（document-internationalization）i18n，並保持 Portable Text 完整。",
+      "fields": {
+        "project_id": "專案 ID",
+        "dataset": "資料集",
+        "token": "API 權杖",
+        "source_locale": "來源語言代碼",
+        "webhook_secret": "Webhook 密鑰"
+      },
+      "hints": {
+        "token": "sanity.io/manage → API → Tokens，需具備 Editor 權限。",
+        "source_locale": "結構描述的語言金鑰（預設為 en）。",
+        "webhook_secret": "GROQ webhook 的密鑰，用於驗證其簽章。"
+      }
+    },
+    "strapi": {
+      "description": "Strapi 4 與 5 的本地化集合類型與單一類型（i18n 外掛）：文字、Markdown 與 Blocks 欄位。",
+      "fields": {
+        "url": "Strapi 網址",
+        "token": "API 權杖"
+      },
+      "hints": {
+        "token": "設定 → API Tokens，選擇 Full access（或僅在你的類型上授予 find、update 與 createLocalization）。"
+      }
+    },
+    "hubspot": {
+      "description": "部落格文章、網站與登陸頁（包含富文字模組），以 HubSpot 多語言變體的形式撰寫。",
+      "fields": {
+        "token": "私人應用程式存取權杖",
+        "webhook_secret": "應用程式用戶端密鑰"
+      },
+      "hints": {
+        "token": "前往 Settings → Integrations → Private apps，並包含 content 範圍。",
+        "webhook_secret": "選填：用於驗證 webhook 呼叫的 X-HubSpot-Signature（v1）。"
+      }
+    },
+    "drupal": {
+      "description": "透過 core JSON:API 處理節點與分類詞彙：標題與格式化文字，寫入現有譯文（Content Translation）。",
+      "fields": {
+        "url": "網站網址",
+        "username": "使用者名稱",
+        "password": "密碼",
+        "token": "OAuth 權杖"
+      },
+      "hints": {
+        "username": "需啟用 basic_auth 模組。或留空並提供 OAuth 權杖。",
+        "token": "Bearer 權杖（Simple OAuth），取代使用者名稱與密碼。"
+      }
+    },
+    "ghost": {
+      "description": "透過 Admin API 處理文章與頁面。每種語言是一篇標記 #fr（slug-fr）的文章，這是 Ghost 的路由模式。",
+      "fields": {
+        "url": "網站網址",
+        "admin_key": "Admin API 金鑰",
+        "webhook_secret": "Webhook 密鑰"
+      },
+      "hints": {
+        "admin_key": "設定 → Integrations → Add custom integration，格式為 id:secret。",
+        "webhook_secret": "任意字串：glot 隨後會註冊已簽章的 Ghost webhook。"
+      }
+    },
+    "craft": {
+      "description": "透過 GraphQL API 處理條目：標題與文字欄位，儲存於各語系的 Craft 網站。",
+      "fields": {
+        "url": "GraphQL 端點",
+        "token": "Schema 權杖",
+        "sites": "每個語系的網站"
+      },
+      "hints": {
+        "token": "GraphQL → 權杖，其 schema 需能查詢並儲存每個網站的條目。",
+        "sites": "glot 語系：Craft 網站代碼，以逗號分隔。預設：與語系同名的網站。"
+      }
+    },
+    "zendesk": {
+      "description": "同步說明中心的分類、區段與文章，並翻譯到每個 Guide 語系。",
+      "fields": {
+        "subdomain": "Zendesk 子網域",
+        "email": "客服人員電子郵件",
+        "token": "API 權杖",
+        "webhook_secret": "Webhook 簽署密鑰"
+      },
+      "hints": {
+        "token": "Admin Center → 應用程式與整合 → Zendesk API。",
+        "webhook_secret": "選填：用於驗證 X-Zendesk-Webhook-Signature。"
+      }
+    },
+    "helpscout": {
+      "description": "文件文章，依語言分別寫入各自的 Docs 網站（Help Scout 翻譯 Docs 的方式）。",
+      "fields": {
+        "api_key": "API 金鑰",
+        "collections": "各語言的 Collections"
+      },
+      "hints": {
+        "api_key": "前往您的 Profile → Authentication → API Keys。",
+        "collections": "glot 語言代碼：該語言 Docs 網站的 collection ID，以逗號分隔。"
+      }
+    },
+    "page": {
+      "title": "整合",
+      "subtitle": "連接 CMS 或商店：glot 會擷取其內容，以您專案的模型翻譯，並將通過驗證的翻譯寫回。",
+      "docs": "各 CMS 的同步運作方式請參閱：<docs>整合文件</docs>。"
+    },
+    "connect": "連接",
+    "save": "測試並儲存",
+    "testing": "測試中…",
+    "cancel": "取消",
+    "optional": "選填",
+    "connected": "{name} 已連接，已排入首次同步。",
+    "localeMismatch": "CMS 的預設語言（{locale}）與專案的來源語言不同。",
+    "webhooksError": "已連接，但無法自動註冊 webhook：請手動新增 webhook URL。",
+    "syncQueued": "已排入同步佇列",
+    "testOk": "{name} 可連線。語言：{locales}",
+    "lastSync": "已於 {when} 同步",
+    "stats": "{items, plural, other {# 個欄位}} · 已推送 {pushed} · {waiting} 等待翻譯",
+    "webhook": "Webhook 網址",
+    "webhookHint": "傳送至此的內容變更會觸發增量同步。請妥善保密：內含權杖。",
+    "sync": "立即同步",
+    "syncing": "同步中…",
+    "test": "測試",
+    "remove": "中斷連線",
+    "removeConfirm": "要中斷與 {name} 的連線嗎？翻譯內容會保留在 glot 中，CMS 中的內容不會被刪除。",
+    "oneClick": "一鍵連接",
+    "oneClickHint": "您將在 {name} 上自行核准存取權限。glot 不會取得您的密碼，您隨時可在該處撤銷存取權限。",
+    "manual": "改為手動輸入憑證",
+    "redirecting": "正在開啟 {name}…",
+    "connectError": "連線未成功：{error}",
+    "connectedPreview": "{name} 已連接。glot 正在讀取你的內容以準備預覽；尚未翻譯或變更任何內容。",
+    "reconnect": "重新連線",
+    "pause": "暫停",
+    "publish": "發布",
+    "published": "已發布",
+    "review": "檢視變更",
+    "ready": "待發布：{count}",
+    "kept": "已在 {name} 手動編輯，保持原樣：{count}",
+    "overwrite": "取代 {name} 中已存在的翻譯",
+    "reviewFirst": "發布前讓我先檢視",
+    "webhookActive": "自動同步運作中（最後收到變更：{when}）。",
+    "webhookNone": "尚未自動收到任何變更。glot 也會每天檢查一次變更。",
+    "issues": "未發布：{count}",
+    "tenant": {
+      "shopify": "商店網域",
+      "wordpress": "網站地址",
+      "woocommerce": "網站地址"
+    },
+    "hold": {
+      "translate": "等待您的核准",
+      "push": "由您發布"
+    },
+    "preview": {
+      "title": "翻譯前確認",
+      "summary": "項目：{resources, number} · 文字：{fields, number} · 語言：{languages, number} · 預計翻譯字數：約 {words, number}",
+      "cost": "預估翻譯費用：{cost}",
+      "types": "待翻譯內容",
+      "nothing": "尚未寫入 {name}。接下來由您決定。",
+      "approve": "翻譯並發布",
+      "approveReview": "翻譯，我自行發布"
+    },
+    "progress": {
+      "pull": "正在讀取內容…已讀取文字：{count, number}",
+      "translate": "翻譯中… {done, number} / {total, number}"
+    },
+    "diff": {
+      "new": "新增",
+      "update": "更新",
+      "blocked": "未寫入",
+      "empty": "沒有等待發布的內容。",
+      "more": "…另有 {count, number} 項。"
+    },
+    "doctor": {
+      "title": "連線檢查",
+      "run": "測試連線",
+      "running": "檢查中…",
+      "allGood": "glot 所需的一切都已就緒。",
+      "problems": "glot 要完整運作前，有項目需要你處理。",
+      "status": {
+        "ok": "正常",
+        "warn": "警告",
+        "fail": "問題"
+      },
+      "check": {
+        "auth": "登入",
+        "source_locale": "來源語言與專案不同",
+        "note": "備註",
+        "languages": "語言",
+        "read": "讀取你的內容（第一頁的文字）",
+        "translations": "讀取現有譯文",
+        "webhooks": "自動同步",
+        "scopes": "權限",
+        "scope_locales": "新增語言的權限",
+        "scope_content": "glot 無法讀取的內容"
+      }
+    },
+    "fix": {
+      "reconnect": "存取權已過期或被撤銷。請重新連線以繼續。",
+      "permissions": "缺少權限。請在平台上授予應用程式或權杖該權限，然後重新測試。",
+      "rate_limit": "平台正在降低請求速度。glot 會自動重試，無需處理。",
+      "placeholders": "譯文改變了變數或樣板程式碼。請在編輯器中修正；glot 之後會立即發布。",
+      "markup": "譯文改變了格式或連結。請在編輯器中修正；glot 之後會立即發布。",
+      "resync": "內容已在此期間變更。請執行同步。",
+      "not_found": "此內容在平台上已不存在。請執行同步。",
+      "enable_locale": "請在平台設定中新增此語言，然後重新測試。",
+      "unreachable": "網站未回應。請確認它已上線，且可從網際網路連線。",
+      "install_plugin": "平台需要多語言外掛來儲存譯文。請安裝後重新測試。",
+      "no_content": "尚未找到可翻譯的內容。",
+      "no_readback": "此平台不允許 glot 讀回譯文：在平台上手動做的變更無法偵測，復原也無法還原。",
+      "webhook_manual": "無法設定自動同步。請在平台上新增下方的 Webhook 網址，或改用每日檢查。"
+    },
+    "history": {
+      "title": "歷史紀錄",
+      "empty": "尚未發布任何內容。",
+      "run": "已發布翻譯：{count, number}",
+      "rollback": "復原",
+      "rolledBack": "已復原",
+      "confirm": "復原此次發布？文字將還原為 {name} 先前的內容。之後發布會暫停，直到您恢復為止。",
+      "done": "已還原：{restored} · 已移除：{removed} · 已保留（手動編輯）：{kept}"
+    },
+    "status": {
+      "idle": "未同步",
+      "queued": "佇列中",
+      "running": "同步中",
+      "ok": "已是最新",
+      "error": "錯誤"
+    },
+    "shopify": {
+      "description": "透過 Translations API 處理商品、系列、頁面、文章、metafields、選單和佈景主題文字。",
+      "fields": {
+        "shop": "商店網域",
+        "client_id": "用戶端 ID",
+        "client_secret": "用戶端密鑰",
+        "token": "Admin API 存取權杖",
+        "webhook_secret": "API 密鑰（webhook 簽章）"
+      },
+      "hints": {
+        "client_id": "來自你在 Shopify 開發者儀表板（設定）中的應用程式。glot 會自動更新其 24 小時存取權杖。",
+        "token": "僅適用於 2026 年前在商店管理後台建立的自訂應用程式。否則請留空。",
+        "webhook_secret": "讓 glot 驗證 Shopify 的商品與集合 Webhook。"
+      }
+    },
+    "webflow": {
+      "description": "CMS 集合（純文字與富文字欄位）、靜態頁面內容與元件，涵蓋網站的每個次要語言（Webflow 本地化）。",
+      "fields": {
+        "token": "網站 API 權杖",
+        "site_id": "網站 ID",
+        "webhook_secret": "Webhook 簽署密鑰"
+      },
+      "hints": {
+        "token": "網站設定 → Apps & integrations → API access，並具備 CMS、Pages、Components 與 Sites 的讀寫權限。",
+        "site_id": "僅在權杖可存取多個網站時需要。",
+        "webhook_secret": "僅適用於由 Webflow 簽署的 Webhook（OAuth 應用程式用戶端密鑰）。在網站設定中新增的 Webhook 則改用下方的 Webhook 網址。"
+      }
+    },
+    "wordpress": {
+      "description": "透過 REST API 同步文章、頁面、分類、標籤與選單；支援 WPML 與 Polylang。",
+      "fields": {
+        "url": "網站網址",
+        "username": "使用者名稱",
+        "app_password": "應用程式密碼"
+      },
+      "hints": {
+        "app_password": "使用者 → 個人資料 → 應用程式密碼。請勿使用登入密碼。"
+      }
+    }
+  },
+  "integrations": {
+    "nav": "整合",
+    "meta": {
+      "title": "整合：在任何平台翻譯你的網站",
+      "description": "依照分步指南，在 {count} 個平台上使用 glot 翻譯您的網站：網站建置工具、商店、CMS、AI 應用程式建置工具、課程平台和說明中心。"
+    },
+    "title": "整合",
+    "subtitle": "glot 可在任何允許在每個頁面加入腳本的網站上運作。選擇你的平台，即可查看確切步驟、所需方案，以及如何取得供搜尋引擎使用的翻譯網址。",
+    "search": "搜尋平台",
+    "searchPlaceholder": "Wix、Shopify、Ghost…",
+    "filter": "依類別篩選",
+    "all": "全部",
+    "count": "{count, plural, =0 {沒有平台} other {# 個平台}}",
+    "empty": "沒有符合「{q}」的平台。如果您的網站允許自訂程式碼，通用標籤也能在那裡運作。",
+    "categories": {
+      "site-builder": "網站建置工具",
+      "e-commerce": "電子商務",
+      "cms": "CMS",
+      "ai-builder": "AI 應用程式建置工具",
+      "lms": "課程平台",
+      "help-center": "說明中心",
+      "enterprise": "企業版"
+    },
+    "methods": {
+      "connector": "連接器",
+      "plugin": "外掛",
+      "tag": "通用標籤"
+    },
+    "generic": {
+      "title": "您的平台沒有列在這裡嗎？",
+      "body": "如果平台允許您在每個頁面的 head 加入指令碼，通用標籤就能在那裡運作。如果您可以控制網域的 DNS，glot Edge 也能提供翻譯後的網址。",
+      "cta": "閱讀網站標籤指南"
+    },
+    "page": {
+      "metaTitle": "glot 適用於 {name}：翻譯你的 {name} 網站",
+      "metaDescription": "如何使用 glot 翻譯 {name} 網站：{method, select, connector {glot 連接器} plugin {glot 外掛} other {一段腳本標籤}}、所需方案，以及供搜尋引擎索引的翻譯網址，循序漸進說明。",
+      "breadcrumb": "麵包屑導覽",
+      "title": "glot 適用於 {name}",
+      "intro": {
+        "connector": "glot 直接連接 {name}：它會讀取你的內容，依你的術語表與檢查規則翻譯，並將譯文寫回 {name} 自有的語言設定中。",
+        "plugin": "glot 以外掛形式安裝在 {name} 中。以下步驟將協助你完成設定。",
+        "tag": "在 {name} 中，glot 透過加入每個頁面的一段腳本標籤運作。它會在訪客的瀏覽器中翻譯頁面，並新增語言選單。"
+      },
+      "unavailable": "{name} 不允許在每個頁面加入腳本，因此通用標籤無法在此運作。下方說明列出可行的做法。",
+      "unverified": "我們無法在 {name} 官方文件中確認這些步驟。依賴前，請先在 {name} 說明中心確認。",
+      "englishNote": "平台步驟以英文提供，並使用 {name} 介面的選單名稱。",
+      "nativeTitle": {
+        "connector": "連接 {name}",
+        "plugin": "安裝 glot 外掛"
+      },
+      "nativeDoc": "完整連接器文件",
+      "tagDoc": "網站標籤指南",
+      "tagTitle": "加入 glot 標籤",
+      "tagAltTitle": "替代方案：通用標籤",
+      "tagAltBody": "若要在瀏覽器中翻譯 {name} 整合未涵蓋的內容，請改為新增通用標籤。",
+      "prep": {
+        "project": "在 glot 中建立專案，並新增你的語言。",
+        "mode": "前往 glot Edge → Website tag，輸入你的網站地址：glot 會進行翻譯並顯示預覽。貼上標籤後，請在該處檢查安裝狀況，並開啟標籤。",
+        "copy": "從該分頁複製你的標籤：它已包含你的專案及公開金鑰（data-key）。下方標籤顯示其格式。"
+      },
+      "snippetLabel": "glot 標籤",
+      "plansTitle": "方案需求",
+      "glotPlan": "在 glot 方面，各方案包含的內容請見定價。glot Edge（翻譯網址）包含在 Growth 方案中，Pro 方案提供有限的試用。",
+      "seoTitle": "供搜尋引擎使用的翻譯網址",
+      "seoYes": "若要讓搜尋引擎無需執行 JavaScript 即可索引翻譯頁面，請將 glot Edge 設在你網域的子網域上（例如 es.example.com），並新增兩筆 DNS 記錄：",
+      "seoNo": "此處無法使用 glot Edge 的子網域模式：",
+      "dnsLabel": "DNS 記錄（TXT 權杖顯示於 glot Edge → Setup）",
+      "edgeDoc": "glot Edge 運作方式",
+      "faqTitle": "常見問題",
+      "faq": {
+        "partner": {
+          "q": "glot 是 {name} 的合作夥伴嗎？",
+          "a": "不會。glot 為獨立服務，與 {name} 沒有隸屬關係，也未獲其認可。本指南僅使用 {name} 的標準功能。"
+        },
+        "content": {
+          "q": "glot 會變更我的 {name} 內容嗎？",
+          "a": "{method, select, tag {不會。標籤會在訪客的瀏覽器中翻譯頁面；你的 {name} 內容保持不變。移除標籤後，網站會恢復為原始語言。} plugin {你的原始內容保持不變。外掛會在瀏覽器中翻譯頁面，連接後會將譯文寫入語言欄位，供你在發布前審閱。} other {你的原始內容保持不變。glot 會將譯文寫入 {name} 自有的語言欄位，你可在發布前審閱。}}"
+        },
+        "seo": {
+          "q": "搜尋引擎會索引我的翻譯嗎？",
+          "a": "僅靠標籤無法做到：它在瀏覽器中翻譯，因此搜尋引擎多半仍索引你的原始語言。若要讓翻譯頁面擁有各自的網址，需要 glot Edge，或能為每種語言發布獨立網址的平台。"
+        }
+      },
+      "docsTitle": "{name} 官方文件",
+      "trademark": "{name} 為其擁有者的商標。glot 與 {name} 無關聯。",
+      "cta": {
+        "title": "翻譯你的 {name} 網站",
+        "body": "建立專案、選擇語言，然後依照上方步驟操作。",
+        "start": "建立專案",
+        "docs": "閱讀文件"
+      },
+      "related": "更多整合：{category}"
+    }
+  },
+  "liveCheck": {
+    "title": "在您的網站上線",
+    "description": "此處可將語言完整翻譯，但若網站自己的程式碼不接受 glot 傳送的語言代碼，該語言仍可能無法在您的網站上顯示。glot 會檢查網站上的每種語言，並告訴您需要更改什麼。",
+    "recheck": "重新檢查",
+    "checking": "正在檢查您的網站…",
+    "willCheck": "儲存並翻譯後，我們會檢查它是否顯示在您的網站上。",
+    "checked": "檢查於 {date}",
+    "state": {
+      "live": "已翻譯 · 已在網站上線",
+      "not_displayed": "已翻譯，但您的網站未顯示",
+      "unknown": "已翻譯 · 尚未在您的網站上確認",
+      "unchecked": "尚未在您的網站上檢查",
+      "no_site": "未在您的網站上檢查"
+    },
+    "badge": {
+      "live": "網站已顯示",
+      "notDisplayed": "網站未顯示"
+    },
+    "evidence": {
+      "visitors": "過去 7 天內選擇此語言的訪客已確認。"
+    },
+    "mapped": "glot 會為此語言傳送 <c>{code}</c> 至您的網站，而非 <c>{locale}</c>。",
+    "mappedAuto": "您的網站會忽略 <c>{locale}</c>，改以 <c>{code}</c> 回應：glot 已找到此設定，現在會自動傳送 <c>{code}</c>。",
+    "cause": {
+      "visitors": "訪客選擇了此語言。切換器將 <c>{code}</c> 送到您的網站，但頁面沒有改變：您網站自己的程式碼不接受 <c>{code}</c>。",
+      "visitorsLang": "訪客選擇了此語言。切換器將 <c>{code}</c> 送到您的網站，但頁面仍停留在 <c>{lang}</c>：您網站自己的程式碼不接受 <c>{code}</c>。",
+      "probe": "我們開啟 <c>{url}</c>，得到的頁面與您的網站對未知語言顯示的頁面相同：您網站自己的程式碼不接受 <c>{code}</c>。",
+      "worksWith": "使用 <c>{code}</c> 時，網站會以此語言回應。"
+    },
+    "fix": {
+      "title": "修正方法",
+      "alias": "在我的網站使用 {code}",
+      "aliasConfirmed": "glot 將改為傳送 <c>{code}</c>，而非 <c>{locale}</c>。您的網站程式碼無需任何更改。",
+      "dev": "或保留 <c>{locale}</c>，並讓您的網站在讀取語言的任何地方都接受它（<docs>指南</docs>）：",
+      "send": "傳送給我的開發人員",
+      "message": "我們的網站尚未顯示 {language}。翻譯已在 glot 中準備就緒，語言切換器也會將代碼「{locale}」傳送至網站（例如 ?lang={locale}），但網站會忽略它，仍停留在預設語言。網站的程式碼可能只接受「en」或「fr」等簡短代碼。\n\n兩種修正方式：\n1. 在網站讀取語言的任何地方接受「{locale}」（只允許字母或長度檢查會拒絕它）。\n2. 或告訴我網站對 {language} 期望的代碼，我會在 glot（設定、語系）中設定。\n\n網站：{site}\n指南：{docs}"
+    },
+    "unknown": {
+      "csr": "您的網站無論語言為何都回傳相同的 HTML（由瀏覽器切換語言），因此我們的伺服器無法判斷。第一位選擇此語言的訪客將會加以確認。",
+      "http": "您的網站在 <c>{url}</c> 回應錯誤（{status}）。請檢查下方「您的網站」中的網站 URL 與 URL 格式。",
+      "unreachable": "glot 的伺服器無法連線至 <c>{url}</c>。"
+    },
+    "noSiteHint": "請在下方的「您的網站」中新增網站 URL，我們就會在該處檢查此語言。使用 glot 語言切換器的訪客也會加以確認。",
+    "codeLabel": "您網站上的程式碼",
+    "reset": "再次使用 {locale}"
+  },
+  "autopilot": {
+    "title": "Autopilot",
+    "subtitle": "下一個要開放的市場、其價值，以及依轉換自動改善的文案。所有數字都來自您自己的流量。",
+    "docs": "計算方式",
+    "footnote": "依據過去 {days} 天中有紀錄的 {dataDays} 天、共 {visits} 次訪問計算。估算會隨天數累積而趨於穩定。",
+    "noConversions": "此期間未收到「{goal}」事件：市場僅依需求排序，不估算任何效益。請回傳該事件，以取得轉換與金額估算。",
+    "empty": {
+      "title": "尚無任何訪問紀錄",
+      "body": "Autopilot 會讀取 Insights 標籤的匿名計數。安裝後，第一批市場會顯示在這裡。在真實訪客到來之前，不會進行任何估算。",
+      "track": "接著回傳你的轉換事件。價值為選填：填入後即可將轉換換算為金額。",
+      "posthog": "已在使用 PostHog？請在下方連接，即可依現有紀錄為市場排序，無需等待 glot 標籤。"
+    },
+    "settings": {
+      "title": "一次轉換的價值",
+      "subtitle": "用於將額外轉換換算為金額。若留空，則使用事件中傳送的平均價值。",
+      "goal": "目標事件",
+      "value": "每次轉換的價值",
+      "valuePlaceholder": "依實測值",
+      "currency": "貨幣",
+      "mode": "文案勝出時",
+      "approval": "保留前先詢問我",
+      "auto": "自動保留",
+      "save": "儲存",
+      "saved": "已儲存"
+    },
+    "value": {
+      "declared": "每次「{goal}」計為 {amount}（您的設定）。",
+      "measured": "每次「{goal}」計為 {amount}：過去 90 天內 {events} 個有價值事件的平均值。",
+      "none": "「{goal}」沒有已知價值：預估值保留為轉換數。請在此設定價值，或隨事件一併傳送。"
+    },
+    "opp": {
+      "title": "可開放的市場",
+      "subtitle": "訪客要求但尚未提供服務的語言，依預期效益排序。",
+      "none": "訪客偏好的所有語言都已提供服務，無需開放任何語言。",
+      "headline": "{language}：{share} 的訪客未使用其語言服務",
+      "headlineFinish": "{language}：{share} 的訪客，僅 {coverage} 已翻譯",
+      "gap": "他們的轉換率比使用其母語的訪客低 {gap}（{fallback} 對 {native}）。",
+      "gapNone": "他們的轉換率與使用其母語的訪客相當（{fallback} 對 {native}）。",
+      "revenue": "每月 {mid}",
+      "conversions": "每月 {mid} 次「{goal}」",
+      "range": "可能介於 {low} 與 {high} 之間",
+      "uncertain": "區間包含零：效益尚未確立。",
+      "insufficient": "資料不足，無法估算效益。",
+      "missingVisits": "還需 {count} 次來自這些訪客的造訪。",
+      "missingNative": "還需 {count} 次以訪客母語提供服務的造訪，才能進行比較。",
+      "missingConversions": "還需 {count} 次轉換，才能得出可靠的估計。",
+      "cost": "翻譯 {keys} 個字串需 {cost}",
+      "payback": "約 {days} 天內回本",
+      "paybackFast": "不到一天即可回本",
+      "method": "計算方式",
+      "formula": "每月 {visits} 次造訪 ×（{native} − {fallback}）= 每月額外 {gain} 次轉換",
+      "formulaMoney": "× {value} = 每月 {revenue}",
+      "caveat": "90 % 信賴區間。此估計假設這些訪客的轉換情況與已使用其語言的訪客相近。這只是估計，不是承諾：開放後的量測結果才是實際情況。",
+      "open": "開放此市場",
+      "locked": "預期效益已包含在 Growth 中。",
+      "bounce": "{rate} 的工作階段在瀏覽一頁後即結束，所有訪客則為 {all}。"
+    },
+    "confidence": {
+      "insufficient": "資料不足",
+      "indicative": "僅供參考",
+      "solid": "可靠"
+    },
+    "open": {
+      "title": "要開放 {language} 嗎？",
+      "body": "glot 會新增此語言，翻譯 {keys} 則字串（約 {cost}，上限 {cap}），並在翻譯完成後立即開始測量。",
+      "mode": "量測方式",
+      "holdout": "對照組（衡量實際效果）",
+      "holdoutHint": "這些訪客中有 20% 在 14 天內維持目前語言，之後所有人都會使用新語言。需要在執行時載入翻譯（glot CDN 或 glot Edge）。",
+      "before_after": "前後比較",
+      "before_afterHint": "比較同一批訪客在前後的表現。這不是證明：季節與行銷活動同樣會影響數字。",
+      "confirm": "開啟市場",
+      "cancel": "取消",
+      "started": "{language}：翻譯已開始"
+    },
+    "openings": {
+      "title": "正在開放的市場",
+      "status": {
+        "translating": "翻譯中",
+        "measuring": "測量中",
+        "failed": "失敗"
+      },
+      "progress": "{done} / {total} 個字串",
+      "predicted": "預測：{gain}，{range}",
+      "predictedNone": "無預測：開啟時此語言沒有任何資料。",
+      "measured": "實測：{lift}（介於 {low} 至 {high} 之間）",
+      "causal": "以對照組衡量：為實際效果。",
+      "notCausal": "前後比較：屬於相關性，並非證明。",
+      "details": "查看測量結果"
+    },
+    "misrouted": {
+      "title": "訪客看到錯誤的語言",
+      "subtitle": "這些語言你已經有了，但部分訪客仍看到其他語言。無需再翻譯：請改為偵測瀏覽器語言，或讓語言切換器更顯眼。",
+      "headline": "{language}：偏好此語言的訪客中有 {share} 看到 {instead}（{count} 次訪問）",
+      "rates": "轉換率：收到其他語言時為 {mismatched}，收到自己語言時為 {matched}。",
+      "gain": "預期每月 {mid} 個「{goal}」（介於 {low} 至 {high} 之間）。",
+      "missing": "還需要 {count} 次轉換，才能比較兩組結果。",
+      "caveat": "其中部分訪客可能是自行選擇該語言。"
+    },
+    "copy": {
+      "title": "會自我優化的文案",
+      "subtitle": "針對標題、按鈕和價格文案，glot 會撰寫替代說法、展示給訪客，並保留轉換率最高的版本。法律條款文字絕不會被更動。",
+      "candidates": "值得優化的文案",
+      "noCandidates": "尚未找到已翻譯的標題、按鈕或定價文字。",
+      "optimize": "優化",
+      "started": "已開始測試 {key}",
+      "lowTraffic": "流量偏低：30 天內不太可能出現結果",
+      "noTraffic": "此語言尚無造訪紀錄",
+      "noConversions": "此語言尚無「{goal}」：測試無法得出結論",
+      "estDays": "約 {days} 天後出現首個結果",
+      "kind": {
+        "headline": "標題",
+        "cta": "按鈕",
+        "pricing": "定價",
+        "other": "文字"
+      },
+      "status": {
+        "running": "測試中",
+        "awaiting_approval": "等待確認的優勝文案",
+        "promoted": "已保留",
+        "rolled_back": "已回復",
+        "no_winner": "無優勝者",
+        "stopped": "已停止"
+      },
+      "reason": {
+        "official_best": "目前的翻譯轉換成效最佳。未做任何變更。",
+        "no_difference": "{days} 天後沒有可測量的差異。維持目前的翻譯。",
+        "all_variants_worse": "所有新文案的轉換成效都較差。已撤下這些文案，維持目前的翻譯。",
+        "source_changed": "來源文字已變更，測試已停止。",
+        "stopped_manually": "已由成員停止。",
+        "promoted_manually": "已從實驗頁面保留。",
+        "approver_missing": "glot 無法自動保留此文案，請自行核准。"
+      },
+      "lift": "以轉換計，介於 {low} 與 {high} 之間",
+      "worth": "若維持成效，每月約 {amount}",
+      "winner": "勝出文案",
+      "leader": "目前最佳文案",
+      "current": "目前的翻譯",
+      "sample": "此文案有 {views} 位訪客與 {conversions} 次轉換，目前翻譯則有 {cviews} 位訪客與 {cconversions} 次轉換",
+      "dropped": "已撤下，轉換成效較差：「{value}」",
+      "refused": "在任何訪客看到之前已被拒絕（{why}）：「{value}」",
+      "why": {
+        "new_number": "新增了數字",
+        "new_price": "新增了價格或百分比",
+        "new_link": "新增了連結",
+        "new_claim": "新增了承諾內容",
+        "validation": "未通過驗證"
+      },
+      "approve": "保留此文案",
+      "stop": "停止",
+      "approved": "已保留文案",
+      "stopped": "測試已停止",
+      "caveat": "獲勝者的提升幅度通常會被高估，因為它是在領先時被選出的。下限才是較安全的數字。",
+      "none": "尚無測試。請選擇下方文字。"
+    },
+    "collected": {
+      "title": "收集內容",
+      "body": "僅計數。不含訪客、Cookie、IP 位址或頁面資料。",
+      "insights": "每日的造訪與事件數，包含偏好語言、提供的語言、國家與測試組別。",
+      "variants": "依文案統計的瀏覽與轉換次數。",
+      "revenue": "依日期、事件與幣別：事件數量及其價值總和。",
+      "posthog": "選用的 PostHog 匯入：依日期、瀏覽器語言、頁面語言與國家／地區，統計工作階段數、頁面瀏覽數、單頁工作階段數、訪客數，以及包含轉換事件的工作階段數。"
+    },
+    "source": {
+      "label": "來源：{source} · 資料天數：{days}",
+      "insights": "glot 標籤",
+      "posthog": "PostHog",
+      "switch": "改顯示 {source}",
+      "synced": "已匯入 {date}"
+    },
+    "posthog": {
+      "title": "資料來源：PostHog",
+      "subtitle": "匯入 PostHog 歷史資料（唯讀，僅限每日計數），無需等待 glot 標籤即可為市場排序。文案測試與上線衡量仍需要 glot 標籤。",
+      "connected": "已連線至 {host} 上的專案 {project}。",
+      "notConnected": "未連線。",
+      "synced": "已匯入 {from} 至 {to} 的資料，上次同步：{when}。",
+      "never": "尚未匯入任何資料。",
+      "error": "上次匯入失敗：{error}",
+      "host": "區域",
+      "us": "US 雲端",
+      "eu": "歐盟雲端",
+      "custom": "自架",
+      "url": "執行個體網址",
+      "project": "專案 ID",
+      "key": "個人 API 金鑰",
+      "keyPlaceholder": "phx_…",
+      "keySaved": "已儲存。留空即保留現有金鑰。",
+      "event": "轉換事件",
+      "eventNone": "無（僅計算造訪）",
+      "eventHint": "測試連線後，可從專案的實際事件中選擇（近 30 天）。",
+      "locale": "未標示語言代碼之頁面的語言",
+      "localeHint": "當網址沒有 /nl/ 或 nl. 前綴時使用。不確定時請留空。",
+      "backfill": "要匯入的歷史資料（天數）",
+      "test": "測試連線",
+      "tested": "已連線：過去 30 天共 {pageviews} 次造訪，其中 {share} 具有瀏覽器語言。",
+      "save": "儲存並匯入",
+      "sync": "立即匯入",
+      "syncing": "匯入中…",
+      "imported": "已匯入：{rows} 個計數器（{queries} 次查詢）。",
+      "disconnect": "中斷連線",
+      "disconnected": "PostHog 已中斷連線：金鑰與已匯入的計數器均已刪除。",
+      "steps": "取得金鑰的方法",
+      "step1": "在 PostHog 中，開啟頭像選單 → Settings → Personal API keys → Create personal API key。",
+      "step2": "範圍：Query → Read only (query:read)，僅限此專案。",
+      "step3": "專案 ID：Project settings → General → Project ID（數字）。",
+      "step4": "區域：若登入 us.posthog.com 請選 US，若登入 eu.posthog.com 請選 EU。",
+      "privacy": "glot 僅向 PostHog 請求每日計數、瀏覽器語言、頁面語言與國家。不會擷取任何使用者、IP 位址或網址。金鑰會加密儲存，且不會再次顯示。"
+    }
+  },
+  "renderProtocol": {
+    "title": "Render API",
+    "subtitle": "傳送任何內容與收件者的語系，即可取得其語言版本。適用於電子郵件、通知、發票與頁面：相同術語表、相同記憶庫、相同檢查。",
+    "docs": "閱讀文件",
+    "play": {
+      "title": "測試區",
+      "hint": "請貼上以 {source} 撰寫的內容。已知內容來自記憶庫；新內容會以專案的模型翻譯並記住。",
+      "content": "內容",
+      "contentPlaceholder": "貼上電子郵件內文、通知或段落…",
+      "type": "類型",
+      "variables": "變數（JSON，選填）",
+      "variablesHint": "翻譯完成後填入。不會傳送給模型，也不會儲存。",
+      "noLocales": "請先在專案設定中新增目標語言，以便開始測試。",
+      "languages": "語言",
+      "run": "渲染",
+      "badJson": "變數必須是 JSON 物件。",
+      "units": "{cached} 來自記憶庫 · {translated} 新增 · {total} 總計",
+      "preview": "預覽，{locale}"
+    },
+    "types": {
+      "html": "HTML",
+      "text": "純文字",
+      "markdown": "Markdown",
+      "template": "ICU 範本"
+    },
+    "status": {
+      "translated": "已翻譯",
+      "source": "來源語言",
+      "partial": "部分翻譯",
+      "fallback": "以來源語言回傳"
+    },
+    "usage": {
+      "title": "用量（近 30 天）",
+      "empty": "尚未渲染任何文件。請使用上方的測試區，或以金鑰呼叫 POST /v1/render，首次呼叫後即會顯示統計。",
+      "documents": "文件",
+      "hitRate": "由記憶庫提供",
+      "translated": "已翻譯單元",
+      "fallbacks": "退回來源語言",
+      "memory": "記憶體中的單元：{entries} · 語言：{locales}",
+      "day": "日",
+      "fromMemory": "來自記憶庫的單位數"
+    },
+    "keys": {
+      "title": "金鑰",
+      "create": "新增金鑰",
+      "createHint": "金鑰隸屬於此專案，且只會顯示一次。",
+      "emptyTitle": "尚無 Render 金鑰",
+      "emptyBody": "建立金鑰，以便從後端呼叫 POST /v1/render。",
+      "name": "名稱",
+      "scope": "存取權限",
+      "scopeRender": "翻譯新內容",
+      "scopeCached": "僅使用記憶庫（不呼叫模型）",
+      "month": "本月文件數",
+      "of": "{used} / {limit}",
+      "revoke": "撤銷",
+      "revokeNamed": "撤銷 {name}",
+      "revoked": "金鑰已撤銷",
+      "limit": "每月上限（文件數）",
+      "limitHint": "留空：僅套用您方案的上限。",
+      "revealTitle": "立即複製您的金鑰",
+      "revealBody": "此內容僅顯示一次，請存放於伺服器的機密設定中。"
+    }
+  },
+  "twoWay": {
+    "title": "對話",
+    "subtitle": "客戶的來信會以您的語言顯示在原文旁。您以您的語言回覆，客戶閱讀他們的語言。",
+    "attention": "需要你處理",
+    "mode": {
+      "suggest": {
+        "name": "建議",
+        "hint": "glot 會翻譯你的回覆，但從不發送：你可以複製，或使用自己的工具發送。"
+      },
+      "one_click": {
+        "name": "一鍵發送",
+        "hint": "未按下回覆的「傳送」前，不會送出任何內容。"
+      },
+      "auto": {
+        "name": "自動",
+        "hint": "譯文完成後即自動送出回覆，glot 無把握者除外。"
+      }
+    },
+    "channel": {
+      "api": "API / Webhook",
+      "helpscout": "Help Scout",
+      "form": "聯絡表單",
+      "email": "電子郵件"
+    },
+    "settings": {
+      "open": "設定",
+      "title": "對話設定",
+      "saved": "設定已儲存",
+      "mode": "發送模式",
+      "team": "團隊語言",
+      "review": "低於 (%) 時要求審核",
+      "reviewHint": "回譯與你原文的一致度低於此值的回覆，會等待人工審核。",
+      "webhook": "已簽署的 Webhook",
+      "secretOnce": "請立即複製此密鑰，此密鑰只會顯示一次。",
+      "secretSet": "已設定密鑰。更換密鑰會使舊密鑰失效。",
+      "secretNone": "尚未設定密鑰：在你產生密鑰前，Webhook 會拒絕所有請求。",
+      "rotate": "更換密鑰",
+      "generate": "產生密鑰",
+      "replyUrl": "回覆網址（選填）",
+      "replyUrlHint": "已發送的回覆會以相同密鑰簽署後張貼至此。留空則從 API 回應讀取。",
+      "form": "聯絡表單助手",
+      "formEnabled": "為表單訊息標註語言與翻譯",
+      "formStore": "同時將表單訊息保存在此收件匣",
+      "formHint": "關閉時不儲存任何內容，僅記錄各語言的數量。此腳本不會阻擋任何表單提交。",
+      "hsAppId": "App ID",
+      "hsAppSecret": "App 密鑰",
+      "hsWebhookSecret": "Webhook 密鑰",
+      "hsHint": "在 Help Scout 中建立應用程式（Your Profile → My Apps），接著建立 Webhook，指向上方網址，並勾選事件「Conversation created」、「Customer replied」和「Note created」。",
+      "forward": "將翻譯後的郵件轉寄至",
+      "forwardHint": "來信會先翻譯，再連同下方的原文轉寄至此地址。"
+    },
+    "empty": {
+      "title": "尚無客戶訊息",
+      "body": "此收件匣僅顯示真實訊息。連接一個管道後，第一則訊息會出現在這裡，並附上譯文與原文。",
+      "docs": "閱讀指南",
+      "api": "任何工具：一次 API 呼叫",
+      "form": "於你的網站：聯絡表單腳本",
+      "formOff": "於你的網站：聯絡表單腳本（請先在設定中開啟）",
+      "helpdesk": "Help Scout 與電子郵件收件已於設定中完成設定。"
+    },
+    "stats": {
+      "title": "最近 {days, plural, other {# 天}} 內的 {count, plural, other {# 則客戶訊息}}",
+      "unknown": "未偵測到",
+      "unserved": "非您支援的語言",
+      "hint": "已用您未支援的語言撰寫的客戶，是下一個市場最明確的訊號。"
+    },
+    "flag": {
+      "pii": "{count, plural, other {已隱藏 # 筆個人資料}}",
+      "piiTip": "電子郵件、電話號碼、訂單與卡號在傳送給模型前會以佔位符取代，之後再還原。",
+      "language_uncertain": "語言不確定",
+      "low_confidence": "請檢查此譯文",
+      "pii_lost": "隱藏資料未能正確還原",
+      "mixed": "混合語言：{languages}",
+      "untranslated": "未翻譯",
+      "validation": "未通過品質檢查"
+    },
+    "thread": {
+      "language": "客戶使用{language}撰寫",
+      "languageUnknown": "客戶語言未知",
+      "fixLabel": "客戶語言（代碼）",
+      "fix": "設定語言",
+      "customer": "客戶",
+      "team": "您的團隊",
+      "original": "原文（{language}）",
+      "translation": "譯文（{language}）",
+      "sameLanguage": "已是您的語言，無需翻譯。"
+    },
+    "status": {
+      "received": "已接收",
+      "draft": "草稿",
+      "needs_review": "待審核",
+      "sent": "已傳送",
+      "failed": "失敗"
+    },
+    "reply": {
+      "sent": "回覆已發送",
+      "failed": "無法發送回覆",
+      "saved": "翻譯已儲存為草稿",
+      "back": "回譯：",
+      "confidence": "{percent}% 一致",
+      "label": "以你的語言回覆",
+      "placeholder": "撰寫你的回覆…",
+      "checking": "翻譯並檢查中…",
+      "review": "回譯內容與你的原文不同：發送前請先閱讀。",
+      "hint": "停止輸入後，即可看到客戶會讀到的內容，並為你回譯。",
+      "save": "翻譯",
+      "send": "發送"
+    }
+  },
+  "localSeo": {
+    "title": "Local SEO",
+    "subtitle": "翻譯後的關鍵字不是人們實際搜尋的字詞。對於每個頁面與市場，glot 會依真實搜尋查詢調整標題、描述與標題列。頁面內文保持忠實翻譯，未經你核准，內容不會上線。",
+    "warnings": "無法完成的項目",
+    "dismiss": "關閉",
+    "cancel": "取消",
+    "save": "儲存",
+    "saved": "已儲存草稿",
+    "approved": "已核准：此市場即時生效",
+    "rejected": "已拒絕：保留目前的翻譯",
+    "approve": "核准",
+    "reject": "拒絕",
+    "takeDown": "下架",
+    "edit": "編輯",
+    "edited": "你的版本",
+    "proposed": "已提議",
+    "current": "今日顯示",
+    "why": "人們在該地區的搜尋內容",
+    "slug": "slug",
+    "blocked": "核准前請先修正以下錯誤",
+    "volumeUnknown": "搜尋量未知",
+    "needsDemand": "{locale} 尚無搜尋資料。請連結 Search Console，或新增你已知此市場的關鍵字：glot 絕不會自行編造關鍵字或搜尋量。",
+    "editTitle": "{path} 於 {locale}",
+    "editBody": "你的版本會取代提案，並經過相同的檢查。",
+    "saveDraft": "儲存草稿",
+    "saveApprove": "儲存並核准",
+    "scan": {
+      "action": "掃描頁面",
+      "running": "正在讀取頁面…",
+      "done": "已讀取頁面：{pages} · 提議：{proposed}"
+    },
+    "empty": {
+      "title": "尚未掃描任何頁面",
+      "body": "glot 會讀取 {site} 的公開頁面，檢查各市場目前顯示的內容，並在有真實搜尋資料時提出面向搜尋的內容建議。",
+      "noSite": "請先告訴 glot 你的網站位置（於上方），以掃描其頁面。"
+    },
+    "site": {
+      "title": "網站",
+      "missing": "glot 尚不知道你網站的網址。"
+    },
+    "auto": {
+      "off": "審閱模式：每則提案都需你核准",
+      "on": "自動模式：通過所有檢查的提案將直接上線",
+      "confirmTitle": "要自動套用提案嗎？",
+      "confirmBody": "沒有任何警告且通過所有檢查的提案，將直接上線，無需先由人工審閱。含錯誤或警告的提案仍會等待你處理。你隨時可以切換回來。",
+      "confirm": "開啟自動模式"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "notConnected": "尚未連結。連結（唯讀）後即可查看使用者在各國實際搜尋的內容，並在變更後衡量曝光、點擊與排名。",
+      "notConfigured": "此伺服器尚未提供此功能：管理者必須先新增 Google OAuth 用戶端。在此之前，請先新增你已知的關鍵字。",
+      "connect": "連結 Search Console",
+      "disconnect": "中斷連結",
+      "result": {
+        "connected": "已連結 Search Console",
+        "denied": "未連結 Search Console：已拒絕存取權限",
+        "no_property": "此 Google 帳戶沒有此網站的 Search Console 資源",
+        "failed": "無法連結 Search Console，請再試一次。"
+      }
+    },
+    "metrics": {
+      "refresh": "更新搜尋資料",
+      "refreshed": "已儲存的搜尋資料天數：{days}",
+      "none": "此頁面尚未儲存 Search Console 資料。",
+      "notConnected": "連結 Search Console 以衡量成效。",
+      "window": "{days} 天 · {impressions} 次曝光 · {clicks} 次點擊 · 排名 {position}",
+      "noRows": "無資料",
+      "before": "上線前 28 天",
+      "after": "上線後"
+    },
+    "keywords": {
+      "title": "你的關鍵字",
+      "hint": "你從自己的工具中已知的各市場搜尋詞。",
+      "saved": "已儲存關鍵字：{count}",
+      "dialogTitle": "{locale} 的關鍵字",
+      "dialogBody": "每行一個搜尋詞，寫法與使用者在此市場的輸入方式相同。若知道月搜尋量，可在後面加上逗號與數字。"
+    },
+    "engine": {
+      "google": "谷歌",
+      "baidu": "百度",
+      "yandex": "Yandex",
+      "naver": "Naver"
+    },
+    "status": {
+      "proposed": "待審核",
+      "approved": "已上線",
+      "auto": "已上線（自動）",
+      "rejected": "已拒絕",
+      "stale": "頁面已變更",
+      "needs_demand": "無搜尋資料"
+    },
+    "source": {
+      "manual": "你的清單",
+      "gsc": "Search Console",
+      "gsc_site": "Search Console，全站"
+    },
+    "field": {
+      "title": "標題",
+      "description": "Meta 描述",
+      "h1": "主標題（H1）",
+      "slug": "URL slug（建議）"
+    }
+  },
+  "liveStream": {
+    "title": "即時串流",
+    "subtitle": "在文字尚未存在時翻譯：AI 回覆、通知、聊天訊息，邊串流邊翻譯，並套用你的詞彙表與翻譯記憶。",
+    "ms": "{n} 毫秒",
+    "optIn": {
+      "title": "這是您使用者的內容",
+      "sent": "傳送給您 AI 供應商的內容：要翻譯的句子、其中包含的術語表詞彙，以及對話最後幾句。程式碼、連結與不翻譯的詞彙會先替換為佔位符；電子郵件與長數字（電話、卡號）同樣會替換，除非您關閉遮罩。姓名與郵寄地址不會被偵測。",
+      "stored": "glot 保存的內容：每個句子的金鑰指紋與計數器，以及每日總計。除非您開啟下方的快取，否則不保存任何文字。",
+      "on": "開",
+      "off": "關"
+    },
+    "settings": {
+      "mask_pii": {
+        "label": "遮蔽個人資料",
+        "help": "電子郵件與 7 位數以上的數字絕不會傳送至服務供應商；翻譯結果中會還原這些內容。"
+      },
+      "store": {
+        "label": "快取翻譯",
+        "help": "保留已遮蔽的翻譯，讓重複句子即時且免費取得。關閉時會刪除這些翻譯。"
+      },
+      "browser": {
+        "label": "瀏覽器存取",
+        "help": "接受來自網頁的專案公開金鑰。關閉時僅允許你的伺服器搭配 API token 存取。"
+      }
+    },
+    "provider": {
+      "mock": "此專案使用模擬供應商：下方輸出的是標記過的原文，並非翻譯。",
+      "missing": "尚未設定 AI 金鑰：只會翻譯已存在於翻譯記憶中的句子，其餘內容將原樣保留。",
+      "fix": "請在<link>專案設定</link>中設定供應商與金鑰。"
+    },
+    "playground": {
+      "title": "用您自己的文字試試",
+      "body": "輸入或貼上訊息。它會依您選擇的速度重播，經過您的應用程式會呼叫的相同流程，並套用此專案的術語表 ({terms, plural, =0 {尚無術語} other {# 個術語}}) 與翻譯記憶。下方的時間是此次執行在您的瀏覽器中測得的。",
+      "enableFirst": "請先開啟上方的即時串流即可試用。",
+      "noLocale": "請先為此專案新增目標語言。",
+      "placeholder": "在此輸入或貼上訊息（支援 Markdown、程式碼區塊與連結）…",
+      "input": "要串流的文字",
+      "to": "翻譯成",
+      "speed": "速度",
+      "cps": "每秒 {n} 個字元",
+      "atOnce": "一次全部顯示",
+      "start": "開始串流",
+      "stop": "停止",
+      "source": "收到的內容",
+      "output": "使用者看到的內容 ({locale})"
+    },
+    "via": {
+      "tm": "來自你的翻譯記憶",
+      "cache": "已在此對話或快取中翻譯過"
+    },
+    "reason": {
+      "no_provider": "未翻譯：尚未設定 AI 供應商。",
+      "provider_error": "未翻譯：AI 供應商回傳錯誤。",
+      "provider_timeout": "未翻譯：AI 供應商未在時限內回應。",
+      "provider_down": "未翻譯：AI 供應商剛剛失敗，因此不再重試呼叫。",
+      "invalid_output": "未翻譯：回應遺失受保護的元素（程式碼、連結、個人資料）或破壞了格式，因此保留原文。",
+      "glossary": "已翻譯，但未遵循某個術語表詞彙。",
+      "live_stream_disabled": "未翻譯：此專案已關閉即時串流。",
+      "live_stream_daily_cap": "未翻譯：已達到此專案的每日上限。",
+      "other": "未翻譯：無法連線至 glot。"
+    },
+    "metric": {
+      "first": "首個譯文",
+      "lag": "中位延遲",
+      "lagMax": "最長延遲",
+      "llm": "由 AI 翻譯",
+      "known": "來自記憶庫"
+    },
+    "code": {
+      "title": "在您的應用程式中",
+      "body": "在 AI SDK 回傳的串流周圍加入一行程式碼。若 glot 無法回應，使用者會完整收到原始文字。<link>閱讀指南</link>。"
+    },
+    "usage": {
+      "title": "近 30 天",
+      "empty": {
+        "title": "尚無翻譯內容",
+        "body": "首次為此專案翻譯串流後，數據會顯示在此處，來源可為上方的測試區或你的應用程式。"
+      },
+      "chars": "字元",
+      "units": "句子",
+      "failed": "未翻譯",
+      "repeats": "{repeats, plural, other {# 個句子出現超過一次}}，共 {distinct} 個不重複，其中 {stored} 個保留在快取中。"
+    }
+  },
+  "siteNav": {
+    "product": "產品",
+    "solutions": "解決方案",
+    "resources": "資源",
+    "signIn": "登入",
+    "tryFree": "免費試用",
+    "why": "為什麼選擇 glot",
+    "how": "運作方式",
+    "demo": "示範",
+    "live": "即時",
+    "sites": "網站與商店",
+    "apps": "應用程式與程式碼",
+    "benchmark": "基準測試",
+    "faq": "常見問題"
+  }
+}

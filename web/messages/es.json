@@ -852,21 +852,6 @@
     "chartAria": "Tasa de conversión posterior por variante: {summary}",
     "chartCaption": "Cada curva muestra el rango plausible de la tasa de conversión de una variante según los datos disponibles; una curva más estrecha indica mayor certeza.",
     "confirm": "Confirmar",
-    "dialog": {
-      "body": "Las variantes conservan el significado, los marcadores de posición y el glosario de la traducción oficial; solo se sirven las que superan la validación.",
-      "cancel": "Cancelar",
-      "created": "{n, plural, one {# variante validada y activa} many {# variantes validadas y activas} other {# variantes validadas y activas}}{rejected, plural, =0 {} one {, # rechazada} many {, # rechazadas} other {, # rechazadas}}",
-      "explore": "Tráfico %",
-      "goal": "Evento objetivo",
-      "guardrails": "La traducción oficial sigue en la competición como referencia. El % de tráfico es la proporción de visitantes expuestos al experimento; el resto siempre ve el texto oficial.",
-      "key": "Clave",
-      "keyHint": "Cadena de alto impacto: llamada a la acción, título de precios, botón de registro.",
-      "locale": "Idioma",
-      "minN": "Mín. por variante",
-      "submit": "Generar e iniciar",
-      "title": "Nuevo experimento de textos",
-      "variants": "Variantes"
-    },
     "empty": {
       "body": "Selecciona un CTA o un titular de precios y un idioma. glot escribe 2-3 variantes con el mismo significado en distintos tonos, las valida, las sirve a una parte de tus visitantes y te indica cuál gana.",
       "title": "Encuentra la redacción que convierte"
@@ -983,14 +968,12 @@
       "proposed": "Propuesta lista",
       "rejected": "Rechazado"
     },
-    "subtitle": "Traducciones marcadas por hablantes nativos en producción, con una corrección de IA para revisar.",
     "suggested": "Sugerida: {text}",
     "tabs": {
       "accepted": "Aceptadas",
       "live": "Por revisar",
       "rejected": "Rechazadas"
     },
-    "title": "Comentarios",
     "userReports": "Lo que dijeron los usuarios",
     "viewPr": "Ver pull request",
     "filterLabel": "Filtrar informes por estado",
@@ -1536,10 +1519,6 @@
     "noBudget": "Sin presupuesto definido",
     "noIssues": "No hay incidencias abiertas. Todas las traducciones superan la validación.",
     "noJobs": "Aún no hay tareas. Traduce las claves que faltan para iniciar una.",
-    "noKeys": {
-      "body": "Envía tus catálogos desde tu repositorio para empezar.",
-      "title": "Aún no hay claves"
-    },
     "openIssues": "Incidencias abiertas",
     "progress": "Progreso por idioma",
     "progressHint": "{translated} de {total} traducidas · {reviewed} revisadas",
@@ -1567,7 +1546,6 @@
   },
   "projects": {
     "create": {
-      "description": "Podrás cambiar los idiomas y la configuración de LLM más adelante.",
       "name": "Nombre",
       "namePlaceholder": "Mi SaaS",
       "slug": "Slug",
@@ -1576,7 +1554,6 @@
       "submit": "{count, plural, one {Crear proyecto con # idioma} many {Crear proyecto con # idiomas} other {Crear proyecto con # idiomas}}",
       "success": "Proyecto {name} creado",
       "targetLocales": "Idiomas de destino",
-      "targetLocalesHint": "Códigos BCP 47 separados por comas, p. ej. fr, de, pt-BR.",
       "title": "Nuevo proyecto",
       "back": "Atrás",
       "next": "Continuar",
@@ -3325,7 +3302,8 @@
         }
       },
       "self_hosted": {
-        "name": "Autoalojado"
+        "name": "Autoalojado",
+        "tagline": ""
       },
       "team": {
         "name": "Growth",
