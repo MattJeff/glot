@@ -15,8 +15,11 @@ const GLOT_CLOUD = "https://app.glotlang.com";
 /** Public (browser) key of the project; rotating it in the dashboard means updating it here. */
 const GLOT_PUBLIC_KEY = "pk_6543cf0f139f7404248a5faa";
 
+// ponytail: the 6 historic locales are prerendered at build; the other 25 render on first request and are then
+// cached (31 locales × every page timed out the image build). Prerender more if their traffic grows.
+const PRERENDERED = ["en", "fr", "es", "de", "ja", "ar"];
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
+  return PRERENDERED.map((locale) => ({ locale }));
 }
 
 // viewport-fit=cover: full-bleed on notched phones; globals.css pads with env(safe-area-inset-*).

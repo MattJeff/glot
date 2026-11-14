@@ -9,14 +9,23 @@ import { GITHUB_URL } from "@/lib/snippets";
 export const SITE = "https://glotlang.com";
 const OG_LOCALE: Record<string, string> = { en: "en_US", fr: "fr_FR", es: "es_ES", de: "de_DE", ja: "ja_JP", ar: "ar_AR" };
 
-export function translatedLocales(ns: string): string[] {
-  return routing.locales.filter((l) => {
+// Top-level namespaces of each catalog, read once per process (the sitemap asks for every page × 31 locales).
+const NAMESPACES = new Map<string, Set<string>>();
+function namespaces(l: string): Set<string> {
+  let ns = NAMESPACES.get(l);
+  if (!ns) {
     try {
-      return ns in JSON.parse(readFileSync(path.join(process.cwd(), "messages", `${l}.json`), "utf8"));
+      ns = new Set(Object.keys(JSON.parse(readFileSync(path.join(process.cwd(), "messages", `${l}.json`), "utf8"))));
     } catch {
-      return false;
+      ns = new Set();
     }
-  });
+    NAMESPACES.set(l, ns);
+  }
+  return ns;
+}
+
+export function translatedLocales(ns: string): string[] {
+  return routing.locales.filter((l) => namespaces(l).has(ns));
 }
 
 export const pageUrl = (locale: string, p = "") => `${SITE}${locale === routing.defaultLocale ? "" : `/${locale}`}${p}`;
