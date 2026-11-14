@@ -9,7 +9,7 @@ Let your team and outside reviewers annotate translations directly on your real 
 Add the loader to your layout, once:
 
 ```html
-<script src="https://unpkg.com/@glot-i18n/review/dist/review.global.js"
+<script src="https://glotlang.com/widget/review.global.js"
         data-project="acme" data-endpoint="https://glot.example.com" async></script>
 ```
 

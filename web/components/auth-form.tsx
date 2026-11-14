@@ -73,6 +73,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         if (me?.email_enabled && !me.email_verified)
           dest = `/verify-email?sent=1${safeNext ? `&next=${encodeURIComponent(safeNext)}` : ""}`;
       }
+      // Signup goal of glot's own Insights / Autopilot (project "lot"); the beacon survives the navigation.
+      if (mode === "signup") (window as { glot?: { track: (e: string) => void } }).glot?.track("signup");
       // Full navigation so the proxy sees the fresh session cookie. Only same-site paths are allowed.
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a router push would keep the pre-login cache
       window.location.assign(dest);

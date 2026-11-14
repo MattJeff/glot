@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -9,6 +10,10 @@ import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+
+const GLOT_CLOUD = "https://app.glotlang.com";
+/** Public (browser) key of the project; rotating it in the dashboard means updating it here. */
+const GLOT_PUBLIC_KEY = "pk_6543cf0f139f7404248a5faa";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -39,6 +44,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <NextIntlClientProvider>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
+        {/* glot in glot (cloud project "lot"). Insights: cookieless daily counters per language, the signup goal
+            feeds Autopilot. Review: ~1 kB loader, inert unless the tab holds a review link. */}
+        <Script src="https://unpkg.com/@glot-i18n/insights@0.4.0/dist/insights.global.js" data-key={GLOT_PUBLIC_KEY} data-endpoint={GLOT_CLOUD} data-locale={locale} strategy="afterInteractive" />
+        <Script src="/widget/review.global.js" data-project="lot" data-endpoint={GLOT_CLOUD} data-locale={locale} strategy="afterInteractive" />
       </body>
     </html>
   );
