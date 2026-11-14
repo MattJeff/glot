@@ -21,8 +21,10 @@ import {
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
-import { ACCENTS, APP_URL, type Chrome, getRepoStats, NPM_URL, RefusalCard, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
+import { APP_URL, type Chrome, getRepoStats, NPM_URL, RefusalCard, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
+import { ACCENTS } from "@/components/landing-accents";
 import { CopyCommand } from "@/components/landing-client";
+import { LangMorph, WinnerBoard } from "@/components/landing-visuals";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -268,16 +270,22 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <section id="how" aria-labelledby="how-title" className="acc-cyan section-wash scroll-mt-16 border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="how-title" eyebrow={t("how.eyebrow")} title={t("how.title")} />
-            <ol className="mt-12 grid gap-4 md:grid-cols-3">
-              {(["pick", "write", "ship"] as const).map((k, i) => (
-                <li key={k} className={`reveal card-acc relative rounded-xl border bg-card p-5 shadow-xs ${["acc-cyan", "acc-violet", "acc-green"][i]}`} style={{ animationDelay: `${i * 80}ms` }}>
-                  <span className="tile size-9 rounded-full font-mono text-sm font-semibold tabular-nums">{i + 1}</span>
-                  <h3 className="mt-3 font-medium">{t(`how.${k}.title`)}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
-                  {i < 2 && <ArrowRight aria-hidden className="absolute top-6 -end-3.5 z-10 hidden size-5 rounded-full border bg-background p-0.5 text-muted-foreground md:block rtl:rotate-180" />}
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12 grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
+              <ol className="relative space-y-6 before:absolute before:inset-y-4 before:start-[1.1rem] before:w-px before:bg-gradient-to-b before:from-cyan-500/60 before:via-violet-500/60 before:to-emerald-500/60">
+                {(["pick", "write", "ship"] as const).map((k, i) => (
+                  <li key={k} className={`reveal relative flex gap-4 ${["acc-cyan", "acc-violet", "acc-green"][i]}`} style={{ animationDelay: `${i * 80}ms` }}>
+                    <span className="tile relative size-9 shrink-0 rounded-full bg-card font-mono text-sm font-semibold tabular-nums">{i + 1}</span>
+                    <div>
+                      <h3 className="font-medium">{t(`how.${k}.title`)}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <div className="reveal min-w-0">
+                <LangMorph />
+              </div>
+            </div>
             <p className="mt-6 text-sm text-muted-foreground">{t("how.footnote")}</p>
           </div>
         </section>
@@ -299,7 +307,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <figcaption className="mb-2 inline-flex rounded-full border border-dashed px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{t("results.example")}</figcaption>
               <blockquote className="text-lg font-medium text-pretty sm:text-2xl">“{t("results.exampleSentence")}”</blockquote>
             </figure>
-            <div className="mt-10">
+            <div className="reveal mt-6">
+              <WinnerBoard />
+            </div>
+            <div className="mt-12">
               <Bullets items={(["noEarly", "noFake", "segment", "traffic", "alarms", "audiences"] as const).map((k) => ({ title: t(`results.${k}.title`), body: t(`results.${k}.body`) }))} />
             </div>
           </div>

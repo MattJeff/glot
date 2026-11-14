@@ -166,3 +166,15 @@
   .marquee:hover .marquee-track { animation-play-state: paused; }
 }
 @media (prefers-reduced-motion: reduce) { .marquee { overflow-x: auto; } }
+
+/* Landing visuals (components/landing-visuals.tsx). */
+.board-bar { transform-origin: left; }
+@keyframes m-in { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } }
+@keyframes m-check { from { opacity: 0; transform: scale(0.8); } }
+@media (prefers-reduced-motion: no-preference) {
+  .morph-text { animation: m-in 500ms var(--ease-out-quint) both; }
+  .morph-check { animation: m-check 300ms var(--ease-out-quint) both; }
+  .morph { transition: border-color 400ms ease-out; }
+  .board-lit { translate: 0 -3px; border-color: color-mix(in oklch, var(--acc) 50%, var(--border)); box-shadow: 0 16px 40px -18px color-mix(in oklch, var(--acc) 60%, transparent); }
+  .board-lit .board-bar { animation: l-grow 800ms var(--ease-out-quint) both; }
+}

@@ -1,3 +1,4 @@
+import { ACCENTS } from "@/components/landing-accents";
 // Landing page building blocks (server components). Product output shown in the visuals (glot's refusal
 // messages, benchmark numbers, command lines) is data, not UI copy: it lives in constants. Every label
 // goes through next-intl.
@@ -58,9 +59,6 @@ export async function getRepoStats(): Promise<{ stars: number | null; version: s
     version: typeof npm?.version === "string" ? npm.version : null,
   };
 }
-
-/** Section and card accents, cycled (classes in app/[locale]/landing.css). */
-export const ACCENTS = ["acc-green", "acc-violet", "acc-coral", "acc-cyan", "acc-amber", "acc-pink"] as const;
 
 export function SectionHead({ eyebrow, title, subtitle, id, center }: { eyebrow?: string; title: string; subtitle?: string; id?: string; center?: boolean }) {
   return (
