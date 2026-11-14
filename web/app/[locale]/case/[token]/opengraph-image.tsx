@@ -15,7 +15,7 @@ export default async function OgImage({ params }: { params: Promise<{ token: str
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "#0b0f17", color: "#f5f6f8" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 36, fontWeight: 700 }}>
-          <div style={{ width: 52, height: 52, borderRadius: 12, background: "#10b981", color: "#04120c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>{"{ }"}</div>
+          <div style={{ display: "flex", fontSize: 44, fontWeight: 900, color: "#ff8a1f" }}>{"{}"}</div>
           {"glot"}
         </div>
         {s ? (
