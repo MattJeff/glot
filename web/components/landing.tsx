@@ -18,11 +18,11 @@ import {
   Wand2,
   Languages,
   Workflow,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { LocaleSwitcher, Logo, ThemeToggle } from "@/components/common";
-import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { GITHUB_URL } from "@/lib/snippets";
 import { cn } from "@/lib/utils";
@@ -479,61 +479,97 @@ type NavLink = { href: string; label: string; route?: boolean };
 /** Chrome labels, resolved by each page from its own namespace (so /i18n keeps its translations). */
 export type Chrome = { skip: string; home: string; nav: string; docs: string; pricing: string; openApp: string; stars: string; tagline: string; npm: string; license: string };
 
-/** Sticky marketing header (home and /i18n). `route` links go through next-intl, others are in-page anchors. */
+/** Sticky marketing header. Page `links` (in-page anchors, or `route` links) fill the Product menu. */
 export async function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLink[]; stars: number | null }) {
-  const ti = await getTranslations("integrations");
-  const item = "rounded-md px-2.5 py-1.5 transition-colors hover:bg-muted hover:text-foreground";
+  const [ti, n] = await Promise.all([getTranslations("integrations"), getTranslations("siteNav")]);
+  const item = "rounded-full px-3 py-1.5 transition-colors hover:bg-foreground/5 hover:text-foreground";
+  const product: NavLink[] = links.length
+    ? links
+    : [
+        { href: "/#why", label: n("why"), route: true },
+        { href: "/#how", label: n("how"), route: true },
+        { href: "/#demo", label: n("demo"), route: true },
+        { href: "/#wow", label: n("live"), route: true },
+      ];
+  const menus: [string, NavLink[]][] = [
+    [n("product"), product],
+    [
+      n("solutions"),
+      [
+        { href: "/integrations", label: n("sites"), route: true },
+        { href: "/i18n", label: n("apps"), route: true },
+        { href: "/integrations", label: ti("nav"), route: true },
+      ],
+    ],
+    [
+      n("resources"),
+      [
+        { href: "/docs", label: c.docs, route: true },
+        { href: "/docs/benchmark", label: n("benchmark"), route: true },
+        { href: "/docs/faq", label: n("faq"), route: true },
+        { href: GITHUB_URL, label: "GitHub" },
+      ],
+    ],
+  ];
+  const go = (l: NavLink, className: string) =>
+    l.route ? (
+      <Link key={l.href + l.label} href={l.href} className={className}>
+        {l.label}
+      </Link>
+    ) : (
+      <a key={l.href + l.label} href={l.href} className={className} {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}>
+        {l.label}
+      </a>
+    );
   return (
     <>
       <a href="#main" className="sr-only z-50 rounded-md bg-background px-3 py-2 focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:shadow-lg">
         {c.skip}
       </a>
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-6">
+      <header className="sticky top-0 z-40 border-b border-foreground/10 bg-background/75 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-8">
           <Link href="/" aria-label={c.home}>
-            <Logo />
+            <Logo className="text-xl" />
           </Link>
-          <nav aria-label={c.nav} className="hidden items-center gap-1 text-sm text-muted-foreground lg:flex">
-            {links.map((l) =>
-              l.route ? (
-                <Link key={l.href} href={l.href} className={item}>
-                  {l.label}
-                </Link>
-              ) : (
-                <a key={l.href} href={l.href} className={item}>
-                  {l.label}
-                </a>
-              ),
-            )}
-            <Link href="/integrations" className={item}>
-              {ti("nav")}
-            </Link>
-            <Link href="/docs" className={item}>
-              {c.docs}
-            </Link>
-            <Link href="/pricing" className={item}>
-              {c.pricing}
-            </Link>
+          <nav aria-label={c.nav} className="hidden items-center gap-1 text-[15px] text-foreground/80 lg:flex">
+            {menus.map(([label, items]) => (
+              // ponytail: CSS-only menu (hover + focus-within), no client JS in the header.
+              <div key={label} className="group relative">
+                <button type="button" aria-haspopup="true" className={`${item} inline-flex items-center gap-1`}>
+                  {label} <ChevronDown aria-hidden className="size-3.5 opacity-60 transition-transform group-focus-within:rotate-180 group-hover:rotate-180" />
+                </button>
+                <div className="invisible absolute start-0 top-full pt-2 opacity-0 transition-all duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                  <div className="flex min-w-52 flex-col rounded-2xl border border-foreground/10 bg-popover p-1.5 shadow-xl">
+                    {items.map((l) => go(l, "rounded-xl px-3 py-2 text-sm hover:bg-foreground/5"))}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {go({ href: "/pricing", label: c.pricing, route: true }, item)}
+            {go({ href: "/#demo", label: n("demo"), route: true }, item)}
           </nav>
           <div className="ms-auto flex items-center gap-1">
-            <Link href="/docs" className="rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden">
-              {c.docs}
-            </Link>
             <a
               href={GITHUB_URL}
               target="_blank"
               rel="noreferrer"
               aria-label={c.stars}
-              className="hidden h-8 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex"
+              className="hidden h-9 items-center gap-1.5 rounded-full px-2.5 text-sm text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground sm:inline-flex"
             >
               <GithubMark className="size-4" />
               {stars ? <span className="tabular-nums">{stars}</span> : null}
             </a>
             <LocaleSwitcher />
             <ThemeToggle />
-            <Button size="sm" asChild className="ms-1">
-              <a href={APP_URL}>{c.openApp}</a>
-            </Button>
+            <a href={`${APP_URL}/login`} className="hidden px-3 text-sm font-medium text-foreground/80 hover:text-foreground md:inline">
+              {n("signIn")}
+            </a>
+            <a
+              href={`${APP_URL}/signup`}
+              className="ms-1 inline-flex h-10 items-center gap-1.5 rounded-full bg-gradient-to-b from-[#ffb257] to-[#ff8a1f] px-4 text-sm font-semibold whitespace-nowrap text-black shadow-[0_6px_24px_-8px_#ff8a1f] transition-transform hover:-translate-y-0.5"
+            >
+              {n("tryFree")} <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
+            </a>
           </div>
         </div>
       </header>

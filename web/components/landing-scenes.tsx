@@ -8,8 +8,11 @@ import { Link } from "@/i18n/navigation";
 type S = Awaited<ReturnType<typeof getTranslations<"home.scenes">>>;
 
 /* eslint-disable @next/next/no-img-element -- pre-sized decorative WebP, no optimizer needed */
+// Cut-outs (transparent WebP) need no blending; scenery on black uses .glow-img or is dark-only.
+const CUT = new Set(["robot-wave", "robot-tired", "robot-fly", "robot-panels", "robot-chart", "pedestal", "tile-glot", "tile-faq"]);
 function Img({ src, className = "" }: { src: string; className?: string }) {
-  return <img src={`/landing/${src}.webp`} alt="" aria-hidden loading="lazy" decoding="async" className={`glow-img pointer-events-none select-none ${className}`} />;
+  const look = CUT.has(src) ? "drop-shadow-[0_18px_30px_rgb(0_0_0/0.25)]" : src === "ribbon" ? "glow-img" : "scenery";
+  return <img src={`/landing/${src}.webp`} alt="" aria-hidden loading="lazy" decoding="async" className={`${look} pointer-events-none select-none ${className}`} />;
 }
 
 export function Badge({ children, acc = "acc-amber", n }: { children: React.ReactNode; acc?: string; n?: string }) {
@@ -35,7 +38,7 @@ const SOLUTIONS = [["s1", "acc-green", "zap"], ["s2", "acc-amber", "pin"], ["s3"
 /** Mockup 02: the climb without glot, then the ribbon with it. */
 export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
   return (
-    <section id="why" aria-labelledby="why-title" className="dark scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
+    <section id="why" aria-labelledby="why-title" className="scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
       <div className="relative mx-auto max-w-7xl px-4 pt-20 pb-10">
         <div className="grid items-start gap-10 lg:grid-cols-[0.8fr_1.6fr]">
           <div>
@@ -51,13 +54,13 @@ export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
               </span>
               <span className="text-muted-foreground">{s("problem.withoutBody")}</span>
             </div>
-            <div className="relative mt-4">
-              <Img src="mountain" className="fade-x absolute inset-x-0 -top-6 w-full opacity-90" />
+            <div className="relative mt-4 pb-[18%]">
+              <Img src="mountain" className="fade-x absolute inset-x-0 top-10 w-full dark:-top-6" />
               <ol className="relative grid grid-cols-2 gap-3 pt-6 sm:grid-cols-4 sm:pt-24">
                 {PROBLEMS.map(([k, icon], i) => (
                   <li key={k} className="acc-amber plate reveal rounded-2xl p-4 sm:[&:nth-child(2)]:-mt-8 sm:[&:nth-child(3)]:-mt-16 sm:[&:nth-child(4)]:-mt-24" style={{ animationDelay: `${i * 90}ms` }}>
                     <span className="flex items-center justify-between">
-                      <span className="text-3xl font-bold text-white/30 tabular-nums">0{i + 1}</span>
+                      <span className="text-3xl font-bold text-foreground/25 tabular-nums">0{i + 1}</span>
                       <Art n={icon} className="size-9" />
                     </span>
                     <p className="mt-2 leading-snug font-semibold">{s(`problem.${k}`)}</p>
@@ -66,7 +69,7 @@ export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
                 ))}
               </ol>
             </div>
-            <p className="hand mt-6 text-end text-xl text-white/85">{s("problem.verdict")}</p>
+            <p className="hand mt-6 text-end text-xl text-foreground/80">{s("problem.verdict")}</p>
           </div>
         </div>
 
@@ -110,7 +113,7 @@ export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
         </div>
 
         <div className="relative mt-16 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
-          <ul className="plate grid grid-cols-3 divide-x divide-white/10 rounded-2xl rtl:divide-x-reverse">
+          <ul className="plate grid grid-cols-3 divide-x divide-foreground/10 rounded-2xl rtl:divide-x-reverse">
             {(["fast", "simple", "profit"] as const).map((k, i) => (
               <li key={k} className="flex items-center gap-3 p-4">
                 <Art n={["zap", "layers", "chart"][i]} className="hidden size-9 shrink-0 sm:block" />
@@ -129,7 +132,7 @@ export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
           </p>
         </div>
       </div>
-      <Img src="earth" className="fade-edges absolute -end-20 bottom-0 w-[55%] opacity-70" />
+      <Img src="earth" className="fade-edges absolute hidden dark:block -end-20 bottom-0 w-[55%] opacity-70" />
     </section>
   );
 }
@@ -151,7 +154,7 @@ const SURFACES = [
 /** Mockup 03: five steps on a lit path, the robot on its pedestal, four product surfaces. */
 export function HowScene({ s }: { s: S }) {
   return (
-    <section id="how" aria-labelledby="how-title" className="dark scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
+    <section id="how" aria-labelledby="how-title" className="scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
       <div className="relative mx-auto max-w-7xl px-4 py-20">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
@@ -161,7 +164,7 @@ export function HowScene({ s }: { s: S }) {
             </h2>
             <p className="mt-3 text-lg text-muted-foreground">{s("how.subtitle")}</p>
           </div>
-          <ul className="grid grid-cols-3 gap-6 border-white/15 lg:border-s lg:ps-8">
+          <ul className="grid grid-cols-3 gap-6 border-foreground/15 lg:border-s lg:ps-8">
             {(["fast", "complete", "scale"] as const).map((k, i) => (
               <li key={k} className="flex items-start gap-2">
                 <Art n={["zap", "layers", "sparkles"][i]} className="size-9 shrink-0" />
@@ -238,7 +241,7 @@ export function DemoScene({ s, demo }: { s: S; demo: React.ReactNode }) {
     ["n4", "acc-amber", "trophy", "lg:top-[38%] lg:-end-6"],
   ] as const;
   return (
-    <section id="demo" aria-labelledby="demo-title" className="dark scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
+    <section id="demo" aria-labelledby="demo-title" className="scene relative scroll-mt-16 overflow-hidden bg-background text-foreground">
       <div className="relative mx-auto max-w-7xl px-4 py-20">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_2fr]">
           <div className="lg:pt-10">
@@ -250,13 +253,13 @@ export function DemoScene({ s, demo }: { s: S; demo: React.ReactNode }) {
             <a href="#demo-live" className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-[#ff9a3c] px-6 font-semibold text-black shadow-[0_0_30px_-6px_#ff9a3c] transition-transform hover:-translate-y-0.5">
               {s("demo.start")} <Play aria-hidden className="size-4 fill-current" />
             </a>
-            <Link href="/docs" className="mt-4 flex items-center gap-2 text-sm underline underline-offset-4 hover:text-white">
+            <Link href="/docs" className="mt-4 flex items-center gap-2 text-sm underline underline-offset-4 hover:text-foreground">
               {s("demo.explore")} <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
             </Link>
           </div>
           <div className="relative">
             <Img src="robot-wave" className="absolute -end-10 -top-16 z-20 hidden w-40 lg:block" />
-            <div id="demo-live" className="tilt relative z-10 scroll-mt-24 rounded-[1.75rem] border border-white/15 bg-card/80 p-2 shadow-[0_40px_120px_-30px_rgba(168,85,247,.55)] backdrop-blur">
+            <div id="demo-live" className="tilt relative z-10 scroll-mt-24 rounded-[1.75rem] border border-foreground/15 bg-card/80 p-2 shadow-[0_40px_120px_-30px_rgba(168,85,247,.55)] backdrop-blur">
               {demo}
             </div>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:mt-0 lg:block">
@@ -273,7 +276,7 @@ export function DemoScene({ s, demo }: { s: S; demo: React.ReactNode }) {
           </div>
         </div>
       </div>
-      <Img src="earth" className="fade-edges absolute -end-10 -bottom-10 w-[45%] opacity-80" />
+      <Img src="earth" className="fade-edges absolute hidden dark:block -end-10 -bottom-10 w-[45%] opacity-80" />
     </section>
   );
 }
@@ -281,7 +284,7 @@ export function DemoScene({ s, demo }: { s: S; demo: React.ReactNode }) {
 /** Mockup 05: verifiable numbers (no invented metrics), the real plans, the real FAQ, the final call. */
 export function ResultsScene({ s, metrics, plans, faq, cta }: { s: S; metrics: [string, string, string, string][]; plans: React.ReactNode; faq: React.ReactNode; cta: React.ReactNode }) {
   return (
-    <section aria-labelledby="results-title" className="dark scene relative overflow-hidden bg-background text-foreground">
+    <section aria-labelledby="results-title" className="scene relative overflow-hidden bg-background text-foreground">
       <div className="relative mx-auto max-w-7xl px-4 py-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.5fr_1.3fr]">
           <div>
@@ -301,7 +304,7 @@ export function ResultsScene({ s, metrics, plans, faq, cta }: { s: S; metrics: [
           <Img src="robot-chart" className="mx-auto w-48 lg:w-full" />
           <div>
             <p className="acc-amber plate mx-auto mb-3 w-fit rounded-full px-3 py-1 text-sm font-medium">{s("results.impact")}</p>
-            <ul className="plate grid grid-cols-2 divide-white/10 overflow-hidden rounded-3xl sm:grid-cols-4 sm:divide-x rtl:sm:divide-x-reverse">
+            <ul className="plate grid grid-cols-2 divide-foreground/10 overflow-hidden rounded-3xl sm:grid-cols-4 sm:divide-x rtl:sm:divide-x-reverse">
               {metrics.map(([v, label, icon, acc]) => (
                 <li key={label} className={`${acc} p-5 text-center`}>
                   <Art n={icon} className="mx-auto size-10" />
@@ -334,7 +337,7 @@ export function ResultsScene({ s, metrics, plans, faq, cta }: { s: S; metrics: [
         </div>
 
         <div className="plate relative mt-24 overflow-hidden rounded-[2.5rem] p-8 sm:p-12">
-          <Img src="earth" className="fade-edges absolute -end-10 -bottom-16 w-[70%] opacity-90" />
+          <Img src="earth" className="fade-edges absolute hidden dark:block -end-10 -bottom-16 w-[70%] opacity-90" />
           <Img src="robot-wave" className="absolute end-8 top-1/2 hidden w-56 -translate-y-1/2 lg:block" />
           <div className="relative max-w-2xl">
             <h2 className="text-4xl leading-tight font-bold tracking-tight italic sm:text-5xl">

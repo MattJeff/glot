@@ -4935,5 +4935,20 @@
       "failed": "Sin traducir",
       "repeats": "{repeats, plural, one {# frase se vio} many {# de frases se vieron} other {# frases se vieron}} más de una vez, de {distinct} distintas; {stored} en caché."
     }
+  },
+  "siteNav": {
+    "product": "Producto",
+    "solutions": "Soluciones",
+    "resources": "Recursos",
+    "signIn": "Iniciar sesión",
+    "tryFree": "Probar gratis",
+    "why": "Por qué glot",
+    "how": "Cómo funciona",
+    "demo": "Demo",
+    "live": "En directo",
+    "sites": "Sitios y tiendas",
+    "apps": "Apps y código",
+    "benchmark": "Benchmark",
+    "faq": "Preguntas"
   }
 }

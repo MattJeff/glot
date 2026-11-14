@@ -159,6 +159,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     { href: "#why", label: t("nav.different") },
     { href: "#how", label: t("how.eyebrow") },
     { href: "#demo", label: t("nav.demo") },
+    { href: "#wow", label: t("nav.wow") },
   ];
 
   const faq = FAQ.map((k) => ({ q: t(`faq.${k}.q`), a: t(`faq.${k}.a`) }));
@@ -213,7 +214,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <a href={`${APP_URL}/signup`} className="inline-flex h-12 items-center gap-2 rounded-full bg-[#ff9a3c] px-6 font-semibold whitespace-nowrap text-black shadow-[0_0_30px_-6px_#ff9a3c] transition-transform hover:-translate-y-0.5">
         {s("hero.start")} <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
       </a>
-      <a href="#demo" className="inline-flex h-12 items-center gap-2 rounded-full border border-current/30 px-6 font-semibold whitespace-nowrap hover:bg-white/5">
+      <a href="#demo" className="inline-flex h-12 items-center gap-2 rounded-full border border-current/30 px-6 font-semibold whitespace-nowrap hover:bg-foreground/5">
         {s("hero.demo")} <Play aria-hidden className="size-4 fill-current" />
       </a>
     </div>
@@ -225,7 +226,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <SiteHeader c={chrome} links={navLinks} stars={stars} />
 
       <main id="main" className="flex-1">
-        <section aria-labelledby="hero-title" className="dark scene relative overflow-hidden bg-background text-foreground">
+        <section aria-labelledby="hero-title" className="scene relative overflow-hidden bg-background text-foreground">
           <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 pt-14 pb-10 sm:pt-20 lg:grid-cols-[0.9fr_1.3fr] lg:gap-4">
             <div className="text-center lg:text-start">
               <p className="mb-6 flex items-center justify-center gap-3 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase lg:justify-start">
@@ -244,7 +245,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 <a href={`${APP_URL}/signup`} className="mint-btn inline-flex h-14 items-center gap-2 rounded-full px-7 text-base font-semibold transition-transform hover:-translate-y-0.5">
                   {s("hero.start")} <ArrowRight aria-hidden className="size-5 rtl:rotate-180" />
                 </a>
-                <a href="#demo" className="inline-flex h-14 items-center gap-2 rounded-full border border-white/30 px-7 text-base font-semibold hover:bg-white/5">
+                <a href="#demo" className="inline-flex h-14 items-center gap-2 rounded-full border border-foreground/25 px-7 text-base font-semibold hover:bg-foreground/5">
                   <Play aria-hidden className="size-4 fill-current" /> {s("hero.demo")}
                 </a>
               </div>
@@ -259,7 +260,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <Globe3 plates={[s("hero.plateCulture"), s("hero.plateAi"), s("hero.plateBrand"), s("hero.platePublish")]} />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 pb-10">
-            <ul className="plate grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:divide-white/10 lg:rounded-full rtl:lg:divide-x-reverse">
+            <ul className="plate grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:divide-foreground/10 lg:rounded-full rtl:lg:divide-x-reverse">
               {stats.map(([v, label, icon, acc, href]) => (
                 <li key={label} className={`${acc} px-6 py-4`}>
                   <a href={href} className="flex items-center gap-3 hover:opacity-90">
@@ -326,7 +327,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 <details key={f.q} open={i === 0} className="faq group plate rounded-2xl open:border-[#ff9a3c]/70">
                   <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
                     {f.q}
-                    <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full border border-white/20 text-muted-foreground transition-transform duration-200 group-open:rotate-45">
+                    <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full border border-foreground/20 text-muted-foreground transition-transform duration-200 group-open:rotate-45">
                       +
                     </span>
                   </summary>

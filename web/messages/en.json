@@ -4913,5 +4913,20 @@
       "failed": "Not translated",
       "repeats": "{repeats, plural, one {# sentence was} other {# sentences were}} seen more than once, out of {distinct} distinct; {stored} kept in the cache."
     }
+  },
+  "siteNav": {
+    "product": "Product",
+    "solutions": "Solutions",
+    "resources": "Resources",
+    "signIn": "Sign in",
+    "tryFree": "Try for free",
+    "why": "Why glot",
+    "how": "How it works",
+    "demo": "Demo",
+    "live": "Live",
+    "sites": "Websites and shops",
+    "apps": "Apps and code",
+    "benchmark": "Benchmark",
+    "faq": "FAQ"
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Braces, Check, Copy, Languages, Monitor, Moon, RotateCw, Sun, TriangleAlert } from "lucide-react";
+import { Check, Copy, Languages, Monitor, Moon, RotateCw, Sun, TriangleAlert } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useCallback, useState, useTransition } from "react";
@@ -25,9 +25,10 @@ import { cn } from "@/lib/utils";
 export function Logo({ className }: { className?: string }) {
   const t = useTranslations("common");
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
-      <span aria-hidden className="grid size-6 place-items-center rounded-md bg-brand text-brand-foreground">
-        <Braces className="size-3.5" strokeWidth={2.5} />
+    <span className={cn("inline-flex items-center gap-1.5 text-lg font-bold tracking-tight", className)}>
+      {/* Brand mark: orange curly braces (same as app/icon.svg). */}
+      <span aria-hidden className="bg-gradient-to-b from-[#ffb257] to-[#ff7a00] bg-clip-text font-black text-transparent">
+        {"{}"}
       </span>
       {t("brand")}
     </span>

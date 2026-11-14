@@ -4935,5 +4935,20 @@
       "failed": "Nicht übersetzt",
       "repeats": "{repeats, plural, one {# Satz wurde} other {# Sätze wurden}} mehr als einmal gesehen, von {distinct} verschiedenen; {stored} im Cache."
     }
+  },
+  "siteNav": {
+    "product": "Produkt",
+    "solutions": "Lösungen",
+    "resources": "Ressourcen",
+    "signIn": "Anmelden",
+    "tryFree": "Kostenlos testen",
+    "why": "Warum glot",
+    "how": "So funktioniert's",
+    "demo": "Demo",
+    "live": "Live",
+    "sites": "Websites und Shops",
+    "apps": "Apps und Code",
+    "benchmark": "Benchmark",
+    "faq": "FAQ"
   }
 }
