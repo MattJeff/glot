@@ -1929,12 +1929,12 @@
     "demo": {
       "check": {
         "label": "Prüfen",
-        "body": "Platzhalter, Plurale, Glossar, Pixelbreite und Dark-Pattern-Regeln, in jeder Sprache.",
-        "title": "Code prüft jede Sprache"
+        "body": "Namen, Preise, Pluralformen, Ihr Glossar und der Platz auf dem Bildschirm, in jeder Sprache.",
+        "title": "glot prüft jede Sprache"
       },
       "write": {
         "label": "Schreiben",
-        "body": "Eine Intention pro Version. Ihr offizieller Text bleibt als Basis erhalten.",
+        "body": "Eine Idee pro Version. Ihr aktueller Text bleibt die Referenz.",
         "title": "KI schreibt drei Versionen"
       },
       "announce": "Schritt {n} von {total}: {title}",
@@ -1943,7 +1943,7 @@
         "fr": "Frankreich · Mobil",
         "rest": "Alle anderen"
       },
-      "caption": "Beispieldaten. Ablehnungsmeldungen stammen wörtlich von glot.",
+      "caption": "Beispieldaten.",
       "checks": "{passed, number} von {total, number} Prüfungen bestanden",
       "day": "Tag {day}",
       "example": "Beispieldaten",
@@ -1964,7 +1964,7 @@
       },
       "learning": "Noch keine Entscheidung. Ca. {days, plural, one {# weiterer Tag} other {# weitere Tage}}.",
       "merge": "Pull Request zusammenführen",
-      "merged": "Zusammengeführt. Ihre Kataloge enthalten nun den Gewinner in allen Sprachen.",
+      "merged": "Fertig. Die Gewinnerin ist in jeder Sprache live.",
       "none": "Noch kein klarer Gewinner. Ihr offizieller Text läuft weiter.",
       "official": "Offizieller Text",
       "pass": "Bestanden",
@@ -1976,17 +1976,17 @@
       "replay": "Wiederholen",
       "retried": "Im ersten Versuch zu breit. Umgeschrieben, dann bestanden.",
       "serve": {
-        "body": "Am Edge ausgewählt und von Ihrem Server gerendert. Der Traffic wandert zu dem, was funktioniert.",
+        "body": "Besucher sehen mehr von dem, was funktioniert.",
         "label": "Ausspielen",
-        "title": "Jede Zielgruppe erhält ihre Versionen"
+        "title": "Jedes Land sieht seine Versionen"
       },
       "ship": {
-        "body": "Überall übernehmen öffnet einen Pull Request mit dem Gewinnertext in jeder Sprache.",
+        "body": "Ein Klick, und der Gewinnertext ersetzt den alten, in jeder Sprache.",
         "label": "Ausliefern",
-        "title": "Der Gewinner landet in Git"
+        "title": "Die Gewinnerin geht live"
       },
       "steps": "Demo-Schritte",
-      "subtitle": "Ein Schlüssel, drei von KI geschriebene Versionen, jede Sprache durch Code geprüft, jede Zielgruppe bekommt ihren eigenen Gewinner und das Ergebnis landet zurück in Git.",
+      "subtitle": "glot schreibt mehrere Versionen einer Überschrift, prüft sie in jeder Sprache, zeigt jedem Land seine beste Version und behält die Gewinnerin.",
       "title": "Eine Idee, in jeder Sprache geschrieben",
       "traffic": "Traffic-Anteil pro Version",
       "version": "Version",
@@ -2001,298 +2001,252 @@
       "license": "MIT-Lizenz",
       "npm": "npm",
       "pricing": "Preise",
-      "tagline": "Copy-Experimente und Lokalisierung, die KI nicht zerstören kann."
-    },
-    "guarantees": {
-      "eyebrow": "Die Garantien",
-      "facts": {
-        "body": "Eine Variante darf nur Zahlen nennen, die Sie angegeben haben. „Join 10,000 teams“ wird abgelehnt, solange 10,000 nicht auf Ihrer Liste steht.",
-        "title": "Nur Ihre Fakten"
-      },
-      "glossary": {
-        "body": "Produktnamen bleiben unverändert. Pflicht- und verbotene Begriffe pro Sprache, in einer Datei in Ihrem Repo.",
-        "title": "Ihr Glossar"
-      },
-      "patterns": {
-        "body": "Künstliche Dringlichkeit, gefälschte Aktivitätszähler, unbelegbare Behauptungen und Confirmshaming werden abgelehnt. Preise und rechtliche Hinweise dürfen sich nicht ändern.",
-        "title": "Keine Dark Patterns"
-      },
-      "patternsNote": "Die Regeln zielen auf Praktiken, die das EU-Verbraucherrecht bereits untersagt. Ein sauberer Bericht bedeutet nur, dass kein bekannter Warnhinweis vorliegt, und ist keine Rechtsberatung.",
-      "placeholders": {
-        "body": "Gleiche Menge wie in der Quelle, keine erfundenen, keine übersetzten. ICU, i18next und MessageFormat 2.",
-        "title": "Platzhalter und Tags"
-      },
-      "plurals": {
-        "body": "Jede Form, die die Sprache braucht: vier im Polnischen, sechs im Arabischen.",
-        "title": "Pluralformen"
-      },
-      "refusal": "Von glot abgelehnt",
-      "subtitle": "Derselbe Validator, der die Übersetzungen von glot prüft, läuft bei jeder Variante in jeder Sprache. Eine Variante mit einer einzigen fehlerhaften Sprache geht nie live.",
-      "title": "KI schlägt vor. Code entscheidet, was Besucher sehen.",
-      "width": {
-        "body": "Gemessen mit der echten Schrift und Box Ihrer App. Eine Variante, die für ihren Button zu breit ist, wird abgelehnt, nie abgeschnitten.",
-        "title": "Pixelbreite"
-      }
+      "tagline": "Ihr Produkt in jeder Sprache, ohne dass etwas kaputtgeht."
     },
     "hero": {
-      "labs": "Labs",
-      "badge": "Texte, die lernen",
-      "commandHint": "Erkennt Ihren i18n-Stack und richtet glot ein. Experimente laufen in der glot Cloud oder auf Ihrem eigenen Server.",
-      "proofBench": "0,0 % fehlerhafte Strings statt 14,1 % ohne glot",
-      "proofBenchNote": "Benchmark: 320 ICU-Nachrichten, 8 Sprachen, claude-haiku-5-5, 18. Oktober 2026. Gleiche Prompts, gleiches Modell.",
+      "badge": "Apps, Websites, E-Mails, Support",
+      "proofBench": "0 % fehlerhafte Sätze statt 14,1 % mit KI allein",
+      "proofBenchNote": "Benchmark: 320 Sätze in 8 Sprachen, dasselbe KI-Modell mit und ohne glot, 18. Oktober 2026.",
       "proofLabel": "Projektfakten",
       "proofNpm": "npm v{version}",
-      "proofOss": "MIT-lizenziert",
+      "proofOss": "Open Source",
       "proofStars": "{count, plural, =0 {Star auf GitHub} one {# Stern auf GitHub} other {# Sterne auf GitHub}}",
       "start": "Kostenlos starten",
-      "startHint": "1 Experiment kostenlos. Keine Kreditkarte nötig.",
-      "subtitle": "Ihre KI schreibt Varianten Ihrer Überschriften und Buttons. glot prüft jede einzelne in jeder Sprache, zeigt jedem Land, Gerät und jeder Traffic-Quelle die Version, die am besten konvertiert, und schickt den Gewinner als Pull Request zurück in Ihr Repo.",
-      "title": "Texte, die in jeder Sprache konvertieren."
+      "startHint": "Keine Kreditkarte nötig.",
+      "subtitle": "glot übersetzt Ihre App, Ihre Website und alles, was Sie versenden, prüft jeden Satz vor der Veröffentlichung und zeigt Ihnen, welche Länder Ihnen Kunden bringen.",
+      "title": "Sprechen Sie die Sprache jedes Kunden.",
+      "see": "In Aktion sehen"
     },
     "cta": {
-      "body": "Starten Sie mit einer Überschrift. glot übernimmt die Textprüfungen, die Berechnungen und den Pull Request.",
-      "docs": "Experiment-Dokumentation lesen",
-      "title": "Wirksame Texte in jeder Sprache ausliefern."
-    },
-    "delivery": {
-      "cookie": {
-        "body": "glot zählt Tagesaufrufe pro Version und Zielgruppe. Keine IP, kein User Agent, keine Besucher-ID. Global Privacy Control wird berücksichtigt.",
-        "title": "Standardmäßig kein Cookie."
-      },
-      "eyebrow": "Standardmäßig schnell und privat",
-      "flicker": {
-        "body": "Ihr Edge wählt die Version, Ihr Server rendert sie. Besucher sehen nie, wie der alte Text ausgetauscht wird.",
-        "title": "Kein Flackern."
-      },
-      "path": {
-        "body": "Entscheidungen nutzen eine zwischengespeicherte Datei, die jede Minute aktualisiert wird. Wenn glot ausfällt, erhalten alle Ihren offiziellen Text.",
-        "title": "Nie im kritischen Pfad."
-      },
-      "seo": {
-        "body": "Gleiche URL, gleiche Canonical-URL, nie eine Version nur für Crawler.",
-        "title": "Suchmaschinen sehen, was Menschen sehen."
-      },
-      "small": "Single-Page-Apps ohne Server-Rendering können den reinen Client-Modus nutzen, der flackern kann.",
-      "title": "Kein Flackern, keine Abhängigkeit im kritischen Pfad"
+      "body": "Verbinden Sie Ihre App oder Website und sehen Sie sie noch heute in jeder Sprache.",
+      "docs": "Dokumentation entdecken",
+      "title": "Ihre nächsten Kunden sprechen Ihre Sprache nicht. Noch nicht."
     },
     "faq": {
-      "agents": {
-        "a": "Jeder Agent, der MCP spricht, etwa Claude Code, Cursor, Codex oder Windsurf, über npx -y glot-i18n mcp. Claude Code hat außerdem ein glot-Plugin und einen Skill, und AGENTS.md-Regeln stehen für andere Agenten bereit.",
-        "q": "Welche Coding-Agenten funktionieren mit glot?"
-      },
-      "ai": {
-        "a": "Jede Variante durchläuft dieselben Prüfungen wie Ihre Übersetzungen, in jeder Sprache, plus Regeln gegen künstliche Dringlichkeit, erfundene Zahlen und nicht belegbare Behauptungen. Sie können eine menschliche Freigabe verlangen, bevor eine Variante live geht.",
-        "q": "Blamiert uns KI-geschriebener Text?"
-      },
-      "audiences": {
-        "a": "Ja. glot liefert mehrere Versionen einer Überschrift oder eines Buttons an die Zielgruppen, die Sie wählen (Land, Gerät, Traffic-Quelle), in allen Sprachen gleichzeitig, und behält die Version, die konvertiert. Bis zu 4 Zielgruppen pro Experiment, plus alle übrigen.",
-        "q": "Kann ich Nutzern in verschiedenen Ländern unterschiedliche Texte zeigen?"
-      },
-      "cookies": {
-        "a": "glot setzt standardmäßig kein Cookie und speichert weder IP, User Agent noch Besucher-ID, sondern nur tägliche Zählwerte. Ein optionales Session-Cookie speichert lediglich die Version, sonst nichts. Ob Sie eine Einwilligung benötigen, entscheidet Ihr Datenschutzbeauftragter; unsere Datenschutzhinweise helfen dabei.",
-        "q": "Brauche ich dafür ein Cookie-Banner?"
-      },
-      "cost": {
-        "a": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und kostenlos; Ihren LLM-Anbieter bezahlen Sie direkt. glot cloud hat einen kostenlosen Plan für ein Projekt, Pro für zuverlässige Lokalisierung im Team und Growth für Experimente und Sprachstarts, gemessen am Umsatz. Hosten Sie den Server selbst, gibt es keine Einschränkungen.",
-        "q": "Was kostet es?"
-      },
-      "facts": {
-        "a": "Nein. Eine Variante darf nur die Fakten zitieren, die Sie angeben. Jede Zahl, die weder in Ihrem Text noch in Ihren Fakten vorkommt, wird abgelehnt. Schlüssel mit den Tags Preis oder Recht können überhaupt nicht getestet werden.",
-        "q": "Kann eine Variante eine Statistik oder einen Rabatt erfinden?"
-      },
-      "formats": {
-        "a": "Automatische Extraktion von Strings: Next.js (App und Pages Router), React Router, Astro und Vite + React. Kataloge: JSON mit ICU-, i18next- oder MessageFormat-2-Syntax, JS-Wörterbücher, Apple .xcstrings und .strings, Android strings.xml, Flutter ARB, gettext PO und YAML.",
-        "q": "Welche Frameworks und Dateiformate unterstützt glot?"
-      },
-      "more": "Weitere Antworten in den FAQ",
-      "seo": {
-        "a": "glot wählt nie anhand des User Agents eine Version. Crawler erhalten wie jeder Besucher eine Version, auf derselben URL mit demselben Canonical, und Bot-Aufrufe werden nicht gezählt. Die Versionen behalten dieselbe Bedeutung.",
-        "q": "Schadet unterschiedlicher Text dem SEO?"
-      },
-      "speed": {
-        "a": "Kein blockierender Aufruf. Der Edge wählt die Version aus einer zwischengespeicherten Datei, und Ihr Server rendert sie, daher gibt es beim Server-Rendering kein Flackern. Reine Client-Single-Page-Apps können beim ersten Paint flackern. Ist glot nicht erreichbar, erhalten Besucher Ihren Originaltext.",
-        "q": "Verlangsamt es meine Seite oder verursacht es Flackern?"
-      },
       "title": "Fragen",
-      "traffic": {
-        "a": "Das hängt von Ihrem Traffic und Ihrer Konversionsrate ab. Beim Anlegen eines Experiments schätzt glot die Dauer und schlägt vor, eine Zielgruppe zusammenzulegen, die mehr als 90 Tage bräuchte. Beginnen Sie mit einem globalen Experiment.",
-        "q": "Wie viel Traffic brauche ich?"
+      "more": "Alle Fragen",
+      "dev": {
+        "q": "Brauche ich einen Entwickler?",
+        "a": "Nicht für eine Website oder einen Shop: Sie fügen eine Zeile ein oder verbinden Ihr Konto. Bei einer App bereitet glot die Änderungen vor, und Ihr Entwickler gibt sie mit einem Klick frei."
       },
-      "what": {
-        "a": "glot ist eine Open-Source-CLI (MIT) und ein MCP-Server, der Ihre App mit Ihrem eigenen API-Schlüssel für LLMs lokalisiert, dazu Copy-Experimente: KI-geschriebene Versionen Ihrer Überschriften, in jeder Sprache geprüft und an jede Zielgruppe ausgeliefert. Der Code lehnt jeden Text ab, der einen Platzhalter, eine Pluralform, Ihr Glossar oder seine UI-Box verletzt.",
-        "q": "Was ist glot?"
+      "quality": {
+        "q": "Ist die Übersetzung gut?",
+        "a": "glot nutzt die besten aktuellen KI-Modelle, hält Ihr Glossar und Ihren Ton ein und prüft jeden Satz vor der Veröffentlichung. Alles Unsichere landet auf einer Liste, die ein Mensch freigibt."
       },
-      "winner": {
-        "a": "glot wartet mindestens 7 Tage und 500 Besucher pro Version, hebt die Messlatte bei jeder Auswertung an und kann eine kleine Holdout-Gruppe behalten, um alles zu messen, was Sie ausgespielt haben.",
-        "q": "Woran erkenne ich, dass ein Gewinner echt ist?"
+      "tools": {
+        "q": "Funktioniert es mit meinen Tools?",
+        "a": "Websites mit Wix, Squarespace, Webflow, Shopify, WordPress und vielen anderen, Web- und Mobile-Apps, E-Mails und Support-Tools. Die vollständige Liste steht auf der Seite Integrationen."
+      },
+      "google": {
+        "q": "Zeigt Google meine übersetzten Seiten?",
+        "a": "Ja. Jede Sprache bekommt eigene, für Suchmaschinen lesbare Seiten, mit Titeln, die zu den Suchanfragen in jedem Land passen."
+      },
+      "privacy": {
+        "q": "Was passiert mit den Daten meiner Besucher?",
+        "a": "glot zählt Besuche ohne Cookies und ohne personenbezogene Daten. In E-Mails und Support-Nachrichten werden persönliche Angaben verborgen, bevor eine KI den Text sieht."
+      },
+      "price": {
+        "q": "Was kostet es?",
+        "a": "Sie starten kostenlos, ohne Kreditkarte. Bezahlte Tarife bringen mehr Volumen und die Wachstumswerkzeuge. Und weil glot Open Source ist, können Sie es auch selbst betreiben."
       }
-    },
-    "foundation": {
-      "bench": "Vollständigen Benchmark lesen",
-      "cost": "850 Strings kosteten in unserem Lauf mit dem Standardmodell 0,035 $. Ihren LLM-Anbieter bezahlen Sie direkt.",
-      "eyebrow": "Die Basis",
-      "link": "Open-Source-Lokalisierung für Coding-Agents",
-      "proof": "In unserem Benchmark schrieb glot 0,0 % fehlerhafte Strings. Dieselben Modelle mit einem einfachen Prompt schrieben 14,1 % (Haiku) und 8,8 % (Sonnet). Ein unabhängiger FormatJS-Judge bestätigt das.",
-      "subtitle": "Varianten basieren auf der Lokalisierungs-Engine von glot. Ein Befehl verschiebt fest codierte Strings in Schlüssel, übersetzt nur das Geänderte und lehnt alles Fehlerhafte ab.",
-      "title": "Und Ihre App, in jeder Sprache, die Sie ausliefern."
-    },
-    "goals": {
-      "eyebrow": "Ziele",
-      "goal": {
-        "body": "Eine Anmeldung oder ein Kauf mit seinem Umsatzwert.",
-        "title": "Ein Ziel entscheidet"
-      },
-      "guardrail": {
-        "body": "Ereignisse, die nicht steigen dürfen, etwa Rückerstattungen.",
-        "title": "Leitplanken"
-      },
-      "holdout": {
-        "body": "Eine kleine Gruppe Besucher sieht immer Ihren offiziellen Text, um alles zu messen, was Sie beworben haben.",
-        "title": "Kontrollgruppe"
-      },
-      "subtitle": "Eine Version gewinnt beim Ereignis, das Ihnen wichtig ist, nie nur bei Klicks.",
-      "title": "Messen, was konvertiert, nicht, was angeklickt wird"
     },
     "how": {
-      "eyebrow": "So funktioniert's",
-      "footnote": "Experimentdefinitionen liegen in glot.experiments.toml neben Ihrem Code. glot experiments validate prüft sie in CI offline.",
+      "eyebrow": "So funktioniert es",
       "pick": {
-        "body": "Wählen Sie eine Gruppe von Schlüsseln, etwa Titel, Untertitel und Button eines Heroes, damit sie sich gemeinsam ändern. Benennen Sie die Zielgruppen: Land, Sprache, Gerät, Traffic-Quelle.",
-        "title": "Wörter auswählen"
+        "body": "Ihre App, Ihre Website, Ihren Shop. Ein paar Klicks oder eine Zeile zum Einfügen.",
+        "title": "Verbinden Sie, was Sie haben"
       },
       "ship": {
-        "body": "glot zeigt jeder Zielgruppe die beste Version, wartet auf belastbare Ergebnisse und öffnet dann einen Pull Request mit dem Gewinner. Ihre Kataloge bleiben die Quelle der Wahrheit.",
-        "title": "Gewinner ausliefern"
+        "body": "Ihre Kunden lesen ihre Sprache. Sie sehen, welche Länder sich anmelden und kaufen.",
+        "title": "Live gehen und wachsen sehen"
       },
-      "title": "Drei Schritte. Ihr Coding-Agent kann sie auch ausführen.",
+      "title": "Drei Schritte, keine technische Einrichtung.",
       "write": {
-        "body": "Wählen Sie Absichten wie Social Proof oder Einfachheit. glot schreibt jede Variante in jeder Sprache und lehnt jede ab, die eine Regel verletzt, mit dem genauen Grund.",
-        "title": "Die KI schreibt, der Code prüft"
+        "body": "Jeder Satz, in jeder gewählten Sprache, geprüft, bevor etwas live geht.",
+        "title": "glot übersetzt und prüft"
       }
     },
-    "install": {
-      "docs": "Experiment-Dokumentation lesen",
-      "eyebrow": "Installation",
-      "label": "Setup-Code",
-      "subtitle": "Mit Next.js (App Router) und next-intl. Ihre t()-Aufrufe bleiben unverändert.",
-      "title": "Installation in drei Zeilen"
-    },
-    "integrations": {
-      "agents": {
-        "label": "Agenten",
-        "value": "Claude Code, Cursor und Codex über den glot MCP-Server. Lovable, Bolt, v0 und Replit über einen generierten Prompt."
-      },
-      "edge": {
-        "label": "Edge",
-        "value": "Next.js-Proxy, Cloudflare Workers (auch statische Sites), Geo-Header von Cloudflare, Vercel und CloudFront."
-      },
-      "eyebrow": "Integrationen",
-      "frameworks": {
-        "label": "Frameworks",
-        "value": "Next.js (App und Pages Router), React Router, Astro, Vite + React."
-      },
-      "git": {
-        "label": "Git",
-        "value": "GitHub-App, GitHub Action mit PR-Annotationen, glot.experiments.toml in Ihrem Repo."
-      },
-      "i18n": {
-        "label": "i18n",
-        "value": "next-intl, react-i18next, i18next, FormatJS, remix-i18next. ICU-, i18next- und MessageFormat-2-Syntax."
-      },
-      "models": {
-        "label": "Modelle",
-        "value": "Ihr eigener Schlüssel für Anthropic, OpenAI oder einen beliebigen OpenAI-kompatiblen Endpunkt, inklusive lokaler Modelle."
-      },
-      "title": "Funktioniert mit Ihrem Stack und Ihrem Agenten."
-    },
     "meta": {
-      "description": "KI-Varianten für Texte generieren, in jeder Sprache validiert (Platzhalter, Plurale, Glossar, Länge), und diejenige behalten, die pro Zielgruppe konvertiert.",
-      "title": "glot: Text-Experimente in jeder Sprache, pro Segment"
+      "description": "glot übersetzt Ihre App, Website, E-Mails und Ihren Support in jede Sprache, prüft jeden Satz vor der Veröffentlichung und zeigt, welche Länder Ihnen Kunden bringen.",
+      "title": "glot: Ihre App und Website in jeder Sprache, fehlerfrei"
     },
     "nav": {
       "demo": "Demo",
       "docs": "Docs",
       "githubStars": "glot auf GitHub, {count, plural, =0 {noch keine Sterne} one {# Stern} other {# Sterne}}",
-      "guarantees": "Garantien",
       "home": "glot Startseite",
-      "how": "So funktioniert's",
       "i18n": "Lokalisierung",
       "label": "Hauptnavigation",
       "openApp": "App öffnen",
       "pricing": "Preise",
-      "results": "Ergebnisse"
+      "results": "Ergebnisse",
+      "app": "Ihre App",
+      "website": "Ihre Website",
+      "beyond": "Alles andere"
     },
     "pricing": {
-      "body": "Die CLI, der Validator und der lokale MCP-Server sind MIT-lizenziert und nie limitiert. In der Cloud hält Pro jede Sprache bei jedem Release korrekt, und Growth misst, welche Texte und welche Sprachen Umsatz bringen. Wenn Sie den Server selbst hosten, ist nichts limitiert.",
+      "body": "Testen Sie glot kostenlos mit Ihrem eigenen Projekt. Wenn Ihr internationaler Traffic wächst, wählen Sie den passenden Tarif. Es ist Open Source, Sie können es also auch selbst betreiben.",
       "cta": "Preise ansehen",
-      "title": "Kostenlos, wo es auf Ihrem Rechner läuft."
+      "title": "Kostenlos starten, zahlen, wenn es sich lohnt."
     },
     "problem": {
       "ai": {
-        "body": "Außerdem kann es einen Preis-Platzhalter weglassen, die polnischen Pluralformen vergessen, einen 112-px-Button sprengen oder „nur noch 3 heute“ erfinden.",
-        "title": "KI kann in einer Sekunde zehn Versionen schreiben."
+        "body": "Schnell, aber sie verunstaltet Namen, Preise und Buttons. In unseren Tests war jeder 7. Satz fehlerhaft.",
+        "title": "KI allein macht Fehler"
       },
       "eyebrow": "Das Problem",
-      "kicker": "glot macht den KI-Teil sicher und den Testteil automatisch.",
+      "kicker": "glot erledigt alles: übersetzen, prüfen, veröffentlichen, messen.",
       "manual": {
-        "body": "Eine Variante, eine Sprache, ein Skript, das beim Laden flackert, ein Dashboard, dem niemand traut, und ein Gewinner, den jemand zurück in den Code kopieren muss.",
-        "title": "Texte von Hand zu testen skaliert nicht."
+        "body": "Google zeigt Ihre Seiten im Ausland nicht, und Sie wissen nicht, welche Länder wirklich kaufen.",
+        "title": "Übersetzt, aber unsichtbar"
       },
-      "note": "Auf die Aufforderung „Übersetze dieses JSON“ hat claude-haiku-5-5 in unserem Benchmark 42,5 % der polnischen Nachrichten kaputtgemacht.",
-      "noteLink": "Zum Benchmark",
       "one": {
-        "body": "Die Überschrift, die Sie für US-Besucher am Desktop geschrieben haben, sehen auch deutsche Suchnutzer und japanische Mobil-Nutzer.",
-        "title": "Ein Text für alle."
+        "body": "Jeden Satz kopieren, Dateien an Übersetzer schicken, wieder einfügen. Und bei jeder Neuerung von vorn.",
+        "title": "Es dauert Wochen"
       },
-      "title": "Ihre beste englische Überschrift ist überall sonst eine Vermutung."
+      "title": "Internationalisierung tut meistens weh."
     },
     "results": {
-      "alarms": {
-        "body": "Wenn die Traffic-Aufteilung falsch aussieht (ein Cache, ein Bot, ein Fehler), frieren Entscheidungen ein und ein rotes Banner erklärt warum.",
-        "title": "Alarme, die Sie nicht übersehen."
-      },
-      "audiences": {
-        "body": "Land, Sprache, Gerät, Traffic-Quelle, neuer oder wiederkehrender Besucher. Alle anderen bekommen eine eigene Zelle.",
-        "title": "Bis zu 4 Zielgruppen."
-      },
       "example": "Beispiel",
       "exampleSentence": "Simplicity: +18 % Anmeldungen in Deutschland (wahrscheinlich zwischen +6 % und +30 %), 97 % Wahrscheinlichkeit, dass sie die beste ist. Noch etwa 3 Tage.",
-      "eyebrow": "Ergebnisse, die Sie lesen können",
-      "noEarly": {
-        "body": "Kein Gewinner vor 7 Tagen und 500 Besuchern pro Version, damit ein einzelner voller Montag nie entscheidet.",
-        "title": "Keine voreiligen Entscheidungen."
-      },
-      "noFake": {
-        "body": "Die Hürde steigt mit jedem Blick, jeder Version und jeder Zielgruppe. Unsere Testsuite simuliert Experimente, bei denen sich nichts ändert, und schlägt fehl, wenn mehr als 5 % davon einen Gewinner melden.",
-        "title": "Keine falschen Gewinner."
-      },
-      "segment": {
-        "body": "glot sagt „Gewinner für Deutschland“ nur, wenn Deutschland das globale Ergebnis klar schlägt. Andernfalls empfiehlt es, überall auszurollen.",
-        "title": "Zielgruppen-Gewinner nur, wenn sie echt sind."
-      },
-      "subtitle": "Für jede Zielgruppe sagt glot in einem Satz, welche Version gewinnt, um wie viel und wie sicher das ist. Kein p-Wert.",
-      "title": "Unterschiedliche Zielgruppen, unterschiedliche Gewinner",
-      "traffic": {
-        "body": "Während des Lernens sehen mehr Besucher die Versionen, die besser aussehen. Jede Version behält bis zum Ende mindestens 10 %.",
-        "title": "Traffic geht dorthin, wo es funktioniert."
-      }
+      "eyebrow": "Ergebnisse",
+      "title": "Andere Länder, andere Gewinner.",
+      "subtitle": "glot sagt Ihnen in einem Satz, welche Version in jedem Land gewinnt, um wie viel und wie sicher."
     },
     "skip": "Zum Inhalt springen",
-    "who": {
-      "dev": {
-        "body": "Drei Zeilen in Ihrer Next.js-App. Ihre t()-Aufrufe ändern sich nicht. Gewinner kommen als Pull Requests, die Sie wie jeden anderen prüfen.",
-        "title": "Sie besitzen den Code"
+    "features": {
+      "before": "Vorher",
+      "after": "Mit glot",
+      "app": {
+        "eyebrow": "Ihre App",
+        "title": "Ihr Produkt spricht jede Sprache.",
+        "subtitle": "Übersetzt, geprüft und aktuell, ohne Ihr Team auszubremsen.",
+        "minutes": {
+          "title": "In Minuten übersetzt",
+          "pain": "Wochen mit Tabellen voller Texte und dem Nachhaken bei Übersetzern.",
+          "gain": "Ihre ganze App, in den Sprachen Ihrer Wahl, noch am selben Tag."
+        },
+        "safe": {
+          "title": "Nichts Kaputtes geht live",
+          "pain": "KI-Übersetzungen, die Buttons, Namen und Preise zerstören.",
+          "gain": "Jeder Satz wird geprüft, bevor Ihre Kunden ihn sehen."
+        },
+        "fresh": {
+          "title": "Immer aktuell",
+          "pain": "Jede Neuerung erscheint halb übersetzt.",
+          "gain": "Jede Änderung wird automatisch übersetzt und liegt zur Freigabe bereit."
+        },
+        "brand": {
+          "title": "Ihre Worte, Ihre Marke",
+          "pain": "Ihr Produktname, auf drei verschiedene Arten übersetzt.",
+          "gain": "Ihr Glossar und Ihr Ton werden in jeder Sprache eingehalten."
+        },
+        "onpage": {
+          "title": "Direkt auf der Seite korrigieren",
+          "pain": "Feedback, das in Screenshots und E-Mail-Verläufen verloren geht.",
+          "gain": "Ihr Team und Ihre Besucher markieren einen Satz auf der echten Website und korrigieren ihn dort."
+        }
       },
-      "eyebrow": "Für wen es ist",
-      "growth": {
-        "body": "Starten Sie ein Experiment auf einem Hero in jeder Sprache über das Dashboard oder lassen Sie Ihren Coding-Agenten es tun. Lesen Sie das Ergebnis in einem Satz.",
-        "title": "Sie besitzen die Zahlen"
+      "web": {
+        "eyebrow": "Ihre Website",
+        "title": "In jedem Land gefunden und verstanden.",
+        "subtitle": "Von der Onepager-Seite bis zum kompletten Shop, in wenigen Minuten.",
+        "tag": {
+          "title": "Jede Website, eine Zeile",
+          "pain": "Eine Wix-, Squarespace- oder Webflow-Seite, die in einer Sprache feststeckt.",
+          "gain": "Eine Zeile einfügen, und Ihre Website hat eine Sprachauswahl. Ganz ohne Entwickler."
+        },
+        "google": {
+          "title": "Bei Google in jedem Land",
+          "pain": "Eine übersetzte Website, die Google im Ausland nie anzeigt.",
+          "gain": "Jede Sprache bekommt eigene Seiten, die Suchmaschinen lesen und ranken."
+        },
+        "local": {
+          "title": "Die Wörter, nach denen man sucht",
+          "pain": "Ein wörtlich übersetzter Titel, den niemand bei Google eingibt.",
+          "gain": "Titel und Überschriften verwenden, wonach Menschen in Madrid oder Mexiko-Stadt wirklich suchen."
+        },
+        "shop": {
+          "title": "Auch Ihr Shop und Ihr Blog",
+          "pain": "Produktseiten und Artikel, von Hand und Sprache für Sprache kopiert.",
+          "gain": "glot verbindet sich mit Ihrem Shop oder CMS und hält alle Sprachen synchron."
+        },
+        "live": {
+          "title": "Jede Sprache wird wirklich angezeigt",
+          "pain": "Zu 100 % übersetzt, und trotzdem zeigt die Website die alte Sprache.",
+          "gain": "glot prüft Ihre echte Website und sagt Ihnen genau, was zu ändern ist."
+        },
+        "longtail": {
+          "title": "Sogar ungeplante Sprachen",
+          "pain": "Besucher mit anderen Sprachen landen auf Englisch.",
+          "gain": "Ihr Browser übersetzt den Rest, genauso geprüft, kostenlos."
+        }
       },
-      "l10n": {
-        "body": "Jede Variante durchläuft Ihr Glossar und Ihre Review-Warteschlange. Nichts erreicht einen Markt, den Sie nicht freigegeben haben.",
-        "title": "Sie besitzen die Qualität"
+      "beyond": {
+        "eyebrow": "Alles andere",
+        "title": "Jedes Wort, das Ihre Kunden lesen.",
+        "subtitle": "Mobile Apps, E-Mails, KI-Antworten und Support, alles in ihrer Sprache.",
+        "mobile": {
+          "title": "Mobile Apps ohne Warten auf die Stores",
+          "pain": "Ein Tippfehler bedeutet ein neues Release und Tage der Store-Prüfung.",
+          "gain": "Korrekturen und neue Sprachen kommen beim nächsten Öffnen der App an."
+        },
+        "emails": {
+          "title": "E-Mails, Rechnungen, Benachrichtigungen",
+          "pain": "Eine übersetzte Website, dann eine Quittung auf Englisch.",
+          "gain": "Jede Nachricht kommt in der Sprache des Kunden, und seine persönlichen Daten gehen nie an die KI."
+        },
+        "ai": {
+          "title": "Die Antworten Ihrer KI",
+          "pain": "Ihr Chatbot antwortet einer japanischen Kundin auf Englisch.",
+          "gain": "KI-Antworten werden übersetzt, während sie entstehen, in den Worten Ihrer Marke."
+        },
+        "support": {
+          "title": "Support in jeder Sprache",
+          "pain": "Tickets in Sprachen, die niemand im Team liest.",
+          "gain": "Lesen und antworten Sie in Ihrer Sprache. Ihr Kunde bekommt seine."
+        },
+        "once": {
+          "title": "Einmal korrigiert, überall korrigiert",
+          "pain": "Derselbe Satz, an fünf Stellen zu korrigieren.",
+          "gain": "glot findet jede Stelle, an der ein Satz vorkommt, und aktualisiert alle zusammen."
+        }
       },
-      "title": "Gebaut für die Menschen, die die Texte ausliefern."
+      "grow": {
+        "eyebrow": "Wachstum",
+        "title": "Wissen, welche Sprachen sich lohnen.",
+        "subtitle": "Ihre eigenen Besucher zeigen, wohin es als Nächstes geht und welche Worte verkaufen.",
+        "next": {
+          "title": "Welches Land als Nächstes",
+          "pain": "Sprachen nach Bauchgefühl hinzufügen.",
+          "gain": "Sehen Sie Nachfrage und Anmeldungen pro Sprache von Ihren eigenen Besuchern und was der nächste Markt wert ist."
+        },
+        "words": {
+          "title": "Die besten Worte für jedes Land",
+          "pain": "Eine Überschrift, die zu Hause funktioniert und im Ausland verpufft.",
+          "gain": "Testen Sie mehrere Versionen in jeder Sprache und behalten Sie die Gewinnerin jedes Landes."
+        },
+        "private": {
+          "title": "Datenschutz von Anfang an",
+          "pain": "Statistiken, die einen Cookie-Banner erfordern.",
+          "gain": "Keine Cookies, keine personenbezogenen Daten, keine Bots. Nur ehrliche Zahlen."
+        }
+      },
+      "trust": {
+        "eyebrow": "Vertrauen",
+        "title": "Sie behalten die Kontrolle.",
+        "subtitle": "Vom ersten bis zum letzten Satz.",
+        "proof": {
+          "title": "Ein Protokoll dessen, was die KI schrieb",
+          "pain": "Neue EU-Regeln für KI-generierte Inhalte und kein Nachweis, wer was übersetzt hat.",
+          "gain": "Jede Übersetzung behält ihre Historie, bereit zum Vorzeigen, wenn jemand fragt."
+        },
+        "open": {
+          "title": "Open Source, für immer Ihres",
+          "pain": "An einen Anbieter gebunden, mit Wortpreisen, die ständig steigen.",
+          "gain": "Kostenlos und Open Source. Selbst betreiben oder von uns betreiben lassen."
+        }
+      }
     }
   },
   "account": {

@@ -1,29 +1,38 @@
 import {
   ArrowRight,
-  Code,
-  Globe,
-  TrendingUp,
-  BadgeCheck,
   BookOpenText,
-  Braces,
+  Bot,
   ChartNoAxesColumn,
-  Code2,
-  Hash,
-  Languages,
+  Check,
+  Compass,
+  Eye,
+  EyeOff,
+  FileClock,
+  Globe,
+  Link2,
   type LucideIcon,
-  Package,
-  Ruler,
+  Mail,
+  MapPin,
+  MessagesSquare,
+  MousePointerClick,
+  RefreshCw,
   Scale,
-  ShieldX,
-  SquareFunction,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  Smartphone,
   Star,
+  Trophy,
+  Unlock,
+  Wand2,
+  X,
+  Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
-import { APP_URL, type Chrome, getRepoStats, NPM_URL, RefusalCard, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
+import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { ACCENTS } from "@/components/landing-accents";
-import { CopyCommand } from "@/components/landing-client";
 import { LangMorph, WinnerBoard } from "@/components/landing-visuals";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -32,35 +41,11 @@ import { ORG_LD, pageMetadata, pageUrl, SITE } from "@/lib/seo";
 import { GITHUB_URL } from "@/lib/snippets";
 import "./landing.css";
 
-const INIT = "npx glot-i18n init";
-
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale: locale as Locale, namespace: "home.meta" });
   return pageMetadata({ locale, ns: "home", title: t("title"), description: t("description"), absolute: true });
 }
-
-// Real refusals (glot-core validator and crates/core/src/policy.rs), shown verbatim.
-const GUARANTEES: { key: "placeholders" | "plurals" | "glossary" | "width" | "patterns" | "facts"; icon: LucideIcon; bad: string; msg: string }[] = [
-  { key: "placeholders", icon: Braces, bad: `de  "Jetzt {Preis} sparen"`, msg: "Placeholder `{Preis}` does not exist in the source; remove it or fix its name (the source only has {price})." },
-  { key: "plurals", icon: SquareFunction, bad: `pl  "{count, plural, one {…} other {…}}"`, msg: "`{count, plural, …}` is missing plural categories required by pl: few, many." },
-  { key: "glossary", icon: BookOpenText, bad: `fr  "Ouvrez votre espace"`, msg: "Glossary: `Workspace` must be translated as `Espace de travail` in fr." },
-  { key: "width", icon: Ruler, bad: `de  "Jetzt kostenlos und ohne Kreditkarte starten"`, msg: "Too wide for its box in the app: one line of 160px at Geist 14px/500; it renders 301px wide." },
-  {
-    key: "patterns",
-    icon: ShieldX,
-    bad: `en  "Today only: unlimited invoices"`,
-    msg: `"Today only": urgency or scarcity with no source. Declare the real deadline or stock as a fact (e.g. "offer ends 31 Oct") or remove the wording.`,
-  },
-  { key: "facts", icon: Hash, bad: `en  "Join 10,000 teams who get paid faster"`, msg: `"10000" is in neither the official text nor the facts. Declare it as a fact or remove it.` },
-];
-
-// web/content/docs/experiments.md, "Install (3 lines)".
-const INSTALL = [
-  { file: "proxy.ts", code: `export const proxy = glotProxy({ source: "en", locales: ["fr", "de"], experiments: { server: "https://glot.example.com", project: "acme", key: "PUBLIC_KEY" } });` },
-  { file: "i18n/request.ts", code: `return { locale, messages: withExperiments(messages, { header: (await headers()).get("x-glot-xp"), locale }) };` },
-  { file: "signup-form.tsx", code: `track("signup"); // or track("purchase", { value: 49, currency: "EUR" })` },
-];
 
 // "Hello" in the languages glot ships; universal, so not in the catalogs.
 const HELLOS = ["Hello", "Bonjour", "Hola", "Hallo", "Ciao", "Olá", "こんにちは", "안녕하세요", "你好", "Привет", "مرحبا", "שלום", "नमस्ते", "Merhaba", "Cześć", "Hej", "Xin chào", "Γειά σου", "Halo", "Sawubona", "สวัสดี", "Ahoj"];
@@ -81,20 +66,53 @@ function HelloMarquee() {
   );
 }
 
-const FAQ = ["what", "audiences", "ai", "facts", "speed", "cookies", "seo", "traffic", "winner", "cost", "formats", "agents"] as const;
+// Every feature, in plain words (the technical detail lives in /docs). Keys under home.features.
+type Group = { id: "app" | "web" | "beyond" | "grow" | "trust"; anchor: string; acc: string; items: [string, LucideIcon][] };
+const GROUPS: Record<Group["id"], Group> = {
+  app: { id: "app", anchor: "app", acc: "acc-green", items: [["minutes", Zap], ["safe", ShieldCheck], ["fresh", RefreshCw], ["brand", BookOpenText], ["onpage", MousePointerClick]] },
+  web: { id: "web", anchor: "website", acc: "acc-cyan", items: [["tag", Wand2], ["google", Search], ["local", MapPin], ["shop", ShoppingBag], ["live", Eye], ["longtail", Globe]] },
+  beyond: { id: "beyond", anchor: "beyond", acc: "acc-violet", items: [["mobile", Smartphone], ["emails", Mail], ["ai", Bot], ["support", MessagesSquare], ["once", Link2]] },
+  grow: { id: "grow", anchor: "grow", acc: "acc-amber", items: [["next", Compass], ["words", Trophy], ["private", EyeOff]] },
+  trust: { id: "trust", anchor: "trust", acc: "acc-pink", items: [["proof", FileClock], ["open", Unlock]] },
+};
 
-function Bullets({ items }: { items: { title: string; body: string }[] }) {
+const FAQ = ["dev", "quality", "tools", "google", "privacy", "price"] as const;
+
+type T = Awaited<ReturnType<typeof getTranslations<"home">>>;
+
+function FeatureGroup({ g, t, wash }: { g: Group; t: T; wash?: boolean }) {
+  const k = (s: string) => `features.${g.id}.${s}` as Parameters<T>[0];
   return (
-    <ul className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
-      {items.map((i) => (
-        <li key={i.title} className="reveal flex gap-3">
-          <BadgeCheck aria-hidden className="acc-ink mt-0.5 size-5 shrink-0" />
-          <p className="text-pretty text-muted-foreground">
-            <strong className="font-semibold text-foreground">{i.title}</strong> {i.body}
-          </p>
-        </li>
-      ))}
-    </ul>
+    <section id={g.anchor} aria-labelledby={`${g.anchor}-title`} className={`${g.acc} scroll-mt-16 ${wash ? "section-wash border-y bg-muted/30" : ""}`}>
+      <div className="mx-auto max-w-6xl px-4 py-24">
+        <SectionHead id={`${g.anchor}-title`} eyebrow={t(k("eyebrow"))} title={t(k("title"))} subtitle={t(k("subtitle"))} />
+        <ul className={`mt-12 grid gap-4 sm:grid-cols-2 ${g.items.length === 2 ? "" : "lg:grid-cols-3"}`}>
+          {g.items.map(([id, Icon], i) => (
+            // ponytail: 5 cards fill a 3-column grid when the first one spans two.
+            <li key={id} className={`reveal card-acc flex flex-col ${g.items.length === 5 && i === 0 ? "lg:col-span-2" : ""} rounded-xl border bg-card p-5 shadow-xs ${ACCENTS[(ACCENTS.indexOf(g.acc as (typeof ACCENTS)[number]) + i) % ACCENTS.length]}`} style={{ animationDelay: `${(i % 3) * 60}ms` }}>
+              <span className="tile size-10">
+                <Icon aria-hidden className="size-5" />
+              </span>
+              <h3 className="mt-4 font-semibold">{t(k(`${id}.title`))}</h3>
+              <p className="mt-3 flex gap-2 text-sm leading-relaxed text-muted-foreground">
+                <X aria-hidden className="mt-0.5 size-4 shrink-0 opacity-60" />
+                <span>
+                  <span className="sr-only">{t("features.before")}: </span>
+                  {t(k(`${id}.pain`))}
+                </span>
+              </p>
+              <p className="mt-2 flex gap-2 text-sm leading-relaxed">
+                <Check aria-hidden className="acc-ink mt-0.5 size-4 shrink-0" />
+                <span>
+                  <span className="sr-only">{t("features.after")}: </span>
+                  {t(k(`${id}.gain`))}
+                </span>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
@@ -117,11 +135,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     license: t("footer.license"),
   };
   const navLinks = [
+    { href: "#app", label: t("nav.app") },
+    { href: "#website", label: t("nav.website") },
+    { href: "#beyond", label: t("nav.beyond") },
     { href: "#demo", label: t("nav.demo") },
-    { href: "#how", label: t("nav.how") },
-    { href: "#guarantees", label: t("nav.guarantees") },
     { href: "#results", label: t("nav.results") },
-    { href: "/i18n", label: t("nav.i18n"), route: true },
   ];
 
   const faq = FAQ.map((k) => ({ q: t(`faq.${k}.q`), a: t(`faq.${k}.a`) }));
@@ -134,14 +152,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       name: "glot",
       alternateName: ["glotlang", "glot-i18n"],
       url: `${SITE}/`,
-      applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS, Linux, Windows",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
       description: t("meta.description"),
       inLanguage: locale,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       license: "https://opensource.org/licenses/MIT",
       ...(version ? { softwareVersion: version } : {}),
-      downloadUrl: NPM_URL,
       codeRepository: GITHUB_URL,
       sameAs: [GITHUB_URL, NPM_URL],
       publisher: { "@id": `${SITE}/#org` },
@@ -156,15 +173,17 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
   const cta = (
     <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-start">
-      <CopyCommand command={INIT} className="max-w-full" />
       <div className="flex flex-col items-center gap-1.5">
-        <Button size="lg" asChild className="h-11 bg-brand px-5 text-brand-foreground hover:bg-brand/90">
+        <Button size="lg" asChild className="h-12 bg-brand px-6 text-base text-brand-foreground hover:bg-brand/90">
           <a href={`${APP_URL}/signup`}>
             {t("hero.start")} <ArrowRight aria-hidden className="rtl:rotate-180" />
           </a>
         </Button>
         <span className="text-xs text-muted-foreground">{t("hero.startHint")}</span>
       </div>
+      <Button size="lg" variant="outline" asChild className="h-12 px-6 text-base">
+        <a href="#demo">{t("hero.see")}</a>
+      </Button>
     </div>
   );
 
@@ -174,7 +193,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <SiteHeader c={chrome} links={navLinks} stars={stars} />
 
       <main id="main" className="flex-1">
-        {/* Hero: outcome, mechanism, two CTAs, sourced proof. */}
         <section aria-labelledby="hero-title" className="relative overflow-hidden">
           <div aria-hidden className="aurora pointer-events-none">
             <span />
@@ -183,23 +201,15 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <span />
           </div>
           <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-50" />
-          <div className="relative mx-auto max-w-3xl px-4 pt-16 pb-12 text-center sm:pt-24">
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 ps-1 pe-3 text-xs text-muted-foreground">
-              <span className="acc-violet tile rounded-full px-2 py-0.5 font-medium">{t("hero.labs")}</span>
-              {t("hero.badge")}
-            </p>
+          <div className="relative mx-auto max-w-3xl px-4 pt-16 pb-10 text-center sm:pt-24">
+            <p className="acc-violet tile mx-auto mb-6 w-fit rounded-full px-3 py-1 text-xs font-medium">{t("hero.badge")}</p>
             <h1 id="hero-title" className="text-4xl font-semibold tracking-tighter text-balance sm:text-6xl">
               {t("hero.title")}
             </h1>
             {/* No entrance animation on the text: it is the LCP. */}
-            <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-              {t("hero.subtitle")}
-            </p>
-            <div className="mt-8">
-              {cta}
-            </div>
-            <p className="mt-3 text-xs text-muted-foreground">{t("hero.commandHint")}</p>
-            <ul aria-label={t("hero.proofLabel")} className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <p className="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">{t("hero.subtitle")}</p>
+            <div className="mt-8">{cta}</div>
+            <ul aria-label={t("hero.proofLabel")} className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/docs/benchmark" title={t("hero.proofBenchNote")} className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
                   <ChartNoAxesColumn aria-hidden className="size-4 text-brand" />
@@ -217,13 +227,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                   <Star aria-hidden className="size-4" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
                 </a>
               </li>
-              {version && (
-                <li>
-                  <a href={NPM_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                    <Package aria-hidden className="size-4" /> <span className="tabular-nums">{t("hero.proofNpm", { version })}</span>
-                  </a>
-                </li>
-              )}
             </ul>
             <p className="mt-2 text-[11px] text-muted-foreground">
               <sup aria-hidden>1 </sup>
@@ -234,33 +237,14 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
         <HelloMarquee />
 
-        {/* The demo is the page's centrepiece. */}
-        <section id="demo" aria-labelledby="demo-title" className="relative scroll-mt-16 border-b">
-          <div className="mx-auto max-w-6xl px-4 pb-20">
-            <SectionHead center id="demo-title" eyebrow={t("demo.eyebrow")} title={t("demo.title")} subtitle={t("demo.subtitle")} />
-            <div className="mt-10">
-              <HomeDemo />
-            </div>
-            <p className="mt-3 text-center text-xs text-muted-foreground">{t("demo.caption")}</p>
-          </div>
-        </section>
-
         <section aria-labelledby="problem-title" className="acc-coral mx-auto max-w-6xl px-4 py-24">
           <SectionHead id="problem-title" eyebrow={t("problem.eyebrow")} title={t("problem.title")} />
           <ol className="mt-10 grid gap-4 md:grid-cols-3">
             {(["one", "ai", "manual"] as const).map((k, i) => (
               <li key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${["acc-coral", "acc-amber", "acc-pink"][i]}`} style={{ animationDelay: `${i * 60}ms` }}>
                 <p className="acc-ink font-mono text-3xl font-semibold tracking-tight tabular-nums">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="mt-2 font-medium">{t(`problem.${k}.title`)}</h3>
+                <h3 className="mt-2 font-semibold">{t(`problem.${k}.title`)}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`problem.${k}.body`)}</p>
-                {k === "ai" && (
-                  <p className="mt-3 border-t pt-3 text-xs text-muted-foreground">
-                    {t("problem.note")}{" "}
-                    <Link href="/docs/benchmark" className="font-medium text-foreground underline underline-offset-2 hover:text-brand">
-                      {t("problem.noteLink")}
-                    </Link>
-                  </p>
-                )}
               </li>
             ))}
           </ol>
@@ -276,7 +260,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                   <li key={k} className={`reveal relative flex gap-4 ${["acc-cyan", "acc-violet", "acc-green"][i]}`} style={{ animationDelay: `${i * 80}ms` }}>
                     <span className="tile relative size-9 shrink-0 rounded-full bg-card font-mono text-sm font-semibold tabular-nums">{i + 1}</span>
                     <div>
-                      <h3 className="font-medium">{t(`how.${k}.title`)}</h3>
+                      <h3 className="font-semibold">{t(`how.${k}.title`)}</h3>
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
                     </div>
                   </li>
@@ -286,19 +270,24 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 <LangMorph />
               </div>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">{t("how.footnote")}</p>
           </div>
         </section>
 
-        <section id="guarantees" aria-labelledby="guarantees-title" className="acc-pink mx-auto max-w-6xl scroll-mt-16 px-4 py-24">
-          <SectionHead id="guarantees-title" eyebrow={t("guarantees.eyebrow")} title={t("guarantees.title")} subtitle={t("guarantees.subtitle")} />
-          <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {GUARANTEES.map(({ key, icon, bad, msg }, i) => (
-              <RefusalCard key={key} id={`hg-${key}`} i={i} icon={icon} title={t(`guarantees.${key}.title`)} body={t(`guarantees.${key}.body`)} bad={bad} msg={msg} refusal={t("guarantees.refusal")} />
-            ))}
-          </ul>
-          <p className="mt-6 text-xs text-muted-foreground">{t("guarantees.patternsNote")}</p>
+        <FeatureGroup g={GROUPS.app} t={t} />
+        <FeatureGroup g={GROUPS.web} t={t} wash />
+        <FeatureGroup g={GROUPS.beyond} t={t} />
+
+        <section id="demo" aria-labelledby="demo-title" className="acc-green section-wash relative scroll-mt-16 border-y bg-muted/30">
+          <div className="mx-auto max-w-6xl px-4 py-24">
+            <SectionHead center id="demo-title" eyebrow={t("demo.eyebrow")} title={t("demo.title")} subtitle={t("demo.subtitle")} />
+            <div className="mt-10">
+              <HomeDemo />
+            </div>
+            <p className="mt-3 text-center text-xs text-muted-foreground">{t("demo.caption")}</p>
+          </div>
         </section>
+
+        <FeatureGroup g={GROUPS.grow} t={t} />
 
         <section id="results" aria-labelledby="results-title" className="acc-green section-wash scroll-mt-16 border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
@@ -310,109 +299,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <div className="reveal mt-6">
               <WinnerBoard />
             </div>
-            <div className="mt-12">
-              <Bullets items={(["noEarly", "noFake", "segment", "traffic", "alarms", "audiences"] as const).map((k) => ({ title: t(`results.${k}.title`), body: t(`results.${k}.body`) }))} />
-            </div>
           </div>
         </section>
 
-        <section aria-labelledby="goals-title" className="acc-amber mx-auto max-w-6xl px-4 py-24">
-          <SectionHead id="goals-title" eyebrow={t("goals.eyebrow")} title={t("goals.title")} subtitle={t("goals.subtitle")} />
-          <dl className="mt-10 grid gap-4 md:grid-cols-3">
-            {(["goal", "guardrail", "holdout"] as const).map((k, i) => (
-              <div key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${["acc-amber", "acc-coral", "acc-cyan"][i]}`}>
-                <dt className="font-medium">{t(`goals.${k}.title`)}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`goals.${k}.body`)}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+        <FeatureGroup g={GROUPS.trust} t={t} />
 
-        <section aria-labelledby="delivery-title" className="acc-violet section-wash border-y bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead id="delivery-title" eyebrow={t("delivery.eyebrow")} title={t("delivery.title")} />
-            <div className="mt-10">
-              <Bullets items={(["flicker", "path", "cookie", "seo"] as const).map((k) => ({ title: t(`delivery.${k}.title`), body: t(`delivery.${k}.body`) }))} />
-            </div>
-            <p className="mt-6 text-xs text-muted-foreground">{t("delivery.small")}</p>
-          </div>
-        </section>
-
-        <section aria-labelledby="install-title" className="acc-cyan mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 lg:grid-cols-[2fr_3fr]">
-          <div>
-            <SectionHead id="install-title" eyebrow={t("install.eyebrow")} title={t("install.title")} subtitle={t("install.subtitle")} />
-            <Link href="/docs/experiments" className="mt-6 inline-flex min-h-6 items-center gap-1 text-sm font-medium underline underline-offset-2 hover:text-brand">
-              {t("install.docs")} <ArrowRight aria-hidden className="size-3.5 rtl:rotate-180" />
-            </Link>
-          </div>
-          <ol aria-label={t("install.label")} dir="ltr" className="reveal min-w-0 space-y-3">
-            {INSTALL.map((s, i) => (
-              <li key={s.file} className="overflow-hidden rounded-xl border term">
-                <p className="term-rule term-faint flex items-center gap-2 border-b px-3 py-1.5 font-mono text-[11px]">
-                  <Code2 aria-hidden className="size-3.5" /> <span className="tabular-nums">{i + 1}</span> {s.file}
-                </p>
-                <pre className="px-3 py-2.5 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap">
-                  <code>{s.code}</code>
-                </pre>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section aria-labelledby="who-title" className="acc-pink section-wash border-y bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead id="who-title" eyebrow={t("who.eyebrow")} title={t("who.title")} />
-            <ul className="mt-10 grid gap-4 md:grid-cols-3">
-              {([["dev", Code, "acc-cyan"], ["growth", TrendingUp, "acc-green"], ["l10n", Globe, "acc-violet"]] as const).map(([k, Icon, acc]) => (
-                <li key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${acc}`}>
-                  <span className="tile mb-3 size-10">
-                    <Icon aria-hidden className="size-5" />
-                  </span>
-                  <h3 className="font-medium">{t(`who.${k}.title`)}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`who.${k}.body`)}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section aria-labelledby="integrations-title" className="acc-amber mx-auto max-w-6xl px-4 py-24">
-          <SectionHead id="integrations-title" eyebrow={t("integrations.eyebrow")} title={t("integrations.title")} />
-          <dl className="reveal mt-10 divide-y rounded-xl border bg-card">
-            {(["i18n", "frameworks", "edge", "agents", "git", "models"] as const).map((k, i) => (
-              <div key={k} className={`grid gap-1 px-5 py-4 sm:grid-cols-[10rem_1fr] sm:gap-6 ${ACCENTS[i]}`}>
-                <dt className="eyebrow text-sm font-medium">{t(`integrations.${k}.label`)}</dt>
-                <dd className="text-sm text-muted-foreground">{t(`integrations.${k}.value`)}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        {/* The localization engine underneath, and the door to the former landing. */}
-        <section aria-labelledby="foundation-title" className="acc-green section-wash relative overflow-hidden border-y bg-muted/30">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 lg:grid-cols-2">
-            <div>
-              <SectionHead id="foundation-title" eyebrow={t("foundation.eyebrow")} title={t("foundation.title")} subtitle={t("foundation.subtitle")} />
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Button asChild size="lg" className="h-11 px-5">
-                  <Link href="/i18n">
-                    <Languages aria-hidden /> {t("foundation.link")}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-            <div className="reveal space-y-4 rounded-xl border bg-card p-5 shadow-xs sm:p-6">
-              <CopyCommand command="npx glot-i18n localize --yes --targets fr,de" className="max-w-full" />
-              <p className="text-sm leading-relaxed">{t("foundation.proof")}</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">{t("foundation.cost")}</p>
-              <Link href="/docs/benchmark" className="inline-flex min-h-6 items-center gap-1 text-sm font-medium underline underline-offset-2 hover:text-brand">
-                {t("foundation.bench")} <ArrowRight aria-hidden className="size-3.5 rtl:rotate-180" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section aria-labelledby="faq-title" className="mx-auto grid max-w-6xl gap-10 px-4 py-24 lg:grid-cols-[1fr_2fr]">
+        <section aria-labelledby="faq-title" className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 lg:grid-cols-[1fr_2fr]">
           <div className="reveal">
             <h2 id="faq-title" className="text-3xl font-semibold tracking-tight sm:text-4xl">{t("faq.title")}</h2>
             <Link href="/docs/faq" className="mt-3 inline-flex min-h-6 items-center gap-1 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
@@ -435,7 +327,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </section>
 
         <section aria-labelledby="pricing-title" className="mx-auto max-w-6xl px-4 pb-24">
-          <div className="reveal flex flex-col items-start gap-5 rounded-2xl border bg-card p-6 shadow-xs sm:p-8 md:flex-row md:items-center">
+          <div className="reveal card-acc acc-amber flex flex-col items-start gap-5 rounded-2xl border bg-card p-6 shadow-xs sm:p-8 md:flex-row md:items-center">
             <div className="flex-1">
               <h2 id="pricing-title" className="text-2xl font-semibold tracking-tight text-balance">{t("pricing.title")}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("pricing.body")}</p>
@@ -457,7 +349,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{t("cta.title")}</h2>
             <p className="text-muted-foreground">{t("cta.body")}</p>
             {cta}
-            <Link href="/docs/experiments" className="inline-flex min-h-6 items-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
+            <Link href="/docs" className="inline-flex min-h-6 items-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
               {t("cta.docs")}
             </Link>
           </div>
