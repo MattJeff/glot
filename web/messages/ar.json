@@ -1784,7 +1784,9 @@
     "skipToContent": "تخطي إلى المحتوى",
     "conversations": "المحادثات",
     "integrations": "التكاملات",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "كل المشاريع",
+    "switchProject": "تبديل المشروع"
   },
   "status": {
     "machine": "آلية",

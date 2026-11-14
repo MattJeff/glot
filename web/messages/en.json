@@ -1854,7 +1854,9 @@
     "github": "GitHub",
     "conversations": "Conversations",
     "integrations": "Integrations",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "All projects",
+    "switchProject": "Switch project"
   },
   "status": {
     "machine": "Machine",

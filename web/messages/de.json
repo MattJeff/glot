@@ -1784,7 +1784,9 @@
     "skipToContent": "Zum Inhalt springen",
     "conversations": "Konversationen",
     "integrations": "Integrationen",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "Alle Projekte",
+    "switchProject": "Projekt wechseln"
   },
   "status": {
     "machine": "Maschinell",

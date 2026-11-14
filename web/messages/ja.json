@@ -1784,7 +1784,9 @@
     "skipToContent": "コンテンツへスキップ",
     "conversations": "会話",
     "integrations": "連携",
-    "autopilot": "Autopilot"
+    "autopilot": "Autopilot",
+    "allProjects": "すべてのプロジェクト",
+    "switchProject": "プロジェクトを切り替え"
   },
   "status": {
     "machine": "機械翻訳",

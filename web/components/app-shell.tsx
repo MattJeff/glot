@@ -3,6 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenText,
+  Check,
+  ChevronsUpDown,
   CreditCard,
   FlaskConical,
   FolderKanban,
@@ -61,7 +63,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, RTL_LOCALES } from "@/i18n/routing";
@@ -94,12 +95,10 @@ const PROJECT_PAGES = [
 
 function SidebarNav({
   onNavigate,
-  onCreate,
   collapsed = false,
   onToggle,
 }: {
   onNavigate?: () => void;
-  onCreate: () => void;
   collapsed?: boolean;
   onToggle?: () => void;
 }) {
@@ -107,10 +106,6 @@ function SidebarNav({
   const slug = useSlug();
   const pathname = usePathname();
   const locale = useLocale();
-  const qc = useQueryClient();
-  const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
-  // Warm the project query on hover/focus so the overview renders without a skeleton.
-  const prefetch = (s: string) => qc.prefetchQuery({ queryKey: qk.project(s), queryFn: () => api.project(s) });
 
   const item = (href: string, active: boolean) =>
     cn(
@@ -160,66 +155,43 @@ function SidebarNav({
           )}
       </div>
 
-      <div>
-        <div className={cn("mb-1 flex items-center justify-between", !collapsed && "px-2")}>
-          {!collapsed && <span className="text-xs font-medium text-muted-foreground">{t("projects")}</span>}
-          {tip(
-            t("newProject"),
-            <Button variant="ghost" size="icon-xs" aria-label={t("newProject")} onClick={onCreate} className={cn(collapsed && "mx-auto")}>
-              <Plus />
-            </Button>,
-          )}
-        </div>
-        <div className="space-y-0.5">
-          {projects.isPending &&
-            Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="mx-2 my-1.5 h-5" />)}
-          {projects.data?.length === 0 && <p className="px-2 py-1 text-xs text-muted-foreground">{t("noProjects")}</p>}
-          {/* ponytail: the rail keeps only the open project; switching goes through ⌘K or expanding. */}
-          {projects.data?.filter((p) => !collapsed || !slug || p.slug === slug).map((p) => (
-            <div key={p.id}>
-              {tip(
-                p.name,
-                <Link
-                  href={`/app/${p.slug}`}
-                  className={item(`/app/${p.slug}`, p.slug === slug && pathname === `/app/${p.slug}`)}
-                  aria-current={current(p.slug === slug && pathname === `/app/${p.slug}`)}
-                  onMouseEnter={() => prefetch(p.slug)}
-                  onFocus={() => prefetch(p.slug)}
-                >
-                  <FolderKanban className="size-4" />
-                  {label(p.name)}
-                </Link>,
-              )}
-              {p.slug === slug && !collapsed && <SidebarProjectProgress slug={p.slug} />}
-              {p.slug === slug && (
-                <div className={cn("mt-2 space-y-0.5", collapsed ? "border-t pt-2" : "ms-4 border-s ps-2")}>
-                  {PROJECT_PAGES.slice(1).map((page) => {
-                    const { seg, icon: Icon, label: name } = page;
-                    const href = `/app/${p.slug}${seg}`;
-                    return (
-                      <div key={seg}>
-                        {seg === "/insights" &&
-                          (collapsed ? (
-                            <div role="separator" aria-label={t("labs")} className="my-2 border-t" />
-                          ) : (
-                            <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
-                          ))}
-                        {tip(
-                          t(name),
-                          <Link href={href} className={item(href, pathname === href)} aria-current={current(pathname === href)}>
-                            <Icon className="size-4" />
-                            {label(t(name))}
-                          </Link>,
-                        )}
-                      </div>
-                    );
-                  })}
+      {/* Only the open project's pages: switching project is the header's project switcher (or ⌘K). */}
+      {slug ? (
+        <div>
+          {!collapsed && <SidebarProjectProgress slug={slug} />}
+          <div className="mt-2 space-y-0.5">
+            {PROJECT_PAGES.map((page) => {
+              const { seg, icon: Icon, label: name } = page;
+              const href = `/app/${slug}${seg}`;
+              return (
+                <div key={seg}>
+                  {seg === "/insights" &&
+                    (collapsed ? (
+                      <div role="separator" aria-label={t("labs")} className="my-2 border-t" />
+                    ) : (
+                      <div className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t("labs")}</div>
+                    ))}
+                  {tip(
+                    t(name),
+                    <Link href={href} className={item(href, pathname === href)} aria-current={current(pathname === href)}>
+                      <Icon className="size-4" />
+                      {label(t(name))}
+                    </Link>,
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : (
+        tip(
+          t("allProjects"),
+          <Link href="/app" className={item("/app", pathname === "/app")} aria-current={current(pathname === "/app")}>
+            <FolderKanban className="size-4" />
+            {label(t("allProjects"))}
+          </Link>,
+        )
+      )}
 
       <div className="mt-auto">
         {tip(
@@ -245,6 +217,49 @@ function SidebarNav({
         )}
       </div>
     </nav>
+  );
+}
+
+/** Header project switcher: the open project, every project, and "new project". */
+function ProjectSwitcher({ onCreate }: { onCreate: () => void }) {
+  const t = useTranslations("shell");
+  const slug = useSlug();
+  const projects = useQuery({ queryKey: qk.projects, queryFn: api.projects });
+  const open = projects.data?.find((p) => p.slug === slug);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" aria-label={t("switchProject")} className="h-9 max-w-52 shrink-0 gap-2 rounded-full bg-card/70 px-3 shadow-xs">
+          <FolderKanban className="size-4 text-brand" />
+          <span className="truncate font-semibold">{open?.name ?? t("allProjects")}</span>
+          <ChevronsUpDown className="size-3.5 opacity-60" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-64">
+        <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">{t("projects")}</DropdownMenuLabel>
+        {projects.data?.map((p) => (
+          <DropdownMenuItem key={p.id} asChild>
+            <Link href={`/app/${p.slug}`} aria-current={p.slug === slug ? "page" : undefined}>
+              <FolderKanban className="size-4" />
+              <span className="flex-1 truncate">{p.name}</span>
+              {p.slug === slug && <Check className="size-4 text-brand" />}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        {projects.data?.length === 0 && <p className="px-2 py-1.5 text-xs text-muted-foreground">{t("noProjects")}</p>}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/app">
+            <LayoutDashboard className="size-4" />
+            {t("allProjects")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onCreate}>
+          <Plus className="size-4" />
+          {t("newProject")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -521,13 +536,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           collapsed ? "w-14" : "w-60",
         )}
       >
-        <SidebarNav collapsed={collapsed} onToggle={toggleCollapsed} onCreate={() => setCreateOpen(true)} />
+        <SidebarNav collapsed={collapsed} onToggle={toggleCollapsed} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         {/* The drawer opens from the reading-start edge (right in Arabic), like the desktop sidebar. */}
         <SheetContent side={RTL_LOCALES.includes(locale) ? "right" : "left"} className="w-72 max-w-[85vw] p-0">
           <SheetTitle className="sr-only">{t("toggleSidebar")}</SheetTitle>
-          <SidebarNav onNavigate={() => setMobileOpen(false)} onCreate={() => setCreateOpen(true)} />
+          <SidebarNav onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 
@@ -536,6 +551,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label={t("toggleSidebar")} onClick={() => setMobileOpen(true)}>
             <Menu />
           </Button>
+          <ProjectSwitcher onCreate={() => setCreateOpen(true)} />
           <button
             type="button"
             onClick={() => setPaletteOpen(true)}
