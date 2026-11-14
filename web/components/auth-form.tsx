@@ -13,24 +13,38 @@ import { Link } from "@/i18n/navigation";
 import { api, ApiError, qk } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 
-/** Centered single-card layout shared by login, signup and the email-link pages. */
+// Greetings around the mascot: the product's sample copy, decorative (aria-hidden), not UI text.
+const HELLO = [["en", "Hello!", "top-[14%] start-[8%]"], ["fr", "Bonjour !", "top-[10%] end-[10%]"], ["ja", "こんにちは！", "bottom-[26%] end-[6%]"], ["es", "¡Hola!", "bottom-[20%] start-[10%]"]] as const;
+
+/** Login, signup and the email-link pages: the form on a glass card, the landing's mascot scene beside it. */
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-14 items-center justify-between px-4">
+    <div className="app-canvas flex min-h-screen flex-col">
+      <header className="flex h-16 items-center justify-between px-4 sm:px-6">
         <Link href="/">
-          <Logo />
+          <Logo className="text-xl" />
         </Link>
         <div className="flex gap-1">
           <LocaleSwitcher />
           <ThemeToggle />
         </div>
       </header>
-      <main className="grid flex-1 place-items-center px-4 pb-20">
-        <div className="w-full max-w-sm">
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 pb-16 lg:grid-cols-2">
+        <div className="mx-auto w-full max-w-sm rounded-3xl border bg-card/80 p-7 shadow-[0_30px_80px_-40px_rgb(30_20_60/0.45)] backdrop-blur-xl">
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
           {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
           {children}
+        </div>
+        <div aria-hidden className="relative hidden aspect-square overflow-hidden rounded-[2.5rem] border bg-[radial-gradient(60%_50%_at_80%_10%,rgb(85_230_255/0.25),transparent_70%),radial-gradient(50%_45%_at_10%_30%,rgb(255_162_87/0.25),transparent_70%),radial-gradient(55%_50%_at_60%_100%,rgb(181_140_255/0.3),transparent_70%)] lg:block">
+          {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized transparent WebP generated with Higgsfield */}
+          <img src="/landing/robot-wave.webp" alt="" className="absolute inset-x-0 bottom-0 mx-auto w-[62%] drop-shadow-[0_30px_40px_rgb(0_0_0/0.3)]" />
+          {HELLO.map(([code, hi, pos]) => (
+            <span key={code} className={`absolute ${pos} flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-sm font-semibold shadow-lg backdrop-blur`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/landing/flags/${code}.webp`} alt="" className="size-5 rounded-full" />
+              {hi}
+            </span>
+          ))}
         </div>
       </main>
     </div>

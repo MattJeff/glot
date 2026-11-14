@@ -114,9 +114,9 @@ function SidebarNav({
 
   const item = (href: string, active: boolean) =>
     cn(
-      "relative flex h-8 items-center gap-2 rounded-md px-2 text-sm pointer-coarse:h-10 text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground [&_svg]:shrink-0",
+      "relative flex h-8 items-center gap-2 rounded-lg px-2 text-sm pointer-coarse:h-10 text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground [&_svg]:shrink-0",
       active &&
-        "bg-accent font-medium text-foreground before:absolute before:inset-y-1.5 before:-start-2 before:w-0.5 before:rounded-full before:bg-brand",
+        "bg-primary/12 font-medium text-foreground ring-1 ring-primary/25 before:absolute before:inset-y-1.5 before:-start-2 before:w-1 before:rounded-full before:bg-primary before:shadow-[0_0_10px_var(--primary)] [&_svg]:text-brand",
     );
   const current = (active: boolean) => (active ? ("page" as const) : undefined);
   // Collapsed rail: icon only; the label stays for screen readers and shows as a tooltip.
@@ -508,7 +508,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useQuery({ queryKey: qk.me, queryFn: api.me });
 
   return (
-    <div className="flex min-h-screen">
+    <div className="app-canvas flex min-h-screen">
       <a
         href="#main"
         className="sr-only z-50 rounded-md bg-background px-3 py-2 text-sm font-medium shadow-(--shadow-raised) focus:not-sr-only focus:fixed focus:start-3 focus:top-3"
@@ -517,7 +517,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 border-e bg-sidebar motion-safe:transition-[width] motion-safe:duration-200 lg:block",
+          "sticky top-0 hidden h-screen shrink-0 border-e bg-sidebar/80 backdrop-blur-xl motion-safe:transition-[width] motion-safe:duration-200 lg:block",
           collapsed ? "w-14" : "w-60",
         )}
       >
@@ -532,7 +532,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur sm:px-4">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/70 px-3 backdrop-blur-xl sm:px-4">
           <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label={t("toggleSidebar")} onClick={() => setMobileOpen(true)}>
             <Menu />
           </Button>
@@ -540,7 +540,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setPaletteOpen(true)}
             aria-keyshortcuts="Meta+K Control+K"
-            className="flex h-8 w-full max-w-xs items-center gap-2 rounded-md border pointer-coarse:h-10 bg-muted/40 px-2.5 text-sm text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground"
+            className="flex h-9 w-full max-w-xs items-center gap-2 rounded-full border pointer-coarse:h-10 bg-card/70 shadow-xs px-2.5 text-sm text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground"
           >
             <Search className="size-4" aria-hidden />
             <span className="flex-1 text-start">{t("search")}</span>

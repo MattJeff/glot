@@ -80,7 +80,7 @@ function ProjectCard({ project: p }: { project: Project }) {
       href={`/app/${p.slug}`}
       onMouseEnter={prefetch}
       onFocus={prefetch}
-      className="group flex w-full flex-col rounded-xl border bg-card p-5 shadow-(--shadow-card) transition-[border-color,box-shadow,translate] duration-200 ease-out hover:border-foreground/20 hover:shadow-(--shadow-raised) focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
+      className="group flex w-full flex-col rounded-2xl border bg-card/90 p-5 shadow-(--shadow-card) backdrop-blur transition-[border-color,box-shadow,translate] duration-200 ease-out hover:border-primary/50 hover:shadow-(--shadow-raised) focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

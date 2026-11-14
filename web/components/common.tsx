@@ -168,7 +168,7 @@ export function PageHeader({
     <div className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div className="min-w-0 max-w-2xl">
         {eyebrow && <div className="mb-1 text-xs font-medium text-muted-foreground">{eyebrow}</div>}
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
         {subtitle && <p className="mt-1.5 text-sm text-pretty text-muted-foreground">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -198,20 +198,20 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-6 py-14 text-center motion-safe:animate-rise",
+        "relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed bg-card/50 px-6 py-12 text-center motion-safe:animate-rise",
         className,
       )}
     >
-      <div aria-hidden className="relative mb-5 grid size-20 place-items-center">
-        <span className="absolute inset-0 rounded-full border border-dashed border-border" />
-        <span className="absolute inset-3 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--brand)_18%,transparent),transparent_70%)]" />
-        <span className="absolute top-1 end-2 size-1.5 rounded-full bg-brand/70" />
-        <span className="absolute bottom-2 start-1 size-1 rounded-full bg-info/70" />
-        <span className="relative grid size-11 place-items-center rounded-xl border bg-card shadow-(--shadow-card)">
-          <Icon className="size-5 text-muted-foreground" />
+      {/* The landing's mascot (Higgsfield cut-out) with the page's own icon as a badge. */}
+      <div aria-hidden className="relative mb-4">
+        <span className="absolute inset-2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_28%,transparent),transparent_70%)] blur-md" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized transparent WebP */}
+        <img src="/landing/robot-wave.webp" alt="" width={112} height={112} className="relative size-28 object-contain drop-shadow-[0_14px_20px_rgb(0_0_0/0.25)]" />
+        <span className="absolute -end-1 bottom-2 grid size-9 place-items-center rounded-xl border bg-card shadow-(--shadow-raised)">
+          <Icon className="size-4 text-brand" />
         </span>
       </div>
-      <h2 className="text-base font-medium">{title}</h2>
+      <h2 className="text-lg font-semibold">{title}</h2>
       {body && <p className="mt-1.5 max-w-md text-sm text-pretty text-muted-foreground">{body}</p>}
       {action && <div className="mt-5 flex flex-wrap justify-center gap-2">{action}</div>}
       {children && <div className="mt-6 w-full max-w-lg text-start">{children}</div>}
