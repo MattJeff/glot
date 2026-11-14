@@ -1,6 +1,7 @@
 # glot dogfooding: this dashboard is translated by glot itself.
 source_locale = "en"
-target_locales = ["fr", "es", "de", "ja", "ar"]
+# The site routes en, fr, es, de, ja, ar today; the others are kept ready in the cloud project "lot".
+target_locales = ["fr", "es", "de", "ja", "ar", "pt-BR", "it", "zh-CN", "ko", "nl", "ru", "fi", "cs", "uk", "he", "da", "vi", "sv", "hi", "pl", "id", "th", "tr", "en-GB", "es-MX", "pt-PT", "zh-TW", "el", "hu", "ro", "nb"]
 files = ["messages/{locale}.json"]
 format = "json-nested"
 syntax = "icu"
@@ -21,3 +22,10 @@ max_length_ratio = 1.6
 include = ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"]
 # Docs content (web/content/docs/*.md) is English documentation, not UI: never extracted.
 exclude = ["**/node_modules/**", "**/*.test.*", "**/*.spec.*", "content/**"]
+
+# glot cloud project that hosts this dashboard's own catalogs (glot in glot).
+# Token: a personal API token from app.glotlang.com/app/settings/tokens, in GLOT_TOKEN (never committed).
+[server]
+url = "https://app.glotlang.com"
+project = "lot"
+token_env = "GLOT_TOKEN"
