@@ -1922,6 +1922,23 @@ async fn run_once(state: &AppState, job: &mut JobRecord) -> anyhow::Result<usize
 
     // Commit on the glot branch (workflow files excluded: the app has no `workflows` permission).
     git(&dir, &home, &token, &["checkout", "-q", "-B", &branch], t).await?;
+    // The clone checks symlinks out as plain files holding their target (core.symlinks=false), so glot may have
+    // appended to one (AGENTS.md -> CLAUDE.md): committed as-is, that becomes a symlink whose "target" is the whole
+    // text, which breaks checkouts on macOS. Symlinks are never ours to change: put them back.
+    let links: Vec<String> = git(&dir, &home, &token, &["ls-files", "-s", "-z"], t)
+        .await?
+        .split('\0')
+        .filter_map(|e| {
+            e.strip_prefix("120000 ")
+                .and_then(|r| r.split_once('\t'))
+                .map(|(_, p)| p.to_string())
+        })
+        .collect();
+    if !links.is_empty() {
+        let mut args = vec!["checkout", "-q", "--"];
+        args.extend(links.iter().map(String::as_str));
+        git(&dir, &home, &token, &args, t).await?;
+    }
     git(
         &dir,
         &home,

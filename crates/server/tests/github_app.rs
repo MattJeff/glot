@@ -260,6 +260,10 @@ async fn connect_github_end_to_end() {
         "export default function RootLayout({ children }: { children: React.ReactNode }) {\n  return (<html lang=\"en\"><body>{children}</body></html>);\n}\n",
     )
     .unwrap();
+    // AGENTS.md as a symlink to CLAUDE.md (cliponit's layout): glot must leave the link alone.
+    std::fs::write(work.join("CLAUDE.md"), "# Notes\n").unwrap();
+    #[cfg(unix)]
+    std::os::unix::fs::symlink("CLAUDE.md", work.join("AGENTS.md")).unwrap();
     sh(&work, &["init", "-q", "-b", "main"]);
     sh(&work, &["add", "-A"]);
     sh(&work, &["commit", "-qm", "init"]);
@@ -525,6 +529,23 @@ async fn connect_github_end_to_end() {
     assert!(!fr.as_object().unwrap().is_empty());
     assert!(check.join("glot.toml").exists() && check.join("glot.lock").exists());
     assert!(!check.join(".github/workflows/glot.yml").exists());
+    #[cfg(unix)]
+    {
+        let ls = std::process::Command::new("git")
+            .args(["ls-tree", "HEAD", "AGENTS.md"])
+            .current_dir(&check)
+            .output()
+            .unwrap();
+        let ls = String::from_utf8_lossy(&ls.stdout);
+        assert!(
+            ls.starts_with("120000 "),
+            "AGENTS.md is no longer a symlink: {ls}"
+        );
+        assert_eq!(
+            std::fs::read_link(check.join("AGENTS.md")).unwrap(),
+            std::path::Path::new("CLAUDE.md")
+        );
+    }
     assert!(
         std::fs::read_to_string(check.join("app/page.tsx"))
             .unwrap()
