@@ -343,7 +343,7 @@ async fn edge_tm_end_to_end() {
     let (_, _, out) = report(
         vec![
             seg("Admin panel", "/admin/x", "h1"),
-            seg("New copy", "/", "p"),
+            seg("New copy", "/blog/new", "p"),
         ],
         json!({}),
     )
@@ -353,6 +353,49 @@ async fn edge_tm_end_to_end() {
         (Some(0), Some(2)),
         "{out}"
     );
+    // Over the cap, what gates a page's readiness still passes: <title>, SEO meta, critical pages ("/").
+    let (_, _, out) = report(
+        vec![
+            seg("A brand new title", "/blog/new", "title"),
+            seg("A fresh description", "/blog/new", "meta:description"),
+            seg("Home copy", "/", "p"),
+        ],
+        json!({}),
+    )
+    .await;
+    assert_eq!(
+        (out["accepted"].as_i64(), out["rejected"].as_i64()),
+        (Some(3), Some(0)),
+        "{out}"
+    );
+    // The refused one is not silent: the coverage API shows the cap and what it held back.
+    let (s, _, cov) = call(Method::GET, "/api/projects/ed/edge/coverage", c, None).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(cov["cap"]["daily_cap"], 4, "{cov}");
+    assert_eq!(cov["cap"]["refused_24h"], 1, "{cov}");
+    assert!(cov["cap"]["new_24h"].as_i64().unwrap() >= 4, "{cov}");
+    // Raising the cap: the deferred segment moves in on the next report, nothing to rediscover.
+    settings["daily_cap"] = json!(1000);
+    let (s, _, e) = call(
+        Method::PUT,
+        "/api/projects/ed/edge/settings",
+        c,
+        Some(settings.clone()),
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK, "{e}");
+    let (_, _, out) = report(vec![seg("Home copy", "/", "p")], json!({})).await;
+    assert_eq!(out["accepted"], 1, "the deferred segment: {out}");
+    let (_, _, cov) = call(Method::GET, "/api/projects/ed/edge/coverage", c, None).await;
+    assert_eq!(cov["cap"]["refused_24h"], 0, "{cov}");
+    let moved: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM edge_segments WHERE project_id = $1 AND source_text = 'New copy')",
+    )
+    .bind(pid)
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert!(moved);
     settings["enabled"] = json!(false);
     call(
         Method::PUT,

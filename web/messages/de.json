@@ -303,7 +303,13 @@
         "title": "Noch keine Seite gesehen",
         "body": "Die Abdeckung erscheint, sobald glot Edge Seiten in dieser Sprache ausgeliefert hat."
       },
-      "pagesSeen": "Gesehene Seiten"
+      "pagesSeen": "Gesehene Seiten",
+      "cap": {
+        "title": "Neuer Text wird zurückgehalten",
+        "body": "In den letzten 24 Stunden wurden {refused} neue Segmente abgelehnt: Das tägliche Erkennungslimit ({cap}) ist erreicht. Sie warten, bis wieder Platz ist; die Seiten, die sie verwenden, bleiben unübersetzt und werden Suchmaschinen noch nicht angezeigt. Titel und Meta-Beschreibungen werden nie zurückgehalten.",
+        "raise": "Limit auf {n} erhöhen",
+        "raised": "Tageslimit auf {n} erhöht. Zurückgehaltener Text wird bei den nächsten Besuchen übernommen."
+      }
     },
     "segments": {
       "title": "Segmente",

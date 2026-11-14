@@ -303,7 +303,13 @@
         "title": "No page seen yet",
         "body": "Coverage appears once glot Edge has served pages in this language."
       },
-      "pagesSeen": "Pages seen"
+      "pagesSeen": "Pages seen",
+      "cap": {
+        "title": "New text is being held back",
+        "body": "{refused} new segments were refused in the last 24 hours: the daily discovery limit ({cap}) is reached. They wait until there is room, so the pages using them stay untranslated and are not advertised to search engines yet. Titles and meta descriptions are never held back.",
+        "raise": "Raise the limit to {n}",
+        "raised": "Daily limit raised to {n}. Held-back text is picked up on the next visits."
+      }
     },
     "segments": {
       "title": "Segments",

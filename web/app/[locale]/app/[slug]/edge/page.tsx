@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorState, PageHeader } from "@/components/common";
 import { edgeApi, edgeKeys } from "@/components/edge/api";
-import { Coverage } from "@/components/edge/coverage";
+import { CapWarning, Coverage } from "@/components/edge/coverage";
 import { Performance, SeoReportView } from "@/components/edge/seo";
 import { SegmentsEditor } from "@/components/edge/segments";
 import { EdgeSettingsForm } from "@/components/edge/settings";
@@ -36,6 +36,7 @@ function EdgeView() {
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader title={t("title")} subtitle={t("subtitle")} actions={<KillSwitch slug={slug} settings={settings.data} />} />
+      <CapWarning slug={slug} settings={settings.data} />
       <Tabs value={tab} onValueChange={(v) => router.replace(`/app/${slug}/edge?tab=${v}`)}>
         <TabsList className="mb-6 h-auto flex-wrap">
           {TABS.map((k) => (

@@ -147,7 +147,9 @@ export type EdgePrewarm = {
 };
 /** GET /edge/slugs (slugs.rs): the current translated path of each page and language. */
 export type EdgeSlug = { locale: string; source_path: string; slug: string; origin: "machine" | "human" };
-export type EdgeCoverage = { seo_min: number; locales: EdgeLocale[] };
+/** Daily discovery cap (missing.rs `cap_state`): `refused_24h > 0` = new page text is held back until there is room. */
+export type EdgeCap = { daily_cap: number; new_24h: number; refused_24h: number };
+export type EdgeCoverage = { seo_min: number; cap: EdgeCap; locales: EdgeLocale[] };
 
 /** GET /edge/segments (tm.rs): one locale, `status` = missing when there is no translation yet. */
 export type SegmentStatus = "missing" | "pending" | "machine" | "reviewed" | "stale";
