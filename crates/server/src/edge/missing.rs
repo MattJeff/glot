@@ -1,7 +1,9 @@
 //! `POST /edge/v1/{project}/missing`: segments a page rendered that the TM could not translate, reported by the
 //! worker, the proxy or the client patcher. Authenticated by the project's public key (`pk_…`, same key as
 //! Insights), rate-limited per minute, aggregated (one row per segment and context, hit counter), bounded by
-//! `edge::discover` (zones, no session, daily cap, no personal data). Accepted segments queue one
+//! `edge::discover` (zones, no session, daily cap, no personal data). Over the cap, what gates a page's readiness
+//! (`<title>`, SEO meta, critical pages) still passes and the rest waits in `edge_segments_deferred` for room
+//! (`cap_state`, shown in the coverage API). Accepted segments queue one
 //! `edge_translate` job per (project, locale); meanwhile the source text is served (never a hole).
 //!
 //! Body (any content type, so browsers post `text/plain` without a CORS preflight):
@@ -178,6 +180,66 @@ async fn ingest(
     Ok((StatusCode::ACCEPTED, Json(json!(out))).into_response())
 }
 
+/// (hash, context, text, needs_review, url sample).
+type Seg = (String, String, String, bool, String);
+
+/// New segments a page's readiness waits for, accepted past the daily cap: `<title>`, the SEO meta
+/// (`meta:description`, `og:*`, `twitter:*`) and every segment of a critical page (`critical_patterns`).
+fn gates_readiness(context: &str, path: &str, settings: &Settings) -> bool {
+    let role = context.split('|').next().unwrap_or("");
+    role == "title" || role.starts_with("meta:") || settings.critical(path)
+}
+
+/// New segments per 24 h [`gates_readiness`] may add past `daily_cap` (a backstop: the text is reporter-chosen).
+const PRIORITY_EXTRA: i64 = 5000;
+/// Segments refused by the cap kept per project, waiting for room.
+const MAX_DEFERRED: i64 = 20_000;
+
+async fn insert(
+    tx: &mut sqlx::PgConnection,
+    table: &str,
+    project: Uuid,
+    rows: &[Seg],
+    conflict: &str,
+) -> sqlx::Result<usize> {
+    if rows.is_empty() {
+        return Ok(0);
+    }
+    let col = |f: fn(&Seg) -> String| rows.iter().map(f).collect::<Vec<_>>();
+    let res = sqlx::query(&format!(
+        "INSERT INTO {table} (project_id, hash, context, source_text, needs_review, url_sample)
+         SELECT $1, h, c, t, r, u FROM unnest($2::text[], $3::text[], $4::text[], $5::bool[], $6::text[]) AS x(h, c, t, r, u)
+         ON CONFLICT {conflict}"
+    ))
+    .bind(project)
+    .bind(col(|i| i.0.clone()))
+    .bind(col(|i| i.1.clone()))
+    .bind(col(|i| i.2.clone()))
+    .bind(rows.iter().map(|i| i.3).collect::<Vec<_>>())
+    .bind(col(|i| i.4.clone()))
+    .execute(tx)
+    .await?;
+    Ok(res.rows_affected() as usize)
+}
+
+/// The daily cap as the dashboard shows it: `daily_cap`, new segments in the rolling 24 h, and segments the cap
+/// refused in that window that still wait for room (`refused_24h > 0` = discovery is being held back).
+pub async fn cap_state(
+    db: &sqlx::PgPool,
+    project: Uuid,
+    settings: &Settings,
+) -> sqlx::Result<serde_json::Value> {
+    let (new_24h, refused_24h): (i64, i64) = sqlx::query_as(
+        "SELECT (SELECT count(*) FROM edge_segments WHERE project_id = $1 AND first_seen > now() - interval '1 day'),
+                (SELECT count(*) FROM edge_segments_deferred
+                 WHERE project_id = $1 AND refused_at > now() - interval '1 day')",
+    )
+    .bind(project)
+    .fetch_one(db)
+    .await?;
+    Ok(json!({"daily_cap": settings.daily_cap, "new_24h": new_24h, "refused_24h": refused_24h}))
+}
+
 /// Store a report (also called in-process by the Rust proxy) and queue the auto-translation.
 pub async fn record(state: &AppState, p: &ProjectRow, r: &Report) -> ApiResult<Outcome> {
     record_as(state, p, r, false).await
@@ -243,7 +305,7 @@ async fn record_as(
 
     // Validated, deduplicated (hash, context, text, needs_review, path).
     let mut seen = BTreeSet::new();
-    let mut items: Vec<(String, String, String, bool, String)> = vec![];
+    let mut items: Vec<Seg> = vec![];
     for it in &r.segments {
         let text = match (app, it.text.is_empty()) {
             (true, true) => known_text.get(&it.hash).cloned().unwrap_or_default(),
@@ -303,26 +365,50 @@ async fn record_as(
     .bind(p.id)
     .fetch_one(&mut *tx)
     .await?;
-    let room = (settings.daily_cap as i64 - today).max(0) as usize;
-    out.rejected += fresh.len().saturating_sub(room);
-    let fresh = &fresh[..fresh.len().min(room)];
-    let col = |f: fn(&(String, String, String, bool, String)) -> String| {
-        fresh.iter().map(f).collect::<Vec<_>>()
-    };
-    let res = sqlx::query(
-        "INSERT INTO edge_segments (project_id, hash, context, source_text, needs_review, url_sample)
-         SELECT $1, h, c, t, r, u FROM unnest($2::text[], $3::text[], $4::text[], $5::bool[], $6::text[]) AS x(h, c, t, r, u)
-         ON CONFLICT DO NOTHING",
-    )
-    .bind(p.id)
-    .bind(col(|i| i.0.clone()))
-    .bind(col(|i| i.1.clone()))
-    .bind(col(|i| i.2.clone()))
-    .bind(fresh.iter().map(|i| i.3).collect::<Vec<_>>())
-    .bind(col(|i| i.4.clone()))
-    .execute(&mut *tx)
-    .await?;
-    out.accepted = res.rows_affected() as usize;
+    // What a page's readiness waits for passes the cap (up to `PRIORITY_EXTRA` more); the rest of what does not
+    // fit waits in `edge_segments_deferred` and moves in when the window has room.
+    let cap = settings.daily_cap as i64;
+    let room = (cap - today).max(0) as usize;
+    let priority_room = (cap + PRIORITY_EXTRA - today).max(0) as usize;
+    let (head, body): (Vec<Seg>, Vec<Seg>) = fresh
+        .into_iter()
+        .partition(|i| gates_readiness(&i.1, &i.4, &settings));
+    let mut over: Vec<Seg> = head.get(priority_room..).unwrap_or_default().to_vec();
+    let mut keep: Vec<Seg> = head.into_iter().take(priority_room).collect();
+    let left = room.saturating_sub(keep.len());
+    over.extend(body.get(left..).unwrap_or_default().iter().cloned());
+    keep.extend(body.into_iter().take(left));
+    out.accepted = insert(&mut tx, "edge_segments", p.id, &keep, "DO NOTHING").await?;
+    out.rejected += over.len();
+    let deferred: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM edge_segments_deferred WHERE project_id = $1")
+            .bind(p.id)
+            .fetch_one(&mut *tx)
+            .await?;
+    // ponytail: bounded per project; past MAX_DEFERRED a refusal is only counted in `rejected` (the page reports
+    // it again on its next render or pre-warm).
+    over.truncate((MAX_DEFERRED - deferred).max(0) as usize);
+    let conflict = "(project_id, hash, context) DO UPDATE SET refused_at = now()";
+    insert(&mut tx, "edge_segments_deferred", p.id, &over, conflict).await?;
+    let room_left = room.saturating_sub(keep.len()) as i64;
+    if deferred > 0 && room_left > 0 {
+        // Most recently refused first (still on the site); rows accepted meanwhile only leave the table.
+        let moved = sqlx::query(
+            "WITH moved AS (
+                DELETE FROM edge_segments_deferred WHERE (project_id, hash, context) IN (
+                    SELECT project_id, hash, context FROM edge_segments_deferred WHERE project_id = $1
+                    ORDER BY refused_at DESC LIMIT $2)
+                RETURNING *)
+             INSERT INTO edge_segments (project_id, hash, context, source_text, needs_review, url_sample)
+             SELECT project_id, hash, context, source_text, needs_review, url_sample FROM moved
+             ON CONFLICT DO NOTHING",
+        )
+        .bind(p.id)
+        .bind(room_left)
+        .execute(&mut *tx)
+        .await?;
+        out.accepted += moved.rows_affected() as usize;
+    }
 
     // Page inventories (coverage per URL), discoverable paths only.
     for page in r.pages.iter().filter(|_| !app) {

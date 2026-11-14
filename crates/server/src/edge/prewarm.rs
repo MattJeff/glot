@@ -8,7 +8,8 @@
 //! polite crawl on the customer's origin. Skipped: paths robots.txt disallows, application paths, paths outside
 //! the discovery zones, URLs with a query string, non-HTML, `noindex` pages, redirects off the site.
 //! Each page goes through `missing::record` exactly like a page a visitor rendered: same personal-data filter,
-//! same daily cap on new segments, same monthly budget, same review rules. Nothing is translated here.
+//! same daily cap on new segments, same monthly budget, same review rules. Nothing is translated here; the run
+//! ends once the auto-translation jobs it needs are queued and settled ([`settle`]).
 //!
 //! Runs: on demand (`POST /api/projects/{slug}/edge/prewarm`), when a domain is verified, and at most once a day
 //! for sites with traffic ([`kick`], from the proxy) when `edge_settings.prewarm` is on.
@@ -359,7 +360,9 @@ async fn settle(state: &AppState, p: &ProjectRow, settings: &Settings) -> ApiRes
     for _ in 0..360 {
         let mut busy = false;
         for l in &p.target_locales {
-            busy |= super::tm::queue(state, p, l, settings).await?;
+            // `queue` refuses for 10 minutes after a failed job: keep waiting (30 min bound in production) so
+            // what this run discovered is queued once the guard lifts, not on the next visitor.
+            busy |= super::tm::queue(state, p, l, settings).await? || held(state, p, l).await?;
         }
         if !busy {
             break;
@@ -367,6 +370,22 @@ async fn settle(state: &AppState, p: &ProjectRow, settings: &Settings) -> ApiRes
         tokio::time::sleep(poll).await;
     }
     Ok(())
+}
+
+/// Untranslated segments wait for `locale` and only `tm::queue`'s failure guard keeps them from a job.
+async fn held(state: &AppState, p: &ProjectRow, locale: &str) -> sqlx::Result<bool> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM jobs WHERE project_id = $1 AND kind = $2 AND params->>'edge_locale' = $3
+                        AND status = 'failed' AND finished_at > now() - interval '10 minutes')
+            AND EXISTS (SELECT 1 FROM edge_segments s WHERE s.project_id = $1 AND NOT EXISTS (
+                SELECT 1 FROM edge_translations t
+                WHERE t.project_id = s.project_id AND t.hash = s.hash AND t.context = s.context AND t.locale = $3))",
+    )
+    .bind(p.id)
+    .bind(super::tm::JOB_KIND)
+    .bind(locale)
+    .fetch_one(&state.db)
+    .await
 }
 
 /// The source HTML of `path` as the proxy would translate it: the origin's page, or for an SPA shell the stored

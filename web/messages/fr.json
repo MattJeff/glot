@@ -303,7 +303,13 @@
         "title": "Aucune page vue",
         "body": "La couverture apparaît dès que glot Edge a servi des pages dans cette langue."
       },
-      "pagesSeen": "Pages vues"
+      "pagesSeen": "Pages vues",
+      "cap": {
+        "title": "Du nouveau texte est mis en attente",
+        "body": "{refused} nouveaux segments ont été refusés ces dernières 24 heures : la limite quotidienne de découverte ({cap}) est atteinte. Ils attendent qu'il y ait de la place : les pages qui les utilisent restent non traduites et ne sont pas encore annoncées aux moteurs de recherche. Les titres et méta-descriptions ne sont jamais mis en attente.",
+        "raise": "Relever la limite à {n}",
+        "raised": "Limite quotidienne relevée à {n}. Le texte en attente sera pris en compte lors des prochaines visites."
+      }
     },
     "segments": {
       "title": "Segments",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileSearch, Star } from "lucide-react";
+import { AlertTriangle, FileSearch, Star } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +14,43 @@ import type { Project } from "@/lib/api";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { cn } from "@/lib/utils";
 import { type EdgeSettings, edgeApi, edgeKeys } from "./api";
+
+const MAX_CAP = 100_000; // discover.rs put_settings bound
+
+/** The daily discovery cap is full: new page text waits, pages stay unadvertised. One click raises the cap. */
+export function CapWarning({ slug, settings }: { slug: string; settings: EdgeSettings }) {
+  const t = useTranslations("edge.coverage.cap");
+  const format = useFormatter();
+  const qc = useQueryClient();
+  const message = useErrorMessage();
+  const coverage = useQuery({ queryKey: edgeKeys.coverage(slug), queryFn: () => edgeApi.coverage(slug) });
+  const raise = useMutation({
+    mutationFn: (daily_cap: number) => edgeApi.putSettings(slug, { ...settings, daily_cap }),
+    onSuccess: (s) => {
+      qc.setQueryData(edgeKeys.settings(slug), s);
+      qc.invalidateQueries({ queryKey: edgeKeys.all(slug) });
+      toast.success(t("raised", { n: format.number(s.daily_cap) }));
+    },
+    onError: (e) => toast.error(message(e)),
+  });
+  const cap = coverage.data?.cap;
+  if (!cap || cap.refused_24h === 0) return null;
+  const next = Math.min(MAX_CAP, Math.max(10_000, cap.daily_cap * 2, cap.new_24h + cap.refused_24h * 2));
+  return (
+    <div role="alert" className="mb-6 flex flex-wrap items-start gap-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+      <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-warning-foreground" />
+      <div className="min-w-0 flex-1 space-y-1">
+        <p className="font-medium">{t("title")}</p>
+        <p className="text-muted-foreground">{t("body", { refused: format.number(cap.refused_24h), cap: format.number(cap.daily_cap) })}</p>
+      </div>
+      {next > cap.daily_cap && (
+        <Button size="sm" disabled={raise.isPending} onClick={() => raise.mutate(next)}>
+          {t("raise", { n: format.number(next) })}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 /** Coverage per page actually served (segments rendered translated / rendered), critical pages first. */
 export function Coverage({ project, settings }: { project: Project; settings: EdgeSettings }) {

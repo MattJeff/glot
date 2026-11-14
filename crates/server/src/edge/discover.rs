@@ -151,7 +151,7 @@ impl Settings {
 }
 
 impl Default for Settings {
-    /// Same values as the `edge_settings` column defaults (migration 0151).
+    /// Same values as the `edge_settings` column defaults (migrations 0151, 0194).
     fn default() -> Self {
         let v = |xs: &[&str]| xs.iter().map(|s| s.to_string()).collect();
         Settings {
@@ -178,7 +178,7 @@ impl Default for Settings {
                 "/settings*",
             ]),
             critical_threshold: 0.98,
-            daily_cap: 2000,
+            daily_cap: 10000,
             monthly_budget_usd: None,
             rendering: "auto".into(),
             app_paths: suggested_app_paths(),

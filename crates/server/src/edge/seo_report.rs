@@ -268,7 +268,8 @@ struct CoverageQuery {
 }
 
 /// `GET /api/projects/{slug}/edge/coverage[?locale=es]`: per locale, readiness and every page's coverage with
-/// its missing segments (critical pages first, then lowest coverage).
+/// its missing segments (critical pages first, then lowest coverage), and `cap` (`missing::cap_state`): the daily
+/// discovery cap, new segments in 24 h and segments it refused (`refused_24h > 0` = new text is held back).
 async fn coverage(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
@@ -299,8 +300,9 @@ async fn coverage(
             "version": r.version, "pages": pages,
         }));
     }
+    let cap = super::missing::cap_state(&state.db, p.id, &settings).await?;
     Ok(Json(
-        json!({"seo_min": super::sitemap::SEO_MIN, "locales": locales}),
+        json!({"seo_min": super::sitemap::SEO_MIN, "cap": cap, "locales": locales}),
     ))
 }
 
