@@ -400,6 +400,7 @@ pub async fn update(
     AppJson(b): AppJson<UpdateBody>,
 ) -> ApiResult<Json<Project>> {
     let mut p = load(&state, user.id, &slug, Role::Admin).await?;
+    crate::cdn::invalidate_locales(p.id);
     if let Some(name) = b.name {
         let name = name.trim().to_string();
         if name.is_empty() || name.len() > 100 {

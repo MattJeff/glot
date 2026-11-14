@@ -332,6 +332,13 @@ static LOCALES_BUILDING: std::sync::LazyLock<
 const LOCALES_FRESH: std::time::Duration = std::time::Duration::from_secs(60);
 const LOCALES_STALE: std::time::Duration = std::time::Duration::from_secs(3600);
 
+/// Drop a project's cached manifests (targets, site codes or Edge domains changed): the next request rebuilds.
+pub fn invalidate_locales(project: Uuid) {
+    if let Ok(mut m) = LOCALES_CACHE.lock() {
+        m.retain(|k, _| k.0 != project);
+    }
+}
+
 /// The `locales.json` body (see [`locales`]).
 async fn locales_body(
     state: &AppState,

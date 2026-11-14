@@ -126,6 +126,7 @@ async fn create(
     AppJson(b): AppJson<NewDomain>,
 ) -> ApiResult<(StatusCode, Json<EdgeDomain>)> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::cdn::invalidate_locales(p.id);
     let host = clean_host(&b.host).ok_or_else(|| AppError::bad_request("invalid host"))?;
     if !["subdomain", "subdirectory", "middleware"].contains(&b.mode.as_str()) {
         return Err(AppError::bad_request(
@@ -185,6 +186,7 @@ async fn update(
     AppJson(b): AppJson<Patch>,
 ) -> ApiResult<Json<EdgeDomain>> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::cdn::invalidate_locales(p.id);
     let d: EdgeDomain = sqlx::query_as(&format!(
         "UPDATE edge_domains SET enabled = $3 WHERE id = $1 AND project_id = $2 RETURNING {COLS}"
     ))
@@ -204,6 +206,7 @@ async fn remove(
     AppPath((slug, id)): AppPath<(String, Uuid)>,
 ) -> ApiResult<StatusCode> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::cdn::invalidate_locales(p.id);
     let n = sqlx::query("DELETE FROM edge_domains WHERE id = $1 AND project_id = $2")
         .bind(id)
         .bind(p.id)
@@ -291,6 +294,7 @@ async fn verify(
     AppPath((slug, id)): AppPath<(String, Uuid)>,
 ) -> ApiResult<Json<EdgeDomain>> {
     let p = projects::load(&state, user.id, &slug, Role::Admin).await?;
+    crate::cdn::invalidate_locales(p.id);
     let (host, mode, token): (String, String, String) = sqlx::query_as(
         "SELECT host, mode, verify_token FROM edge_domains WHERE id = $1 AND project_id = $2",
     )

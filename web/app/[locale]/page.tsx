@@ -1,5 +1,6 @@
 import { ArrowRight, Check, Play, X } from "lucide-react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
 import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
@@ -143,6 +144,9 @@ function FeatureGroup({ g, t, wash, extra }: { g: Group; t: T; wash?: boolean; e
 
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
+  // In production the page renders alongside the layout: refuse a bogus locale ("/x.txt") here too, before
+  // Intl.NumberFormat throws on it (500).
+  if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale as Locale);
   const t = await getTranslations("home");
   const { stars, version } = await getRepoStats();

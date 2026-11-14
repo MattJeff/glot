@@ -82,6 +82,7 @@ pub async fn site_codes(db: &sqlx::PgPool, project: Uuid) -> sqlx::Result<SiteCo
 }
 
 async fn save_site_codes(db: &sqlx::PgPool, project: Uuid, codes: &SiteCodes) -> sqlx::Result<()> {
+    crate::cdn::invalidate_locales(project);
     sqlx::query("UPDATE projects SET site_codes = $2 WHERE id = $1")
         .bind(project)
         .bind(sqlx::types::Json(codes))
