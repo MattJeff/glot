@@ -4938,5 +4938,10 @@
     "apps": "Apps und Code",
     "benchmark": "Benchmark",
     "faq": "FAQ"
+  },
+  "legal": {
+    "legal": "Impressum",
+    "privacy": "Datenschutz",
+    "terms": "AGB"
   }
 }

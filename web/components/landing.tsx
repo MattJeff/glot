@@ -578,7 +578,7 @@ export async function SiteHeader({ c, links, stars }: { c: Chrome; links: NavLin
 }
 
 export async function SiteFooter({ c, links }: { c: Chrome; links: NavLink[] }) {
-  const [tc, ti] = await Promise.all([getTranslations("common"), getTranslations("integrations")]);
+  const [tc, ti, tl] = await Promise.all([getTranslations("common"), getTranslations("integrations"), getTranslations("legal")]);
   return (
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-8 text-sm text-muted-foreground">
@@ -595,6 +595,14 @@ export async function SiteFooter({ c, links }: { c: Chrome; links: NavLink[] }) 
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center hover:text-foreground">{tc("github")}</a>
           <span>{c.license}</span>
         </nav>
+      </div>
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 pb-8 text-xs text-muted-foreground">
+        <span>© {new Date().getFullYear()} KAIROS SAS</span>
+        {(["legal", "privacy", "terms"] as const).map((k) => (
+          <Link key={k} href={`/legal/${k}`} className="inline-flex min-h-6 items-center hover:text-foreground">
+            {tl(k)}
+          </Link>
+        ))}
       </div>
     </footer>
   );
