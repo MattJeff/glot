@@ -368,13 +368,14 @@ async fn run(state: AppState, mut job: JobRecord) {
     let github = job.kind.starts_with("github_");
     let edge = job.kind == crate::edge::tm::JOB_KIND;
     let result = if github {
-        // Every subprocess has its own timeout, but one wedged step must not hold a worker forever: a hard
-        // ceiling on the whole job.
+        // Every subprocess has its own timeout, but one wedged step must not hold a worker forever: a hard ceiling on the whole job, on top of the translation time
+        // (which stops by itself and saves as it goes, see `github_app::translate_secs`).
         let ceiling = Duration::from_secs(
             std::env::var("GLOT_GITHUB_JOB_MAX_SECS")
                 .ok()
                 .and_then(|v| v.parse().ok())
-                .unwrap_or(2700),
+                .unwrap_or(2700)
+                + crate::github_app::translate_secs(),
         );
         match tokio::time::timeout(ceiling, crate::github_app::run_job(state, &mut job)).await {
             Ok(r) => r,
@@ -482,8 +483,44 @@ pub(crate) async fn setup(
 
 async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> {
     let params = job.params.0.clone();
+    translate_with(state, job, &params, Limits::default())
+        .await
+        .map(|_| ())
+}
+
+/// How a translation run started by another job (GitHub) differs from the dashboard one.
+#[derive(Default)]
+pub(crate) struct Limits {
+    /// Refuse before any call when the estimate exceeds the budget; says where that budget is set.
+    pub(crate) budget_source: Option<String>,
+    /// No batch starts after this instant (batches in flight are still written): the rest is
+    /// left for the next run, which starts from what is saved.
+    pub(crate) deadline: Option<std::time::Instant>,
+    /// This run is step `.0` of `.1` of its job: progress = (step·n + done) / (steps·n).
+    pub(crate) step: Option<(i32, i32)>,
+}
+
+#[derive(Debug, Default)]
+pub(crate) struct Outcome {
+    pub(crate) planned: usize,
+    pub(crate) translated: usize,
+    /// Strings not attempted (deadline).
+    pub(crate) remaining: usize,
+    /// Placeholder values (`⟦fr⟧ …`) a real provider answered with: refused, not written.
+    pub(crate) placeholders: usize,
+}
+
+/// Translates what is missing or stale in the database (resumable: each batch is committed as soon
+/// as it is back, so an interrupted run loses at most the batches in flight).
+pub(crate) async fn translate_with(
+    state: &AppState,
+    job: &mut JobRecord,
+    params: &JobParams,
+    limits: Limits,
+) -> anyhow::Result<Outcome> {
     let (p, config, translator, glossary) = setup(state, job.project_id, params.budget_usd).await?;
     let syntax = params.syntax.unwrap_or(p.syntax);
+    let mock = config.llm.provider == "mock";
 
     let all_keys: Vec<KeyRecord> = sqlx::query_as(
         "SELECT id, key, source, description, refs, ui_role, component FROM keys WHERE project_id = $1 ORDER BY key",
@@ -495,8 +532,11 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
         .locales
         .clone()
         .unwrap_or_else(|| p.target_locales.clone());
+    let wanted: Option<std::collections::HashSet<&String>> =
+        params.keys.as_ref().map(|ks| ks.iter().collect());
 
     // Plan: (locale, key, previous value) for keys with no translation, a stale one, or everything when forced.
+    // A placeholder of the offline mock is missing for a real provider.
     let mut plan: Vec<(String, Vec<(&KeyRecord, Option<String>)>)> = vec![];
     for locale in &locales {
         let existing: std::collections::HashMap<Uuid, (String, String)> = sqlx::query_as::<_, (Uuid, String, String)>(
@@ -511,9 +551,12 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
         .collect();
         let todo: Vec<_> = all_keys
             .iter()
-            .filter(|k| params.keys.as_ref().is_none_or(|ks| ks.contains(&k.key)))
+            .filter(|k| wanted.as_ref().is_none_or(|ks| ks.contains(&k.key)))
             .filter_map(|k| match existing.get(&k.id) {
                 None => Some((k, None)),
+                Some((value, _)) if !mock && crate::github_app::has_mock_marker(value) => {
+                    Some((k, None))
+                }
                 Some((value, status)) if params.force || status == "stale" => {
                     Some((k, Some(value.clone())))
                 }
@@ -522,11 +565,24 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
             .collect();
         plan.push((locale.clone(), todo));
     }
-    job.progress_total = plan.iter().map(|(_, items)| items.len() as i32).sum();
-    save(state, job).await;
+    let n: usize = plan.iter().map(|(_, items)| items.len()).sum();
+    let mut out = Outcome {
+        planned: n,
+        ..Default::default()
+    };
+    let (step, steps) = limits.step.unwrap_or((0, 1));
+    let progress = |done: usize| (step * n as i32 + done as i32, steps * n as i32);
+    if n > 0 {
+        (job.progress_done, job.progress_total) = progress(0);
+        save(state, job).await;
+    }
 
-    for (locale, items) in plan {
-        for chunk in items.chunks(config.llm.batch_size.max(1)) {
+    // Requests: CONCURRENCY batches each (run together by the translator), code context computed once per key.
+    let mut contexts: std::collections::HashMap<Uuid, KeyContext> = Default::default();
+    let mut chunks: Vec<(&str, &[(&KeyRecord, Option<String>)], Request)> = vec![];
+    let size = config.llm.batch_size.max(1) * glot_llm::translate::CONCURRENCY;
+    for (locale, items) in &plan {
+        for chunk in items.chunks(size) {
             let mut glossary_terms: Vec<Term> = vec![];
             for (k, _) in chunk {
                 for t in glossary.matches(&k.source) {
@@ -543,7 +599,10 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
                     .map(|(k, previous)| Item {
                         key: k.key.clone(),
                         source: k.source.clone(),
-                        context: context(k, &all_keys),
+                        context: contexts
+                            .entry(k.id)
+                            .or_insert_with(|| context(k, &all_keys))
+                            .clone(),
                         previous: previous.clone(),
                     })
                     .collect(),
@@ -551,55 +610,126 @@ async fn translate(state: &AppState, job: &mut JobRecord) -> anyhow::Result<()> 
                 syntax,
                 style: p.style.clone(),
             };
-            let (results, usage) = translator.translate(req).await?;
-            job.cost_usd += usage.cost_usd;
-
-            let mut tx = state.db.begin().await?;
-            for r in results {
-                if has_errors(&r.issues) {
-                    continue;
-                }
-                let Some((k, _)) = chunk.iter().find(|(k, _)| k.key == r.key) else {
-                    continue;
-                };
-                let low_score = r
-                    .issues
-                    .into_iter()
-                    .filter(|i| i.code == IssueCode::LowScore)
-                    .collect();
-                write_translation(
-                    &mut tx,
-                    &glossary,
-                    Write {
-                        key: k,
-                        locale: &locale,
-                        value: &r.value,
-                        origin: "machine",
-                        status: "machine",
-                        model: Some(&r.model),
-                        score: r.score,
-                        extra_issues: low_score,
-                        author: None,
-                        syntax,
-                    },
-                )
-                .await
-                .map_err(|e| anyhow::anyhow!(e.message))?;
-            }
-            tx.commit().await?;
-            job.progress_done += chunk.len() as i32;
-            save(state, job).await;
-            if let Some(budget) = config.llm.budget_usd
-                && job.cost_usd > budget
-            {
-                anyhow::bail!(
-                    "budget exceeded: spent ${:.4} of ${budget:.2}",
-                    job.cost_usd
-                );
-            }
+            chunks.push((locale, chunk, req));
         }
     }
-    Ok(())
+    let budget = config.llm.budget_usd;
+    if let (Some(b), Some(source)) = (budget, &limits.budget_source) {
+        let est: f64 = chunks
+            .iter()
+            .map(|(_, _, r)| glot_llm::translate::estimate(&config, r).cost_usd)
+            .sum();
+        if est > b {
+            anyhow::bail!(
+                "budget: estimated ${est:.2} to translate {n} strings exceeds the budget ${b:.2} {source}"
+            );
+        }
+    }
+
+    // A few requests at a time across locales; each one is written as soon as it is back.
+    // ponytail: GLOT_TRANSLATE_PARALLEL × CONCURRENCY calls in flight, lower it on low provider tiers.
+    let parallel = std::env::var("GLOT_TRANSLATE_PARALLEL")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(4usize)
+        .max(1);
+    // A failed request (or the budget reached) starts nothing new, but what is in flight is still
+    // written: money already spent is never thrown away.
+    let stop = std::sync::atomic::AtomicBool::new(false);
+    let mut failed: Option<anyhow::Error> = None;
+    let (t, stop_ref) = (&translator, &stop);
+    let deadline = limits.deadline;
+    let mut calls = vec![];
+    for (i, (_, _, req)) in chunks.iter().enumerate() {
+        let req = req.clone();
+        calls.push(async move {
+            if stop_ref.load(std::sync::atomic::Ordering::Relaxed)
+                || deadline.is_some_and(|d| std::time::Instant::now() >= d)
+            {
+                return (i, None);
+            }
+            (i, Some(t.translate(req).await))
+        });
+    }
+    let mut results = futures::StreamExt::buffer_unordered(futures::stream::iter(calls), parallel);
+    let mut done = 0usize;
+    while let Some((i, res)) = results.next().await {
+        let (locale, chunk) = (chunks[i].0, chunks[i].1);
+        let Some(res) = res else {
+            out.remaining += chunk.len();
+            continue;
+        };
+        let (results, usage) = match res {
+            Ok(r) => r,
+            Err(e) => {
+                stop.store(true, std::sync::atomic::Ordering::Relaxed);
+                failed.get_or_insert(e.into());
+                continue;
+            }
+        };
+        job.cost_usd += usage.cost_usd;
+
+        let mut tx = state.db.begin().await?;
+        for r in results {
+            if has_errors(&r.issues) {
+                continue;
+            }
+            if !mock && crate::github_app::has_mock_marker(&r.value) {
+                out.placeholders += 1;
+                continue;
+            }
+            let Some((k, _)) = chunk.iter().find(|(k, _)| k.key == r.key) else {
+                continue;
+            };
+            let low_score = r
+                .issues
+                .into_iter()
+                .filter(|i| i.code == IssueCode::LowScore)
+                .collect();
+            write_translation(
+                &mut tx,
+                &glossary,
+                Write {
+                    key: k,
+                    locale,
+                    value: &r.value,
+                    origin: "machine",
+                    status: "machine",
+                    model: Some(&r.model),
+                    score: r.score,
+                    extra_issues: low_score,
+                    author: None,
+                    syntax,
+                },
+            )
+            .await
+            .map_err(|e| anyhow::anyhow!(e.message))?;
+            out.translated += 1;
+        }
+        tx.commit().await?;
+        done += chunk.len();
+        (job.progress_done, job.progress_total) = progress(done);
+        save(state, job).await;
+        if let Some(budget) = budget
+            && job.cost_usd > budget
+            && failed.is_none()
+        {
+            stop.store(true, std::sync::atomic::Ordering::Relaxed);
+            failed = Some(anyhow::anyhow!(
+                "budget exceeded: spent ${:.4} of ${budget:.2}{}",
+                job.cost_usd,
+                limits
+                    .budget_source
+                    .as_ref()
+                    .map(|s| format!(" {s}"))
+                    .unwrap_or_default()
+            ));
+        }
+    }
+    match failed {
+        Some(e) => Err(e),
+        None => Ok(out),
+    }
 }
 
 fn context(k: &KeyRecord, all: &[KeyRecord]) -> KeyContext {

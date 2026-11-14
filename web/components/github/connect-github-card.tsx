@@ -362,9 +362,12 @@ function RepoPicker({ slug, status, onDone }: { slug: string; status: GithubStat
 
 function Steps({ job }: { job: GithubJob }) {
   const t = useTranslations("github");
-  const done = job.progress.done;
+  // done / total is the fraction of the run: whole steps, plus the strings translated within a step.
+  const { done: d, total } = job.progress;
+  const frac = total ? d / total : 0;
+  const done = Math.floor(frac * STEPS.length + 1e-9);
   const current = Math.min(done, STEPS.length - 1);
-  const pct = (done / STEPS.length) * 100;
+  const pct = frac * 100;
   // Waiting for a free worker: say so (and where) instead of spinning on the first step.
   const queued = job.status === "queued";
   return (

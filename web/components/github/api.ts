@@ -51,7 +51,7 @@ export type GithubAppStatus = {
   webhook_url: string;
 };
 
-/** Job steps, in order: progress.done = steps finished (see STEPS in github_app.rs). */
+/** Job steps, in order: progress.done / progress.total = share of the steps finished (see STEPS in github_app.rs). */
 export const STEPS = ["token", "clone", "localize", "sync", "push", "pr"] as const;
 
 async function call<T>(method: string, path: string, body?: unknown): Promise<T> {

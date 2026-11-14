@@ -926,11 +926,7 @@ impl Workspace {
 
     /// Apply sets (Some) / deletions (None) for one locale: update the file already holding the key,
     /// else the first file of the pattern; keep the in-memory catalog in sync.
-    pub(crate) fn write_entries(
-        &mut self,
-        locale: &str,
-        changes: &[(Key, Option<String>)],
-    ) -> Result<()> {
+    pub fn write_entries(&mut self, locale: &str, changes: &[(Key, Option<String>)]) -> Result<()> {
         if changes.is_empty() {
             return Ok(());
         }

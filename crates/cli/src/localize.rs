@@ -34,6 +34,10 @@ pub struct LocalizeArgs {
     /// nothing and produces no diff; keys it added that the code no longer uses are dropped.
     #[arg(long, value_name = "DIR")]
     pub carry_from: Option<std::path::PathBuf>,
+    /// Stop after the code rewrite and catalog tidy: translate, check and status are left to the
+    /// caller (the glot server translates GitHub runs itself, resumably).
+    #[arg(long)]
+    pub no_translate: bool,
 }
 
 #[derive(clap::Args)]
@@ -163,6 +167,9 @@ pub fn run(a: LocalizeArgs) -> Result<ExitCode> {
         }
     }
 
+    if a.no_translate {
+        return Ok(ExitCode::SUCCESS);
+    }
     let mut args = vec![s("translate")];
     args.extend(dry.iter().chain(&flags).chain(&provider).cloned());
     if !step("translate", &args)? {
