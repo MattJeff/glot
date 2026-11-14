@@ -47,7 +47,7 @@ test("detects overflowing German button, untranslated text and missing rtl", asy
     const report = await run({
       baseUrl: `http://localhost:${port}`,
       routes: ["/login"],
-      locales: ["de", "ar"],
+      locales: ["de", "ar", "ko"], // ko: not served (404), skipped instead of aborting the run
       sourceLocale: "en",
       urlPattern: "/{locale}{route}",
       viewports: ["1280x800"],
@@ -63,6 +63,7 @@ test("detects overflowing German button, untranslated text and missing rtl", asy
     assert.ok(report.issues.some((i) => i.locale === "ar" && i.kind === "rtl"));
     assert.ok(!report.issues.some((i) => i.locale === "ar" && i.kind === "overflow"));
     assert.match(await readFile(join(out, "report.md"), "utf8"), /\| `de` \| 1 \|/);
+    assert.deepEqual(report.skipped?.map((s) => [s.locale, s.status]), [["ko", "404"]]);
   } finally {
     server.close();
   }

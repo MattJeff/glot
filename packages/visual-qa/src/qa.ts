@@ -87,6 +87,8 @@ export interface Report {
   issues: Issue[];
   keys?: Mapped[];
   layout?: Record<string, Fit>;
+  /** Locale pages that answered 4xx (a language the site doesn't serve yet): reported, not fatal. */
+  skipped?: { locale: string; route: string; viewport: string; url: string; status: string }[];
 }
 
 const VISUAL: Kind[] = ["overflow", "clamp", "overlap"];
@@ -515,7 +517,16 @@ export async function run(o: Options): Promise<Report> {
 
         for (const locale of o.locales) {
           const url = buildUrl(o, locale, route);
-          await grab(page, url);
+          try {
+            await grab(page, url);
+          } catch (e) {
+            // One unserved language must not throw away the whole run: note it and go on.
+            const m = /→ HTTP (4\d\d)$/.exec(e instanceof Error ? e.message : "");
+            if (!m) throw e;
+            console.warn(`skipped ${url}: HTTP ${m[1]}`);
+            (report.skipped ??= []).push({ locale, route, viewport: vp, url, status: m[1] });
+            continue;
+          }
           await page.evaluate(unmark);
           // The source locale is the reference: never "untranslated" against itself.
           const { found, els } = await page.evaluate(detect, { sourceTexts: locale === o.sourceLocale ? null : sourceTexts, checkRtl: RTL.has(locale.split("-")[0]) });
@@ -605,6 +616,10 @@ const cell = (s: string) => s.replace(/\|/g, "\\|").replace(/\s+/g, " ").slice(0
 
 export function toMarkdown(r: Report): string {
   const lines = ["## glot visual QA", ""];
+  if (r.skipped?.length) {
+    const locs = [...new Set(r.skipped.map((s) => s.locale))];
+    lines.push(`Skipped ${r.skipped.length} page(s) answering HTTP 4xx (${locs.map((l) => `\`${l}\``).join(", ")}).`, "");
+  }
   const kinds: Kind[] = ["overflow", "clamp", "overlap", "untranslated", "tofu", "rtl"];
   lines.push(`| Locale | ${kinds.join(" | ")} |`, `|---|${kinds.map(() => "---:").join("|")}|`);
   for (const l of r.options.locales) {

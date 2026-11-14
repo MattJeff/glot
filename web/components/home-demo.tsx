@@ -106,7 +106,7 @@ export function HomeDemo() {
         <code dir="ltr" className="rounded-md border bg-background px-2 py-0.5 font-mono text-xs">
           {KEY}
         </code>
-        <span className="min-w-0 truncate text-sm" title={OFFICIAL.en}>
+        <span className="min-w-0 text-sm sm:truncate" title={OFFICIAL.en}>
           <span className="text-muted-foreground">{t("official")}: </span>
           <span lang="en">“{OFFICIAL.en}”</span>
         </span>

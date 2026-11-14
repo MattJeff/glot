@@ -105,7 +105,7 @@ export function ProblemScene({ s, cta }: { s: S; cta: React.ReactNode }) {
                     <Art n={icon} className="size-9" />
                     <span className="acc-ink text-3xl font-bold tabular-nums">0{i + 1}</span>
                   </span>
-                  <p className="mt-3 text-lg leading-snug font-semibold">{s(`problem.${k}`)}</p>
+                  <p className="mt-3 text-base leading-snug font-semibold [overflow-wrap:anywhere] hyphens-auto sm:text-lg">{s(`problem.${k}`)}</p>
                 </li>
               ))}
             </ol>
@@ -308,7 +308,7 @@ export function ResultsScene({ s, metrics, plans, faq, cta }: { s: S; metrics: [
               {metrics.map(([v, label, icon, acc]) => (
                 <li key={label} className={`${acc} p-5 text-center`}>
                   <Art n={icon} className="mx-auto size-10" />
-                  <p className="mt-2 text-3xl font-bold tabular-nums">{v}</p>
+                  <p className="mt-2 text-2xl font-bold whitespace-nowrap tabular-nums xl:text-3xl">{v}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{label}</p>
                 </li>
               ))}
