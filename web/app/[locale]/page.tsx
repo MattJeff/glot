@@ -10,13 +10,16 @@ import { WowShowcase } from "@/components/wow-showcase";
 import { getPlans } from "./pricing/get-plans";
 import { PricingCards } from "./pricing/pricing-cards";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
+import { hasLocale } from "next-intl";
 import { ORG_LD, pageMetadata, pageUrl, SITE } from "@/lib/seo";
 import { GITHUB_URL } from "@/lib/snippets";
 import "./landing.css";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
+  // "/x.txt" lands here with locale "x.txt": an invalid language tag would throw (500) before the layout's 404.
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale: locale as Locale, namespace: "home.meta" });
   return pageMetadata({ locale, ns: "home", title: t("title"), description: t("description"), absolute: true });
 }

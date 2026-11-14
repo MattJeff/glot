@@ -41,3 +41,5 @@ Key facts:
 - [Labs](https://glotlang.com/docs/labs)
 - [GitHub repository](https://github.com/MattJeff/glot)
 - [npm: glot-i18n](https://www.npmjs.com/package/glot-i18n)
+
+Full documentation in one file: https://glotlang.com/llms-full.txt

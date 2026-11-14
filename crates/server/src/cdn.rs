@@ -280,7 +280,66 @@ pub async fn locales(
         .unwrap_or(0.0);
     let all = q.get("all").is_some_and(|v| v == "1");
     let p = readable(&state, &slug, &headers).await?;
-    let ready = crate::edge::seo_report::readiness(&state, &p).await?;
+    // Readiness walks every page segment of every locale (seconds on a big site, 27 s under load): the switcher
+    // must not wait for it. Fresh for 60 s; older bodies are served at once and rebuilt in the background.
+    let key = (p.id, min.to_bits(), all);
+    // `all=1` is for dashboards: always fresh.
+    let cached = if all {
+        None
+    } else {
+        LOCALES_CACHE.lock().ok().and_then(|m| m.get(&key).cloned())
+    };
+    let body = match cached {
+        Some((at, body)) if at.elapsed() < LOCALES_FRESH => body,
+        Some((at, body)) if at.elapsed() < LOCALES_STALE => {
+            if LOCALES_BUILDING.lock().is_ok_and(|mut b| b.insert(key)) {
+                let (state, p) = (state.clone(), p.clone());
+                tokio::spawn(async move {
+                    if let Ok(body) = locales_body(&state, &p, min, all).await
+                        && let Ok(mut m) = LOCALES_CACHE.lock()
+                    {
+                        m.insert(key, (std::time::Instant::now(), body));
+                    }
+                    if let Ok(mut b) = LOCALES_BUILDING.lock() {
+                        b.remove(&key);
+                    }
+                });
+            }
+            body
+        }
+        _ => {
+            let body = locales_body(&state, &p, min, all).await?;
+            if !all && let Ok(mut m) = LOCALES_CACHE.lock() {
+                if m.len() > 5_000 {
+                    m.clear();
+                }
+                m.insert(key, (std::time::Instant::now(), body.clone()));
+            }
+            body
+        }
+    };
+    let etag = format!("\"loc-{}\"", glot_core::hash::hash(&body));
+    Ok(respond(&headers, body, etag, p.public_cdn))
+}
+
+type LocalesKey = (Uuid, u64, bool);
+static LOCALES_CACHE: std::sync::LazyLock<
+    std::sync::Mutex<std::collections::HashMap<LocalesKey, (std::time::Instant, String)>>,
+> = std::sync::LazyLock::new(Default::default);
+static LOCALES_BUILDING: std::sync::LazyLock<
+    std::sync::Mutex<std::collections::HashSet<LocalesKey>>,
+> = std::sync::LazyLock::new(Default::default);
+const LOCALES_FRESH: std::time::Duration = std::time::Duration::from_secs(60);
+const LOCALES_STALE: std::time::Duration = std::time::Duration::from_secs(3600);
+
+/// The `locales.json` body (see [`locales`]).
+async fn locales_body(
+    state: &AppState,
+    p: &crate::projects::ProjectRow,
+    min: f64,
+    all: bool,
+) -> ApiResult<String> {
+    let ready = crate::edge::seo_report::readiness(state, p).await?;
     let updated_at: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
         "SELECT max(t.updated_at) FROM translations t JOIN keys k ON k.id = t.key_id
          WHERE k.project_id = $1 AND t.locale = ANY($2)",
@@ -364,10 +423,7 @@ pub async fn locales(
         .chain(edge_updated)
         .max()
         .map(|t| t.to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
-    let body =
-        json!({"source": p.source_locale, "locales": list, "updated_at": updated_at}).to_string();
-    let etag = format!("\"loc-{}\"", glot_core::hash::hash(&body));
-    Ok(respond(&headers, body, etag, p.public_cdn))
+    Ok(json!({"source": p.source_locale, "locales": list, "updated_at": updated_at}).to_string())
 }
 
 fn is_rtl(code: &str) -> bool {
