@@ -1,12 +1,13 @@
-import { ArrowRight, Check, X } from "lucide-react";
+import { ArrowRight, Check, Play, X } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
 import { APP_URL, type Chrome, getRepoStats, NPM_URL, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { ACCENTS } from "@/components/landing-accents";
 import { Art } from "@/components/landing-art";
+import { DemoScene, HowScene, ProblemScene, ResultsScene } from "@/components/landing-scenes";
 import { WowShowcase } from "@/components/wow-showcase";
-import { Button } from "@/components/ui/button";
+import { PricingCards } from "./pricing/pricing-cards";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { ORG_LD, pageMetadata, pageUrl, SITE } from "@/lib/seo";
@@ -17,25 +18,6 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">): Prom
   const { locale } = await params;
   const t = await getTranslations({ locale: locale as Locale, namespace: "home.meta" });
   return pageMetadata({ locale, ns: "home", title: t("title"), description: t("description"), absolute: true });
-}
-
-// "Hello" in the languages glot ships; universal, so not in the catalogs.
-const HELLOS = ["Hello", "Bonjour", "Hola", "Hallo", "Ciao", "Olá", "こんにちは", "안녕하세요", "你好", "Привет", "مرحبا", "שלום", "नमस्ते", "Merhaba", "Cześć", "Hej", "Xin chào", "Γειά σου", "Halo", "Sawubona", "สวัสดี", "Ahoj"];
-
-function HelloMarquee() {
-  const row = HELLOS.map((h, i) => (
-    <span key={`${h}${i}`} className={`hello text-sm ${ACCENTS[i % ACCENTS.length]}`}>
-      {h}
-    </span>
-  ));
-  return (
-    <div aria-hidden className="marquee py-6" dir="ltr">
-      <div className="marquee-track">
-        {row}
-        {row}
-      </div>
-    </div>
-  );
 }
 
 // Every feature, in plain words (the technical detail lives in /docs), ranked by what it does for glot:
@@ -56,9 +38,6 @@ const VIRAL: Group = {
 const WOW = [["minutes", "app"], ["ai", "beyond"], ["mobile", "beyond"], ["support", "beyond"], ["words", "grow"], ["live", "web"]] as const;
 type Key = Parameters<T>[0];
 
-// Under the hero: five promises, worded as the features they come from.
-const TRUST = [["trust.open", "unlock", "acc-green"], ["app.safe", "shield", "acc-violet"], ["web.google", "search", "acc-cyan"], ["grow.private", "eyeoff", "acc-amber"], ["app.minutes", "zap", "acc-coral"]] as const;
-
 // Greetings orbiting the globe: the product's sample copy in each language, not UI text.
 const ORBIT = [
   ["EN", "Hello!", "top-[4%] start-[30%]", "acc-violet"],
@@ -70,7 +49,7 @@ const ORBIT = [
   ["ES", "¡Hola!", "top-[50%] -end-[4%]", "acc-violet"],
 ] as const;
 
-function Globe3() {
+function Globe3({ plates }: { plates: string[] }) {
   return (
     <div aria-hidden className="relative mx-auto aspect-square w-full max-w-[26rem] lg:max-w-[34rem]" dir="ltr">
       {/* Glowing ribbon around the globe; the moving dash only runs without reduced motion. */}
@@ -89,24 +68,32 @@ function Globe3() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/landing/globe.webp" alt="" width={880} height={880} fetchPriority="high" decoding="async" className="glow-img globe-float size-full" />
       {ORBIT.map(([code, hi, pos, acc], i) => (
-        <span key={code} className={`${acc} chip-float glass absolute ${pos} flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold`} style={{ animationDelay: `${i * -0.9}s` }}>
+        <span key={code} className={`${acc} chip-float plate absolute ${pos} flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold`} style={{ animationDelay: `${i * -0.9}s` }}>
           {/* Flags generated with Higgsfield (gpt_image_2_6), cropped to 96 px WebP. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`/landing/flags/${code.toLowerCase()}.webp`} alt="" width={24} height={24} className="size-6 rounded-full shadow-sm" />
           {hi}
         </span>
       ))}
-      <div className="acc-amber glass absolute start-1/2 bottom-[4%] w-[78%] -translate-x-1/2 rounded-2xl p-4 text-start">
+      <span className="acc-amber plate absolute start-1/2 top-[40%] flex -translate-x-1/2 -translate-y-1/2 -rotate-6 items-center gap-2 rounded-2xl px-5 py-3 text-3xl font-bold shadow-[0_0_60px_-10px_#ff9a3c]">
+        <span className="text-[#ff9a3c]">{"{ }"}</span> glot
+      </span>
+      <div className="acc-amber plate plate-lit absolute start-1/2 bottom-[2%] w-[70%] -translate-x-1/2 rounded-2xl p-4 text-start">
         <div className="flex items-center justify-between">
-          <span className="hello acc-ink inline-flex items-center gap-1.5 !py-0.5 text-xs font-semibold"><Art n="sparkles" className="size-4" /> AI</span>
-          <span className="acc-green tile size-6 rounded-full"><Check className="size-3.5" /></span>
+          <span className="acc-amber plate inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"><Art n="sparkles" className="size-4" /> {plates[1]}</span>
+          <span className="grid size-6 place-items-center rounded-full bg-[#2ef7b7] text-black"><Check className="size-3.5" /></span>
         </div>
         <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm">
           <p><span className="block font-mono text-[10px] text-muted-foreground">EN</span><i>Launch your product globally.</i></p>
-          <span className="acc-green tile size-7 rounded-full"><ArrowRight className="size-4" /></span>
+          <span className="grid size-7 place-items-center rounded-full border border-[#2ef7b7]/50 text-[#2ef7b7]"><ArrowRight className="size-4" /></span>
           <p><span className="block font-mono text-[10px] text-muted-foreground">FR</span>Lancez votre produit dans le monde entier.</p>
         </div>
       </div>
+      {([[0, "layers", "acc-green", "bottom-[8%] -start-[8%] -rotate-[10deg]"], [2, "book", "acc-violet", "bottom-[6%] -end-[6%] rotate-[6deg]"], [3, "zap", "acc-amber", "bottom-[24%] -end-[14%] rotate-[8deg]"]] as const).map(([i, icon, acc, pos]) => (
+        <span key={i} className={`${acc} plate absolute hidden w-36 items-center gap-2 rounded-xl p-3 text-xs leading-tight font-semibold xl:flex ${pos}`}>
+          <Art n={icon} className="size-8 shrink-0" /> {plates[i]}
+        </span>
+      ))}
     </div>
   );
 }
@@ -169,10 +156,9 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     license: t("footer.license"),
   };
   const navLinks = [
-    { href: "#wow", label: t("nav.wow") },
-    { href: "#different", label: t("nav.different") },
+    { href: "#why", label: t("nav.different") },
+    { href: "#how", label: t("how.eyebrow") },
     { href: "#demo", label: t("nav.demo") },
-    { href: "#together", label: t("nav.together") },
   ];
 
   const faq = FAQ.map((k) => ({ q: t(`faq.${k}.q`), a: t(`faq.${k}.a`) }));
@@ -204,19 +190,32 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     },
   ];
 
+  const s = await getTranslations("home.scenes");
+  const pct = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 });
+  const num = new Intl.NumberFormat(locale);
+  // Only verifiable figures: benchmark (docs/benchmark), licence, live GitHub stars, no-cookie analytics.
+  const stats: [string, string, string, string, string][] = [
+    [pct.format(0), s("hero.statBroken"), "shield", "acc-green", "/docs/benchmark"],
+    [pct.format(0.141), s("hero.statAlone"), "chart", "acc-amber", "/docs/benchmark"],
+    ["MIT", s("hero.statOss"), "unlock", "acc-violet", GITHUB_URL],
+    [num.format(stars ?? 0), s("hero.statStars"), "trophy", "acc-amber", GITHUB_URL],
+    [num.format(0), s("hero.statCookie"), "eyeoff", "acc-cyan", "/docs/faq"],
+  ];
+  const metrics: [string, string, string, string][] = [
+    [pct.format(0), s("results.m1"), "shield", "acc-green"],
+    [pct.format(0.141), s("results.m2"), "chart", "acc-amber"],
+    [num.format(320), s("results.m3"), "languages", "acc-violet"],
+    [num.format(6), s("results.m4"), "globe", "acc-cyan"],
+  ];
+
   const cta = (
-    <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-start">
-      <div className="flex flex-col items-center gap-1.5">
-        <Button size="lg" asChild className="h-12 bg-brand px-6 text-base text-brand-foreground hover:bg-brand/90">
-          <a href={`${APP_URL}/signup`}>
-            {t("hero.start")} <ArrowRight aria-hidden className="rtl:rotate-180" />
-          </a>
-        </Button>
-        <span className="text-xs text-muted-foreground">{t("hero.startHint")}</span>
-      </div>
-      <Button size="lg" variant="outline" asChild className="h-12 px-6 text-base">
-        <a href="#wow">{t("hero.see")}</a>
-      </Button>
+    <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <a href={`${APP_URL}/signup`} className="inline-flex h-12 items-center gap-2 rounded-full bg-[#ff9a3c] px-6 font-semibold whitespace-nowrap text-black shadow-[0_0_30px_-6px_#ff9a3c] transition-transform hover:-translate-y-0.5">
+        {s("hero.start")} <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
+      </a>
+      <a href="#demo" className="inline-flex h-12 items-center gap-2 rounded-full border border-current/30 px-6 font-semibold whitespace-nowrap hover:bg-white/5">
+        {s("hero.demo")} <Play aria-hidden className="size-4 fill-current" />
+      </a>
     </div>
   );
 
@@ -226,91 +225,66 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <SiteHeader c={chrome} links={navLinks} stars={stars} />
 
       <main id="main" className="flex-1">
-        <section aria-labelledby="hero-title" className="relative overflow-hidden">
-          <div aria-hidden className="aurora pointer-events-none">
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
-          <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-40" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pt-14 pb-10 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-4">
+        <section aria-labelledby="hero-title" className="dark scene relative overflow-hidden bg-background text-foreground">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 pt-14 pb-10 sm:pt-20 lg:grid-cols-[0.9fr_1.3fr] lg:gap-4">
             <div className="text-center lg:text-start">
-              <p className="mb-6 flex items-center justify-center gap-3 text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase lg:justify-start"><span aria-hidden className="h-px w-8 bg-emerald-400" />{t("hero.badge")}</p>
-              <h1 id="hero-title" className="text-5xl leading-[0.95] font-bold tracking-tighter text-balance sm:text-7xl">
-                {t.rich("hero.title", { hl: (c) => <span className="hl">{c}</span> })}
+              <p className="mb-6 flex items-center justify-center gap-3 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase lg:justify-start">
+                <span aria-hidden className="h-px w-8 bg-[#2ef7b7]" />
+                {s("hero.eyebrow")}
+              </p>
+              <h1 id="hero-title" className="text-6xl leading-[0.9] font-extrabold tracking-[-0.04em] sm:text-8xl">
+                <span className="block">{s("hero.l1")}</span>
+                <span className="block">{s("hero.l2")}</span>
+                <span className="o-hl block">{s("hero.l3")}</span>
+                <span className="m-hl block">{s("hero.l4")}</span>
               </h1>
               {/* No entrance animation on the text: it is the LCP. */}
-              <p className="mx-auto mt-5 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg lg:mx-0">{t("hero.subtitle")}</p>
-              <div className="mt-8 [&>div]:lg:justify-start">{cta}</div>
-              <ul aria-label={t("hero.proofLabel")} className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start">
-                <li>
-                  <Link href="/docs/benchmark" title={t("hero.proofBenchNote")} className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                    <Check aria-hidden className="size-4 text-emerald-500" />
-                    <span className="tabular-nums">{t("hero.proofBench")}</span>
-                  </Link>
-                </li>
-                <li>
-                  <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                    <Check aria-hidden className="size-4 text-emerald-500" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
-                  </a>
-                </li>
+              <p className="mx-auto mt-6 max-w-xl text-lg text-pretty text-muted-foreground lg:mx-0">{s("hero.subtitle")}</p>
+              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
+                <a href={`${APP_URL}/signup`} className="mint-btn inline-flex h-14 items-center gap-2 rounded-full px-7 text-base font-semibold transition-transform hover:-translate-y-0.5">
+                  {s("hero.start")} <ArrowRight aria-hidden className="size-5 rtl:rotate-180" />
+                </a>
+                <a href="#demo" className="inline-flex h-14 items-center gap-2 rounded-full border border-white/30 px-7 text-base font-semibold hover:bg-white/5">
+                  <Play aria-hidden className="size-4 fill-current" /> {s("hero.demo")}
+                </a>
+              </div>
+              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start">
+                {(["check1", "check2", "check3"] as const).map((k) => (
+                  <li key={k} className="flex items-center gap-1.5">
+                    <Check aria-hidden className="size-4 text-[#2ef7b7]" /> {s(`hero.${k}`)}
+                  </li>
+                ))}
               </ul>
             </div>
-            <Globe3 />
+            <Globe3 plates={[s("hero.plateCulture"), s("hero.plateAi"), s("hero.plateBrand"), s("hero.platePublish")]} />
           </div>
-          <div className="relative mx-auto max-w-6xl px-4 pb-6">
-            <ul className="reveal glass grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:rounded-full rtl:lg:divide-x-reverse">
-              {TRUST.map(([key, Icon, acc]) => (
-                <li key={key} className={`${acc} flex items-center gap-3 px-5 py-4`}>
-                  <Art n={Icon} className="size-10 shrink-0" />
-                  <span className="text-sm leading-snug font-medium">{t(`features.${key}.title` as Key)}</span>
+          <div className="relative mx-auto max-w-7xl px-4 pb-10">
+            <ul className="plate grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:divide-white/10 lg:rounded-full rtl:lg:divide-x-reverse">
+              {stats.map(([v, label, icon, acc, href]) => (
+                <li key={label} className={`${acc} px-6 py-4`}>
+                  <a href={href} className="flex items-center gap-3 hover:opacity-90">
+                    <Art n={icon} className="size-10 shrink-0" />
+                    <span>
+                      <span className="block text-2xl leading-none font-bold tabular-nums">{v}</span>
+                      <span className="block text-sm text-muted-foreground">{label}</span>
+                    </span>
+                  </a>
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-center text-[11px] text-muted-foreground">{t("hero.proofBenchNote")}</p>
+            <p className="mt-3 text-center text-[11px] text-muted-foreground">{s("hero.statNote")}</p>
           </div>
         </section>
 
-        <HelloMarquee />
+        <ProblemScene s={s} cta={cta} />
+
+        <HowScene s={s} />
 
         <section id="wow" aria-labelledby="wow-title" className="scroll-mt-16">
-          <div className="mx-auto max-w-6xl px-4 pt-12 pb-24">
+          <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="wow-title" eyebrow={t("features.wow.eyebrow")} title={t("features.wow.title")} subtitle={t("features.wow.subtitle")} />
             <div className="mt-12">
               <WowShowcase label={t("features.wow.title")} items={WOW.map(([id, g]) => ({ id, title: t(`features.${g}.${id}.title` as Key), gain: t(`features.${g}.${id}.gain` as Key) }))} />
-            </div>
-          </div>
-        </section>
-
-        <section id="how" aria-labelledby="how-title" className="relative scroll-mt-16 overflow-hidden border-y bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead center id="how-title" eyebrow={t("how.eyebrow")} title={t("how.title")} />
-            <div className="relative mt-16">
-              <svg aria-hidden viewBox="0 0 1200 120" preserveAspectRatio="none" className="how-wave pointer-events-none absolute inset-x-0 top-0 hidden h-28 w-full md:block">
-                <defs>
-                  <linearGradient id="how-g" x1="0" x2="1">
-                    <stop offset="0" stopColor="#22d3ee" />
-                    <stop offset="0.5" stopColor="#a855f7" />
-                    <stop offset="1" stopColor="#10b981" />
-                  </linearGradient>
-                </defs>
-                <path d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60" fill="none" stroke="url(#how-g)" strokeWidth="3" />
-                <path className="how-flow" d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
-              </svg>
-              <ol className="relative grid gap-10 md:grid-cols-3">
-                {([["pick", "plug", "acc-cyan"], ["write", "sparkles", "acc-violet"], ["ship", "rocket", "acc-green"]] as const).map(([k, Icon, acc], i) => (
-                  <li key={k} className={`reveal ${acc} flex flex-col items-center text-center`} style={{ animationDelay: `${i * 100}ms` }}>
-                    <span className="how-node tile size-20 rounded-full bg-card">
-                      <Art n={Icon} className="size-16" />
-                    </span>
-                    <h3 className="mt-5 text-lg font-semibold">
-                      <span className="acc-ink tabular-nums">{i + 1}.</span> {t(`how.${k}.title`)}
-                    </h3>
-                    <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
-                  </li>
-                ))}
-              </ol>
             </div>
           </div>
         </section>
@@ -337,65 +311,34 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           }
         />
 
-        <section id="demo" aria-labelledby="demo-title" className="acc-green section-wash relative scroll-mt-16 border-y bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-24">
-            <SectionHead center id="demo-title" eyebrow={t("demo.eyebrow")} title={t("demo.title")} subtitle={t("demo.subtitle")} />
-            <div className="mt-10">
-              <HomeDemo />
-            </div>
-            <p className="mt-3 text-center text-xs text-muted-foreground">{t("demo.caption")}</p>
-          </div>
-        </section>
+        <DemoScene s={s} demo={<HomeDemo />} />
 
         <FeatureGroup g={VIRAL} t={t} />
 
-        <section aria-labelledby="faq-title" className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 lg:grid-cols-[1fr_2fr]">
-          <div className="reveal">
-            <h2 id="faq-title" className="text-3xl font-semibold tracking-tight sm:text-4xl">{t("faq.title")}</h2>
-            <Link href="/docs/faq" className="mt-3 inline-flex min-h-6 items-center gap-1 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
-              {t("faq.more")}
-            </Link>
-          </div>
-          <div className="divide-y rounded-xl border bg-card">
-            {faq.map((f) => (
-              <details key={f.q} className="faq group">
-                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-medium hover:bg-muted/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
-                  {f.q}
-                  <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full border text-muted-foreground transition-transform duration-200 group-open:rotate-45">
-                    +
-                  </span>
-                </summary>
-                <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section aria-labelledby="pricing-title" className="mx-auto max-w-6xl px-4 pb-24">
-          <div className="reveal card-acc acc-amber flex flex-col items-start gap-5 rounded-2xl border bg-card p-6 shadow-xs sm:p-8 md:flex-row md:items-center">
-            <div className="flex-1">
-              <h2 id="pricing-title" className="text-2xl font-semibold tracking-tight text-balance">{t("pricing.title")}</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("pricing.body")}</p>
+        <ResultsScene
+          s={s}
+          metrics={metrics}
+          plans={<PricingCards />}
+          cta={cta}
+          faq={
+            <div className="space-y-3">
+              {faq.map((f, i) => (
+                <details key={f.q} open={i === 0} className="faq group plate rounded-2xl open:border-[#ff9a3c]/70">
+                  <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+                    {f.q}
+                    <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full border border-white/20 text-muted-foreground transition-transform duration-200 group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
+                </details>
+              ))}
+              <Link href="/docs/faq" className="inline-flex min-h-6 items-center gap-1 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
+                {t("faq.more")}
+              </Link>
             </div>
-            <Button asChild variant="outline" size="lg" className="h-11 px-5">
-              <Link href="/pricing">{t("pricing.cta")}</Link>
-            </Button>
-          </div>
-        </section>
-
-        <section aria-labelledby="cta-title" className="relative overflow-hidden border-t">
-          {/* Generated with Higgsfield (gpt_image_2_6), text-free so every locale shares it. Already a sized WebP. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img aria-hidden src="/landing/waves.webp" alt="" width={1344} height={576} loading="lazy" decoding="async" className="glow-img pointer-events-none absolute inset-x-0 bottom-0 w-full opacity-80" />
-          <div className="reveal relative mx-auto flex max-w-3xl flex-col items-center gap-5 px-4 py-24 text-center">
-            <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{t.rich("cta.title", { hl: (c) => <span className="hl">{c}</span> })}</h2>
-            <p className="text-muted-foreground">{t("cta.body")}</p>
-            {cta}
-            <Link href="/docs" className="inline-flex min-h-6 items-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
-              {t("cta.docs")}
-            </Link>
-          </div>
-        </section>
+          }
+        />
       </main>
 
       <SiteFooter
