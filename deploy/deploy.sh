@@ -42,7 +42,11 @@ remote 'test -f .env || { echo "missing glot/deploy/.env on the server: cp .env.
   # rsync replaces the Caddyfile (new inode): the single-file bind mount keeps the old one until a restart.
   docker compose -f compose.prod.yml exec -T caddy cat /etc/caddy/Caddyfile | cmp -s - Caddyfile \
     || docker compose -f compose.prod.yml restart caddy
+  # Each deploy pulls ~4 GB of SHA-tagged images: untag all but this one (latest/previous keep what rollback
+  # needs), then drop the orphans and the build cache. On 2026-11-14 76 old images filled the 38 GB disk.
+  docker images --format "{{.Repository}}:{{.Tag}}" "'"$REGISTRY"'/glot-*" | grep -v ":'"${GLOT_IMAGE_TAG:-none}"'\$" | xargs -r docker rmi >/dev/null 2>&1 || true
   docker image prune -f >/dev/null
+  docker builder prune -f --filter until=72h >/dev/null 2>&1 || true
   mkdir -p ~/backups
   ( crontab -l 2>/dev/null | grep -v "# glot-backup" || true
     echo "17 3 * * * $HOME/glot/deploy/backup.sh >> $HOME/backups/backup.log 2>&1 # glot-backup" ) | crontab -'
