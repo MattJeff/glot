@@ -59,10 +59,13 @@ export async function getRepoStats(): Promise<{ stars: number | null; version: s
   };
 }
 
+/** Section and card accents, cycled (classes in app/[locale]/landing.css). */
+export const ACCENTS = ["acc-green", "acc-violet", "acc-coral", "acc-cyan", "acc-amber", "acc-pink"] as const;
+
 export function SectionHead({ eyebrow, title, subtitle, id, center }: { eyebrow?: string; title: string; subtitle?: string; id?: string; center?: boolean }) {
   return (
     <div className={cn("reveal max-w-2xl", center && "mx-auto text-center")}>
-      {eyebrow && <p className="text-sm font-medium text-brand">{eyebrow}</p>}
+      {eyebrow && <p className="eyebrow text-sm font-medium">{eyebrow}</p>}
       <h2 id={id} className="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
         {title}
       </h2>
@@ -250,16 +253,16 @@ export async function GuaranteeGrid() {
 /** One guarantee: what it checks, then a real refusal (product output, shown verbatim). */
 export function RefusalCard({ id, i, icon: Icon, title, body, bad, msg, refusal }: { id: string; i: number; icon: LucideIcon; title: string; body: string; bad: string; msg: string; refusal: string }) {
   return (
-    <li className="reveal" style={{ animationDelay: `${(i % 3) * 60}ms` }}>
+    <li className={cn("reveal", ACCENTS[i % ACCENTS.length])} style={{ animationDelay: `${(i % 3) * 60}ms` }}>
       {/* Focusable so keyboard users get the same reveal as hover. */}
       <article
         tabIndex={0}
         aria-labelledby={id}
-        className="guarantee group flex h-full flex-col rounded-xl border bg-card p-5 shadow-xs transition-[border-color,box-shadow,translate] duration-200 ease-out outline-none hover:-translate-y-0.5 hover:border-destructive/40 hover:shadow-md focus-visible:border-destructive/40 focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+        className="guarantee card-acc group flex h-full flex-col rounded-xl border bg-card p-5 shadow-xs outline-none focus-visible:border-destructive/40 focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       >
         <div className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-lg border bg-background">
-            <Icon aria-hidden className="size-4 text-brand" />
+          <span className="tile size-8">
+            <Icon aria-hidden className="size-4" />
           </span>
           <h3 id={id} className="font-medium">
             {title}

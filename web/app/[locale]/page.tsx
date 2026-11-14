@@ -1,5 +1,8 @@
 import {
   ArrowRight,
+  Code,
+  Globe,
+  TrendingUp,
   BadgeCheck,
   BookOpenText,
   Braces,
@@ -18,7 +21,7 @@ import {
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeDemo } from "@/components/home-demo";
-import { APP_URL, type Chrome, getRepoStats, NPM_URL, RefusalCard, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
+import { ACCENTS, APP_URL, type Chrome, getRepoStats, NPM_URL, RefusalCard, SectionHead, SiteFooter, SiteHeader } from "@/components/landing";
 import { CopyCommand } from "@/components/landing-client";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -57,6 +60,25 @@ const INSTALL = [
   { file: "signup-form.tsx", code: `track("signup"); // or track("purchase", { value: 49, currency: "EUR" })` },
 ];
 
+// "Hello" in the languages glot ships; universal, so not in the catalogs.
+const HELLOS = ["Hello", "Bonjour", "Hola", "Hallo", "Ciao", "Olá", "こんにちは", "안녕하세요", "你好", "Привет", "مرحبا", "שלום", "नमस्ते", "Merhaba", "Cześć", "Hej", "Xin chào", "Γειά σου", "Halo", "Sawubona", "สวัสดี", "Ahoj"];
+
+function HelloMarquee() {
+  const row = HELLOS.map((h, i) => (
+    <span key={`${h}${i}`} className={`hello text-sm ${ACCENTS[i % ACCENTS.length]}`}>
+      {h}
+    </span>
+  ));
+  return (
+    <div aria-hidden className="marquee py-6" dir="ltr">
+      <div className="marquee-track">
+        {row}
+        {row}
+      </div>
+    </div>
+  );
+}
+
 const FAQ = ["what", "audiences", "ai", "facts", "speed", "cookies", "seo", "traffic", "winner", "cost", "formats", "agents"] as const;
 
 function Bullets({ items }: { items: { title: string; body: string }[] }) {
@@ -64,7 +86,7 @@ function Bullets({ items }: { items: { title: string; body: string }[] }) {
     <ul className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
       {items.map((i) => (
         <li key={i.title} className="reveal flex gap-3">
-          <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-brand" />
+          <BadgeCheck aria-hidden className="acc-ink mt-0.5 size-5 shrink-0" />
           <p className="text-pretty text-muted-foreground">
             <strong className="font-semibold text-foreground">{i.title}</strong> {i.body}
           </p>
@@ -152,11 +174,16 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <main id="main" className="flex-1">
         {/* Hero: outcome, mechanism, two CTAs, sourced proof. */}
         <section aria-labelledby="hero-title" className="relative overflow-hidden">
-          <div aria-hidden className="hero-glow pointer-events-none absolute inset-0" />
+          <div aria-hidden className="aurora pointer-events-none">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
           <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-50" />
           <div className="relative mx-auto max-w-3xl px-4 pt-16 pb-12 text-center sm:pt-24">
             <p className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 ps-1 pe-3 text-xs text-muted-foreground">
-              <span className="rounded-full bg-brand/10 px-2 py-0.5 font-medium text-brand">{t("hero.labs")}</span>
+              <span className="acc-violet tile rounded-full px-2 py-0.5 font-medium">{t("hero.labs")}</span>
               {t("hero.badge")}
             </p>
             <h1 id="hero-title" className="text-4xl font-semibold tracking-tighter text-balance sm:text-6xl">
@@ -203,6 +230,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
+        <HelloMarquee />
+
         {/* The demo is the page's centrepiece. */}
         <section id="demo" aria-labelledby="demo-title" className="relative scroll-mt-16 border-b">
           <div className="mx-auto max-w-6xl px-4 pb-20">
@@ -214,12 +243,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section aria-labelledby="problem-title" className="mx-auto max-w-6xl px-4 py-24">
+        <section aria-labelledby="problem-title" className="acc-coral mx-auto max-w-6xl px-4 py-24">
           <SectionHead id="problem-title" eyebrow={t("problem.eyebrow")} title={t("problem.title")} />
           <ol className="mt-10 grid gap-4 md:grid-cols-3">
             {(["one", "ai", "manual"] as const).map((k, i) => (
-              <li key={k} className="reveal rounded-xl border bg-card p-5 shadow-xs" style={{ animationDelay: `${i * 60}ms` }}>
-                <p className="font-mono text-xs text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</p>
+              <li key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${["acc-coral", "acc-amber", "acc-pink"][i]}`} style={{ animationDelay: `${i * 60}ms` }}>
+                <p className="acc-ink font-mono text-3xl font-semibold tracking-tight tabular-nums">{String(i + 1).padStart(2, "0")}</p>
                 <h3 className="mt-2 font-medium">{t(`problem.${k}.title`)}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`problem.${k}.body`)}</p>
                 {k === "ai" && (
@@ -236,13 +265,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <p className="reveal mt-8 text-lg font-medium text-pretty">{t("problem.kicker")}</p>
         </section>
 
-        <section id="how" aria-labelledby="how-title" className="scroll-mt-16 border-y bg-muted/30">
+        <section id="how" aria-labelledby="how-title" className="acc-cyan section-wash scroll-mt-16 border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="how-title" eyebrow={t("how.eyebrow")} title={t("how.title")} />
             <ol className="mt-12 grid gap-4 md:grid-cols-3">
               {(["pick", "write", "ship"] as const).map((k, i) => (
-                <li key={k} className="reveal relative rounded-xl border bg-card p-5 shadow-xs" style={{ animationDelay: `${i * 80}ms` }}>
-                  <span className="grid size-7 place-items-center rounded-full border bg-background font-mono text-xs tabular-nums">{i + 1}</span>
+                <li key={k} className={`reveal card-acc relative rounded-xl border bg-card p-5 shadow-xs ${["acc-cyan", "acc-violet", "acc-green"][i]}`} style={{ animationDelay: `${i * 80}ms` }}>
+                  <span className="tile size-9 rounded-full font-mono text-sm font-semibold tabular-nums">{i + 1}</span>
                   <h3 className="mt-3 font-medium">{t(`how.${k}.title`)}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`how.${k}.body`)}</p>
                   {i < 2 && <ArrowRight aria-hidden className="absolute top-6 -end-3.5 z-10 hidden size-5 rounded-full border bg-background p-0.5 text-muted-foreground md:block rtl:rotate-180" />}
@@ -253,7 +282,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section id="guarantees" aria-labelledby="guarantees-title" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-24">
+        <section id="guarantees" aria-labelledby="guarantees-title" className="acc-pink mx-auto max-w-6xl scroll-mt-16 px-4 py-24">
           <SectionHead id="guarantees-title" eyebrow={t("guarantees.eyebrow")} title={t("guarantees.title")} subtitle={t("guarantees.subtitle")} />
           <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {GUARANTEES.map(({ key, icon, bad, msg }, i) => (
@@ -263,12 +292,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <p className="mt-6 text-xs text-muted-foreground">{t("guarantees.patternsNote")}</p>
         </section>
 
-        <section id="results" aria-labelledby="results-title" className="scroll-mt-16 border-y bg-muted/30">
+        <section id="results" aria-labelledby="results-title" className="acc-green section-wash scroll-mt-16 border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="results-title" eyebrow={t("results.eyebrow")} title={t("results.title")} subtitle={t("results.subtitle")} />
-            <figure className="reveal mt-10 rounded-xl border bg-card p-5 shadow-xs">
+            <figure className="reveal card-acc mt-10 rounded-xl border bg-card p-5 shadow-xs sm:p-7">
               <figcaption className="mb-2 inline-flex rounded-full border border-dashed px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{t("results.example")}</figcaption>
-              <blockquote className="text-lg font-medium text-pretty sm:text-xl">“{t("results.exampleSentence")}”</blockquote>
+              <blockquote className="text-lg font-medium text-pretty sm:text-2xl">“{t("results.exampleSentence")}”</blockquote>
             </figure>
             <div className="mt-10">
               <Bullets items={(["noEarly", "noFake", "segment", "traffic", "alarms", "audiences"] as const).map((k) => ({ title: t(`results.${k}.title`), body: t(`results.${k}.body`) }))} />
@@ -276,11 +305,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section aria-labelledby="goals-title" className="mx-auto max-w-6xl px-4 py-24">
+        <section aria-labelledby="goals-title" className="acc-amber mx-auto max-w-6xl px-4 py-24">
           <SectionHead id="goals-title" eyebrow={t("goals.eyebrow")} title={t("goals.title")} subtitle={t("goals.subtitle")} />
           <dl className="mt-10 grid gap-4 md:grid-cols-3">
-            {(["goal", "guardrail", "holdout"] as const).map((k) => (
-              <div key={k} className="reveal rounded-xl border bg-card p-5 shadow-xs">
+            {(["goal", "guardrail", "holdout"] as const).map((k, i) => (
+              <div key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${["acc-amber", "acc-coral", "acc-cyan"][i]}`}>
                 <dt className="font-medium">{t(`goals.${k}.title`)}</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`goals.${k}.body`)}</dd>
               </div>
@@ -288,7 +317,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </dl>
         </section>
 
-        <section aria-labelledby="delivery-title" className="border-y bg-muted/30">
+        <section aria-labelledby="delivery-title" className="acc-violet section-wash border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="delivery-title" eyebrow={t("delivery.eyebrow")} title={t("delivery.title")} />
             <div className="mt-10">
@@ -298,7 +327,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section aria-labelledby="install-title" className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 lg:grid-cols-[2fr_3fr]">
+        <section aria-labelledby="install-title" className="acc-cyan mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 lg:grid-cols-[2fr_3fr]">
           <div>
             <SectionHead id="install-title" eyebrow={t("install.eyebrow")} title={t("install.title")} subtitle={t("install.subtitle")} />
             <Link href="/docs/experiments" className="mt-6 inline-flex min-h-6 items-center gap-1 text-sm font-medium underline underline-offset-2 hover:text-brand">
@@ -319,12 +348,15 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </ol>
         </section>
 
-        <section aria-labelledby="who-title" className="border-y bg-muted/30">
+        <section aria-labelledby="who-title" className="acc-pink section-wash border-y bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <SectionHead id="who-title" eyebrow={t("who.eyebrow")} title={t("who.title")} />
             <ul className="mt-10 grid gap-4 md:grid-cols-3">
-              {(["dev", "growth", "l10n"] as const).map((k) => (
-                <li key={k} className="reveal rounded-xl border bg-card p-5 shadow-xs">
+              {([["dev", Code, "acc-cyan"], ["growth", TrendingUp, "acc-green"], ["l10n", Globe, "acc-violet"]] as const).map(([k, Icon, acc]) => (
+                <li key={k} className={`reveal card-acc rounded-xl border bg-card p-5 shadow-xs ${acc}`}>
+                  <span className="tile mb-3 size-10">
+                    <Icon aria-hidden className="size-5" />
+                  </span>
                   <h3 className="font-medium">{t(`who.${k}.title`)}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`who.${k}.body`)}</p>
                 </li>
@@ -333,12 +365,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        <section aria-labelledby="integrations-title" className="mx-auto max-w-6xl px-4 py-24">
+        <section aria-labelledby="integrations-title" className="acc-amber mx-auto max-w-6xl px-4 py-24">
           <SectionHead id="integrations-title" eyebrow={t("integrations.eyebrow")} title={t("integrations.title")} />
           <dl className="reveal mt-10 divide-y rounded-xl border bg-card">
-            {(["i18n", "frameworks", "edge", "agents", "git", "models"] as const).map((k) => (
-              <div key={k} className="grid gap-1 px-5 py-4 sm:grid-cols-[10rem_1fr] sm:gap-6">
-                <dt className="text-sm font-medium">{t(`integrations.${k}.label`)}</dt>
+            {(["i18n", "frameworks", "edge", "agents", "git", "models"] as const).map((k, i) => (
+              <div key={k} className={`grid gap-1 px-5 py-4 sm:grid-cols-[10rem_1fr] sm:gap-6 ${ACCENTS[i]}`}>
+                <dt className="eyebrow text-sm font-medium">{t(`integrations.${k}.label`)}</dt>
                 <dd className="text-sm text-muted-foreground">{t(`integrations.${k}.value`)}</dd>
               </div>
             ))}
@@ -346,7 +378,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* The localization engine underneath, and the door to the former landing. */}
-        <section aria-labelledby="foundation-title" className="relative overflow-hidden border-y bg-muted/30">
+        <section aria-labelledby="foundation-title" className="acc-green section-wash relative overflow-hidden border-y bg-muted/30">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 lg:grid-cols-2">
             <div>
               <SectionHead id="foundation-title" eyebrow={t("foundation.eyebrow")} title={t("foundation.title")} subtitle={t("foundation.subtitle")} />
@@ -404,7 +436,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </section>
 
         <section aria-labelledby="cta-title" className="relative overflow-hidden border-t">
-          <div aria-hidden className="hero-glow pointer-events-none absolute inset-0 rotate-180" />
+          <div aria-hidden className="aurora pointer-events-none top-auto! -bottom-1/2">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
           <div className="reveal relative mx-auto flex max-w-3xl flex-col items-center gap-5 px-4 py-24 text-center">
             <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{t("cta.title")}</h2>
             <p className="text-muted-foreground">{t("cta.body")}</p>
