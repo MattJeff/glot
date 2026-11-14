@@ -2,7 +2,6 @@ import {
   ArrowRight,
   BookOpenText,
   Bot,
-  ChartNoAxesColumn,
   Check,
   Compass,
   EyeOff,
@@ -20,7 +19,6 @@ import {
   ShieldCheck,
   ShoppingBag,
   Sparkles,
-  Star,
   Unlock,
   Wand2,
   Zap,
@@ -85,20 +83,52 @@ type Key = Parameters<T>[0];
 // Under the hero: five promises, worded as the features they come from.
 const TRUST = [["trust.open", Unlock, "acc-green"], ["app.safe", ShieldCheck, "acc-violet"], ["web.google", Search, "acc-cyan"], ["grow.private", EyeOff, "acc-amber"], ["app.minutes", Zap, "acc-coral"]] as const;
 
-// The six site languages orbiting the globe (codes are universal, not catalog text).
-const ORBIT = [["EN", "top-[12%] start-[6%]", "acc-cyan"], ["FR", "top-[40%] -start-[2%]", "acc-violet"], ["DE", "top-[8%] end-[10%]", "acc-amber"], ["JA", "top-[38%] -end-[1%]", "acc-pink"], ["ES", "bottom-[14%] start-[10%]", "acc-coral"], ["AR", "bottom-[10%] end-[12%]", "acc-green"]] as const;
+// Greetings orbiting the globe: the product's sample copy in each language, not UI text.
+const ORBIT = [
+  ["EN", "Hello!", "top-[4%] start-[30%]", "acc-violet"],
+  ["DE", "Hallo!", "top-[20%] start-[4%]", "acc-amber"],
+  ["IT", "Ciao!", "top-[42%] -start-[4%]", "acc-coral"],
+  ["PT", "Olá!", "top-[62%] start-[4%]", "acc-green"],
+  ["FR", "Bonjour !", "top-[6%] -end-[2%]", "acc-cyan"],
+  ["JA", "こんにちは！", "top-[28%] -end-[6%]", "acc-pink"],
+  ["ES", "¡Hola!", "top-[50%] -end-[4%]", "acc-violet"],
+] as const;
 
 function Globe3() {
   return (
-    <div aria-hidden className="relative mx-auto aspect-square w-full max-w-[26rem] lg:max-w-[32rem]" dir="ltr">
+    <div aria-hidden className="relative mx-auto aspect-square w-full max-w-[26rem] lg:max-w-[34rem]" dir="ltr">
+      {/* Glowing ribbon around the globe; the moving dash only runs without reduced motion. */}
+      <svg viewBox="0 0 400 400" className="absolute inset-0 size-full overflow-visible" fill="none">
+        <defs>
+          <linearGradient id="ribbon" x1="0" x2="1">
+            <stop offset="0" stopColor="#22d3ee" />
+            <stop offset=".5" stopColor="#a855f7" />
+            <stop offset="1" stopColor="#f59e0b" />
+          </linearGradient>
+        </defs>
+        <ellipse cx="200" cy="215" rx="215" ry="70" transform="rotate(-14 200 215)" stroke="url(#ribbon)" strokeWidth="2.5" opacity=".55" />
+        <ellipse cx="200" cy="215" rx="215" ry="70" transform="rotate(-14 200 215)" stroke="white" strokeWidth="3" className="how-flow" pathLength="1460" />
+      </svg>
       {/* Generated with Higgsfield (gpt_image_2_6), text-free so every locale shares it. Already a sized WebP. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/landing/globe.webp" alt="" width={880} height={880} fetchPriority="high" decoding="async" className="glow-img globe-float size-full" />
-      {ORBIT.map(([code, pos, acc], i) => (
-        <span key={code} className={`${acc} chip-float hello absolute ${pos} font-mono text-sm font-semibold shadow-lg backdrop-blur`} style={{ animationDelay: `${i * -1.1}s` }}>
-          {code}
+      {ORBIT.map(([code, hi, pos, acc], i) => (
+        <span key={code} className={`${acc} chip-float glass absolute ${pos} flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold`} style={{ animationDelay: `${i * -0.9}s` }}>
+          <span className="tile rounded-md px-1.5 font-mono text-[10px]">{code}</span>
+          {hi}
         </span>
       ))}
+      <div className="acc-amber glass absolute start-1/2 bottom-[4%] w-[78%] -translate-x-1/2 rounded-2xl p-4 text-start">
+        <div className="flex items-center justify-between">
+          <span className="hello acc-ink inline-flex items-center gap-1.5 !py-0.5 text-xs font-semibold"><Sparkles className="size-3.5" /> AI</span>
+          <span className="acc-green tile size-6 rounded-full"><Check className="size-3.5" /></span>
+        </div>
+        <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm">
+          <p><span className="block font-mono text-[10px] text-muted-foreground">EN</span><i>Launch your product globally.</i></p>
+          <span className="acc-green tile size-7 rounded-full"><ArrowRight className="size-4" /></span>
+          <p><span className="block font-mono text-[10px] text-muted-foreground">FR</span>Lancez votre produit dans le monde entier.</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -230,8 +260,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_65%)] opacity-40" />
           <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pt-14 pb-10 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-4">
             <div className="text-center lg:text-start">
-              <p className="acc-green tile mx-auto mb-6 w-fit rounded-full px-3 py-1 text-xs font-medium lg:mx-0">{t("hero.badge")}</p>
-              <h1 id="hero-title" className="text-4xl font-semibold tracking-tighter text-balance sm:text-6xl">
+              <p className="mb-6 flex items-center justify-center gap-3 text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase lg:justify-start"><span aria-hidden className="h-px w-8 bg-emerald-400" />{t("hero.badge")}</p>
+              <h1 id="hero-title" className="text-5xl leading-[0.95] font-bold tracking-tighter text-balance sm:text-7xl">
                 {t.rich("hero.title", { hl: (c) => <span className="hl">{c}</span> })}
               </h1>
               {/* No entrance animation on the text: it is the LCP. */}
@@ -240,13 +270,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <ul aria-label={t("hero.proofLabel")} className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start">
                 <li>
                   <Link href="/docs/benchmark" title={t("hero.proofBenchNote")} className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                    <ChartNoAxesColumn aria-hidden className="size-4 text-brand" />
+                    <Check aria-hidden className="size-4 text-emerald-500" />
                     <span className="tabular-nums">{t("hero.proofBench")}</span>
                   </Link>
                 </li>
                 <li>
                   <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1.5 hover:text-foreground">
-                    <Star aria-hidden className="size-4" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
+                    <Check aria-hidden className="size-4 text-emerald-500" /> <span className="tabular-nums">{t("hero.proofStars", { count: stars ?? 0 })}</span>
                   </a>
                 </li>
               </ul>
@@ -254,10 +284,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <Globe3 />
           </div>
           <div className="relative mx-auto max-w-6xl px-4 pb-6">
-            <ul className="reveal grid grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-3 lg:grid-cols-5">
+            <ul className="reveal glass grid grid-cols-2 overflow-hidden rounded-3xl sm:grid-cols-3 lg:grid-cols-5 lg:divide-x lg:rounded-full rtl:lg:divide-x-reverse">
               {TRUST.map(([key, Icon, acc]) => (
-                <li key={key} className={`${acc} flex items-center gap-3 bg-card/80 p-4 backdrop-blur`}>
-                  <Icon aria-hidden className="acc-ink size-5 shrink-0" />
+                <li key={key} className={`${acc} flex items-center gap-3 px-5 py-4`}>
+                  <Icon aria-hidden className="acc-ink size-7 shrink-0" strokeWidth={1.6} />
                   <span className="text-sm leading-snug font-medium">{t(`features.${key}.title` as Key)}</span>
                 </li>
               ))}
