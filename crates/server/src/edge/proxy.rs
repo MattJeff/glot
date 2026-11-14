@@ -62,6 +62,10 @@ const BUNDLE_BUDGET: Duration = Duration::from_millis(1500);
 const DOMAIN_TTL: Duration = Duration::from_secs(15);
 /// TM version re-checked this often (a translation edited in glot is live within it).
 const VERSION_TTL: Duration = Duration::from_secs(3);
+/// While a locale is being translated its version moves every batch; reloading the whole TM each time saturated
+/// a small server (27 locales translating at once, 2026-11-14). A loaded TM serves at least this long (short
+/// enough that an edit made in glot stays live within seconds).
+const TM_MIN_RELOAD: Duration = Duration::from_secs(4);
 const ORIGIN_TIMEOUT: Duration = Duration::from_secs(20);
 const MAX_REQUEST_BODY: usize = 10 * 1024 * 1024;
 /// Larger HTML is streamed through untranslated.
@@ -140,6 +144,8 @@ struct Edge {
     domains: RwLock<HashMap<String, (Instant, Option<Arc<Domain>>)>>,
     projects: RwLock<HashMap<Uuid, ProjectRow>>,
     versions: RwLock<HashMap<(Uuid, String), (Instant, i64)>>,
+    /// Last full TM load per (project, locale): see `TM_MIN_RELOAD`.
+    reloaded: RwLock<HashMap<(Uuid, String), Instant>>,
     tms: RwLock<HashMap<(Uuid, String), Arc<Tm>>>,
     loading: Mutex<HashSet<(Uuid, String)>>,
     pages: Mutex<HashMap<String, (Instant, CachedPage)>>,
@@ -253,6 +259,7 @@ static EDGE: LazyLock<Edge> = LazyLock::new(|| {
         domains: Default::default(),
         projects: Default::default(),
         versions: Default::default(),
+        reloaded: Default::default(),
         tms: Default::default(),
         loading: Default::default(),
         pages: Default::default(),
@@ -325,8 +332,10 @@ impl Edge {
         {
             return d.clone();
         }
-        // A cold lookup may take longer than the glot budget: without the domain there is no origin to serve.
-        match tokio::time::timeout(Duration::from_secs(3), load_domain(state, host)).await {
+        // A cold lookup may take longer than the glot budget: without the domain there is no origin to serve, so
+        // wait longer when nothing is cached (a busy database is not an unknown domain: that 404'd verified hosts).
+        let wait = Duration::from_secs(if cached.is_some() { 3 } else { 15 });
+        match tokio::time::timeout(wait, load_domain(state, host)).await {
             Ok(Ok(d)) => {
                 let d = d.map(seal);
                 if let Some(d) = &d {
@@ -410,9 +419,22 @@ impl Edge {
         if cur.as_ref().is_some_and(|t| t.v >= want) {
             return cur;
         }
+        let recent = self
+            .reloaded
+            .read()
+            .ok()?
+            .get(&key)
+            .is_some_and(|at| at.elapsed() < TM_MIN_RELOAD);
+        if cur.is_some() && recent {
+            return cur;
+        }
         if !self.loading.lock().ok()?.insert(key.clone()) {
             return cur; // another request is loading it
         }
+        self.reloaded
+            .write()
+            .ok()?
+            .insert(key.clone(), Instant::now());
         let p = self.project_of(state, project_id, slug).await?;
         let st = state.clone();
         let locale = locale.to_string();

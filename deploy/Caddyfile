@@ -17,7 +17,6 @@
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
-		X-Frame-Options "SAMEORIGIN"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		-Server
 	}
@@ -31,7 +30,9 @@
 # so the session cookie has a single home.
 {$GLOT_DOMAIN} {
 	import common
-	@dashboard path_regexp ^(/(en|fr|es|de|ja|ar))?/(app|login|signup|oauth)(/|$)
+	# Framed only by itself and the dashboard (live review of glot's own site, project "lot").
+	header Content-Security-Policy "frame-ancestors 'self' https://app.{$GLOT_DOMAIN}"
+	@dashboard path_regexp ^(/[a-z]{2}(-[A-Za-z]{2})?)?/(app|login|signup|oauth)(/|$)
 	redir @dashboard https://app.{http.request.hostport}{uri}
 	reverse_proxy web:3100
 }
@@ -39,13 +40,14 @@
 # Dashboard: same Next app; Next proxies /api and /cdn to glot-server (same origin => cookie just works).
 app.{$GLOT_DOMAIN} {
 	import common
+	header X-Frame-Options "SAMEORIGIN"
 	# The dashboard is never a search result; the marketing site lives on the apex only.
 	header X-Robots-Tag "noindex, nofollow"
 	redir / /app
 	# Everything that is not dashboard, auth, API or a build/static asset moves to the apex (no duplicate site).
 	@marketing {
 		not path /
-		not path_regexp ^(/(en|fr|es|de|ja|ar))?/(app|login|signup|oauth|forgot-password|reset-password|verify-email|admin|api|cdn|_next)(/|$)
+		not path_regexp ^(/[a-z]{2}(-[A-Za-z]{2})?)?/(app|login|signup|oauth|forgot-password|reset-password|verify-email|admin|api|cdn|_next)(/|$)
 		not path_regexp \.[A-Za-z0-9]+$
 	}
 	redir @marketing https://{$GLOT_DOMAIN}{uri} 308
@@ -56,12 +58,14 @@ app.{$GLOT_DOMAIN} {
 # ponytail: the whole server is exposed; the session cookie is host-only on app.<domain>, so nothing leaks here.
 api.{$GLOT_DOMAIN} {
 	import common
+	header X-Frame-Options "SAMEORIGIN"
 	reverse_proxy server:8790
 }
 
 # glot Edge CNAME target: customers point `es.their-site.com CNAME edge.<domain>`.
 edge.{$GLOT_DOMAIN} {
 	import common
+	header X-Frame-Options "SAMEORIGIN"
 	respond "glot Edge: point a CNAME here, then verify the domain in glot." 200
 }
 
