@@ -334,6 +334,7 @@ const LOCALES_STALE: std::time::Duration = std::time::Duration::from_secs(3600);
 
 /// Drop a project's cached manifests (targets, site codes or Edge domains changed): the next request rebuilds.
 pub fn invalidate_locales(project: Uuid) {
+    crate::edge::seo_report::invalidate_readiness(project);
     if let Ok(mut m) = LOCALES_CACHE.lock() {
         m.retain(|k, _| k.0 != project);
     }
@@ -346,7 +347,11 @@ async fn locales_body(
     min: f64,
     all: bool,
 ) -> ApiResult<String> {
-    let ready = crate::edge::seo_report::readiness(state, p).await?;
+    let ready = if all {
+        crate::edge::seo_report::readiness_fresh(state, p).await?
+    } else {
+        crate::edge::seo_report::readiness(state, p).await?
+    };
     let updated_at: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
         "SELECT max(t.updated_at) FROM translations t JOIN keys k ON k.id = t.key_id
          WHERE k.project_id = $1 AND t.locale = ANY($2)",

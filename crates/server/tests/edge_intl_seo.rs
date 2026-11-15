@@ -90,6 +90,8 @@ fn median(mut v: Vec<f64>) -> f64 {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn edge_intl_seo() {
+    // SAFETY: set before any server code reads it; this test edits readiness rows and reads them back.
+    unsafe { std::env::set_var("GLOT_READINESS_TTL_SECS", "0") };
     let url = std::env::var("DATABASE_URL")
         .unwrap_or_else(|_| "postgres://glot:glot@localhost:5433/glot".into());
     let Ok(admin) = PgPool::connect(&url).await else {

@@ -334,7 +334,8 @@ impl Edge {
         }
         // A cold lookup may take longer than the glot budget: without the domain there is no origin to serve, so
         // wait longer when nothing is cached (a busy database is not an unknown domain: that 404'd verified hosts).
-        let wait = Duration::from_secs(if cached.is_some() { 3 } else { 15 });
+        let known = cached.is_some() || self.disk(&format!("domain-{host}")).exists();
+        let wait = Duration::from_secs(if known { 3 } else { 15 });
         match tokio::time::timeout(wait, load_domain(state, host)).await {
             Ok(Ok(d)) => {
                 let d = d.map(seal);
@@ -349,9 +350,19 @@ impl Edge {
                 }
                 d
             }
-            _ => cached
-                .and_then(|c| c.1)
-                .or_else(|| self.load::<Domain>(&format!("domain-{host}")).map(seal)),
+            _ => {
+                // Slow or failed lookup: serve the last known row and keep it for DOMAIN_TTL, so the next requests
+                // don't wait again (each one waited the full timeout).
+                let d = cached
+                    .and_then(|c| c.1)
+                    .or_else(|| self.load::<Domain>(&format!("domain-{host}")).map(seal));
+                if d.is_some()
+                    && let Ok(mut m) = self.domains.write()
+                {
+                    m.insert(host.to_string(), (Instant::now(), d.clone()));
+                }
+                d
+            }
         }
     }
 

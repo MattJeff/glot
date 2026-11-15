@@ -184,8 +184,80 @@ pub async fn readiness(state: &AppState, p: &ProjectRow) -> ApiResult<Vec<Readin
     Ok(readiness_pages(state, p).await?.0)
 }
 
-/// [`readiness`] and, from the same rows and snapshots, each locale's complete pages.
+/// [`readiness`] computed now (dashboards: never a cached view), and kept for the next cached readers.
+pub async fn readiness_fresh(state: &AppState, p: &ProjectRow) -> ApiResult<Vec<Readiness>> {
+    let v = readiness_pages_uncached(state, p).await?;
+    if let Ok(mut m) = READINESS.lock() {
+        m.insert(p.id, (std::time::Instant::now(), v.clone()));
+    }
+    Ok(v.0)
+}
+
+type ReadinessEntry = (std::time::Instant, (Vec<Readiness>, ReadyPages));
+static READINESS: std::sync::LazyLock<
+    std::sync::Mutex<std::collections::HashMap<uuid::Uuid, ReadinessEntry>>,
+> = std::sync::LazyLock::new(Default::default);
+static READINESS_BUILDING: std::sync::LazyLock<
+    std::sync::Mutex<std::collections::HashSet<uuid::Uuid>>,
+> = std::sync::LazyLock::new(Default::default);
+/// `GLOT_READINESS_TTL_SECS` (default 60; 0 = always recompute, for tests that edit rows and read back at once).
+static READINESS_FRESH: std::sync::LazyLock<std::time::Duration> = std::sync::LazyLock::new(|| {
+    std::time::Duration::from_secs(
+        std::env::var("GLOT_READINESS_TTL_SECS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(60),
+    )
+});
+
+/// [`readiness`] and, from the same rows and snapshots, each locale's complete pages. Walking every segment of
+/// every locale takes seconds on a big site (15-25 s for 31 locales under load), and the Edge proxy, sitemaps and
+/// locales.json all ask for it: computed once, fresh for 60 s, then served while rebuilt in the background.
 pub async fn readiness_pages(
+    state: &AppState,
+    p: &ProjectRow,
+) -> ApiResult<(Vec<Readiness>, ReadyPages)> {
+    let cached = if READINESS_FRESH.is_zero() {
+        None
+    } else {
+        READINESS.lock().ok().and_then(|m| m.get(&p.id).cloned())
+    };
+    match cached {
+        Some((at, v)) if at.elapsed() < *READINESS_FRESH => Ok(v),
+        Some((_, v)) => {
+            if READINESS_BUILDING.lock().is_ok_and(|mut b| b.insert(p.id)) {
+                let (state, p) = (state.clone(), p.clone());
+                tokio::spawn(async move {
+                    if let Ok(v) = readiness_pages_uncached(&state, &p).await
+                        && let Ok(mut m) = READINESS.lock()
+                    {
+                        m.insert(p.id, (std::time::Instant::now(), v));
+                    }
+                    if let Ok(mut b) = READINESS_BUILDING.lock() {
+                        b.remove(&p.id);
+                    }
+                });
+            }
+            Ok(v)
+        }
+        None => {
+            let v = readiness_pages_uncached(state, p).await?;
+            if let Ok(mut m) = READINESS.lock() {
+                m.insert(p.id, (std::time::Instant::now(), v.clone()));
+            }
+            Ok(v)
+        }
+    }
+}
+
+/// Forget a project's readiness (targets or domains changed): the next request recomputes it.
+pub fn invalidate_readiness(project: uuid::Uuid) {
+    if let Ok(mut m) = READINESS.lock() {
+        m.remove(&project);
+    }
+}
+
+async fn readiness_pages_uncached(
     state: &AppState,
     p: &ProjectRow,
 ) -> ApiResult<(Vec<Readiness>, ReadyPages)> {
