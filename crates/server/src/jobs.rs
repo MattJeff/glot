@@ -325,18 +325,30 @@ pub async fn claim(db: &sqlx::PgPool, fast_lane: bool) -> sqlx::Result<Option<Jo
     let fq = FAMILY.replace("kind", "q.kind");
     let fr = FAMILY.replace("kind", "r.kind");
     let key = claim_key!("q");
-    let sql = format!(
-        "UPDATE jobs SET status = 'running' WHERE id = (
-            SELECT q.id FROM jobs q WHERE q.status = 'queued' {lane}
-              AND NOT EXISTS (SELECT 1 FROM jobs r WHERE r.status = 'running' AND r.project_id = q.project_id AND {fr} = {fq})
-            ORDER BY {key} FOR UPDATE SKIP LOCKED LIMIT 1
-         ) RETURNING {COLS}"
+    let sql = |fair: &str| {
+        format!(
+            "UPDATE jobs SET status = 'running' WHERE id = (
+                SELECT q.id FROM jobs q WHERE q.status = 'queued' {lane} {fair}
+                ORDER BY {key} FOR UPDATE SKIP LOCKED LIMIT 1
+             ) RETURNING {COLS}"
+        )
+    };
+    let fair = format!(
+        "AND NOT EXISTS (SELECT 1 FROM jobs r WHERE r.status = 'running' AND r.project_id = q.project_id AND {fr} = {fq})"
     );
     let mut tx = db.begin().await?;
     sqlx::query("SELECT pg_advisory_xact_lock(7426_1001)")
         .execute(&mut *tx)
         .await?;
-    let job = sqlx::query_as(&sql).fetch_optional(&mut *tx).await?;
+    let mut job = sqlx::query_as(&sql(&fair)).fetch_optional(&mut *tx).await?;
+    // Work-conserving for Edge: when every other project is served, an idle worker takes the busy project's
+    // next `edge_translate` (one per locale, `tm::queue`, so they never touch the same rows). cliponit's 31
+    // locales ran one at a time while three workers idled. GitHub jobs on one repo still wait for each other.
+    if job.is_none() {
+        job = sqlx::query_as(&sql("AND q.kind = 'edge_translate'"))
+            .fetch_optional(&mut *tx)
+            .await?;
+    }
     tx.commit().await?;
     Ok(job)
 }

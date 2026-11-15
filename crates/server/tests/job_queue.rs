@@ -156,8 +156,14 @@ async fn priority_fairness_and_queue_position() {
                 .map(|r| glot_server::jobs::Job::from(&r).id)
         }
     };
-    // Fast lane: urgent edge job first; then nothing (A already runs an edge job, GitHub and translate are long).
+    // Fast lane: urgent edge job first; A's second edge job (another locale) only once nothing else is
+    // claimable, i.e. right away here (GitHub and translate are long); then nothing.
     assert_eq!(claim(true).await, Some(e1));
+    assert_eq!(
+        claim(true).await,
+        Some(e2),
+        "idle worker: A's next edge job, not left waiting"
+    );
     assert_eq!(claim(true).await, None);
     // Regular workers: GitHub before translate; C's second GitHub job waits for its first; A's translate runs
     // alongside A's edge job (other family); then B's translate.
@@ -167,20 +173,13 @@ async fn priority_fairness_and_queue_position() {
     assert_eq!(
         claim(false).await,
         None,
-        "e2 and g2 wait for their project's running job"
+        "g2 waits for its repository's running job"
     );
 
     let pos = positions(c).await;
-    assert_eq!(pos[&e2], Some(1));
     assert_eq!(pos[&e1], None, "running: no position");
     assert_eq!(pos[&t_a], None);
 
-    sqlx::query("UPDATE jobs SET status = 'done' WHERE id = $1")
-        .bind(e1)
-        .execute(&db)
-        .await
-        .unwrap();
-    assert_eq!(claim(true).await, Some(e2));
     sqlx::query("UPDATE jobs SET status = 'failed' WHERE id = $1")
         .bind(g1)
         .execute(&db)
