@@ -307,6 +307,14 @@ pub async fn requeue_orphans(db: &sqlx::PgPool) -> sqlx::Result<()> {
     sqlx::query("UPDATE jobs SET status = 'queued', progress_done = 0 WHERE status = 'running'")
         .execute(db)
         .await?;
+    // An Edge pre-warm runs in this process: a restart (deploy) kills it, and a row left `running` blocks the next
+    // one for 2 hours and shows a frozen run (cliponit's stopped at a deploy and nothing restarted it).
+    sqlx::query(
+        "UPDATE edge_prewarm SET status = 'failed', error = 'interrupted by a server restart', finished_at = now()
+         WHERE status = 'running'",
+    )
+    .execute(db)
+    .await?;
     Ok(())
 }
 

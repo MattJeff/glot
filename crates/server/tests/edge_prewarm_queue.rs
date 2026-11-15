@@ -189,6 +189,22 @@ async fn prewarm_queues_translation_after_a_recent_failure() {
         "over the project budget: no new job, whichever locale spent it"
     );
 
+    // A restart (deploy) kills the in-process run: the row left `running` is closed, not left to block 2 hours.
+    sqlx::query(
+        "UPDATE edge_prewarm SET status = 'running', finished_at = NULL WHERE project_id = $1",
+    )
+    .bind(pid)
+    .execute(&pool)
+    .await
+    .unwrap();
+    glot_server::jobs::requeue_orphans(&pool).await.unwrap();
+    let st: String = sqlx::query_scalar("SELECT status FROM edge_prewarm WHERE project_id = $1")
+        .bind(pid)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(st, "failed", "an interrupted pre-warm is closed at startup");
+
     pool.close().await;
     let _ = sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
         .execute(&admin)
