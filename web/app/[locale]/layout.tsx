@@ -51,7 +51,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </NextIntlClientProvider>
         {/* glot in glot (cloud project "lot"). Insights: cookieless daily counters per language, the signup goal
             feeds Autopilot. Review: ~1 kB loader, inert unless the tab holds a review link. */}
-        <Script src="https://unpkg.com/@glot-i18n/insights@0.4.0/dist/insights.global.js" data-key={GLOT_PUBLIC_KEY} data-endpoint={GLOT_CLOUD} data-locale={locale} strategy="afterInteractive" />
+        <Script src="/widget/insights.global.js" data-key={GLOT_PUBLIC_KEY} data-endpoint={GLOT_CLOUD} data-locale={locale} strategy="afterInteractive" />
         <Script src="/widget/review.global.js" data-project="lot" data-endpoint={GLOT_CLOUD} data-app-origin={GLOT_CLOUD} data-locale={locale} strategy="afterInteractive" />
       </body>
     </html>

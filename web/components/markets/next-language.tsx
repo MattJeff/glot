@@ -24,6 +24,9 @@ import { api, qk, type Recommendation } from "@/lib/api";
 import { useOrigin } from "@/lib/hooks";
 
 /** Job cap: the estimate + 20 % (estimates are a dry run), at least one cent. */
+/** Same floor as the server's `recommend::MIN_VISITS`: below it a recommendation shows no gain or rate. */
+const MIN_VISITS = 30;
+const thin = (r: Recommendation) => r.confidence === "insufficient";
 const cap = (cost: number) => Math.max(0.01, Math.ceil(cost * 1.2 * 100) / 100);
 
 /** "Next language": top 3 recommendations from Insights, one click to add the locale and translate it (capped). */
@@ -85,11 +88,14 @@ export function NextLanguageCard({ slug, days = 30, goal, emptyState }: { slug: 
   const facts = (r: Recommendation) =>
     [
       t("cost", { cost: usd(r.cost_usd), keys: r.keys_to_translate }),
-      r.gain_monthly &&
+      // Too few visits: no gain or rate, they would read as facts (6 visits made "-0.5 signup/month").
+      thin(r) && t("thinData", { visits: r.visits, min: MIN_VISITS }),
+      !thin(r) &&
+        r.gain_monthly &&
         (r.gain_monthly.high <= 0
           ? t("noGain", { goal: d.goal })
           : t("gain", { mid: num(r.gain_monthly.mid, true), low: num(r.gain_monthly.low), high: num(r.gain_monthly.high), goal: d.goal })),
-      r.cost_per_conversion != null && t("perConversion", { cost: usd(r.cost_per_conversion) }),
+      !thin(r) && r.cost_per_conversion != null && t("perConversion", { cost: usd(r.cost_per_conversion) }),
     ].filter(Boolean) as string[];
   const headline = (r: Recommendation) =>
     t(r.kind === "missing" ? "headline" : "headlineFinish", { language: title(name(r.locale)), share: pct(r.share), coverage: pct(r.coverage) });
@@ -127,7 +133,7 @@ export function NextLanguageCard({ slug, days = 30, goal, emptyState }: { slug: 
                 {best.served_now && (
                   <li>{t("servedNow", { locale: name(best.served_now), share: pct(best.served_now_share) })}</li>
                 )}
-                {d.conversions_tracked && (
+                {d.conversions_tracked && !thin(best) && (
                   <li>{t("rates", { fallback: pct(best.fallback.rate), native: pct(best.native.rate), goal: d.goal })}</li>
                 )}
                 {best.trend != null && (best.reasons.includes("rising") || best.reasons.includes("falling")) && (

@@ -3034,7 +3034,8 @@
       "open": "Ouvrir les analyses"
     },
     "gainLocked": "Gain attendu inclus dans Growth",
-    "upgrade": "Passer à Growth"
+    "upgrade": "Passer à Growth",
+    "thinData": "Seulement {visits} visites pour l'instant : glot affichera un gain à partir de {min}."
   },
   "onboarding": {
     "achievements": {
