@@ -854,6 +854,30 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         }
     };
     let status = resp.status();
+    // A page the origin now redirects or removed no longer counts toward readiness: its never-translatable
+    // segments kept every cliponit locale under 95 % after its clipper blog posts started redirecting.
+    if navigation
+        && (status.is_redirection()
+            || status == StatusCode::NOT_FOUND
+            || status == StatusCode::GONE)
+    {
+        let (db, project, page) = (
+            state.db.clone(),
+            d.project_id,
+            glot_core::edge::tm::path_only(&path_q),
+        );
+        tokio::spawn(async move {
+            let gone =
+                sqlx::query("DELETE FROM edge_page_segments WHERE project_id = $1 AND path = $2")
+                    .bind(project)
+                    .bind(&page)
+                    .execute(&db)
+                    .await;
+            if gone.is_ok_and(|r| r.rows_affected() > 0) {
+                super::seo_report::invalidate_readiness(project);
+            }
+        });
+    }
     let mut headers = HeaderMap::new();
     for (k, v) in resp.headers() {
         if !HOP.contains(&k.as_str()) {

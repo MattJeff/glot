@@ -587,6 +587,35 @@ async fn edge_proxy() {
     .await;
     assert_eq!((s, b.as_str()), (StatusCode::OK, "got a=1"));
 
+    // A page the origin no longer serves (redirect, 404) leaves the readiness inventory: its segments can never be
+    // translated and kept every locale under the SEO bar.
+    sqlx::query("INSERT INTO edge_page_segments (project_id, path, hash, context) VALUES ($1, '/gone-page', 'deadbeefdeadbeefdeadbeefdeadbeef', 'p|/gone-page')")
+        .bind(project).execute(&pool).await.unwrap();
+    let (s, _, _) = call(
+        Method::GET,
+        "es.cliponit.test",
+        "/edge/proxy/gone-page",
+        &[("accept", "text/html")],
+        "",
+    )
+    .await;
+    assert_eq!(s, StatusCode::NOT_FOUND);
+    let mut left = 1i64;
+    for _ in 0..50 {
+        left = sqlx::query_scalar(
+            "SELECT count(*) FROM edge_page_segments WHERE project_id = $1 AND path = '/gone-page'",
+        )
+        .bind(project)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        if left == 0 {
+            break;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+    assert_eq!(left, 0, "a page answered 404 is forgotten");
+
     // The site root (Caddy rewrites `/` to `/edge/proxy/`) reaches the origin, not the API's 404.
     let (s, h, _) = call(Method::GET, "es.cliponit.test", "/edge/proxy/", &[], "").await;
     assert_eq!(s, StatusCode::NOT_FOUND);
