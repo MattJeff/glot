@@ -334,8 +334,13 @@ async fn edge_seo() {
     );
 
     // Not ready: nothing advertised to search engines.
-    let (s, _, _) = call(Method::GET, "/edge/v1/clip/es/sitemap.xml", None, None).await;
-    assert_eq!(s, StatusCode::NOT_FOUND);
+    let (s, _, b) = call(Method::GET, "/edge/v1/clip/es/sitemap.xml", None, None).await;
+    assert_eq!(
+        s,
+        StatusCode::OK,
+        "an empty urlset, not a 404 (a fetch failure in Search Console)"
+    );
+    assert!(!b.to_string().contains("<url>"), "{b}");
 
     // Translate the last critical segment → ready (global ≥ 0.95 needs the blog line too for the SEO bar).
     let (h, ctx): (String, String) =
@@ -381,8 +386,12 @@ async fn edge_seo() {
         r.contains("Disallow: /admin") && r.contains(&format!("Sitemap: {base}/es/sitemap.xml")),
         "{r}"
     );
-    let (s, _, _) = call(Method::GET, "/edge/v1/clip/de/sitemap.xml", None, None).await;
-    assert_eq!(s, StatusCode::NOT_FOUND);
+    let (s, _, b) = call(Method::GET, "/edge/v1/clip/de/sitemap.xml", None, None).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(
+        !b.to_string().contains("<url>"),
+        "de not ready: empty urlset {b}"
+    );
 
     // IndexNow: Bing/Yandex payload for the es URLs; the key file the proxy serves matches.
     let (s, _, r) = call(Method::POST, "/api/projects/clip/edge/indexnow", c, None).await;

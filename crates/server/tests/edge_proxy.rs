@@ -491,7 +491,7 @@ async fn edge_proxy() {
     )
     .await;
     assert_eq!((s, k.as_str()), (StatusCode::OK, key.as_str()));
-    let (s, _, _) = call(
+    let (s, _, b) = call(
         Method::GET,
         "de.cliponit.test",
         "/edge/proxy/sitemap.xml",
@@ -499,7 +499,19 @@ async fn edge_proxy() {
         "",
     )
     .await;
-    assert_eq!(s, StatusCode::NOT_FOUND, "not ready: no sitemap");
+    // Not ready: a valid empty sitemap (a 404 is a fetch failure in Search Console), robots.txt without it.
+    assert_eq!(s, StatusCode::OK, "not ready: empty sitemap, not a 404");
+    assert!(b.contains("<urlset") && !b.contains("<url>"), "{b}");
+    let (s, _, b) = call(
+        Method::GET,
+        "de.cliponit.test",
+        "/edge/proxy/robots.txt",
+        &[],
+        "",
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(!b.contains("Sitemap:"), "{b}");
 
     // --- Discovery: the untranslated paragraph is recorded (path only), in the background.
     let mut found = false;

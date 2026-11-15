@@ -184,10 +184,13 @@ pub async fn queue(
         .execute(&mut *tx)
         .await?;
     let (pending, failed_recently, spent): (bool, bool, f64) = sqlx::query_as(
-        "SELECT coalesce(bool_or(status IN ('queued', 'running')), false),
-                coalesce(bool_or(status = 'failed' AND finished_at > now() - interval '10 minutes'), false),
+        // The monthly budget is the project's, across every locale (it was summed per locale: 31 locales
+        // could spend 31 times the cap). ponytail: concurrent jobs may overshoot it by one job's spend each.
+        "SELECT coalesce(bool_or(status IN ('queued', 'running')) FILTER (WHERE params->>'edge_locale' = $3), false),
+                coalesce(bool_or(status = 'failed' AND finished_at > now() - interval '10 minutes')
+                    FILTER (WHERE params->>'edge_locale' = $3), false),
                 coalesce(sum(cost_usd) FILTER (WHERE created_at >= date_trunc('month', now())), 0)
-         FROM jobs WHERE project_id = $1 AND kind = $2 AND params->>'edge_locale' = $3",
+         FROM jobs WHERE project_id = $1 AND kind = $2",
     )
     .bind(p.id)
     .bind(JOB_KIND)

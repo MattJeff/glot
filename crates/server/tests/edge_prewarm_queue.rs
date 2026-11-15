@@ -156,6 +156,39 @@ async fn prewarm_queues_translation_after_a_recent_failure() {
     );
     assert!(translated >= 2, "title and copy translated: {translated}");
 
+    // The monthly budget is the project's: what other locales spent counts (it was summed per locale).
+    sqlx::query(
+        "INSERT INTO edge_settings (project_id, monthly_budget_usd) VALUES ($1, 1)
+                 ON CONFLICT (project_id) DO UPDATE SET monthly_budget_usd = 1",
+    )
+    .bind(pid)
+    .execute(&pool)
+    .await
+    .unwrap();
+    sqlx::query(
+        "INSERT INTO jobs (id, project_id, kind, status, params, cost_usd, finished_at)
+         VALUES ($1, $2, 'edge_translate', 'done', '{\"edge_locale\": \"de\"}', 2, now())",
+    )
+    .bind(Uuid::new_v4())
+    .bind(pid)
+    .execute(&pool)
+    .await
+    .unwrap();
+    sqlx::query("DELETE FROM edge_translations WHERE project_id = $1 AND locale = 'es'")
+        .bind(pid)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let settings = glot_server::edge::discover::Settings::load(&pool, pid)
+        .await
+        .unwrap();
+    assert!(
+        !glot_server::edge::tm::queue(&state, &p, "es", &settings)
+            .await
+            .unwrap(),
+        "over the project budget: no new job, whichever locale spent it"
+    );
+
     pool.close().await;
     let _ = sqlx::query(&format!("DROP DATABASE {db} WITH (FORCE)"))
         .execute(&admin)

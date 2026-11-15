@@ -402,7 +402,7 @@ pub fn index(site: &Site) -> String {
 }
 
 /// robots.txt of a translated host: the origin's rules, its `Sitemap:` lines replaced by this locale's sitemap.
-pub fn robots(origin_robots: &str, sitemap_url: &str) -> String {
+pub fn robots(origin_robots: &str, sitemap_url: Option<&str>) -> String {
     let mut out: String = origin_robots
         .lines()
         .filter(|l| {
@@ -414,7 +414,9 @@ pub fn robots(origin_robots: &str, sitemap_url: &str) -> String {
     if out.trim().is_empty() {
         out = "User-agent: *\nAllow: /\n".into();
     }
-    out.push_str(&format!("\nSitemap: {sitemap_url}\n"));
+    if let Some(u) = sitemap_url {
+        out.push_str(&format!("\nSitemap: {u}\n"));
+    }
     out
 }
 
@@ -471,10 +473,9 @@ pub async fn special(
         return None;
     }
     let site = site(state, p, true).await.ok()?;
-    let not_found = || Some(StatusCode::NOT_FOUND.into_response());
-    let Some(base) = site.base(locale).map(str::to_string) else {
-        return not_found();
-    };
+    // A locale not ready yet still answers both files: a 404 is a fetch failure in Search Console on every
+    // submission. Its sitemap is a valid, empty urlset; its robots.txt announces no sitemap.
+    let base = site.base(locale).map(str::to_string);
     if path == "/robots.txt" {
         let origin = match &site.origin {
             Some(o) => match fetch(&format!("{o}/robots.txt"), 256 * 1024).await {
@@ -483,8 +484,14 @@ pub async fn special(
             },
             None => String::new(),
         };
-        return Some(text(robots(&origin, &format!("{base}/sitemap.xml"))));
+        let map = base.as_ref().map(|b| format!("{b}/sitemap.xml"));
+        return Some(text(robots(&origin, map.as_deref())));
     }
+    let Some(_) = base else {
+        return Some(xml(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>\n".into(),
+        ));
+    };
     let paths = source_paths(&site).await;
     Some(xml(urlset(&site, locale, &paths)))
 }
@@ -659,12 +666,13 @@ mod tests {
         );
         let r = robots(
             "User-agent: *\nDisallow: /admin\nSitemap: https://cliponit.app/sitemap.xml\n",
-            "https://es.cliponit.app/sitemap.xml",
+            Some("https://es.cliponit.app/sitemap.xml"),
         );
         assert!(r.contains("Disallow: /admin"));
         assert!(!r.contains("https://cliponit.app/sitemap.xml"));
         assert!(r.ends_with("Sitemap: https://es.cliponit.app/sitemap.xml\n"));
-        assert!(robots("", "https://e/s.xml").starts_with("User-agent: *\nAllow: /\n"));
+        assert!(robots("", Some("https://e/s.xml")).starts_with("User-agent: *\nAllow: /\n"));
+        assert!(!robots("User-agent: *\nSitemap: https://x/s.xml\n", None).contains("Sitemap"));
     }
 
     #[test]
