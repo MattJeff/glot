@@ -108,6 +108,9 @@ if (typeof addEventListener === "function") addEventListener("glot:locale-change
  * language-experiment arm, copy-variant arms and segmented-experiment exposures (each experiment once per
  * session and event). `value` (0..1e6) + `currency` (ISO 4217) count as revenue. */
 export function track(event: string, rev?: Revenue): void {
+  // A conversion without revenue counts once per session: a reloaded thank-you or onboarding page must not count
+  // the same signup again (cliponit counted 28 signups for 7 accounts). Revenue events (purchases) always count.
+  if (!rev && !once(`ev:${event}`)) return;
   void send(event, rev);
 }
 

@@ -26,7 +26,9 @@ test("init counts one visit per session, applies the experiment, track sends the
   await init({ key: "pk_1", endpoint: "http://g", onLocale: (l) => seen.push(l) });
   await init({ key: "pk_1", endpoint: "http://g", onLocale: (l) => seen.push(l) });
   track("signup");
-  assert.equal(sent.length, 2, "second init is the same session: no new visit");
+  track("signup"); // reloaded onboarding page: same session, not a second signup
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(sent.length, 2, "second init is the same session: no new visit; second signup deduplicated");
   assert.equal(sent[0].url, "http://g/api/insights/pk_1");
   assert.deepEqual(sent[0].body, { langs: ["de-AT", "en"], served: "en", route: "/pricing" });
   assert.equal(sent[1].body.event, "signup");
@@ -34,3 +36,4 @@ test("init counts one visit per session, applies the experiment, track sends the
   assert.deepEqual(seen, ["de", "de"]);
   assert.ok(!JSON.stringify(sent).includes("cookie"));
 });
+
