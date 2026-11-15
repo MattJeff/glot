@@ -12,7 +12,7 @@
 use axum::{
     Json, Router,
     extract::State,
-    http::{StatusCode, header},
+    http::header,
     response::{IntoResponse, Response},
     routing::{get, post},
 };
