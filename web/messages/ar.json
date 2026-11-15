@@ -3034,7 +3034,8 @@
       "open": "فتح التحليلات"
     },
     "gainLocked": "المكسب المتوقع متاح في Growth",
-    "upgrade": "الترقية"
+    "upgrade": "الترقية",
+    "thinData": "{visits} زيارة حتى الآن فقط: يعرض glot مكسبًا عند الوصول إلى {min} زيارة."
   },
   "onboarding": {
     "achievements": {

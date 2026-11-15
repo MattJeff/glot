@@ -2030,7 +2030,8 @@
       "open": "打开分析"
     },
     "gainLocked": "预期收益已包含在 Growth 中",
-    "upgrade": "升级"
+    "upgrade": "升级",
+    "thinData": "目前仅 {visits} 次访问：达到 {min} 次后，glot 将显示增长。"
   },
   "insights": {
     "layout": {

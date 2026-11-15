@@ -2030,7 +2030,8 @@
       "open": "Öppna analyser"
     },
     "gainLocked": "Förväntad vinst ingår i Growth",
-    "upgrade": "Uppgradera"
+    "upgrade": "Uppgradera",
+    "thinData": "Hittills bara {visits} besök: glot visar en vinst när det finns {min}."
   },
   "insights": {
     "layout": {

@@ -2030,7 +2030,8 @@
       "open": "Analizleri Aç"
     },
     "gainLocked": "Beklenen kazanç Growth içinde dahil",
-    "upgrade": "Yükselt"
+    "upgrade": "Yükselt",
+    "thinData": "Şimdiye kadar yalnızca {visits} ziyaret var: glot, {min} ziyarete ulaşıldığında kazancı gösterir."
   },
   "insights": {
     "layout": {

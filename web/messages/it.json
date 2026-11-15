@@ -2030,7 +2030,8 @@
       "open": "Apri Analisi"
     },
     "gainLocked": "Guadagno previsto incluso in Growth",
-    "upgrade": "Aggiorna"
+    "upgrade": "Aggiorna",
+    "thinData": "Finora solo {visits} visite: glot mostra un guadagno da {min} in poi."
   },
   "insights": {
     "layout": {

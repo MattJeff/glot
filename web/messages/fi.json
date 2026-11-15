@@ -2030,7 +2030,8 @@
       "open": "Avaa analyysit"
     },
     "gainLocked": "Odotettu hyöty sisältyy Growthiin",
-    "upgrade": "Päivitä"
+    "upgrade": "Päivitä",
+    "thinData": "Käyntejä on tähän mennessä vain {visits}: glot näyttää hyödyn, kun niitä on {min}."
   },
   "insights": {
     "layout": {

@@ -2030,7 +2030,8 @@
       "open": "Buka Analisis"
     },
     "gainLocked": "Perkiraan peningkatan termasuk dalam Growth",
-    "upgrade": "Tingkatkan"
+    "upgrade": "Tingkatkan",
+    "thinData": "Baru {visits} kunjungan sejauh ini: glot menampilkan peningkatan setelah ada {min}."
   },
   "insights": {
     "layout": {

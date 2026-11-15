@@ -2030,7 +2030,8 @@
       "open": "Elemzések megnyitása"
     },
     "gainLocked": "A várható nyereség a Growth-ban szerepel",
-    "upgrade": "Frissítés"
+    "upgrade": "Frissítés",
+    "thinData": "Eddig csak {visits} látogatás van: a glot {min} látogatástól mutat nyereséget."
   },
   "insights": {
     "layout": {

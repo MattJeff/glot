@@ -2030,7 +2030,8 @@
       "open": "Deschideți Analizele"
     },
     "gainLocked": "Câștig estimat inclus în Growth",
-    "upgrade": "Actualizați"
+    "upgrade": "Actualizați",
+    "thinData": "Doar {visits} vizite până acum: glot arată un câștig când ajunge la {min}."
   },
   "insights": {
     "layout": {

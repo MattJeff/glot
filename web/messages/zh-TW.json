@@ -2030,7 +2030,8 @@
       "open": "開啟分析"
     },
     "gainLocked": "預期增益已包含於 Growth",
-    "upgrade": "升級"
+    "upgrade": "升級",
+    "thinData": "目前僅 {visits} 次造訪；達到 {min} 次後 glot 才會顯示成長。"
   },
   "insights": {
     "layout": {

@@ -2030,7 +2030,8 @@
       "open": "Otevřít analýzy"
     },
     "gainLocked": "Očekávaný zisk je zahrnut v Growth",
-    "upgrade": "Upgradovat"
+    "upgrade": "Upgradovat",
+    "thinData": "Zatím jen {visits} návštěv: glot ukáže zisk, až jich bude {min}."
   },
   "insights": {
     "layout": {

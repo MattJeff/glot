@@ -2030,7 +2030,8 @@
       "open": "Otwórz Analizy"
     },
     "gainLocked": "Spodziewany przyrost uwzględniony w Growth",
-    "upgrade": "Ulepsz"
+    "upgrade": "Ulepsz",
+    "thinData": "Dotąd tylko {visits} wizyt: glot pokaże wzrost, gdy będzie co najmniej {min}."
   },
   "insights": {
     "layout": {

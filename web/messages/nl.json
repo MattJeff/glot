@@ -2030,7 +2030,8 @@
       "open": "Open Analyses"
     },
     "gainLocked": "Verwachte winst inbegrepen in Growth",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "thinData": "Tot nu toe slechts {visits} bezoeken: glot toont een winst zodra er {min} zijn."
   },
   "insights": {
     "layout": {

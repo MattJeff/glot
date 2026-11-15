@@ -2030,7 +2030,8 @@
       "open": "Open Analyses"
     },
     "gainLocked": "Expected gain included in Growth",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "thinData": "Only {visits} visits so far: glot shows a gain once there are {min}."
   },
   "insights": {
     "layout": {

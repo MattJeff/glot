@@ -2030,7 +2030,8 @@
       "open": "Analyses खोलें"
     },
     "gainLocked": "अपेक्षित बढ़त Growth में शामिल",
-    "upgrade": "अपग्रेड करें"
+    "upgrade": "अपग्रेड करें",
+    "thinData": "अभी तक सिर्फ़ {visits} विज़िट हैं: {min} विज़िट होने पर glot बढ़त दिखाएगा।"
   },
   "insights": {
     "layout": {

@@ -2030,7 +2030,8 @@
       "open": "Mở Phân tích"
     },
     "gainLocked": "Mức tăng dự kiến đã bao gồm trong Growth",
-    "upgrade": "Nâng cấp"
+    "upgrade": "Nâng cấp",
+    "thinData": "Mới có {visits} lượt truy cập: glot chỉ hiển thị mức tăng khi đạt {min} lượt."
   },
   "insights": {
     "layout": {

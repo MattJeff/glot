@@ -3034,7 +3034,8 @@
       "open": "分析を開く"
     },
     "gainLocked": "期待される効果は Growth に含まれます",
-    "upgrade": "アップグレード"
+    "upgrade": "アップグレード",
+    "thinData": "現在の訪問数は{visits}件のみです。glotは訪問が{min}件以上になると効果を表示します。"
   },
   "onboarding": {
     "achievements": {

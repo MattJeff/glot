@@ -2030,7 +2030,8 @@
       "open": "분석 열기"
     },
     "gainLocked": "예상 증가분은 Growth에 포함됨",
-    "upgrade": "업그레이드"
+    "upgrade": "업그레이드",
+    "thinData": "현재 방문 {visits}회뿐입니다. glot은 방문이 {min}회 이상일 때 효과를 표시합니다."
   },
   "insights": {
     "layout": {

@@ -2030,7 +2030,8 @@
       "open": "פתיחת ניתוחים"
     },
     "gainLocked": "רווח צפוי כלול ב-Growth",
-    "upgrade": "שדרוג"
+    "upgrade": "שדרוג",
+    "thinData": "רק {visits} ביקורים עד כה: glot מציג שיפור כשיהיו {min}."
   },
   "insights": {
     "layout": {
