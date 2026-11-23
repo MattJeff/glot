@@ -373,6 +373,9 @@ struct ScanBody {
     /// Propose again even where a decision exists.
     #[serde(default)]
     regenerate: bool,
+    /// Only collect search demand (Search Console, keyword list): no LLM call, proposals are written by hand.
+    #[serde(default)]
+    demand_only: bool,
 }
 
 fn fingerprint(p: &Page) -> String {
@@ -868,6 +871,11 @@ async fn scan(
             if terms.is_empty() {
                 row.note = Some(format!(
                     "No search data for {locale} yet: connect Search Console or add the keywords you already know for this market."
+                ));
+            } else if b.demand_only {
+                row.note = Some(format!(
+                    "{} search terms collected for {locale}; no proposal generated (demand_only).",
+                    terms.len()
                 ));
             } else {
                 let gate = match &llm_gate {

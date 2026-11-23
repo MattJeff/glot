@@ -242,6 +242,14 @@ async fn local_seo() {
     )
     .await;
     assert_eq!(s, StatusCode::BAD_REQUEST, "{b}");
+    // demand_only: terms are collected, nothing is generated (proposals written by hand).
+    let mut only = pages.clone();
+    only["demand_only"] = json!(true);
+    let (s, _, b) = call(Method::POST, &format!("{api}/scan"), c, Some(only)).await;
+    assert_eq!(s, StatusCode::OK, "{b}");
+    let es = row(&view().await, "/", "es-ES").clone();
+    assert_eq!(es["status"], "needs_demand", "{es}");
+    assert!(es["proposed"]["title"].is_null() && es["model"].is_null() && es["terms"].as_array().is_some_and(|t| !t.is_empty()), "{es}");
     let (s, _, b) = call(Method::POST, &format!("{api}/scan"), c, Some(pages.clone())).await;
     assert_eq!(s, StatusCode::OK, "{b}");
     let v = view().await;
