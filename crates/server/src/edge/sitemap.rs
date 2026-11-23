@@ -114,7 +114,7 @@ fn origin_of(url: &str) -> Option<String> {
 }
 
 /// The project's verified, enabled Edge domains as per-locale bases. `ready_only`: only locales that pass
-/// [`SEO_MIN`] and the critical-page threshold (what is advertised to search engines).
+/// the critical-page threshold and have at least one page complete to [`SEO_MIN`] (what is advertised).
 pub async fn site(state: &AppState, p: &ProjectRow, ready_only: bool) -> ApiResult<Site> {
     let rows: Vec<(String, String, String, String)> = sqlx::query_as(
         "SELECT host, mode, locale, origin_url FROM edge_domains
@@ -125,9 +125,11 @@ pub async fn site(state: &AppState, p: &ProjectRow, ready_only: bool) -> ApiResu
     .await?;
     let (ready, ready_pages): (Vec<String>, _) = if ready_only {
         let (r, pages) = super::seo_report::readiness_pages(state, p).await?;
+        // Gated per page, not per locale: new untranslated pages on the origin (12 guides at once) used to drop
+        // a whole locale below SEO_MIN and empty its sitemap, de-listing pages that were still complete.
         (
             r.into_iter()
-                .filter(|r| r.ready(SEO_MIN))
+                .filter(|r| r.critical_ok() && pages.get(&r.locale).is_some_and(|s| !s.is_empty()))
                 .map(|r| r.locale)
                 .collect(),
             Some(pages),

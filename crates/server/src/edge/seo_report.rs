@@ -366,9 +366,9 @@ async fn coverage(
         locales.push(json!({
             "locale": r.locale, "coverage": round(r.coverage()), "critical_coverage": r.critical_coverage,
             "critical_threshold": r.critical_threshold, "ready": r.ready(super::sitemap::SEO_MIN),
-            // Pages a search engine is told about: complete, in a language that is itself ready.
+            // Pages a search engine is told about: each complete on its own (sitemap::site gates per page).
             "pages_seen": pages.len(),
-            "pages_indexable": if r.ready(super::sitemap::SEO_MIN) { pages.iter().filter(|p| p.ready).count() } else { 0 },
+            "pages_indexable": if r.critical_ok() { pages.iter().filter(|p| p.ready).count() } else { 0 },
             "version": r.version, "pages": pages,
         }));
     }

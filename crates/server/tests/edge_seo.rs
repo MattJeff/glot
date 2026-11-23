@@ -386,6 +386,16 @@ async fn edge_seo() {
         r.contains("Disallow: /admin") && r.contains(&format!("Sitemap: {base}/es/sitemap.xml")),
         "{r}"
     );
+    // A new untranslated page drags es below SEO_MIN overall: its complete pages stay listed, the new one doesn't.
+    for i in 0..40 {
+        sqlx::query("INSERT INTO edge_segments (project_id, hash, context, source_text) VALUES ($1, $2, 'p|/guides', $3)")
+            .bind(pid).bind(format!("g{i}")).bind(format!("Guide {i}")).execute(&pool).await.unwrap();
+        sqlx::query("INSERT INTO edge_page_segments (project_id, path, hash, context) VALUES ($1, '/guides', $2, 'p|/guides')")
+            .bind(pid).bind(format!("g{i}")).execute(&pool).await.unwrap();
+    }
+    let (_, _, x) = call(Method::GET, "/edge/v1/clip/es/sitemap.xml", None, None).await;
+    assert!(x.contains(&format!("<loc>{base}/es/pricing</loc>")), "{x}");
+    assert!(!x.contains("/es/guides"), "{x}");
     let (s, _, b) = call(Method::GET, "/edge/v1/clip/de/sitemap.xml", None, None).await;
     assert_eq!(s, StatusCode::OK);
     assert!(
