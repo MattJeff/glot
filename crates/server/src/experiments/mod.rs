@@ -21,6 +21,15 @@ pub fn routes() -> axum::Router<AppState> {
 }
 pub use model::*;
 
+/// Edge segment under test (`edge:<hash>`, contract §4.1): substituted by the Edge proxy, not a catalog key.
+pub const EDGE_KEY: &str = "edge:";
+
+/// SQL: current source of the `xp_keys x` row — the catalog key's source, or an `edge:<hash>` segment's text.
+pub(crate) const XP_SOURCE: &str = "coalesce(
+    (SELECT k.source FROM keys k WHERE k.project_id = x.project_id AND k.key = x.key),
+    (SELECT s.source_text FROM edge_segments s WHERE s.project_id = x.project_id AND x.key LIKE 'edge:%'
+       AND s.hash = substr(x.key, 6) ORDER BY s.last_seen DESC LIMIT 1))";
+
 use crate::{ApiResult, AppError, AppState, keys, projects::ProjectRow};
 
 #[derive(sqlx::FromRow)]
@@ -61,11 +70,9 @@ pub async fn load(state: &AppState, project_id: Uuid, id: Uuid) -> ApiResult<Exp
     .await?
     .ok_or_else(|| AppError::not_found("experiment not found"))?;
     let status = Status::parse(&r.status).ok_or_else(|| AppError::internal("bad status"))?;
-    let keys: Vec<(String, String, Option<String>)> = sqlx::query_as(
-        "SELECT x.key, x.source, k.source FROM xp_keys x
-         LEFT JOIN keys k ON k.project_id = x.project_id AND k.key = x.key
-         WHERE x.experiment_id = $1 ORDER BY x.key",
-    )
+    let keys: Vec<(String, String, Option<String>)> = sqlx::query_as(&format!(
+        "SELECT x.key, x.source, {XP_SOURCE} FROM xp_keys x WHERE x.experiment_id = $1 ORDER BY x.key"
+    ))
     .bind(id)
     .fetch_all(&state.db)
     .await?;
@@ -196,10 +203,9 @@ pub async fn readiness(state: &AppState, p: &ProjectRow, id: Uuid) -> ApiResult<
         blockers.push(Blocker { code, ..b });
     };
     let none = Blocker::default;
-    let sources: Vec<(String, Option<String>)> = sqlx::query_as(
-        "SELECT x.key, k.source FROM xp_keys x LEFT JOIN keys k ON k.project_id = x.project_id AND k.key = x.key
-         WHERE x.experiment_id = $1 ORDER BY x.key",
-    )
+    let sources: Vec<(String, Option<String>)> = sqlx::query_as(&format!(
+        "SELECT x.key, {XP_SOURCE} FROM xp_keys x WHERE x.experiment_id = $1 ORDER BY x.key"
+    ))
     .bind(id)
     .fetch_all(&state.db)
     .await?;

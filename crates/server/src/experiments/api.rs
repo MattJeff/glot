@@ -296,9 +296,35 @@ async fn apply(
         if !(1..=MAX_KEYS).contains(&keys.len()) {
             return Err(bad(format!("an experiment covers 1-{MAX_KEYS} keys")));
         }
+        let edge = keys
+            .iter()
+            .filter(|k| k.starts_with(super::EDGE_KEY))
+            .count();
+        if edge > 0 && edge < keys.len() {
+            return Err(bad("edge: segments and catalog keys cannot be mixed"));
+        }
         for k in &keys {
             validate_key(k)?;
-            keys::find_key(&mut *conn, p.id, k).await?;
+            match k.strip_prefix(super::EDGE_KEY) {
+                // An Edge segment (hash = text hash of its source, any context): substituted by the Edge proxy.
+                Some(hash) => {
+                    let found: bool = sqlx::query_scalar(
+                        "SELECT EXISTS(SELECT 1 FROM edge_segments WHERE project_id = $1 AND hash = $2)",
+                    )
+                    .bind(p.id)
+                    .bind(hash)
+                    .fetch_one(&mut *conn)
+                    .await?;
+                    if !found {
+                        return Err(AppError::not_found(format!(
+                            "edge segment '{hash}' not found"
+                        )));
+                    }
+                }
+                None => {
+                    keys::find_key(&mut *conn, p.id, k).await?;
+                }
+            }
         }
         let keys: Vec<String> = keys.into_iter().collect();
         sqlx::query("DELETE FROM xp_keys WHERE experiment_id = $1 AND NOT key = ANY($2)")
@@ -865,10 +891,11 @@ pub async fn start(
     .fetch_one(&mut *tx)
     .await?;
     crate::billing::check_experiment(&state, p.id, live + 1, x.cells.len() as i64).await?;
-    sqlx::query(
-        "UPDATE xp_keys x SET live = true, source = CASE WHEN $2 THEN k.source ELSE x.source END
-         FROM keys k WHERE k.project_id = x.project_id AND k.key = x.key AND x.experiment_id = $1",
-    )
+    sqlx::query(&format!(
+        "UPDATE xp_keys x SET live = true, source = CASE WHEN $2 THEN coalesce({}, x.source) ELSE x.source END
+         WHERE x.experiment_id = $1",
+        super::XP_SOURCE
+    ))
     .bind(id)
     .bind(s == Status::Draft)
     .execute(&mut *tx)
@@ -1030,6 +1057,12 @@ pub async fn promote(
                 .await?;
         }
         Scope::All => {
+            if arm.arm > 0 && x.keys.iter().any(|k| k.key.starts_with(super::EDGE_KEY)) {
+                // ponytail: no write path to edge_translations here; the winner is typed in Edge by hand.
+                return Err(AppError::conflict(
+                    "scope 'all' cannot promote edge: segments; write the winning text as the Edge translation",
+                ));
+            }
             if arm.arm > 0 {
                 let glossary = crate::glossary::load(&state.db, p.id).await?;
                 for k in &x.keys {

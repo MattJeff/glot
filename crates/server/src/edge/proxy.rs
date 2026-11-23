@@ -41,7 +41,7 @@ use glot_core::edge::{
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     net::{IpAddr, SocketAddr},
     path::PathBuf,
     sync::{Arc, LazyLock, Mutex, RwLock},
@@ -154,7 +154,11 @@ struct Edge {
     quota: Mutex<HashMap<Uuid, Quota>>,
     shells: Mutex<HashMap<String, (Instant, bool)>>,
     translations: Mutex<TrCache>,
+    /// Per project: experiments config (`xp.rs`), last check, last successful read.
+    xps: RwLock<HashMap<Uuid, XpEntry>>,
 }
+
+type XpEntry = (Instant, Instant, Option<Arc<super::xp::Config>>);
 
 /// One translation pass's result, reusable for an identical origin body.
 struct Translated {
@@ -215,8 +219,8 @@ impl TrCache {
 }
 
 /// Everything the translation output depends on: origin body, domain row (locale, bases, selectors, DNT…),
-/// path, TM version.
-fn tr_key(html: &[u8], d: &Domain, path: &str, v: i64) -> [u8; 32] {
+/// path, TM version, experiment arm texts (`xp.rs`).
+fn tr_key(html: &[u8], d: &Domain, path: &str, v: i64, xp: &BTreeMap<String, String>) -> [u8; 32] {
     use sha2::{Digest, Sha256};
     let mut h = Sha256::new();
     h.update(html);
@@ -225,6 +229,12 @@ fn tr_key(html: &[u8], d: &Domain, path: &str, v: i64) -> [u8; 32] {
     h.update([0]);
     h.update(path.as_bytes());
     h.update(v.to_le_bytes());
+    for (k, v) in xp {
+        h.update([0]);
+        h.update(k.as_bytes());
+        h.update([0]);
+        h.update(v.as_bytes());
+    }
     h.finalize().into()
 }
 
@@ -267,6 +277,7 @@ static EDGE: LazyLock<Edge> = LazyLock::new(|| {
         quota: Default::default(),
         shells: Default::default(),
         translations: Default::default(),
+        xps: Default::default(),
     }
 });
 
@@ -364,6 +375,35 @@ impl Edge {
                 d
             }
         }
+    }
+
+    /// The project's experiments config (`cdn::xp_config`), re-read every `DOMAIN_TTL` within `deadline`; a
+    /// failed read keeps the last one for its `max_stale`.
+    async fn xp(
+        &self,
+        state: &AppState,
+        d: &Domain,
+        deadline: Instant,
+    ) -> Option<Arc<super::xp::Config>> {
+        let cached = self.xps.read().ok()?.get(&d.project_id).cloned();
+        if let Some((at, _, c)) = &cached
+            && at.elapsed() < DOMAIN_TTL
+        {
+            return c.clone();
+        }
+        let p = self.project(state, d).await?;
+        let left = deadline.saturating_duration_since(Instant::now());
+        let now = Instant::now();
+        let entry = match tokio::time::timeout(left, crate::cdn::xp_config(state, &p)).await {
+            Ok(Ok(v)) => (now, now, serde_json::from_value(v).ok().map(Arc::new)),
+            _ => {
+                let (_, fetched, c) = cached?;
+                let c = c.filter(|c| fetched.elapsed().as_secs() < c.max_stale);
+                (now, fetched, c)
+            }
+        };
+        self.xps.write().ok()?.insert(d.project_id, entry.clone());
+        entry.2
     }
 
     async fn project(&self, state: &AppState, d: &Domain) -> Option<ProjectRow> {
@@ -777,10 +817,30 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     } else {
         None
     };
+    // Copy experiments on Edge segments (`xp.rs`), decided before the page cache: it only ever holds the
+    // official text (a page with an arm's text is neither read from nor stored in it).
+    let xp = match &tm {
+        Some(_) if navigation => e
+            .xp(&state, &d, deadline)
+            .await
+            .map(|c| {
+                let domain = super::xp::cookie_domain(&host, &d.origin_url);
+                super::xp::decide(
+                    &parts.headers,
+                    query,
+                    &host,
+                    &c,
+                    &d.locale,
+                    domain.as_deref(),
+                )
+            })
+            .unwrap_or_default(),
+        _ => Default::default(),
+    };
     let t_lookup = t0.elapsed();
     let cache_key = tm
         .as_ref()
-        .filter(|_| anon && get)
+        .filter(|_| anon && get && xp.overlay.is_empty())
         .map(|t| format!("{host}{path_q}@{}", t.v));
     if let Some(k) = &cache_key
         && let Some((exp, page)) = e.pages.lock().ok().and_then(|m| m.get(k).cloned())
@@ -800,6 +860,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         };
         let mut res = res.body(body).expect("response");
         finish(&mut res, page.state, t_lookup, Duration::ZERO, Some("hit"));
+        xp_served(&state, &d, xp, res.headers_mut());
         count(&state, d.project_id);
         return res;
     }
@@ -818,10 +879,23 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     let mut up = reqwest::header::HeaderMap::new();
     for (k, v) in &parts.headers {
         let n = k.as_str();
-        if HOP.contains(&n) || n == "host" || n == "accept-encoding" || n == "content-length" {
+        // `x-glot-xp` from the client is forged: only ours reaches the origin.
+        if HOP.contains(&n)
+            || n == "host"
+            || n == "accept-encoding"
+            || n == "content-length"
+            || n == "x-glot-xp"
+        {
             continue;
         }
         up.append(k.clone(), v.clone());
+    }
+    if let Some(v) = xp
+        .header
+        .as_deref()
+        .and_then(|v| HeaderValue::from_str(v).ok())
+    {
+        up.insert("x-glot-xp", v);
     }
     up.insert(
         header::ACCEPT_ENCODING,
@@ -968,7 +1042,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
     // Same origin body, same domain row and version: the previous translation (origins that revalidate every
     // request). Otherwise translation off the async runtime, bounded by what is left of the budget (≥ 150 ms CPU).
     let t_tr = Instant::now();
-    let key = anon.then(|| tr_key(&html, &d, path, tm.v));
+    let key = anon.then(|| tr_key(&html, &d, path, tm.v, &xp.overlay));
     let reused = key
         .as_ref()
         .and_then(|k| e.translations.lock().ok()?.get(k));
@@ -976,8 +1050,20 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         Some(t) => (t, true),
         None => {
             let src = String::from_utf8_lossy(&html).into_owned();
-            let (dd, tt, pq) = (d.clone(), tm.clone(), path.to_string());
-            let job = tokio::task::spawn_blocking(move || translate(&src, &dd, &tt, &pq));
+            let (dd, tt, pq, ov) = (d.clone(), tm.clone(), path.to_string(), xp.overlay.clone());
+            let job = tokio::task::spawn_blocking(move || {
+                if ov.is_empty() {
+                    return translate(&src, &dd, &tt, &pq);
+                }
+                // The arm's text for its segments, in the page and in the TM the client patcher gets.
+                // ponytail: one TM clone per experimental page translated (TrCache keys the arm); an overlay
+                // lookup inside `translate` if TMs grow large.
+                let mut t = (*tt).clone();
+                for (h, v) in ov {
+                    t.t.insert(h, ctm::Entry::One(v));
+                }
+                translate(&src, &dd, &t, &pq)
+            });
             let left = deadline
                 .saturating_duration_since(Instant::now())
                 .max(Duration::from_millis(150));
@@ -1058,6 +1144,7 @@ async fn proxy(State(state): State<AppState>, req: Request) -> Response {
         };
         m.insert(k, (Instant::now() + Duration::from_secs(ttl), page));
     }
+    xp_served(&state, &d, xp, &mut headers);
     count(&state, d.project_id);
     super::prewarm::kick(&state, d.project_id, &d.slug);
     let mut res = if not_modified(&parts.headers, &headers) {
@@ -1119,6 +1206,36 @@ async fn serve_bundle(
     let st = if l.n > 0 { "bundle" } else { "passthrough" };
     finish(&mut res, st, glot_ms, origin_ms, None);
     res
+}
+
+/// A translated page decided by an experiment (`xp.rs`): sticky cookie, kept out of shared caches, exposures
+/// counted through the insights path (`ingest::record`), off the request path.
+fn xp_served(state: &AppState, d: &Domain, xp: super::xp::Decision, h: &mut HeaderMap) {
+    if !xp.assigned {
+        return;
+    }
+    if let Some(c) = xp.cookie.and_then(|c| HeaderValue::from_str(&c).ok()) {
+        h.append(header::SET_COOKIE, c);
+    }
+    h.insert(
+        header::CACHE_CONTROL,
+        HeaderValue::from_static("private, no-cache"),
+    );
+    if xp.exposures.is_empty() {
+        return;
+    }
+    let (state, project) = (state.clone(), d.project_id);
+    let hit = crate::experiments::ingest::XpHit {
+        served: d.locale.clone(),
+        exposures: xp.exposures,
+        ..Default::default()
+    };
+    // ponytail: one `record` (3 statements) per counted document; batch per project if experiment traffic grows.
+    tokio::spawn(async move {
+        if let Err(e) = crate::experiments::ingest::record(&state, project, vec![hit]).await {
+            tracing::info!(target: "glot_edge", "experiment exposure failed: {}", e.message);
+        }
+    });
 }
 
 /// Over the plan's `edge_pages` (the origin is served untranslated meanwhile).

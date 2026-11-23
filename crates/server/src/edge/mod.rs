@@ -14,3 +14,4 @@ pub mod slugs;
 pub mod snapshots;
 pub mod tm;
 pub mod website_setup;
+pub mod xp;

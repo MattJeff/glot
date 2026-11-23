@@ -119,6 +119,15 @@ pub async fn experiments(
     headers: HeaderMap,
 ) -> ApiResult<Response> {
     let p = readable(&state, &slug, &headers).await?;
+    let mut config = xp_config(&state, &p).await?;
+    let etag = format!("\"xp-{}\"", glot_core::hash::hash(&config.to_string()));
+    config["generated_at"] =
+        json!(chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
+    Ok(respond(&headers, config.to_string(), etag, p.public_cdn))
+}
+
+/// The experiments config of `p` (without `generated_at`): `experiments.json` and the Edge proxy (`edge::xp`).
+pub(crate) async fn xp_config(state: &AppState, p: &ProjectRow) -> ApiResult<Value> {
     let (holdout_pct, persistence): (i32, String) =
         sqlx::query_as("SELECT xp_holdout_pct, xp_persistence FROM projects WHERE id = $1")
             .bind(p.id)
@@ -143,15 +152,16 @@ pub async fn experiments(
         Vec<Uuid>,
         Vec<String>,
     );
-    let xps: Vec<Row> = sqlx::query_as(
+    let xps: Vec<Row> = sqlx::query_as(&format!(
         "SELECT e.id, e.status, e.traffic_pct, e.goal, e.guardrails, e.metric, e.currency, e.locales, e.cells,
                 array(SELECT key FROM xp_keys WHERE experiment_id = e.id ORDER BY key)
          FROM xp_experiments e
          WHERE e.project_id = $1 AND e.kind = 'copy' AND e.status IN ('running', 'personalized')
-           AND NOT EXISTS (SELECT 1 FROM xp_keys x LEFT JOIN keys k ON k.project_id = e.project_id AND k.key = x.key
-                           WHERE x.experiment_id = e.id AND k.source IS DISTINCT FROM x.source)
+           AND NOT EXISTS (SELECT 1 FROM xp_keys x
+                           WHERE x.experiment_id = e.id AND {} IS DISTINCT FROM x.source)
          ORDER BY e.created_at, e.id",
-    )
+        crate::experiments::XP_SOURCE
+    ))
     .bind(p.id)
     .fetch_all(&state.db)
     .await?;
@@ -244,7 +254,7 @@ pub async fn experiments(
             },
         )
         .collect();
-    let mut config = json!({
+    Ok(json!({
         "v": 1,
         "project": p.slug,
         "max_stale": 86400,
@@ -252,11 +262,7 @@ pub async fn experiments(
         "holdout": holdout.filter(|_| holdout_pct > 0).map(|id| json!({"id": id, "pct": holdout_pct})),
         "segments": segments.into_iter().map(|(id, rule)| json!({"id": id, "rule": rule})).collect::<Vec<_>>(),
         "experiments": experiments,
-    });
-    let etag = format!("\"xp-{}\"", glot_core::hash::hash(&config.to_string()));
-    config["generated_at"] =
-        json!(chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
-    Ok(respond(&headers, config.to_string(), etag, p.public_cdn))
+    }))
 }
 
 /// `GET /cdn/{slug}/locales.json[?min=0.95][&all=1]`: what a language switcher needs — the source and the target

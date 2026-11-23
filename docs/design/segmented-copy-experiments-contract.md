@@ -399,3 +399,17 @@ et `start` refuse une clé live dans `variant_experiments`.
     à ajouter au type `XpConfig` de l'edge) : le runtime observe `[data-glot-key]` / `[data-glot]` de ces clés. Sans `k`,
     pas de « vue » (le mode `render` reste correct).
   - Runtime : si `x-glot-xp.locale` ≠ locale servie, l'assignation n'est ni stockée ni créditée (textes officiels).
+- 2026-11-23 v1.7 — expériences sur segments Edge (proxy glot Edge, bras écrits à la main, aucun appel LLM) :
+  - Clé `edge:<hash>` (`hash` = `text_hash` du texte source du segment, tous contextes) : validée contre
+    `edge_segments` du projet au lieu du catalogue (404 sinon) ; pas de mélange avec des clés catalogue (400).
+    Source figée = `edge_segments.source_text`. Une seule expérience live par clé (même index `xp_keys_live`).
+    Les valeurs d'un bras gardent les balises du segment (`<0>…</0>`). `promote all` refusé (409) : le gagnant
+    s'écrit comme traduction Edge.
+  - Le proxy Edge (`edge/xp.rs`, portage de `decide()` d'`experiments.ts`) ne décide que les expériences dont
+    toutes les clés sont `edge:` et qui couvrent la locale du domaine : bras substitué au segment (page et TM
+    inline), `x-glot-xp` vers l'origine, cookie `glot_xp` (si `persistence = "session"`) avec
+    `Domain=<domaine de l'origine>` quand l'hôte Edge en est un sous-domaine, exposition via `ingest::record`.
+    Bots (`ingest::is_bot`) et GPC/DNT : textes officiels, aucune assignation, rien compté (SEO inchangé). Page
+    décidée ⇒ `Cache-Control: private, no-cache` ; un bras ≠ 0 ne passe jamais par le cache de pages, le cache
+    de traduction est indexé par le bras.
+  - `Hit` gagne `glot_xp?: string` = valeur brute du cookie, ajoutée à `exposures` : conversions côté serveur.

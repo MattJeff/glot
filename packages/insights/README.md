@@ -26,4 +26,13 @@ the fallback for held-out sessions. An explicit choice wins and leaves the measu
 
 Server side (no client JS): `import { reportVisit } from "@glot-i18n/insights/server"`.
 
+Server-side conversions (webhook, API route): forward the visitor's `glot_xp` cookie value as is; the glot Edge proxy
+sets it on your parent domain, so your server receives it. `served` = the locale the visitor browsed, `dedup` = a
+stable id (order id) so a retried webhook counts once:
+
+```sh
+curl -X POST https://glot.example.com/api/insights/pk_… -H 'content-type: application/json' \
+  -d '{"served":"es","event":"signup","glot_xp":"<cookie value>","dedup":"order_123456"}'
+```
+
 MIT — part of [glot](https://github.com/MattJeff/glot).

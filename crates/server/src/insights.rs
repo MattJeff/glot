@@ -85,6 +85,9 @@ pub struct Hit {
     /// Segmented experiments (contract §6): assignments of this document/session, revenue, retry id.
     #[serde(default)]
     exposures: Vec<crate::experiments::Exposure>,
+    /// The visitor's `glot_xp` cookie value, as is (`<id>.<arm>.<cell>~…`): a server posting a conversion
+    /// forwards it instead of parsing it; its assignments are added to `exposures`.
+    glot_xp: Option<String>,
     value: Option<f64>,
     currency: Option<String>,
     dedup: Option<String>,
@@ -261,9 +264,20 @@ pub async fn ingest(
         return Ok(StatusCode::NO_CONTENT.into_response());
     }
     // Any content type: the snippet posts text/plain to avoid a CORS preflight.
-    let hit: Hit = serde_json::from_slice(&body)
+    let mut hit: Hit = serde_json::from_slice(&body)
         .map_err(|e| AppError::bad_request(format!("invalid body: {e}")))?;
     validate_locale(&hit.served)?;
+    let from_cookie = crate::edge::xp::parse_cookie(hit.glot_xp.as_deref().unwrap_or(""));
+    hit.exposures
+        .extend(from_cookie.into_iter().filter_map(|(id, arm, cell)| {
+            Some(crate::experiments::Exposure {
+                id: id.parse().ok()?,
+                cell,
+                arm,
+                seen: false,
+                visible_ms: None,
+            })
+        }));
     let event = match hit.event.as_deref() {
         None => VIEW,
         Some(e) => {
